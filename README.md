@@ -1,5 +1,5 @@
 ---
-title: ffmpeg-autobuild
+title: media-autobuild_suite
 
 description: A Windows automatic build script for ffmpeg and other media tools
 
@@ -11,7 +11,7 @@ modified: 2013-09-28
 
 ---
 
-ffmpeg-autobuild
+media-autobuild_suite
 =========
 
 This tool is inspire by the very nice, linux cross compile, tool from Roger Pack(rdp):
@@ -61,7 +61,7 @@ After building the environment it get and compile all tools.
 
 For using it: 
  - Download the file, and copy it in your target folder. In that folder all compiler and tools get installed. Please look that you use a folder without space characters. A good place is: c:\mingw
- - double click the ffmpeg-autobuild.bat file 
+ - double click the media-autobuild_suite.bat file 
  - select if you want to compile for Windows 32 bit, 64 bit or both
  - select if you want to compile non free tools like "fdk aac"
  - select the numbers of CPU (cores) you want to use
