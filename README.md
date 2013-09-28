@@ -58,7 +58,8 @@ This Windows Batchscript is for setup a compiler environment for building ffmpeg
 After building the environment it get and compile all tools.
 
 For using it: 
- - Download the file, double click the ffmpeg-autobuild.bat file 
+ - Download the file, and copy it in your target folder. In that folder all compiler and tools get installed. Please look that you use a folder without space characters. A good place is: c:\mingw
+ - double click the ffmpeg-autobuild.bat file 
  - select if you want to compile for Windows 32 bit, 64 bit or both
  - select if you want to compile non free tools like "fdk aac"
  - select the numbers of CPU (cores) you want to use
