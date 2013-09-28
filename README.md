@@ -26,7 +26,7 @@ Thanks to both of them!
 Download
 --------
 
-### [Click here to download latest version](https://github.com/jb-alvarado/ffmpeg-autobuild/archive/master.zip)
+### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
 Current release is **v0.5**
 

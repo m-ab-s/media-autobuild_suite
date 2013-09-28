@@ -30,7 +30,7 @@
 
 @echo off
 color 87
-title ffmpeg-autobuild
+title media-autobuild_suite
 
 set instdir=%CD%
 
@@ -695,7 +695,7 @@ if %build32%==yes (
 		echo.- get script for audio coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O ffmpeg-autobuild.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\compile_audiotools.zip -o%instdir% compile_audiotools32.sh
 	
 	:compileAudio32
@@ -717,7 +717,7 @@ if %build64%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackAudio64
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O ffmpeg-autobuild.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackAudio64
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\compile_audiotools.zip -o%instdir% compile_audiotools64.sh
