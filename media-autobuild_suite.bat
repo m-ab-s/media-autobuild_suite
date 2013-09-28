@@ -696,7 +696,7 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\compile_audiotools.zip -o%instdir% compile_audiotools32.sh
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools32.sh
 	
 	:compileAudio32
 		echo -------------------------------------------------------------------------------
@@ -720,7 +720,7 @@ if %build64%==yes (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackAudio64
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\compile_audiotools.zip -o%instdir% compile_audiotools64.sh
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools64.sh
 	
 	:compileAudio64
 	echo -------------------------------------------------------------------------------
