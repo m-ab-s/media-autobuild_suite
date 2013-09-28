@@ -15,9 +15,11 @@ ffmpeg-autobuild
 =========
 
 This tool is inspire by the very nice, linux cross compile, tool from Roger Pack(rdp):
+
 https://github.com/rdp/ffmpeg-windows-build-helpers
 
 I also use some jscipt parts from nu774:
+
 https://github.com/nu774/fdkaac_autobuild
 
 Thanks to both of them!
@@ -73,6 +75,7 @@ References
 --------
 
 http://ingar.satgnu.net/devenv/mingw32/base.html
+
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
 
 
