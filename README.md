@@ -33,11 +33,12 @@ Download
 Current release is **v0.5**
 
 
-Included, External, Tools
+Included Tools
 --------
 
  - bzip2
  - fdkaac
+ - ffmpeg (comming soon)
  - flac
  - gsm
  - lame
@@ -46,8 +47,8 @@ Included, External, Tools
  - speex
  - theora
  - vorbis
- - x264
- - xvid
+ - x264 (comming soon)
+ - xvid  (comming soon)
  - zlib
 
 more will comming... 
