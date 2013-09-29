@@ -78,10 +78,10 @@ echo ---------------------------------------------------------------------------
 set /P nonfree="Binaries:"
 
 if %nonfree%==1 (
-	set "binary=nonfree"
+	set "binary=y"
 	)
 if %nonfree%==2 (
-	set "binary=free"
+	set "binary=n"
 	)
 if %nonfree% GTR 2 GOTO :selectNonFree
 
@@ -430,13 +430,22 @@ if %build32%==yes (
 	
 :checkYasm64	
 if %build64%==yes (
-	if exist %instdir%\mingw64\bin\yasm.exe GOTO compileGlobals32
+	if exist %instdir%\mingw64\bin\yasm.exe GOTO getPr
 	cd %instdir%\build64
 	%instdir%\msys\1.0\bin\wget -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
 	ren yasm-1.2.0-win64.exe yasm.exe
 	copy yasm.exe %instdir%\mingw64\bin
 	del yasm.exe
 	)	
+	
+:getPr	
+if exist %instdir%\msys\1.0\bin\pr.exe GOTO compileGlobals32
+	cd %instdir%\build32
+	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/mingw/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys-1.0.13-ext.tar.lzma"
+	cd %instdir%\msys\1.0\bin
+	%instdir%\opt\bin\7za x %instdir%\build32\coreutils-5.97-3-msys-1.0.13-ext.tar.lzma -aos
+	del %instdir%\build32\coreutils-5.97-3-msys-1.0.13-ext.tar.lzma
+	cd %instdir%
 
 :compileGlobals32
 if %build32%==yes (
@@ -732,11 +741,126 @@ if %build64%==yes (
 	echo. compile audio coders 64 bit done...
 	)	
 
+:: video coders
+if %build32%==yes (
+	if exist %instdir%\compile_videotools32.sh GOTO compileVideo32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- get script for video coders, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackVideo32
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackVideo32
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools32.sh
+	
+		:compileVideo32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile video coders, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount%
+		echo. compile video coders 32 bit done...
+	)
+	
+if %build64%==yes (
+	if exist %instdir%\compile_videotools64.sh GOTO compileVideo64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- get script for video coders, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackVideo64
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackVideo64
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools64.sh
+	
+		:compileVideo64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile video coders, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount%
+		echo. compile video coders 64 bit done...
+	)
+
+:: ffmpeg
+if %build32%==yes (
+	if exist %instdir%\compile_ffmpeg32.sh GOTO compileFFmpeg32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- get script for ffmpeg, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackFFmpeg32
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackFFmpeg32
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg32.sh
+	
+		:compileFFmpeg32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile ffmpeg, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
+		echo. compile ffmpeg 32 bit done...
+	)
+
+if %build64%==yes (
+	if exist %instdir%\compile_ffmpeg64.sh GOTO compileFFmpeg64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- get script for ffmpeg, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackFFmpeg64
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackFFmpeg64
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
+	
+		:compileFFmpeg64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile ffmpeg, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
+		echo. compile ffmpeg 64 bit done...
+	)
+	
 echo -------------------------------------------------------------------------------
 echo.
-echo.- done...
+echo.- striping all bins...
 echo.
 echo -------------------------------------------------------------------------------
 
+if %build32%==yes (
+	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
+		%instdir%\mingw32\bin\strip --strip-all %%C 
+		echo.%%C done...
+		)
+	FOR /R "%instdir%\local32\bin" %%D IN (*.dll) DO (
+		%instdir%\mingw32\bin\strip --strip-all %%D 
+		echo.%%D done...
+		)
+	)
+	
+if %build64%==yes (
+	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
+		%instdir%\mingw64\bin\strip --strip-all %%C 
+		echo.%%C done...
+		)
+	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
+		%instdir%\mingw64\bin\strip --strip-all %%D 
+		echo.%%D done...
+		)
+	)
 
 pause

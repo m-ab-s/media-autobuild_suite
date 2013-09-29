@@ -135,7 +135,7 @@ if [ -f "flac-1.3.0/compile.done" ]; then
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm speex-1.2rc1.tar.gz
+		rm flac-1.3.0.tar.xz
 fi
 
 if [ -f "lame-3.99.5/compile.done" ]; then
