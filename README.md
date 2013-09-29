@@ -38,12 +38,12 @@ Included Tools
 
  - bzip2
  - fdkaac
- - ffmpeg (comming soon)
+ - ffmpeg
  - flac
  - gsm
  - lame
  - ogg
- - sdl (for ffplay)
+ - sdl
  - speex
  - theora
  - vorbis
