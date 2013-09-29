@@ -47,8 +47,8 @@ Included Tools
  - speex
  - theora
  - vorbis
- - x264 (comming soon)
- - xvid (comming soon)
+ - x264
+ - xvid
  - zlib
 
 more will comming... 
