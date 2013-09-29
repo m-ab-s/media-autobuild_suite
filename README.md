@@ -43,11 +43,12 @@ Included Tools
  - gsm
  - lame
  - ogg
- - sdl
+ - sdl (for ffplay)
  - speex
  - theora
  - vorbis
  - x264
+ - x264 10 bit (standalone)
  - xvid
  - zlib
 
