@@ -69,7 +69,8 @@ For using it:
  
  - Wait a little bit, and hopefully after a while you found all your "*.exe" Tools under local32\bin, or local64\bin
 
-For all you need ~1,5 GB disk space
+For all you need ~1,5 GB disk space. 
+The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
 
 Have fun!
 
