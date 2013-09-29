@@ -116,3 +116,80 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 		cd $LOCALBUILDDIR
 		rm libiconv-1.14.tar.gz
 fi
+
+if [ -f "pcre-8.33/compile.done" ]; then
+	echo ----------------------------------
+	echo "pcre-8.33 is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.33.tar.gz
+		tar xf pcre-8.33.tar.gz
+		cd pcre-8.33
+		./configure --build=x86_64-w64-mingw32 --prefix=$LOCALDESTDIR --enable-pcre16 --enable-pcre32 --enable-unicode-properties --enable-newline-is-any --enable-shared=no --enable-static=yes
+		make -j $cpuCount
+		make install
+		echo 'finish' > compile.done
+		cd $LOCALDESTDIR/include
+		cp pcreposix.h regex.h
+		cd $LOCALDESTDIR/lib
+		cp libpcreposix.a libregex.a
+		cp libpcreposix.a libgnurx.a
+		cd $LOCALBUILDDIR
+		rm pcre-8.33.tar.gz
+fi
+
+if [ -f "openssl-1.0.1e/compile.done" ]; then
+	echo ----------------------------------
+	echo "openssl-1.0.1e is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c http://www.openssl.org/source/openssl-1.0.1e.tar.gz
+		tar xf openssl-1.0.1e.tar.gz
+		cd openssl-1.0.1e
+		./Configure --prefix=$LOCALDESTDIR -DHAVE_STRUCT_TIMESPEC -L/local64/lib -lz -lws2_32 no-shared zlib mingw64
+		make -j $cpuCount
+		make test
+		make install
+		echo 'finish' > compile.done
+		cd $LOCALBUILDDIR
+		rm openssl-1.0.1e.tar.gz
+fi
+
+if [ -f "rtmpdump-2.3/compile.done" ]; then
+	echo ----------------------------------
+	echo "rtmpdump-2.3 is already compiled"
+	echo ----------------------------------
+	else 
+	wget --no-check-certificate -c https://github.com/snpn/rtmpdump/archive/master.zip -O rtmpdump-master.zip
+	unzip rtmpdump-master.zip
+	cd rtmpdump-master
+	sed -i 's/LIB_OPENSSL=-lssl -lcrypto $(LIBZ)/LIB_OPENSSL=-lssl -lcrypto $(LIBZ) -L\/local64\/lib/g' Makefile
+	sed -i 's/LIB_OPENSSL=-lssl -lcrypto $(LIBZ)/LIB_OPENSSL=-lssl -lcrypto $(LIBZ) -L\/local64\/lib/g' librtmp/Makefile
+	make SYS=mingw SHARED=no
+	cp -iv *.exe $LOCALDESTDIR/bin
+	mkdir $LOCALDESTDIR/include/librtmp
+	cd librtmp
+	cp -iv amf.h http.h log.h rtmp.h $LOCALDESTDIR/include/librtmp
+	cp -iv librtmp*.a $LOCALDESTDIR/lib
+
+if [ -f "/local64/lib/pkgconfig/librtmp.pc" ]; then
+cat > /local64/lib/pkgconfig/librtmp.pc << "EOF"
+prefix=/local64
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+incdir=${prefix}/include/librtmp
+
+Name: librtmp
+Description: RTMP implementation
+Version: 2.3
+Requires: openssl libcrypto
+URL: http://rtmpdump.mplayerhq.hu
+Libs: -L${libdir} -lrtmp -lz
+Libs.private: -lws2_32 -lwinmm -lgdi32 -lssl -lcrypto
+Cflags: -I${incdir}
+EOF
+fi
+
+cd $LOCALBUILDDIR
+rm rtmpdump-master.zip
+fi
