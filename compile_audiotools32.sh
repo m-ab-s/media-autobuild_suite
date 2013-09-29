@@ -176,7 +176,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		make install
 
 		cp lib-fdk-aac.a $LOCALDESTDIR/lib/lib-fdk-aac.a
-		cp lib-fdk-aac.dll.a $LOCALDESTDIR/lib/lib-fdk-aac.dll.a
+		#cp lib-fdk-aac.dll.a $LOCALDESTDIR/lib/lib-fdk-aac.dll.a
 
 		cd $LOCALBUILDDIR
 		wget --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
@@ -194,7 +194,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		rm patch-fdk-aac.zip
 		rm lib-fdk-aac.zip
 		rm bin-fdk-aac.zip 
-
+		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
 		
 cat > /local32/lib/pkgconfig/fdk-aac.pc << "EOF"
 prefix=/local32

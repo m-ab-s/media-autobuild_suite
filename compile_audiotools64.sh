@@ -5,6 +5,7 @@ cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
+--nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -154,6 +155,7 @@ if [ -f "lame-3.99.5/compile.done" ]; then
 		rm lame-3.99.5.tar.gz
 fi
 
+if [[ $nonfree = "y" ]]; then
 if [ -f "bin-fdk-aac/compile.done" ]; then
 	echo ----------------------------------
 	echo "bin-fdk-aac is already compiled"
@@ -176,7 +178,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		make install
 
 		cp lib-fdk-aac.a $LOCALDESTDIR/lib/lib-fdk-aac.a
-		cp lib-fdk-aac.dll.a $LOCALDESTDIR/lib/lib-fdk-aac.dll.a
+		#cp lib-fdk-aac.dll.a $LOCALDESTDIR/lib/lib-fdk-aac.dll.a
 
 		cd $LOCALBUILDDIR
 		wget --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
@@ -194,7 +196,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		rm patch-fdk-aac.zip
 		rm lib-fdk-aac.zip
 		rm bin-fdk-aac.zip 
-
+		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
 		
 cat > /local64/lib/pkgconfig/fdk-aac.pc << "EOF"
 prefix=/local64
@@ -210,4 +212,5 @@ Libs.private: -lm
 Cflags: -I${includedir}
 
 EOF
+fi
 fi

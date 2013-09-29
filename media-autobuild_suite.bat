@@ -450,189 +450,61 @@ if exist %instdir%\msys\1.0\bin\pr.exe GOTO compileGlobals32
 :compileGlobals32
 if %build32%==yes (
 if exist %instdir%\local32\bin\iconv.exe GOTO compileGlobals64
-
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- download and compile global tools 32 bit
-	echo.
-	echo -------------------------------------------------------------------------------
+	if exist %instdir%\compileGlobals32.sh GOTO compileGobal32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- download global tools, 32 bit
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackglobal32
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackglobal32
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals32.sh
 
 	:: workaround...
+	:compileGobal32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile global tools, 32 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
 	ren %instdir%\bin\msgmerge.exe msgmerge_._exe
-	
-	echo.source /local32/etc/profile.local>>%instdir%\compileGlobals32.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	echo.wget -c http://www.zlib.net/zlib-1.2.8.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.tar xzf zlib-1.2.8.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.cd zlib-1.2.8>>%instdir%\compileGlobals32.sh
-	echo.sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc ^>Makefile.gcc>>%instdir%\compileGlobals32.sh
-	echo.make IMPLIB='libz.dll.a' -fMakefile.gcc>>%instdir%\compileGlobals32.sh
-	echo.install zlib1.dll $LOCALDESTDIR/bin>>%instdir%\compileGlobals32.sh
-	echo.install libz.dll.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals32.sh
-	echo.install libz.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals32.sh
-	echo.install zlib.h $LOCALDESTDIR/include>>%instdir%\compileGlobals32.sh
-	echo.install zconf.h $LOCALDESTDIR/include>>%instdir%\compileGlobals32.sh
-	
-	echo.>>%instdir%\compileGlobals32.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	echo.wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.tar xf bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.cd bzip2-1.0.6>>%instdir%\compileGlobals32.sh
-	echo.make>>%instdir%\compileGlobals32.sh
-	echo.cp bzip2.exe $LOCALDESTDIR/bin/>>%instdir%\compileGlobals32.sh
-	echo.cp bzip2recover.exe $LOCALDESTDIR/bin/>>%instdir%\compileGlobals32.sh
-	echo.cp bzlib.h $LOCALDESTDIR/include/>>%instdir%\compileGlobals32.sh
-	echo.cp libbz2.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals32.sh
-	
-	echo.>>%instdir%\compileGlobals32.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	echo.wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals32.sh
-	echo.tar xf dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals32.sh
-	echo.cd dlfcn-win32-r19>>%instdir%\compileGlobals32.sh
-	echo../configure --prefix=$LOCALDESTDIR --libdir=$LOCALDESTDIR/lib --incdir=$LOCALDESTDIR/include --disable-shared --enable-static>>%instdir%\compileGlobals32.sh
-	echo.make -j %cpuCount%>>%instdir%\compileGlobals32.sh
-	echo.make install>>%instdir%\compileGlobals32.sh
-	
-	echo.>>%instdir%\compileGlobals32.sh
-	
-	::maybe we don't need this...
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	echo.wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.tar xf nasm-2.10.09.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.cd nasm-2.10.09>>%instdir%\compileGlobals32.sh
-	echo../configure --prefix=/mingw32>>%instdir%\compileGlobals32.sh
-	echo.make -j %cpuCount%>>%instdir%\compileGlobals32.sh
-	echo.make install>>%instdir%\compileGlobals32.sh
-	
-	echo.>>%instdir%\compileGlobals32.sh
 
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	echo.wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.tar xf libiconv-1.14.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.cd libiconv-1.14>>%instdir%\compileGlobals32.sh
-	echo../configure --prefix=$LOCALDESTDIR --disable-msgmerge --disable-shared --enable-static=yes>>%instdir%\compileGlobals32.sh
-	echo.make -j %cpuCount%>>%instdir%\compileGlobals32.sh
-	echo.make install>>%instdir%\compileGlobals32.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals32.sh
-	
-	echo.rm zlib-1.2.8.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.rm bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.rm dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals32.sh
-	echo.rm nasm-2.10.09.tar.gz>>%instdir%\compileGlobals32.sh
-	echo.rm libiconv-1.14.tar.gz>>%instdir%\compileGlobals32.sh
-	
-	%instdir%\msys\1.0\bin\sh -l %instdir%\compileGlobals32.sh
-	
-	if not exist %instdir%\local32\lib\pkgconfig\zlib.pc (
-		echo.prefix=/local32>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.exec_prefix=/local32>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.libdir=/local32/lib>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.sharedlibdir=/local32/lib>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.includedir=/local32/include>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Name: zlib>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Description: zlib compression library>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Version: 1.2.8>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Requires:>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Libs: -L${libdir} -L${sharedlibdir} -lz>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		echo.Cflags: -I${includedir}>>%instdir%\local32\lib\pkgconfig\zlib.pc
-		)
+	%instdir%\mintty.lnk %instdir%\compileGlobals32.sh --cpuCount=%cpuCount%
 		
 	ren %instdir%\bin\msgmerge_._exe msgmerge.exe	
-	del %instdir%\compileGlobals32.sh
 	)
 
 :compileGlobals64
 if %build64%==yes (
 if exist %instdir%\local64\bin\iconv.exe GOTO getMintty
+	if exist %instdir%\compileGlobals32.sh GOTO compileGobal64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- download global tools, 64 bit
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackglobal64
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackglobal64
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals64.sh
 
+	:: workaround...
+	:compileGobal64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- download and compile global tools 64 bit
+	echo.- compile global tools, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	
-	:: maybe we build this later self, when we have a solution for gettext
-	cd %instdir%\build64
-	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/ray_linn/64bit-libraries/libiconv/libiconv-1.14.7z"
-	%instdir%\opt\bin\7za x %instdir%\build64\libiconv-1.14.7z
-	move %instdir%\build64\libiconv-1.14\bin\* %instdir%\local64\bin
-	move %instdir%\build64\libiconv-1.14\include\* %instdir%\local64\include
-	move %instdir%\build64\libiconv-1.14\lib\* %instdir%\local64\lib
-	xcopy %instdir%\build64\libiconv-1.14\share\* %instdir%\local64\share /s
+	ren %instdir%\bin\msgmerge.exe msgmerge_._exe
+	ren %instdir%\bin\xgettext.exe xgettext_._exe
 
-	del %instdir%\build64\libiconv-1.14.7z
-	cd %instdir%
+	%instdir%\mintty.lnk %instdir%\compileGlobals64.sh --cpuCount=%cpuCount%
 	
-	echo.source /local64/etc/profile.local>>%instdir%\compileGlobals64.sh
-	
-	echo.make install>>%instdir%\compileGlobals64.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals64.sh
-	echo.wget -c http://www.zlib.net/zlib-1.2.8.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.tar xzf zlib-1.2.8.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.cd zlib-1.2.8>>%instdir%\compileGlobals64.sh
-	echo.sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc ^>Makefile.gcc>>%instdir%\compileGlobals64.sh
-	echo.make IMPLIB='libz.dll.a' -fMakefile.gcc>>%instdir%\compileGlobals64.sh
-	echo.install zlib1.dll $LOCALDESTDIR/bin>>%instdir%\compileGlobals64.sh
-	echo.install libz.dll.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals64.sh
-	echo.install libz.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals64.sh
-	echo.install zlib.h $LOCALDESTDIR/include>>%instdir%\compileGlobals64.sh
-	echo.install zconf.h $LOCALDESTDIR/include>>%instdir%\compileGlobals64.sh
-	
-	echo.>>%instdir%\compileGlobals64.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals64.sh
-	echo.wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.tar xf bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.cd bzip2-1.0.6>>%instdir%\compileGlobals64.sh
-	echo.make>>%instdir%\compileGlobals64.sh
-	echo.cp bzip2.exe $LOCALDESTDIR/bin/>>%instdir%\compileGlobals64.sh
-	echo.cp bzip2recover.exe $LOCALDESTDIR/bin/>>%instdir%\compileGlobals64.sh
-	echo.cp bzlib.h $LOCALDESTDIR/include/>>%instdir%\compileGlobals64.sh
-	echo.cp libbz2.a $LOCALDESTDIR/lib>>%instdir%\compileGlobals64.sh
-	
-	echo.>>%instdir%\compileGlobals64.sh
-	
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals64.sh
-	echo.wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals64.sh
-	echo.tar xf dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals64.sh
-	echo.cd dlfcn-win32-r19>>%instdir%\compileGlobals64.sh
-	echo../configure --prefix=$LOCALDESTDIR --libdir=$LOCALDESTDIR/lib --incdir=$LOCALDESTDIR/include --disable-shared --enable-static>>%instdir%\compileGlobals64.sh
-	echo.make -j %cpuCount%>>%instdir%\compileGlobals64.sh
-	echo.make install>>%instdir%\compileGlobals64.sh
-	
-	echo.>>%instdir%\compileGlobals64.sh	
-
-	echo.cd $LOCALBUILDDIR>>%instdir%\compileGlobals64.sh
-	
-	echo.rm zlib-1.2.8.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.rm bzip2-1.0.6.tar.gz>>%instdir%\compileGlobals64.sh
-	echo.rm dlfcn-win32-r19.tar.bz2>>%instdir%\compileGlobals64.sh
-
-	call %instdir%\msys\1.0\bin\sh -l %instdir%\compileGlobals64.sh
-	
-	if not exist %instdir%\local64\lib\pkgconfig\zlib.pc (
-		echo.prefix=/local64>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.exec_prefix=/local64>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.libdir=/local64/lib>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.sharedlibdir=/local64/lib>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.includedir=/local64/include>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Name: zlib>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Description: zlib compression library>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Version: 1.2.8>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Requires:>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Libs: -L${libdir} -L${sharedlibdir} -lz>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		echo.Cflags: -I${includedir}>>%instdir%\local64\lib\pkgconfig\zlib.pc
-		)
-	del %instdir%\compileGlobals64.sh
+	ren %instdir%\bin\msgmerge_._exe msgmerge.exe
+	ren %instdir%\bin\xgettext_._exe xgettext.exe
 	)
 	
 :getMintty
@@ -713,7 +585,7 @@ if %build32%==yes (
 		echo.- compile audio coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount%
+		%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
 		echo. compile audio coders 32 bit done...
 	)
 	
@@ -737,7 +609,7 @@ if %build64%==yes (
 	echo.- compile audio coders, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_audiotools64.sh --cpuCount=%cpuCount%
+	%instdir%\mintty.lnk %instdir%\compile_audiotools64.sh --cpuCount=%cpuCount% --nonfree=%binary%
 	echo. compile audio coders 64 bit done...
 	)	
 
@@ -837,7 +709,7 @@ if %build64%==yes (
 	
 echo -------------------------------------------------------------------------------
 echo.
-echo.- compiling...
+echo. compiling done...
 echo.
 echo -------------------------------------------------------------------------------
 
