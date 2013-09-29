@@ -58,7 +58,7 @@ more will comming...
 
 
 This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
-After building the environment it get and compile all tools.
+After building the environment it get and compile all tools. All tools get static compiled, no external .dlls needed.
 
 For using it: 
  - Download the file, and copy it in your target folder. In that folder all compiler and tools get installed. Please look that you use a folder without space characters. A good place is: c:\mingw

@@ -197,6 +197,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		rm lib-fdk-aac.zip
 		rm bin-fdk-aac.zip 
 		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
+		rm $LOCALDESTDIR/lib/libfdk-aac.dll.a
 		
 cat > /local64/lib/pkgconfig/fdk-aac.pc << "EOF"
 prefix=/local64

@@ -5,6 +5,7 @@ cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
+--nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -154,6 +155,7 @@ if [ -f "lame-3.99.5/compile.done" ]; then
 		rm lame-3.99.5.tar.gz
 fi
 
+if [[ $nonfree = "y" ]]; then
 if [ -f "bin-fdk-aac/compile.done" ]; then
 	echo ----------------------------------
 	echo "bin-fdk-aac is already compiled"
@@ -195,6 +197,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 		rm lib-fdk-aac.zip
 		rm bin-fdk-aac.zip 
 		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
+		rm $LOCALDESTDIR/lib/libfdk-aac.dll.a
 		
 cat > /local32/lib/pkgconfig/fdk-aac.pc << "EOF"
 prefix=/local32
@@ -210,4 +213,5 @@ Libs.private: -lm
 Cflags: -I${includedir}
 
 EOF
+fi
 fi
