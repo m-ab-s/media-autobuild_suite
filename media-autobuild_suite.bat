@@ -24,9 +24,9 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-09-30
+::  This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-09-29
 ::	2013-09-29 add ffmpeg, rtmp and other tools
-::	reorder code and add mp4box
+::	2013-09-30 reorder code and some small things
 ::
 ::-------------------------------------------------------------------------------------
 

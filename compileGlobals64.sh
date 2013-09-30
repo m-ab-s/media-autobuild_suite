@@ -101,6 +101,22 @@ if [ -f "nasm-2.10.09/compile.done" ]; then
 		rm nasm-2.10.09.tar.gz
 fi		
 
+if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
+	echo ----------------------------------
+	echo "pkg-config-lite-0.28-1 is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
+		tar xf pkg-config-lite-0.28-1.tar.gz
+		cd pkg-config-lite-0.28-1
+		./configure --host=x86_64-pc-mingw32 --prefix=/mingw64 --enable-shared=no --with-pc-path="/local64/lib/pkgconfig"
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm pkg-config-lite-0.28-1.tar.gz
+fi	
+
 if [ -f "libiconv-1.14/compile.done" ]; then
 	echo ----------------------------------
 	echo "libiconv-1.14 is already compiled"
@@ -184,8 +200,8 @@ Description: RTMP implementation
 Version: 2.4
 Requires: openssl libcrypto
 
-Libs: -L${libdir} -lrtmp -lz
-Libs.private: -lws2_32 -lwinmm -lgdi32 -lssl -lcrypto
+Libs: -L${libdir} -lrtmp -lwinmm -lz
+Libs.private: -lws2_32 -lgdi32 -lssl -lcrypto
 Cflags: -I${incdir}
 EOF
 fi
