@@ -1,7 +1,7 @@
 ::-------------------------------------------------------------------------------------
 :: LICENSE -------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
-::	   This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
+::	This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
 ::
 ::    Copyright (C) 2013  jb_alvarado
 ::
@@ -24,7 +24,9 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::   This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-04-26
+::  This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-09-30
+::	2013-09-29 add ffmpeg, rtmp and other tools
+::	reorder code and add mp4box
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -509,8 +511,9 @@ if exist %instdir%\msys\1.0\bin\pr.exe GOTO compileGlobals32
 	cd %instdir%
 
 :compileGlobals32
+:: no existing check here, because it is more easy to extend the global tools. 
+:: existing check in compileGlobals32.sh/compileGlobals64.sh
 if %build32%==yes (
-if exist %instdir%\local32\bin\iconv.exe GOTO compileGlobals64
 	if exist %instdir%\compileGlobals32.sh GOTO compileGobal32
 		echo -------------------------------------------------------------------------------
 		echo.
@@ -537,9 +540,8 @@ if exist %instdir%\local32\bin\iconv.exe GOTO compileGlobals64
 	ren %instdir%\bin\msgmerge_._exe msgmerge.exe	
 	)
 
-:compileGlobals64
+::compileGlobals64
 if %build64%==yes (
-if exist %instdir%\local64\bin\iconv.exe GOTO getAudio32
 	if exist %instdir%\compileGlobals32.sh GOTO compileGobal64
 		echo -------------------------------------------------------------------------------
 		echo.
@@ -568,6 +570,7 @@ if exist %instdir%\local64\bin\iconv.exe GOTO getAudio32
 	ren %instdir%\bin\xgettext_._exe xgettext.exe
 	)
 
+:: audio coders
 :getAudio32
 if %build32%==yes (
 	if exist %instdir%\compile_audiotools32.sh GOTO compileAudio32
@@ -576,10 +579,13 @@ if %build32%==yes (
 		echo.- get script for audio coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools32.sh
+		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackAudio32
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		
+			:unpackAudio32
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools32.sh
 	
-	:compileAudio32
+		:compileAudio32
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- compile audio coders, 32 bit:
@@ -713,4 +719,17 @@ echo. compiling done...
 echo.
 echo -------------------------------------------------------------------------------
 
-pause
+ping 127.0.0.0 -n 3 >nul
+echo.
+echo Window close in 15
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
+echo Window close in 10
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
+echo Window close in 5
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
