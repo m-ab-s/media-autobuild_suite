@@ -18,9 +18,9 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 	echo ----------------------------------
 	else 
 		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
-		tar xzf zlib-1.2.8.tar.gz
+		tar xf zlib-1.2.8.tar.gz
 		cd zlib-1.2.8
-		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc ^>Makefile.gcc
+		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
 		install libz.a $LOCALDESTDIR/lib
 		install zlib.h $LOCALDESTDIR/include
