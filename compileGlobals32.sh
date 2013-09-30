@@ -168,7 +168,7 @@ if [ -f "rtmpdump-2.3/compile.done" ]; then
 	cp -iv amf.h http.h log.h rtmp.h $LOCALDESTDIR/include/librtmp
 	cp -iv librtmp*.a $LOCALDESTDIR/lib
 
-if [ -f "/local32/lib/pkgconfig/librtmp.pc" ]; then
+if [ -n "/local32/lib/pkgconfig/librtmp.pc" ]; then
 cat > /local32/lib/pkgconfig/librtmp.pc << "EOF"
 prefix=/local32
 exec_prefix=${prefix}
@@ -177,9 +177,9 @@ incdir=${prefix}/include/librtmp
 
 Name: librtmp
 Description: RTMP implementation
-Version: 2.3
+Version: 2.4
 Requires: openssl libcrypto
-URL: http://rtmpdump.mplayerhq.hu
+
 Libs: -L${libdir} -lrtmp -lz
 Libs.private: -lws2_32 -lwinmm -lgdi32 -lssl -lcrypto
 Cflags: -I${incdir}
