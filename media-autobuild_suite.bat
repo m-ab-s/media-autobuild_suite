@@ -430,13 +430,74 @@ if %build32%==yes (
 	
 :checkYasm64	
 if %build64%==yes (
-	if exist %instdir%\mingw64\bin\yasm.exe GOTO getPr
+	if exist %instdir%\mingw64\bin\yasm.exe GOTO getMintty
 	cd %instdir%\build64
 	%instdir%\msys\1.0\bin\wget -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
 	ren yasm-1.2.0-win64.exe yasm.exe
 	copy yasm.exe %instdir%\mingw64\bin
 	del yasm.exe
 	)	
+
+:getMintty
+if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- download and install mintty (a nice shell console tool):
+	echo. (it is recommended to don't use the windows cmd, it is not stable)
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\msys\1.0\bin\wget --no-check-certificate -c https://mintty.googlecode.com/files/mintty-1.1.3-msys.zip
+	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\bin mintty.exe
+	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\share\doc readme-msys.html
+	
+	for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
+	
+	echo.Set Shell = CreateObject^("WScript.Shell"^)>>%instdir%\setlink.vbs
+	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
+	echo.link.Arguments = "/bin/sh -l" >>%instdir%\setlink.vbs
+	echo.link.Description = "msys shell console">>%instdir%\setlink.vbs
+	echo.link.TargetPath = "%instdir%\msys\1.0\bin\mintty.exe">>%instdir%\setlink.vbs
+	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
+	echo.link.WorkingDirectory = "%instdir%\msys\1.0\bin">>%instdir%\setlink.vbs
+	echo.link.Save>>%instdir%\setlink.vbs
+
+	cscript /nologo %instdir%\setlink.vbs 
+	del %instdir%\mintty-1.1.3-msys.zip 
+	del %instdir%\setlink.vbs 
+	
+::mintty seetings, color, transparency, etc.
+:minttySettings
+if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO getPr
+	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Transparency=medium>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.FontHeight=^9>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.FontSmoothing=full>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.AllowBlinking=yes>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Font=DejaVu Sans Mono>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Columns=90>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Rows=30>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Locale=de_DE>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Charset=ISO-8859-1>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Term=xterm-256color>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.CursorType=block>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Black=38,39,41>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Red=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Green=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Yellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Blue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Magenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Cyan=94,113,117>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.White=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldBlack=85,68,68>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldRed=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldGreen=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldYellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldBlue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldMagenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldCyan=163,186,191>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldWhite=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	
 :getPr	
 if exist %instdir%\msys\1.0\bin\pr.exe GOTO compileGlobals32
@@ -478,7 +539,7 @@ if exist %instdir%\local32\bin\iconv.exe GOTO compileGlobals64
 
 :compileGlobals64
 if %build64%==yes (
-if exist %instdir%\local64\bin\iconv.exe GOTO getMintty
+if exist %instdir%\local64\bin\iconv.exe GOTO getAudio32
 	if exist %instdir%\compileGlobals32.sh GOTO compileGobal64
 		echo -------------------------------------------------------------------------------
 		echo.
@@ -506,67 +567,6 @@ if exist %instdir%\local64\bin\iconv.exe GOTO getMintty
 	ren %instdir%\bin\msgmerge_._exe msgmerge.exe
 	ren %instdir%\bin\xgettext_._exe xgettext.exe
 	)
-	
-:getMintty
-if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- download and install mintty (a nice shell console tool):
-	echo. (it is recommended to don't use the windows cmd, it is not stable)
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\msys\1.0\bin\wget --no-check-certificate -c https://mintty.googlecode.com/files/mintty-1.1.3-msys.zip
-	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\bin mintty.exe
-	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\share\doc readme-msys.html
-	
-	for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
-	
-	echo.Set Shell = CreateObject^("WScript.Shell"^)>>%instdir%\setlink.vbs
-	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
-	echo.link.Arguments = "/bin/sh -l" >>%instdir%\setlink.vbs
-	echo.link.Description = "msys shell console">>%instdir%\setlink.vbs
-	echo.link.TargetPath = "%instdir%\msys\1.0\bin\mintty.exe">>%instdir%\setlink.vbs
-	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
-	echo.link.WorkingDirectory = "%instdir%\msys\1.0\bin">>%instdir%\setlink.vbs
-	echo.link.Save>>%instdir%\setlink.vbs
-
-	cscript /nologo %instdir%\setlink.vbs 
-	del %instdir%\mintty-1.1.3-msys.zip 
-	del %instdir%\setlink.vbs 
-	
-::mintty seetings, color, transparency, etc.
-:minttySettings
-if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO getAudio32
-	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Transparency=medium>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.FontHeight=^9>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.FontSmoothing=full>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.AllowBlinking=yes>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Font=DejaVu Sans Mono>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Columns=90>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Rows=30>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Locale=de_DE>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Charset=ISO-8859-1>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Term=xterm-256color>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.CursorType=block>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Black=38,39,41>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Red=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Green=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Yellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Blue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Magenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Cyan=94,113,117>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.White=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldBlack=85,68,68>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldRed=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldGreen=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldYellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldBlue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldMagenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldCyan=163,186,191>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.BoldWhite=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 
 :getAudio32
 if %build32%==yes (
