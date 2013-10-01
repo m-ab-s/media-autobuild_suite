@@ -77,7 +77,7 @@ if [ -f "xvidcore/compile.done" ]; then
 		fi
 fi
 
-if [[ $mp4box = "y" ]]; the
+if [[ $mp4box = "y" ]]; then
 	if [ -f "mp4box_gpac/compile.done" ]; then
 		echo ----------------------------------
 		echo "mp4box_gpac is already compiled"

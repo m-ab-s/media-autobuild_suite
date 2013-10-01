@@ -25,12 +25,14 @@ echo
 echo "compile ffmpeg 64 bit"
 echo 
 echo "-------------------------------------------------------------------------------"
+
+cd $LOCALBUILDDIR
+
 if [ -f "ffmpeg-2.0.1/compile.done" ]; then
 	echo ----------------------------------
 	echo "ffmpeg-2.0.1 is already compiled"
 	echo ----------------------------------
 	else 
-		cd $LOCALBUILDDIR
 		#if [ -f "ffmpeg-git/configure" ]; then
 		#	cd ffmpeg-git
 		#   echo " updating ffmpeg"

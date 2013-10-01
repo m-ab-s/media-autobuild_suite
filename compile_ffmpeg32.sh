@@ -25,12 +25,14 @@ echo
 echo "compile ffmpeg 32 bit"
 echo 
 echo "-------------------------------------------------------------------------------"
+
+cd $LOCALBUILDDIR
+
 if [ -f "ffmpeg-2.0.1/compile.done" ]; then
 	echo ----------------------------------
 	echo "ffmpeg-2.0.1 is already compiled"
 	echo ----------------------------------
 	else 
-		cd $LOCALBUILDDIR
 #cd $LOCALBUILDDIR
 #if [ -f "ffmpeg-git/configure" ]; then
 #	cd ffmpeg-git
@@ -43,7 +45,7 @@ if [ -f "ffmpeg-2.0.1/compile.done" ]; then
 		wget -c http://ffmpeg.org/releases/ffmpeg-2.0.1.tar.gz
 		tar xf ffmpeg-2.0.1.tar.gz
 		cd ffmpeg-2.0.1
-		./configure --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --disable-debug $extras
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth --enable-libgsm --enable-libmp3lame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid --disable-debug $extras
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
