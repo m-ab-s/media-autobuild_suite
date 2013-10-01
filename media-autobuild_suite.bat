@@ -469,7 +469,7 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	echo. (it is recommended to don't use the windows cmd, it is not stable)
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\msys\1.0\bin\wget --no-check-certificate -c https://mintty.googlecode.com/files/mintty-1.1.3-msys.zip
+	%instdir%\msys\1.0\bin\wget -c http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mintty-1.1.3-msys.zip
 	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\bin mintty.exe
 	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\share\doc readme-msys.html
 	
