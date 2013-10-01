@@ -460,7 +460,7 @@ if %build64%==yes (
 	copy yasm.exe %instdir%\mingw64\bin
 	del yasm.exe
 	)	
-
+cd %instdir%
 :getMintty
 if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	echo -------------------------------------------------------------------------------
