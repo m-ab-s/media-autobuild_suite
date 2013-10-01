@@ -43,6 +43,7 @@ Included Tools
  - gsm
  - lame (standalone and lib for ffmpeg)
  - ogg
+ - mp4box (standalone)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
