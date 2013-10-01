@@ -109,13 +109,78 @@ if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
 		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
-		./configure --host=x86_64-pc-mingw32 --prefix=/mingw64 --enable-shared=no --with-pc-path="/local64/lib/pkgconfig"
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --with-pc-path="/local64/lib/pkgconfig"
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm pkg-config-lite-0.28-1.tar.gz
+
+cat >  ${LOCALDESTDIR}/bin/pkg-config.sh << "EOF"
+#!/bin/sh
+if pkg-config "$@" > /dev/null 2>&1 ; then
+res=true
+else
+res=false
+fi
+pkg-config "$@" | tr -d \\r && $res
+
+EOF
+
+chmod ugo+x ${LOCALDESTDIR}/bin/pkg-config.sh
+echo "PKG_CONFIG=${LOCALDESTDIR}/bin/pkg-config.sh" >> ${LOCALDESTDIR}/etc/profile.local
+echo "export PKG_CONFIG" >> ${LOCALDESTDIR}/etc/profile.local
+source ${LOCALDESTDIR}/etc/profile.local
 fi	
+
+if [ -f "libpng-1.6.6/compile.done" ]; then
+	echo ----------------------------------
+	echo "libpng-1.6.6 is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.6/libpng-1.6.6.tar.gz"
+		tar xf libpng-1.6.6.tar.gz
+		cd libpng-1.6.6
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm libpng-1.6.6.tar.gz
+fi
+
+if [ -f "freetype-2.5.0.1/compile.done" ]; then
+	echo ----------------------------------
+	echo "freetype-2.5.0.1 is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
+		tar xf freetype-2.5.0.1.tar.gz
+		cd freetype-2.5.0.1
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm freetype-2.5.0.1.tar.gz
+fi
+
+if [ -f "dx7headers/compile.done" ]; then
+	echo ----------------------------------
+	echo "dx7headers is already compiled"
+	echo ----------------------------------
+	else 
+		wget -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
+		mkdir dx7headers
+		cd dx7headers
+		/opt/bin/7za x ../dx7headers.tgz
+		/opt/bin/7za x dx7headers.tar
+		cd $LOCALBUILDDIR
+		cp dx7headers/* $LOCALDESTDIR/include
+		echo "finish" > dx7headers/compile.done
+		rm dx7headers.tgz
+		rm dx7headers/dx7headers.tar
+fi
 
 if [ -f "libiconv-1.14/compile.done" ]; then
 	echo ----------------------------------
@@ -171,9 +236,9 @@ if [ -f "openssl-1.0.1e/compile.done" ]; then
 		rm openssl-1.0.1e.tar.gz
 fi
 
-if [ -f "rtmpdump-2.3/compile.done" ]; then
+if [ -f "rtmpdump-master/compile.done" ]; then
 	echo ----------------------------------
-	echo "rtmpdump-2.3 is already compiled"
+	echo "rtmpdump is already compiled"
 	echo ----------------------------------
 	else 
 	wget --no-check-certificate -c https://github.com/snpn/rtmpdump/archive/master.zip -O rtmpdump-master.zip
@@ -184,6 +249,7 @@ if [ -f "rtmpdump-2.3/compile.done" ]; then
 	make SYS=mingw SHARED=no
 	cp -iv *.exe $LOCALDESTDIR/bin
 	mkdir $LOCALDESTDIR/include/librtmp
+	echo 'finish' > compile.done
 	cd librtmp
 	cp -iv amf.h http.h log.h rtmp.h $LOCALDESTDIR/include/librtmp
 	cp -iv librtmp*.a $LOCALDESTDIR/lib

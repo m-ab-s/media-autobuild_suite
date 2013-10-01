@@ -29,22 +29,6 @@ if [ -f "jpeg-9/compile.done" ]; then
 		rm jpegsrc.v9.tar.gz
 fi
 
-if [ -f "libpng-1.6.6/compile.done" ]; then
-	echo ----------------------------------
-	echo "libpng-1.6.6 is already compiled"
-	echo ----------------------------------
-	else 
-		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.6/libpng-1.6.6.tar.gz"
-		tar xf libpng-1.6.6.tar.gz
-		cd libpng-1.6.6
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libpng-1.6.6.tar.gz
-fi
-
 if [ -f "a52dec-0.7.4/compile.done" ]; then
 	echo ----------------------------------
 	echo "a52dec-0.7.4 is already compiled"

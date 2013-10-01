@@ -24,9 +24,10 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-09-29
+::  This is version 0.5 from 2013-09-24. Last bigger modification was on 2013-10-01
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
+::  2013-10-01 change pkg-config, add mp4box, and reorder code
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -85,7 +86,27 @@ if %nonfree%==1 (
 if %nonfree%==2 (
 	set "binary=n"
 	)
-if %nonfree% GTR 2 GOTO :selectNonFree
+if %nonfree% GTR 2 GOTO selectNonFree
+
+:mp4boxStatic
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+echo.
+echo. Build static mp4box binary:
+echo. 1 = yes
+echo. 2 = no
+echo.
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+set /P buildMp4box="build mp4box:"
+
+if %buildMp4box%==1 (
+	set "mp4box=y"
+	)
+if %buildMp4box%==2 (
+	set "mp4box=n"
+	)
+if %buildMp4box% GTR 2 GOTO mp4boxStatic
 
 :numCores
 echo -------------------------------------------------------------------------------
@@ -639,7 +660,7 @@ if %build32%==yes (
 		echo.- compile video coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount%
+		%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
 		echo. compile video coders 32 bit done...
 	)
 	
@@ -662,7 +683,7 @@ if %build64%==yes (
 		echo.- compile video coders, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount%
+		%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
 		echo. compile video coders 64 bit done...
 	)
 
