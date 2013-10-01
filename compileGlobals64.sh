@@ -229,7 +229,7 @@ if [ -f "openssl-1.0.1e/compile.done" ]; then
 		cd openssl-1.0.1e
 		./Configure --prefix=$LOCALDESTDIR -DHAVE_STRUCT_TIMESPEC -L/local64/lib -lz -lws2_32 no-shared zlib mingw64
 		make -j $cpuCount
-		make test
+		#make test #do we need a test?
 		make install
 		echo 'finish' > compile.done
 		cd $LOCALBUILDDIR
