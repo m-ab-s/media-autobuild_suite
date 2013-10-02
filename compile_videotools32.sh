@@ -21,9 +21,9 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "x264-git/compile8.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "x264 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		if [ -f "x264-git/configure" ]; then
 			cd x264-git
@@ -41,9 +41,9 @@ if [ -f "x264-git/compile8.done" ]; then
 fi
 
 if [ -f "x264-git/compile10.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "x264-10bit is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 	./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread --bit-depth=10
 	make -j $cpuCount
@@ -56,9 +56,9 @@ fi
 cd $LOCALBUILDDIR
 
 if [ -f "xvidcore/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "xvidcore is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
@@ -78,9 +78,9 @@ fi
 
 if [[ $mp4box = "y" ]]; then
 	if [ -f "mp4box_gpac/compile.done" ]; then
-		echo ----------------------------------
+		echo -------------------------------------------------
 		echo "mp4box_gpac is already compiled"
-		echo ----------------------------------
+		echo -------------------------------------------------
 		else 
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
@@ -98,3 +98,5 @@ if [[ $mp4box = "y" ]]; then
 			echo "mp4box done..."
 	fi
 fi
+
+sleep 2

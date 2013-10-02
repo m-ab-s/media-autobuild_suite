@@ -541,7 +541,7 @@ if %build32%==yes (
 		echo.- download global tools, 32 bit
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackglobal32
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal32
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackglobal32
@@ -569,7 +569,7 @@ if %build64%==yes (
 		echo.- download global tools, 64 bit
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackglobal64
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal64
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackglobal64
@@ -600,20 +600,20 @@ if %build32%==yes (
 		echo.- get script for audio coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackAudio32
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio32
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		
 			:unpackAudio32
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools32.sh
 	
-		:compileAudio32
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile audio coders, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-		echo. compile audio coders 32 bit done...
+	:compileAudio32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile audio coders, 32 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
+	echo. compile audio coders 32 bit done...
 	)
 	
 :getAudio64
@@ -624,7 +624,7 @@ if %build64%==yes (
 		echo.- get script for audio coders, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackAudio64
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio64
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackAudio64
@@ -642,96 +642,93 @@ if %build64%==yes (
 
 :: video coders
 if %build32%==yes (
-	if exist %instdir%\compile_videotools32.sh GOTO compileVideo32
+	if not exist %instdir%\compile_videotools32.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- get script for video coders, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackVideo32
+		if not exist %instdir%\media-autobuild_suite.zip (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			
-			:unpackVideo32
+			)
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools32.sh
-	
-		:compileVideo32
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile video coders, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
-		echo. compile video coders 32 bit done...
+		)
+
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile video coders, 32 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
+	echo. compile video coders 32 bit done...
 	)
-	
+
 if %build64%==yes (
-	if exist %instdir%\compile_videotools64.sh GOTO compileVideo64
+	if not exist %instdir%\compile_videotools64.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- get script for video coders, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackVideo64
+		if not exist %instdir%\media-autobuild_suite.zip (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			
-			:unpackVideo64
+			)
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools64.sh
+		)	
 	
-		:compileVideo64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile video coders, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
-		echo. compile video coders 64 bit done...
+	:compileVideo64
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile video coders, 64 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
+	echo. compile video coders 64 bit done...
 	)
 
 :: ffmpeg
 if %build32%==yes (
-	if exist %instdir%\compile_ffmpeg32.sh GOTO compileFFmpeg32
+	if not exist %instdir%\compile_ffmpeg32.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- get script for ffmpeg, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackFFmpeg32
+		if not exist %instdir%\media-autobuild_suite.zip (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			
-			:unpackFFmpeg32
+			)
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg32.sh
-	
-		:compileFFmpeg32
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile ffmpeg, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-		echo. compile ffmpeg 32 bit done...
+		)
+
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile ffmpeg, 32 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
+	echo. compile ffmpeg 32 bit done...
 	)
 
 if %build64%==yes (
-	if exist %instdir%\compile_ffmpeg64.sh GOTO compileFFmpeg64
+	if not exist %instdir%\compile_ffmpeg64.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- get script for ffmpeg, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		if exist %instdir%\ffmpeg-autobuild.zip GOTO unpackFFmpeg64
+		if not exist %instdir%\media-autobuild_suite.zip (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			
-			:unpackFFmpeg64
+			)
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
-	
-		:compileFFmpeg64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile ffmpeg, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-		echo. compile ffmpeg 64 bit done...
+		)
+	:compileFFmpeg64
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile ffmpeg, 64 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
+	echo. compile ffmpeg 64 bit done...
 	)
 	
 echo -------------------------------------------------------------------------------

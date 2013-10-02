@@ -14,9 +14,9 @@ done
 cd $LOCALBUILDDIR
 
 if [ -f "jpeg-9/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "jpeg-9 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "http://www.ijg.org/files/jpegsrc.v9.tar.gz"
 		tar xf jpegsrc.v9.tar.gz
@@ -30,9 +30,9 @@ if [ -f "jpeg-9/compile.done" ]; then
 fi
 
 if [ -f "a52dec-0.7.4/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "a52dec-0.7.4 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
 		tar xf a52dec-0.7.4.tar.gz
@@ -46,9 +46,9 @@ if [ -f "a52dec-0.7.4/compile.done" ]; then
 fi
 
 if [ -f "libmad-0.15.1b/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libmad-0.15.1b is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 		tar xf libmad-0.15.1b.tar.gz

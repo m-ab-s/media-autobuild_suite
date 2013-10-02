@@ -13,9 +13,9 @@ done
 	
 cd $LOCALBUILDDIR
 if [ -f "zlib-1.2.8/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "zlib-1.2.8 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
 		tar xf zlib-1.2.8.tar.gz
@@ -47,9 +47,9 @@ EOF
 fi	
 
 if [ -f "bzip2-1.0.6/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "bzip2-1.0.6 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 		tar xf bzip2-1.0.6.tar.gz
@@ -65,9 +65,9 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 fi	
 	
 if [ -f "dlfcn-win32-r19/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "dlfcn-win32-r19 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
 		tar xf dlfcn-win32-r19.tar.bz2
@@ -82,9 +82,9 @@ fi
 
 #maybe we don't need this...
 if [ -f "nasm-2.10.09/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "nasm-2.10.09 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
 		tar xf nasm-2.10.09.tar.gz
@@ -98,9 +98,9 @@ if [ -f "nasm-2.10.09/compile.done" ]; then
 fi	
 
 if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "pkg-config-lite-0.28-1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
@@ -130,9 +130,9 @@ source ${LOCALDESTDIR}/etc/profile.local
 fi	
 
 if [ -f "libpng-1.6.6/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libpng-1.6.6 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.6/libpng-1.6.6.tar.gz"
 		tar xf libpng-1.6.6.tar.gz
@@ -146,9 +146,9 @@ if [ -f "libpng-1.6.6/compile.done" ]; then
 fi
 
 if [ -f "freetype-2.5.0.1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "freetype-2.5.0.1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
 		tar xf freetype-2.5.0.1.tar.gz
@@ -162,9 +162,9 @@ if [ -f "freetype-2.5.0.1/compile.done" ]; then
 fi
 
 if [ -f "dx7headers/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "dx7headers is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
 		mkdir dx7headers
@@ -179,9 +179,9 @@ if [ -f "dx7headers/compile.done" ]; then
 fi
 
 if [ -f "libiconv-1.14/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libiconv-1.14 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
@@ -195,9 +195,9 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 fi		
 
 if [ -f "pcre-8.33/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "pcre-8.33 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.33.tar.gz
 		tar xf pcre-8.33.tar.gz
@@ -216,9 +216,9 @@ if [ -f "pcre-8.33/compile.done" ]; then
 fi
 
 if [ -f "openssl-1.0.1e/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "openssl-1.0.1e is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://www.openssl.org/source/openssl-1.0.1e.tar.gz
 		tar xf openssl-1.0.1e.tar.gz
@@ -233,9 +233,9 @@ if [ -f "openssl-1.0.1e/compile.done" ]; then
 fi
 
 if [ -f "rtmpdump-master/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "rtmpdump is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 	wget --no-check-certificate -c https://github.com/snpn/rtmpdump/archive/master.zip -O rtmpdump-master.zip
 	unzip rtmpdump-master.zip
@@ -271,3 +271,23 @@ fi
 cd $LOCALBUILDDIR
 rm rtmpdump-master.zip
 fi
+
+if [ -f "SDL-1.2.15/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "SDL-1.2.15 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
+		tar xf SDL-1.2.15.tar.gz
+		cd SDL-1.2.15
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm SDL-1.2.15.tar.gz
+		sed -i "s/-mwindows//" "/local32/bin/sdl-config"
+		sed -i "s/-mwindows//" "/local32/lib/pkgconfig/sdl.pc"
+fi
+
+sleep 2

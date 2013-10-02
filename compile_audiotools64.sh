@@ -12,29 +12,7 @@ while true; do
   esac
 done
 
-echo "-------------------------------------------------------------------------------"
-echo "compile SDL 64 bit"
-echo "-------------------------------------------------------------------------------"
-
 cd $LOCALBUILDDIR
-
-if [ -f "SDL-1.2.15/compile.done" ]; then
-	echo ----------------------------------
-	echo "SDL-1.2.15 is already compiled"
-	echo ----------------------------------
-	else 
-		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
-		tar xf SDL-1.2.15.tar.gz
-		cd SDL-1.2.15
-		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm SDL-1.2.15.tar.gz
-		sed -i "s/-mwindows//" "/local64/bin/sdl-config"
-		sed -i "s/-mwindows//" "/local64/lib/pkgconfig/sdl.pc"
-fi
 
 echo "-------------------------------------------------------------------------------"
 echo
@@ -43,9 +21,9 @@ echo
 echo "-------------------------------------------------------------------------------"
 
 if [ -f "gsm-1.0.13/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "gsm-1.0.13 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
 		tar xf gsm-1.0.13.tar.bz2
@@ -60,9 +38,9 @@ if [ -f "gsm-1.0.13/compile.done" ]; then
 fi
 
 if [ -f "libogg-1.3.1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libogg-1.3.1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz
 		tar xf libogg-1.3.1.tar.gz
@@ -76,9 +54,9 @@ if [ -f "libogg-1.3.1/compile.done" ]; then
 fi
 
 if [ -f "libvorbis-1.3.3/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libvorbis-1.3.3 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.xz
 		tar xf libvorbis-1.3.3.tar.xz
@@ -92,9 +70,9 @@ if [ -f "libvorbis-1.3.3/compile.done" ]; then
 fi
 
 if [ -f "libtheora-1.1.1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "libtheora-1.1.1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 		tar xf libtheora-1.1.1.tar.bz2
@@ -108,9 +86,9 @@ if [ -f "libtheora-1.1.1/compile.done" ]; then
 fi
 
 if [ -f "speex-1.2rc1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "speex-1.2rc1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
 		tar xf speex-1.2rc1.tar.gz
@@ -124,9 +102,9 @@ if [ -f "speex-1.2rc1/compile.done" ]; then
 fi
 
 if [ -f "flac-1.3.0/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "flac-1.3.0 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
 		tar xf flac-1.3.0.tar.xz
@@ -140,9 +118,9 @@ if [ -f "flac-1.3.0/compile.done" ]; then
 fi
 
 if [ -f "lame-3.99.5/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "lame-3.99.5 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		wget -c -O lame-3.99.5.tar.gz http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download 
 		tar xf lame-3.99.5.tar.gz
@@ -157,9 +135,9 @@ fi
 
 if [[ $nonfree = "y" ]]; then
 if [ -f "bin-fdk-aac/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "bin-fdk-aac is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		cd $LOCALBUILDDIR
 		
@@ -215,3 +193,5 @@ Cflags: -I${includedir}
 EOF
 fi
 fi
+
+sleep 2

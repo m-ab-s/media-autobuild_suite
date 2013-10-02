@@ -29,9 +29,9 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "ffmpeg-2.0.1/compile.done" ]; then
-	echo ----------------------------------
+	echo -------------------------------------------------
 	echo "ffmpeg-2.0.1 is already compiled"
-	echo ----------------------------------
+	echo -------------------------------------------------
 	else 
 		#if [ -f "ffmpeg-git/configure" ]; then
 		#	cd ffmpeg-git
@@ -51,3 +51,5 @@ if [ -f "ffmpeg-2.0.1/compile.done" ]; then
 		cd $LOCALBUILDDIR
 		rm ffmpeg-2.0.1.tar.gz
 fi		
+
+sleep 2
