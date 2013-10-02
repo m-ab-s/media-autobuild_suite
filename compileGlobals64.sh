@@ -149,20 +149,21 @@ if [ -f "libpng-1.6.6/compile.done" ]; then
 		rm libpng-1.6.6.tar.gz
 fi
 
-if [ -f "freetype-2.5.0.1/compile.done" ]; then
+if [ -f "freetype-2.4.10/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "freetype-2.5.0.1 is already compiled"
+	echo "freetype-2.4.10 is already compiled"
 	echo -------------------------------------------------
 	else 
-		wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
-		tar xf freetype-2.5.0.1.tar.gz
-		cd freetype-2.5.0.1
+		#wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
+		wget -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
+		tar xf freetype-2.4.10.tar.gz
+		cd freetype-2.4.10
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm freetype-2.5.0.1.tar.gz
+		rm freetype-2.4.10.tar.gz
 fi
 
 if [ -f "dx7headers/compile.done" ]; then
@@ -175,11 +176,11 @@ if [ -f "dx7headers/compile.done" ]; then
 		cd dx7headers
 		/opt/bin/7za x ../dx7headers.tgz
 		/opt/bin/7za x dx7headers.tar
+		rm dx7headers.tar
 		cd $LOCALBUILDDIR
 		cp dx7headers/* $LOCALDESTDIR/include
 		echo "finish" > dx7headers/compile.done
 		rm dx7headers.tgz
-		rm dx7headers/dx7headers.tar
 fi
 
 if [ -f "libiconv-1.14/compile.done" ]; then
