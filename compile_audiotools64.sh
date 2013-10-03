@@ -133,6 +133,22 @@ if [ -f "lame-3.99.5/compile.done" ]; then
 		rm lame-3.99.5.tar.gz
 fi
 
+if [ -f "vo-aacenc-0.1.3/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "vo-aacenc-0.1.3 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz
+		tar xf vo-aacenc-0.1.3.tar.gz
+		cd vo-aacenc-0.1.3
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm vo-aacenc-0.1.3.tar.gz
+fi
+
 if [[ $nonfree = "y" ]]; then
 if [ -f "bin-fdk-aac/compile.done" ]; then
 	echo -------------------------------------------------
@@ -192,6 +208,24 @@ Cflags: -I${includedir}
 
 EOF
 fi
+
+if [ -f "faac-1.28/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "faac-1.28 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+		tar xf faac-1.28.tar.gz
+		cd faac-1.28
+		sh bootstrap 
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --without-mp4v2
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm faac-1.28.tar.gz
+fi
+
 fi
 
 sleep 2

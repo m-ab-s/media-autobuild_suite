@@ -33,19 +33,18 @@ if [ -f "ffmpeg-2.0.1/compile.done" ]; then
 	echo "ffmpeg-2.0.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-#cd $LOCALBUILDDIR
-#if [ -f "ffmpeg-git/configure" ]; then
-#	cd ffmpeg-git
-#    echo " updating ffmpeg"
-#    git pull https://github.com/FFmpeg/FFmpeg.git || exit 1
-#	else 
-#		git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
-#		cd ffmpeg-git
-#  fi
+		#if [ -f "ffmpeg-git/configure" ]; then
+		#	cd ffmpeg-git
+		#    echo " updating ffmpeg"
+		#    git pull https://github.com/FFmpeg/FFmpeg.git || exit 1
+		#	else 
+		#		git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+		#		cd ffmpeg-git
+		#  fi
 		wget -c http://ffmpeg.org/releases/ffmpeg-2.0.1.tar.gz
 		tar xf ffmpeg-2.0.1.tar.gz
 		cd ffmpeg-2.0.1
-		./configure --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth  --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid $extras
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libx264 --enable-libxvid $extras
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
