@@ -149,6 +149,38 @@ if [ -f "vo-aacenc-0.1.3/compile.done" ]; then
 		rm vo-aacenc-0.1.3.tar.gz
 fi
 
+if [ -f "opencore-amr-0.1.3/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "opencore-amr-0.1.3 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
+		tar xf opencore-amr-0.1.3.tar.gz
+		cd opencore-amr-0.1.3
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm opencore-amr-0.1.3.tar.gz
+fi
+
+if [ -f "vo-amrwbenc-0.1.2/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "vo-amrwbenc-0.1.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz
+		tar xf vo-amrwbenc-0.1.2.tar.gz
+		cd vo-amrwbenc-0.1.2
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm vo-amrwbenc-0.1.2.tar.gz
+fi
+
 if [[ $nonfree = "y" ]]; then
 if [ -f "bin-fdk-aac/compile.done" ]; then
 	echo -------------------------------------------------
