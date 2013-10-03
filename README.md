@@ -49,7 +49,10 @@ Included Tools
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
+ - opencore-amr (lib for ffmpeg)
  - vo-aacenc (lib for ffmpeg)
+ - vo-amrwbenc (lib for ffmpeg)
+
  - vorbis
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
