@@ -41,6 +41,7 @@ Included Tools
  - ffmpeg
  - faac (standalone)
  - flac (standalone)
+ - freetype (lib for ffmpeg)
  - gsm
  - lame (standalone and lib for ffmpeg)
  - ogg
