@@ -39,14 +39,17 @@ Included Tools
  - bzip2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg
+ - faac (standalone)
  - flac (standalone)
  - gsm
  - lame (standalone and lib for ffmpeg)
  - ogg
  - mp4box (standalone)
+ - rtmp (standalone)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
+ - vo-aacenc (lib for ffmpeg)
  - vorbis
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
