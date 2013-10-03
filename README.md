@@ -41,7 +41,7 @@ Included Tools
  - ffmpeg
  - faac (standalone)
  - flac (standalone)
- - freetype (lib for ffmpeg)
+ - freetype
  - gsm
  - lame (standalone and lib for ffmpeg)
  - ogg
@@ -50,9 +50,9 @@ Included Tools
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
- - opencore-amr (lib for ffmpeg)
- - vo-aacenc (lib for ffmpeg)
- - vo-amrwbenc (lib for ffmpeg)
+ - opencore-amr
+ - vo-aacenc
+ - vo-amrwbenc
  - vorbis
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
