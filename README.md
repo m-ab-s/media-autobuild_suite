@@ -39,7 +39,7 @@ Included Tools
  - bzip2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg
- - faac (standalone)
+ - faac (standalone and lib for ffmpeg)
  - flac (standalone)
  - freetype
  - gsm
