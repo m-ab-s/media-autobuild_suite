@@ -10,7 +10,18 @@ while true; do
     * ) break ;;
   esac
 done
-	
+
+cd $pwd
+if [ ! -f ".gitconfig" ]; then
+echo -------------------------------------------------
+echo "build git config..."
+echo -------------------------------------------------
+cat > .gitconfig << "EOF"
+[core]
+	autocrlf = false
+EOF
+fi
+
 cd $LOCALBUILDDIR
 if [ -f "zlib-1.2.8/compile.done" ]; then
 	echo -------------------------------------------------
@@ -251,7 +262,7 @@ if [ -f "rtmpdump-master/compile.done" ]; then
 	cp -iv amf.h http.h log.h rtmp.h $LOCALDESTDIR/include/librtmp
 	cp -iv librtmp*.a $LOCALDESTDIR/lib
 
-if [ -n "/local32/lib/pkgconfig/librtmp.pc" ]; then
+if [ ! -f "/local32/lib/pkgconfig/librtmp.pc" ]; then
 cat > /local32/lib/pkgconfig/librtmp.pc << "EOF"
 prefix=/local32
 exec_prefix=${prefix}

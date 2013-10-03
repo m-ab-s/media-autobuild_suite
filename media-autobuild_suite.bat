@@ -417,7 +417,7 @@ if exist %instdir%\opt\bin\cmake.exe GOTO checkDoxygen32
 	echo.rm ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86.zip>>%instdir%\extraPack.sh
 	echo.rm -r ${LOCALBUILDDIR}/svn-win32-1.8.0>>%instdir%\extraPack.sh
 	echo.rm -r ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86>>%instdir%\extraPack.sh
-	
+
 	%instdir%\msys\1.0\bin\sh -l %instdir%\extraPack.sh
 	del %instdir%\extraPack.sh
 	
