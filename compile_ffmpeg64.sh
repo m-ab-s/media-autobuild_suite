@@ -13,7 +13,7 @@ while true; do
 done
 
   if [[ $nonfree = "y" ]]; then
-    extras="--enable-nonfree --enable-libfdk-aac"
+    extras="--enable-nonfree  --enable-libfaac --enable-libfdk-aac"
   else
     if  [[ $nonfree = "n" ]]; then
       extras="" 
