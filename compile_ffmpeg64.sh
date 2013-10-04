@@ -13,7 +13,7 @@ while true; do
 done
 
   if [[ $nonfree = "y" ]]; then
-    extras="--enable-nonfree  --enable-libfaac --enable-libfdk-aac"
+    extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
   else
     if  [[ $nonfree = "n" ]]; then
       extras="" 
@@ -28,16 +28,16 @@ echo "--------------------------------------------------------------------------
 
 cd $LOCALBUILDDIR
 
-if [ -f "ffmpeg-2.0.1/compile.done" ]; then
+if [ -f "ffmpeg-git/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "ffmpeg-2.0.1 is already compiled"
+	echo "ffmpeg-git is already compiled"
 	echo -------------------------------------------------
 	else 
 		git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 		#wget -c http://ffmpeg.org/releases/ffmpeg-2.0.1.tar.gz
 		#tar xf ffmpeg-2.0.1.tar.gz
 		cd ffmpeg-git
-		./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth  --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libx264 --enable-libxvid $extras
+		./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth  --enable-fontconfig --enable-libfreetype --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libx264 --enable-libxvid $extras
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done

@@ -210,6 +210,39 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 		rm libiconv-1.14.tar.gz
 fi
 
+if [ -f "expat-2.1.0/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "expat-2.1.0 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
+		tar xf expat-2.1.0.tar.gz
+		cd expat-2.1.0
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm expat-2.1.0.tar.gz
+fi
+
+if [ -f "fontconfig-2.10.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "fontconfig-2.10.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.1.tar.gz
+		tar xf fontconfig-2.10.1.tar.gz
+		cd fontconfig-2.10.1
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$PKG_CONFIG_PATH/fontconfig.pc"
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm fontconfig-2.10.1.tar.gz
+fi
+
 if [ -f "pcre-8.33/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "pcre-8.33 is already compiled"
