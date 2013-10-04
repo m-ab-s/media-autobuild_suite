@@ -78,8 +78,11 @@ For using it:
  
  - Wait a little bit, and hopefully after a while you found all your "*.exe" Tools under local32\bin, or local64\bin
 
-For all you need ~1,5 GB disk space. 
+For all you need ~3 GB disk space. 
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
+Build all from the begin take around ~2 hours.
+
+Later when you need only some new builds, delete the folder in /build32 or build64, for example the ffmpeg folder. After that starting the script again and it only compile this tool new.
 
 Have fun!
 
