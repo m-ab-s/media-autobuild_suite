@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-03
+modified: 2013-10-04
 
 ---
 
@@ -41,6 +41,7 @@ Included Tools
  - ffmpeg
  - faac (standalone and lib for ffmpeg)
  - flac (standalone)
+ - fontconfig
  - freetype
  - gsm
  - lame (standalone and lib for ffmpeg)
