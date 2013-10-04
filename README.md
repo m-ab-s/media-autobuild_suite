@@ -69,7 +69,7 @@ more will comming...
 This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
 After building the environment it get and compile all tools. All tools get static compiled, no external .dlls needed.
 
-For using it: 
+For using it:
  - Download the file, and copy it in your target folder. In that folder all compiler and tools get installed. Please look that you use a folder without space characters. A good place is: c:\mingw
  - double click the media-autobuild_suite.bat file 
  - select if you want to compile for Windows 32 bit, 64 bit or both
@@ -93,7 +93,3 @@ References
 http://ingar.satgnu.net/devenv/mingw32/base.html
 
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
-
-
-
- 
