@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.65 from 2013-09-24. Last bigger modification was on 2013-10-06
+::  This is version 0.69 from 2013-09-24. Last bigger modification was on 2013-10-06
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::  2013-10-01 change pkg-config, add mp4box, and reorder code
