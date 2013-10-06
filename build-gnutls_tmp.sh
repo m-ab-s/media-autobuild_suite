@@ -13,6 +13,22 @@ done
 
 cd $LOCALBUILDDIR
 
+if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "pthreads-w32-2-9-1-release is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
+		tar xf pthreads-w32-2-9-1-release.tar.gz
+		cd pthreads-w32-2-9-1-release
+		make clean GC-static
+		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
+		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm pthreads-w32-2-9-1-release.tar.gz
+fi
+
 if [ -f "gmp-5.0.5/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "gmp-5.0.5 is already compiled"
@@ -123,22 +139,6 @@ if [ -f "readline-6.2/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm readline-6.2.tar.gz
-fi
-
-if [ -f "readline-6.2/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "readline-6.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
-		tar xf pthreads-w32-2-9-1-release.tar.gz
-		cd pthreads-w32-2-9-1-release
-		make clean GC-static
-		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
-		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm pthreads-w32-2-9-1-release.tar.gz
 fi
 
 if [ -f "guile-2.0.9/compile.done" ]; then
