@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-04
+modified: 2013-10-06
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.65**
+Current release is **v0.69**
 
 
 Included Tools
@@ -47,7 +47,6 @@ Included Tools
  - lame (standalone and lib for ffmpeg)
  - ogg
  - mp4box (standalone)
- - rtmp (standalone)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
