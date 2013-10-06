@@ -43,4 +43,4 @@ if [ -f "ffmpeg-git/compile.done" ]; then
 		echo "finish" > compile.done
 fi		
 
-sleep 2
+sleep 5

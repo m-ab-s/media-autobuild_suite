@@ -24,11 +24,12 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.65 from 2013-09-24. Last bigger modification was on 2013-10-03
+::  This is version 0.65 from 2013-09-24. Last bigger modification was on 2013-10-06
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::  2013-10-01 change pkg-config, add mp4box, and reorder code
 ::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
+::	2013-10-06 build the environment new and remove openssl and rtmp
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -113,11 +114,12 @@ if %buildMp4box% GTR 2 GOTO mp4boxStatic
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
-echo. Numbers of CPU (Cores) for compiling, the half number is recommended:
+echo. Number of CPU Cores/Threads for compiling:
+echo. (it is non-recommended to use all cores/threads)
 echo.
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
-set /P cpuCores="CPU Count:"
+set /P cpuCores="Core/Thread Count:"
 echo -------------------------------------------------------------------------------
 
 for /l %%a in (1,1,%cpuCores%) do (
@@ -132,17 +134,18 @@ if "%cpuCount%"=="" GOTO :numCores
 if exist "%instdir%\msys\1.0\msys.bat" GOTO 7za
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- Download and install msys basic setup
+	echo.- Download and install msys basic system
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	echo.var wshell = new ActiveXObject("WScript.Shell");var htmldoc = new ActiveXObject("htmlfile");var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");var adodb = new ActiveXObject("ADODB.Stream");var FSO = new ActiveXObject("Scripting.FileSystemObject");;function http_get(url, is_binary){ xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4);  WScript.Sleep(100); if (xmlhttp.status != 200) { WScript.Echo("http get failed: " + xmlhttp.status);  WScript.Quit(2); }; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText;}; function url_decompose_filename(url) { return url.split('/').pop().split('?').shift(); }; function save_binary(path, data) { adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2);}; function pick_from_sf_file_list(html, cond) { htmldoc.open(); htmldoc.write(html); var tr = htmldoc.getElementById("files_list").getElementsByTagName("tr"); for (var i = 0; i ^< tr.length; ++i) {  title = tr[i].title;  if (cond(title)) return title; }; return null;}; function download_mingw_get() { var base_url = "http://sourceforge.net/projects/mingw/files/Installer/mingw-get/"; var html = http_get(base_url, false); var project_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("mingw-get") ^>= 0; }); var project_url = base_url + project_name + "/"; html = http_get(project_url, false); var dlp_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("bin.zip") ^>= 0; }); var dlp_url = project_url + dlp_name + "/download"; html = http_get(dlp_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var url = div.getElementsByTagName("a")[1].href; var filename = url.split('/').pop().split('?').shift(); var installer_data = http_get(url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename) }; function extract_zip(zip_file, dstdir) { var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0);}; function install_mingw(zip_file, packages) { var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir); wshell.Run("bin\\mingw-get install " + packages, 10, true); var fstab = FSO.GetAbsolutePathName("msys\\1.0\\etc\\fstab"); var fp = FSO.CreateTextFile(fstab, true); fp.WriteLine(rootdir.replace(/\\/g,"/") + "\t/mingw"); fp.Close(); FSO.GetFile(zip_file).Delete();}; var packages = "msys-base mingw-developer-toolkit msys-wget msys-zip msys-unzip";install_mingw(download_mingw_get(), packages)>>media-autobuild_suite.js
+	echo.var wshell = new ActiveXObject("WScript.Shell");var htmldoc = new ActiveXObject("htmlfile");var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");var adodb = new ActiveXObject("ADODB.Stream");var FSO = new ActiveXObject("Scripting.FileSystemObject");;function http_get(url, is_binary){ xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4);  WScript.Sleep(100); if (xmlhttp.status != 200) { WScript.Echo("http get failed: " + xmlhttp.status);  WScript.Quit(2); }; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText;}; function url_decompose_filename(url) { return url.split('/').pop().split('?').shift(); }; function save_binary(path, data) { adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2);}; function pick_from_sf_file_list(html, cond) { htmldoc.open(); htmldoc.write(html); var tr = htmldoc.getElementById("files_list").getElementsByTagName("tr"); for (var i = 0; i ^< tr.length; ++i) {  title = tr[i].title;  if (cond(title)) return title; }; return null;}; function download_mingw_get() { var base_url = "http://sourceforge.net/projects/mingw/files/Installer/mingw-get/"; var html = http_get(base_url, false); var project_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("mingw-get") ^>= 0; }); var project_url = base_url + project_name + "/"; html = http_get(project_url, false); var dlp_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("bin.zip") ^>= 0; }); var dlp_url = project_url + dlp_name + "/download"; html = http_get(dlp_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var url = div.getElementsByTagName("a")[1].href; var filename = url.split('/').pop().split('?').shift(); var installer_data = http_get(url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename) }; function extract_zip(zip_file, dstdir) { var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0);}; function install_mingw(zip_file, packages) { var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir); wshell.Run("bin\\mingw-get install " + packages, 10, true); var fstab = FSO.GetAbsolutePathName("msys\\1.0\\etc\\fstab"); var fp = FSO.CreateTextFile(fstab, true); fp.WriteLine(rootdir.replace(/\\/g,"/") + "\t/mingw"); fp.Close(); FSO.GetFile(zip_file).Delete();}; var packages = "msys-base msys-coreutils msys-wget msys-zip msys-unzip";install_mingw(download_mingw_get(), packages)>>build_msys.js
 	
-	cscript media-autobuild_suite.js
-	del media-autobuild_suite.js
+	cscript build_msys.js
+	del build_msys.js
+	del mingw-get-0.6*
 
 :7za
-if exist "%instdir%\opt\bin\7za.exe" GOTO mingw32
+if exist "%instdir%\opt\bin\7za.exe" GOTO mingw-dtk
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- Download and install 7za
@@ -162,12 +165,27 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO mingw32
 	cd ..\..
 	del 7za920.zip
 	
+:mingw-dtk
+if exist "%instdir%\bin\msgmerge.exe" GOTO mingw32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- Download and install ming-developer-toolkit
+	echo.
+	echo -------------------------------------------------------------------------------
+	del /Q %instdir%\var\lib\mingw-get\data\mingw*
+	%instdir%\msys\1.0\bin\wget.exe -c "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mingw-dtk_jb.zip"
+	cd %instdir%\var\lib\mingw-get\data
+	%instdir%\opt\bin\7za.exe x %instdir%\mingw-dtk_jb.zip
+	cd %instdir%
+	del mingw-dtk_jb.zip
+	%instdir%\bin\mingw-get install mingw-developer-toolkit pkginfo
+	%instdir%\bin\mingw-get upgrade msys-core-bin=1.0.17-1
+
 ::------------------------------------------------------------------
 ::download and install mingw compiler:
 ::------------------------------------------------------------------	
 	
 :mingw32
-
 if %build32%==yes (
 	if exist "%instdir%\mingw32\bin\gcc.exe" GOTO mingw64
 		echo -------------------------------------------------------------------------------
@@ -186,7 +204,7 @@ if %build32%==yes (
 		
 :mingw64
 if %build64%==yes (
-if exist "%instdir%\mingw64\bin\gcc.exe" GOTO downgradeCore
+if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- Download and install mingw 64bit compiler to mingw64
@@ -200,21 +218,6 @@ if exist "%instdir%\mingw64\bin\gcc.exe" GOTO downgradeCore
 	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
 	del mingw64-gcc-4.8.0.7z
 	)
-	
-::------------------------------------------------------------------
-:: downgrade msys core:
-::------------------------------------------------------------------	
-	
-:downgradeCore
-if exist %instdir%\msys\1.0\etc\msyscore-1.0.17-1.cfg GOTO makeDIR
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- downgrade msys core to 1.0.17-1
-	echo.- (a little bad workaround because make don't work in multi cpu mode)
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\bin\mingw-get upgrade msys-core-bin=1.0.17-1
-	echo.downgrade core to 1.0.17-1 done>>%instdir%\msys\1.0\etc\msyscore-1.0.17-1.cfg
 
 :makeDIR
 set targetSys=false
@@ -462,6 +465,7 @@ if %build64%==yes (
 	del yasm.exe
 	)	
 cd %instdir%
+
 :getMintty
 if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	echo -------------------------------------------------------------------------------
@@ -491,7 +495,7 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	
 ::mintty seetings, color, transparency, etc.
 :minttySettings
-if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO getPr
+if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals32
 	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
@@ -522,15 +526,6 @@ if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO getPr
 	echo.BoldMagenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BoldCyan=163,186,191>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BoldWhite=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	
-:getPr	
-if exist %instdir%\msys\1.0\bin\pr.exe GOTO compileGlobals32
-	cd %instdir%\build32
-	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/mingw/MSYS/Base/coreutils/coreutils-5.97-3/coreutils-5.97-3-msys-1.0.13-ext.tar.lzma"
-	cd %instdir%\msys\1.0\bin
-	%instdir%\opt\bin\7za x %instdir%\build32\coreutils-5.97-3-msys-1.0.13-ext.tar.lzma -aos
-	del %instdir%\build32\coreutils-5.97-3-msys-1.0.13-ext.tar.lzma
-	cd %instdir%
 
 :compileGlobals32
 :: no existing check here, because it is more easy to extend the global tools. 
@@ -555,11 +550,7 @@ if %build32%==yes (
 	echo.- compile global tools, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	ren %instdir%\bin\msgmerge.exe msgmerge_._exe
-
 	%instdir%\mintty.lnk %instdir%\compileGlobals32.sh --cpuCount=%cpuCount%
-		
-	ren %instdir%\bin\msgmerge_._exe msgmerge.exe	
 	)
 
 ::compileGlobals64
@@ -583,13 +574,7 @@ if %build64%==yes (
 	echo.- compile global tools, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	ren %instdir%\bin\msgmerge.exe msgmerge_._exe
-	ren %instdir%\bin\xgettext.exe xgettext_._exe
-
 	%instdir%\mintty.lnk %instdir%\compileGlobals64.sh --cpuCount=%cpuCount%
-	
-	ren %instdir%\bin\msgmerge_._exe msgmerge.exe
-	ren %instdir%\bin\xgettext_._exe xgettext.exe
 	)
 
 :: audio coders
