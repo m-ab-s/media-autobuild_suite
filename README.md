@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-06
+modified: 2013-10-08
 
 ---
 
@@ -51,6 +51,8 @@ Included Tools
  - speex (standalone and lib for ffmpeg)
  - theora
  - opencore-amr
+ - opus
+ - vpx
  - vo-aacenc
  - vo-amrwbenc
  - vorbis
