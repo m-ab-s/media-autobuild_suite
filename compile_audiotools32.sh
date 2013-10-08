@@ -258,6 +258,27 @@ if [ -f "faac-1.28/compile.done" ]; then
 		rm faac-1.28.tar.gz
 fi
 
+fi # nonfree end
+
+if [ -f "libopus-git/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "libopus is already compiled"
+    echo -------------------------------------------------
+    else 
+        if [ -f "libopus-git/configure" ]; then
+            cd libopus-git
+            echo " updating libopus-git"
+            git pull git://git.opus-codec.org/opus.git || exit 1
+        else 
+            git clone git://git.opus-codec.org/opus.git libopus-git
+            cd libopus-git
+        fi
+        ./autogen.sh
+        ./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --enable-custom-modes --disable-extra-programs --disable-doc
+        make -j $cpuCount
+        make install
+        echo "finish" > compile.done
+        make clean
 fi
 
 sleep 2

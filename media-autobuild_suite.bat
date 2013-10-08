@@ -577,13 +577,13 @@ if %build64%==yes (
 	%instdir%\mintty.lnk %instdir%\compileGlobals64.sh --cpuCount=%cpuCount%
 	)
 
-:: audio coders
+:: audio coder
 :getAudio32
 if %build32%==yes (
 	if exist %instdir%\compile_audiotools32.sh GOTO compileAudio32
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for audio coders, 32 bit:
+		echo.- get script for audio coder, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio32
@@ -595,11 +595,11 @@ if %build32%==yes (
 	:compileAudio32
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile audio coders, 32 bit:
+	echo.- compile audio coder, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio coders 32 bit done...
+	echo. compile audio coder 32 bit done...
 	)
 	
 :getAudio64
@@ -607,7 +607,7 @@ if %build64%==yes (
 	if exist %instdir%\compile_audiotools64.sh GOTO compileAudio64
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for audio coders, 64 bit:
+		echo.- get script for audio coder, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio64
@@ -619,19 +619,19 @@ if %build64%==yes (
 	:compileAudio64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile audio coders, 64 bit:
+	echo.- compile audio coder, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_audiotools64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio coders 64 bit done...
+	echo. compile audio coder 64 bit done...
 	)	
 
-:: video coders
+:: video coder
 if %build32%==yes (
 	if not exist %instdir%\compile_videotools32.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for video coders, 32 bit:
+		echo.- get script for video coder, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if not exist %instdir%\media-autobuild_suite.zip (
@@ -642,18 +642,18 @@ if %build32%==yes (
 
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile video coders, 32 bit:
+	echo.- compile video coder, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
-	echo. compile video coders 32 bit done...
+	echo. compile video coder 32 bit done...
 	)
 
 if %build64%==yes (
 	if not exist %instdir%\compile_videotools64.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for video coders, 64 bit:
+		echo.- get script for video coder, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if not exist %instdir%\media-autobuild_suite.zip (
@@ -665,11 +665,11 @@ if %build64%==yes (
 	:compileVideo64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile video coders, 64 bit:
+	echo.- compile video coder, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
-	echo. compile video coders 64 bit done...
+	echo. compile video coder 64 bit done...
 	)
 
 :: ffmpeg

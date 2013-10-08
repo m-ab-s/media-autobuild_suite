@@ -77,6 +77,45 @@ if [ -f "xvidcore/compile.done" ]; then
 		fi
 fi
 
+if [ -f "libvpx-git/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "libvpx is already compiled"
+    echo -------------------------------------------------
+    else 
+        if [ -f "libvpx-git/configure" ]; then
+            cd libvpx-git
+            echo " updating libvpx-git"
+            git pull http://git.chromium.org/webm/libvpx.git || exit 1
+        else 
+            git clone http://git.chromium.org/webm/libvpx.git libvpx-git
+            cd libvpx-git
+        fi
+        ./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static
+cat >  libvpx-makefile.diff << "EOF"
+diff --git a/build/make/Makefile b/build/make/Makefile
+index 92113cc..cb9d4f4 100644
+--- a/build/make/Makefile
++++ b/build/make/Makefile
+@@ -162,9 +162,8 @@ ifeq ($(HAVE_GNU_STRIP),yes)
+ # keep them.
+ %.a: %_g.a
+ 	$(if $(quiet),@echo "    [STRIP] $@ < $<")
+-	$(qexec)$(STRIP) --strip-unneeded \
+-         `$(NM) $< | grep ' [A-TV-Z] ' | awk '{print "-K"$$3'}`\
+-          -o $@ $<
++	$(qexec)cp $< $@
++	$(qexec)$(STRIP) --strip-unneeded $@
+ else
+ %.a: %_g.a
+ 	$(if $(quiet),@echo "    [CP] $@ < $<")
+EOF
+		patch -i libvpx-makefile.diff
+        make -j $cpuCount
+        make install
+        echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+fi
+
 if [[ $mp4box = "y" ]]; then
 	if [ -f "mp4box_gpac/compile.done" ]; then
 		echo -------------------------------------------------
