@@ -138,4 +138,4 @@ if [[ $mp4box = "y" ]]; then
 	fi
 fi
 
-sleep 50
+sleep 2
