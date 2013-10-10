@@ -55,6 +55,19 @@ Requires:
 Libs: -L${libdir} -L${sharedlibdir} -lz
 Cflags: -I${includedir}
 EOF
+	if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
+		echo -
+		echo -------------------------------------------------
+		echo "build zlib-1.2.8 done..."
+		echo -------------------------------------------------
+		echo -
+		else
+			echo -------------------------------------------------
+			echo "build zlib-1.2.8 failed..."
+			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+			read -p "first close the batch window, then the shell window"
+			sleep 15
+		fi
 fi	
 
 if [ -f "bzip2-1.0.6/compile.done" ]; then
@@ -73,6 +86,20 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm bzip2-1.0.6.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/bin/bzip2.exe" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build bzip2-1.0.6 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build bzip2-1.0.6 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi	
 	
 if [ -f "dlfcn-win32-r19/compile.done" ]; then
@@ -89,24 +116,68 @@ if [ -f "dlfcn-win32-r19/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm dlfcn-win32-r19.tar.bz2
+		
+		if [ -f "$LOCALDESTDIR/lib/libdl.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build dlfcn-win32-r19 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build dlfcn-win32-r19 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi		
 
-#maybe we don't need this...
-if [ -f "nasm-2.10.09/compile.done" ]; then
+if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "nasm-2.10.09 is already compiled"
+	echo "pthreads-w32-2-9-1-release is already compiled"
 	echo -------------------------------------------------
 	else 
-		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
-		tar xf nasm-2.10.09.tar.gz
-		cd nasm-2.10.09
-		./configure --prefix=/mingw32
-		make -j $cpuCount
-		make install
+		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
+		tar xf pthreads-w32-2-9-1-release.tar.gz
+		cd pthreads-w32-2-9-1-release
+		make clean GC-static
+		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
+		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm nasm-2.10.09.tar.gz
-fi	
+		rm pthreads-w32-2-9-1-release.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build pthreads-w32-2-9-1-release done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build pthreads-w32-2-9-1-release failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
+fi
+
+#maybe we don't need this...
+#if [ -f "nasm-2.10.09/compile.done" ]; then
+#	echo -------------------------------------------------
+#	echo "nasm-2.10.09 is already compiled"
+#	echo -------------------------------------------------
+#	else 
+#		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
+#		tar xf nasm-2.10.09.tar.gz
+#		cd nasm-2.10.09
+#		./configure --prefix=/mingw32
+#		make -j $cpuCount
+#		make install
+#		echo "finish" > compile.done
+#		cd $LOCALBUILDDIR
+#		rm nasm-2.10.09.tar.gz
+#fi	
 
 if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
 	echo -------------------------------------------------
@@ -138,6 +209,20 @@ chmod ugo+x ${LOCALDESTDIR}/bin/pkg-config.sh
 echo "PKG_CONFIG=${LOCALDESTDIR}/bin/pkg-config.sh" >> ${LOCALDESTDIR}/etc/profile.local
 echo "export PKG_CONFIG" >> ${LOCALDESTDIR}/etc/profile.local
 source ${LOCALDESTDIR}/etc/profile.local
+
+if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
+	echo -
+	echo -------------------------------------------------
+	echo "build pkg-config-lite-0.28-1 done..."
+	echo -------------------------------------------------
+	echo -
+	else
+		echo -------------------------------------------------
+		echo "build pkg-config-lite-0.28-1 failed..."
+		echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+		read -p "first close the batch window, then the shell window"
+		sleep 15
+	fi
 fi	
 
 if [ -f "libpng-1.6.6/compile.done" ]; then
@@ -154,6 +239,20 @@ if [ -f "libpng-1.6.6/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm libpng-1.6.6.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libpng-1.6.6 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libpng-1.6.6 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "freetype-2.4.10/compile.done" ]; then
@@ -171,6 +270,20 @@ if [ -f "freetype-2.4.10/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm freetype-2.4.10.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build freetype-2.4.10 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build freetype-2.4.10 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "dx7headers/compile.done" ]; then
@@ -188,6 +301,20 @@ if [ -f "dx7headers/compile.done" ]; then
 		cp dx7headers/* $LOCALDESTDIR/include
 		echo "finish" > dx7headers/compile.done
 		rm dx7headers.tgz
+		
+		if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build dx7headers done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build dx7headers failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "libiconv-1.14/compile.done" ]; then
@@ -204,6 +331,20 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm libiconv-1.14.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libiconv-1.14 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libiconv-1.14 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "expat-2.1.0/compile.done" ]; then
@@ -220,6 +361,20 @@ if [ -f "expat-2.1.0/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm expat-2.1.0.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libexpat.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build expat-2.1.0 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build expat-2.1.0 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "fontconfig-2.10.1/compile.done" ]; then
@@ -237,6 +392,20 @@ if [ -f "fontconfig-2.10.1/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm fontconfig-2.10.1.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build fontconfig-2.10.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build fontconfig-2.10.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
 if [ -f "SDL-1.2.15/compile.done" ]; then
@@ -255,6 +424,20 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 		rm SDL-1.2.15.tar.gz
 		sed -i "s/-mwindows//" "/local32/bin/sdl-config"
 		sed -i "s/-mwindows//" "/local32/lib/pkgconfig/sdl.pc"
+		
+		if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build SDL-1.2.15 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build SDL-1.2.15 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+			fi
 fi
 
-sleep 2
+sleep 3

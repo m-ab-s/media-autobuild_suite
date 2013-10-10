@@ -31,6 +31,7 @@
 ::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
 ::	2013-10-06 build the environment new and remove openssl and rtmp
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
+::	2013-10-10 add build check to compileGlobals*.sh
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ echo ---------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
 echo. Number of CPU Cores/Threads for compiling:
-echo. (it is non-recommended to use all cores/threads)
+echo. (it is non-recommended to use all cores/threads!)
 echo.
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
@@ -382,7 +383,6 @@ if %build64%==yes (
 	%instdir%\msys\1.0\bin\sh -l %instdir%\profile.sh
 	echo 32 bit build system add to profile. see profile>>%instdir%\msys\1.0\etc\userprofile.cfg
 	del %instdir%\profile.sh
-	GOTO extraPacks
 
 :extraPacks
 ::------------------------------------------------------------------
@@ -544,7 +544,6 @@ if %build32%==yes (
 			:unpackglobal32
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals32.sh
 
-	:: workaround...
 	:compileGobal32
 	echo -------------------------------------------------------------------------------
 	echo.
@@ -568,7 +567,6 @@ if %build64%==yes (
 			:unpackglobal64
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals64.sh
 
-	:: workaround...
 	:compileGobal64
 	echo -------------------------------------------------------------------------------
 	echo.
@@ -708,6 +706,7 @@ if %build64%==yes (
 			)
 			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
 		)
+
 	:compileFFmpeg64
 	echo -------------------------------------------------------------------------------
 	echo.
