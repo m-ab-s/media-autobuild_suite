@@ -89,26 +89,8 @@ if [ -f "libvpx-git/compile.done" ]; then
             git clone http://git.chromium.org/webm/libvpx.git libvpx-git
             cd libvpx-git
         fi
-        ./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
-cat >  libvpx-makefile.diff << "EOF"
-diff --git a/build/make/Makefile b/build/make/Makefile
-index 92113cc..cb9d4f4 100644
---- a/build/make/Makefile
-+++ b/build/make/Makefile
-@@ -162,9 +162,8 @@ ifeq ($(HAVE_GNU_STRIP),yes)
- # keep them.
- %.a: %_g.a
- 	$(if $(quiet),@echo "    [STRIP] $@ < $<")
--	$(qexec)$(STRIP) --strip-unneeded \
--         `$(NM) $< | grep ' [A-TV-Z] ' | awk '{print "-K"$$3'}`\
--          -o $@ $<
-+	$(qexec)cp $< $@
-+	$(qexec)$(STRIP) --strip-unneeded $@
- else
- %.a: %_g.a
- 	$(if $(quiet),@echo "    [CP] $@ < $<")
-EOF
-		patch -i libvpx-makefile.diff
+        ./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-examples --disable-unit-tests --disable-docs
+		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
         make -j $cpuCount
         make install
         echo "finish" > compile.done
