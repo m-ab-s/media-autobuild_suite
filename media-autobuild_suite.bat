@@ -31,7 +31,7 @@
 ::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
 ::	2013-10-06 build the environment new and remove openssl and rtmp
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
-::	2013-10-10 add build check to compileGlobals*.sh
+::	2013-10-10 add libass and add build check to compileGlobals*.sh
 ::
 ::-------------------------------------------------------------------------------------
 

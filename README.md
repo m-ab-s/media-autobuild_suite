@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-08
+modified: 2013-10-10
 
 ---
 
@@ -45,6 +45,7 @@ Included Tools
  - freetype
  - gsm
  - lame (standalone and lib for ffmpeg)
+ - libass
  - ogg
  - mp4box (standalone)
  - sdl (for ffplay)
