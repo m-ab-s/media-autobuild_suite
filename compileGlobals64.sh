@@ -67,7 +67,7 @@ EOF
 			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 			read -p "first close the batch window, then the shell window"
 			sleep 15
-		fi
+	fi
 fi	
 	
 if [ -f "bzip2-1.0.6/compile.done" ]; then
@@ -99,7 +99,7 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi	
 
 if [ -f "dlfcn-win32-r19/compile.done" ]; then
@@ -129,7 +129,7 @@ if [ -f "dlfcn-win32-r19/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi		
 
 if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
@@ -159,7 +159,7 @@ if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 	
 #maybe we don't need this...
@@ -213,18 +213,18 @@ echo "PKG_CONFIG=${LOCALDESTDIR}/bin/pkg-config.sh" >> ${LOCALDESTDIR}/etc/profi
 echo "export PKG_CONFIG" >> ${LOCALDESTDIR}/etc/profile.local
 source ${LOCALDESTDIR}/etc/profile.local
 
-if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
-	echo -
-	echo -------------------------------------------------
-	echo "build pkg-config-lite-0.28-1 done..."
-	echo -------------------------------------------------
-	echo -
-	else
+	if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
+		echo -
 		echo -------------------------------------------------
-		echo "build pkg-config-lite-0.28-1 failed..."
-		echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-		read -p "first close the batch window, then the shell window"
-		sleep 15
+		echo "build pkg-config-lite-0.28-1 done..."
+		echo -------------------------------------------------
+		echo -
+		else
+			echo -------------------------------------------------
+			echo "build pkg-config-lite-0.28-1 failed..."
+			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+			read -p "first close the batch window, then the shell window"
+			sleep 15
 	fi
 fi	
 
@@ -255,7 +255,7 @@ if [ -f "libpng-1.6.6/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "freetype-2.4.10/compile.done" ]; then
@@ -286,7 +286,7 @@ if [ -f "freetype-2.4.10/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "dx7headers/compile.done" ]; then
@@ -317,7 +317,7 @@ if [ -f "dx7headers/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "libiconv-1.14/compile.done" ]; then
@@ -347,7 +347,7 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "expat-2.1.0/compile.done" ]; then
@@ -377,7 +377,7 @@ if [ -f "expat-2.1.0/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "fontconfig-2.10.1/compile.done" ]; then
@@ -408,7 +408,7 @@ if [ -f "fontconfig-2.10.1/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 if [ -f "SDL-1.2.15/compile.done" ]; then
@@ -440,7 +440,7 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
-			fi
+		fi
 fi
 
 sleep 3

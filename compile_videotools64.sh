@@ -38,6 +38,20 @@ if [ -f "x264-git/compile8.done" ]; then
 		make install
 		echo "finish" > compile8.done
 		make clean
+		
+		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build x264 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build x264 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "x264-git/compile10.done" ]; then
@@ -45,12 +59,26 @@ if [ -f "x264-git/compile10.done" ]; then
 	echo "x264-10bit is already compiled"
 	echo -------------------------------------------------
 	else 
-	./configure --host=x86_64-pc-mingw32 --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread --bit-depth=10
-	make -j $cpuCount
-	mv x264.exe x264-10bit.exe
-	cp x264-10bit.exe /local64/bin/x264-10bit.exe
-	echo "finish" > compile10.done
-	make clean
+		./configure --host=x86_64-pc-mingw32 --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread --bit-depth=10
+		make -j $cpuCount
+		mv x264.exe x264-10bit.exe
+		cp x264-10bit.exe /local64/bin/x264-10bit.exe
+		echo "finish" > compile10.done
+		make clean
+		
+		if [ -f "$LOCALDESTDIR/bin/x264-10bit.exe" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build x264-10bit done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build x264-10bit failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 cd $LOCALBUILDDIR
@@ -75,6 +103,20 @@ if [ -f "xvidcore/compile.done" ]; then
 			rm /local64/lib/xvidcore.dll || exit 1
 			mv /local64/lib/xvidcore.a /local64/lib/libxvidcore.a || exit 1
 		fi
+		
+		if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build xvidcore done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build xvidcore failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "libvpx-git/compile.done" ]; then
@@ -96,6 +138,20 @@ if [ -f "libvpx-git/compile.done" ]; then
         make install
         echo "finish" > compile.done
 		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libvpx done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libvpx failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [[ $mp4box = "y" ]]; then
@@ -117,8 +173,21 @@ if [[ $mp4box = "y" ]]; then
 			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
 			echo "finish" > compile.done
 			cd $LOCALBUILDDIR
-			echo "mp4box done..."
+			
+			if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build mp4box done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build mp4box failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
 	fi
 fi
 
-sleep 2
+sleep 3

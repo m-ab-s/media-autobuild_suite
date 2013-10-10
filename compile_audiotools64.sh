@@ -35,6 +35,20 @@ if [ -f "gsm-1.0.13/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm gsm-1.0.13.tar.bz2
+		
+		if [ -f "$LOCALDESTDIR/lib/libgsm.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build gsm-1.0.13 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build gsm-1.0.13 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "libogg-1.3.1/compile.done" ]; then
@@ -51,6 +65,20 @@ if [ -f "libogg-1.3.1/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm libogg-1.3.1.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libogg-1.3.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libogg-1.3.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "libvorbis-1.3.3/compile.done" ]; then
@@ -67,6 +95,20 @@ if [ -f "libvorbis-1.3.3/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm libvorbis-1.3.3.tar.xz
+		
+		if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libvorbis-1.3.3 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libvorbis-1.3.3 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "libtheora-1.1.1/compile.done" ]; then
@@ -83,6 +125,20 @@ if [ -f "libtheora-1.1.1/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm libtheora-1.1.1.tar.bz2
+		
+		if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libtheora-1.1.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libtheora-1.1.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "speex-1.2rc1/compile.done" ]; then
@@ -99,6 +155,20 @@ if [ -f "speex-1.2rc1/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm speex-1.2rc1.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build speex-1.2rc1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build speex-1.2rc1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "flac-1.3.0/compile.done" ]; then
@@ -115,6 +185,20 @@ if [ -f "flac-1.3.0/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm flac-1.3.0.tar.xz
+		
+		if [ -f "$LOCALDESTDIR/lib/libFLAC.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build flac-1.3.0 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build flac-1.3.0 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "lame-3.99.5/compile.done" ]; then
@@ -131,6 +215,20 @@ if [ -f "lame-3.99.5/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm lame-3.99.5.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libmp3lame.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build lame-3.99.5 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build lame-3.99.5 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "vo-aacenc-0.1.3/compile.done" ]; then
@@ -147,6 +245,20 @@ if [ -f "vo-aacenc-0.1.3/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm vo-aacenc-0.1.3.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libvo-aacenc.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build vo-aacenc-0.1.3 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build vo-aacenc-0.1.3 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "opencore-amr-0.1.3/compile.done" ]; then
@@ -163,6 +275,20 @@ if [ -f "opencore-amr-0.1.3/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm opencore-amr-0.1.3.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libopencore-amrnb.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build opencore-amr-0.1.3 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build opencore-amr-0.1.3 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [ -f "vo-amrwbenc-0.1.2/compile.done" ]; then
@@ -179,6 +305,20 @@ if [ -f "vo-amrwbenc-0.1.2/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm vo-amrwbenc-0.1.2.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libvo-amrwbenc.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build vo-amrwbenc-0.1.2 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build vo-amrwbenc-0.1.2 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 if [[ $nonfree = "y" ]]; then
@@ -239,6 +379,20 @@ Libs.private: -lm
 Cflags: -I${includedir}
 
 EOF
+
+	if [ -f "$LOCALDESTDIR/lib/libfdk-aac.a" ]; then
+		echo -
+		echo -------------------------------------------------
+		echo "build fdk-aac done..."
+		echo -------------------------------------------------
+		echo -
+		else
+			echo -------------------------------------------------
+			echo "build fdk-aac failed..."
+			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+			read -p "first close the batch window, then the shell window"
+			sleep 15
+	fi
 fi
 
 if [ -f "faac-1.28/compile.done" ]; then
@@ -256,6 +410,20 @@ if [ -f "faac-1.28/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm faac-1.28.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build faac-1.28 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build faac-1.28 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
 fi # nonfree end
@@ -274,6 +442,20 @@ if [ -f "opus-1.0.1/compile.done" ]; then
         echo "finish" > compile.done
 		cd $LOCALBUILDDIR
         rm opus-1.0.1.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build opus-1.0.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build opus-1.0.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
 fi
 
-sleep 2
+sleep 3
