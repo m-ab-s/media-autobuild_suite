@@ -453,7 +453,25 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm fribidi-0.19.4.tar.bz2
-		
+
+cat > /local32/bin/fribidi-config << "EOF"
+#!/bin/sh
+case $1 in
+  --version)
+    pkg-config --modversion fribidi
+    ;;
+  --cflags)
+    pkg-config --cflags fribidi
+    ;;
+  --libs)
+    pkg-config --libs fribidi
+    ;;
+  *)
+    false
+    ;;
+esac
+EOF
+
 		if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 			echo -
 			echo -------------------------------------------------
@@ -477,7 +495,7 @@ if [ -f "libass-0.10.1/compile.done" ]; then
 		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
 		tar xf libass-0.10.1.tar.gz
 		cd libass-0.10.1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"

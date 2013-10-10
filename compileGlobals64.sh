@@ -228,6 +228,37 @@ source ${LOCALDESTDIR}/etc/profile.local
 	fi
 fi	
 
+
+if [ -f "libtool-2.4.2/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libtool-2.4.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
+		tar xf libtool-2.4.2.tar.gz
+		cd libtool-2.4.2
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm libtool-2.4.2.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libltdl.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libtool-2.4.2 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libtool-2.4.2 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 if [ -f "libpng-1.6.6/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "libpng-1.6.6 is already compiled"
@@ -427,7 +458,25 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm fribidi-0.19.4.tar.bz2
-		
+
+cat > /local64/bin/fribidi-config << "EOF"
+#!/bin/sh
+case $1 in
+  --version)
+    pkg-config --modversion fribidi
+    ;;
+  --cflags)
+    pkg-config --cflags fribidi
+    ;;
+  --libs)
+    pkg-config --libs fribidi
+    ;;
+  *)
+    false
+    ;;
+esac
+EOF
+
 		if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 			echo -
 			echo -------------------------------------------------
