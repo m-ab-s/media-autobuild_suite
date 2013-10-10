@@ -225,6 +225,36 @@ source ${LOCALDESTDIR}/etc/profile.local
 	fi
 fi
 
+if [ -f "libtool-2.4.2/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libtool-2.4.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
+		tar xf libtool-2.4.2.tar.gz
+		cd libtool-2.4.2
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm libtool-2.4.2.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libltdl.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libtool-2.4.2 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libtool-2.4.2 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 if [ -f "libpng-1.6.6/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "libpng-1.6.6 is already compiled"
@@ -402,6 +432,68 @@ if [ -f "fontconfig-2.10.1/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build fontconfig-2.10.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+if [ -f "fribidi-0.19.4/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "fribidi-0.19.4 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
+		tar xf fribidi-0.19.4.tar.bz2
+		cd fribidi-0.19.4
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm fribidi-0.19.4.tar.bz2
+		
+		if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build fribidi-0.19.4 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build fribidi-0.19.4 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+if [ -f "libass-0.10.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libass-0.10.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
+		tar xf libass-0.10.1.tar.gz
+		cd libass-0.10.1
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm libass-0.10.1.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libass-0.10.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libass-0.10.1 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
