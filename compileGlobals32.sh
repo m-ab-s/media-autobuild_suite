@@ -225,35 +225,35 @@ source ${LOCALDESTDIR}/etc/profile.local
 	fi
 fi
 
-if [ -f "libtool-2.4.2/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libtool-2.4.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
-		tar xf libtool-2.4.2.tar.gz
-		cd libtool-2.4.2
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libtool-2.4.2.tar.gz
-		
-		if [ -f "$LOCALDESTDIR/lib/libltdl.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libtool-2.4.2 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libtool-2.4.2 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
+#if [ -f "libtool-2.4.2/compile.done" ]; then
+#	echo -------------------------------------------------
+#	echo "libtool-2.4.2 is already compiled"
+#	echo -------------------------------------------------
+#	else 
+#		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
+#		tar xf libtool-2.4.2.tar.gz
+#		cd libtool-2.4.2
+#		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+#		make -j $cpuCount
+#		make install
+#		echo "finish" > compile.done
+#		cd $LOCALBUILDDIR
+#		rm libtool-2.4.2.tar.gz
+#		
+#		if [ -f "$LOCALDESTDIR/lib/libltdl.a" ]; then
+#			echo -
+#			echo -------------------------------------------------
+#			echo "build libtool-2.4.2 done..."
+#			echo -------------------------------------------------
+#			echo -
+#			else
+#				echo -------------------------------------------------
+#				echo "build libtool-2.4.2 failed..."
+#				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+#				read -p "first close the batch window, then the shell window"
+#				sleep 15
+#		fi
+#fi
 
 if [ -f "libpng-1.6.6/compile.done" ]; then
 	echo -------------------------------------------------
