@@ -500,7 +500,7 @@ if [ -f "libass-0.10.1/compile.done" ]; then
 		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
 		tar xf libass-0.10.1.tar.gz
 		cd libass-0.10.1
-		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
