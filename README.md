@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-10
+modified: 2013-10-13
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.69**
+Current release is **v0.71**
 
 
 Included Tools
@@ -46,6 +46,7 @@ Included Tools
  - gsm
  - lame (standalone and lib for ffmpeg)
  - libass
+ - libbluray
  - ogg
  - mp4box (standalone)
  - sdl (for ffplay)
