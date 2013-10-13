@@ -54,6 +54,7 @@ Included Tools
  - theora
  - opencore-amr
  - opus
+ - rtmp (standalone and lib for ffmpeg)
  - vpx
  - vo-aacenc
  - vo-amrwbenc
@@ -62,8 +63,6 @@ Included Tools
  - x264 10 bit (standalone)
  - xvid
  - zlib
-
-more will comming... 
 
 
 --------

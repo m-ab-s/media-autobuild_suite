@@ -35,7 +35,7 @@ if [ -f "ffmpeg-git/compile.done" ]; then
 	else 
 		git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 		cd ffmpeg-git
-		./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-avisynth --enable-libbluray --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libvpx --enable-libopus --enable-libx264 --enable-libxvid $extras
+		./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libvpx --enable-libopus --enable-libx264 --enable-libxvid $extras
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
