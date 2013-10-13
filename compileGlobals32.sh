@@ -285,6 +285,37 @@ if [ -f "libpng-1.6.6/compile.done" ]; then
 		fi
 fi
 
+if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "openjpeg_v1_4_sources_r697 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
+		tar xf openjpeg_v1_4_sources_r697.tgz
+		cd openjpeg_v1_4_sources_r697
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		sed -i "s/\/usr\/lib/\/local32\/lib/" Makefile
+		make
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		rm openjpeg_v1_4_sources_r697.tgz
+		
+		if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build openjpeg_v1_4_sources_r697 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build openjpeg_v1_4_sources_r697 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 if [ -f "freetype-2.4.10/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "freetype-2.4.10 is already compiled"

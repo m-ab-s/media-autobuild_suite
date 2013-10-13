@@ -53,6 +53,7 @@ Included Tools
  - speex (standalone and lib for ffmpeg)
  - theora
  - opencore-amr
+ - openjpeg
  - opus
  - rtmp (standalone and lib for ffmpeg)
  - vpx

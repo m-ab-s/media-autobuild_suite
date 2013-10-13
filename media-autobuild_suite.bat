@@ -33,7 +33,7 @@
 ::	2013-10-06 build the environment new and remove openssl and rtmp
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
 ::	2013-10-10 add libass and add build check to the shell scripts
-::	2013-10-13 add libbluray and finally librtmp to ffmpeg
+::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
 ::
 ::-------------------------------------------------------------------------------------
 
