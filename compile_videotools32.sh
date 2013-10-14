@@ -219,4 +219,32 @@ if [ -f "libbluray-0.2.3/compile.done" ]; then
 		fi
 fi
 
+if [ -f "libutvideo/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libutvideo is already compiled"
+	echo -------------------------------------------------
+	else 
+		git clone git://github.com/qyot27/libutvideo.git 
+		cd libutvideo
+		./configure --prefix=$LOCALDESTDIR
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libutvideo.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libutvideo done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libutvideo failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 sleep 3

@@ -557,7 +557,7 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		CFLAGS="-DDECLSPEC=" ./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done

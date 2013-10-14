@@ -34,6 +34,7 @@
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
 ::	2013-10-10 add libass and add build check to the shell scripts
 ::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
+::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -299,7 +300,7 @@ if %build32%==yes (
 		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profile.local
 		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
 		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
-		echo.LDFLAGS="-L/local32/lib -mthreads">>%instdir%\local32\etc\profile.local
+		echo.LDFLAGS="-L/local32/lib -mthreads -static -static-libgcc -static-libstdc++">>%instdir%\local32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.PATH=".:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local32\etc\profile.local
@@ -332,7 +333,7 @@ if %build64%==yes (
 		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profile.local
 		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
 		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
-		echo.LDFLAGS="-L/local64/lib">>%instdir%\local64\etc\profile.local
+		echo.LDFLAGS="-L/local64/lib -static -static-libgcc -static-libstdc++">>%instdir%\local64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.PATH=".:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local64\etc\profile.local
