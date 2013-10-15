@@ -205,6 +205,7 @@ if %build32%==yes (
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.0.7z
 		%instdir%\msys\1.0\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
 		del mingw32-gcc-4.8.0.7z
+		ren %instdir%\mingw\mingw32\lib\libstdc++.dll.a libstdc++.dll.a.old
 		)
 		
 :mingw64
@@ -222,6 +223,7 @@ if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
 	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.0.7z
 	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
 	del mingw64-gcc-4.8.0.7z
+	ren %instdir%\mingw\mingw64\lib\libstdc++.dll.a libstdc++.dll.a.old
 	)
 
 :makeDIR
@@ -283,7 +285,7 @@ if exist %instdir%\msys\1.0\etc\userconf.cfg GOTO writeProfile32
 
 :writeProfile32
 if %build32%==yes (
-	if exist %instdir%\local32\etc\profile.local GOTO writeProfileff
+	if exist %instdir%\local32\etc\profile.local GOTO writeProfile64
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 32 bit compiling
@@ -312,42 +314,11 @@ if %build32%==yes (
 		echo.# package installation prefix>>%instdir%\local32\etc\profile.local
 		echo.LOCALDESTDIR=/local32>>%instdir%\local32\etc\profile.local
 		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local32\etc\profile.local
-	
-	:writeProfile32ff
-	if exist %instdir%\local32\etc\profileff.local GOTO writeProfile64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- write profile for 32 bit ffmpeg
-		echo.
-		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local32\etc\profileff.local
-		echo.# /local32/etc/profile.local>>%instdir%\local32\etc\profileff.local
-		echo.#>>%instdir%\local32\etc\profileff.local
-		echo.>>%instdir%\local32\etc\profileff.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local32\etc\profileff.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local32\etc\profileff.local
-		echo.>>%instdir%\local32\etc\profileff.local
-		echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig">>%instdir%\local32\etc\profileff.local
-		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profileff.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profileff.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profileff.local
-		echo.LDFLAGS="-L/local32/lib -mthreads -static -static-libgcc -static-libstdc++">>%instdir%\local32\etc\profileff.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local32\etc\profileff.local
-		echo.>>%instdir%\local32\etc\profileff.local
-		echo.PATH=".:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local32\etc\profileff.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local32\etc\profileff.local
-		echo.export PATH PS1>>%instdir%\local32\etc\profileff.local
-		echo.>>%instdir%\local32\etc\profileff.local
-		echo.# package build directory>>%instdir%\local32\etc\profileff.local
-		echo.LOCALBUILDDIR=/build32>>%instdir%\local32\etc\profileff.local
-		echo.# package installation prefix>>%instdir%\local32\etc\profileff.local
-		echo.LOCALDESTDIR=/local32>>%instdir%\local32\etc\profileff.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local32\etc\profileff.local
 		)
 		
 :writeProfile64
 if %build64%==yes (
-	if exist %instdir%\local64\etc\profile.local GOTO writeProfile64ff
+	if exist %instdir%\local64\etc\profile.local GOTO loginProfile
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 64 bit compiling
@@ -376,37 +347,6 @@ if %build64%==yes (
 		echo.# package installation prefix>>%instdir%\local64\etc\profile.local
 		echo.LOCALDESTDIR=/local64>>%instdir%\local64\etc\profile.local
 		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profile.local
-		
-	:writeProfile64ff
-	if exist %instdir%\local64\etc\profileff.local GOTO loginProfile
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- write profile for 64 bit ffmpeg
-		echo.
-		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local64\etc\profileff.local
-		echo.# /local64/etc/profile.local>>%instdir%\local64\etc\profileff.local
-		echo.#>>%instdir%\local64\etc\profileff.local
-		echo.>>%instdir%\local64\etc\profileff.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local64\etc\profileff.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local64\etc\profileff.local
-		echo.>>%instdir%\local64\etc\profileff.local
-		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig">>%instdir%\local64\etc\profileff.local
-		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profileff.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profileff.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profileff.local
-		echo.LDFLAGS="-L/local64/lib -static -static-libgcc -static-libstdc++">>%instdir%\local64\etc\profileff.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local64\etc\profileff.local
-		echo.>>%instdir%\local64\etc\profileff.local
-		echo.PATH=".:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local64\etc\profileff.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local64\etc\profileff.local
-		echo.export PATH PS1>>%instdir%\local64\etc\profileff.local
-		echo.>>%instdir%\local64\etc\profileff.local
-		echo.# package build directory>>%instdir%\local64\etc\profileff.local
-		echo.LOCALBUILDDIR=/build64>>%instdir%\local64\etc\profileff.local
-		echo.# package installation prefix>>%instdir%\local64\etc\profileff.local
-		echo.LOCALDESTDIR=/local64>>%instdir%\local64\etc\profileff.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profileff.local
 		)
 	
 :loginProfile
