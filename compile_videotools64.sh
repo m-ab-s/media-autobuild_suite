@@ -162,11 +162,11 @@ if [[ $mp4box = "y" ]]; then
 		else 
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
-			rm extra_lib/linclude/zlib/zconf.h
-			rm extra_lib/linclude/zlib/zlib.h
+			rm extra_lib/include/zlib/zconf.h
+			rm extra_lib/include/zlib/zlib.h
 			cp $LOCALDESTDIR/lib/libz.a extra_lib/lib/gcc
-			cp $LOCALDESTDIR/include/zconf.h extra_lib/linclude/zlib
-			cp $LOCALDESTDIR/include/zlib.h extra_lib/linclude/zlib
+			cp $LOCALDESTDIR/include/zconf.h extra_lib/include/zlib
+			cp $LOCALDESTDIR/include/zlib.h extra_lib/include/zlib
 			./configure --static-mp4box --enable-static-bin --extra-libs=-lws2_32 -lwinmm --use-zlib=local --use-ffmpeg=no --use-png=no 
 			cp config.h include/gpac/internal
 			make -j $cpuCount
