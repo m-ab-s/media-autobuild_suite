@@ -131,7 +131,7 @@ if [ -f "libvpx-git/compile.done" ]; then
             git clone http://git.chromium.org/webm/libvpx.git libvpx-git
             cd libvpx-git
         fi
-        ./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-examples --disable-unit-tests --disable-docs
+        ./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
 		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
         make -j $cpuCount
         make install
