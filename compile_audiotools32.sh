@@ -428,30 +428,60 @@ fi
 
 fi # nonfree end
 
-if [ -f "opus-1.0.1/compile.done" ]; then
+if [ -f "opus-1.0.3/compile.done" ]; then
     echo -------------------------------------------------
-    echo "opus-1.0.1 is already compiled"
+    echo "opus-1.0.3 is already compiled"
     echo -------------------------------------------------
     else 
-      wget -c http://downloads.xiph.org/releases/opus/opus-1.0.1.tar.gz
-		tar xf opus-1.0.1.tar.gz
-		cd opus-1.0.1
+      wget -c http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
+		tar xf opus-1.0.3.tar.gz
+		cd opus-1.0.3
         ./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
         make -j $cpuCount
         make install
         echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-        rm opus-1.0.1.tar.gz
+        rm opus-1.0.3.tar.gz
 		
 		if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build opus-1.0.1 done..."
+			echo "build opus-1.0.3 done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build opus-1.0.1 failed..."
+				echo "build opus-1.0.3 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+if [ -f "opus-tools-0.1.7/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "opus-tools-0.1.7 is already compiled"
+    echo -------------------------------------------------
+    else 
+      wget -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
+		tar xf opus-tools-0.1.7.tar.gz
+		cd opus-tools-0.1.7
+        ./configure --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"
+        make -j $cpuCount
+        make install
+        echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+        rm opus-tools-0.1.7.tar.gz
+		
+		if [ -f "$LOCALDESTDIR/bin/opusenc.exe" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build opus-tools-0.1.7 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build opus-tools-0.1.7 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15

@@ -35,6 +35,7 @@
 ::	2013-10-10 add libass and add build check to the shell scripts
 ::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
 ::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
+::	2013-10-19 add xavs and opus-tools, update svn and opus version
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -410,11 +411,11 @@ if exist %instdir%\opt\bin\cmake.exe GOTO checkDoxygen32
 	echo.>>%instdir%\extraPack.sh
 	
 	echo.cd ${LOCALBUILDDIR}>>%instdir%\extraPack.sh
-	echo.wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.0/apache22/svn-win32-1.8.0.zip">>%instdir%\extraPack.sh
-	echo.unzip svn-win32-1.8.0.zip>>%instdir%\extraPack.sh
-	echo.cp -va svn-win32-1.8.0/* /opt>>%instdir%\extraPack.sh
-	echo.mkdir -p /opt/doc/svn-win32-1.8.0>>%instdir%\extraPack.sh
-	echo.mv /opt/README.txt /opt/doc/svn-win32-1.8.0>>%instdir%\extraPack.sh
+	echo.wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.3/apache22/svn-win32-1.8.3.zip">>%instdir%\extraPack.sh
+	echo.unzip svn-win32-1.8.3.zip>>%instdir%\extraPack.sh
+	echo.cp -va svn-win32-1.8.3/* /opt>>%instdir%\extraPack.sh
+	echo.mkdir -p /opt/doc/svn-win32-1.8.3>>%instdir%\extraPack.sh
+	echo.mv /opt/README.txt /opt/doc/svn-win32-1.8.3>>%instdir%\extraPack.sh
 	echo.>>%instdir%\extraPack.sh
 	
 	echo.cd ${LOCALBUILDDIR}>>%instdir%\extraPack.sh
@@ -423,9 +424,9 @@ if exist %instdir%\opt\bin\cmake.exe GOTO checkDoxygen32
 	echo.cp -va cmake-2.8.11.1-win32-x86/* /opt>>%instdir%\extraPack.sh
 		
 	echo.rm ${LOCALBUILDDIR}/PortableGit-1.8.3-preview20130601.7z>>%instdir%\extraPack.sh
-	echo.rm ${LOCALBUILDDIR}/svn-win32-1.8.0.zip>>%instdir%\extraPack.sh
+	echo.rm ${LOCALBUILDDIR}/svn-win32-1.8.3.zip>>%instdir%\extraPack.sh
 	echo.rm ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86.zip>>%instdir%\extraPack.sh
-	echo.rm -r ${LOCALBUILDDIR}/svn-win32-1.8.0>>%instdir%\extraPack.sh
+	echo.rm -r ${LOCALBUILDDIR}/svn-win32-1.8.3>>%instdir%\extraPack.sh
 	echo.rm -r ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86>>%instdir%\extraPack.sh
 
 	%instdir%\msys\1.0\bin\sh -l %instdir%\extraPack.sh

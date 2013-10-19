@@ -248,4 +248,32 @@ if [ -f "libutvideo/compile.done" ]; then
 		fi
 fi
 
+if [ -f "xavs/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "xavs is already compiled"
+	echo -------------------------------------------------
+	else 
+		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/vsde/trunk xavs 
+		cd xavs
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build xavs done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build xavs failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 sleep 3

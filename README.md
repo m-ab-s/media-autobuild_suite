@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-10-14
+modified: 2013-10-19
 
 ---
 
@@ -44,11 +44,13 @@ Included Tools
  - fontconfig
  - freetype
  - gsm
+ - gnutls (standalone and lib for ffmpeg)
  - lame (standalone and lib for ffmpeg)
  - libass
  - libbluray
  - libutvideo
  - ogg
+ - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
@@ -56,13 +58,15 @@ Included Tools
  - opencore-amr
  - openjpeg
  - opus
+ - opus-tools (standalone)
  - rtmp (standalone and lib for ffmpeg)
- - vpx
+ - vpx (standalone and lib for ffmpeg)
  - vo-aacenc
  - vo-amrwbenc
  - vorbis
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
+ - xavs (standalone and lib for ffmpeg)
  - xvid
  - zlib
 
