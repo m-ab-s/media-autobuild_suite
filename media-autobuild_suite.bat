@@ -206,7 +206,7 @@ if %build32%==yes (
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.0.7z
 		%instdir%\msys\1.0\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
 		del mingw32-gcc-4.8.0.7z
-		ren %instdir%\mingw\mingw32\lib\libstdc++.dll.a libstdc++.dll.a.old
+		ren %instdir%\mingw32\lib\libstdc++.dll.a libstdc++.dll.a.old
 		)
 		
 :mingw64
@@ -224,7 +224,7 @@ if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
 	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.0.7z
 	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
 	del mingw64-gcc-4.8.0.7z
-	ren %instdir%\mingw\mingw64\lib\libstdc++.dll.a libstdc++.dll.a.old
+	ren %instdir%\mingw64\lib\libstdc++.dll.a libstdc++.dll.a.old
 	)
 
 :makeDIR
