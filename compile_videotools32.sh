@@ -306,6 +306,7 @@ if [[ $mplayer = "y" ]]; then
 			make install
 			echo "finish" > compile.done
 			cd $LOCALBUILDDIR
+			rm mplayer-checkout-snapshot.tar.bz2
 			
 			if [ -f "$LOCALDESTDIR/bin/mplayer.exe" ]; then
 				echo -
