@@ -52,6 +52,7 @@ Included Tools
  - ogg
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
+ - mplayer (standalone)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
