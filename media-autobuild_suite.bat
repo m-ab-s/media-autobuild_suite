@@ -671,7 +671,7 @@ if %build32%==yes (
 	echo.- compile video coder, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer%
+	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer% --nonfree=%binary%
 	echo. compile video coder 32 bit done...
 	)
 
@@ -694,7 +694,7 @@ if %build64%==yes (
 	echo.- compile video coder, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer%
+	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer% --nonfree=%binary%
 	echo. compile video coder 64 bit done...
 	)
 

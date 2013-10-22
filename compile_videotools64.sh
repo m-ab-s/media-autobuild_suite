@@ -13,6 +13,14 @@ while true; do
   esac
 done
 
+if [[ $nonfree = "y" ]]; then
+    faac=""
+  else
+    if  [[ $nonfree = "n" ]]; then
+      faac="--disable-faac --disable-faac-lavc" 
+	fi
+fi	
+
 echo "-------------------------------------------------------------------------------"
 echo 
 echo "compile video tools 64 bit"
@@ -299,7 +307,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=/local32 --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal
+			./configure --prefix=/local32 --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal $faac
 			cd ffmpeg
 			./configure --arch=x86_64 --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static
 			cd ..

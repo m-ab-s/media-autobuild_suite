@@ -12,7 +12,7 @@ while true; do
   esac
 done
 
-  if [[ $nonfree = "y" ]]; then
+if [[ $nonfree = "y" ]]; then
     extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
   else
     if  [[ $nonfree = "n" ]]; then

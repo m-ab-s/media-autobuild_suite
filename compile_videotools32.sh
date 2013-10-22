@@ -7,11 +7,20 @@ while true; do
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
+--nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
   esac
 done
+
+if [[ $nonfree = "y" ]]; then
+    faac=""
+  else
+    if  [[ $nonfree = "n" ]]; then
+      faac="--disable-faac --disable-faac-lavc" 
+	fi
+fi	
 
 echo "-------------------------------------------------------------------------------"
 echo 
@@ -298,7 +307,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=/local32 --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal
+			./configure --prefix=/local32 --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal $faac
 			cd ffmpeg
 			./configure --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static
 			cd ..
