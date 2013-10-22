@@ -6,6 +6,7 @@ while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
+--mplayer=* ) mplayer="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -277,7 +278,7 @@ if [[ $mp4box = "y" ]]; then
 fi
 
 if [[ $mplayer = "y" ]]; then
-	if [ -f "mplayer/compile.done" ]; then
+	if [ -f mplayer-checkout*/compile.done ]; then
 		echo -------------------------------------------------
 		echo "mplayer is already compiled"
 		echo -------------------------------------------------

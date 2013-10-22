@@ -277,7 +277,7 @@ if [[ $mp4box = "y" ]]; then
 fi
 
 if [[ $mplayer = "y" ]]; then
-	if [ -f "mplayer/compile.done" ]; then
+	if [ -f mplayer-checkout*/compile.done ]; then
 		echo -------------------------------------------------
 		echo "mplayer is already compiled"
 		echo -------------------------------------------------
