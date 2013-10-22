@@ -7,6 +7,7 @@ while true; do
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
+--nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
