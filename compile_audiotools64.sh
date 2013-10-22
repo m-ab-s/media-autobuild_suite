@@ -464,7 +464,7 @@ if [ -f "opus-tools-0.1.7/compile.done" ]; then
     echo "opus-tools-0.1.7 is already compiled"
     echo -------------------------------------------------
     else 
-      wget -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
+      wget --no-check-certificate -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
 		tar xf opus-tools-0.1.7.tar.gz
 		cd opus-tools-0.1.7
         ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"

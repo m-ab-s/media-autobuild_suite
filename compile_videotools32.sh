@@ -6,6 +6,7 @@ while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
+--mplayer=* ) mplayer="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -153,42 +154,6 @@ if [ -f "libvpx-git/compile.done" ]; then
 		fi
 fi
 
-if [[ $mp4box = "y" ]]; then
-	if [ -f "mp4box_gpac/compile.done" ]; then
-		echo -------------------------------------------------
-		echo "mp4box_gpac is already compiled"
-		echo -------------------------------------------------
-		else 
-			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
-			cd mp4box_gpac
-			rm extra_lib/include/zlib/zconf.h
-			rm extra_lib/include/zlib/zlib.h
-			cp $LOCALDESTDIR/lib/libz.a extra_lib/lib/gcc
-			cp $LOCALDESTDIR/include/zconf.h extra_lib/include/zlib
-			cp $LOCALDESTDIR/include/zlib.h extra_lib/include/zlib
-			./configure --static-mp4box --enable-static-bin --extra-libs=-lws2_32 -lwinmm --use-zlib=local --use-ffmpeg=no --use-png=no 
-			cp config.h include/gpac/internal
-			make -j $cpuCount
-			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
-			echo "finish" > compile.done
-			cd $LOCALBUILDDIR
-			
-			if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
-				echo -
-				echo -------------------------------------------------
-				echo "build mp4box done..."
-				echo -------------------------------------------------
-				echo -
-				else
-					echo -------------------------------------------------
-					echo "build mp4box failed..."
-					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-					read -p "first close the batch window, then the shell window"
-					sleep 15
-			fi
-	fi
-fi
-
 if [ -f "libbluray-0.2.3/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "libbluray-0.2.3 is already compiled"
@@ -252,7 +217,7 @@ if [ -f "xavs/compile.done" ]; then
 	echo "xavs is already compiled"
 	echo -------------------------------------------------
 	else 
-		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/vsde/trunk xavs 
+		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --prefix=$LOCALDESTDIR
 		make -j $cpuCount
@@ -273,6 +238,89 @@ if [ -f "xavs/compile.done" ]; then
 				read -p "first close the batch window, then the shell window"
 				sleep 15
 		fi
+fi
+
+if [[ $mp4box = "y" ]]; then
+	if [ -f "mp4box_gpac/compile.done" ]; then
+		echo -------------------------------------------------
+		echo "mp4box_gpac is already compiled"
+		echo -------------------------------------------------
+		else 
+			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
+			cd mp4box_gpac
+			rm extra_lib/include/zlib/zconf.h
+			rm extra_lib/include/zlib/zlib.h
+			cp $LOCALDESTDIR/lib/libz.a extra_lib/lib/gcc
+			cp $LOCALDESTDIR/include/zconf.h extra_lib/include/zlib
+			cp $LOCALDESTDIR/include/zlib.h extra_lib/include/zlib
+			./configure --static-mp4box --enable-static-bin --extra-libs=-lws2_32 -lwinmm --use-zlib=local --use-ffmpeg=no --use-png=no 
+			cp config.h include/gpac/internal
+			make -j $cpuCount
+			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
+			echo "finish" > compile.done
+			cd $LOCALBUILDDIR
+			
+			if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build mp4box done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build mp4box failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+	fi
+fi
+
+if [[ $mplayer = "y" ]]; then
+	if [ -f "mplayer/compile.done" ]; then
+		echo -------------------------------------------------
+		echo "mplayer is already compiled"
+		echo -------------------------------------------------
+		else 
+			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
+			tar xf mplayer-checkout-snapshot.tar.bz2
+			cd mplayer-checkout*
+			
+			if ! test -e ffmpeg ; then
+				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
+					rm -rf ffmpeg
+					echo "Failed to get a FFmpeg checkout"
+					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
+					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
+					echo "To use a github mirror via http (e.g. because a firewall blocks git):"
+					echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
+					exit 1
+				fi
+				touch ffmpeg/mp_auto_pull
+			fi
+			./configure --prefix=/local32 --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal
+			cd ffmpeg
+			./configure --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static
+			cd ..
+			make
+			make install
+			echo "finish" > compile.done
+			cd $LOCALBUILDDIR
+			
+			if [ -f "$LOCALDESTDIR/bin/mplayer.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build mplayer done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build mplayer failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+	fi
 fi
 
 sleep 3

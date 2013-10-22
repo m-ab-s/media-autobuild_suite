@@ -36,6 +36,7 @@
 ::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
 ::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
 ::	2013-10-19 add xavs and opus-tools, update svn and opus version
+::	2013-10-22 some fixes and add mplayer (maybe not the best way)
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -116,6 +117,26 @@ if %buildMp4box%==2 (
 	)
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 
+:mplayer
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+echo.
+echo. Build static mplayer/mencoder binary:
+echo. 1 = yes
+echo. 2 = no
+echo.
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+set /P buildmplayer="build mplayer:"
+
+if %buildmplayer%==1 (
+	set "mplayer=y"
+	)
+if %buildmplayer%==2 (
+	set "mplayer=n"
+	)
+if %buildmplayer% GTR 2 GOTO mplayer
+
 :numCores
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
@@ -166,7 +187,7 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO mingw-dtk
 	mkdir 7za920
 	cd ..
 	cd bin
-	%instdir%\msys\1.0\bin\unzip ../../7za920.zip
+	%instdir%\msys\1.0\bin\unzip %instdir%/7za920.zip
 	%instdir%\msys\1.0\bin\mv license.txt readme.txt 7-zip.chm ../doc/7za920
 	cd ..\..
 	del 7za920.zip
@@ -650,7 +671,7 @@ if %build32%==yes (
 	echo.- compile video coder, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
+	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer%
 	echo. compile video coder 32 bit done...
 	)
 
@@ -673,7 +694,7 @@ if %build64%==yes (
 	echo.- compile video coder, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box%
+	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer%
 	echo. compile video coder 64 bit done...
 	)
 
