@@ -33,6 +33,7 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 		cd zlib-1.2.8
 		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
+		install zlib1.dll $LOCALDESTDIR/bin
 		install libz.a $LOCALDESTDIR/lib
 		install zlib.h $LOCALDESTDIR/include
 		install zconf.h $LOCALDESTDIR/include
@@ -310,6 +311,66 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build openjpeg_v1_4_sources_r697 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+if [ -f "jpeg-9/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "jpeg-9 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
+		tar xf jpegsrc.v9.tar.gz
+		rm jpegsrc.v9.tar.gz
+		cd jpeg-9
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build jpeg-9 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build jpeg-9 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+if [ -f "tiff-4.0.3/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "tiff-4.0.3 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
+		tar xf tiff-4.0.3.tar.gz
+		rm tiff-4.0.3.tar.gz
+		cd tiff-4.0.3
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libtiff.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build tiff-4.0.3 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build tiff-4.0.3 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
@@ -761,6 +822,65 @@ if [ -f "rtmpdump/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build rtmpdump failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "lzo-2.06/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "lzo-2.06 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
+		tar xf lzo-2.06.tar.gz
+		rm lzo-2.06.tar.gz
+		cd lzo-2.06
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/liblzo2.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build lzo-2.06 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build lzo-2.06 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdca/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdca is already compiled"
+	echo -------------------------------------------------
+	else 
+		svn co svn://svn.videolan.org/libdca/trunk libdca
+		cd libdca
+		./bootstrap
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdca done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdca failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
