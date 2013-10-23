@@ -307,10 +307,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal $faac
-			cd ffmpeg
-			./configure --extra-cflags=-DPTW32_STATIC_LIB --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static
-			cd ..
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal $faac
 			make
 			make install
 			echo "finish" > compile.done
