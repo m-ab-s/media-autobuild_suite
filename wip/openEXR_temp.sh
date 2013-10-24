@@ -104,7 +104,8 @@ make install
 cd ..
 
 cd OpenEXR_Viewers
-./bootstrap ./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"
+./bootstrap 
+./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"
 make -j $cpuCount
 make install
 
