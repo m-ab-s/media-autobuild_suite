@@ -1,7 +1,7 @@
 source /local32/etc/profile.local
 
 # set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
-cpuCount=1
+cpuCount=6
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
@@ -70,10 +70,10 @@ make -j $cpuCount
 make install
 
 cd $LOCALBUILDDIR
-wget -c https://github.com/downloads/openexr/openexr/ilmbase-1.0.3.tar.gz
+wget --no-check-certificate -c https://github.com/downloads/openexr/openexr/ilmbase-1.0.3.tar.gz
 tar xf ilmbase-1.0.3.tar.gz
 rm ilmbase-1.0.3.tar.gz
-ch ilmbase-1.0.3
+cd ilmbase-1.0.3
 sed -i 's/#if !defined (_WIN32) &&!(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThread.cpp
 sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadMutex.cpp
 sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadSemaphore.cpp
