@@ -70,14 +70,41 @@ make -j $cpuCount
 make install
 
 cd $LOCALBUILDDIR
-wget --no-check-certificate -c https://github.com/downloads/openexr/openexr/ilmbase-1.0.3.tar.gz
-tar xf ilmbase-1.0.3.tar.gz
-rm ilmbase-1.0.3.tar.gz
-cd ilmbase-1.0.3
+wget -c http://fltk.org/pub/fltk/1.3.2/fltk-1.3.2-source.tar.gz
+tar xzf fltk-1.3.2-source.tar.gz
+rm fltk-1.3.2-source.tar.gz
+cd fltk-1.3.2
+./configure --prefix=$LOCALDESTDIR
+make -j $cpuCount
+make install
+
+cd $LOCALBUILDDIR
+git clone https://github.com/openexr/openexr.git OpenEXR-Master
+cd OpenEXR
+cd IlmBase
+./bootstrap
 sed -i 's/#if !defined (_WIN32) &&!(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThread.cpp
 sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadMutex.cpp
 sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadSemaphore.cpp
-./configure --disable-threading --disable-posix-sem --prefix=/local32
+./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem
+make -j $cpuCount
+make install
+cd ..
+
+cd OpenEXR
+./bootstrap
+sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfZipCompressor.cpp
+sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfPxr24Compressor.cpp
+./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem --disable-ilmbasetest
+cd IlmImf
+g++ -I/local32/include -I/local32/include/OpenEXR -mms-bitfields -mthreads -mtune=pentium3 -I/local32/include -L/local32/lib -mthreads  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
+cd ..
+make -j $cpuCount
+make install
+cd ..
+
+cd OpenEXR_Viewers
+./bootstrap ./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"
 make -j $cpuCount
 make install
 
