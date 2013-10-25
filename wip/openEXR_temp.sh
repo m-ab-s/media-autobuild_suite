@@ -22,7 +22,7 @@ if [ -f "exiv2-0.23/compile.done" ]; then
 		tar xzf exiv2-0.23.tar.gz
 		rm exiv2-0.23.tar.gz
 		cd exiv2-0.23
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes 
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -54,7 +54,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		cd fftw-3.2.2
 		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
 		#sed -i 's/configur*/ /g' bootstrap.sh
-		./configure --prefix=/local32 --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse
+		./configure --prefix=/local32 --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -84,7 +84,7 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
 		tar xzf fltk-1.3.2-source.tar.gz
 		rm fltk-1.3.2-source.tar.gz
 		cd fltk-1.3.2
-		./configure --prefix=$LOCALDESTDIR
+		./configure --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -117,7 +117,7 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		sed -i 's/#if !defined (_WIN32) &&!(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThread.cpp
 		sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadMutex.cpp
 		sed -i 's/#if !defined (_WIN32) && !(_WIN64) && !(HAVE_PTHREAD)/#if true/g' IlmThread/IlmThreadSemaphore.cpp
-		./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem
+		./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
 		make install
 		cd ..
@@ -126,16 +126,16 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		./bootstrap
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfZipCompressor.cpp
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfPxr24Compressor.cpp
-		./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem --disable-ilmbasetest
+		./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem --disable-ilmbasetest LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		cd IlmImf
-		g++ -I/local32/include -I/local32/include/OpenEXR -mms-bitfields -mthreads -mtune=pentium3 -I/local32/include -L/local32/lib -mthreads  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
+		g++ -I/local32/include -I/local32/include/OpenEXR -mms-bitfields -mthreads -mtune=pentium3 -static -static-libgcc -static-libstdc++ -I/local32/include -L/local32/lib -mthreads  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
 		cd ..
 		make -j $cpuCount
 		make install
 		cd ..
 		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/bin/openexrmakepreview.exe" ]; then
+		if [ -f "$LOCALDESTDIR/bin/exrmakepreview.exe" ]; then
 			echo -
 			echo -------------------------------------------------
 			echo "build OpenEXR done..."
@@ -150,72 +150,72 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		fi
 fi
 
-cd $LOCALBUILDDIR
-if [ -f "aces_container/compile.done" ]; then
-    echo -------------------------------------------------
-    echo "aces_container is already compiled"
-    echo -------------------------------------------------
-    else 
-		git clone https://github.com/ampas/aces_container.git aces_container
-		cd aces_container
-		mkdir build
-		cd build
-		cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -G "MSYS Makefiles" ..
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		
-		if [ -f "$LOCALDESTDIR/bin/aces_container.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build aces_container done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build aces_container failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-cd $LOCALBUILDDIR
-if [ -f "CTL/compile.done" ]; then
-    echo -------------------------------------------------
-    echo "CTL is already compiled"
-    echo -------------------------------------------------
-    else 
-		git clone https://github.com/ampas/CTL.git CTL
-		cd CTL
-		mkdir build
-		cd build
-		cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -G "MSYS Makefiles" ..
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		
-		if [ -f "$LOCALDESTDIR/bin/CTL.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build CTL done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build CTL failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
+#cd $LOCALBUILDDIR
+#if [ -f "aces_container/compile.done" ]; then
+#    echo -------------------------------------------------
+#    echo "aces_container is already compiled"
+#    echo -------------------------------------------------
+#    else 
+#		git clone https://github.com/ampas/aces_container.git aces_container
+#		cd aces_container
+#		mkdir build
+#		cd build
+#		cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -G "MSYS Makefiles" ..
+#		make -j $cpuCount
+#		make install
+#		echo "finish" > compile.done
+#		
+#		if [ -f "$LOCALDESTDIR/bin/aces_container.exe" ]; then
+#			echo -
+#			echo -------------------------------------------------
+#			echo "build aces_container done..."
+#			echo -------------------------------------------------
+#			echo -
+#			else
+#				echo -------------------------------------------------
+#				echo "build aces_container failed..."
+#				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+#				read -p "first close the batch window, then the shell window"
+#				sleep 15
+#		fi
+#fi
+#
+#cd $LOCALBUILDDIR
+#if [ -f "CTL/compile.done" ]; then
+#    echo -------------------------------------------------
+#    echo "CTL is already compiled"
+#    echo -------------------------------------------------
+#    else 
+#		git clone https://github.com/ampas/CTL.git CTL
+#		cd CTL
+#		mkdir build
+#		cd build
+#		cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -G "MSYS Makefiles" ..
+#		make -j $cpuCount
+#		make install
+#		echo "finish" > compile.done
+#		
+#		if [ -f "$LOCALDESTDIR/bin/CTL.exe" ]; then
+#			echo -
+#			echo -------------------------------------------------
+#			echo "build CTL done..."
+#			echo -------------------------------------------------
+#			echo -
+#			else
+#				echo -------------------------------------------------
+#				echo "build CTL failed..."
+#				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+#				read -p "first close the batch window, then the shell window"
+#				sleep 15
+#		fi
+#fi
 
 #cd $LOCALBUILDDIR
-#cd OpenEXR_Viewers
-#./bootstrap 
-#./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem
-#make -j $cpuCount
-#make install
+cd OpenEXR_Viewers
+./bootstrap 
+./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+make -j $cpuCount
+make install
 
 
 
