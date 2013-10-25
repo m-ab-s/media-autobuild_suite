@@ -22,7 +22,7 @@ if [ -f "exiv2-0.23/compile.done" ]; then
 		tar xzf exiv2-0.23.tar.gz
 		rm exiv2-0.23.tar.gz
 		cd exiv2-0.23
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -54,7 +54,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		cd fftw-3.2.2
 		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
 		#sed -i 's/configur*/ /g' bootstrap.sh
-		./configure --prefix=/local32 --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		./configure --prefix=/local32 --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -84,7 +84,7 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
 		tar xzf fltk-1.3.2-source.tar.gz
 		rm fltk-1.3.2-source.tar.gz
 		cd fltk-1.3.2
-		./configure --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		./configure --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
