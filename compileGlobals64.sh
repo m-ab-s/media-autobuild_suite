@@ -33,7 +33,7 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 		cd zlib-1.2.8
 		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
-		install zlib1.dll $LOCALDESTDIR/bin
+		#install zlib1.dll $LOCALDESTDIR/bin
 		install libz.a $LOCALDESTDIR/lib
 		install zlib.h $LOCALDESTDIR/include
 		install zconf.h $LOCALDESTDIR/include
