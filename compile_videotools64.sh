@@ -164,30 +164,31 @@ if [ -f "libvpx-git/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libbluray-0.2.3/compile.done" ]; then
+if [ -f "libbluray-git/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "libbluray-0.2.3 is already compiled"
+	echo "libbluray-git is already compiled"
 	echo -------------------------------------------------
 	else 
-		wget -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.2.3/libbluray-0.2.3.tar.bz2 
-		tar xf libbluray-0.2.3.tar.bz2
-		cd libbluray-0.2.3
+		#wget -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.2.3/libbluray-0.2.3.tar.bz2 
+		#tar xf libbluray-0.2.3.tar.bz2
+		git clone git://git.videolan.org/libbluray.git libbluray-git
+		cd libbluray-git
+		./bootstrap
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm libbluray-0.2.3.tar.bz2
 		
 		if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build libbluray-0.2.3 done..."
+			echo "build libbluray-git done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build libbluray-0.2.3 failed..."
+				echo "build libbluray-git failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15

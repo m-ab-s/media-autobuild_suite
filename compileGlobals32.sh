@@ -499,31 +499,31 @@ if [ -f "expat-2.1.0/compile.done" ]; then
 		fi
 fi
 
-if [ -f "fontconfig-2.10.1/compile.done" ]; then
+if [ -f "fontconfig-2.10.2/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "fontconfig-2.10.1 is already compiled"
+	echo "fontconfig-2.10.2 is already compiled"
 	echo -------------------------------------------------
 	else 
-		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.1.tar.gz
-		tar xf fontconfig-2.10.1.tar.gz
-		cd fontconfig-2.10.1
+		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
+		tar xf fontconfig-2.10.2.tar.gz
+		cd fontconfig-2.10.2
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$PKG_CONFIG_PATH/fontconfig.pc"
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm fontconfig-2.10.1.tar.gz
+		rm fontconfig-2.10.2.tar.gz
 		
 		if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build fontconfig-2.10.1 done..."
+			echo "build fontconfig-2.10.2 done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build fontconfig-2.10.1 failed..."
+				echo "build fontconfig-2.10.2 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
@@ -881,6 +881,38 @@ if [ -f "libdca/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build libdca failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libxml2-2.9.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libxml2-2.9.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
+		tar xf libxml2-2.9.1.tar.gz
+		rm libxml2-2.9.1.tar.gz
+		cd libxml2-2.9.1
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		make -j $cpuCount
+		make install
+		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
+		cp $LOCALDESTDIR/lib/xml2.la $LOCALDESTDIR/lib/libxml2.la
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libxml2-2.9.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libxml2-2.9.1 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
