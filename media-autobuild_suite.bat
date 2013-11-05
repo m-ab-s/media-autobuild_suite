@@ -24,11 +24,11 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.71
+::  This is version 0.75
 ::	Project stared at 2013-09-24. Last bigger modification was on 2013-10-06
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
-::  2013-10-01 change pkg-config, add mp4box, and reorder code
+::      2013-10-01 change pkg-config, add mp4box, and reorder code
 ::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
 ::	2013-10-06 build the environment new and remove openssl and rtmp
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
@@ -37,6 +37,7 @@
 ::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
 ::	2013-10-19 add xavs and opus-tools, update svn and opus version
 ::	2013-10-22 some fixes and add mplayer (maybe not the best way)
+::      2013-11-05 update libbluray, fontconfig and add update function to ffmpeg
 ::
 ::-------------------------------------------------------------------------------------
 
