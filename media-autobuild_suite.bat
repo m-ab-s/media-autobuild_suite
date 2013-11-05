@@ -37,7 +37,7 @@
 ::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
 ::	2013-10-19 add xavs and opus-tools, update svn and opus version
 ::	2013-10-22 some fixes and add mplayer (maybe not the best way)
-::      2013-11-05 update libbluray, fontconfig and add update function to ffmpeg
+::      2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
 ::
 ::-------------------------------------------------------------------------------------
 
