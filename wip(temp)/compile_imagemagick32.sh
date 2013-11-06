@@ -12,37 +12,6 @@ while true; do
 done
 
 cd $LOCALBUILDDIR
-if [ -f "libiconv-1.14/compile1.done" ]; then
-    echo -------------------------------------------------
-    echo "libiconv-1.14 is already compiled"
-    echo -------------------------------------------------
-    else 
-		if [ -d "libiconv-1.14" ]; then rm -r libiconv-1.14; fi
-		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
-		tar xzf libiconv-1.14.tar.gz
-		rm libiconv-1.14.tar.gz
-		cd libiconv-1.14
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
-		make -j $cpuCount
-		make install
-		echo "finish" > compile1.done
-		
-		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libiconv-1.14 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libiconv-1.14 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-cd $LOCALBUILDDIR
 if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
     echo -------------------------------------------------
     echo "gettext-0.18.3.1-runtime is already compiled"
@@ -138,19 +107,6 @@ if [ -f "libiconv-1.14/compile2.done" ]; then
 		fi
 fi
 
-source /local32/etc/profile.local
-
-# set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
-cpuCount=6
-while true; do
-  case $1 in
---cpuCount=* ) cpuCount="${1#*=}"; shift ;;
-    -- ) shift; break ;;
-    -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
-    * ) break ;;
-  esac
-done
-
 cd $LOCALBUILDDIR
 if [ -f "fftw-3.2.2/compile.done" ]; then
     echo -------------------------------------------------
@@ -163,7 +119,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		cd fftw-3.2.2
 		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
 		#sed -i 's/configur*/ /g' bootstrap.sh
-		./configure --prefix=/local32 --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
+		./configure --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -237,7 +193,7 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfPxr24Compressor.cpp
 		./configure --prefix=$LOCALDESTDIR --disable-threading --disable-posix-sem --disable-ilmbasetest LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		cd IlmImf
-		g++ -I/local32/include -I/local32/include/OpenEXR -mms-bitfields -mthreads -mtune=pentium3 -static -static-libgcc -static-libstdc++ -I/local32/include -L/local32/lib -mthreads  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
+		g++ -I$LOCALDESTDIR/include -I$LOCALDESTDIR/include/OpenEXR -mms-bitfields -mthreads -mtune=pentium3 -static -static-libgcc -static-libstdc++ -I$LOCALDESTDIR/include -L$LOCALDESTDIR/lib -mthreads  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
 		cd ..
 		make -j $cpuCount
 		make install
@@ -328,7 +284,7 @@ if [ -f "ImageMagick-git/configure" ]; then
 		make -j $cpuCount
 		make install
 		
-		if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
+		if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 			echo -
 			echo -------------------------------------------------
 			echo "ImageMagick done..."

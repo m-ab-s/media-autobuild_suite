@@ -478,7 +478,7 @@ if [ -f "dx7headers/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libiconv-1.14/compile.done" ]; then
+if [ -f "libiconv-1.14/compile1.done" ]; then
 	echo -------------------------------------------------
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
@@ -486,10 +486,10 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
+		echo "finish" > compile1.done
 		cd $LOCALBUILDDIR
 		rm libiconv-1.14.tar.gz
 		
