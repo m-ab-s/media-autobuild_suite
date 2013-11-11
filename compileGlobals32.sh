@@ -22,6 +22,12 @@ cat > .gitconfig << "EOF"
 EOF
 fi
 
+#make mingw libs static
+if [ -f "/mingw32/lib/libgfortran.dll.a" ]; then mv /mingw32/lib/libgfortran.dll.a /mingw32/lib/libgfortran.dll.a.old; fi
+if [ -f "/mingw32/lib/libgomp.dll.a" ]; then mv /mingw32/lib/libgomp.dll.a /mingw32/lib/libgomp.dll.a.old; fi
+if [ -f "/mingw32/lib/libquadmath.dll.a" ]; then mv /mingw32/lib/libquadmath.dll.a /mingw32/lib/libquadmath.dll.a.old; fi
+if [ -f "/mingw32/lib/libssp.dll.a" ]; then mv /mingw32/lib/libssp.dll.a /mingw32/lib/libssp.dll.a.old; fi
+
 cd $LOCALBUILDDIR
 if [ -f "zlib-1.2.8/compile.done" ]; then
 	echo -------------------------------------------------
@@ -347,6 +353,36 @@ if [ -f "jpeg-9/compile.done" ]; then
 		fi
 fi
 
+if [ -f "jasper-1.900.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "jasper-1.900.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
+		unzip jasper-1.900.1.zip
+		rm jasper-1.900.1.zip
+		cd jasper-1.900.1
+		./configure --prefix=$LOCALDESTDIR --enable-static=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		cd $LOCALBUILDDIR
+		
+		if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build jasper-1.900.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build jasper-1.900.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
 if [ -f "tiff-4.0.3/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "tiff-4.0.3 is already compiled"
@@ -439,7 +475,7 @@ if [ -f "dx7headers/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libiconv-1.14/compile.done" ]; then
+if [ -f "libiconv-1.14/compile1.done" ]; then
 	echo -------------------------------------------------
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
@@ -447,10 +483,10 @@ if [ -f "libiconv-1.14/compile.done" ]; then
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
+		echo "finish" > compile1.done
 		cd $LOCALBUILDDIR
 		rm libiconv-1.14.tar.gz
 		

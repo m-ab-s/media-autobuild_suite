@@ -24,11 +24,11 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::  This is version 0.75
-::	Project stared at 2013-09-24. Last bigger modification was on 2013-10-06
+::  This is version 0.77
+::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-06
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
-::      2013-10-01 change pkg-config, add mp4box, and reorder code
+::  2013-10-01 change pkg-config, add mp4box, and reorder code
 ::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
 ::	2013-10-06 build the environment new and remove openssl and rtmp
 ::	2013-10-08 add libopus and libvpx (thanks to hoary)
@@ -36,8 +36,10 @@
 ::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
 ::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
 ::	2013-10-19 add xavs and opus-tools, update svn and opus version
-::	2013-10-22 some fixes and add mplayer (maybe not the best way)
-::      2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
+::  2013-10-22 some fixes and add mplayer (maybe not the best way)
+::  2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
+::  2013-11-06 add openexr, jpeg2000 and imagemagick (openexr and imagemagick only for 32 bit at the moment)
+::  2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -98,6 +100,26 @@ if %nonfree%==2 (
 	)
 if %nonfree% GTR 2 GOTO selectNonFree
 
+:ffmpeg
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+echo.
+echo. Build static ffmpeg binary:
+echo. 1 = yes
+echo. 2 = no
+echo.
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+set /P buildffmpeg="build ffmpeg:"
+
+if %buildffmpeg%==1 (
+	set "ffmpeg=y"
+	)
+if %buildffmpeg%==2 (
+	set "ffmpeg=n"
+	)
+if %buildffmpeg% GTR 2 GOTO ffmpeg
+
 :mp4boxStatic
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
@@ -138,6 +160,26 @@ if %buildmplayer%==2 (
 	)
 if %buildmplayer% GTR 2 GOTO mplayer
 
+:magick
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+echo.
+echo. Build static openEXR and ImageMagick 32 bit binarys:
+echo. 1 = yes
+echo. 2 = no
+echo.
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+set /P buildmagick="build ImageMagick:"
+
+if %buildmagick%==1 (
+	set "magick=y"
+	)
+if %buildmagick%==2 (
+	set "magick=n"
+	)
+if %buildmagick% GTR 2 GOTO magick
+
 :numCores
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
@@ -166,7 +208,7 @@ if exist "%instdir%\msys\1.0\msys.bat" GOTO 7za
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	echo.var wshell = new ActiveXObject("WScript.Shell");var htmldoc = new ActiveXObject("htmlfile");var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");var adodb = new ActiveXObject("ADODB.Stream");var FSO = new ActiveXObject("Scripting.FileSystemObject");;function http_get(url, is_binary){ xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4);  WScript.Sleep(100); if (xmlhttp.status != 200) { WScript.Echo("http get failed: " + xmlhttp.status);  WScript.Quit(2); }; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText;}; function url_decompose_filename(url) { return url.split('/').pop().split('?').shift(); }; function save_binary(path, data) { adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2);}; function pick_from_sf_file_list(html, cond) { htmldoc.open(); htmldoc.write(html); var tr = htmldoc.getElementById("files_list").getElementsByTagName("tr"); for (var i = 0; i ^< tr.length; ++i) {  title = tr[i].title;  if (cond(title)) return title; }; return null;}; function download_mingw_get() { var base_url = "http://sourceforge.net/projects/mingw/files/Installer/mingw-get/"; var html = http_get(base_url, false); var project_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("mingw-get") ^>= 0; }); var project_url = base_url + project_name + "/"; html = http_get(project_url, false); var dlp_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("bin.zip") ^>= 0; }); var dlp_url = project_url + dlp_name + "/download"; html = http_get(dlp_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var url = div.getElementsByTagName("a")[1].href; var filename = url.split('/').pop().split('?').shift(); var installer_data = http_get(url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename) }; function extract_zip(zip_file, dstdir) { var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0);}; function install_mingw(zip_file, packages) { var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir); wshell.Run("bin\\mingw-get install " + packages, 10, true); var fstab = FSO.GetAbsolutePathName("msys\\1.0\\etc\\fstab"); var fp = FSO.CreateTextFile(fstab, true); fp.WriteLine(rootdir.replace(/\\/g,"/") + "\t/mingw"); fp.Close(); FSO.GetFile(zip_file).Delete();}; var packages = "msys-base msys-coreutils msys-wget msys-zip msys-unzip";install_mingw(download_mingw_get(), packages)>>build_msys.js
+	echo.var wshell = new ActiveXObject("WScript.Shell");var htmldoc = new ActiveXObject("htmlfile");var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");var adodb = new ActiveXObject("ADODB.Stream");var FSO = new ActiveXObject("Scripting.FileSystemObject");;function http_get(url, is_binary){ xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4);  WScript.Sleep(100); if (xmlhttp.status != 200) { WScript.Echo("http get failed: " + xmlhttp.status);  WScript.Quit(2); }; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText;}; function url_decompose_filename(url) { return url.split('/').pop().split('?').shift(); }; function save_binary(path, data) { adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2);}; function pick_from_sf_file_list(html, cond) { htmldoc.open(); htmldoc.write(html); var tr = htmldoc.getElementById("files_list").getElementsByTagName("tr"); for (var i = 0; i ^< tr.length; ++i) {  title = tr[i].title;  if (cond(title)) return title; }; return null;}; function download_mingw_get() { var base_url = "http://sourceforge.net/projects/mingw/files/Installer/mingw-get/"; var html = http_get(base_url, false); var project_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("mingw-get") ^>= 0; }); var project_url = base_url + project_name + "/"; html = http_get(project_url, false); var dlp_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("bin.zip") ^>= 0; }); var dlp_url = project_url + dlp_name + "/download"; html = http_get(dlp_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var url = div.getElementsByTagName("a")[1].href; var filename = url.split('/').pop().split('?').shift(); var installer_data = http_get(url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename) }; function extract_zip(zip_file, dstdir) { var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0);}; function install_mingw(zip_file, packages) { var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir); wshell.Run("bin\\mingw-get install " + packages, 10, true); var fstab = FSO.GetAbsolutePathName("msys\\1.0\\etc\\fstab"); var fp = FSO.CreateTextFile(fstab, true); fp.WriteLine(rootdir.replace(/\\/g,"/") + "\t/mingw"); fp.Close(); FSO.GetFile(zip_file).Delete();}; var packages = "msys-base msys-coreutils msys-wget msys-zip msys-unzip"; install_mingw(download_mingw_get(), packages)>>build_msys.js
 	
 	cscript build_msys.js
 	del build_msys.js
@@ -700,50 +742,100 @@ if %build64%==yes (
 	)
 
 :: ffmpeg
-if %build32%==yes (
-	if not exist %instdir%\compile_ffmpeg32.sh (
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for ffmpeg, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if not exist %instdir%\media-autobuild_suite.zip (
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+if %ffmpeg%==y (
+	if %build32%==yes (
+		if not exist %instdir%\compile_ffmpeg32.sh (
+			echo -------------------------------------------------------------------------------
+			echo.
+			echo.- get script for ffmpeg, 32 bit:
+			echo.
+			echo -------------------------------------------------------------------------------
+			if not exist %instdir%\media-autobuild_suite.zip (
+				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+				)
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg32.sh
 			)
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg32.sh
+
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile ffmpeg, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
+		echo. compile ffmpeg 32 bit done...
 		)
 
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile ffmpeg, 32 bit:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile ffmpeg 32 bit done...
-	)
-
-if %build64%==yes (
-	if not exist %instdir%\compile_ffmpeg64.sh (
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for ffmpeg, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if not exist %instdir%\media-autobuild_suite.zip (
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+	if %build64%==yes (
+		if not exist %instdir%\compile_ffmpeg64.sh (
+			echo -------------------------------------------------------------------------------
+			echo.
+			echo.- get script for ffmpeg, 64 bit:
+			echo.
+			echo -------------------------------------------------------------------------------
+			if not exist %instdir%\media-autobuild_suite.zip (
+				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+				)
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
 			)
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
-		)
 
-	:compileFFmpeg64
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile ffmpeg, 64 bit:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile ffmpeg 64 bit done...
+		:compileFFmpeg64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile ffmpeg, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
+		echo. compile ffmpeg 64 bit done...
+		)
 	)
+	
+::imagemagick	
+if %magick%==y (
+	if %build32%==yes (
+		if not exist %instdir%\compile_imagemagick32.sh (
+			echo -------------------------------------------------------------------------------
+			echo.
+			echo.- get script for imagemagick, 32 bit:
+			echo.
+			echo -------------------------------------------------------------------------------
+			if not exist %instdir%\media-autobuild_suite.zip (
+				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+				)
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagemagick32.sh
+			)
+
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile imagemagick, 32 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_imagemagick32.sh --cpuCount=%cpuCount%
+		echo. compile imagemagick 32 bit done...
+		)
+	
+	if %build64%==stop (
+		if not exist %instdir%\compile_imagemagick64.sh (
+			echo -------------------------------------------------------------------------------
+			echo.
+			echo.- get script for imagemagick, 64 bit:
+			echo.
+			echo -------------------------------------------------------------------------------
+			if not exist %instdir%\media-autobuild_suite.zip (
+				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+				)
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagemagick64.sh
+			)
+
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile imagemagick, 64 bit:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_imagemagick64.sh --cpuCount=%cpuCount%
+		echo. compile imagemagick 64 bit done...
+		)
+	)
+	
 	
 echo -------------------------------------------------------------------------------
 echo.

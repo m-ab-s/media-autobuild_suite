@@ -29,12 +29,11 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "ffmpeg-git/configure" ]; then
-	cd ffmpeg-git 
-	if git checkout master &&
-		git fetch origin master &&
-		[ `git rev-list HEAD...origin/master --count` != 0 ] &&
-		git merge origin/master
-	then
+	cd ffmpeg-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
 		make uninstall
 		make clean
 		./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
@@ -60,6 +59,7 @@ if [ -f "ffmpeg-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
+		cd $LOCALBUILDDIR
 		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
 		if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi
 		if [ -d "$LOCALDESTDIR/include/libpostproc" ]; then rm -r $LOCALDESTDIR/include/libpostproc; fi

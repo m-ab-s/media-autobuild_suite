@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-05
+modified: 2013-11-11
 
 ---
 
@@ -30,26 +30,35 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.75**
+Current release is **v0.77**
 
 
-Included Tools
+Included Tools and Libraries
 --------
 
  - bzip2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg
  - faac (standalone and lib for ffmpeg)
+ - fftw
  - flac (standalone)
+ - fltk
  - fontconfig
  - freetype
  - gsm
  - gnutls (standalone and lib for ffmpeg)
  - lame (standalone and lib for ffmpeg)
+ - ImageMagick (standalone (32 bit))
+ - jpeg
+ - jpeg2000
  - libass
  - libbluray
+ - libpng
+ - libtiff
  - libutvideo
+ - libxml2
  - ogg
+ - openEXR (standalone and lib for ImageMagick (32 bit))
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)

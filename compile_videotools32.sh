@@ -30,26 +30,25 @@ echo "--------------------------------------------------------------------------
 
 cd $LOCALBUILDDIR
 
-if [ -f "x264-git/compile8.done" ]; then
-	echo -------------------------------------------------
-	echo "x264 is already compiled"
-	echo -------------------------------------------------
-	else 
-		if [ -f "x264-git/configure" ]; then
-			cd x264-git
-			echo " updating x264-git"
-			git pull http://repo.or.cz/r/x264.git || exit 1
-			else 
-				git clone http://repo.or.cz/r/x264.git x264-git
-				cd x264-git
-		  fi
-		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread
+if [ -f "x264-git/configure" ]; then
+	cd x264-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		rm $LOCALDESTDIR/bin/x264-10bit.exe
+		make uninstall
+		make clean
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 		make -j $cpuCount
 		make install
-		echo "finish" > compile8.done
 		make clean
+
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		make -j $cpuCount
+		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
-		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+		if [ -f "$LOCALDESTDIR/bin/x264-10bit.exe" ]; then
 			echo -
 			echo -------------------------------------------------
 			echo "build x264 done..."
@@ -62,18 +61,23 @@ if [ -f "x264-git/compile8.done" ]; then
 				read -p "first close the batch window, then the shell window"
 				sleep 15
 		fi
-fi
+	else
+		echo -------------------------------------------------
+		echo "x264 is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		cd $LOCALBUILDDIR
+		git clone http://repo.or.cz/r/x264.git x264-git
+		cd x264-git
+		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread
+		make -j $cpuCount
+		make install
+		make clean
 
-if [ -f "x264-git/compile10.done" ]; then
-	echo -------------------------------------------------
-	echo "x264-10bit is already compiled"
-	echo -------------------------------------------------
-	else 
 		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread --bit-depth=10
 		make -j $cpuCount
-		mv x264.exe x264-10bit.exe
-		cp x264-10bit.exe /local32/bin/x264-10bit.exe
-		echo "finish" > compile10.done
+		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		make clean
 		
 		if [ -f "$LOCALDESTDIR/bin/x264-10bit.exe" ]; then
@@ -100,14 +104,14 @@ if [ -f "xvidcore/compile.done" ]; then
 	else 
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
+		rm xvidcore-1.3.2.tar.gz
 		cd xvidcore/build/generic
 		./configure --prefix=$LOCALDESTDIR
 		sed -i "s/-mno-cygwin//" platform.inc
 		make -j $cpuCount
 		make install
-		cd $LOCALBUILDDIR
-		echo "finish" > xvidcore/compile.done
-		rm xvidcore-1.3.2.tar.gz
+		echo "finish" > compile.done
+		
 		if [[ -f "/local32/lib/xvidcore.dll" ]]; then
 			rm /local32/lib/xvidcore.dll || exit 1
 			mv /local32/lib/xvidcore.a /local32/lib/libxvidcore.a || exit 1
@@ -128,25 +132,53 @@ if [ -f "xvidcore/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libvpx-git/compile.done" ]; then
-    echo -------------------------------------------------
-    echo "libvpx is already compiled"
-    echo -------------------------------------------------
-    else 
-        if [ -f "libvpx-git/configure" ]; then
-            cd libvpx-git
-            echo " updating libvpx-git"
-            git pull http://git.chromium.org/webm/libvpx.git || exit 1
-        else 
-            git clone http://git.chromium.org/webm/libvpx.git libvpx-git
-            cd libvpx-git
-        fi
-        ./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+cd $LOCALBUILDDIR
+
+if [ -f "libvpx-git/configure" ]; then
+	cd libvpx-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -r $LOCALDESTDIR/include/vpx; fi
+	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
+	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
+		make clean
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
 		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
         make -j $cpuCount
         make install
-        echo "finish" > compile.done
+		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
+		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
+		
+		if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libvpx done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libvpx failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+	else
+		echo -------------------------------------------------
+		echo "libvpx-git is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
 		cd $LOCALBUILDDIR
+		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
+		cd libvpx-git
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+		make -j $cpuCount
+		make install
+		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
+		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
 		
 		if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then
 			echo -
@@ -163,22 +195,47 @@ if [ -f "libvpx-git/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libbluray-git/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libbluray-git is already compiled"
-	echo -------------------------------------------------
-	else 
-		#wget -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.2.3/libbluray-0.2.3.tar.bz2 
-		#tar xf libbluray-0.2.3.tar.bz2
+cd $LOCALBUILDDIR
+		
+if [ -f "libbluray-git/bootstrap" ]; then
+	cd libbluray-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		make uninstall
+		make clean
+		/bootstrap
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		make -j $cpuCount
+		make install
+		
+		if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libbluray-git done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libbluray-git failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+	else
+		echo -------------------------------------------------
+		echo "libbluray is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
 		git clone git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
 		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		
+
 		if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
 			echo -
 			echo -------------------------------------------------
@@ -194,13 +251,15 @@ if [ -f "libbluray-git/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libutvideo/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "libutvideo-git/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "libutvideo is already compiled"
 	echo -------------------------------------------------
 	else 
-		git clone git://github.com/qyot27/libutvideo.git 
-		cd libutvideo
+		git clone git://github.com/qyot27/libutvideo.git libutvideo-git
+		cd libutvideo-git
 		./configure --prefix=$LOCALDESTDIR
 		make -j $cpuCount
 		make install
