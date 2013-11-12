@@ -112,11 +112,12 @@ if [ -f "xvidcore/compile.done" ]; then
 		sed -i "s/-mno-cygwin//" platform.inc
 		make -j $cpuCount
 		make install
+		cd $LOCALBUILDDIR/xvidcore
 		echo "finish" > compile.done
 		
-		if [[ -f "/local32/lib/xvidcore.dll" ]]; then
-			rm /local32/lib/xvidcore.dll || exit 1
-			mv /local32/lib/xvidcore.a /local32/lib/libxvidcore.a || exit 1
+		if [[ -f "$LOCALDESTDIR/lib/xvidcore.dll" ]]; then
+			rm $LOCALDESTDIR/lib/xvidcore.dll || exit 1
+			mv $LOCALDESTDIR/lib/xvidcore.a $LOCALDESTDIR/lib/libxvidcore.a || exit 1
 		fi
 		
 		if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then

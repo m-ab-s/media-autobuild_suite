@@ -105,18 +105,18 @@ if [ -f "xvidcore/compile.done" ]; then
 		echo -ne "\033]0;compiling xvidcore 64Bit\007"
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
+		rm xvidcore-1.3.2.tar.gz
 		cd xvidcore/build/generic
 		./configure --host=x86_64-pc-mingw32 --build=x86_64-unknown-linux-gnu --disable-assembly --prefix=$LOCALDESTDIR
 		sed -i "s/-mno-cygwin//" platform.inc
 		make -j $cpuCount
 		make install
+		cd $LOCALBUILDDIR/xvidcore
 		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		echo "finish" > xvidcore/compile.done
-		rm xvidcore-1.3.2.tar.gz
-		if [[ -f "/local64/lib/xvidcore.dll" ]]; then
-			rm /local64/lib/xvidcore.dll || exit 1
-			mv /local64/lib/xvidcore.a /local64/lib/libxvidcore.a || exit 1
+		
+		if [[ -f "$LOCALDESTDIR/lib/xvidcore.dll" ]]; then
+			rm $LOCALDESTDIR/lib/xvidcore.dll || exit 1
+			mv $LOCALDESTDIR/lib/xvidcore.a $LOCALDESTDIR/lib/libxvidcore.a || exit 1
 		fi
 		
 		if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
