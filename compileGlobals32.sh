@@ -331,6 +331,38 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 		fi
 fi
 
+if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libjpeg-turbo-1.3.0 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libjpeg-turbo 32Bit\007"
+		wget -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
+		tar xf libjpeg-turbo-1.3.0.tar.gz
+		rm libjpeg-turbo-1.3.0.tar.gz
+		cd libjpeg-turbo-1.3.0
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libjpeg-turbo-1.3.0 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libjpeg-turbo-1.3.0 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "jpeg-9/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "jpeg-9 is already compiled"

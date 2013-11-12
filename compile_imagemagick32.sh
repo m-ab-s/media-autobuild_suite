@@ -24,7 +24,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		cd fftw-3.2.2
 		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
 		#sed -i 's/configur*/ /g' bootstrap.sh
-		./configure --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
+		./configure --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -76,7 +76,7 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "OpenEXR-Master/compile.done" ]; then
+if [ -f "OpenEXR-git/compile.done" ]; then
     echo -------------------------------------------------
     echo "OpenEXR is already compiled"
     echo -------------------------------------------------
@@ -139,11 +139,10 @@ cd $LOCALBUILDDIR
 if [ -f "ImageMagick-git/configure" ]; then
 	echo -ne "\033]0;compiling ImageMagick 32Bit\007"
 	cd ImageMagick-git
-	if git checkout master &&
-		git fetch origin master &&
-		[ `git rev-list HEAD...origin/master --count` != 0 ] &&
-		git merge origin/master
-	then
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
 		rm -r $LOCALDESTDIR/bin/magick16
 		rm -r $LOCALDESTDIR/bin/magick32
 		
@@ -209,3 +208,5 @@ if [ -f "ImageMagick-git/configure" ]; then
 				sleep 15
 		fi
 fi
+
+sleep 5
