@@ -17,6 +17,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
     echo "fftw-3.2.2 is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling fftw 32Bit\007"
 		wget -c ftp://ftp.fftw.org/pub/fftw/fftw-3.2.2.tar.gz
 		tar xf fftw-3.2.2.tar.gz
 		rm fftw-3.2.2.tar.gz
@@ -49,6 +50,7 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
     echo "fltk-1.3.2 is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling fltk 32Bit\007"
 		wget -c http://fltk.org/pub/fltk/1.3.2/fltk-1.3.2-source.tar.gz
 		tar xzf fltk-1.3.2-source.tar.gz
 		rm fltk-1.3.2-source.tar.gz
@@ -79,6 +81,7 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
     echo "OpenEXR is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling IlmBase 32Bit\007"
 		git clone https://github.com/openexr/openexr.git OpenEXR-git
 		cd OpenEXR-git
 		cd IlmBase
@@ -90,7 +93,8 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		cd ..
-
+		
+		echo -ne "\033]0;compiling OpenEXR 32Bit\007"
 		cd OpenEXR
 		./bootstrap
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfZipCompressor.cpp
@@ -106,6 +110,7 @@ if [ -f "OpenEXR-Master/compile.done" ]; then
 		sed -i 's/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread -lstdc++/' "$PKG_CONFIG_PATH/IlmBase.pc"
 		sed -i 's/Libs: -L${libdir} -lIlmImf/Libs: -L${libdir} -lIlmImf -lstdc++/' "$PKG_CONFIG_PATH/OpenEXR.pc"
 		
+		echo -ne "\033]0;compiling OpenEXR_Viewers 32Bit\007"
 		cd OpenEXR_Viewers
 		./bootstrap 
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
@@ -132,6 +137,7 @@ fi
 
 cd $LOCALBUILDDIR
 if [ -f "ImageMagick-git/configure" ]; then
+	echo -ne "\033]0;compiling ImageMagick 32Bit\007"
 	cd ImageMagick-git
 	if git checkout master &&
 		git fetch origin master &&
@@ -173,6 +179,7 @@ if [ -f "ImageMagick-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
     else 
+		echo -ne "\033]0;compiling ImageMagick 32Bit\007"
 		git clone https://github.com/trevor/ImageMagick.git ImageMagick-git
 		cd ImageMagick-git
 		

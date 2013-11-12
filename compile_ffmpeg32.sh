@@ -29,6 +29,7 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "ffmpeg-git/configure" ]; then
+	echo -ne "\033]0;compiling ffmpeg 32Bit\007"
 	cd ffmpeg-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -59,6 +60,7 @@ if [ -f "ffmpeg-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
+		echo -ne "\033]0;compiling ffmpeg 32Bit\007"
 		cd $LOCALBUILDDIR
 		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
 		if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi

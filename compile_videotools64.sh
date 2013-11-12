@@ -31,6 +31,7 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "x264-git/configure" ]; then
+	echo -ne "\033]0;compiling x264 64Bit\007"
 	cd x264-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -67,7 +68,7 @@ if [ -f "x264-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		cd $LOCALBUILDDIR
+		echo -ne "\033]0;compiling x264 64Bit\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
@@ -101,6 +102,7 @@ if [ -f "xvidcore/compile.done" ]; then
 	echo "xvidcore is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling xvidcore 64Bit\007"
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
 		cd xvidcore/build/generic
@@ -135,6 +137,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [ -f "libvpx-git/configure" ]; then
+	echo -ne "\033]0;compiling libvpx 64Bit\007"
 	cd libvpx-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -170,7 +173,7 @@ if [ -f "libvpx-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		cd $LOCALBUILDDIR
+		echo -ne "\033]0;compiling libvpx 64Bit\007"
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
@@ -198,6 +201,7 @@ fi
 cd $LOCALBUILDDIR
 		
 if [ -f "libbluray-git/bootstrap" ]; then
+	echo -ne "\033]0;compiling libbluray 64Bit\007"
 	cd libbluray-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -229,6 +233,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 		echo -------------------------------------------------
 	fi
 	else
+		echo -ne "\033]0;compiling libbluray 64Bit\007"
 		git clone git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
@@ -258,6 +263,7 @@ if [ -f "libutvideo-git/compile.done" ]; then
 	echo "libutvideo is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling libutvideo 64Bit\007"
 		git clone git://github.com/qyot27/libutvideo.git libutvideo-git
 		cd libutvideo-git
 		./configure --prefix=$LOCALDESTDIR
@@ -286,6 +292,7 @@ if [ -f "xavs/compile.done" ]; then
 	echo "xavs is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling xavs 64Bit\007"
 		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR
@@ -315,6 +322,7 @@ if [[ $mp4box = "y" ]]; then
 		echo "mp4box_gpac is already compiled"
 		echo -------------------------------------------------
 		else 
+			echo -ne "\033]0;compiling mp4box_gpac 64Bit\007"
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
 			rm extra_lib/include/zlib/zconf.h
@@ -351,6 +359,7 @@ if [[ $mplayer = "y" ]]; then
 		echo "mplayer is already compiled"
 		echo -------------------------------------------------
 		else 
+			echo -ne "\033]0;compiling mplayer 64Bit\007"
 			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
 			tar xf mplayer-checkout-snapshot.tar.bz2
 			cd mplayer-checkout*

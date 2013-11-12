@@ -25,6 +25,7 @@ if [ -f "gsm-1.0.13/compile.done" ]; then
 	echo "gsm-1.0.13 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling gsm 32Bit\007"
 		wget -c http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
 		tar xf gsm-1.0.13.tar.bz2
 		cd gsm-1.0.13
@@ -56,6 +57,7 @@ if [ -f "libogg-1.3.1/compile.done" ]; then
 	echo "libogg-1.3.1 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling libogg 32Bit\007"
 		wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz
 		tar xf libogg-1.3.1.tar.gz
 		cd libogg-1.3.1
@@ -86,6 +88,7 @@ if [ -f "libvorbis-1.3.3/compile.done" ]; then
 	echo "libvorbis-1.3.3 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling libvorbis 32Bit\007"
 		wget -c http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.xz
 		tar xf libvorbis-1.3.3.tar.xz
 		cd libvorbis-1.3.3
@@ -116,6 +119,7 @@ if [ -f "libtheora-1.1.1/compile.done" ]; then
 	echo "libtheora-1.1.1 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling libtheora 32Bit\007"
 		wget -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 		tar xf libtheora-1.1.1.tar.bz2
 		cd libtheora-1.1.1
@@ -146,6 +150,7 @@ if [ -f "speex-1.2rc1/compile.done" ]; then
 	echo "speex-1.2rc1 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling speex 32Bit\007"
 		wget -c http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
 		tar xf speex-1.2rc1.tar.gz
 		cd speex-1.2rc1
@@ -176,6 +181,7 @@ if [ -f "flac-1.3.0/compile.done" ]; then
 	echo "flac-1.3.0 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling flac 32Bit\007"
 		wget -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
 		tar xf flac-1.3.0.tar.xz
 		cd flac-1.3.0
@@ -206,6 +212,7 @@ if [ -f "lame-3.99.5/compile.done" ]; then
 	echo "lame-3.99.5 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling lame 32Bit\007"
 		wget -c -O lame-3.99.5.tar.gz http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download 
 		tar xf lame-3.99.5.tar.gz
 		cd lame-3.99.5
@@ -236,6 +243,7 @@ if [ -f "vo-aacenc-0.1.3/compile.done" ]; then
 	echo "vo-aacenc-0.1.3 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling vo-aacenc 32Bit\007"
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz
 		tar xf vo-aacenc-0.1.3.tar.gz
 		cd vo-aacenc-0.1.3
@@ -266,6 +274,7 @@ if [ -f "opencore-amr-0.1.3/compile.done" ]; then
 	echo "opencore-amr-0.1.3 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling opencore-amr 32Bit\007"
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
 		tar xf opencore-amr-0.1.3.tar.gz
 		cd opencore-amr-0.1.3
@@ -296,6 +305,7 @@ if [ -f "vo-amrwbenc-0.1.2/compile.done" ]; then
 	echo "vo-amrwbenc-0.1.2 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling vo-amrwbenc 32Bit\007"
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz
 		tar xf vo-amrwbenc-0.1.2.tar.gz
 		cd vo-amrwbenc-0.1.2
@@ -327,6 +337,7 @@ if [ -f "bin-fdk-aac/compile.done" ]; then
 	echo "bin-fdk-aac is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling fdk-aac 32Bit\007"
 		cd $LOCALBUILDDIR
 		
 		wget --no-check-certificate -c https://github.com/nu774/fdkaac_autobuild/archive/master.zip -O patch-fdk-aac.zip
@@ -400,6 +411,7 @@ if [ -f "faac-1.28/compile.done" ]; then
 	echo "faac-1.28 is already compiled"
 	echo -------------------------------------------------
 	else 
+		echo -ne "\033]0;compiling faac 32Bit\007"
 		wget -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
 		tar xf faac-1.28.tar.gz
 		cd faac-1.28
@@ -433,6 +445,7 @@ if [ -f "opus-1.0.3/compile.done" ]; then
     echo "opus-1.0.3 is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling opus 32Bit\007"
       wget -c http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
 		tar xf opus-1.0.3.tar.gz
 		cd opus-1.0.3
@@ -463,6 +476,7 @@ if [ -f "opus-tools-0.1.7/compile.done" ]; then
     echo "opus-tools-0.1.7 is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling opus-tools 32Bit\007"
       wget --no-check-certificate -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
 		tar xf opus-tools-0.1.7.tar.gz
 		cd opus-tools-0.1.7
