@@ -1,7 +1,7 @@
 source /local64/etc/profile.local
 
 # set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
-cpuCount=1
+cpuCount=6
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
@@ -24,7 +24,7 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		cd fftw-3.2.2
 		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
 		#sed -i 's/configur*/ /g' bootstrap.sh
-		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-shared --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -99,6 +99,11 @@ if [ -f "OpenEXR-git/compile.done" ]; then
 		./bootstrap
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfZipCompressor.cpp
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfPxr24Compressor.cpp
+		sed -i 's/void\* ptr = 0;//g' IlmImf/ImfSystemSpecific.h
+		sed -i 's/posix_memalign(&ptr, alignment, size);/__mingw_aligned_malloc(alignment, size);/g' IlmImf/ImfSystemSpecific.h
+		sed -i 's/    return ptr;//g' IlmImf/ImfSystemSpecific.h
+		sed -i 's/    free(ptr);/    __mingw_aligned_free(ptr);/g' IlmImf/ImfSystemSpecific.h
+		sed -i 's/#define IMF_HAVE_SSE2 1/\/\/#define IMF_HAVE_SSE2 1/g' IlmImf/ImfOptimizedPixelReading.h
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-threading --enable-shared=no --disable-posix-sem --disable-ilmbasetest LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
 		cd IlmImf
 		g++ -I$LOCALDESTDIR/include -I$LOCALDESTDIR/include/OpenEXR -mms-bitfields -mthreads -static -static-libgcc -static-libstdc++ -I$LOCALDESTDIR/include -L$LOCALDESTDIR/lib  b44ExpLogTable.cpp -lHalf -o b44ExpLogTable
