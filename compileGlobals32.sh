@@ -344,6 +344,7 @@ if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
+		sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
 		echo "finish" > compile.done
 		
 		if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
