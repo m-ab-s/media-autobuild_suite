@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-11
+modified: 2013-11-12
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.77**
+Current release is **v0.8**
 
 
 Included Tools and Libraries
@@ -51,6 +51,7 @@ Included Tools and Libraries
  - ImageMagick (standalone (32 bit))
  - jpeg
  - jpeg2000
+ - jpegturbo
  - libass
  - libbluray
  - libpng
@@ -58,7 +59,7 @@ Included Tools and Libraries
  - libutvideo
  - libxml2
  - ogg
- - openEXR (standalone and lib for ImageMagick (32 bit))
+ - openEXR (standalone and lib for ImageMagick)
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)

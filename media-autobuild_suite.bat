@@ -40,7 +40,7 @@
 ::	2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
 ::	2013-11-06 add openexr, jpeg2000 and imagemagick (openexr and imagemagick only for 32 bit at the moment)
 ::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
-::	2013-11-12 add info from corrent compiling to the window title and make all mingw libs static
+::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
 ::
 ::-------------------------------------------------------------------------------------
 
