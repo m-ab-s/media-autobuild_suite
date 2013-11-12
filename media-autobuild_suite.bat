@@ -40,7 +40,7 @@
 ::	2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
 ::	2013-11-06 add openexr, jpeg2000 and imagemagick (openexr and imagemagick only for 32 bit at the moment)
 ::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
-::	2013-11-12 add info from corrent compiling to the window title
+::	2013-11-12 add info from corrent compiling to the window title and make all mingw libs static
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -271,7 +271,10 @@ if %build32%==yes (
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.0.7z
 		%instdir%\msys\1.0\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
 		del mingw32-gcc-4.8.0.7z
-		ren %instdir%\mingw32\lib\libstdc++.dll.a libstdc++.dll.a.old
+		
+		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
+			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
+			)	
 		)
 		
 :mingw64
@@ -289,7 +292,10 @@ if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
 	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.0.7z
 	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
 	del mingw64-gcc-4.8.0.7z
-	ren %instdir%\mingw64\lib\libstdc++.dll.a libstdc++.dll.a.old
+
+	FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
+		%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
+		)	
 	)
 
 :makeDIR
