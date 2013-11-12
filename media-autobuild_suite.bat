@@ -165,7 +165,7 @@ if %buildmplayer% GTR 2 GOTO mplayer
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
-echo. Build static openEXR and ImageMagick 32 bit binarys:
+echo. Build static openEXR and ImageMagick:
 echo. 1 = yes
 echo. 2 = no
 echo.
@@ -820,7 +820,7 @@ if %magick%==y (
 		echo. compile imagemagick 32 bit done...
 		)
 	
-	if %build64%==stop (
+	if %build64%==yes (
 		if not exist %instdir%\compile_imagemagick64.sh (
 			echo -------------------------------------------------------------------------------
 			echo.
