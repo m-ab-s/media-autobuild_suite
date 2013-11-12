@@ -1,7 +1,7 @@
 source /local64/etc/profile.local
 
 # set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
-cpuCount=6
+cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
