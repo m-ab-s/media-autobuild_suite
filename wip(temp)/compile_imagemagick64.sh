@@ -76,7 +76,7 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "OpenEXR-Master/compile.done" ]; then
+if [ -f "OpenEXR-git/compile.done" ]; then
     echo -------------------------------------------------
     echo "OpenEXR is already compiled"
     echo -------------------------------------------------
