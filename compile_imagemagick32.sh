@@ -190,11 +190,13 @@ if [ -f "ImageMagick-git/configure" ]; then
 		./configure --prefix=$LOCALDESTDIR/bin/magick16 --enable-hdri --enable-shared=no --with-quantum-depth=16
 		make -j $cpuCount
 		make install
+		strip --strip-all $LOCALDESTDIR/bin/magick16/bin/*.exe
 		
 		make clean
 		./configure --prefix=$LOCALDESTDIR/bin/magick32 --enable-hdri --enable-shared=no --with-quantum-depth=32
 		make -j $cpuCount
 		make install
+		strip --strip-all $LOCALDESTDIR/bin/magick32/bin/*.exe
 		
 		if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 			echo -
