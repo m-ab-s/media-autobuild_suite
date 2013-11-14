@@ -12,6 +12,8 @@ if [ -f "qt-everywhere-opensource-src-4.8.5/compile.done" ]; then
 		
 		sed -i 's/QMAKE_LFLAGS		=/QMAKE_LFLAGS		= -static -static-libgcc -static-libstdc++/' "mkspecs/win32-g++/qmake.conf"
 		sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++ -s/' "qmake/Makefile.win32-g++"
+		sed -i 's/SUBDIRS += examples/#SUBDIRS += examples/' "projects.pro"
+		sed -i 's/SUBDIRS += demos/#SUBDIRS += demos/' "projects.pro"
 
 		./configure.exe -prefix $LOCALDESTDIR/qt4 -static -release -opensource -confirm-license -platform win32-g++
 		mingw32-make -j8
