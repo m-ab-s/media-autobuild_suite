@@ -11,13 +11,12 @@ if [ -f "qt-everywhere-opensource-src-4.8.5/compile.done" ]; then
 		cd qt-everywhere-opensource-src-4.8.5
 		
 		sed -i 's/QMAKE_LFLAGS		=/QMAKE_LFLAGS		= -static -static-libgcc -static-libstdc++/' "mkspecs/win32-g++/qmake.conf"
-		sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++/' "qmake/Makefile.win32-g++"
-		
-		./configure.exe -prefix $LOCALDESTDIR/qt4 -static -release -opensource -confirm-license -platform win32-g++ -no-exceptions -no-qt3support -no-webkit
-		mingw32-make -j6
+		sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++ -s/' "qmake/Makefile.win32-g++"
+
+		./configure.exe -prefix $LOCALDESTDIR/qt4 -static -release -opensource -confirm-license -platform win32-g++
+		mingw32-make -j8
 		mingw32-make install
 		strip --strip-all $LOCALDESTDIR/qt4/bin/*.exe
-		strip --strip-all $LOCALDESTDIR/qt4/bin/*.dll
 		
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/qt4/bin/designer.exe" ]; then
