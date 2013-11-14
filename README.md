@@ -58,19 +58,19 @@ Included Tools and Libraries
  - libtiff
  - libutvideo
  - libxml2
- - ogg
- - openEXR (standalone and lib for ImageMagick)
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)
- - sdl (for ffplay)
- - speex (standalone and lib for ffmpeg)
- - theora
  - opencore-amr
+ - openEXR (standalone and lib for ImageMagick)
  - openjpeg
+ - ogg
  - opus
  - opus-tools (standalone)
  - rtmp (standalone and lib for ffmpeg)
+ - sdl (for ffplay)
+ - speex (standalone and lib for ffmpeg)
+ - theora
  - vpx (standalone and lib for ffmpeg)
  - vo-aacenc
  - vo-amrwbenc
