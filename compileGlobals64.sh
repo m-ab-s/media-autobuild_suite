@@ -270,31 +270,31 @@ fi
 #		fi
 #fi
 
-if [ -f "libpng-1.6.6/compile.done" ]; then
+if [ -f "libpng-1.6.7/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "libpng-1.6.6 is already compiled"
+	echo "libpng-1.6.7 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compiling libpng 64Bit\007"
-		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.6/libpng-1.6.6.tar.gz"
-		tar xf libpng-1.6.6.tar.gz
-		cd libpng-1.6.6
+		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.7/libpng-1.6.7.tar.gz"
+		tar xf libpng-1.6.7.tar.gz
+		cd libpng-1.6.7
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm libpng-1.6.6.tar.gz
+		rm libpng-1.6.7.tar.gz
 		
 		if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build libpng-1.6.6 done..."
+			echo "build libpng-1.6.7 done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build libpng-1.6.6 failed..."
+				echo "build libpng-1.6.7 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
