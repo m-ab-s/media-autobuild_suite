@@ -315,6 +315,7 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 		make
 		make install
 		echo "finish" > compile.done
+		cp libopenjpeg.pc $PKG_CONFIG_PATH
 		cd $LOCALBUILDDIR
 		rm openjpeg_v1_4_sources_r697.tgz
 		
@@ -625,6 +626,8 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
+		wget -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
+		patch -p0 fribidi.diff
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
@@ -1012,6 +1015,140 @@ if [ -f "libxml2-2.9.1/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build libxml2-2.9.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "lua-5.1.4/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "lua-5.1.4 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling lua 32Bit\007"
+		wget -c http://www.lua.org/ftp/lua-5.1.4.tar.gz
+		tar xf lua-5.1.4.tar.gz
+		rm lua-5.1.4.tar.gz
+		cd lua-5.1.4
+		sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/local64/" Makefile
+		make mingw
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build lua-5.1.4 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build lua-5.1.4 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdcss-1.2.13/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdcss-1.2.13 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdcss 32Bit\007"
+		wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
+		tar xf libdvdcss-1.2.13.tar.bz2
+		rm libdvdcss-1.2.13.tar.bz2
+		cd libdvdcss-1.2.13
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdcss-1.2.13 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdcss-1.2.13 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdread-4.2.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdread-4.2.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdread 32Bit\007"
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
+		tar xf libdvdread-4.2.1.tar.xz
+		rm libdvdread-4.2.1.tar.xz
+		cd libdvdread-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
+		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
+		
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdread-4.2.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdread-4.2.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdnav-4.2.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdnav-4.2.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+		tar xf libdvdnav-4.2.1.tar.xz
+		rm libdvdnav-4.2.1.tar.xz
+		cd libdvdnav-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
+		make -j $cpuCount
+		make install
+		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdnav-4.2.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdnav-4.2.1 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15

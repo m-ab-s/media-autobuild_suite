@@ -1057,9 +1057,15 @@ if [ -f "libdvdread-4.2.1/compile.done" ]; then
 		tar xf libdvdread-4.2.1.tar.xz
 		rm libdvdread-4.2.1.tar.xz
 		cd libdvdread-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
 		./configure --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
+		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
+		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
+		
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 			echo -
@@ -1076,4 +1082,38 @@ if [ -f "libdvdread-4.2.1/compile.done" ]; then
 		fi
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdnav-4.2.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdnav-4.2.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+		tar xf libdvdnav-4.2.1.tar.xz
+		rm libdvdnav-4.2.1.tar.xz
+		cd libdvdnav-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		./configure --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
+		make -j $cpuCount
+		make install
+		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdnav-4.2.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdnav-4.2.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
 sleep 3

@@ -237,7 +237,7 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO mingw-dtk
 	del 7za920.zip
 	
 :mingw-dtk
-if exist "%instdir%\bin\msgmerge.exe" GOTO mingw32
+if exist "%instdir%\bin\msgmerge.exe" GOTO autoTools
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- Download and install ming-developer-toolkit
@@ -251,7 +251,57 @@ if exist "%instdir%\bin\msgmerge.exe" GOTO mingw32
 	del mingw-dtk_jb.zip
 	%instdir%\bin\mingw-get install mingw-developer-toolkit pkginfo
 	%instdir%\bin\mingw-get upgrade msys-core-bin=1.0.17-1
-
+	
+:autoTools
+if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO mingw32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- Download and install AutoTools, libcrypt, Glib and PKG-CONFIG
+	echo.
+	echo -------------------------------------------------------------------------------
+	cd %instdir%\msys\1.0
+	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/autoconf/autoconf-2.68-1/autoconf-2.68-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/automake/automake-1.11.1-1/automake-1.11.1-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/libtool/libtool-2.4-1/libtool-2.4-1-msys-1.0.15-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe -c http://prdownloads.sourceforge.net/mingw/libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
+	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/perl/perl-5.8.8-1/perl-5.8.8-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/m4/m4-1.4.14-1/m4-1.4.14-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe -c http://ftp.acc.umu.se/pub/GNOME/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-dev_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe -c http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip
+	
+	%instdir%\msys\1.0\bin\lzma -d autoconf-2.68-1-msys-1.0.17-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf autoconf-2.68-1-msys-1.0.17-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d automake-1.11.1-1-msys-1.0.13-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf automake-1.11.1-1-msys-1.0.13-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d libtool-2.4-1-msys-1.0.15-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf libtool-2.4-1-msys-1.0.15-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar
+	%instdir%\msys\1.0\bin\lzma -d perl-5.8.8-1-msys-1.0.17-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf perl-5.8.8-1-msys-1.0.17-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d m4-1.4.14-1-msys-1.0.13-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf m4-1.4.14-1-msys-1.0.13-bin.tar
+	%instdir%\msys\1.0\bin\unzip -n glib_2.28.8-1_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n pkg-config_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n pkg-config-dev_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n gettext-runtime_0.18.1.1-2_win32.zip
+	
+	del autoconf-2.68-1-msys-1.0.17-bin.tar
+	del automake-1.11.1-1-msys-1.0.13-bin.tar
+	del libtool-2.4-1-msys-1.0.15-bin.tar
+	del libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar
+	del perl-5.8.8-1-msys-1.0.17-bin.tar
+	del m4-1.4.14-1-msys-1.0.13-bin.tar
+	del glib_2.28.8-1_win32.zip
+	del pkg-config_0.23-3_win32.zip
+	del pkg-config-dev_0.23-3_win32.zip
+	del gettext-runtime_0.18.1.1-2_win32.zip
+	
+	for /f %%a in ('dir %instdir%\msys\1.0\home /B') do set userName=%%a
+	echo.echo '%userName%'>%instdir%\msys\1.0\bin\whoami
+	
 ::------------------------------------------------------------------
 ::download and install mingw compiler:
 ::------------------------------------------------------------------	
