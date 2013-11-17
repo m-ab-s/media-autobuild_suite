@@ -1034,6 +1034,7 @@ if [ -f "lua-5.1.4/compile.done" ]; then
 		rm lua-5.1.4.tar.gz
 		cd lua-5.1.4
 		sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/local64/" Makefile
+		sed -i "s/CC= gcc/local/CC= gcc -static-libgcc/" src/Makefile
 		make mingw
 		make install
 		echo "finish" > compile.done
