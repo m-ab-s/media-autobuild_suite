@@ -1034,6 +1034,7 @@ if [ -f "lua-5.1.4/compile.done" ]; then
 		sed -i "s/CC= gcc/local/CC= gcc -static-libgcc/" src/Makefile
 		make mingw
 		make install
+		cp src/lua51.dll $LOCALDESTDIR/bin
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
 			echo -
