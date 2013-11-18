@@ -306,7 +306,7 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libpng 64Bit\007"
+		echo -ne "\033]0;compiling openjpeg 64Bit\007"
 		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
@@ -626,8 +626,8 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
-		wget -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
-		patch -p0 fribidi.diff
+		wget --no-check-certificate -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
+		patch -p0 < fribidi.diff
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
