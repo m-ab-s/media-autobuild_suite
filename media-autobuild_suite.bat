@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.8
-::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-06
+::	This is version 0.9
+::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-18
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -41,6 +41,7 @@
 ::	2013-11-06 add openexr, jpeg2000 and imagemagick (openexr and imagemagick only for 32 bit at the moment)
 ::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
 ::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
+::	2013-11-18 add gettext, dvdcss, dvdread, dvdnav, qt4, vlc and reorder code.
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -165,7 +166,7 @@ if %buildmplayer% GTR 2 GOTO mplayer
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
-echo. Build static openEXR and ImageMagick:
+echo. Build static image tools (openEXR, ImageMagick):
 echo. 1 = yes
 echo. 2 = no
 echo.
@@ -180,6 +181,28 @@ if %buildmagick%==2 (
 	set "magick=n"
 	)
 if %buildmagick% GTR 2 GOTO magick
+
+:vlc
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+echo.
+echo. Build vlc player:
+echo. 1 = yes
+echo. 2 = no
+echo.
+echo -------------------------------------------------------------------------------
+echo -------------------------------------------------------------------------------
+set /P buildvlc="build vlc:"
+
+if %buildvlc%==1 (
+	set "vlc=y"
+	set "qt4=y"
+	)
+if %buildvlc%==2 (
+	set "vlc=n"
+	set "qt4=n"
+	)
+if %buildvlc% GTR 2 GOTO vlc
 
 :numCores
 echo -------------------------------------------------------------------------------
@@ -657,9 +680,9 @@ if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals32
 
 :compileGlobals32
 :: no existing check here, because it is more easy to extend the global tools. 
-:: existing check in compileGlobals32.sh/compileGlobals64.sh
+:: existing check in compile_Globals32.sh/compile_Globals64.sh
 if %build32%==yes (
-	if exist %instdir%\compileGlobals32.sh GOTO compileGobal32
+	if exist %instdir%\compile_Globals32.sh GOTO compileGobal32
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- download global tools, 32 bit
@@ -669,7 +692,7 @@ if %build32%==yes (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackglobal32
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals32.sh
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_Globals32.sh
 
 	:compileGobal32
 	echo -------------------------------------------------------------------------------
@@ -677,12 +700,12 @@ if %build32%==yes (
 	echo.- compile global tools, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compileGlobals32.sh --cpuCount=%cpuCount%
+	%instdir%\mintty.lnk %instdir%\compile_Globals32.sh --qt4=%qt4% --cpuCount=%cpuCount%
 	)
 
 ::compileGlobals64
 if %build64%==yes (
-	if exist %instdir%\compileGlobals32.sh GOTO compileGobal64
+	if exist %instdir%\compile_Globals64.sh GOTO compileGobal64
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- download global tools, 64 bit
@@ -692,7 +715,7 @@ if %build64%==yes (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			
 			:unpackglobal64
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compileGlobals64.sh
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_Globals64.sh
 
 	:compileGobal64
 	echo -------------------------------------------------------------------------------
@@ -700,16 +723,16 @@ if %build64%==yes (
 	echo.- compile global tools, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compileGlobals64.sh --cpuCount=%cpuCount%
+	%instdir%\mintty.lnk %instdir%\compile_Globals64.sh --qt4=%qt4% --cpuCount=%cpuCount%
 	)
 
-:: audio coder
+:: audio tools
 :getAudio32
 if %build32%==yes (
 	if exist %instdir%\compile_audiotools32.sh GOTO compileAudio32
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for audio coder, 32 bit:
+		echo.- get script for audio tools, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio32
@@ -721,11 +744,11 @@ if %build32%==yes (
 	:compileAudio32
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile audio coder, 32 bit:
+	echo.- compile audio tools, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio coder 32 bit done...
+	echo. compile audio tools 32 bit done...
 	)
 	
 :getAudio64
@@ -733,7 +756,7 @@ if %build64%==yes (
 	if exist %instdir%\compile_audiotools64.sh GOTO compileAudio64
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for audio coder, 64 bit:
+		echo.- get script for audio tools, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio64
@@ -745,19 +768,19 @@ if %build64%==yes (
 	:compileAudio64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile audio coder, 64 bit:
+	echo.- compile audio tools, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
 	%instdir%\mintty.lnk %instdir%\compile_audiotools64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio coder 64 bit done...
+	echo. compile audio tools 64 bit done...
 	)	
 
-:: video coder
+:: video tools
 if %build32%==yes (
 	if not exist %instdir%\compile_videotools32.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for video coder, 32 bit:
+		echo.- get script for video tools, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if not exist %instdir%\media-autobuild_suite.zip (
@@ -768,18 +791,18 @@ if %build32%==yes (
 
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile video coder, 32 bit:
+	echo.- compile video tools, 32 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer% --nonfree=%binary%
-	echo. compile video coder 32 bit done...
+	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+	echo. compile video tools 32 bit done...
 	)
 
 if %build64%==yes (
 	if not exist %instdir%\compile_videotools64.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for video coder, 64 bit:
+		echo.- get script for video tools, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if not exist %instdir%\media-autobuild_suite.zip (
@@ -791,105 +814,57 @@ if %build64%==yes (
 	:compileVideo64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile video coder, 64 bit:
+	echo.- compile video tools, 64 bit:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --mplayer=%mplayer% --nonfree=%binary%
-	echo. compile video coder 64 bit done...
-	)
-
-:: ffmpeg
-if %ffmpeg%==y (
-	if %build32%==yes (
-		if not exist %instdir%\compile_ffmpeg32.sh (
-			echo -------------------------------------------------------------------------------
-			echo.
-			echo.- get script for ffmpeg, 32 bit:
-			echo.
-			echo -------------------------------------------------------------------------------
-			if not exist %instdir%\media-autobuild_suite.zip (
-				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg32.sh
-			)
-
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile ffmpeg, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_ffmpeg32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-		echo. compile ffmpeg 32 bit done...
-		)
-
-	if %build64%==yes (
-		if not exist %instdir%\compile_ffmpeg64.sh (
-			echo -------------------------------------------------------------------------------
-			echo.
-			echo.- get script for ffmpeg, 64 bit:
-			echo.
-			echo -------------------------------------------------------------------------------
-			if not exist %instdir%\media-autobuild_suite.zip (
-				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_ffmpeg64.sh
-			)
-
-		:compileFFmpeg64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile ffmpeg, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_ffmpeg64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-		echo. compile ffmpeg 64 bit done...
-		)
+	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+	echo. compile video tools 64 bit done...
 	)
 	
 ::imagemagick	
 if %magick%==y (
 	if %build32%==yes (
-		if not exist %instdir%\compile_imagemagick32.sh (
+		if not exist %instdir%\compile_imagetools32 (
 			echo -------------------------------------------------------------------------------
 			echo.
-			echo.- get script for imagemagick, 32 bit:
+			echo.- get script for image tools, 32 bit:
 			echo.
 			echo -------------------------------------------------------------------------------
 			if not exist %instdir%\media-autobuild_suite.zip (
 				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagemagick32.sh
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools32
 			)
 
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- compile imagemagick, 32 bit:
+		echo.- compile image tools, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagemagick32.sh --cpuCount=%cpuCount%
-		echo. compile imagemagick 32 bit done...
+		%instdir%\mintty.lnk %instdir%\compile_imagetools32 --cpuCount=%cpuCount%
+		echo. compile image tools 32 bit done...
 		)
 	
 	if %build64%==yes (
-		if not exist %instdir%\compile_imagemagick64.sh (
+		if not exist %instdir%\compile_imagetools64.sh (
 			echo -------------------------------------------------------------------------------
 			echo.
-			echo.- get script for imagemagick, 64 bit:
+			echo.- get script for image tools, 64 bit:
 			echo.
 			echo -------------------------------------------------------------------------------
 			if not exist %instdir%\media-autobuild_suite.zip (
 				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagemagick64.sh
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools64.sh
 			)
 
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- compile imagemagick, 64 bit:
+		echo.- compile image tools, 64 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagemagick64.sh --cpuCount=%cpuCount%
-		echo. compile imagemagick 64 bit done...
+		%instdir%\mintty.lnk %instdir%\compile_imagetools64.sh --cpuCount=%cpuCount%
+		echo. compile image tools 64 bit done...
 		)
 	)
 	

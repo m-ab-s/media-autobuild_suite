@@ -1,6 +1,6 @@
 source /local32/etc/profile.local
 
-# set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
+# set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 while true; do
   case $1 in

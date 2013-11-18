@@ -1,10 +1,11 @@
-source /local32/etc/profile.local
+source /local64/etc/profile.local
 
-# set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
+# set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
+--qt4=* ) qt4="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -23,19 +24,18 @@ EOF
 fi
 
 #make mingw libs static
-if [ -f "/mingw32/lib/libgfortran.dll.a" ]; then mv /mingw32/lib/libgfortran.dll.a /mingw32/lib/libgfortran.dll.a.old; fi
-if [ -f "/mingw32/lib/libgomp.dll.a" ]; then mv /mingw32/lib/libgomp.dll.a /mingw32/lib/libgomp.dll.a.old; fi
-if [ -f "/mingw32/lib/libquadmath.dll.a" ]; then mv /mingw32/lib/libquadmath.dll.a /mingw32/lib/libquadmath.dll.a.old; fi
-if [ -f "/mingw32/lib/libssp.dll.a" ]; then mv /mingw32/lib/libssp.dll.a /mingw32/lib/libssp.dll.a.old; fi
+if [ -f "/mingw64/lib/libgfortran.dll.a" ]; then mv /mingw64/lib/libgfortran.dll.a /mingw64/lib/libgfortran.dll.a.old; fi
+if [ -f "/mingw64/lib/libgomp.dll.a" ]; then mv /mingw64/lib/libgomp.dll.a /mingw64/lib/libgomp.dll.a.old; fi
+if [ -f "/mingw64/lib/libquadmath.dll.a" ]; then mv /mingw64/lib/libquadmath.dll.a /mingw64/lib/libquadmath.dll.a.old; fi
+if [ -f "/mingw64/lib/libssp.dll.a" ]; then mv /mingw64/lib/libssp.dll.a /mingw64/lib/libssp.dll.a.old; fi
 
 cd $LOCALBUILDDIR
-
 if [ -f "zlib-1.2.8/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "zlib-1.2.8 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling zlib 32Bit\007"
+		echo -ne "\033]0;compiling zlib 64Bit\007"
 		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
 		tar xf zlib-1.2.8.tar.gz
 		cd zlib-1.2.8
@@ -48,13 +48,13 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm zlib-1.2.8.tar.gz
-		
-cat > /local32/lib/pkgconfig/zlib.pc << "EOF"
-prefix=/local32
-exec_prefix=/local32
-libdir=/local32/lib
-sharedlibdir=/local32/lib
-includedir=/local32/include
+
+cat > /local64/lib/pkgconfig/zlib.pc << "EOF"
+prefix=/local64
+exec_prefix=/local64
+libdir=/local64/lib
+sharedlibdir=/local64/lib
+includedir=/local64/include
 
 Name: zlib
 Description: zlib compression library
@@ -78,13 +78,13 @@ EOF
 			sleep 15
 	fi
 fi	
-
+	
 if [ -f "bzip2-1.0.6/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "bzip2-1.0.6 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling bzip2 32Bit\007"
+		echo -ne "\033]0;compiling bzip2 64Bit\007"
 		wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 		tar xf bzip2-1.0.6.tar.gz
 		cd bzip2-1.0.6
@@ -111,13 +111,13 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 				sleep 15
 		fi
 fi	
-	
+
 if [ -f "dlfcn-win32-r19/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "dlfcn-win32-r19 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling dlfcn-win32 32Bit\007"
+		echo -ne "\033]0;compiling dlfcn-win32 64Bit\007"
 		wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
 		tar xf dlfcn-win32-r19.tar.bz2
 		cd dlfcn-win32-r19
@@ -148,7 +148,7 @@ if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 	echo "pthreads-w32-2-9-1-release is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling pthreads-w32 32Bit\007"
+		echo -ne "\033]0;compiling pthreads-w32 64Bit\007"
 		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
 		tar xf pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
@@ -173,40 +173,43 @@ if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 				sleep 15
 		fi
 fi
-
+	
 #maybe we don't need this...
 #if [ -f "nasm-2.10.09/compile.done" ]; then
 #	echo -------------------------------------------------
 #	echo "nasm-2.10.09 is already compiled"
 #	echo -------------------------------------------------
 #	else 
+#		cd $LOCALBUILDDIR
 #		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
 #		tar xf nasm-2.10.09.tar.gz
 #		cd nasm-2.10.09
-#		./configure --prefix=/mingw32
+#		./configure --prefix=/mingw64
+#		sed -i 's/ -mthreads//g' Makefile
+#		sed -i 's/ -mthreads//g' rdoff/Makefile
 #		make -j $cpuCount
 #		make install
 #		echo "finish" > compile.done
 #		cd $LOCALBUILDDIR
 #		rm nasm-2.10.09.tar.gz
-#fi	
+#fi		
 
 if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "pkg-config-lite-0.28-1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling pkg-config-lite 32Bit\007"
+		echo -ne "\033]0;compiling pkg-config-lite 64Bit\007"
 		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --with-pc-path="/local32/lib/pkgconfig"
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --with-pc-path="/local64/lib/pkgconfig"
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm pkg-config-lite-0.28-1.tar.gz
-		
+
 cat >  ${LOCALDESTDIR}/bin/pkg-config.sh << "EOF"
 #!/bin/sh
 if pkg-config "$@" > /dev/null 2>&1 ; then
@@ -236,7 +239,7 @@ source ${LOCALDESTDIR}/etc/profile.local
 			read -p "first close the batch window, then the shell window"
 			sleep 15
 	fi
-fi
+fi	
 
 #if [ -f "libtool-2.4.2/compile.done" ]; then
 #	echo -------------------------------------------------
@@ -246,7 +249,7 @@ fi
 #		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
 #		tar xf libtool-2.4.2.tar.gz
 #		cd libtool-2.4.2
-#		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+#		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 #		make -j $cpuCount
 #		make install
 #		echo "finish" > compile.done
@@ -268,31 +271,31 @@ fi
 #		fi
 #fi
 
-if [ -f "libpng-1.6.6/compile.done" ]; then
+if [ -f "libpng-1.6.7/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "libpng-1.6.6 is already compiled"
+	echo "libpng-1.6.7 is already compiled"
 	echo -------------------------------------------------
-	else
-		echo -ne "\033]0;compiling libpng 32Bit\007"
-		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.6/libpng-1.6.6.tar.gz"
-		tar xf libpng-1.6.6.tar.gz
-		cd libpng-1.6.6
-		./configure --prefix=$LOCALDESTDIR --disable-shared
+	else 
+		echo -ne "\033]0;compiling libpng 64Bit\007"
+		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.7/libpng-1.6.7.tar.gz"
+		tar xf libpng-1.6.7.tar.gz
+		cd libpng-1.6.7
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
-		rm libpng-1.6.6.tar.gz
+		rm libpng-1.6.7.tar.gz
 		
 		if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build libpng-1.6.6 done..."
+			echo "build libpng-1.6.7 done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build libpng-1.6.6 failed..."
+				echo "build libpng-1.6.7 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
@@ -304,15 +307,16 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libpng 32Bit\007"
+		echo -ne "\033]0;compiling openjpeg 64Bit\007"
 		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
-		sed -i "s/\/usr\/lib/\/local32\/lib/" Makefile
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		sed -i "s/\/usr\/lib/\/local64\/lib/" Makefile
 		make
 		make install
 		echo "finish" > compile.done
+		cp libopenjpeg.pc $PKG_CONFIG_PATH
 		cd $LOCALBUILDDIR
 		rm openjpeg_v1_4_sources_r697.tgz
 		
@@ -336,14 +340,15 @@ if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
 	echo "libjpeg-turbo-1.3.0 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libjpeg-turbo 32Bit\007"
+		echo -ne "\033]0;compiling libjpeg-turbo 64Bit\007"
 		wget -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
 		tar xf libjpeg-turbo-1.3.0.tar.gz
 		rm libjpeg-turbo-1.3.0.tar.gz
 		cd libjpeg-turbo-1.3.0
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
+		sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
 		echo "finish" > compile.done
 		
 		if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
@@ -368,12 +373,12 @@ if [ -f "jpeg-9/compile.done" ]; then
 	echo "jpeg-9 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling jpeg-9 32Bit\007"
+		echo -ne "\033]0;compiling jpeg-9 64Bit\007"
 		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
 		tar xf jpegsrc.v9.tar.gz
 		rm jpegsrc.v9.tar.gz
 		cd jpeg-9
-		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -399,12 +404,12 @@ if [ -f "jasper-1.900.1/compile.done" ]; then
 	echo "jasper-1.900.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling jasper 32Bit\007"
+		echo -ne "\033]0;compiling jasper 64Bit\007"
 		wget -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
-		./configure --prefix=$LOCALDESTDIR --enable-static=no
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-static=no
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -430,12 +435,12 @@ if [ -f "tiff-4.0.3/compile.done" ]; then
 	echo "tiff-4.0.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling tiff 32Bit\007"
+		echo -ne "\033]0;compiling tiff 64Bit\007"
 		wget -c ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
 		tar xf tiff-4.0.3.tar.gz
 		rm tiff-4.0.3.tar.gz
 		cd tiff-4.0.3
-		./configure --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -450,38 +455,6 @@ if [ -f "tiff-4.0.3/compile.done" ]; then
 			else
 				echo -------------------------------------------------
 				echo "build tiff-4.0.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-if [ -f "freetype-2.4.10/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "freetype-2.4.10 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling freetype 32Bit\007"
-		#wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
-		wget -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
-		tar xf freetype-2.4.10.tar.gz
-		cd freetype-2.4.10
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm freetype-2.4.10.tar.gz
-		
-		if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build freetype-2.4.10 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build freetype-2.4.10 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
@@ -524,16 +497,114 @@ if [ -f "libiconv-1.14/compile1.done" ]; then
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libiconv 32Bit\007"
+		echo -ne "\033]0;compiling libiconv 64Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
+		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
 		echo "finish" > compile1.done
-		cd $LOCALBUILDDIR
+
+		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libiconv-1.14 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libiconv-1.14 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "gettext-0.18.3.1-runtime is already compiled"
+    echo -------------------------------------------------
+    else 
+		wget -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
+		tar xzf gettext-0.18.3.1.tar.gz
+		mv gettext-0.18.3.1 gettext-0.18.3.1-runtime
+		cd gettext-0.18.3.1-runtime
+		cat gettext-tools/woe32dll/gettextlib-exports.c | grep -v rpl_opt > gettext-tools/woe32dll/gettextlib-exports.c.new
+		mv gettext-tools/woe32dll/gettextlib-exports.c.new gettext-tools/woe32dll/gettextlib-exports.c
+		CFLAGS="-mms-bitfields -mthreads -O2" ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -DPTW32_STATIC_LIB" 
+		cd gettext-runtime
+		make -j $cpuCount
+		make install
+		cd ..
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build gettext-0.18.3.1-runtime done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build gettext-0.18.3.1-runtime failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+		
+cd $LOCALBUILDDIR
+
+if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "gettext-0.18.3.1-static is already compiled"
+    echo -------------------------------------------------
+    else 
+		tar xzf gettext-0.18.3.1.tar.gz
+		rm gettext-0.18.3.1.tar.gz
+		mv gettext-0.18.3.1 gettext-0.18.3.1-static
+		cd gettext-0.18.3.1-static
+		CFLAGS="-mms-bitfields -mthreads -O2" ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		make -j $cpuCount
+		install gettext-tools/src/*.exe $LOCALDESTDIR/bin
+		install gettext-tools/misc/autopoint $LOCALDESTDIR/bin
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build gettext-0.18.3.1-static done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build gettext-0.18.3.1-static failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libiconv-1.14/compile2.done" ]; then
+    echo -------------------------------------------------
+    echo "libiconv-1.14 is already compiled"
+    echo -------------------------------------------------
+    else 
+		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
+		cd libiconv-1.14
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		make clean
+		make -j $cpuCount
+		make install
+		echo "finish" > compile2.done
 		
 		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
 			echo -
@@ -550,16 +621,51 @@ if [ -f "libiconv-1.14/compile1.done" ]; then
 		fi
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "freetype-2.4.10/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "freetype-2.4.10 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling freetype 64Bit\007"
+		#wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
+		wget -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
+		tar xf freetype-2.4.10.tar.gz
+		rm freetype-2.4.10.tar.gz
+		cd freetype-2.4.10
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build freetype-2.4.10 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build freetype-2.4.10 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "expat-2.1.0/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "expat-2.1.0 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling expat 32Bit\007"
+		echo -ne "\033]0;compiling expat 64Bit\007"
 		wget -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
 		tar xf expat-2.1.0.tar.gz
 		cd expat-2.1.0
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -586,11 +692,11 @@ if [ -f "fontconfig-2.10.2/compile.done" ]; then
 	echo "fontconfig-2.10.2 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling fontconfig 32Bit\007"
+		echo -ne "\033]0;compiling fontconfig 64Bit\007"
 		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
 		tar xf fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$PKG_CONFIG_PATH/fontconfig.pc"
@@ -618,11 +724,13 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 	echo "fribidi-0.19.4 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling fribidi 32Bit\007"
+		echo -ne "\033]0;compiling fribidi 64Bit\007"
 		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		wget --no-check-certificate -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
+		patch -p0 < fribidi.diff
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
 		make install
@@ -630,7 +738,7 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		cd $LOCALBUILDDIR
 		rm fribidi-0.19.4.tar.bz2
 
-cat > /local32/bin/fribidi-config << "EOF"
+cat > /local64/bin/fribidi-config << "EOF"
 #!/bin/sh
 case $1 in
   --version)
@@ -668,11 +776,11 @@ if [ -f "libass-0.10.1/compile.done" ]; then
 	echo "libass-0.10.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libass 32Bit\007"
+		echo -ne "\033]0;compiling libass 64Bit\007"
 		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
 		tar xf libass-0.10.1.tar.gz
 		cd libass-0.10.1
-		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
@@ -700,18 +808,18 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 	echo "SDL-1.2.15 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling SDL 32Bit\007"
+		echo -ne "\033]0;compiling SDL 64Bit\007"
 		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		cd $LOCALBUILDDIR
 		rm SDL-1.2.15.tar.gz
-		sed -i "s/-mwindows//" "/local32/bin/sdl-config"
-		sed -i "s/-mwindows//" "/local32/lib/pkgconfig/sdl.pc"
+		sed -i "s/-mwindows//" "/local64/bin/sdl-config"
+		sed -i "s/-mwindows//" "/local64/lib/pkgconfig/sdl.pc"
 		
 		if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
 			echo -
@@ -728,6 +836,7 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 		fi
 fi
 
+
 #----------------------
 # crypto engine
 #----------------------
@@ -739,12 +848,12 @@ if [ -f "gmp-5.1.3/compile.done" ]; then
 	echo "gmp-5.1.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling gmp 32Bit\007"
+		echo -ne "\033]0;compiling gmp 64Bit\007"
 		wget ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
 		tar xf gmp-5.1.3.tar.bz2
 		rm gmp-5.1.3.tar.bz2
 		cd gmp-5.1.3
-		./configure --prefix=$LOCALDESTDIR --host=x86-pc-mingw32 --build=x86-pc-mingw32 --enable-cxx --disable-shared --with-gnu-ld
+		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --enable-cxx --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -770,12 +879,12 @@ if [ -f "nettle-2.7.1/compile.done" ]; then
 	echo "nettle-2.7.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling nettle 32Bit\007"
+		echo -ne "\033]0;compiling nettle 64Bit\007"
 		wget -c http://www.lysator.liu.se/~nisse/archive/nettle-2.7.1.tar.gz
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
 		cd nettle-2.7.1
-		./configure --prefix=$LOCALDESTDIR --host=x86-pc-mingw32 --build=x86-pc-mingw32 --disable-shared
+		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -801,12 +910,12 @@ if [ -f "libgpg-error-1.12/compile.done" ]; then
 	echo "libgpg-error-1.12 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libgpg-error 32Bit\007"
+		echo -ne "\033]0;compiling libgpg-error 64Bit\007"
 		wget ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.12.tar.bz2
 		tar xf libgpg-error-1.12.tar.bz2
 		rm libgpg-error-1.12.tar.bz2
 		cd libgpg-error-1.12
-		./configure --prefix=$LOCALDESTDIR --host=x86-pc-mingw32 --build=x86-pc-mingw32 --disable-shared --with-gnu-ld
+		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --disable-shared --with-gnu-ld
 		sed -i 's/iconv --silent/iconv -s/g' potomo
 		make -j $cpuCount
 		make install
@@ -833,12 +942,12 @@ if [ -f "libgcrypt-1.5.3/compile.done" ]; then
 	echo "libgcrypt-1.5.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libgcrypt 32Bit\007"
+		echo -ne "\033]0;compiling libgcrypt 64Bit\007"
 		wget ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.5.3.tar.bz2
 		tar xf libgcrypt-1.5.3.tar.bz2
 		rm libgcrypt-1.5.3.tar.bz2
 		cd libgcrypt-1.5.3
-		./configure --prefix=$LOCALDESTDIR --host=x86-pc-mingw32 --build=x86-pc-mingw32 --disable-shared --with-gnu-ld
+		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -864,12 +973,12 @@ if [ -f "gnutls-3.2.3/compile.done" ]; then
 	echo "gnutls-3.2.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling gnutls 32Bit\007"
+		echo -ne "\033]0;compiling gnutls 64Bit\007"
 		wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.3.tar.xz
 		tar xf gnutls-3.2.3.tar.xz
 		rm gnutls-3.2.3.tar.xz
 		cd gnutls-3.2.3
-		./configure --prefix=$LOCALDESTDIR --host=x86-pc-mingw32 --build=x86-pc-mingw32 --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
+		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp/' $PKG_CONFIG_PATH/gnutls.pc
@@ -897,7 +1006,7 @@ if [ -f "rtmpdump/compile.done" ]; then
 	echo "rtmpdump is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling rtmpdump 32Bit\007"
+		echo -ne "\033]0;compiling rtmpdump 64Bit\007"
 		git clone git://git.ffmpeg.org/rtmpdump rtmpdump
 		cd rtmpdump
 		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv $(LIBZ)/' Makefile
@@ -927,12 +1036,12 @@ if [ -f "lzo-2.06/compile.done" ]; then
 	echo "lzo-2.06 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling lzo 32Bit\007"
+		echo -ne "\033]0;compiling lzo 64Bit\007"
 		wget -c http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
 		tar xf lzo-2.06.tar.gz
 		rm lzo-2.06.tar.gz
 		cd lzo-2.06
-		./configure --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -958,11 +1067,11 @@ if [ -f "libdca/compile.done" ]; then
 	echo "libdca is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdca 32Bit\007"
+		echo -ne "\033]0;compiling libdca 64Bit\007"
 		svn co svn://svn.videolan.org/libdca/trunk libdca
 		cd libdca
 		./bootstrap
-		./configure --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
@@ -988,12 +1097,12 @@ if [ -f "libxml2-2.9.1/compile.done" ]; then
 	echo "libxml2-2.9.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libxml2 32Bit\007"
+		echo -ne "\033]0;compiling libxml2 64Bit\007"
 		wget -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
 		cd libxml2-2.9.1
-		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
@@ -1016,29 +1125,31 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdvdcss-1.2.13/compile.done" ]; then
+if [ -f "lua-5.1.4/compile.done" ]; then
 	echo -------------------------------------------------
-	echo "libdvdcss-1.2.13 is already compiled"
+	echo "lua-5.1.4 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdcss 32Bit\007"
-		wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
-		tar xf libdvdcss-1.2.13.tar.bz2
-		rm libdvdcss-1.2.13.tar.bz2
-		cd libdvdcss-1.2.13
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
+		echo -ne "\033]0;compiling lua 32Bit\007"
+		wget -c http://www.lua.org/ftp/lua-5.1.4.tar.gz
+		tar xf lua-5.1.4.tar.gz
+		rm lua-5.1.4.tar.gz
+		cd lua-5.1.4
+		sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/local64/" Makefile
+		sed -i "s/CC= gcc/local/CC= gcc -static-libgcc/" src/Makefile
+		make mingw
 		make install
+		cp src/lua51.dll $LOCALDESTDIR/bin
 		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
+		if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
 			echo -
 			echo -------------------------------------------------
-			echo "build libdvdcss-1.2.13 done..."
+			echo "build lua-5.1.4 done..."
 			echo -------------------------------------------------
 			echo -
 			else
 				echo -------------------------------------------------
-				echo "build libdvdcss-1.2.13 failed..."
+				echo "build lua-5.1.4 failed..."
 				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
 				read -p "first close the batch window, then the shell window"
 				sleep 15
@@ -1047,73 +1158,46 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdvdread-4.2.1/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libdvdread-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libdvdread 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
-		tar xf libdvdread-4.2.1.tar.xz
-		rm libdvdread-4.2.1.tar.xz
-		cd libdvdread-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
-		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
-		
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdread-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
+if [[ $qt4 = "y" ]]; then
+	if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
+		echo -------------------------------------------------
+		echo "qt-everywhere-opensource-src-4.8.5 is already compiled"
+		echo -------------------------------------------------
+		else 
+			echo -ne "\033]0;compiling qt4 64Bit\007"
+			wget -c http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.zip
+			unzip -o qt-everywhere-opensource-src-4.8.5.zip
+			rm qt-everywhere-opensource-src-4.8.5.zip
+			cd qt-everywhere-opensource-src-4.8.5
+			
+			sed -i 's/QMAKE_LFLAGS		=/QMAKE_LFLAGS		= -static -static-libgcc -static-libstdc++/' "mkspecs/win32-g++/qmake.conf"
+			sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++ -s/' "qmake/Makefile.win32-g++"
+			sed -i 's/!contains(QT_CONFIG, no-jpeg):!contains(QT_CONFIG, jpeg):SUBDIRS += jpeg/!contains(QT_CONFIG, no-libjpeg):!contains(QT_CONFIG, libjpeg):SUBDIRS += jpeg/' "src/plugins/imageformats/imageformats.pro"
+			sed -i 's/#if defined(Q_OS_WIN64) && !defined(Q_CC_GNU)/#if defined(Q_OS_WIN64)/' "src/corelib/tools/qsimd.cpp"
+			sed -i 's/SUBDIRS += demos/#SUBDIRS += demos/' "projects.pro"
+			./configure.exe -prefix $LOCALDESTDIR -platform win32-g++ -static -release -opensource -confirm-license -nomake examples -qt-libjpeg -sse
+			mingw32-make -j $cpuCount
+			mingw32-make install
+			
+			cp ./plugins/imageformats/*.a $LOCALDESTDIR/lib
+			cp ./plugins/accessible/libqtaccessiblewidgets.a  $LOCALDESTDIR/lib
+			sed -i 's/\.\.\\.\.\\lib\\pkgconfig\\//' lib/pkgconfig/*.pc
+			sed -i 's/Libs: -L${libdir} -lQtGui/Libs: -L${libdir} -lcomctl32 -lqjpeg -lqtaccessiblewidgets -lQtGui/' "lib/pkgconfig/QtGui.pc"
+			cp lib/pkgconfig/*.pc $PKG_CONFIG_PATH
+			if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
+				echo -
 				echo -------------------------------------------------
-				echo "build libdvdread-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+				echo "build qt-everywhere-opensource-src-4.8.5 done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build qt-everywhere-opensource-src-4.8.5 failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+	fi
 fi
 
-cd $LOCALBUILDDIR
-
-if [ -f "libdvdnav-4.2.1/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libdvdnav-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
-		tar xf libdvdnav-4.2.1.tar.xz
-		rm libdvdnav-4.2.1.tar.xz
-		cd libdvdnav-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi
-		./configure --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
-		make -j $cpuCount
-		make install
-		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdnav-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libdvdnav-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
 sleep 3

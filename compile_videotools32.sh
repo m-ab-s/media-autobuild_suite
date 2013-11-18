@@ -1,12 +1,14 @@
 source /local32/etc/profile.local
 
-# set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
+# set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
+--ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
+--vlc=* ) vlc="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
@@ -271,8 +273,7 @@ if [ -f "libutvideo-git/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		
+
 		if [ -f "$LOCALDESTDIR/lib/libutvideo.a" ]; then
 			echo -
 			echo -------------------------------------------------
@@ -288,6 +289,8 @@ if [ -f "libutvideo-git/compile.done" ]; then
 		fi
 fi
 
+cd $LOCALBUILDDIR
+
 if [ -f "xavs/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "xavs is already compiled"
@@ -300,7 +303,6 @@ if [ -f "xavs/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
 		
 		if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 			echo -
@@ -316,6 +318,111 @@ if [ -f "xavs/compile.done" ]; then
 				sleep 15
 		fi
 fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdcss-1.2.13/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdcss-1.2.13 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdcss 32Bit\007"
+		wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
+		tar xf libdvdcss-1.2.13.tar.bz2
+		rm libdvdcss-1.2.13.tar.bz2
+		cd libdvdcss-1.2.13
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdcss-1.2.13 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdcss-1.2.13 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdread-4.2.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdread-4.2.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdread 32Bit\007"
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
+		tar xf libdvdread-4.2.1.tar.xz
+		rm libdvdread-4.2.1.tar.xz
+		cd libdvdread-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
+		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
+		
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdread-4.2.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdread-4.2.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libdvdnav-4.2.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libdvdnav-4.2.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+		tar xf libdvdnav-4.2.1.tar.xz
+		rm libdvdnav-4.2.1.tar.xz
+		cd libdvdnav-4.2.1
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		./configure --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
+		make -j $cpuCount
+		make install
+		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libdvdnav-4.2.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libdvdnav-4.2.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
 	if [ -f "mp4box_gpac/compile.done" ]; then
@@ -336,7 +443,6 @@ if [[ $mp4box = "y" ]]; then
 			make -j $cpuCount
 			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
 			echo "finish" > compile.done
-			cd $LOCALBUILDDIR
 			
 			if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
 				echo -
@@ -353,6 +459,106 @@ if [[ $mp4box = "y" ]]; then
 			fi
 	fi
 fi
+
+cd $LOCALBUILDDIR
+
+if [[ $ffmpeg = "y" ]]; then
+	if [[ $nonfree = "y" ]]; then
+		extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
+	  else
+		if  [[ $nonfree = "n" ]]; then
+		  extras="" 
+		fi
+	fi		
+
+	echo "-------------------------------------------------------------------------------"
+	echo 
+	echo "compile ffmpeg 32 bit"
+	echo 
+	echo "-------------------------------------------------------------------------------"
+
+	if [ -f "ffmpeg-git/configure" ]; then
+		echo -ne "\033]0;compiling ffmpeg 32Bit\007"
+		cd ffmpeg-git
+		oldHead=`git rev-parse HEAD`
+		git pull origin master
+		newHead=`git rev-parse HEAD`
+		if [[ "$oldHead" != "$newHead" ]]; then
+			make uninstall
+			make clean
+			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			make -j $cpuCount
+			make install
+			
+			if [ -f "$LOCALDESTDIR/bin/ffmpeg.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build ffmpeg done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build ffmpeg failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+		else
+			echo -------------------------------------------------
+			echo "ffmpeg is already up to date"
+			echo -------------------------------------------------
+		fi
+		else
+			echo -ne "\033]0;compiling ffmpeg 32Bit\007"
+			cd $LOCALBUILDDIR
+			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
+			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi
+			if [ -d "$LOCALDESTDIR/include/libpostproc" ]; then rm -r $LOCALDESTDIR/include/libpostproc; fi
+			if [ -d "$LOCALDESTDIR/include/libswresample" ]; then rm -r $LOCALDESTDIR/include/libswresample; fi
+			if [ -d "$LOCALDESTDIR/include/libswscale" ]; then rm -r $LOCALDESTDIR/include/libswscale; fi
+			if [ -d "$LOCALDESTDIR/include/libavdevice" ]; then rm -r $LOCALDESTDIR/include/libavdevice; fi
+			if [ -d "$LOCALDESTDIR/include/libavfilter" ]; then rm -r $LOCALDESTDIR/include/libavfilter; fi
+			if [ -d "$LOCALDESTDIR/include/libavformat" ]; then rm -r $LOCALDESTDIR/include/libavformat; fi
+			if [ -f "$LOCALDESTDIR/lib/libavutil.a" ]; then rm -r $LOCALDESTDIR/lib/libavutil.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libswresample.a" ]; then rm -r $LOCALDESTDIR/lib/libswresample.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libswscale.a" ]; then rm -r $LOCALDESTDIR/lib/libswscale.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then rm -r $LOCALDESTDIR/lib/libavcodec.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavdevice.a" ]; then rm -r $LOCALDESTDIR/lib/libavdevice.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -r $LOCALDESTDIR/lib/libavfilter.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -r $LOCALDESTDIR/lib/libavformat.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -r $LOCALDESTDIR/lib/libpostproc.a; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavcodec.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavutil.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavutil.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libpostproc.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswresample.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libswresample.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswscale.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libswscale.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavdevice.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavfilter.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavformat.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavformat.pc; fi
+
+			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+			cd ffmpeg-git
+			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			make -j $cpuCount
+			make install
+			
+			if [ -f "$LOCALDESTDIR/bin/ffmpeg.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build ffmpeg done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build ffmpeg failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+	fi
+fi
+
+cd $LOCALBUILDDIR
 
 if [[ $mplayer = "y" ]]; then
 	if [ -f mplayer-checkout*/compile.done ]; then
@@ -397,6 +603,91 @@ if [[ $mplayer = "y" ]]; then
 					read -p "first close the batch window, then the shell window"
 					sleep 15
 			fi
+	fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [[ $vlc = "y" ]]; then
+	if [ -f "vlc-git/bootstrap" ]; then
+		echo -ne "\033]0;compiling vlc 32Bit\007"
+		cd vlc-git
+		oldHead=`git rev-parse HEAD`
+		git pull origin master
+		newHead=`git rev-parse HEAD`
+		if [[ "$oldHead" != "$newHead" ]]; then
+		make clean
+		if [[ ! -f "configure" ]]; then
+			./bootstrap
+		fi 
+		./configure --disable-libgcrypt --disable-a52 --host=i586-pc-mingw32msvc --disable-mad --enable-qt --disable-sdl
+		make -j $cpuCount
+		
+		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
+		sed -i "s/.*cp .*builddir.*npapi-vlc.*//g" Makefile
+		for file in ./*/vlc.exe; do
+			rm $file # try to force a rebuild...
+		done
+		make package-win-common
+		strip --strip-all ./vlc-2.2.0-git/*.dll
+		strip --strip-all ./vlc-2.2.0-git/*.exe
+		cp -rf ./vlc-2.2.0-git $LOCALDESTDIR/bin
+		
+		if [ -f "$LOCALDESTDIR/bin/vlc-2.2.0-git/vlc.exe" ]; then
+				echo -
+				echo -------------------------------------------------
+				echo "build vlc done..."
+				echo -------------------------------------------------
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build vlc failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+		else
+			echo -------------------------------------------------
+			echo "vlc is already up to date"
+			echo -------------------------------------------------
+		fi
+		else
+		echo -ne "\033]0;compiling vlc 32Bit\007"
+			git clone https://github.com/videolan/vlc.git vlc-git
+			cd vlc-git
+			sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
+			sed -i '/		CC="$CC -static-libgcc"/ a\		CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac
+			sed -i 's/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>\/dev\/null || hostname`", \[host which ran configure\])/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", \[host which ran configure\])/' configure.ac
+			cp -v /usr/share/aclocal/* m4/
+			if [[ ! -f "configure" ]]; then
+				./bootstrap
+			fi 
+			./configure --disable-libgcrypt --disable-a52 --host=i586-pc-mingw32msvc --disable-mad --enable-qt --disable-sdl
+			make -j $cpuCount
+			
+			sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
+			sed -i "s/.*cp .*builddir.*npapi-vlc.*//g" Makefile
+			for file in ./*/vlc.exe; do
+				rm $file # try to force a rebuild...
+			done
+			make package-win-common
+			strip --strip-all ./vlc-2.2.0-git/*.dll
+			strip --strip-all ./vlc-2.2.0-git/*.exe
+			cp -rf ./vlc-2.2.0-git $LOCALDESTDIR/bin
+			
+			if [ -f "$LOCALDESTDIR/bin/vlc-2.2.0-git/vlc.exe" ]; then
+					echo -
+					echo -------------------------------------------------
+					echo "build vlc done..."
+					echo -------------------------------------------------
+					echo -
+					else
+						echo -------------------------------------------------
+						echo "build vlc failed..."
+						echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+						read -p "first close the batch window, then the shell window"
+						sleep 15
+				fi
 	fi
 fi
 

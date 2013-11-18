@@ -45,6 +45,7 @@ Included Tools and Libraries
  - fltk
  - fontconfig
  - freetype
+ - gettext
  - gsm
  - gnutls (standalone and lib for ffmpeg)
  - lame (standalone and lib for ffmpeg)
@@ -54,10 +55,14 @@ Included Tools and Libraries
  - jpegturbo
  - libass
  - libbluray
+ - libdvdcss
+ - libdvdnav
+ - libdvdread
  - libpng
  - libtiff
  - libutvideo
  - libxml2
+ - lua
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)
@@ -67,10 +72,12 @@ Included Tools and Libraries
  - ogg
  - opus
  - opus-tools (standalone)
+ - qt4
  - rtmp (standalone and lib for ffmpeg)
  - sdl (for ffplay)
  - speex (standalone and lib for ffmpeg)
  - theora
+ - vlc player
  - vpx (standalone and lib for ffmpeg)
  - vo-aacenc
  - vo-amrwbenc

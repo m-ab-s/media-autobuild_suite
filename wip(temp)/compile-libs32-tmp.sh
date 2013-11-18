@@ -13,22 +13,6 @@ done
 	
 cd $LOCALBUILDDIR
 
-if [ -f "jpeg-9/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "jpeg-9 is already compiled"
-	echo -------------------------------------------------
-	else 
-		wget -c "http://www.ijg.org/files/jpegsrc.v9.tar.gz"
-		tar xf jpegsrc.v9.tar.gz
-		cd jpeg-9
-		./configure --prefix=$LOCALDESTDIR --enable-static
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm jpegsrc.v9.tar.gz
-fi
-
 if [ -f "a52dec-0.7.4/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "a52dec-0.7.4 is already compiled"

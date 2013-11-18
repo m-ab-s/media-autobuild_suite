@@ -1,10 +1,11 @@
 source /local32/etc/profile.local
 
-# set CPU count global. This can be overwrite from the compiler script (ffmpeg-autobuild.bat)
+# set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
+--qt4=* ) qt4="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -458,6 +459,170 @@ if [ -f "tiff-4.0.3/compile.done" ]; then
 		fi
 fi
 
+if [ -f "dx7headers/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "dx7headers is already compiled"
+	echo -------------------------------------------------
+	else 
+		wget -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
+		mkdir dx7headers
+		cd dx7headers
+		/opt/bin/7za x ../dx7headers.tgz
+		/opt/bin/7za x dx7headers.tar
+		rm dx7headers.tar
+		cd $LOCALBUILDDIR
+		cp dx7headers/* $LOCALDESTDIR/include
+		echo "finish" > dx7headers/compile.done
+		rm dx7headers.tgz
+		
+		if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build dx7headers done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build dx7headers failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libiconv-1.14/compile1.done" ]; then
+	echo -------------------------------------------------
+	echo "libiconv-1.14 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libiconv 32Bit\007"
+		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+		tar xf libiconv-1.14.tar.gz
+		rm libiconv-1.14.tar.gz
+		cd libiconv-1.14
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+		make -j $cpuCount
+		make install
+		echo "finish" > compile1.done
+
+		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libiconv-1.14 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libiconv-1.14 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "gettext-0.18.3.1-runtime is already compiled"
+    echo -------------------------------------------------
+    else 
+		wget -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
+		tar xzf gettext-0.18.3.1.tar.gz
+		mv gettext-0.18.3.1 gettext-0.18.3.1-runtime
+		cd gettext-0.18.3.1-runtime
+		cat gettext-tools/woe32dll/gettextlib-exports.c | grep -v rpl_opt > gettext-tools/woe32dll/gettextlib-exports.c.new
+		mv gettext-tools/woe32dll/gettextlib-exports.c.new gettext-tools/woe32dll/gettextlib-exports.c
+		CFLAGS="-mms-bitfields -mthreads -O2" ./configure --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -DPTW32_STATIC_LIB" 
+		cd gettext-runtime
+		make -j $cpuCount
+		make install
+		cd ..
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build gettext-0.18.3.1-runtime done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build gettext-0.18.3.1-runtime failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+		
+cd $LOCALBUILDDIR
+
+if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
+    echo -------------------------------------------------
+    echo "gettext-0.18.3.1-static is already compiled"
+    echo -------------------------------------------------
+    else 
+		tar xzf gettext-0.18.3.1.tar.gz
+		rm gettext-0.18.3.1.tar.gz
+		mv gettext-0.18.3.1 gettext-0.18.3.1-static
+		cd gettext-0.18.3.1-static
+		CFLAGS="-mms-bitfields -mthreads -O2" ./configure --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		make -j $cpuCount
+		install gettext-tools/src/*.exe $LOCALDESTDIR/bin
+		install gettext-tools/misc/autopoint $LOCALDESTDIR/bin
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build gettext-0.18.3.1-static done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build gettext-0.18.3.1-static failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libiconv-1.14/compile2.done" ]; then
+    echo -------------------------------------------------
+    echo "libiconv-1.14 is already compiled"
+    echo -------------------------------------------------
+    else 
+		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+		tar xzf libiconv-1.14.tar.gz
+		rm libiconv-1.14.tar.gz
+		cd libiconv-1.14
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		make clean
+		make -j $cpuCount
+		make install
+		echo "finish" > compile2.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libiconv-1.14 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libiconv-1.14 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "freetype-2.4.10/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "freetype-2.4.10 is already compiled"
@@ -490,67 +655,7 @@ if [ -f "freetype-2.4.10/compile.done" ]; then
 		fi
 fi
 
-if [ -f "dx7headers/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "dx7headers is already compiled"
-	echo -------------------------------------------------
-	else 
-		wget -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
-		mkdir dx7headers
-		cd dx7headers
-		/opt/bin/7za x ../dx7headers.tgz
-		/opt/bin/7za x dx7headers.tar
-		rm dx7headers.tar
-		cd $LOCALBUILDDIR
-		cp dx7headers/* $LOCALDESTDIR/include
-		echo "finish" > dx7headers/compile.done
-		rm dx7headers.tgz
-		
-		if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build dx7headers done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build dx7headers failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-if [ -f "libiconv-1.14/compile1.done" ]; then
-	echo -------------------------------------------------
-	echo "libiconv-1.14 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libiconv 32Bit\007"
-		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
-		tar xf libiconv-1.14.tar.gz
-		cd libiconv-1.14
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
-		make -j $cpuCount
-		make install
-		echo "finish" > compile1.done
-		cd $LOCALBUILDDIR
-		rm libiconv-1.14.tar.gz
-		
-		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libiconv-1.14 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libiconv-1.14 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
+cd $LOCALBUILDDIR
 
 if [ -f "expat-2.1.0/compile.done" ]; then
 	echo -------------------------------------------------
@@ -1053,105 +1158,46 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdvdcss-1.2.13/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libdvdcss-1.2.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libdvdcss 32Bit\007"
-		wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
-		tar xf libdvdcss-1.2.13.tar.bz2
-		rm libdvdcss-1.2.13.tar.bz2
-		cd libdvdcss-1.2.13
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdcss-1.2.13 done..."
-			echo -------------------------------------------------
-			echo -
-			else
+if [[ $qt4 = "y" ]]; then
+	if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
+		echo -------------------------------------------------
+		echo "qt-everywhere-opensource-src-4.8.5 is already compiled"
+		echo -------------------------------------------------
+		else 
+			echo -ne "\033]0;compiling qt4 32Bit\007"
+			wget -c http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.zip
+			unzip -o qt-everywhere-opensource-src-4.8.5.zip
+			rm qt-everywhere-opensource-src-4.8.5.zip
+			cd qt-everywhere-opensource-src-4.8.5
+			
+			sed -i 's/QMAKE_LFLAGS		=/QMAKE_LFLAGS		= -static -static-libgcc -static-libstdc++/' "mkspecs/win32-g++/qmake.conf"
+			sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++ -s/' "qmake/Makefile.win32-g++"
+			sed -i 's/!contains(QT_CONFIG, no-jpeg):!contains(QT_CONFIG, jpeg):SUBDIRS += jpeg/!contains(QT_CONFIG, no-libjpeg):!contains(QT_CONFIG, libjpeg):SUBDIRS += jpeg/' "src/plugins/imageformats/imageformats.pro"
+			sed -i 's/#if defined(Q_OS_WIN64) && !defined(Q_CC_GNU)/#if defined(Q_OS_WIN64)/' "src/corelib/tools/qsimd.cpp"
+			sed -i 's/SUBDIRS += demos/#SUBDIRS += demos/' "projects.pro"
+			./configure.exe -prefix $LOCALDESTDIR -platform win32-g++ -static -release -opensource -confirm-license -nomake examples -qt-libjpeg -sse
+			mingw32-make -j $cpuCount
+			mingw32-make install
+			
+			cp ./plugins/imageformats/*.a $LOCALDESTDIR/lib
+			cp ./plugins/accessible/libqtaccessiblewidgets.a  $LOCALDESTDIR/lib
+			sed -i 's/\.\.\\.\.\\lib\\pkgconfig\\//' lib/pkgconfig/*.pc
+			sed -i 's/Libs: -L${libdir} -lQtGui/Libs: -L${libdir} -lcomctl32 -lqjpeg -lqtaccessiblewidgets -lQtGui/' "lib/pkgconfig/QtGui.pc"
+			cp lib/pkgconfig/*.pc $PKG_CONFIG_PATH
+			if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
+				echo -
 				echo -------------------------------------------------
-				echo "build libdvdcss-1.2.13 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "libdvdread-4.2.1/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libdvdread-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libdvdread 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
-		tar xf libdvdread-4.2.1.tar.xz
-		rm libdvdread-4.2.1.tar.xz
-		cd libdvdread-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi
-		./configure --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
-		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
-		
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdread-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
+				echo "build qt-everywhere-opensource-src-4.8.5 done..."
 				echo -------------------------------------------------
-				echo "build libdvdread-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "libdvdnav-4.2.1/compile.done" ]; then
-	echo -------------------------------------------------
-	echo "libdvdnav-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
-		tar xf libdvdnav-4.2.1.tar.xz
-		rm libdvdnav-4.2.1.tar.xz
-		cd libdvdnav-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi
-		./configure --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
-		make -j $cpuCount
-		make install
-		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdnav-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libdvdnav-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+				echo -
+				else
+					echo -------------------------------------------------
+					echo "build qt-everywhere-opensource-src-4.8.5 failed..."
+					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+					read -p "first close the batch window, then the shell window"
+					sleep 15
+			fi
+	fi
 fi
 
 sleep 3
