@@ -144,11 +144,10 @@ cd $LOCALBUILDDIR
 if [ -f "ImageMagick-git/configure" ]; then
 	echo -ne "\033]0;compiling ImageMagick 64Bit\007"
 	cd ImageMagick-git
-	if git checkout master &&
-		git fetch origin master &&
-		[ `git rev-list HEAD...origin/master --count` != 0 ] &&
-		git merge origin/master
-	then
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
 		rm -r $LOCALDESTDIR/bin/magick16
 		rm -r $LOCALDESTDIR/bin/magick32
 		
@@ -218,3 +217,5 @@ if [ -f "ImageMagick-git/configure" ]; then
 				sleep 15
 		fi
 fi
+
+sleep 5

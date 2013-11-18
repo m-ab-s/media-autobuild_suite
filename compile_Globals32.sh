@@ -529,6 +529,7 @@ if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
     echo "gettext-0.18.3.1-runtime is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling gettext-runtime 32Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
 		tar xzf gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-runtime
@@ -564,6 +565,7 @@ if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
     echo "gettext-0.18.3.1-static is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling gettext-static 32Bit\007"
 		tar xzf gettext-0.18.3.1.tar.gz
 		rm gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-static
@@ -596,6 +598,7 @@ if [ -f "libiconv-1.14/compile2.done" ]; then
     echo "libiconv-1.14 is already compiled"
     echo -------------------------------------------------
     else 
+		echo -ne "\033]0;compiling libiconv 32Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz

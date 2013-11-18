@@ -824,7 +824,7 @@ if %build64%==yes (
 ::imagemagick	
 if %magick%==y (
 	if %build32%==yes (
-		if not exist %instdir%\compile_imagetools32 (
+		if not exist %instdir%\compile_imagetools32.sh (
 			echo -------------------------------------------------------------------------------
 			echo.
 			echo.- get script for image tools, 32 bit:
@@ -833,7 +833,7 @@ if %magick%==y (
 			if not exist %instdir%\media-autobuild_suite.zip (
 				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools32
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools32.sh
 			)
 
 		echo -------------------------------------------------------------------------------
@@ -841,7 +841,7 @@ if %magick%==y (
 		echo.- compile image tools, 32 bit:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagetools32 --cpuCount=%cpuCount%
+		%instdir%\mintty.lnk %instdir%\compile_imagetools32.sh --cpuCount=%cpuCount%
 		echo. compile image tools 32 bit done...
 		)
 	
