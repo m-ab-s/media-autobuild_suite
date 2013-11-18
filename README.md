@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-12
+modified: 2013-11-18
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.8**
+Current release is **v0.9**
 
 
 Included Tools and Libraries
@@ -104,9 +104,9 @@ For using it:
  
  - Wait a little bit, and hopefully after a while you found all your "*.exe" Tools under local32\bin, or local64\bin
 
-For all you need ~7,5 GB disk space.
+For all you need ~15 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Build all from the begin take around ~4 hours (the cross compile script from rdp is much faster).
+Build all from the begin take around ~6 hours (the cross compile script from rdp is much faster).
 
 Later when you need only some new builds, delete the folder in /build32 or build64, for example the ffmpeg folder. After that starting the script again and it only compile this tool new.
 
