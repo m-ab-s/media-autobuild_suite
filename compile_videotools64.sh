@@ -365,7 +365,8 @@ if [ -f "libdvdread-4.2.1/compile.done" ]; then
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
 		fi
-		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared CFLAGS="-I$LOCALDESTDIR/include -mms-bitfields -mthreads -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="-L$LOCALDESTDIR/lib -ldvdcss"
+		sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
 		make -j $cpuCount
 		make install
 		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
@@ -405,7 +406,7 @@ if [ -f "libdvdnav-4.2.1/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
 		make -j $cpuCount
 		make install
-		sed -i "s/echo -L${exec_prefix}/lib -ldvdnav -ldvdread/echo -L${exec_prefix}/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
+		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 			echo -
