@@ -38,7 +38,7 @@
 ::	2013-10-19 add xavs and opus-tools, update svn and opus version
 ::	2013-10-22 some fixes and add mplayer (maybe not the best way)
 ::	2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
-::	2013-11-06 add openexr, jpeg2000 and imagemagick (openexr and imagemagick only for 32 bit at the moment)
+::	2013-11-06 add openexr, jpeg2000 and imagemagick
 ::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
 ::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
 ::	2013-11-18 add gettext, dvdcss, dvdread, dvdnav, qt4, vlc and reorder code.
