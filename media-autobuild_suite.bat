@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.9
+::	This is version 0.91
 ::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-18
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -42,6 +42,7 @@
 ::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
 ::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
 ::	2013-11-18 add gettext, dvdcss, dvdread, dvdnav, qt4, vlc and reorder code.
+::	2013-11-19 add a52dec, libmad, and libmpeg2 and sdl_image
 ::
 ::-------------------------------------------------------------------------------------
 
