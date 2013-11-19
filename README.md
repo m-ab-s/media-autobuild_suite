@@ -36,6 +36,7 @@ Current release is **v0.9**
 Included Tools and Libraries
 --------
 
+ - a52dec
  - bzip2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg
@@ -58,6 +59,8 @@ Included Tools and Libraries
  - libdvdcss
  - libdvdnav
  - libdvdread
+ - libmad
+ - libmpeg2
  - libpng
  - libtiff
  - libutvideo
@@ -75,6 +78,7 @@ Included Tools and Libraries
  - qt4
  - rtmp (standalone and lib for ffmpeg)
  - sdl (for ffplay)
+ - sdl_image
  - speex (standalone and lib for ffmpeg)
  - theora
  - vlc player

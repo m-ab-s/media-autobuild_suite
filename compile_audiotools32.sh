@@ -479,14 +479,13 @@ if [ -f "opus-tools-0.1.7/compile.done" ]; then
 		echo -ne "\033]0;compiling opus-tools 32Bit\007"
       wget --no-check-certificate -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
 		tar xf opus-tools-0.1.7.tar.gz
+		rm opus-tools-0.1.7.tar.gz
 		cd opus-tools-0.1.7
         ./configure --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++"
         make -j $cpuCount
         make install
         echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-        rm opus-tools-0.1.7.tar.gz
-		
+
 		if [ -f "$LOCALDESTDIR/bin/opusenc.exe" ]; then
 			echo -
 			echo -------------------------------------------------
@@ -500,6 +499,70 @@ if [ -f "opus-tools-0.1.7/compile.done" ]; then
 				read -p "first close the batch window, then the shell window"
 				sleep 15
 		fi
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "a52dec-0.7.4/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "a52dec-0.7.4 is already compiled"
+	echo -------------------------------------------------
+	else 
+	echo -ne "\033]0;compiling a52dec 32Bit\007"
+		wget -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
+		tar xf a52dec-0.7.4.tar.gz
+		rm a52dec-0.7.4.tar.gz
+		cd a52dec-0.7.4
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done	
+
+		if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build a52dec-0.7.4 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build a52dec-0.7.47 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi		
+fi
+
+cd $LOCALBUILDDIR
+		
+if [ -f "libmad-0.15.1b/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libmad-0.15.1b is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libmad 32Bit\007"
+		wget -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+		tar xf libmad-0.15.1b.tar.gz
+		rm libmad-0.15.1b.tar.gz
+		cd libmad-0.15.1b
+		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libmad-0.15.1b done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libmad-0.15.1b failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
 fi
 
 sleep 3

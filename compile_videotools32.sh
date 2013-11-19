@@ -358,9 +358,9 @@ if [ -f "libdvdread-4.2.1/compile.done" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compiling libdvdread 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
-		tar xf libdvdread-4.2.1.tar.xz
-		rm libdvdread-4.2.1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
+		tar xf libdvdread-4.2.1-rc1.tar.xz
+		rm libdvdread-4.2.1-rc1.tar.xz
 		cd libdvdread-4.2.1
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
@@ -396,9 +396,9 @@ if [ -f "libdvdnav-4.2.1/compile.done" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
-		tar xf libdvdnav-4.2.1.tar.xz
-		rm libdvdnav-4.2.1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
+		tar xf libdvdnav-4.2.1-rc1.tar.xz
+		rm libdvdnav-4.2.1-rc1.tar.xz
 		cd libdvdnav-4.2.1
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
@@ -422,6 +422,41 @@ if [ -f "libdvdnav-4.2.1/compile.done" ]; then
 				sleep 15
 		fi
 fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "libmpeg2-0.5.1/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "libmpeg2-0.5.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling libmpeg2 32Bit\007"
+		wget -c http://libmpeg2.sourceforge.net/files/libmpeg2-0.5.1.tar.gz
+		tar xf libmpeg2-0.5.1.tar.gz
+		rm libmpeg2-0.5.1.tar.gz
+		cd libmpeg2-0.5.1
+		./configure --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build libmpeg2-0.5.1 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build libmpeg2-0.5.1 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
+
+#------------------------------------------------
+# final tools
+#------------------------------------------------
 
 cd $LOCALBUILDDIR
 
@@ -584,7 +619,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-runtime-cpudetection --enable-static --disable-ass --enable-ass-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --disable-ass --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install
 			echo "finish" > compile.done
@@ -621,7 +656,7 @@ if [[ $vlc = "y" ]]; then
 		if [[ ! -f "configure" ]]; then
 			./bootstrap
 		fi 
-		./configure --disable-libgcrypt --disable-a52 --host=i586-pc-mingw32msvc --disable-mad --enable-qt --disable-sdl
+		./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt
 		make -j $cpuCount
 		
 		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
@@ -663,7 +698,7 @@ if [[ $vlc = "y" ]]; then
 			if [[ ! -f "configure" ]]; then
 				./bootstrap
 			fi 
-			./configure --disable-libgcrypt --disable-a52 --host=i586-pc-mingw32msvc --disable-mad --enable-qt --disable-sdl
+			./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt
 			make -j $cpuCount
 			
 			sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile

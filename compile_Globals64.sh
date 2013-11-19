@@ -839,6 +839,35 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 		fi
 fi
 
+if [ -f "SDL_image-1.2.12/compile.done" ]; then
+	echo -------------------------------------------------
+	echo "SDL_image-1.2.12 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compiling SDL_imagae 32Bit\007"
+		wget -c http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
+		tar xf SDL_image-1.2.12.tar.gz
+		rm SDL_image-1.2.12.tar.gz
+		cd SDL_image-1.2.12
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		echo "finish" > compile.done
+		
+		if [ -f "$LOCALDESTDIR/lib/libSDL_image.a" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build SDL_image-1.2.12 done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build SDL_image-1.2.12 failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi
+fi
 
 #----------------------
 # crypto engine
