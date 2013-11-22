@@ -68,7 +68,7 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "x264-git/configure" ]; then
-	echo -ne "\033]0;compiling x264 32Bit\007"
+	echo -ne "\033]0;compile x264 32Bit\007"
 	cd x264-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -93,7 +93,7 @@ if [ -f "x264-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-	echo -ne "\033]0;compiling x264 32Bit\007"
+	echo -ne "\033]0;compile x264 32Bit\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
 		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread
@@ -116,7 +116,8 @@ if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 	echo "xvidcore is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling xvidcore 32Bit\007"
+		echo -ne "\033]0;compile xvidcore 32Bit\007"
+		if [ -d "xvidcore" ]; then rm -r xvidcore; fi
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
 		rm xvidcore-1.3.2.tar.gz
@@ -137,7 +138,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [ -f "libvpx-git/configure" ]; then
-	echo -ne "\033]0;compiling libvpx 32Bit\007"
+	echo -ne "\033]0;compile libvpx 32Bit\007"
 	cd libvpx-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -154,14 +155,14 @@ if [ -f "libvpx-git/configure" ]; then
 		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
 		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
 		
-		do_checkIfExist libvpx-git libvpx.a
+		do_checkIfExist libvpx-git vpxenc.exe
 	else
 		echo -------------------------------------------------
 		echo "libvpx-git is already up to date"
 		echo -------------------------------------------------
 	fi
 	else
-		echo -ne "\033]0;compiling libvpx 32Bit\007"
+		echo -ne "\033]0;compile libvpx 32Bit\007"
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
@@ -171,13 +172,13 @@ if [ -f "libvpx-git/configure" ]; then
 		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
 		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
 		
-		do_checkIfExist libvpx-git libvpx.a
+		do_checkIfExist libvpx-git vpxenc.exe
 fi
 
 cd $LOCALBUILDDIR
 		
 if [ -f "libbluray-git/bootstrap" ]; then
-	echo -ne "\033]0;compiling libbluray 32Bit\007"
+	echo -ne "\033]0;compile libbluray 32Bit\007"
 	cd libbluray-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -197,7 +198,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		echo -ne "\033]0;compiling libbluray 32Bit\007"
+		echo -ne "\033]0;compile libbluray 32Bit\007"
 		git clone git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
@@ -212,10 +213,11 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libutvideo.a" ]; then
 	echo -------------------------------------------------
-	echo "libutvideo is already compiled"
+	echo "libutvideo-git is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libutvideo 32Bit\007"
+		echo -ne "\033]0;compile libutvideo 32Bit\007"
+		if [ -d "libutvideo-git" ]; then rm -r libutvideo-git; fi
 		git clone git://github.com/qyot27/libutvideo.git libutvideo-git
 		cd libutvideo-git
 		./configure --prefix=$LOCALDESTDIR
@@ -232,7 +234,8 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	echo "xavs is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling xavs 32Bit\007"
+		echo -ne "\033]0;compile xavs 32Bit\007"
+		if [ -d "xavs" ]; then rm -r xavs; fi
 		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --prefix=$LOCALDESTDIR
@@ -249,7 +252,8 @@ if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
 	echo "libdvdcss-1.2.13 is already compiled"
 	echo -------------------------------------------------
 	else 
-			echo -ne "\033]0;compiling libdvdcss 32Bit\007"
+			echo -ne "\033]0;compile libdvdcss 32Bit\007"
+			if [ -d "libdvdcss-1.2.13" ]; then rm -r libdvdcss-1.2.13; fi
 			wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
 			tar xf libdvdcss-1.2.13.tar.bz2
 			rm libdvdcss-1.2.13.tar.bz2
@@ -263,12 +267,13 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdvdread-4.2.1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	echo -------------------------------------------------
 	echo "libdvdread-4.2.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdread 32Bit\007"
+		echo -ne "\033]0;compile libdvdread 32Bit\007"
+		if [ -d "libdvdread-4.2.1" ]; then rm -r libdvdread-4.2.1; fi
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
 		tar xf libdvdread-4.2.1-rc1.tar.xz
 		rm libdvdread-4.2.1-rc1.tar.xz
@@ -283,30 +288,18 @@ if [ -f "libdvdread-4.2.1/compile.done" ]; then
 		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
 		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
 		
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdread-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libdvdread-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libdvdread-4.2.1 libdvdread.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdvdnav-4.2.1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	echo -------------------------------------------------
 	echo "libdvdnav-4.2.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
+		echo -ne "\033]0;compile libdvdnav 32Bit\007"
+		if [ -d "libdvdnav-4.2.1" ]; then rm -r libdvdnav-4.2.1; fi
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
 		tar xf libdvdnav-4.2.1-rc1.tar.xz
 		rm libdvdnav-4.2.1-rc1.tar.xz
@@ -318,30 +311,19 @@ if [ -f "libdvdnav-4.2.1/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdvdnav-4.2.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libdvdnav-4.2.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libdvdread-4.2.1 libdvdnav.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libmpeg2-0.5.1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
 	echo -------------------------------------------------
 	echo "libmpeg2-0.5.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libmpeg2 32Bit\007"
+		echo -ne "\033]0;compile libmpeg2 32Bit\007"
+		if [ -d "libmpeg2-0.5.1" ]; then rm -r libmpeg2-0.5.1; fi
 		wget -c http://libmpeg2.sourceforge.net/files/libmpeg2-0.5.1.tar.gz
 		tar xf libmpeg2-0.5.1.tar.gz
 		rm libmpeg2-0.5.1.tar.gz
@@ -349,20 +331,8 @@ if [ -f "libmpeg2-0.5.1/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libmpeg2-0.5.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libmpeg2-0.5.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libmpeg2-0.5.1 libmpeg2.a
 fi
 
 #------------------------------------------------
@@ -372,38 +342,31 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	if [ -f "mp4box_gpac/compile.done" ]; then
+	if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
 		echo -------------------------------------------------
 		echo "mp4box_gpac is already compiled"
 		echo -------------------------------------------------
 		else 
-			echo -ne "\033]0;compiling mp4box_gpac 32Bit\007"
+			echo -ne "\033]0;compile mp4box_gpac 32Bit\007"
+			if [ -d "mp4box_gpac" ]; then rm -r mp4box_gpac; fi
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
-			rm extra_lib/include/zlib/zconf.h
-			rm extra_lib/include/zlib/zlib.h
-			cp $LOCALDESTDIR/lib/libz.a extra_lib/lib/gcc
-			cp $LOCALDESTDIR/include/zconf.h extra_lib/include/zlib
-			cp $LOCALDESTDIR/include/zlib.h extra_lib/include/zlib
-			./configure --static-mp4box --enable-static-bin --extra-libs=-lws2_32 -lwinmm --use-zlib=local --use-ffmpeg=no --use-png=no 
+			#rm extra_lib/include/zlib/zconf.h
+			#rm extra_lib/include/zlib/zlib.h
+			#cp $LOCALDESTDIR/lib/libz.a extra_lib/lib/gcc
+			#cp $LOCALDESTDIR/include/zconf.h extra_lib/include/zlib
+			#cp $LOCALDESTDIR/include/zlib.h extra_lib/include/zlib
+			./configure --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no 
 			cp config.h include/gpac/internal
+			cd src
 			make -j $cpuCount
+			cd ..
+			cd applications/mp4box
+			make -j $cpuCount
+			cd ../..
 			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
-			echo "finish" > compile.done
 			
-			if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
-				echo -
-				echo -------------------------------------------------
-				echo "build mp4box done..."
-				echo -------------------------------------------------
-				echo -
-				else
-					echo -------------------------------------------------
-					echo "build mp4box failed..."
-					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-					read -p "first close the batch window, then the shell window"
-					sleep 15
-			fi
+			do_checkIfExist mp4box_gpac MP4Box.exe
 	fi
 fi
 
@@ -425,7 +388,7 @@ if [[ $ffmpeg = "y" ]]; then
 	echo "-------------------------------------------------------------------------------"
 
 	if [ -f "ffmpeg-git/configure" ]; then
-		echo -ne "\033]0;compiling ffmpeg 32Bit\007"
+		echo -ne "\033]0;compile ffmpeg 32Bit\007"
 		cd ffmpeg-git
 		oldHead=`git rev-parse HEAD`
 		git pull origin master
@@ -456,7 +419,7 @@ if [[ $ffmpeg = "y" ]]; then
 			echo -------------------------------------------------
 		fi
 		else
-			echo -ne "\033]0;compiling ffmpeg 32Bit\007"
+			echo -ne "\033]0;compile ffmpeg 32Bit\007"
 			cd $LOCALBUILDDIR
 			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
 			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi
@@ -513,7 +476,7 @@ if [[ $mplayer = "y" ]]; then
 		echo "mplayer is already compiled"
 		echo -------------------------------------------------
 		else 
-			echo -ne "\033]0;compiling mplayer 32Bit\007"
+			echo -ne "\033]0;compile mplayer 32Bit\007"
 			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
 			tar xf mplayer-checkout-snapshot.tar.bz2
 			cd mplayer-checkout*
@@ -557,7 +520,7 @@ cd $LOCALBUILDDIR
 
 if [[ $vlc = "y" ]]; then
 	if [ -f "vlc-git/bootstrap" ]; then
-		echo -ne "\033]0;compiling vlc 32Bit\007"
+		echo -ne "\033]0;compile vlc 32Bit\007"
 		cd vlc-git
 		oldHead=`git rev-parse HEAD`
 		git pull origin master
@@ -599,7 +562,7 @@ if [[ $vlc = "y" ]]; then
 			echo -------------------------------------------------
 		fi
 		else
-		echo -ne "\033]0;compiling vlc 32Bit\007"
+		echo -ne "\033]0;compile vlc 32Bit\007"
 			git clone https://github.com/videolan/vlc.git vlc-git
 			cd vlc-git
 			sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
