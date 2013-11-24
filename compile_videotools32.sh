@@ -484,10 +484,13 @@ if [[ $vlc = "y" ]]; then
 		newHead=`git rev-parse HEAD`
 		if [[ "$oldHead" != "$newHead" ]]; then
 		make clean
+		rm -r _win32
+		rm -r vlc-2.2.0-git
+		rm -r $LOCALDESTDIR/bin/vlc-2.2.0-git
 		if [[ ! -f "configure" ]]; then
 			./bootstrap
 		fi 
-		./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt
+		./configure --host=i586-pc-mingw32msvc --enable-qt --disable-libgcrypt #--disable-sdl
 		make -j $cpuCount
 		
 		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
@@ -518,7 +521,7 @@ if [[ $vlc = "y" ]]; then
 			if [[ ! -f "configure" ]]; then
 				./bootstrap
 			fi 
-			./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt --disable-sdl
+			./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt #--disable-sdl
 			make -j $cpuCount
 			
 			sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
