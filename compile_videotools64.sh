@@ -106,7 +106,7 @@ if [ -f "x264-git/configure" ]; then
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
-		do_checkIfExist x264-git x264-10bi.exe
+		do_checkIfExist x264-git x264-10bit.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -455,11 +455,11 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --disable-ass --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --disable- !@#$%^&* --enable- !@#$%^&*-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install			
 			
-			do_checkIfExist mplayer-checkout mplaye.exe
+			do_checkIfExist mplayer-checkout mplayer.exe
 	fi
 fi
 
