@@ -1000,7 +1000,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "gnutls-3.2.3/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
 	echo "gnutls-3.2.3 is already compiled"
 	echo -------------------------------------------------
@@ -1013,7 +1013,7 @@ if [ -f "gnutls-3.2.3/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
-		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp/' $PKG_CONFIG_PATH/gnutls.pc
+		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $PKG_CONFIG_PATH/gnutls.pc
 		sed -i 's/-L\/local64\/lib .*/-L\/local64\/lib/' $PKG_CONFIG_PATH/gnutls.pc
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
@@ -1042,9 +1042,9 @@ if [ -f "rtmpdump/compile.done" ]; then
 		git clone git://git.ffmpeg.org/rtmpdump rtmpdump
 		cd rtmpdump
 		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv $(LIBZ)/' Makefile
-		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32/' Makefile
+		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl/' Makefile
 		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR CRYPTO=GNUTLS SHARED= SYS=mingw install
-		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp/' $PKG_CONFIG_PATH/librtmp.pc
+		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $PKG_CONFIG_PATH/librtmp.pc
 		echo "finish" > compile.done
 		if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
 			echo -

@@ -11,8 +11,45 @@ while true; do
   esac
 done
 
+# check if compiled file exist
+do_checkIfExist() {
+	local packetName="$1"
+	local fileName="$2"
+	local fileExtension=${fileName##*.}
+	if [[ "$fileExtension" = "exe" ]]; then
+		if [ -f "$LOCALDESTDIR/bin/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	elif [[ "$fileExtension" = "a" ]]; then
+		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	fi
+}
+
 cd $LOCALBUILDDIR
-if [ -f "fftw-3.2.2/compile.done" ]; then
+
+if [ -f "$LOCALDESTDIR/bin/fftwf-wisdom.exe" ]; then
     echo -------------------------------------------------
     echo "fftw-3.2.2 is already compiled"
     echo -------------------------------------------------
@@ -22,30 +59,17 @@ if [ -f "fftw-3.2.2/compile.done" ]; then
 		tar xf fftw-3.2.2.tar.gz
 		rm fftw-3.2.2.tar.gz
 		cd fftw-3.2.2
-		#sed -i 's/.\/configure --disable-shared --enable-maintainer-mode --enable-threads $*/ /g' bootstrap.sh
-		#sed -i 's/configur*/ /g' bootstrap.sh
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --with-our-malloc16 --with-windows-f77-mangling --enable-threads --with-combined-threads --enable-portable-binary --enable-float --enable-sse LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
 		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/bin/fftwf-wisdom.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build fftw-3.2.2 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build fftw-3.2.2 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist fftw-3.2.2 fftwf-wisdom.exe
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "fltk-1.3.2/compile.done" ]; then
+
+if [ -f "$LOCALDESTDIR/bin/fluid.exe" ]; then
     echo -------------------------------------------------
     echo "fltk-1.3.2 is already compiled"
     echo -------------------------------------------------
@@ -58,25 +82,13 @@ if [ -f "fltk-1.3.2/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/bin/fluid.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build fltk-1.3.2 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build fltk-1.3.2 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist fltk-1.3.2 fluid.exe
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "OpenEXR-git/compile.done" ]; then
+
+if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
     echo -------------------------------------------------
     echo "OpenEXR is already compiled"
     echo -------------------------------------------------
@@ -122,26 +134,11 @@ if [ -f "OpenEXR-git/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		
-		cd ..
-		echo "finish" > compile.done
-		
-		if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build OpenEXR done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build OpenEXR failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist OpenEXR-git exrdisplay.exe
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "ImageMagick-git/configure" ]; then
+if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
 	echo -ne "\033]0;compiling ImageMagick 64Bit\007"
 	cd ImageMagick-git
 	oldHead=`git rev-parse HEAD`
@@ -166,19 +163,7 @@ if [ -f "ImageMagick-git/configure" ]; then
 		make install
 		strip --strip-all $LOCALDESTDIR/bin/magick32/bin/*.exe
 		
-		if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "ImageMagick done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build ImageMagick failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist ImageMagick-git magick32/magick.exe
 	else
 		echo -------------------------------------------------
 		echo "ImageMagick is already up to date"
@@ -203,19 +188,7 @@ if [ -f "ImageMagick-git/configure" ]; then
 		make install
 		strip --strip-all $LOCALDESTDIR/bin/magick32/bin/*.exe
 		
-		if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "ImageMagick done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build ImageMagick failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist ImageMagick-git magick32/magick.exe
 fi
 
 sleep 5

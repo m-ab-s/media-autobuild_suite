@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.91
-::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-18
+::	This is version 0.95
+::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-24
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -43,6 +43,7 @@
 ::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
 ::	2013-11-18 add gettext, dvdcss, dvdread, dvdnav, qt4, vlc and reorder code.
 ::	2013-11-19 add a52dec, libmad, and libmpeg2 and sdl_image
+::	2013-11-24 change compiler version to 4.8.2 and start to simplify code
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -339,12 +340,12 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys\1.0\bin\wget.exe -c -O mingw32-gcc-4.8.0.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/rubenvb/gcc-4.8-release/i686-w64-mingw32-gcc-4.8.0-win32_rubenvb.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c -O mingw32-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-posix/sjlj/i686-4.8.2-release-posix-sjlj-rt_v3-rev0.7z"
 
 		:instMingW32
-		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.0.7z
+		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
 		%instdir%\msys\1.0\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
-		del mingw32-gcc-4.8.0.7z
+		del mingw32-gcc-4.8.2.7z
 		
 		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
 			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
@@ -360,12 +361,12 @@ if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
 	echo.
 	echo -------------------------------------------------------------------------------
 	if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-	%instdir%\msys\1.0\bin\wget.exe -c -O mingw64-gcc-4.8.0.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/rubenvb/gcc-4.8-release/x86_64-w64-mingw32-gcc-4.8.0-win64_rubenvb.7z"
+	%instdir%\msys\1.0\bin\wget.exe -c -O mingw64-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-posix/sjlj/x86_64-4.8.2-release-posix-sjlj-rt_v3-rev0.7z"
 	
 	:instMingW64
-	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.0.7z
+	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
 	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
-	del mingw64-gcc-4.8.0.7z
+	del mingw64-gcc-4.8.2.7z
 
 	FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
 		%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
