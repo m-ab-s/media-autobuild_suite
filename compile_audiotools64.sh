@@ -12,6 +12,42 @@ while true; do
   esac
 done
 
+# check if compiled file exist
+do_checkIfExist() {
+	local packetName="$1"
+	local fileName="$2"
+	local fileExtension=${fileName##*.}
+	if [[ "$fileExtension" = "exe" ]]; then
+		if [ -f "$LOCALDESTDIR/bin/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	elif [[ "$fileExtension" = "a" ]]; then
+		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	fi
+}
+
 cd $LOCALBUILDDIR
 
 echo "-------------------------------------------------------------------------------"
@@ -20,7 +56,7 @@ echo "compile audio tools 64 bit"
 echo
 echo "-------------------------------------------------------------------------------"
 
-if [ -f "gsm-1.0.13/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libgsm.a" ]; then
 	echo -------------------------------------------------
 	echo "gsm-1.0.13 is already compiled"
 	echo -------------------------------------------------
@@ -28,31 +64,19 @@ if [ -f "gsm-1.0.13/compile.done" ]; then
 		echo -ne "\033]0;compiling gsm 64Bit\007"
 		wget -c http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
 		tar xf gsm-1.0.13.tar.bz2
+		rm gsm-1.0.13.tar.bz2
 		cd gsm-1.0.13
 		make -j $cpuCount
 		mkdir $LOCALDESTDIR/include/gsm
 		cp inc/gsm.h  $LOCALDESTDIR/include/gsm
 		cp lib/libgsm.a $LOCALDESTDIR/lib
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm gsm-1.0.13.tar.bz2
 		
-		if [ -f "$LOCALDESTDIR/lib/libgsm.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build gsm-1.0.13 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build gsm-1.0.13 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist gsm-1.0.13 libgsm.a
 fi
 
-if [ -f "libogg-1.3.1/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
 	echo -------------------------------------------------
 	echo "libogg-1.3.1 is already compiled"
 	echo -------------------------------------------------
@@ -60,30 +84,18 @@ if [ -f "libogg-1.3.1/compile.done" ]; then
 		echo -ne "\033]0;compiling libogg 64Bit\007"
 		wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz
 		tar xf libogg-1.3.1.tar.gz
+		rm libogg-1.3.1.tar.gz
 		cd libogg-1.3.1
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libogg-1.3.1.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libogg-1.3.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libogg-1.3.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libogg-1.3.1 libogg.a
 fi
 
-if [ -f "libvorbis-1.3.3/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
 	echo -------------------------------------------------
 	echo "libvorbis-1.3.3 is already compiled"
 	echo -------------------------------------------------
@@ -91,27 +103,13 @@ if [ -f "libvorbis-1.3.3/compile.done" ]; then
 		echo -ne "\033]0;compiling libvorbis 64Bit\007"
 		wget -c http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.xz
 		tar xf libvorbis-1.3.3.tar.xz
+		rm libvorbis-1.3.3.tar.xz
 		cd libvorbis-1.3.3
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libvorbis-1.3.3.tar.xz
 		
-		if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libvorbis-1.3.3 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libvorbis-1.3.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libvorbis-1.3.3 libvorbis.a
 fi
 
 if [ -f "libtheora-1.1.1/compile.done" ]; then

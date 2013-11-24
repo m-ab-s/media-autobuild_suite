@@ -49,6 +49,12 @@ do_checkIfExist() {
 
 cd $LOCALBUILDDIR
 
+echo "-------------------------------------------------------------------------------"
+echo
+echo "compile image tools 32 bit"
+echo
+echo "-------------------------------------------------------------------------------"
+
 if [ -f "$LOCALDESTDIR/bin/fftwf-wisdom.exe" ]; then
     echo -------------------------------------------------
     echo "fftw-3.2.2 is already compiled"

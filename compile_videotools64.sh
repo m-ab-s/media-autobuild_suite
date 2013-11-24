@@ -106,7 +106,7 @@ if [ -f "x264-git/configure" ]; then
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
-		do_checkIfExist x264-git x264-10bi.exe
+		do_checkIfExist x264-git x264-10bit.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -459,7 +459,7 @@ if [[ $mplayer = "y" ]]; then
 			make
 			make install			
 			
-			do_checkIfExist mplayer-checkout mplaye.exe
+			do_checkIfExist mplayer-checkout mplayer.exe
 	fi
 fi
 
@@ -477,7 +477,7 @@ if [[ $vlc = "y" ]]; then
 		if [[ ! -f "configure" ]]; then
 			./bootstrap
 		fi 
-		./configure --disable-libgcrypt --host=x86_64-w64-mingw32 --enable-qt
+		./configure --disable-libgcrypt --host=x86_64-w64-mingw32 --enable-qt --disable-sdl
 		make -j $cpuCount
 		
 		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile

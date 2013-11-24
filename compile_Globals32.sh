@@ -23,12 +23,6 @@ cat > .gitconfig << "EOF"
 EOF
 fi
 
-#make mingw libs static
-if [ -f "/mingw32/lib/libgfortran.dll.a" ]; then mv /mingw32/lib/libgfortran.dll.a /mingw32/lib/libgfortran.dll.a.old; fi
-if [ -f "/mingw32/lib/libgomp.dll.a" ]; then mv /mingw32/lib/libgomp.dll.a /mingw32/lib/libgomp.dll.a.old; fi
-if [ -f "/mingw32/lib/libquadmath.dll.a" ]; then mv /mingw32/lib/libquadmath.dll.a /mingw32/lib/libquadmath.dll.a.old; fi
-if [ -f "/mingw32/lib/libssp.dll.a" ]; then mv /mingw32/lib/libssp.dll.a /mingw32/lib/libssp.dll.a.old; fi
-
 cd $LOCALBUILDDIR
 
 if [ -f "zlib-1.2.8/compile.done" ]; then

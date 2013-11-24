@@ -518,7 +518,7 @@ if [[ $vlc = "y" ]]; then
 			if [[ ! -f "configure" ]]; then
 				./bootstrap
 			fi 
-			./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt
+			./configure --disable-libgcrypt --host=i586-pc-mingw32msvc --enable-qt --disable-sdl
 			make -j $cpuCount
 			
 			sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
