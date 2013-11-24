@@ -349,28 +349,42 @@ if %build32%==yes (
 		
 		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
 			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
-			)	
-		)
+			)
+		if not exist "%instdir%\mingw32\bin\gcc.exe" (
+			echo.
+			echo.download from compiler mingw32 fail...
+			echo.try again or fix download
+			echo.
+			GOTO mingw32
+			)
+	)
 		
 :mingw64
 if %build64%==yes (
-if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- Download and install mingw 64bit compiler to mingw64
-	echo.
-	echo -------------------------------------------------------------------------------
-	if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-	%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-posix/sjlj/x86_64-4.8.2-release-posix-sjlj-rt_v3-rev0.7z"
-	
-	:instMingW64
-	%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
-	%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
-	del mingw64-gcc-4.8.2.7z
+	if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- Download and install mingw 64bit compiler to mingw64
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-posix/sjlj/x86_64-4.8.2-release-posix-sjlj-rt_v3-rev0.7z"
+		
+		:instMingW64
+		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
+		%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
+		del mingw64-gcc-4.8.2.7z
 
-	FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
-		%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
-		)	
+		FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
+			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
+			)
+		if not exist "%instdir%\mingw64\bin\gcc.exe" (
+			echo.
+			echo.download from compiler mingw64 fail...
+			echo.try again or fix download
+			echo.
+			GOTO mingw64
+			)	
 	)
 
 :makeDIR
