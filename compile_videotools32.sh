@@ -351,7 +351,7 @@ if [[ $mp4box = "y" ]]; then
 			if [ -d "mp4box_gpac" ]; then rm -r mp4box_gpac; fi
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
-			./configure --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
+			./configure --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
 			cp config.h include/gpac/internal
 			cd src
 			make -j $cpuCount
