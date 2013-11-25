@@ -144,7 +144,7 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
 fi
 
 cd $LOCALBUILDDIR
-if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
+if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 	echo -ne "\033]0;compile ImageMagick 64Bit\007"
 	cd ImageMagick-git
 	oldHead=`git rev-parse HEAD`
@@ -194,7 +194,7 @@ if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
 		make install
 		strip --strip-all $LOCALDESTDIR/bin/magick32/bin/*.exe
 		
-		do_checkIfExist ImageMagick-git magick32/magick.exe
+		do_checkIfExist ImageMagick-git magick32/bin/magick.exe
 fi
 
 sleep 5
