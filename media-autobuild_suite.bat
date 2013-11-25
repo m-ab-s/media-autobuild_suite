@@ -327,6 +327,8 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO mingw32
 	for /f %%a in ('dir %instdir%\msys\1.0\home /B') do set userName=%%a
 	echo.echo '%userName%'>%instdir%\msys\1.0\bin\whoami
 	
+	cd %instdir%
+	
 ::------------------------------------------------------------------
 ::download and install mingw compiler:
 ::------------------------------------------------------------------	
@@ -350,7 +352,7 @@ if %build32%==yes (
 		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
 			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
 			)
-		if not exist "%instdir%\mingw32\bin\gcc.exe" (
+		if not exist "%instdir%\mingw32\bin\cc.exe" (
 			echo.
 			echo.download from compiler mingw32 fail...
 			echo.try again or fix download
@@ -378,7 +380,7 @@ if %build64%==yes (
 		FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
 			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
 			)
-		if not exist "%instdir%\mingw64\bin\gcc.exe" (
+		if not exist "%instdir%\mingw64\bin\cc.exe" (
 			echo.
 			echo.download from compiler mingw64 fail...
 			echo.try again or fix download

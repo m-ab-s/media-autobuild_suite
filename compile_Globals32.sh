@@ -907,7 +907,7 @@ if [ -f "nettle-2.7.1/compile.done" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile nettle 32Bit\007"
-		wget -c http://www.lysator.liu.se/~nisse/archive/nettle-2.7.1.tar.gz
+		wget -c http://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
 		cd nettle-2.7.1
