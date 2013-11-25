@@ -29,7 +29,7 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 	echo "zlib-1.2.8 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling zlib 64Bit\007"
+		echo -ne "\033]0;compile zlib 64Bit\007"
 		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
 		tar xf zlib-1.2.8.tar.gz
 		cd zlib-1.2.8
@@ -78,7 +78,7 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 	echo "bzip2-1.0.6 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling bzip2 64Bit\007"
+		echo -ne "\033]0;compile bzip2 64Bit\007"
 		wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 		tar xf bzip2-1.0.6.tar.gz
 		cd bzip2-1.0.6
@@ -111,7 +111,7 @@ if [ -f "dlfcn-win32-r19/compile.done" ]; then
 	echo "dlfcn-win32-r19 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling dlfcn-win32 64Bit\007"
+		echo -ne "\033]0;compile dlfcn-win32 64Bit\007"
 		wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
 		tar xf dlfcn-win32-r19.tar.bz2
 		cd dlfcn-win32-r19
@@ -142,7 +142,7 @@ if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 	echo "pthreads-w32-2-9-1-release is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling pthreads-w32 64Bit\007"
+		echo -ne "\033]0;compile pthreads-w32 64Bit\007"
 		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
 		tar xf pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
@@ -193,7 +193,7 @@ if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
 	echo "pkg-config-lite-0.28-1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling pkg-config-lite 64Bit\007"
+		echo -ne "\033]0;compile pkg-config-lite 64Bit\007"
 		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
@@ -270,7 +270,7 @@ if [ -f "libpng-1.6.7/compile.done" ]; then
 	echo "libpng-1.6.7 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libpng 64Bit\007"
+		echo -ne "\033]0;compile libpng 64Bit\007"
 		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.7/libpng-1.6.7.tar.gz"
 		tar xf libpng-1.6.7.tar.gz
 		cd libpng-1.6.7
@@ -301,7 +301,7 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling openjpeg 64Bit\007"
+		echo -ne "\033]0;compile openjpeg 64Bit\007"
 		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
@@ -334,7 +334,7 @@ if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
 	echo "libjpeg-turbo-1.3.0 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libjpeg-turbo 64Bit\007"
+		echo -ne "\033]0;compile libjpeg-turbo 64Bit\007"
 		wget -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
 		tar xf libjpeg-turbo-1.3.0.tar.gz
 		rm libjpeg-turbo-1.3.0.tar.gz
@@ -367,7 +367,7 @@ if [ -f "jpeg-9/compile.done" ]; then
 	echo "jpeg-9 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling jpeg-9 64Bit\007"
+		echo -ne "\033]0;compile jpeg-9 64Bit\007"
 		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
 		tar xf jpegsrc.v9.tar.gz
 		rm jpegsrc.v9.tar.gz
@@ -398,7 +398,7 @@ if [ -f "jasper-1.900.1/compile.done" ]; then
 	echo "jasper-1.900.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling jasper 64Bit\007"
+		echo -ne "\033]0;compile jasper 64Bit\007"
 		wget -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
@@ -429,7 +429,7 @@ if [ -f "tiff-4.0.3/compile.done" ]; then
 	echo "tiff-4.0.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling tiff 64Bit\007"
+		echo -ne "\033]0;compile tiff 64Bit\007"
 		wget -c ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
 		tar xf tiff-4.0.3.tar.gz
 		rm tiff-4.0.3.tar.gz
@@ -491,7 +491,7 @@ if [ -f "libiconv-1.14/compile1.done" ]; then
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libiconv 64Bit\007"
+		echo -ne "\033]0;compile libiconv 64Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
@@ -523,7 +523,7 @@ if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
     echo "gettext-0.18.3.1-runtime is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling gettext-runtime 64Bit\007"
+		echo -ne "\033]0;compile gettext-runtime 64Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
 		tar xzf gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-runtime
@@ -559,7 +559,7 @@ if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
     echo "gettext-0.18.3.1-static is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling gettext-static 64Bit\007"
+		echo -ne "\033]0;compile gettext-static 64Bit\007"
 		tar xzf gettext-0.18.3.1.tar.gz
 		rm gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-static
@@ -592,7 +592,7 @@ if [ -f "libiconv-1.14/compile2.done" ]; then
     echo "libiconv-1.14 is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling libiconv 64Bit\007"
+		echo -ne "\033]0;compile libiconv 64Bit\007"
 		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
@@ -625,7 +625,7 @@ if [ -f "freetype-2.4.10/compile.done" ]; then
 	echo "freetype-2.4.10 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling freetype 64Bit\007"
+		echo -ne "\033]0;compile freetype 64Bit\007"
 		#wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
 		wget -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
 		tar xf freetype-2.4.10.tar.gz
@@ -658,7 +658,7 @@ if [ -f "expat-2.1.0/compile.done" ]; then
 	echo "expat-2.1.0 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling expat 64Bit\007"
+		echo -ne "\033]0;compile expat 64Bit\007"
 		wget -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
 		tar xf expat-2.1.0.tar.gz
 		cd expat-2.1.0
@@ -689,7 +689,7 @@ if [ -f "fontconfig-2.10.2/compile.done" ]; then
 	echo "fontconfig-2.10.2 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling fontconfig 64Bit\007"
+		echo -ne "\033]0;compile fontconfig 64Bit\007"
 		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
 		tar xf fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
@@ -721,7 +721,7 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 	echo "fribidi-0.19.4 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling fribidi 64Bit\007"
+		echo -ne "\033]0;compile fribidi 64Bit\007"
 		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
@@ -773,7 +773,7 @@ if [ -f "libass-0.10.1/compile.done" ]; then
 	echo "libass-0.10.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libass 64Bit\007"
+		echo -ne "\033]0;compile libass 64Bit\007"
 		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
 		tar xf libass-0.10.1.tar.gz
 		cd libass-0.10.1
@@ -805,7 +805,7 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 	echo "SDL-1.2.15 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling SDL 64Bit\007"
+		echo -ne "\033]0;compile SDL 64Bit\007"
 		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
@@ -838,7 +838,7 @@ if [ -f "SDL_image-1.2.12/compile.done" ]; then
 	echo "SDL_image-1.2.12 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling SDL_imagae 32Bit\007"
+		echo -ne "\033]0;compile SDL_imagae 32Bit\007"
 		wget -c http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
 		tar xf SDL_image-1.2.12.tar.gz
 		rm SDL_image-1.2.12.tar.gz
@@ -874,7 +874,7 @@ if [ -f "gmp-5.1.3/compile.done" ]; then
 	echo "gmp-5.1.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling gmp 64Bit\007"
+		echo -ne "\033]0;compile gmp 64Bit\007"
 		wget ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
 		tar xf gmp-5.1.3.tar.bz2
 		rm gmp-5.1.3.tar.bz2
@@ -905,7 +905,7 @@ if [ -f "nettle-2.7.1/compile.done" ]; then
 	echo "nettle-2.7.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling nettle 64Bit\007"
+		echo -ne "\033]0;compile nettle 64Bit\007"
 		wget -c http://www.lysator.liu.se/~nisse/archive/nettle-2.7.1.tar.gz
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
@@ -936,7 +936,7 @@ if [ -f "libgpg-error-1.12/compile.done" ]; then
 	echo "libgpg-error-1.12 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libgpg-error 64Bit\007"
+		echo -ne "\033]0;compile libgpg-error 64Bit\007"
 		wget ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.12.tar.bz2
 		tar xf libgpg-error-1.12.tar.bz2
 		rm libgpg-error-1.12.tar.bz2
@@ -968,7 +968,7 @@ if [ -f "libgcrypt-1.5.3/compile.done" ]; then
 	echo "libgcrypt-1.5.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libgcrypt 64Bit\007"
+		echo -ne "\033]0;compile libgcrypt 64Bit\007"
 		wget ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.5.3.tar.bz2
 		tar xf libgcrypt-1.5.3.tar.bz2
 		rm libgcrypt-1.5.3.tar.bz2
@@ -999,7 +999,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo "gnutls-3.2.3 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling gnutls 64Bit\007"
+		echo -ne "\033]0;compile gnutls 64Bit\007"
 		wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.3.tar.xz
 		tar xf gnutls-3.2.3.tar.xz
 		rm gnutls-3.2.3.tar.xz
@@ -1032,7 +1032,7 @@ if [ -f "rtmpdump/compile.done" ]; then
 	echo "rtmpdump is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling rtmpdump 64Bit\007"
+		echo -ne "\033]0;compile rtmpdump 64Bit\007"
 		git clone git://git.ffmpeg.org/rtmpdump rtmpdump
 		cd rtmpdump
 		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv $(LIBZ)/' Makefile
@@ -1062,7 +1062,7 @@ if [ -f "lzo-2.06/compile.done" ]; then
 	echo "lzo-2.06 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling lzo 64Bit\007"
+		echo -ne "\033]0;compile lzo 64Bit\007"
 		wget -c http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
 		tar xf lzo-2.06.tar.gz
 		rm lzo-2.06.tar.gz
@@ -1093,7 +1093,7 @@ if [ -f "libdca/compile.done" ]; then
 	echo "libdca is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdca 64Bit\007"
+		echo -ne "\033]0;compile libdca 64Bit\007"
 		svn co svn://svn.videolan.org/libdca/trunk libdca
 		cd libdca
 		./bootstrap
@@ -1123,7 +1123,7 @@ if [ -f "libxml2-2.9.1/compile.done" ]; then
 	echo "libxml2-2.9.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libxml2 64Bit\007"
+		echo -ne "\033]0;compile libxml2 64Bit\007"
 		wget -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
@@ -1156,7 +1156,7 @@ if [ -f "lua-5.1.4/compile.done" ]; then
 	echo "lua-5.1.4 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling lua 32Bit\007"
+		echo -ne "\033]0;compile lua 32Bit\007"
 		wget -c http://www.lua.org/ftp/lua-5.1.4.tar.gz
 		tar xf lua-5.1.4.tar.gz
 		rm lua-5.1.4.tar.gz
@@ -1190,7 +1190,7 @@ if [[ $qt4 = "y" ]]; then
 		echo "qt-everywhere-opensource-src-4.8.5 is already compiled"
 		echo -------------------------------------------------
 		else 
-			echo -ne "\033]0;compiling qt4 64Bit\007"
+			echo -ne "\033]0;compile qt4 64Bit\007"
 			wget -c http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.zip
 			unzip -o qt-everywhere-opensource-src-4.8.5.zip
 			rm qt-everywhere-opensource-src-4.8.5.zip

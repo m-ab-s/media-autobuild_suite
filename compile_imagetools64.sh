@@ -60,7 +60,7 @@ if [ -f "$LOCALDESTDIR/bin/fftwf-wisdom.exe" ]; then
     echo "fftw-3.2.2 is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling fftw 64Bit\007"
+		echo -ne "\033]0;compile fftw 64Bit\007"
 		wget -c ftp://ftp.fftw.org/pub/fftw/fftw-3.2.2.tar.gz
 		tar xf fftw-3.2.2.tar.gz
 		rm fftw-3.2.2.tar.gz
@@ -80,7 +80,7 @@ if [ -f "$LOCALDESTDIR/bin/fluid.exe" ]; then
     echo "fltk-1.3.2 is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling fltk 64Bit\007"
+		echo -ne "\033]0;compile fltk 64Bit\007"
 		wget -c http://fltk.org/pub/fltk/1.3.2/fltk-1.3.2-source.tar.gz
 		tar xzf fltk-1.3.2-source.tar.gz
 		rm fltk-1.3.2-source.tar.gz
@@ -99,7 +99,7 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
     echo "OpenEXR is already compiled"
     echo -------------------------------------------------
     else 
-		echo -ne "\033]0;compiling IlmBase 64Bit\007"
+		echo -ne "\033]0;compile IlmBase 64Bit\007"
 		git clone https://github.com/openexr/openexr.git OpenEXR-git
 		cd OpenEXR-git
 		cd IlmBase
@@ -112,7 +112,7 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
 		make install
 		cd ..
 		
-		echo -ne "\033]0;compiling OpenEXR 64Bit\007"
+		echo -ne "\033]0;compile OpenEXR 64Bit\007"
 		cd OpenEXR
 		./bootstrap
 		sed -i 's/#define ZLIB_WINAPI/\/\/#define ZLIB_WINAPI/g' IlmImf/ImfZipCompressor.cpp
@@ -133,7 +133,7 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
 		sed -i 's/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread -lstdc++/' "$PKG_CONFIG_PATH/IlmBase.pc"
 		sed -i 's/Libs: -L${libdir} -lIlmImf/Libs: -L${libdir} -lIlmImf -lstdc++/' "$PKG_CONFIG_PATH/OpenEXR.pc"
 		
-		echo -ne "\033]0;compiling OpenEXR_Viewers 64Bit\007"
+		echo -ne "\033]0;compile OpenEXR_Viewers 64Bit\007"
 		cd OpenEXR_Viewers
 		./bootstrap 
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes --disable-threading --disable-posix-sem LDFLAGS="-L$LOCALDESTDIR/lib -static -static-libgcc -static-libstdc++" 
@@ -145,7 +145,7 @@ fi
 
 cd $LOCALBUILDDIR
 if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
-	echo -ne "\033]0;compiling ImageMagick 64Bit\007"
+	echo -ne "\033]0;compile ImageMagick 64Bit\007"
 	cd ImageMagick-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -176,7 +176,7 @@ if [ -f "$LOCALDESTDIR/bin/magick32/magick.exe" ]; then
 		echo -------------------------------------------------
 	fi
     else 
-		echo -ne "\033]0;compiling ImageMagick 64Bit\007"
+		echo -ne "\033]0;compile ImageMagick 64Bit\007"
 		git clone https://github.com/trevor/ImageMagick.git ImageMagick-git
 		cd ImageMagick-git
 		

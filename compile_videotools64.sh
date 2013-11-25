@@ -69,7 +69,7 @@ echo "--------------------------------------------------------------------------
 cd $LOCALBUILDDIR
 
 if [ -f "x264-git/configure" ]; then
-	echo -ne "\033]0;compiling x264 64Bit\007"
+	echo -ne "\033]0;compile x264 64Bit\007"
 	cd x264-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -94,7 +94,7 @@ if [ -f "x264-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		echo -ne "\033]0;compiling x264 64Bit\007"
+		echo -ne "\033]0;compile x264 64Bit\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
@@ -116,7 +116,7 @@ if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 	echo "xvidcore is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling xvidcore 64Bit\007"
+		echo -ne "\033]0;compile xvidcore 64Bit\007"
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
 		rm xvidcore-1.3.2.tar.gz
@@ -137,7 +137,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [ -f "libvpx-git/configure" ]; then
-	echo -ne "\033]0;compiling libvpx 64Bit\007"
+	echo -ne "\033]0;compile libvpx 64Bit\007"
 	cd libvpx-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -161,7 +161,7 @@ if [ -f "libvpx-git/configure" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		echo -ne "\033]0;compiling libvpx 64Bit\007"
+		echo -ne "\033]0;compile libvpx 64Bit\007"
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
@@ -177,7 +177,7 @@ fi
 cd $LOCALBUILDDIR
 		
 if [ -f "libbluray-git/bootstrap" ]; then
-	echo -ne "\033]0;compiling libbluray 64Bit\007"
+	echo -ne "\033]0;compile libbluray 64Bit\007"
 	cd libbluray-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -197,7 +197,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 		echo -------------------------------------------------
 	fi
 	else
-		echo -ne "\033]0;compiling libbluray 64Bit\007"
+		echo -ne "\033]0;compile libbluray 64Bit\007"
 		git clone git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
@@ -215,7 +215,7 @@ if [ -f "$LOCALDESTDIR/lib/libutvideo.a" ]; then
 	echo "libutvideo is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libutvideo 64Bit\007"
+		echo -ne "\033]0;compile libutvideo 64Bit\007"
 		git clone git://github.com/qyot27/libutvideo.git libutvideo-git
 		cd libutvideo-git
 		./configure --prefix=$LOCALDESTDIR
@@ -232,7 +232,7 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	echo "xavs is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling xavs 64Bit\007"
+		echo -ne "\033]0;compile xavs 64Bit\007"
 		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR
@@ -249,7 +249,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
 	echo "libdvdcss-1.2.13 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdcss 32Bit\007"
+		echo -ne "\033]0;compile libdvdcss 32Bit\007"
 		wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
 		tar xf libdvdcss-1.2.13.tar.bz2
 		rm libdvdcss-1.2.13.tar.bz2
@@ -268,7 +268,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	echo "libdvdread-4.2.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdread 32Bit\007"
+		echo -ne "\033]0;compile libdvdread 32Bit\007"
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
 		tar xf libdvdread-4.2.1-rc1.tar.xz
 		rm libdvdread-4.2.1-rc1.tar.xz
@@ -293,7 +293,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	echo "libdvdnav-4.2.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libdvdnav 32Bit\007"
+		echo -ne "\033]0;compile libdvdnav 32Bit\007"
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
 		tar xf libdvdnav-4.2.1-rc1.tar.xz
 		rm libdvdnav-4.2.1-rc1.tar.xz
@@ -316,7 +316,7 @@ if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
 	echo "libmpeg2-0.5.1 is already compiled"
 	echo -------------------------------------------------
 	else 
-		echo -ne "\033]0;compiling libmpeg2 64Bit\007"
+		echo -ne "\033]0;compile libmpeg2 64Bit\007"
 		wget -c http://libmpeg2.sourceforge.net/files/libmpeg2-0.5.1.tar.gz
 		tar xf libmpeg2-0.5.1.tar.gz
 		rm libmpeg2-0.5.1.tar.gz
@@ -340,7 +340,7 @@ if [[ $mp4box = "y" ]]; then
 		echo "mp4box_gpac is already compiled"
 		echo -------------------------------------------------
 		else 
-			echo -ne "\033]0;compiling mp4box_gpac 64Bit\007"
+			echo -ne "\033]0;compile mp4box_gpac 64Bit\007"
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
 			./configure --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-zlib=local --use-ffmpeg=no --use-png=no
@@ -374,7 +374,7 @@ if [[ $ffmpeg = "y" ]]; then
 	echo "-------------------------------------------------------------------------------"
 
 	if [ -f "ffmpeg-git/configure" ]; then
-		echo -ne "\033]0;compiling ffmpeg 64Bit\007"
+		echo -ne "\033]0;compile ffmpeg 64Bit\007"
 		cd ffmpeg-git 
 		oldHead=`git rev-parse HEAD`
 		git pull origin master
@@ -393,7 +393,7 @@ if [[ $ffmpeg = "y" ]]; then
 			echo -------------------------------------------------
 		fi
 		else
-			echo -ne "\033]0;compiling ffmpeg 64Bit\007"
+			echo -ne "\033]0;compile ffmpeg 64Bit\007"
 			cd $LOCALBUILDDIR
 			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
 			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi
@@ -437,7 +437,7 @@ if [[ $mplayer = "y" ]]; then
 		echo "mplayer is already compiled"
 		echo -------------------------------------------------
 		else 
-			echo -ne "\033]0;compiling mplayer 64Bit\007"
+			echo -ne "\033]0;compile mplayer 64Bit\007"
 			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
 			tar xf mplayer-checkout-snapshot.tar.bz2
 			rm mplayer-checkout-snapshot.tar.bz2
@@ -467,7 +467,7 @@ cd $LOCALBUILDDIR
 
 if [[ $vlc = "y" ]]; then
 	if [ -f "vlc-git/bootstrap" ]; then
-		echo -ne "\033]0;compiling vlc 64Bit\007"
+		echo -ne "\033]0;compile vlc 64Bit\007"
 		cd vlc-git
 		oldHead=`git rev-parse HEAD`
 		git pull origin master
@@ -501,7 +501,7 @@ if [[ $vlc = "y" ]]; then
 			echo -------------------------------------------------
 		fi
 		else
-		echo -ne "\033]0;compiling vlc 64Bit\007"
+		echo -ne "\033]0;compile vlc 64Bit\007"
 			git clone https://github.com/videolan/vlc.git vlc-git
 			cd vlc-git
 			sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
