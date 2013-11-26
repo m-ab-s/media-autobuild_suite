@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-24
+modified: 2013-11-26
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.95**
+Current release is **v0.96**
 
 
 Included Tools and Libraries
@@ -88,6 +88,8 @@ Included Tools and Libraries
  - vorbis
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
+ - x265 (standalone and lib)
+ - x265 16 bit (standalone)
  - xavs (standalone and lib for ffmpeg)
  - xvid
  - zlib

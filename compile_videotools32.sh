@@ -97,16 +97,87 @@ if [ -f "x264-git/configure" ]; then
 	echo -ne "\033]0;compile x264 32Bit\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
-		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 		make -j $cpuCount
 		make install
 		make clean
 
-		./configure --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --prefix=$LOCALDESTDIR --extra-cflags='-DX264_VERSION=20100422' --enable-win32thread --bit-depth=10
+		./configure --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
 		do_checkIfExist x264-git x264-10bit.exe
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "x265-git/toolchain.cmake" ]; then
+	echo -ne "\033]0;compile x265 32Bit\007"
+	cd x265-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+	
+if [ ! -f "toolchain.cmake" ]; then
+cat > toolchain.cmake << "EOF"
+SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_C_COMPILER gcc -static-libgcc)
+SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
+SET(CMAKE_RC_COMPILER windres)
+SET(CMAKE_ASM_YASM_COMPILER yasm)
+EOF
+fi
+		cd build/msys
+		make clean
+		rm -r *
+		rm $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265.exe
+		cd libx265.a $LOCALDESTDIR/lib
+		cd ../../source/x265.h $LOCALDESTDIR/include
+		make clean
+		rm -r *
+
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		do_checkIfExist x265-git x265-16bit.exe
+	else
+		echo -------------------------------------------------
+		echo "x265 is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+	echo -ne "\033]0;compile x265 32Bit\007"
+		git clone https://github.com/videolan/x265.git x265-git
+		cd x265-git
+cat > toolchain.cmake << "EOF"
+SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_C_COMPILER gcc -static-libgcc)
+SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
+SET(CMAKE_RC_COMPILER windres)
+SET(CMAKE_ASM_YASM_COMPILER yasm)
+EOF
+
+		cd build/msys
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265.exe
+		cd libx265.a $LOCALDESTDIR/lib
+		cd ../../source/x265.h $LOCALDESTDIR/include
+		make clean
+		rm -r *
+
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		do_checkIfExist x265-git x265-16bit.exe
 fi
 
 cd $LOCALBUILDDIR

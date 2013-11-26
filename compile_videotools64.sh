@@ -111,6 +111,77 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "x265-git/toolchain.cmake" ]; then
+	echo -ne "\033]0;compile x265 32Bit\007"
+	cd x265-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+	
+if [ ! -f "toolchain.cmake" ]; then
+cat > toolchain.cmake << "EOF"
+SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_C_COMPILER gcc -static-libgcc)
+SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
+SET(CMAKE_RC_COMPILER windres)
+SET(CMAKE_ASM_YASM_COMPILER yasm)
+EOF
+fi
+		cd build/msys
+		make clean
+		rm -r *
+		rm $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265.exe
+		cd libx265.a $LOCALDESTDIR/lib
+		cd ../../source/x265.h $LOCALDESTDIR/include
+		make clean
+		rm -r *
+
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		do_checkIfExist x265-git x265-16bit.exe
+	else
+		echo -------------------------------------------------
+		echo "x265 is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+	echo -ne "\033]0;compile x265 32Bit\007"
+		git clone https://github.com/videolan/x265.git x265-git
+		cd x265-git
+cat > toolchain.cmake << "EOF"
+SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_C_COMPILER gcc -static-libgcc)
+SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
+SET(CMAKE_RC_COMPILER windres)
+SET(CMAKE_ASM_YASM_COMPILER yasm)
+EOF
+
+		cd build/msys
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265.exe
+		cd libx265.a $LOCALDESTDIR/lib
+		cd ../../source/x265.h $LOCALDESTDIR/include
+		make clean
+		rm -r *
+
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		do_checkIfExist x265-git x265-16bit.exe
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 	echo -------------------------------------------------
 	echo "xvidcore is already compiled"
