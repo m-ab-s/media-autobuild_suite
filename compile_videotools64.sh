@@ -138,6 +138,7 @@ fi
 		cp x265.exe $LOCALDESTDIR/bin/x265.exe
 		cd libx265.a $LOCALDESTDIR/lib
 		cd ../../source/x265.h $LOCALDESTDIR/include
+		cd ../../source/x265_config.h $LOCALDESTDIR/include
 		make clean
 		rm -r *
 
@@ -170,6 +171,7 @@ EOF
 		cp x265.exe $LOCALDESTDIR/bin/x265.exe
 		cd libx265.a $LOCALDESTDIR/lib
 		cd ../../source/x265.h $LOCALDESTDIR/include
+		cd ../../source/x265_config.h $LOCALDESTDIR/include
 		make clean
 		rm -r *
 

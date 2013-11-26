@@ -112,6 +112,8 @@ if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
 		do_checkIfExist libvorbis-1.3.3 libvorbis.a
 fi
 
+cd $LOCALBUILDDIR
+
 if [ -f "libtheora-1.1.1/compile.done" ]; then
 	echo -------------------------------------------------
 	echo "libtheora-1.1.1 is already compiled"
