@@ -112,7 +112,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [ -f "x265-git/toolchain.cmake" ]; then
-	echo -ne "\033]0;compile x265 32Bit\007"
+	echo -ne "\033]0;compile x265 64Bit\007"
 	cd x265-git
 	oldHead=`git rev-parse HEAD`
 	git pull origin master
@@ -153,7 +153,7 @@ fi
 		echo -------------------------------------------------
 	fi
 	else
-	echo -ne "\033]0;compile x265 32Bit\007"
+	echo -ne "\033]0;compile x265 64Bit\007"
 		git clone https://github.com/videolan/x265.git x265-git
 		cd x265-git
 cat > toolchain.cmake << "EOF"
