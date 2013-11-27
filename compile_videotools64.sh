@@ -136,9 +136,9 @@ fi
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265.exe
-		cd libx265.a $LOCALDESTDIR/lib
-		cd ../../source/x265.h $LOCALDESTDIR/include
-		cd ../../source/x265_config.h $LOCALDESTDIR/include
+		cp libx265.a $LOCALDESTDIR/lib
+		cp ../../source/x265.h $LOCALDESTDIR/include
+		cp x265_config.h $LOCALDESTDIR/include
 		make clean
 		rm -r *
 
@@ -169,9 +169,9 @@ EOF
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265.exe
-		cd libx265.a $LOCALDESTDIR/lib
-		cd ../../source/x265.h $LOCALDESTDIR/include
-		cd ../../source/x265_config.h $LOCALDESTDIR/include
+		cp libx265.a $LOCALDESTDIR/lib
+		cp ../../source/x265.h $LOCALDESTDIR/include
+		cp x265_config.h $LOCALDESTDIR/include
 		make clean
 		rm -r *
 
