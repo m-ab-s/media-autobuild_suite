@@ -23,8 +23,45 @@ cat > .gitconfig << "EOF"
 EOF
 fi
 
+# check if compiled file exist
+do_checkIfExist() {
+	local packetName="$1"
+	local fileName="$2"
+	local fileExtension=${fileName##*.}
+	if [[ "$fileExtension" = "exe" ]]; then
+		if [ -f "$LOCALDESTDIR/bin/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	elif [[ "$fileExtension" = "a" ]]; then
+		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
+			echo -
+			echo -------------------------------------------------
+			echo "build $packetName done..."
+			echo -------------------------------------------------
+			echo -
+			else
+				echo -------------------------------------------------
+				echo "build $packetName failed..."
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				read -p "first close the batch window, then the shell window"
+				sleep 15
+		fi	
+	fi
+}
+
 cd $LOCALBUILDDIR
-if [ -f "zlib-1.2.8/compile.done" ]; then
+
+if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
 	echo -------------------------------------------------
 	echo "zlib-1.2.8 is already compiled"
 	echo -------------------------------------------------
@@ -32,6 +69,7 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 		echo -ne "\033]0;compile zlib 64Bit\007"
 		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
 		tar xf zlib-1.2.8.tar.gz
+		rm zlib-1.2.8.tar.gz
 		cd zlib-1.2.8
 		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
@@ -39,9 +77,6 @@ if [ -f "zlib-1.2.8/compile.done" ]; then
 		install libz.a $LOCALDESTDIR/lib
 		install zlib.h $LOCALDESTDIR/include
 		install zconf.h $LOCALDESTDIR/include
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm zlib-1.2.8.tar.gz
 
 cat > /local64/lib/pkgconfig/zlib.pc << "EOF"
 prefix=/local64
@@ -58,22 +93,12 @@ Requires:
 Libs: -L${libdir} -L${sharedlibdir} -lz
 Cflags: -I${includedir}
 EOF
-	if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
-		echo -
-		echo -------------------------------------------------
-		echo "build zlib-1.2.8 done..."
-		echo -------------------------------------------------
-		echo -
-		else
-			echo -------------------------------------------------
-			echo "build zlib-1.2.8 failed..."
-			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-			read -p "first close the batch window, then the shell window"
-			sleep 15
-	fi
+	do_checkIfExist zlib-1.2.8 libz.a
 fi	
-	
-if [ -f "bzip2-1.0.6/compile.done" ]; then
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/bin/bzip2.exe" ]; then
 	echo -------------------------------------------------
 	echo "bzip2-1.0.6 is already compiled"
 	echo -------------------------------------------------
@@ -81,32 +106,20 @@ if [ -f "bzip2-1.0.6/compile.done" ]; then
 		echo -ne "\033]0;compile bzip2 64Bit\007"
 		wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 		tar xf bzip2-1.0.6.tar.gz
+		rm bzip2-1.0.6.tar.gz
 		cd bzip2-1.0.6
 		make
 		cp bzip2.exe $LOCALDESTDIR/bin/
 		cp bzip2recover.exe $LOCALDESTDIR/bin/
 		cp bzlib.h $LOCALDESTDIR/include/
 		cp libbz2.a $LOCALDESTDIR/lib
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm bzip2-1.0.6.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/bin/bzip2.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build bzip2-1.0.6 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build bzip2-1.0.6 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist bzip2-1.0.6 bzip2.exe
 fi	
 
-if [ -f "dlfcn-win32-r19/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libdl.a" ]; then
 	echo -------------------------------------------------
 	echo "dlfcn-win32-r19 is already compiled"
 	echo -------------------------------------------------
@@ -114,30 +127,18 @@ if [ -f "dlfcn-win32-r19/compile.done" ]; then
 		echo -ne "\033]0;compile dlfcn-win32 64Bit\007"
 		wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
 		tar xf dlfcn-win32-r19.tar.bz2
+		rm dlfcn-win32-r19.tar.bz2
 		cd dlfcn-win32-r19
 		./configure --prefix=$LOCALDESTDIR --libdir=$LOCALDESTDIR/lib --incdir=$LOCALDESTDIR/include --disable-shared --enable-static
 		make
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm dlfcn-win32-r19.tar.bz2
 		
-		if [ -f "$LOCALDESTDIR/lib/libdl.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build dlfcn-win32-r19 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build dlfcn-win32-r19 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
-fi		
+		do_checkIfExist dlfcn-win32-r19 libdl.a
+fi
 
-if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
 	echo -------------------------------------------------
 	echo "pthreads-w32-2-9-1-release is already compiled"
 	echo -------------------------------------------------
@@ -145,29 +146,17 @@ if [ -f "pthreads-w32-2-9-1-release/compile.done" ]; then
 		echo -ne "\033]0;compile pthreads-w32 64Bit\007"
 		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
 		tar xf pthreads-w32-2-9-1-release.tar.gz
+		rm pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
 		make clean GC-static
 		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
 		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm pthreads-w32-2-9-1-release.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build pthreads-w32-2-9-1-release done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build pthreads-w32-2-9-1-release failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist pthreads-w32-2-9-1-release libpthread.a
 fi
-	
+
+cd $LOCALBUILDDIR
+
 #maybe we don't need this...
 #if [ -f "nasm-2.10.09/compile.done" ]; then
 #	echo -------------------------------------------------
@@ -188,7 +177,7 @@ fi
 #		rm nasm-2.10.09.tar.gz
 #fi		
 
-if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
 	echo -------------------------------------------------
 	echo "pkg-config-lite-0.28-1 is already compiled"
 	echo -------------------------------------------------
@@ -196,13 +185,11 @@ if [ -f "pkg-config-lite-0.28-1/compile.done" ]; then
 		echo -ne "\033]0;compile pkg-config-lite 64Bit\007"
 		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
+		rm pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no --with-pc-path="/local64/lib/pkgconfig"
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm pkg-config-lite-0.28-1.tar.gz
 
 cat >  ${LOCALDESTDIR}/bin/pkg-config.sh << "EOF"
 #!/bin/sh
@@ -220,20 +207,10 @@ echo "PKG_CONFIG=${LOCALDESTDIR}/bin/pkg-config.sh" >> ${LOCALDESTDIR}/etc/profi
 echo "export PKG_CONFIG" >> ${LOCALDESTDIR}/etc/profile.local
 source ${LOCALDESTDIR}/etc/profile.local
 
-	if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
-		echo -
-		echo -------------------------------------------------
-		echo "build pkg-config-lite-0.28-1 done..."
-		echo -------------------------------------------------
-		echo -
-		else
-			echo -------------------------------------------------
-			echo "build pkg-config-lite-0.28-1 failed..."
-			echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-			read -p "first close the batch window, then the shell window"
-			sleep 15
-	fi
+	do_checkIfExist pkg-config-lite-0.28-1 pkg-config.exe
 fi	
+
+cd $LOCALBUILDDIR
 
 #if [ -f "libtool-2.4.2/compile.done" ]; then
 #	echo -------------------------------------------------
@@ -265,7 +242,7 @@ fi
 #		fi
 #fi
 
-if [ -f "libpng-1.6.7/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
 	echo -------------------------------------------------
 	echo "libpng-1.6.7 is already compiled"
 	echo -------------------------------------------------
@@ -273,30 +250,18 @@ if [ -f "libpng-1.6.7/compile.done" ]; then
 		echo -ne "\033]0;compile libpng 64Bit\007"
 		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.7/libpng-1.6.7.tar.gz"
 		tar xf libpng-1.6.7.tar.gz
+		rm libpng-1.6.7.tar.gz
 		cd libpng-1.6.7
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libpng-1.6.7.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libpng-1.6.7 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libpng-1.6.7 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libpng-1.6.7 libpng.a
 fi
 
-if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
 	echo -------------------------------------------------
@@ -304,6 +269,7 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 		echo -ne "\033]0;compile openjpeg 64Bit\007"
 		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
 		tar xf openjpeg_v1_4_sources_r697.tgz
+		rm openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		sed -i "s/\/usr\/lib/\/local64\/lib/" Makefile
@@ -311,25 +277,13 @@ if [ -f "openjpeg_v1_4_sources_r697/compile.done" ]; then
 		make install
 		echo "finish" > compile.done
 		cp libopenjpeg.pc $PKG_CONFIG_PATH
-		cd $LOCALBUILDDIR
-		rm openjpeg_v1_4_sources_r697.tgz
 		
-		if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build openjpeg_v1_4_sources_r697 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build openjpeg_v1_4_sources_r697 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist openjpeg_v1_4_sources_r697 libopenjpeg.a
 fi
 
-if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "libjpeg-turbo-1.3.0 is already compiled"
 	echo -------------------------------------------------
@@ -343,26 +297,13 @@ if [ -f "libjpeg-turbo-1.3.0/compile.done" ]; then
 		make -j $cpuCount
 		make install
 		sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libjpeg-turbo-1.3.0 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libjpeg-turbo-1.3.0 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libjpeg-turbo-1.3.0 libturbojpeg.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "jpeg-9/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "jpeg-9 is already compiled"
 	echo -------------------------------------------------
@@ -375,25 +316,13 @@ if [ -f "jpeg-9/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
 		
-		if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build jpeg-9 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build jpeg-9 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist jpeg-9 libjpeg.a
 fi
 
-if [ -f "jasper-1.900.1/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
 	echo -------------------------------------------------
 	echo "jasper-1.900.1 is already compiled"
 	echo -------------------------------------------------
@@ -406,25 +335,13 @@ if [ -f "jasper-1.900.1/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-static=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
 		
-		if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build jasper-1.900.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build jasper-1.900.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist jasper-1.900.1 libjasper.a
 fi
 
-if [ -f "tiff-4.0.3/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libtiff.a" ]; then
 	echo -------------------------------------------------
 	echo "tiff-4.0.3 is already compiled"
 	echo -------------------------------------------------
@@ -437,25 +354,13 @@ if [ -f "tiff-4.0.3/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
 		
-		if [ -f "$LOCALDESTDIR/lib/libtiff.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build tiff-4.0.3 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build tiff-4.0.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist tiff-4.0.3 libtiff.a
 fi
 
-if [ -f "dx7headers/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
 	echo -------------------------------------------------
 	echo "dx7headers is already compiled"
 	echo -------------------------------------------------
@@ -468,7 +373,6 @@ if [ -f "dx7headers/compile.done" ]; then
 		rm dx7headers.tar
 		cd $LOCALBUILDDIR
 		cp dx7headers/* $LOCALDESTDIR/include
-		echo "finish" > dx7headers/compile.done
 		rm dx7headers.tgz
 		
 		if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
@@ -486,7 +390,9 @@ if [ -f "dx7headers/compile.done" ]; then
 		fi
 fi
 
-if [ -f "libiconv-1.14/compile1.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
 	echo -------------------------------------------------
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
@@ -499,26 +405,13 @@ if [ -f "libiconv-1.14/compile1.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
-		echo "finish" > compile1.done
-
-		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libiconv-1.14 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libiconv-1.14 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libiconv-1.14 libiconv.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
     echo -------------------------------------------------
     echo "gettext-0.18.3.1-runtime is already compiled"
     echo -------------------------------------------------
@@ -534,27 +427,13 @@ if [ -f "gettext-0.18.3.1-runtime/compile.done" ]; then
 		cd gettext-runtime
 		make -j $cpuCount
 		make install
-		cd ..
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build gettext-0.18.3.1-runtime done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build gettext-0.18.3.1-runtime failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist gettext-0.18.3.1-runtime libasprintf.a
 fi
 		
 cd $LOCALBUILDDIR
 
-if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
     echo -------------------------------------------------
     echo "gettext-0.18.3.1-static is already compiled"
     echo -------------------------------------------------
@@ -568,26 +447,13 @@ if [ -f "gettext-0.18.3.1-static/compile.done" ]; then
 		make -j $cpuCount
 		install gettext-tools/src/*.exe $LOCALDESTDIR/bin
 		install gettext-tools/misc/autopoint $LOCALDESTDIR/bin
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build gettext-0.18.3.1-static done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build gettext-0.18.3.1-static failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist gettext-0.18.3.1-static msgmerge.exe
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libiconv-1.14/compile2.done" ]; then
+if [ -f "$LOCALDESTDIR/bin/iconv.exe" ]; then
     echo -------------------------------------------------
     echo "libiconv-1.14 is already compiled"
     echo -------------------------------------------------
@@ -601,26 +467,13 @@ if [ -f "libiconv-1.14/compile2.done" ]; then
 		make clean
 		make -j $cpuCount
 		make install
-		echo "finish" > compile2.done
 		
-		if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libiconv-1.14 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libiconv-1.14 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libiconv-1.14 iconv.exe
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "freetype-2.4.10/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
 	echo -------------------------------------------------
 	echo "freetype-2.4.10 is already compiled"
 	echo -------------------------------------------------
@@ -634,26 +487,13 @@ if [ -f "freetype-2.4.10/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build freetype-2.4.10 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build freetype-2.4.10 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist freetype-2.4.10 libfreetype.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "expat-2.1.0/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libexpat.a" ]; then
 	echo -------------------------------------------------
 	echo "expat-2.1.0 is already compiled"
 	echo -------------------------------------------------
@@ -661,30 +501,18 @@ if [ -f "expat-2.1.0/compile.done" ]; then
 		echo -ne "\033]0;compile expat 64Bit\007"
 		wget -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
 		tar xf expat-2.1.0.tar.gz
+		rm expat-2.1.0.tar.gz
 		cd expat-2.1.0
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm expat-2.1.0.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libexpat.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build expat-2.1.0 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build expat-2.1.0 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist expat-2.1.0 libexpat.a
 fi
 
-if [ -f "fontconfig-2.10.2/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
 	echo -------------------------------------------------
 	echo "fontconfig-2.10.2 is already compiled"
 	echo -------------------------------------------------
@@ -692,31 +520,19 @@ if [ -f "fontconfig-2.10.2/compile.done" ]; then
 		echo -ne "\033]0;compile fontconfig 64Bit\007"
 		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
 		tar xf fontconfig-2.10.2.tar.gz
+		rm fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$PKG_CONFIG_PATH/fontconfig.pc"
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm fontconfig-2.10.2.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build fontconfig-2.10.2 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build fontconfig-2.10.2 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist fontconfig-2.10.2 libfontconfig.a
 fi
 
-if [ -f "fribidi-0.19.4/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 	echo -------------------------------------------------
 	echo "fribidi-0.19.4 is already compiled"
 	echo -------------------------------------------------
@@ -724,6 +540,7 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		echo -ne "\033]0;compile fribidi 64Bit\007"
 		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
+		rm fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
 		wget --no-check-certificate -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
@@ -731,9 +548,6 @@ if [ -f "fribidi-0.19.4/compile.done" ]; then
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm fribidi-0.19.4.tar.bz2
 
 cat > /local64/bin/fribidi-config << "EOF"
 #!/bin/sh
@@ -753,22 +567,12 @@ case $1 in
 esac
 EOF
 
-		if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build fribidi-0.19.4 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build fribidi-0.19.4 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist fribidi-0.19.4 libfribidi.a
 fi
 
-if [ -f "libass-0.10.1/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
 	echo -------------------------------------------------
 	echo "libass-0.10.1 is already compiled"
 	echo -------------------------------------------------
@@ -776,31 +580,19 @@ if [ -f "libass-0.10.1/compile.done" ]; then
 		echo -ne "\033]0;compile libass 64Bit\007"
 		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
 		tar xf libass-0.10.1.tar.gz
+		rm libass-0.10.1.tar.gz
 		cd libass-0.10.1
 		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm libass-0.10.1.tar.gz
 		
-		if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libass-0.10.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libass-0.10.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist libass-0.10.1 libass.a
 fi
 
-if [ -f "SDL-1.2.15/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL-1.2.15 is already compiled"
 	echo -------------------------------------------------
@@ -808,32 +600,20 @@ if [ -f "SDL-1.2.15/compile.done" ]; then
 		echo -ne "\033]0;compile SDL 64Bit\007"
 		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
+		rm SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		cd $LOCALBUILDDIR
-		rm SDL-1.2.15.tar.gz
 		sed -i "s/-mwindows//" "/local64/bin/sdl-config"
 		sed -i "s/-mwindows//" "/local64/lib/pkgconfig/sdl.pc"
 		
-		if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build SDL-1.2.15 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build SDL-1.2.15 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist SDL-1.2.15 libSDL.a
 fi
 
-if [ -f "SDL_image-1.2.12/compile.done" ]; then
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libSDL_image.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL_image-1.2.12 is already compiled"
 	echo -------------------------------------------------
@@ -846,21 +626,8 @@ if [ -f "SDL_image-1.2.12/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
 		
-		if [ -f "$LOCALDESTDIR/lib/libSDL_image.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build SDL_image-1.2.12 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build SDL_image-1.2.12 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		do_checkIfExist SDL_image-1.2.12 libSDL_image.a
 fi
 
 #----------------------
@@ -869,7 +636,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "gmp-5.1.3/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libgmp.a" ]; then
 	echo -------------------------------------------------
 	echo "gmp-5.1.3 is already compiled"
 	echo -------------------------------------------------
@@ -882,25 +649,13 @@ if [ -f "gmp-5.1.3/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --enable-cxx --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libgmp.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build gmp-5.1.3 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build gmp-5.1.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist gmp-5.1.3 libgmp.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "nettle-2.7.1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libnettle.a" ]; then
 	echo -------------------------------------------------
 	echo "nettle-2.7.1 is already compiled"
 	echo -------------------------------------------------
@@ -913,25 +668,13 @@ if [ -f "nettle-2.7.1/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libnettle.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build nettle-2.7.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build nettle-2.7.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist nettle-2.7.1 libnettle.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libgpg-error-1.12/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libgpg-error.a" ]; then
 	echo -------------------------------------------------
 	echo "libgpg-error-1.12 is already compiled"
 	echo -------------------------------------------------
@@ -945,25 +688,13 @@ if [ -f "libgpg-error-1.12/compile.done" ]; then
 		sed -i 's/iconv --silent/iconv -s/g' potomo
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libgpg-error.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libgpg-error-1.12 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libgpg-error-1.12 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libgpg-error-1.12 libgpg-error.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libgcrypt-1.5.3/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
 	echo "libgcrypt-1.5.3 is already compiled"
 	echo -------------------------------------------------
@@ -976,20 +707,8 @@ if [ -f "libgcrypt-1.5.3/compile.done" ]; then
 		./configure --prefix=$LOCALDESTDIR --host=x86_64-pc-mingw32 --build=x86_64-pc-mingw32 --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libgcrypt-1.5.3 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libgcrypt-1.5.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libgcrypt-1.5.3 libgcrypt.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1009,25 +728,13 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		make install
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $PKG_CONFIG_PATH/gnutls.pc
 		sed -i 's/-L\/local64\/lib .*/-L\/local64\/lib/' $PKG_CONFIG_PATH/gnutls.pc
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build gnutls-3.2.3 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build gnutls-3.2.3 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist gnutls-3.2.3 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "rtmpdump/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/bin/rtmpdump.exe" ]; then
 	echo -------------------------------------------------
 	echo "rtmpdump is already compiled"
 	echo -------------------------------------------------
@@ -1039,25 +746,13 @@ if [ -f "rtmpdump/compile.done" ]; then
 		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl/' Makefile
 		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR CRYPTO=GNUTLS SHARED= SYS=mingw install
 		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $PKG_CONFIG_PATH/librtmp.pc
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build rtmpdump done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build rtmpdump failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist rtmpdump rtmpdump.exe
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "lzo-2.06/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/liblzo2.a" ]; then
 	echo -------------------------------------------------
 	echo "lzo-2.06 is already compiled"
 	echo -------------------------------------------------
@@ -1070,25 +765,13 @@ if [ -f "lzo-2.06/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/liblzo2.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build lzo-2.06 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build lzo-2.06 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist lzo-2.06 liblzo2.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libdca/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
 	echo -------------------------------------------------
 	echo "libdca is already compiled"
 	echo -------------------------------------------------
@@ -1100,25 +783,13 @@ if [ -f "libdca/compile.done" ]; then
 		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libdca done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libdca failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libdca libdca.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libxml2-2.9.1/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
 	echo -------------------------------------------------
 	echo "libxml2-2.9.1 is already compiled"
 	echo -------------------------------------------------
@@ -1133,25 +804,13 @@ if [ -f "libxml2-2.9.1/compile.done" ]; then
 		make install
 		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
 		cp $LOCALDESTDIR/lib/xml2.la $LOCALDESTDIR/lib/libxml2.la
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build libxml2-2.9.1 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build libxml2-2.9.1 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist libxml2-2.9.1 libxml2.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "lua-5.1.4/compile.done" ]; then
+if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
 	echo -------------------------------------------------
 	echo "lua-5.1.4 is already compiled"
 	echo -------------------------------------------------
@@ -1166,20 +825,8 @@ if [ -f "lua-5.1.4/compile.done" ]; then
 		make mingw
 		make install
 		cp src/lua51.dll $LOCALDESTDIR/bin
-		echo "finish" > compile.done
-		if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
-			echo -
-			echo -------------------------------------------------
-			echo "build lua-5.1.4 done..."
-			echo -------------------------------------------------
-			echo -
-			else
-				echo -------------------------------------------------
-				echo "build lua-5.1.4 failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-				read -p "first close the batch window, then the shell window"
-				sleep 15
-		fi
+		
+		do_checkIfExist lua-5.1.4 liblua.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1210,19 +857,8 @@ if [[ $qt4 = "y" ]]; then
 			sed -i 's/\.\.\\.\.\\lib\\pkgconfig\\//' lib/pkgconfig/*.pc
 			sed -i 's/Libs: -L${libdir} -lQtGui/Libs: -L${libdir} -lcomctl32 -lqjpeg -lqtaccessiblewidgets -lQtGui/' "lib/pkgconfig/QtGui.pc"
 			cp lib/pkgconfig/*.pc $PKG_CONFIG_PATH
-			if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
-				echo -
-				echo -------------------------------------------------
-				echo "build qt-everywhere-opensource-src-4.8.5 done..."
-				echo -------------------------------------------------
-				echo -
-				else
-					echo -------------------------------------------------
-					echo "build qt-everywhere-opensource-src-4.8.5 failed..."
-					echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-					read -p "first close the batch window, then the shell window"
-					sleep 15
-			fi
+			
+			do_checkIfExist qt-everywhere-opensource-src-4.8.5 designer.exe
 	fi
 fi
 

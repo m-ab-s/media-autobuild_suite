@@ -45,7 +45,7 @@
 ::	2013-11-19 add a52dec, libmad, and libmpeg2 and sdl_image
 ::	2013-11-24 change compiler version to 4.8.2 and start to simplify code
 ::	2013-11-26 add x265
-::	2013-11-27 add function for write settings to ini-file and change downloads from extra packs
+::	2013-11-27 add function for write settings to ini-file, change downloads from extra packs and finish simplify scripts
 ::
 ::-------------------------------------------------------------------------------------
 
