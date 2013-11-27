@@ -66,6 +66,7 @@ Included Tools and Libraries
  - libutvideo
  - libxml2
  - lua
+ - mediainfo cli (only 32 bit)
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)

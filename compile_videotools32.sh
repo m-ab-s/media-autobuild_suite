@@ -408,6 +408,30 @@ if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
 		do_checkIfExist libmpeg2-0.5.1 libmpeg2.a
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
+	echo -------------------------------------------------
+	echo "MediaInfo_CLI is already compiled"
+	echo -------------------------------------------------
+	else
+		echo -ne "\033]0;compile MediaInfo_CLI 32Bit\007"
+		if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -r MediaInfo_CLI_GNU_FromSource; fi
+		wget -c http://mediaarea.net/download/binary/mediainfo/0.7.65/MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
+		tar xf MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
+		rm MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
+		cd MediaInfo_CLI_GNU_FromSource
+		
+		sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
+		sed -i 's/make -s -j$numprocs/make -s -j $cpuCount/' CLI_Compile.sh
+		sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
+		
+		source CLI_Compile.sh
+		cp MediaInfo/Project/GNU/CLI/mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
+		
+		do_checkIfExist MediaInfo_CLI mediainfo.exe
+fi
+
 #------------------------------------------------
 # final tools
 #------------------------------------------------
