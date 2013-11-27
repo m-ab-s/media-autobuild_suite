@@ -78,18 +78,21 @@ for /F "tokens=2 delims==" %%g in ('findstr /i vlc %ini%') do set vlcINI=%%g
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 
 :selectSystem
-if %archINI% GTR 0 GOTO selectNonFree
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Select the build target system:
-echo. 1 = both (32 bit and 64 bit)
-echo. 2 = 32 bit build system
-echo. 3 = 64 bit build system
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildEnv="Build System:"
+if %archINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Select the build target system:
+	echo. 1 = both [32 bit and 64 bit]
+	echo. 2 = 32 bit build system
+	echo. 3 = 64 bit build system
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildEnv="Build System:"
+	) else (
+		set buildEnv=%archINI%
+		)
 
 if %buildEnv%==1 (
 	set "build32=yes"
@@ -106,17 +109,20 @@ if %buildEnv%==3 (
 if %buildEnv% GTR 3 GOTO :selectSystem
 
 :selectNonFree
-if %freeINI% GTR 0 GOTO ffmpeg
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build nonfree binaries (like fdkaac), is not allow to distribute them:
-echo. 1 = nonfree binaries
-echo. 2 = free binaries
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P nonfree="Binaries:"
+if %freeINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build nonfree binaries [like fdkaac], is not allow to distribute them:
+	echo. 1 = nonfree binaries
+	echo. 2 = free binaries
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P nonfree="Binaries:"
+	) else (
+		set nonfree=%freeINI%
+		)
 
 if %nonfree%==1 (
 	set "binary=y"
@@ -127,17 +133,20 @@ if %nonfree%==2 (
 if %nonfree% GTR 2 GOTO selectNonFree
 
 :ffmpeg
-if %ffmpegINI% GTR 0 GOTO mp4boxStatic
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build static ffmpeg binary:
-echo. 1 = yes
-echo. 2 = no
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildffmpeg="build ffmpeg:"
+if %ffmpegINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static ffmpeg binary:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildffmpeg="build ffmpeg:"
+	) else (
+		set buildffmpeg=%ffmpegINI%
+		)
 
 if %buildffmpeg%==1 (
 	set "ffmpeg=y"
@@ -148,17 +157,20 @@ if %buildffmpeg%==2 (
 if %buildffmpeg% GTR 2 GOTO ffmpeg
 
 :mp4boxStatic
-if %mp4boxINI% GTR 0 GOTO mplayer
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build static mp4box binary:
-echo. 1 = yes
-echo. 2 = no
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildMp4box="build mp4box:"
+if %mp4boxINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static mp4box binary:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildMp4box="build mp4box:"
+	) else (
+		set buildMp4box=%mp4boxINI%
+		)
 
 if %buildMp4box%==1 (
 	set "mp4box=y"
@@ -169,18 +181,21 @@ if %buildMp4box%==2 (
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 
 :mplayer
-if %mplayerINI% GTR 0 GOTO magick
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build static mplayer/mencoder binary:
-echo. 1 = yes
-echo. 2 = no
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildmplayer="build mplayer:"
-
+if %mplayerINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static mplayer/mencoder binary:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildmplayer="build mplayer:"
+	) else (
+		set buildmplayer=%mplayerINI%
+		)
+		
 if %buildmplayer%==1 (
 	set "mplayer=y"
 	)
@@ -190,18 +205,21 @@ if %buildmplayer%==2 (
 if %buildmplayer% GTR 2 GOTO mplayer
 
 :magick
-if %imageINI% GTR 0 GOTO vlc
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build static image tools (openEXR, ImageMagick):
-echo. 1 = yes
-echo. 2 = no
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildmagick="build ImageMagick:"
-
+if %imageINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static image tools [openEXR, ImageMagick]:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildmagick="build ImageMagick:"
+	) else (
+		set buildmagick=%imageINI%
+	)
+	
 if %buildmagick%==1 (
 	set "magick=y"
 	)
@@ -211,18 +229,21 @@ if %buildmagick%==2 (
 if %buildmagick% GTR 2 GOTO magick
 
 :vlc
-if %vlcINI% GTR 0 GOTO numCores
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Build vlc player:
-echo. 1 = yes
-echo. 2 = no
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P buildvlc="build vlc:"
-
+if %vlcINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build vlc player:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildvlc="build vlc:"
+	) else (
+		set buildvlc=%vlcINI%
+		)
+	
 if %buildvlc%==1 (
 	set "vlc=y"
 	set "qt4=y"
@@ -234,24 +255,25 @@ if %buildvlc%==2 (
 if %buildvlc% GTR 2 GOTO vlc
 
 :numCores
-if %coresINI% GTR 0 GOTO start
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-echo.
-echo. Number of CPU Cores/Threads for compiling:
-echo. (it is non-recommended to use all cores/threads!)
-echo.
-echo -------------------------------------------------------------------------------
-echo -------------------------------------------------------------------------------
-set /P cpuCores="Core/Thread Count:"
-echo -------------------------------------------------------------------------------
-
-for /l %%a in (1,1,%cpuCores%) do (
-	set cpuCount=%%a
-	)
+if %coresINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Number of CPU Cores/Threads for compiling:
+	echo. [it is non-recommended to use all cores/threads!]
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P cpuCores="Core/Thread Count:"
+	echo -------------------------------------------------------------------------------
+	) else ( 
+		set cpuCores=%coresINI%
+		)
+	for /l %%a in (1,1,%cpuCores%) do (
+		set cpuCount=%%a
+		)
 if "%cpuCount%"=="" GOTO :numCores	
 
-:start
 ::------------------------------------------------------------------
 ::download and install basic msys system:
 ::------------------------------------------------------------------
@@ -586,7 +608,7 @@ if %build64%==yes (
 ::------------------------------------------------------------------
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
-echo extra
+
 if not exist "%instdir%\opt\bin\git.exe" (
 	echo.-------------------------------------------------------------------------------
 	echo.download and install PortableGit
