@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.95
+::	This is version 0.96
 ::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-24
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -45,20 +45,40 @@
 ::	2013-11-19 add a52dec, libmad, and libmpeg2 and sdl_image
 ::	2013-11-24 change compiler version to 4.8.2 and start to simplify code
 ::	2013-11-26 add x265
+::	2013-11-27 add function for write settings to ini-file and change downloads from extra packs
 ::
 ::-------------------------------------------------------------------------------------
 
 @echo off
-color 87
+color 80
 title media-autobuild_suite
 
 set instdir=%CD%
+set "ini=media-autobuild_suite.ini"
 
-::------------------------------------------------------------------
-::configure build system:
-::------------------------------------------------------------------
+if not exist %ini% (
+	echo.[compiler list]>>%ini%
+	echo.arch=^0>>%ini%
+	echo.free=^0>>%ini%
+	echo.ffmpeg=^0>>%ini%
+	echo.mp4box=^0>>%ini%
+	echo.mplayer=^0>>%ini%
+	echo.image=^0>>%ini%
+	echo.vlc=^0>>%ini%
+	echo.cores=^0>>%ini%
+	)
+
+for /F "tokens=2 delims==" %%a in ('findstr /i arch %ini%') do set archINI=%%a
+for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
+for /F "tokens=2 delims==" %%c in ('findstr /i ffmpeg %ini%') do set ffmpegINI=%%c
+for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
+for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
+for /F "tokens=2 delims==" %%f in ('findstr /i image %ini%') do set imageINI=%%f
+for /F "tokens=2 delims==" %%g in ('findstr /i vlc %ini%') do set vlcINI=%%g
+for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 
 :selectSystem
+if %archINI% GTR 0 GOTO selectNonFree
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -86,6 +106,7 @@ if %buildEnv%==3 (
 if %buildEnv% GTR 3 GOTO :selectSystem
 
 :selectNonFree
+if %freeINI% GTR 0 GOTO ffmpeg
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -106,6 +127,7 @@ if %nonfree%==2 (
 if %nonfree% GTR 2 GOTO selectNonFree
 
 :ffmpeg
+if %ffmpegINI% GTR 0 GOTO mp4boxStatic
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -126,6 +148,7 @@ if %buildffmpeg%==2 (
 if %buildffmpeg% GTR 2 GOTO ffmpeg
 
 :mp4boxStatic
+if %mp4boxINI% GTR 0 GOTO mplayer
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -146,6 +169,7 @@ if %buildMp4box%==2 (
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 
 :mplayer
+if %mplayerINI% GTR 0 GOTO magick
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -166,6 +190,7 @@ if %buildmplayer%==2 (
 if %buildmplayer% GTR 2 GOTO mplayer
 
 :magick
+if %imageINI% GTR 0 GOTO vlc
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -186,6 +211,7 @@ if %buildmagick%==2 (
 if %buildmagick% GTR 2 GOTO magick
 
 :vlc
+if %vlcINI% GTR 0 GOTO numCores
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -208,6 +234,7 @@ if %buildvlc%==2 (
 if %buildvlc% GTR 2 GOTO vlc
 
 :numCores
+if %coresINI% GTR 0 GOTO start
 echo -------------------------------------------------------------------------------
 echo -------------------------------------------------------------------------------
 echo.
@@ -224,6 +251,7 @@ for /l %%a in (1,1,%cpuCores%) do (
 	)
 if "%cpuCount%"=="" GOTO :numCores	
 
+:start
 ::------------------------------------------------------------------
 ::download and install basic msys system:
 ::------------------------------------------------------------------
@@ -391,17 +419,12 @@ if %build64%==yes (
 	)
 
 :makeDIR
-set targetSys=false
-if exist %instdir%\local32\share set targetSys=true 
-if exist %instdir%\local64\share set targetSys=true 
-if %targetSys%==true GOTO writeConfFile
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- making build folders
-	echo.
-	echo -------------------------------------------------------------------------------
-	if %build32%==yes (
-		mkdir %instdir%\build32
+if %build32%==yes (
+	if not exist %instdir%\build32 mkdir %instdir%\build32
+	if not exist %instdir%\local32\share (
+		echo.-------------------------------------------------------------------------------
+		echo.create local32 folders
+		echo.-------------------------------------------------------------------------------
 		mkdir %instdir%\local32
 		mkdir %instdir%\local32\bin
 		mkdir %instdir%\local32\etc
@@ -410,8 +433,13 @@ if %targetSys%==true GOTO writeConfFile
 		mkdir %instdir%\local32\lib\pkgconfig
 		mkdir %instdir%\local32\share
 		)
-	if %build64%==yes (
-		mkdir %instdir%\build64
+	)
+if %build64%==yes (
+	if not exist %instdir%\build64 mkdir %instdir%\build64
+	if not exist %instdir%\local64\share (
+		echo.-------------------------------------------------------------------------------
+		echo.create local64 folders
+		echo.-------------------------------------------------------------------------------
 		mkdir %instdir%\local64
 		mkdir %instdir%\local64\bin
 		mkdir %instdir%\local64\etc
@@ -420,6 +448,7 @@ if %targetSys%==true GOTO writeConfFile
 		mkdir %instdir%\local64\lib\pkgconfig
 		mkdir %instdir%\local64\share
 		)
+	)
 	
 :writeConfFile
 if exist %instdir%\conf-env.sh GOTO runConfFile
@@ -557,44 +586,50 @@ if %build64%==yes (
 ::------------------------------------------------------------------
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
+echo extra
+if not exist "%instdir%\opt\bin\git.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install PortableGit
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget -c "http://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z"
+	%instdir%\opt\bin\7za x PortableGit-1.8.3-preview20130601.7z -aoa
+	%instdir%\msys\1.0\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
+	%instdir%\msys\1.0\bin\mv ReleaseNotes.rtf README.portable doc\git
+	%instdir%\msys\1.0\bin\rm PortableGit-1.8.3-preview20130601.7z
+	cd ..
+	)
 
-if exist %instdir%\opt\bin\cmake.exe GOTO checkDoxygen32
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- download and install extra packs
-	echo.
-	echo -------------------------------------------------------------------------------
+if not exist "%instdir%\opt\bin\svn.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install svn
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.3/apache22/svn-win32-1.8.3.zip"
+	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.3.zip
+	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.3/* .
+	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.3
+	%instdir%\msys\1.0\bin\mv README.txt doc\svn-win32-1.8.3
+	%instdir%\msys\1.0\bin\rm svn-win32-1.8.3.zip
+	%instdir%\msys\1.0\bin\rm -r svn-win32-1.8.3
+	cd ..
+	)
 
-	echo.cd ${LOCALBUILDDIR}>>%instdir%\extraPack.sh
-	echo.wget -c "http://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z">>%instdir%\extraPack.sh
-	echo.cd /opt>>%instdir%\extraPack.sh
-	echo.7za x ${LOCALBUILDDIR}/PortableGit-1.8.3-preview20130601.7z>>%instdir%\extraPack.sh
-	echo.rm git-bash.bat git-cmd.bat 'Git Bash.vbs'>>%instdir%\extraPack.sh
-	echo.mv ReleaseNotes.rtf README.portable doc/git>>%instdir%\extraPack.sh
-	echo.>>%instdir%\extraPack.sh
-	
-	echo.cd ${LOCALBUILDDIR}>>%instdir%\extraPack.sh
-	echo.wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.3/apache22/svn-win32-1.8.3.zip">>%instdir%\extraPack.sh
-	echo.unzip svn-win32-1.8.3.zip>>%instdir%\extraPack.sh
-	echo.cp -va svn-win32-1.8.3/* /opt>>%instdir%\extraPack.sh
-	echo.mkdir -p /opt/doc/svn-win32-1.8.3>>%instdir%\extraPack.sh
-	echo.mv /opt/README.txt /opt/doc/svn-win32-1.8.3>>%instdir%\extraPack.sh
-	echo.>>%instdir%\extraPack.sh
-	
-	echo.cd ${LOCALBUILDDIR}>>%instdir%\extraPack.sh
-	echo.wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.11.1-win32-x86.zip">>%instdir%\extraPack.sh
-	echo.unzip cmake-2.8.11.1-win32-x86.zip>>%instdir%\extraPack.sh
-	echo.cp -va cmake-2.8.11.1-win32-x86/* /opt>>%instdir%\extraPack.sh
-		
-	echo.rm ${LOCALBUILDDIR}/PortableGit-1.8.3-preview20130601.7z>>%instdir%\extraPack.sh
-	echo.rm ${LOCALBUILDDIR}/svn-win32-1.8.3.zip>>%instdir%\extraPack.sh
-	echo.rm ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86.zip>>%instdir%\extraPack.sh
-	echo.rm -r ${LOCALBUILDDIR}/svn-win32-1.8.3>>%instdir%\extraPack.sh
-	echo.rm -r ${LOCALBUILDDIR}/cmake-2.8.11.1-win32-x86>>%instdir%\extraPack.sh
+if not exist "%instdir%\opt\bin\cmake.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install cmake
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.11.1-win32-x86.zip"
+	%instdir%\msys\1.0\bin\unzip cmake-2.8.11.1-win32-x86.zip
+	%instdir%\msys\1.0\bin\cp -va cmake-2.8.11.1-win32-x86/* .
+	%instdir%\msys\1.0\bin\rm cmake-2.8.11.1-win32-x86.zip
+	%instdir%\msys\1.0\bin\rm -r cmake-2.8.11.1-win32-x86
+	cd ..
+	)	
 
-	%instdir%\msys\1.0\bin\sh -l %instdir%\extraPack.sh
-	del %instdir%\extraPack.sh
-	
+cd %instdir%
+
 :checkDoxygen32	
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\doxygen.exe GOTO checkDoxygen64
