@@ -402,4 +402,44 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 		do_checkIfExist libmad-0.15.1b libmad.a
 fi
 
+cd $LOCALBUILDDIR
+		
+if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
+	echo -------------------------------------------------
+	echo "soxr-0.1.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile soxr-0.1.1 32Bit\007"
+		if [ -d "soxr-0.1.1-Source" ]; then rm -r soxr-0.1.1-Source; fi
+		wget -c "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
+		tar xf soxr-0.1.1-Source.tar.xz
+		rm soxr-0.1.1-Source.tar.xz
+		cd soxr-0.1.1-Source
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist soxr-0.1.1-Source libsoxr.a
+fi
+
+cd $LOCALBUILDDIR
+		
+if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
+	echo -------------------------------------------------
+	echo "twolame-0.3.13 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile twolame 32Bit\007"
+		if [ -d "twolame-0.3.13" ]; then rm -r twolame-0.3.13; fi
+		wget -c http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
+		tar xf twolame-0.3.13.tar.gz
+		rm twolame-0.3.13.tar.gz
+		cd twolame-0.3.13
+		./configure --prefix=$LOCALDESTDIR --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist twolame-0.3.13 libtwolame.a
+fi
+
 sleep 3

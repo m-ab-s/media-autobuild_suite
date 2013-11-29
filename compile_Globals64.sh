@@ -864,6 +864,69 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
+	echo -------------------------------------------------
+	echo "orc-0.4.18 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile orc 64Bit\007"
+		if [ -d "orc-0.4.18" ]; then rm -r orc-0.4.18; fi
+		wget -c http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz
+		tar xf orc-0.4.18.tar.gz
+		rm orc-0.4.18.tar.gz
+		cd orc-0.4.18
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist orc-0.4.18 liborc-0.4.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
+	echo -------------------------------------------------
+	echo "schroedinger-1.0.11 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile schroedinger 64Bit\007"
+		if [ -d "schroedinger-1.0.11" ]; then rm -r schroedinger-1.0.11; fi
+		wget -c http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz
+		tar xf schroedinger-1.0.11.tar.gz
+		rm schroedinger-1.0.11.tar.gz
+		cd schroedinger-1.0.11
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		sed -i 's/testsuite//' Makefile
+		make -j $cpuCount
+		make install
+		sed -i 's/-lschroedinger-1.0$/-lschroedinger-1.0 -lorc-0.4/' "$PKG_CONFIG_PATH/schroedinger-1.0.pc"
+		
+		do_checkIfExist schroedinger-1.0.11 libschroedinger-1.0.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
+	echo -------------------------------------------------
+	echo "libilbc is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libilbc 64Bit\007"
+		if [ -d "libilbc" ]; then rm -r libilbc; fi
+		git clone https://github.com/dekkers/libilbc.git libilbc
+		cd libilbc
+		if [[ ! -f "configure" ]]; then
+			autoreconf -fiv
+		fi
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libilbc libilbc.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [[ $qt4 = "y" ]]; then
 	if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
 		echo -------------------------------------------------

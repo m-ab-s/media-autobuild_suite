@@ -432,6 +432,40 @@ if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
 		do_checkIfExist MediaInfo_CLI mediainfo.exe
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "vidstab-git/Makefile" ]; then
+	echo -ne "\033]0;compile vidstab 32Bit\007"
+	cd vidstab-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		make uninstall
+		make clean
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
+		 sed -i "s/SHARED/STATIC/" CMakeLists.txt
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist vidstab-git libvidstab.a
+	else
+		echo -------------------------------------------------
+		echo "vidstab is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+	echo -ne "\033]0;compile vidstab 32Bit\007"
+		git clone https://github.com/georgmartius/vid.stab.git vidstab-git
+		cd vidstab-git
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
+		 sed -i "s/SHARED/STATIC/" CMakeLists.txt
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist vidstab-git libvidstab.a
+fi
+
 #------------------------------------------------
 # final tools
 #------------------------------------------------
@@ -488,7 +522,7 @@ if [[ $ffmpeg = "y" ]]; then
 		if [[ "$oldHead" != "$newHead" ]]; then
 			make uninstall
 			make clean
-			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			
@@ -528,7 +562,7 @@ if [[ $ffmpeg = "y" ]]; then
 
 			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
-			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=x86 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			

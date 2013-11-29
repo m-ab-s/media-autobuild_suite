@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.96
+::	This is version 0.965
 ::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-24
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -46,6 +46,7 @@
 ::	2013-11-24 change compiler version to 4.8.2 and start to simplify code
 ::	2013-11-26 add x265
 ::	2013-11-27 add function for write settings to ini-file, change downloads from extra packs, finish simplify scripts and mediainfo cli (only 32 bit)
+::	2013-11-29 add vidstab, libtwolame, soxr, libilbc, schroedinger, orc
 ::
 ::-------------------------------------------------------------------------------------
 

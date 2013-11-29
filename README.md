@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-27
+modified: 2013-11-29
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.96**
+Current release is **v0.965**
 
 
 Included Tools and Libraries
@@ -59,10 +59,13 @@ Included Tools and Libraries
  - libdvdcss
  - libdvdnav
  - libdvdread
+ - libilbc
  - libmad
  - libmpeg2
  - libpng
+ - libsoxr
  - libtiff
+ - libtwolame
  - libutvideo
  - libxml2
  - lua
@@ -70,6 +73,7 @@ Included Tools and Libraries
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)
+ - orc
  - opencore-amr
  - openEXR (standalone and lib for ImageMagick)
  - openjpeg
@@ -78,11 +82,13 @@ Included Tools and Libraries
  - opus-tools (standalone)
  - qt4
  - rtmp (standalone and lib for ffmpeg)
+ - schroedinger
  - sdl (for ffplay)
  - sdl_image
  - speex (standalone and lib for ffmpeg)
  - theora
  - vlc player
+ - vidstab
  - vpx (standalone and lib for ffmpeg)
  - vo-aacenc
  - vo-amrwbenc
