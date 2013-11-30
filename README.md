@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-29
+modified: 2013-11-30
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.965**
+Current release is **v0.97**
 
 
 Included Tools and Libraries
@@ -38,6 +38,7 @@ Included Tools and Libraries
 
  - a52dec
  - bzip2
+ - exiv2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg
  - faac (standalone and lib for ffmpeg)

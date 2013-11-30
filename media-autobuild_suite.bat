@@ -47,6 +47,7 @@
 ::	2013-11-26 add x265
 ::	2013-11-27 add function for write settings to ini-file, change downloads from extra packs, finish simplify scripts and mediainfo cli (only 32 bit)
 ::	2013-11-29 add vidstab, libtwolame, soxr, libilbc, schroedinger, orc
+::	2013-11-30 add exiv2
 ::
 ::-------------------------------------------------------------------------------------
 

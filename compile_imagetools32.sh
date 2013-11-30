@@ -191,4 +191,32 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 		do_checkIfExist ImageMagick-git magick32/bin/magick.exe
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/bin/exiv2.exe" ]; then
+    echo -------------------------------------------------
+    echo "exiv2 is already compiled"
+    echo -------------------------------------------------
+    else 
+		echo -ne "\033]0;compile exiv2 32Bit\007"
+		if [ -d "exiv2" ]; then rm -r exiv2; fi
+		svn checkout svn://dev.exiv2.org/svn/trunk exiv2
+		cd exiv2
+		
+cat > toolchain.cmake << "EOF"
+SET(CMAKE_SYSTEM_NAME Windows)
+SET(CMAKE_C_COMPILER gcc)
+SET(CMAKE_CXX_COMPILER g++)
+SET(CMAKE_RC_COMPILER windres)
+set(ZLIB_LIBRARY       /local32/lib/libz.a)
+set(ZLIB_INCLUDE_DIR   /local32/include)
+EOF
+		mkdir build && cd build
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_BUILD_SAMPLES=off -DEXIV2_ENABLE_SHARED=off -DEXIV2_ENABLE_BUILD_PO=on -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_CXX_FLAGS="$CXXFLAGS -static -static-libgcc -static-libstdc++" ..
+		make -j $cpuCount
+		make install
+
+		do_checkIfExist exiv2 exiv2.exe
+fi
+
 sleep 5
