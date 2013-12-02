@@ -223,6 +223,9 @@ if [ -f "libvpx-git/configure" ]; then
 		make clean
 		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
 		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
+		#define strtok_r strtok_s\
+		#endif' vpx/src/svc_encodeframe.c
         make -j $cpuCount
         make install
 		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
@@ -240,6 +243,9 @@ if [ -f "libvpx-git/configure" ]; then
 		cd libvpx-git
 		./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
 		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
+		#define strtok_r strtok_s\
+		#endif' vpx/src/svc_encodeframe.c
 		make -j $cpuCount
 		make install
 		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
