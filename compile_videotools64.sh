@@ -114,9 +114,9 @@ cd $LOCALBUILDDIR
 if [ -f "x265-git/toolchain.cmake" ]; then
 	echo -ne "\033]0;compile x265 64Bit\007"
 	cd x265-git
-	oldHead=`git rev-parse HEAD`
-	git pull origin master
-	newHead=`git rev-parse HEAD`
+	oldHead=`hg id`
+	hg pull
+	newHead=`hg id`
 	if [[ "$oldHead" != "$newHead" ]]; then
 	
 if [ ! -f "toolchain.cmake" ]; then
@@ -133,12 +133,9 @@ fi
 		rm -r *
 		rm $LOCALDESTDIR/bin/x265-16bit.exe
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
 		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265.exe
-		cp libx265.a $LOCALDESTDIR/lib
-		cp ../../source/x265.h $LOCALDESTDIR/include
-		cp x265_config.h $LOCALDESTDIR/include
+		make install
 		make clean
 		rm -r *
 
@@ -154,7 +151,7 @@ fi
 	fi
 	else
 	echo -ne "\033]0;compile x265 64Bit\007"
-		git clone https://github.com/videolan/x265.git x265-git
+		hg clone https://bitbucket.org/multicoreware/x265 x265-git
 		cd x265-git
 cat > toolchain.cmake << "EOF"
 SET(CMAKE_SYSTEM_NAME Windows)
@@ -166,12 +163,9 @@ EOF
 
 		cd build/msys
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake ../../source 
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
 		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265.exe
-		cp libx265.a $LOCALDESTDIR/lib
-		cp ../../source/x265.h $LOCALDESTDIR/include
-		cp x265_config.h $LOCALDESTDIR/include
+		make install
 		make clean
 		rm -r *
 

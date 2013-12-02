@@ -522,7 +522,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/local32/lib -mthreads">>%instdir%\local32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
-		echo.PATH=".:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local32\etc\profile.local
+		echo.PATH=".:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\local32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
@@ -555,7 +555,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/local64/lib">>%instdir%\local64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
-		echo.PATH=".:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin">>%instdir%\local64\etc\profile.local
+		echo.PATH=".:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\local64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
@@ -650,7 +650,20 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	%instdir%\msys\1.0\bin\rm cmake-2.8.11.1-win32-x86.zip
 	%instdir%\msys\1.0\bin\rm -r cmake-2.8.11.1-win32-x86
 	cd ..
-	)	
+	)
+	
+if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install TortoiseHg
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg-winbuild/downloads/tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi"
+	msiexec /a tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi /qb TARGETDIR=%instdir%\opt\hg-temp
+	%instdir%\msys\1.0\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
+	%instdir%\msys\1.0\bin\rm tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi
+	%instdir%\msys\1.0\bin\rm -r -f %instdir%\opt\hg-temp
+	cd ..
+	)		
 
 cd %instdir%
 
