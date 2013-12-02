@@ -111,9 +111,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "x265-git/toolchain.cmake" ]; then
+if [ -f "x265-hg/toolchain.cmake" ]; then
 	echo -ne "\033]0;compile x265 32Bit\007"
-	cd x265-git
+	cd x265-hg
 	oldHead=`hg id`
 	hg pull
 	newHead=`hg id`
@@ -151,8 +151,8 @@ fi
 	fi
 	else
 	echo -ne "\033]0;compile x265 32Bit\007"
-		hg clone https://bitbucket.org/multicoreware/x265 x265-git
-		cd x265-git
+		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
+		cd x265-hg
 cat > toolchain.cmake << "EOF"
 SET(CMAKE_SYSTEM_NAME Windows)
 SET(CMAKE_C_COMPILER gcc -static-libgcc)
