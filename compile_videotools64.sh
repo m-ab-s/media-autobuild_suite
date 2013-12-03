@@ -114,9 +114,9 @@ cd $LOCALBUILDDIR
 if [ -f "x265-hg/toolchain.cmake" ]; then
 	echo -ne "\033]0;compile x265 64Bit\007"
 	cd x265-hg
-	oldHead=`hg id`
+	oldHead=`hg id --id`
 	hg pull
-	newHead=`hg id`
+	newHead=`hg id --id`
 	if [[ "$oldHead" != "$newHead" ]]; then
 	
 if [ ! -f "toolchain.cmake" ]; then
