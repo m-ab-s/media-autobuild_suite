@@ -116,6 +116,7 @@ if [ -f "x265-hg/toolchain.cmake" ]; then
 	cd x265-hg
 	oldHead=`hg id --id`
 	hg pull
+	hg update
 	newHead=`hg id --id`
 	if [[ "$oldHead" != "$newHead" ]]; then
 	
