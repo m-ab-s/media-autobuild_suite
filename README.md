@@ -125,7 +125,7 @@ Build all from the begin take around ~7 hours (the cross compile script from rdp
 
 Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, ImageMagick, x264, x265, libvpx, libbluray and vlc have automatic update from git, so by them you don't need to delete files or folders. 
 
-For saving space you can delete, after compiling, all source folders (except the folders with a "-git" on end) in build32 and build64.
+For saving space you can delete, after compiling, all source folders (except the folders with a "-git" or "-hg" on end) in build32 and build64.
 Have fun!
 
 
