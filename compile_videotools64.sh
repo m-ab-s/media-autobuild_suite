@@ -453,7 +453,8 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 		sed -i "s/__declspec(dllexport)//g" *.h
 		sed -i "s/__declspec(dllimport)//g" *.h 
 		cd ..
-		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --libdir=$LOCALDESTDIR/lib --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		sed -i 's/ln -sf/$(LN_S)/' "caca/Makefile" "cxx/Makefile" "doc/Makefile"
 		make -j $cpuCount
 		make install
 		
