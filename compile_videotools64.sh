@@ -436,6 +436,30 @@ if [ -f "vidstab-git/Makefile" ]; then
 		do_checkIfExist vidstab-git libvidstab.a
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
+	echo -------------------------------------------------
+	echo "libcaca-0.99.beta18 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libcaca 64Bit\007"
+		if [ -d "libcaca-0.99.beta18" ]; then rm -r libcaca-0.99.beta18; fi
+		wget -c http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz
+		tar xf libcaca-0.99.beta18.tar.gz
+		rm libcaca-0.99.beta18.tar.gz
+		cd libcaca-0.99.beta18
+		cd caca
+		sed -i "s/__declspec(dllexport)//g" *.h
+		sed -i "s/__declspec(dllimport)//g" *.h 
+		cd ..
+		./configure --host=x86_64-pc-mingw32 --prefix=$LOCALDESTDIR --disable-shared --libdir=$LOCALDESTDIR/lib --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libcaca-0.99.beta18 libcaca.a
+fi
+
 #------------------------------------------------
 # final tools
 #------------------------------------------------
@@ -490,7 +514,7 @@ if [[ $ffmpeg = "y" ]]; then
 		if [[ "$oldHead" != "$newHead" ]]; then
 			make uninstall
 			make clean
-			./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			
@@ -530,7 +554,7 @@ if [[ $ffmpeg = "y" ]]; then
 			
 			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
-			./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=x86_64 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			

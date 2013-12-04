@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-11-30
+modified: 2013-12-04
 
 ---
 
@@ -57,6 +57,7 @@ Included Tools and Libraries
  - jpegturbo
  - libass
  - libbluray
+ - libcaca
  - libdvdcss
  - libdvdnav
  - libdvdread
