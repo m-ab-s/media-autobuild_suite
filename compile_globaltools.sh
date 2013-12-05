@@ -336,7 +336,7 @@ if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=no
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=no --disable-libjpeg
 		make -j $cpuCount
 		make install
 		
