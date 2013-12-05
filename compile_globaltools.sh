@@ -75,7 +75,6 @@ if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
 		cd zlib-1.2.8
 		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
-		#install zlib1.dll $LOCALDESTDIR/bin
 		install libz.a $LOCALDESTDIR/lib
 		install zlib.h $LOCALDESTDIR/include
 		install zconf.h $LOCALDESTDIR/include
@@ -235,20 +234,6 @@ cd $LOCALBUILDDIR
 #		echo "finish" > compile.done
 #		cd $LOCALBUILDDIR
 #		rm libtool-2.4.2.tar.gz
-#		
-#		if [ -f "$LOCALDESTDIR/lib/libltdl.a" ]; then
-#			echo -
-#			echo -------------------------------------------------
-#			echo "build libtool-2.4.2 done..."
-#			echo -------------------------------------------------
-#			echo -
-#			else
-#				echo -------------------------------------------------
-#				echo "build libtool-2.4.2 failed..."
-#				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
-#				read -p "first close the batch window, then the shell window"
-#				sleep 15
-#		fi
 #fi
 
 if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
