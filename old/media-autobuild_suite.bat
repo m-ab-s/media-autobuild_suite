@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.98
-::	Project stared at 2013-09-24. Last bigger modification was on 2013-12-05
+::	This is version 0.965
+::	Project stared at 2013-09-24. Last bigger modification was on 2013-11-24
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -49,7 +49,6 @@
 ::	2013-11-29 add vidstab, libtwolame, soxr, libilbc, schroedinger, orc
 ::	2013-11-30 add exiv2
 ::	2013-12-04 add libcaca
-::	2013-12-05 simplify code - now we only need one *.sh file for 32bit and 64bit compiling. (More edit and add features friendly)
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -739,7 +738,7 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	
 ::mintty seetings, color, transparency, etc.
 :minttySettings
-if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
+if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals32
 	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
@@ -771,26 +770,53 @@ if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
 	echo.BoldCyan=163,186,191>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BoldWhite=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 
-:compileGlobals
-if exist %instdir%\compile_globaltools.sh GOTO compileGobal
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- get script for global tools:
-	echo.
-	echo -------------------------------------------------------------------------------
-	if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		
-		:unpackglobal
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_globaltools.sh
+:compileGlobals32
+:: no existing check here, because it is more easy to extend the global tools. 
+:: existing check in compile_Globals32.sh/compile_Globals64.sh
+if %build32%==yes (
+	if exist %instdir%\compile_Globals32.sh GOTO compileGobal32
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- download global tools, 32 bit
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal32
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackglobal32
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_Globals32.sh
 
-:compileGobal
-echo -------------------------------------------------------------------------------
-echo.
-echo.- compile global tools:
-echo.
-echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --qt4=%qt4%
+	:compileGobal32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile global tools, 32 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_Globals32.sh --qt4=%qt4% --cpuCount=%cpuCount%
+	)
+
+::compileGlobals64
+if %build64%==yes (
+	if exist %instdir%\compile_Globals64.sh GOTO compileGobal64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- download global tools, 64 bit
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal64
+			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+			
+			:unpackglobal64
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_Globals64.sh
+
+	:compileGobal64
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- compile global tools, 64 bit:
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\mintty.lnk %instdir%\compile_Globals64.sh --qt4=%qt4% --cpuCount=%cpuCount%
+	)
 
 :: audio tools
 if exist %instdir%\compile_audiotools.sh GOTO compileAudio
