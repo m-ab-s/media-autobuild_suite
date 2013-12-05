@@ -66,8 +66,8 @@ if not exist %ini% (
 	echo.ffmpeg=^0>>%ini%
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
-	echo.image=^0>>%ini%
 	echo.vlc=^0>>%ini%
+	echo.image=^0>>%ini%
 	echo.cores=^0>>%ini%
 	)
 
@@ -76,8 +76,8 @@ for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%c in ('findstr /i ffmpeg %ini%') do set ffmpegINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
-for /F "tokens=2 delims==" %%f in ('findstr /i image %ini%') do set imageINI=%%f
-for /F "tokens=2 delims==" %%g in ('findstr /i vlc %ini%') do set vlcINI=%%g
+for /F "tokens=2 delims==" %%f in ('findstr /i vlc %ini%') do set vlcINI=%%f
+for /F "tokens=2 delims==" %%g in ('findstr /i image %ini%') do set imageINI=%%g
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 
 :selectSystem
@@ -868,96 +868,47 @@ if %build64%==yes (
 	)	
 
 :: video tools
-if %build32%==yes (
-	if not exist %instdir%\compile_videotools32.sh (
+	if not exist %instdir%\compile_videotools.sh (
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- get script for video tools, 32 bit:
+		echo.- get script for video tools:
 		echo.
 		echo -------------------------------------------------------------------------------
 		if not exist %instdir%\media-autobuild_suite.zip (
 			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 			)
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools32.sh
+			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
 		)
 
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- compile video tools, 32 bit:
+	echo.- compile video tools:
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools32.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
-	echo. compile video tools 32 bit done...
-	)
-
-if %build64%==yes (
-	if not exist %instdir%\compile_videotools64.sh (
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for video tools, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if not exist %instdir%\media-autobuild_suite.zip (
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			)
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools64.sh
-		)	
-	
-	:compileVideo64
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile video tools, 64 bit:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools64.sh --cpuCount=%cpuCount% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
-	echo. compile video tools 64 bit done...
-	)
+	%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+	echo. compile video tools done...
 	
 ::imagemagick	
 if %magick%==y (
-	if %build32%==yes (
-		if not exist %instdir%\compile_imagetools32.sh (
+		if not exist %instdir%\compile_imagetools.sh (
 			echo -------------------------------------------------------------------------------
 			echo.
-			echo.- get script for image tools, 32 bit:
-			echo.
-			echo -------------------------------------------------------------------------------
-			if not exist %instdir%\media-autobuild_suite.zip (
-				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools32.sh
-			)
-
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- compile image tools, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagetools32.sh --cpuCount=%cpuCount%
-		echo. compile image tools 32 bit done...
-		)
-	
-	if %build64%==yes (
-		if not exist %instdir%\compile_imagetools64.sh (
-			echo -------------------------------------------------------------------------------
-			echo.
-			echo.- get script for image tools, 64 bit:
+			echo.- get script for image tools:
 			echo.
 			echo -------------------------------------------------------------------------------
 			if not exist %instdir%\media-autobuild_suite.zip (
 				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 				)
-				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools64.sh
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools.sh
 			)
 
 		echo -------------------------------------------------------------------------------
 		echo.
-		echo.- compile image tools, 64 bit:
+		echo.- compile image tools:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagetools64.sh --cpuCount=%cpuCount%
-		echo. compile image tools 64 bit done...
-		)
+		%instdir%\mintty.lnk %instdir%\compile_imagetools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64%
+		echo. compile image tools done...
 	)
 	
 	

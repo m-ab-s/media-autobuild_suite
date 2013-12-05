@@ -926,7 +926,7 @@ cd $LOCALBUILDDIR
 if [[ $qt4 = "y" ]]; then
 	if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
 		echo -------------------------------------------------
-		echo "qt-everywhere-opensource-src-4.8.5 is already compiled"
+		echo "qt-4.8.5 is already compiled"
 		echo -------------------------------------------------
 		else 
 			echo -ne "\033]0;compile qt4 32Bit\007"
