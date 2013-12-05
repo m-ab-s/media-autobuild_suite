@@ -819,74 +819,47 @@ if %build64%==yes (
 	)
 
 :: audio tools
-:getAudio32
-if %build32%==yes (
-	if exist %instdir%\compile_audiotools32.sh GOTO compileAudio32
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for audio tools, 32 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio32
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		
-			:unpackAudio32
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools32.sh
+if exist %instdir%\compile_audiotools.sh GOTO compileAudio
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- get script for audio tools:
+	echo.
+	echo -------------------------------------------------------------------------------
+	if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio
+		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 	
-	:compileAudio32
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile audio tools, 32 bit:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_audiotools32.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio tools 32 bit done...
-	)
-	
-:getAudio64
-if %build64%==yes (
-	if exist %instdir%\compile_audiotools64.sh GOTO compileAudio64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for audio tools, 64 bit:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio64
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			
-			:unpackAudio64
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools64.sh
-	
-	:compileAudio64
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile audio tools, 64 bit:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_audiotools64.sh --cpuCount=%cpuCount% --nonfree=%binary%
-	echo. compile audio tools 64 bit done...
-	)	
+		:unpackAudio
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools.sh
+
+:compileAudio
+echo -------------------------------------------------------------------------------
+echo.
+echo.- compile audio tools:
+echo.
+echo -------------------------------------------------------------------------------
+%instdir%\mintty.lnk %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --nonfree=%binary%
+echo. compile audio tools done...
 
 :: video tools
-	if not exist %instdir%\compile_videotools.sh (
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- get script for video tools:
-		echo.
-		echo -------------------------------------------------------------------------------
-		if not exist %instdir%\media-autobuild_suite.zip (
-			%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-			)
-			%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
+if not exist %instdir%\compile_videotools.sh (
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- get script for video tools:
+	echo.
+	echo -------------------------------------------------------------------------------
+	if not exist %instdir%\media-autobuild_suite.zip (
+		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		)
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
+	)
 
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- compile video tools:
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
-	echo. compile video tools done...
+echo -------------------------------------------------------------------------------
+echo.
+echo.- compile video tools:
+echo.
+echo -------------------------------------------------------------------------------
+%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+echo. compile video tools done...
 	
 ::imagemagick	
 if %magick%==y (
