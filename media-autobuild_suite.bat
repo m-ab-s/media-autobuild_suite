@@ -791,6 +791,7 @@ echo.- compile global tools:
 echo.
 echo -------------------------------------------------------------------------------
 %instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --qt4=%qt4%
+echo. compile global tools done...
 
 :: audio tools
 if exist %instdir%\compile_audiotools.sh GOTO compileAudio
