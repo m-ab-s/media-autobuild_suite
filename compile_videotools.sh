@@ -678,6 +678,11 @@ if [[ $vlc = "y" ]]; then
 		rm -r _win32
 		rm -r vlc-2.2.0-git
 		rm -r $LOCALDESTDIR/bin/vlc-2.2.0-git
+		
+		grep -q -e 'CC="$CC -static-libgcc"' configure.ac || sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
+		grep -q -e 'CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac || sed -i '/		CC="$CC -static-libgcc"/ a\		CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac
+		sed -i 's/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>\/dev\/null || hostname`", \[host which ran configure\])/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", \[host which ran configure\])/' configure.ac
+		
 		if [[ ! -f "configure" ]]; then
 			./bootstrap
 		fi 
@@ -687,7 +692,7 @@ if [[ $vlc = "y" ]]; then
 		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
 		sed -i "s/.*cp .*builddir.*npapi-vlc.*//g" Makefile
 		for file in ./*/vlc.exe; do
-		rm $file # try to force a rebuild...
+			rm $file # try to force a rebuild...
 		done
 		make package-win-common
 		strip --strip-all ./vlc-2.2.0-git/*.dll
