@@ -318,7 +318,7 @@ if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
+		#sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
 		
 		do_checkIfExist libjpeg-turbo-1.3.0 libturbojpeg.a
 fi
@@ -336,7 +336,7 @@ if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=no --disable-libjpeg
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=no
 		make -j $cpuCount
 		make install
 		
