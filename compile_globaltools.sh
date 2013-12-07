@@ -256,6 +256,26 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
+	echo -------------------------------------------------
+	echo "jpeg-9 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile jpeg-9 $bits\007"
+		if [ -d "jpeg-9" ]; then rm -r jpeg-9; fi
+		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
+		tar xf jpegsrc.v9.tar.gz
+		rm jpegsrc.v9.tar.gz
+		cd jpeg-9
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist jpeg-9 libjpeg.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
@@ -301,26 +321,6 @@ if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
 		sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
 		
 		do_checkIfExist libjpeg-turbo-1.3.0 libturbojpeg.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
-	echo -------------------------------------------------
-	echo "jpeg-9 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile jpeg-9 $bits\007"
-		if [ -d "jpeg-9" ]; then rm -r jpeg-9; fi
-		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
-		tar xf jpegsrc.v9.tar.gz
-		rm jpegsrc.v9.tar.gz
-		cd jpeg-9
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist jpeg-9 libjpeg.a
 fi
 
 cd $LOCALBUILDDIR
