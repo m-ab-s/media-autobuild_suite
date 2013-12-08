@@ -508,6 +508,27 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 		do_checkIfExist libcaca-0.99.beta18 libcaca.a
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
+	echo -------------------------------------------------
+	echo "libmodplug-0.8.8.4 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libmodplug $bits\007"
+		if [ -d "libmodplug-0.8.8.4" ]; then rm -r libmodplug-0.8.8.4; fi
+		wget -c http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
+		tar xf libmodplug-0.8.8.4.tar.gz
+		rm libmodplug-0.8.8.4.tar.gz
+		cd libmodplug-0.8.8.4
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $PKG_CONFIG_PATH/libmodplug.pc
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libmodplug-0.8.8.4 libmodplug.a
+fi
+
 #------------------------------------------------
 # final tools
 #------------------------------------------------
@@ -569,7 +590,7 @@ if [[ $ffmpeg = "y" ]]; then
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			
@@ -616,7 +637,7 @@ if [[ $ffmpeg = "y" ]]; then
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
+			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras
 			make -j $cpuCount
 			make install
 			
@@ -639,6 +660,7 @@ if [[ $mplayer = "y" ]]; then
 		echo -------------------------------------------------
 		else 
 			echo -ne "\033]0;compile mplayer $bits\007"
+			if [ -d mplayer-checkout* ]; then rm -r mplayer-checkout*; fi
 			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
 			tar xf mplayer-checkout-snapshot.tar.bz2
 			rm mplayer-checkout-snapshot.tar.bz2
@@ -676,7 +698,6 @@ if [[ $vlc = "y" ]]; then
 		if [[ "$oldHead" != "$newHead" ]]; then
 		make clean
 		rm -r _win32
-		rm -r vlc-2.2.0-git
 		rm -r $LOCALDESTDIR/bin/vlc-2.2.0-git
 		
 		grep -q -e 'CC="$CC -static-libgcc"' configure.ac || sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
@@ -696,11 +717,13 @@ if [[ $vlc = "y" ]]; then
 		done
 		make package-win-common
 		strip --strip-all ./vlc-2.2.0-git/*.dll
-		strip --strip-all ./vlc-2.2.0-git/*.dll
+		strip --strip-all ./vlc-2.2.0-git/plugins/*/*.dll
 		strip --strip-all ./vlc-2.2.0-git/*.exe
-		cp -rf ./vlc-2.2.0-git $LOCALDESTDIR/bin
+		rm ./vlc-2.2.0-git/plugins/*/*.dll.a
+		rm ./vlc-2.2.0-git/plugins/*/*.la
+		mv vlc-2.2.0-git $LOCALDESTDIR/bin
 		
-		do_checkIfExist mplayer-checkout vlc-2.2.0-git/vlc.exe
+		do_checkIfExist vlc-2.2.0-git vlc-2.2.0-git/vlc.exe
 		
 		else
 			echo -------------------------------------------------
@@ -728,11 +751,13 @@ if [[ $vlc = "y" ]]; then
 			done
 			make package-win-common
 			strip --strip-all ./vlc-2.2.0-git/*.dll
-			strip --strip-all ./vlc-2.2.0-git/*/*.dll
+			strip --strip-all ./vlc-2.2.0-git/plugins/*/*.dll
 			strip --strip-all ./vlc-2.2.0-git/*.exe
-			cp -rf ./vlc-2.2.0-git $LOCALDESTDIR/bin
-			
-			do_checkIfExist mplayer-checkout vlc-2.2.0-git/vlc.exe
+			rm ./vlc-2.2.0-git/plugins/*/*.dll.a
+			rm ./vlc-2.2.0-git/plugins/*/*.la
+			mv vlc-2.2.0-git $LOCALDESTDIR/bin
+
+			do_checkIfExist vlc-2.2.0-git vlc-2.2.0-git/vlc.exe
 	fi
 fi
 }

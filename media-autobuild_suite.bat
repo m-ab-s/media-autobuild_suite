@@ -50,6 +50,7 @@
 ::	2013-11-30 add exiv2
 ::	2013-12-04 add libcaca
 ::	2013-12-05 simplify code - now we only need one *.sh file for 32bit and 64bit compiling. (More edit and add features friendly)
+::	2013-12-08 little fixes, some changes on libjpeg, openjpeg and libjasper (maybe not finish), fix libass for mplayer and add libmodplug
 ::
 ::-------------------------------------------------------------------------------------
 

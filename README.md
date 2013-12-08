@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-12-05
+modified: 2013-12-08
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.98**
+Current release is **v0.985**
 
 
 Included Tools and Libraries
@@ -63,6 +63,7 @@ Included Tools and Libraries
  - libdvdread
  - libilbc
  - libmad
+ - libmodplug
  - libmpeg2
  - libpng
  - libsoxr
