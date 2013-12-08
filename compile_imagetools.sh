@@ -126,7 +126,7 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
 		cd ..
 		make -j $cpuCount
 		make install
-		cp IlmImf/ImfDeepImageStateAttribute.h $LOCALDESTDIR/include
+		cp IlmImf/ImfDeepImageStateAttribute.h $LOCALDESTDIR/include/OpenEXR
 		cd ..
 		do_checkIfExist OpenEXR-git exrheader.exe
 		
@@ -155,8 +155,8 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 		rm -r $LOCALDESTDIR/bin/magick32
 		
 		sed -i 's/AC_PREREQ(2.69)/AC_PREREQ(2.68)/' "configure.ac"
-		sed -i 's/m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.69],,/m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.68],,/' "aclocal.m4"
-		
+		sed -i 's/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.69\],,/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.68\],,/' "aclocal.m4"
+		grep -q -e '#define HAVE_BOOLEAN' coders/jpeg.c || sed -i '/# define XMD_H 1  \/* Avoid conflicting typedef for INT32 *\// a\#define HAVE_BOOLEAN' coders/jpeg.c
 		make clean
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR/bin/magick16 --enable-hdri --enable-shared=no --with-quantum-depth=16
 		make -j $cpuCount
@@ -181,7 +181,8 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 		cd ImageMagick-git
 		
 		sed -i 's/AC_PREREQ(2.69)/AC_PREREQ(2.68)/' "configure.ac"
-		sed -i 's/m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.69],,/m4_if(m4_defn([AC_AUTOCONF_VERSION]), [2.68],,/' "aclocal.m4"
+		sed -i 's/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.69\],,/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.68\],,/' "aclocal.m4"
+		grep -q -e '#define HAVE_BOOLEAN' coders/jpeg.c || sed -i '/# define XMD_H 1  \/* Avoid conflicting typedef for INT32 *\// a\#define HAVE_BOOLEAN' coders/jpeg.c
 		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR/bin/magick16 --enable-hdri --enable-shared=no --with-quantum-depth=16
 		make -j $cpuCount
@@ -257,6 +258,6 @@ if [[ $build64 = "yes" ]]; then
 	echo "compile image tools 64 bit done..."
 	echo "-------------------------------------------------------------------------------"
 	sleep 3
-fi	
+fi
 
 sleep 5

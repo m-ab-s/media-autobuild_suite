@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.985**
+Current release is **v0.99**
 
 
 Included Tools and Libraries
@@ -71,6 +71,7 @@ Included Tools and Libraries
  - libtwolame
  - libutvideo
  - libxml2
+ - libzvbi
  - lua
  - mediainfo cli (only 32 bit)
  - mp3lame (standalone and lib for ffmpeg)

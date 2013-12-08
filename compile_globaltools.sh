@@ -556,7 +556,7 @@ if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 		tar xf fribidi-0.19.4.tar.bz2
 		rm fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
-		wget --no-check-certificate -c https://raw.github.com/rdp/ffmpeg-windows-build-helpers/master/patches/fribidi.diff
+		wget --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
