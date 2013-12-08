@@ -203,7 +203,7 @@ if [ -f "libvpx-git/configure" ]; then
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
 	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -r $LOCALDESTDIR/include/vpx; fi
-	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
+	if [ -f "$PKG_CONFIG_PATH/vpx.pc" ]; then rm $PKG_CONFIG_PATH/vpx.pc; fi
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
@@ -550,6 +550,7 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 		cd src
 		make -j $cpuCount
 		make install
+		cp ../zvbi-0.2.pc $PKG_CONFIG_PATH
 		
 		do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
@@ -615,7 +616,7 @@ if [[ $ffmpeg = "y" ]]; then
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
@@ -644,14 +645,14 @@ if [[ $ffmpeg = "y" ]]; then
 			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -r $LOCALDESTDIR/lib/libavfilter.a; fi
 			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -r $LOCALDESTDIR/lib/libavformat.a; fi
 			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -r $LOCALDESTDIR/lib/libpostproc.a; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavcodec.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavutil.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavutil.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libpostproc.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswresample.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libswresample.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswscale.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libswscale.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavdevice.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavfilter.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavformat.pc" ]; then rm -r $LOCALDESTDIR/lib/pkgconfig/libavformat.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavcodec.pc" ]; then rm -r $PKG_CONFIG_PATH/libavcodec.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavutil.pc" ]; then rm -r $PKG_CONFIG_PATH/libavutil.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libpostproc.pc" ]; then rm -r $PKG_CONFIG_PATH/libpostproc.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libswresample.pc" ]; then rm -r $PKG_CONFIG_PATH/libswresample.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libswscale.pc" ]; then rm -r $PKG_CONFIG_PATH/libswscale.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavdevice.pc" ]; then rm -r $PKG_CONFIG_PATH/libavdevice.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavfilter.pc" ]; then rm -r $PKG_CONFIG_PATH/libavfilter.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavformat.pc" ]; then rm -r $PKG_CONFIG_PATH/libavformat.pc; fi
 
 			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
@@ -662,7 +663,7 @@ if [[ $ffmpeg = "y" ]]; then
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
