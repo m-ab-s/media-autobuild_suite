@@ -660,7 +660,7 @@ if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.download and install TortoiseHg
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg-winbuild/downloads/tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi"
+	%instdir%\msys\1.0\bin\wget --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg-winbuild/downloads/tortoisehg-dev-2.10.1103.1104-x64-bea933627ab1.msi"
 	msiexec /a tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi /qb TARGETDIR=%instdir%\opt\hg-temp
 	%instdir%\msys\1.0\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
 	%instdir%\msys\1.0\bin\rm tortoisehg-stable-2.9.2238.124-x86-cd739dd1df7a.msi
