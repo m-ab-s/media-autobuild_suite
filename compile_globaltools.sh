@@ -154,6 +154,7 @@ if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
 		rm pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
 		make clean GC-static
+		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthreadGC2.a || exit 1
 		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
 		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
 		
