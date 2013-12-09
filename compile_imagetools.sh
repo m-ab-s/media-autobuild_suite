@@ -182,7 +182,7 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 		
 		sed -i 's/AC_PREREQ(2.69)/AC_PREREQ(2.68)/' "configure.ac"
 		sed -i 's/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.69\],,/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.68\],,/' "aclocal.m4"
-		grep -q -e '#define HAVE_BOOLEAN' coders/jpeg.c || sed -i '/# define XMD_H 1  \/* Avoid conflicting typedef for INT32 *\// a\#define HAVE_BOOLEAN' coders/jpeg.c
+		grep -q -e '#define HAVE_BOOLEAN' coders/jpeg.c || sed -i '/# define XMD_H 1  \/\* Avoid conflicting typedef for INT32 \*\// a\#define HAVE_BOOLEAN' coders/jpeg.c
 		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR/bin/magick16 --enable-hdri --enable-shared=no --with-quantum-depth=16
 		make -j $cpuCount
