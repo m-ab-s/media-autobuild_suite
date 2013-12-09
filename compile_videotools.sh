@@ -35,7 +35,7 @@ do_checkIfExist() {
 				read -p "first close the batch window, then the shell window"
 				sleep 15
 		fi	
-	elif [[ "$fileExtension" = "a" ]]; then
+	elif [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
 		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
 			echo -
 			echo -------------------------------------------------
@@ -555,13 +555,25 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 		do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
 
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	echo -------------------------------------------------
-	echo "frei0r already exist"
+	echo "frei0r is already compiled"
 	echo -------------------------------------------------
-	else
-		echo -ne "\033]0;get frei0r $bits\007"
-		wget -O $LOCALDESTDIR/include/frei0r.h http://code.dyne.org/frei0r/plain/include/frei0r.h
+	else 
+		echo -ne "\033]0;compile frei0r $bits\007"
+		if [ -d "libmodplug-0.8.8.4" ]; then rm -r libmodplug-0.8.8.4; fi
+		wget -c https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
+		tar xf frei0r-plugins-1.4.tar.gz
+		rm frei0r-plugins-1.4.tar.gz
+		cd frei0r-plugins-1.4
+		mkdir build
+		cd build 
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
+		make -j $cpuCount all install
+		
+		do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
 
 #------------------------------------------------

@@ -47,6 +47,7 @@ Included Tools and Libraries
  - fltk
  - fontconfig
  - freetype
+ - frei0r
  - gettext
  - gsm
  - gnutls (standalone and lib for ffmpeg)
