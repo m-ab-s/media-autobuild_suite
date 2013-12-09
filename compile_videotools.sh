@@ -564,7 +564,7 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
 		if [ -d "libmodplug-0.8.8.4" ]; then rm -r libmodplug-0.8.8.4; fi
-		wget -c https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
+		wget --no-check-certificate -c https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4
