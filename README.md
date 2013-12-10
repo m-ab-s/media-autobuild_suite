@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2013-12-08
+modified: 2013-12-10
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v0.99**
+Current release is **v1.0**
 
 
 Included Tools and Libraries
@@ -90,6 +90,7 @@ Included Tools and Libraries
  - schroedinger
  - sdl (for ffplay)
  - sdl_image
+ - sox
  - speex (standalone and lib for ffmpeg)
  - theora
  - vlc player

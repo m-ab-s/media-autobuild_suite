@@ -467,6 +467,26 @@ if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
 		
 		do_checkIfExist twolame-0.3.13 libtwolame.a
 fi
+
+cd $LOCALBUILDDIR
+		
+if [ -f "$LOCALDESTDIR/bin/sox.exe" ]; then
+	echo -------------------------------------------------
+	echo "sox-14.4.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile sox $bits\007"
+		if [ -d "sox-14.4.1" ]; then rm -r sox-14.4.1; fi
+		wget -c http://downloads.sourceforge.net/project/sox/sox/14.4.1/sox-14.4.1.tar.gz
+		tar xf sox-14.4.1.tar.gz
+		rm sox-14.4.1.tar.gz
+		cd sox-14.4.1
+		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist sox-14.4.1 libtwolame.a
+fi
 }
 
 if [[ $build32 = "yes" ]]; then

@@ -52,6 +52,7 @@
 ::	2013-12-05 simplify code - now we only need one *.sh file for 32bit and 64bit compiling. (More edit and add features friendly)
 ::	2013-12-08 little fixes, fix libjpeg and libjasper, patch imagemagick, fix libass for mplayer, patchfiles to local, add libmodplug and libzvbi
 ::	2013-12-09 add frei0r and some fixes 
+::	2013-12-10 add sox
 ::
 ::-------------------------------------------------------------------------------------
 
