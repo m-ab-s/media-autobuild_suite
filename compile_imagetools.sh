@@ -28,7 +28,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -50,7 +50,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -168,8 +168,8 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
-		rm -r $LOCALDESTDIR/bin/magick16
-		rm -r $LOCALDESTDIR/bin/magick32
+		rm -rf $LOCALDESTDIR/bin/magick16
+		rm -rf $LOCALDESTDIR/bin/magick32
 		
 		sed -i 's/AC_PREREQ(2.69)/AC_PREREQ(2.68)/' "configure.ac"
 		sed -i 's/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.69\],,/m4_if(m4_defn(\[AC_AUTOCONF_VERSION\]), \[2.68\],,/' "aclocal.m4"
@@ -223,7 +223,7 @@ if [ -f "$LOCALDESTDIR/bin/exiv2.exe" ]; then
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile exiv2 $bits\007"
-		if [ -d "exiv2" ]; then rm -r exiv2; fi
+		if [ -d "exiv2" ]; then rm -rf exiv2; fi
 		svn checkout svn://dev.exiv2.org/svn/trunk exiv2
 		cd exiv2
 

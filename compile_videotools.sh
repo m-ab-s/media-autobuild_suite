@@ -33,7 +33,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -55,7 +55,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -135,14 +135,14 @@ EOF
 fi
 		cd build/msys
 		make clean
-		rm -r *
+		rm -rf *
 		rm $LOCALDESTDIR/bin/x265-16bit.exe
 		
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
 		make -j $cpuCount
 		make install
 		make clean
-		rm -r *
+		rm -rf *
 
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
 		make -j $cpuCount
@@ -172,7 +172,7 @@ EOF
 		make -j $cpuCount
 		make install
 		make clean
-		rm -r *
+		rm -rf *
 
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
 		make -j $cpuCount
@@ -189,7 +189,7 @@ if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile xvidcore $bits\007"
-		if [ -d "xvidcore" ]; then rm -r xvidcore; fi
+		if [ -d "xvidcore" ]; then rm -rf xvidcore; fi
 		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
 		rm xvidcore-1.3.2.tar.gz
@@ -219,7 +219,7 @@ if [ -f "libvpx-git/configure" ]; then
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
-	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -r $LOCALDESTDIR/include/vpx; fi
+	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
 	if [ -f "$PKG_CONFIG_PATH/vpx.pc" ]; then rm $PKG_CONFIG_PATH/vpx.pc; fi
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
@@ -340,7 +340,7 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile xavs $bits\007"
-		if [ -d "xavs" ]; then rm -r xavs; fi
+		if [ -d "xavs" ]; then rm -rf xavs; fi
 		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR
@@ -358,7 +358,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
 	echo -------------------------------------------------
 	else 
 			echo -ne "\033]0;compile libdvdcss $bits\007"
-			if [ -d "libdvdcss-1.2.13" ]; then rm -r libdvdcss-1.2.13; fi
+			if [ -d "libdvdcss-1.2.13" ]; then rm -rf libdvdcss-1.2.13; fi
 			wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
 			tar xf libdvdcss-1.2.13.tar.bz2
 			rm libdvdcss-1.2.13.tar.bz2
@@ -378,7 +378,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libdvdread $bits\007"
-		if [ -d "libdvdread-4.2.1" ]; then rm -r libdvdread-4.2.1; fi
+		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
 		tar xf libdvdread-4.2.1-rc1.tar.xz
 		rm libdvdread-4.2.1-rc1.tar.xz
@@ -404,7 +404,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libdvdnav $bits\007"
-		if [ -d "libdvdnav-4.2.1" ]; then rm -r libdvdnav-4.2.1; fi
+		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
 		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
 		tar xf libdvdnav-4.2.1-rc1.tar.xz
 		rm libdvdnav-4.2.1-rc1.tar.xz
@@ -428,7 +428,7 @@ if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmpeg2 $bits\007"
-		if [ -d "libmpeg2-0.5.1" ]; then rm -r libmpeg2-0.5.1; fi
+		if [ -d "libmpeg2-0.5.1" ]; then rm -rf libmpeg2-0.5.1; fi
 		wget -c http://libmpeg2.sourceforge.net/files/libmpeg2-0.5.1.tar.gz
 		tar xf libmpeg2-0.5.1.tar.gz
 		rm libmpeg2-0.5.1.tar.gz
@@ -449,7 +449,7 @@ if [[ $bits = "32bit" ]]; then
 		echo -------------------------------------------------
 		else
 			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -r MediaInfo_CLI_GNU_FromSource; fi
+			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -rf MediaInfo_CLI_GNU_FromSource; fi
 			wget -c http://mediaarea.net/download/binary/mediainfo/0.7.65/MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
 			tar xf MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
 			rm MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
@@ -508,7 +508,7 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libcaca $bits\007"
-		if [ -d "libcaca-0.99.beta18" ]; then rm -r libcaca-0.99.beta18; fi
+		if [ -d "libcaca-0.99.beta18" ]; then rm -rf libcaca-0.99.beta18; fi
 		wget -c http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz
 		tar xf libcaca-0.99.beta18.tar.gz
 		rm libcaca-0.99.beta18.tar.gz
@@ -533,7 +533,7 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
-		if [ -d "libmodplug-0.8.8.4" ]; then rm -r libmodplug-0.8.8.4; fi
+		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
 		wget -c http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
 		tar xf libmodplug-0.8.8.4.tar.gz
 		rm libmodplug-0.8.8.4.tar.gz
@@ -554,7 +554,7 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
-		if [ -d "zvbi-0.2.35" ]; then rm -r zvbi-0.2.35; fi
+		if [ -d "zvbi-0.2.35" ]; then rm -rf zvbi-0.2.35; fi
 		wget -c http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
 		tar xf zvbi-0.2.35.tar.bz2
 		rm zvbi-0.2.35.tar.bz2
@@ -580,7 +580,7 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
-		if [ -d "libmodplug-0.8.8.4" ]; then rm -r libmodplug-0.8.8.4; fi
+		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
 		wget --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
@@ -606,7 +606,7 @@ if [[ $mp4box = "y" ]]; then
 		echo -------------------------------------------------
 		else 
 			echo -ne "\033]0;compile mp4box_gpac $bits\007"
-			if [ -d "mp4box_gpac" ]; then rm -r mp4box_gpac; fi
+			if [ -d "mp4box_gpac" ]; then rm -rf mp4box_gpac; fi
 			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
 			./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
@@ -667,30 +667,30 @@ if [[ $ffmpeg = "y" ]]; then
 		else
 			echo -ne "\033]0;compile ffmpeg $bits\007"
 			cd $LOCALBUILDDIR
-			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -r $LOCALDESTDIR/include/libavutil; fi
-			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -r $LOCALDESTDIR/include/libavcodec; fi
-			if [ -d "$LOCALDESTDIR/include/libpostproc" ]; then rm -r $LOCALDESTDIR/include/libpostproc; fi
-			if [ -d "$LOCALDESTDIR/include/libswresample" ]; then rm -r $LOCALDESTDIR/include/libswresample; fi
-			if [ -d "$LOCALDESTDIR/include/libswscale" ]; then rm -r $LOCALDESTDIR/include/libswscale; fi
-			if [ -d "$LOCALDESTDIR/include/libavdevice" ]; then rm -r $LOCALDESTDIR/include/libavdevice; fi
-			if [ -d "$LOCALDESTDIR/include/libavfilter" ]; then rm -r $LOCALDESTDIR/include/libavfilter; fi
-			if [ -d "$LOCALDESTDIR/include/libavformat" ]; then rm -r $LOCALDESTDIR/include/libavformat; fi
-			if [ -f "$LOCALDESTDIR/lib/libavutil.a" ]; then rm -r $LOCALDESTDIR/lib/libavutil.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libswresample.a" ]; then rm -r $LOCALDESTDIR/lib/libswresample.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libswscale.a" ]; then rm -r $LOCALDESTDIR/lib/libswscale.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then rm -r $LOCALDESTDIR/lib/libavcodec.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavdevice.a" ]; then rm -r $LOCALDESTDIR/lib/libavdevice.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -r $LOCALDESTDIR/lib/libavfilter.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -r $LOCALDESTDIR/lib/libavformat.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -r $LOCALDESTDIR/lib/libpostproc.a; fi
-			if [ -f "$PKG_CONFIG_PATH/libavcodec.pc" ]; then rm -r $PKG_CONFIG_PATH/libavcodec.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavutil.pc" ]; then rm -r $PKG_CONFIG_PATH/libavutil.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libpostproc.pc" ]; then rm -r $PKG_CONFIG_PATH/libpostproc.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libswresample.pc" ]; then rm -r $PKG_CONFIG_PATH/libswresample.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libswscale.pc" ]; then rm -r $PKG_CONFIG_PATH/libswscale.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavdevice.pc" ]; then rm -r $PKG_CONFIG_PATH/libavdevice.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavfilter.pc" ]; then rm -r $PKG_CONFIG_PATH/libavfilter.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavformat.pc" ]; then rm -r $PKG_CONFIG_PATH/libavformat.pc; fi
+			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -rf $LOCALDESTDIR/include/libavutil; fi
+			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -rf $LOCALDESTDIR/include/libavcodec; fi
+			if [ -d "$LOCALDESTDIR/include/libpostproc" ]; then rm -rf $LOCALDESTDIR/include/libpostproc; fi
+			if [ -d "$LOCALDESTDIR/include/libswresample" ]; then rm -rf $LOCALDESTDIR/include/libswresample; fi
+			if [ -d "$LOCALDESTDIR/include/libswscale" ]; then rm -rf $LOCALDESTDIR/include/libswscale; fi
+			if [ -d "$LOCALDESTDIR/include/libavdevice" ]; then rm -rf $LOCALDESTDIR/include/libavdevice; fi
+			if [ -d "$LOCALDESTDIR/include/libavfilter" ]; then rm -rf $LOCALDESTDIR/include/libavfilter; fi
+			if [ -d "$LOCALDESTDIR/include/libavformat" ]; then rm -rf $LOCALDESTDIR/include/libavformat; fi
+			if [ -f "$LOCALDESTDIR/lib/libavutil.a" ]; then rm -rf $LOCALDESTDIR/lib/libavutil.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libswresample.a" ]; then rm -rf $LOCALDESTDIR/lib/libswresample.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libswscale.a" ]; then rm -rf $LOCALDESTDIR/lib/libswscale.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then rm -rf $LOCALDESTDIR/lib/libavcodec.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavdevice.a" ]; then rm -rf $LOCALDESTDIR/lib/libavdevice.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -rf $LOCALDESTDIR/lib/libavfilter.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -rf $LOCALDESTDIR/lib/libavformat.a; fi
+			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -rf $LOCALDESTDIR/lib/libpostproc.a; fi
+			if [ -f "$PKG_CONFIG_PATH/libavcodec.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavcodec.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavutil.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavutil.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libpostproc.pc" ]; then rm -rf $PKG_CONFIG_PATH/libpostproc.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libswresample.pc" ]; then rm -rf $PKG_CONFIG_PATH/libswresample.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libswscale.pc" ]; then rm -rf $PKG_CONFIG_PATH/libswscale.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavdevice.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavdevice.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavfilter.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavfilter.pc; fi
+			if [ -f "$PKG_CONFIG_PATH/libavformat.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavformat.pc; fi
 
 			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
@@ -724,7 +724,7 @@ if [[ $mplayer = "y" ]]; then
 		echo -------------------------------------------------
 		else 
 			echo -ne "\033]0;compile mplayer $bits\007"
-			if [ -d mplayer-checkout* ]; then rm -r mplayer-checkout*; fi
+			if [ -d mplayer-checkout* ]; then rm -rf mplayer-checkout*; fi
 			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
 			tar xf mplayer-checkout-snapshot.tar.bz2
 			rm mplayer-checkout-snapshot.tar.bz2
@@ -732,7 +732,7 @@ if [[ $mplayer = "y" ]]; then
 			
 			if ! test -e ffmpeg ; then
 				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
-					rm -rf ffmpeg
+					rm -rff ffmpeg
 					echo "Failed to get a FFmpeg checkout"
 					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
 					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
@@ -761,8 +761,8 @@ if [[ $vlc = "y" ]]; then
 		newHead=`git rev-parse HEAD`
 		if [[ "$oldHead" != "$newHead" ]]; then
 		make clean
-		rm -r _win32
-		rm -r $LOCALDESTDIR/bin/vlc-2.2.0-git
+		rm -rf _win32
+		rm -rf $LOCALDESTDIR/bin/vlc-2.2.0-git
 		
 		grep -q -e 'CC="$CC -static-libgcc"' configure.ac || sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
 		grep -q -e 'CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac || sed -i '/		CC="$CC -static-libgcc"/ a\		CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac
@@ -819,7 +819,7 @@ if [[ $vlc = "y" ]]; then
 			strip --strip-all ./vlc-2.2.0-git/*.exe
 			rm ./vlc-2.2.0-git/plugins/*/*.dll.a
 			rm ./vlc-2.2.0-git/plugins/*/*.la
-			if [ -d "$LOCALDESTDIR/bin/vlc-2.2.0-git" ]; then rm -r $LOCALDESTDIR/bin/vlc-2.2.0-git; fi
+			if [ -d "$LOCALDESTDIR/bin/vlc-2.2.0-git" ]; then rm -rf $LOCALDESTDIR/bin/vlc-2.2.0-git; fi
 			mv vlc-2.2.0-git $LOCALDESTDIR/bin
 
 			do_checkIfExist vlc-2.2.0-git vlc-2.2.0-git/vlc.exe

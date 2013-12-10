@@ -31,7 +31,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -53,7 +53,7 @@ do_checkIfExist() {
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
 						cd $LOCALBUILDDIR
-						rm -r  $LOCALBUILDDIR/$packetName
+						rm -rf $LOCALBUILDDIR/$packetName
 					fi
 				fi
 			fi
@@ -76,7 +76,7 @@ if [ -f "$LOCALDESTDIR/lib/libgsm.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile gsm $bits\007"
-		if [ -d "gsm-1.0.13" ]; then rm -r gsm-1.0.13; fi
+		if [ -d "gsm-1.0.13" ]; then rm -rf gsm-1.0.13; fi
 		wget -c http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
 		tar xf gsm-1.0.13.tar.bz2
 		rm gsm-1.0.13.tar.bz2
@@ -97,7 +97,7 @@ if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libogg $bits\007"
-		if [ -d "libogg-1.3.1" ]; then rm -r libogg-1.3.1; fi
+		if [ -d "libogg-1.3.1" ]; then rm -rf libogg-1.3.1; fi
 		wget -c http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz
 		tar xf libogg-1.3.1.tar.gz
 		rm libogg-1.3.1.tar.gz
@@ -117,7 +117,7 @@ if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libvorbis $bits\007"
-		if [ -d "libvorbis-1.3.3" ]; then rm -r libvorbis-1.3.3; fi
+		if [ -d "libvorbis-1.3.3" ]; then rm -rf libvorbis-1.3.3; fi
 		wget -c http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.xz
 		tar xf libvorbis-1.3.3.tar.xz
 		rm libvorbis-1.3.3.tar.xz
@@ -137,7 +137,7 @@ if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libtheora $bits\007"
-		if [ -d "libtheora-1.1.1" ]; then rm -r libtheora-1.1.1; fi
+		if [ -d "libtheora-1.1.1" ]; then rm -rf libtheora-1.1.1; fi
 		wget -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 		tar xf libtheora-1.1.1.tar.bz2
 		rm libtheora-1.1.1.tar.bz2
@@ -157,7 +157,7 @@ if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile speex $bits\007"
-		if [ -d "speex-1.2rc1" ]; then rm -r speex-1.2rc1; fi
+		if [ -d "speex-1.2rc1" ]; then rm -rf speex-1.2rc1; fi
 		wget -c http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
 		tar xf speex-1.2rc1.tar.gz
 		rm speex-1.2rc1.tar.gz
@@ -177,7 +177,7 @@ if [ -f "$LOCALDESTDIR/bin/flac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile flac $bits\007"
-		if [ -d "flac-1.3.0" ]; then rm -r flac-1.3.0; fi
+		if [ -d "flac-1.3.0" ]; then rm -rf flac-1.3.0; fi
 		wget -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
 		tar xf flac-1.3.0.tar.xz
 		rm flac-1.3.0.tar.xz
@@ -197,7 +197,7 @@ if [ -f "$LOCALDESTDIR/bin/lame.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile lame $bits\007"
-		if [ -d "lame-3.99.5" ]; then rm -r lame-3.99.5; fi
+		if [ -d "lame-3.99.5" ]; then rm -rf lame-3.99.5; fi
 		wget -c -O lame-3.99.5.tar.gz http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download 
 		tar xf lame-3.99.5.tar.gz
 		rm lame-3.99.5.tar.gz
@@ -217,7 +217,7 @@ if [ -f "$LOCALDESTDIR/lib/libvo-aacenc.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile vo-aacenc $bits\007"
-		if [ -d "vo-aacenc-0.1.3" ]; then rm -r vo-aacenc-0.1.3; fi
+		if [ -d "vo-aacenc-0.1.3" ]; then rm -rf vo-aacenc-0.1.3; fi
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz
 		tar xf vo-aacenc-0.1.3.tar.gz
 		rm vo-aacenc-0.1.3.tar.gz
@@ -237,7 +237,7 @@ if [ -f "$LOCALDESTDIR/lib/libopencore-amrnb.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile opencore-amr $bits\007"
-		if [ -d "opencore-amr-0.1.3" ]; then rm -r opencore-amr-0.1.3; fi
+		if [ -d "opencore-amr-0.1.3" ]; then rm -rf opencore-amr-0.1.3; fi
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
 		tar xf opencore-amr-0.1.3.tar.gz
 		rm opencore-amr-0.1.3.tar.gz
@@ -257,7 +257,7 @@ if [ -f "$LOCALDESTDIR/lib/libvo-amrwbenc.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile vo-amrwbenc $bits\007"
-		if [ -d "vo-amrwbenc-0.1.2" ]; then rm -r vo-amrwbenc-0.1.2; fi
+		if [ -d "vo-amrwbenc-0.1.2" ]; then rm -rf vo-amrwbenc-0.1.2; fi
 		wget -c http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz
 		tar xf vo-amrwbenc-0.1.2.tar.gz
 		rm vo-amrwbenc-0.1.2.tar.gz
@@ -278,9 +278,9 @@ if [ -f "$LOCALDESTDIR/bin/fdkaac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fdk-aac $bits\007"
-		if [ -d "patch-fdk-aac" ]; then rm -r patch-fdk-aac; fi
-		if [ -d "lib-fdk-aac" ]; then rm -r lib-fdk-aac; fi
-		if [ -d "bin-fdk-aac" ]; then rm -r bin-fdk-aac; fi
+		if [ -d "patch-fdk-aac" ]; then rm -rf patch-fdk-aac; fi
+		if [ -d "lib-fdk-aac" ]; then rm -rf lib-fdk-aac; fi
+		if [ -d "bin-fdk-aac" ]; then rm -rf bin-fdk-aac; fi
 		wget --no-check-certificate -c https://github.com/nu774/fdkaac_autobuild/archive/master.zip -O patch-fdk-aac.zip
 		unzip patch-fdk-aac.zip
 		rm patch-fdk-aac.zip
@@ -351,7 +351,7 @@ if [ -f "$LOCALDESTDIR/bin/faac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile faac $bits\007"
-		if [ -d "faac-1.28" ]; then rm -r faac-1.28; fi
+		if [ -d "faac-1.28" ]; then rm -rf faac-1.28; fi
 		wget -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
 		tar xf faac-1.28.tar.gz
 		rm faac-1.28.tar.gz
@@ -373,7 +373,7 @@ if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus $bits\007"
-		if [ -d "opus-1.0.3" ]; then rm -r opus-1.0.3; fi
+		if [ -d "opus-1.0.3" ]; then rm -rf opus-1.0.3; fi
       wget -c http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
 		tar xf opus-1.0.3.tar.gz
 		rm opus-1.0.3.tar.gz
@@ -393,7 +393,7 @@ if [ -f "$LOCALDESTDIR/bin/opusenc.exe" ]; then
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus-tools $bits\007"
-		if [ -d "opus-tools-0.1.7" ]; then rm -r opus-tools-0.1.7; fi
+		if [ -d "opus-tools-0.1.7" ]; then rm -rf opus-tools-0.1.7; fi
       wget --no-check-certificate -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
 		tar xf opus-tools-0.1.7.tar.gz
 		rm opus-tools-0.1.7.tar.gz
@@ -413,7 +413,7 @@ if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile a52dec $bits\007"
-		if [ -d "a52dec-0.7.4" ]; then rm -r a52dec-0.7.4; fi
+		if [ -d "a52dec-0.7.4" ]; then rm -rf a52dec-0.7.4; fi
 		wget -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
 		tar xf a52dec-0.7.4.tar.gz
 		rm a52dec-0.7.4.tar.gz
@@ -433,7 +433,7 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmad $bits\007"
-		if [ -d "libmad-0.15.1b" ]; then rm -r libmad-0.15.1b; fi
+		if [ -d "libmad-0.15.1b" ]; then rm -rf libmad-0.15.1b; fi
 		wget -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 		tar xf libmad-0.15.1b.tar.gz
 		rm libmad-0.15.1b.tar.gz
@@ -453,7 +453,7 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile soxr-0.1.1 $bits\007"
-		if [ -d "soxr-0.1.1-Source" ]; then rm -r soxr-0.1.1-Source; fi
+		if [ -d "soxr-0.1.1-Source" ]; then rm -rf soxr-0.1.1-Source; fi
 		wget -c "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 		tar xf soxr-0.1.1-Source.tar.xz
 		rm soxr-0.1.1-Source.tar.xz
@@ -473,7 +473,7 @@ if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile twolame $bits\007"
-		if [ -d "twolame-0.3.13" ]; then rm -r twolame-0.3.13; fi
+		if [ -d "twolame-0.3.13" ]; then rm -rf twolame-0.3.13; fi
 		wget -c http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
 		tar xf twolame-0.3.13.tar.gz
 		rm twolame-0.3.13.tar.gz
@@ -493,7 +493,7 @@ if [ -f "$LOCALDESTDIR/bin/sox.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile sox $bits\007"
-		if [ -d "sox-14.4.1" ]; then rm -r sox-14.4.1; fi
+		if [ -d "sox-14.4.1" ]; then rm -rf sox-14.4.1; fi
 		wget -c http://downloads.sourceforge.net/project/sox/sox/14.4.1/sox-14.4.1.tar.gz
 		tar xf sox-14.4.1.tar.gz
 		rm sox-14.4.1.tar.gz
