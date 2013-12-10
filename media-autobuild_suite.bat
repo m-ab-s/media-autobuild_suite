@@ -73,6 +73,7 @@ if not exist %ini% (
 	echo.vlc=^0>>%ini%
 	echo.image=^0>>%ini%
 	echo.cores=^0>>%ini%
+	echo.deleteSource=^0>>%ini%
 	)
 
 for /F "tokens=2 delims==" %%a in ('findstr /i arch %ini%') do set archINI=%%a
@@ -83,6 +84,7 @@ for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI
 for /F "tokens=2 delims==" %%f in ('findstr /i vlc %ini%') do set vlcINI=%%f
 for /F "tokens=2 delims==" %%g in ('findstr /i image %ini%') do set imageINI=%%g
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
+for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
 
 :selectSystem
 if %archINI%==0 (
@@ -279,7 +281,31 @@ if %coresINI%==0 (
 	for /l %%a in (1,1,%cpuCores%) do (
 		set cpuCount=%%a
 		)
-if "%cpuCount%"=="" GOTO :numCores	
+if "%cpuCount%"=="" GOTO :numCores
+
+:delete
+if %deleteSourceINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. delete source folders, after compile is done:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P deleteS="delete source:"
+	) else (
+		set deleteS=%deleteSourceINI%
+	)
+	
+if %deleteS%==1 (
+	set "deleteSource=y"
+	)
+if %deleteS%==2 (
+	set "deleteSource=n"
+	)
+if %deleteS% GTR 2 GOTO delete
 
 ::------------------------------------------------------------------
 ::download and install basic msys system:
@@ -793,7 +819,7 @@ echo.
 echo.- compile global tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --qt4=%qt4%
+%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --qt4=%qt4%
 echo. compile global tools done...
 
 :: audio tools
@@ -815,7 +841,7 @@ echo.
 echo.- compile audio tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --nonfree=%binary%
+%instdir%\mintty.lnk %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --nonfree=%binary%
 echo. compile audio tools done...
 
 :: video tools
@@ -836,7 +862,7 @@ echo.
 echo.- compile video tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
 echo. compile video tools done...
 	
 ::imagemagick	
@@ -858,7 +884,7 @@ if %magick%==y (
 		echo.- compile image tools:
 		echo.
 		echo -------------------------------------------------------------------------------
-		%instdir%\mintty.lnk %instdir%\compile_imagetools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64%
+		%instdir%\mintty.lnk %instdir%\compile_imagetools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
 		echo. compile image tools done...
 	)
 	

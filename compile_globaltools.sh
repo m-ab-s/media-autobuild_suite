@@ -5,6 +5,7 @@ while true; do
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
+--deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --qt4=* ) qt4="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
@@ -35,6 +36,14 @@ do_checkIfExist() {
 			echo "build $packetName done..."
 			echo -------------------------------------------------
 			echo -
+			if [[ $deleteSource = "y" ]]; then
+				if [[ ! "${packetName: -4}" = "-git" ]]; then
+					if [[ ! "${packetName: -3}" = "-hg" ]]; then
+						cd $LOCALBUILDDIR
+						rm -r  $LOCALBUILDDIR/$packetName
+					fi
+				fi
+			fi
 			else
 				echo -------------------------------------------------
 				echo "build $packetName failed..."
@@ -49,6 +58,14 @@ do_checkIfExist() {
 			echo "build $packetName done..."
 			echo -------------------------------------------------
 			echo -
+			if [[ $deleteSource = "y" ]]; then
+				if [[ ! "${packetName: -4}" = "-git" ]]; then
+					if [[ ! "${packetName: -3}" = "-hg" ]]; then
+						cd $LOCALBUILDDIR
+						rm -r  $LOCALBUILDDIR/$packetName
+					fi
+				fi
+			fi
 			else
 				echo -------------------------------------------------
 				echo "build $packetName failed..."
