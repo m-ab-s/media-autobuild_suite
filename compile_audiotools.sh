@@ -485,7 +485,7 @@ if [ -f "$LOCALDESTDIR/bin/sox.exe" ]; then
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist sox-14.4.1 libtwolame.a
+		do_checkIfExist sox-14.4.1 sox.exe
 fi
 }
 
