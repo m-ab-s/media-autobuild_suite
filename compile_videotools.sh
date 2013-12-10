@@ -732,7 +732,7 @@ if [[ $mplayer = "y" ]]; then
 			
 			if ! test -e ffmpeg ; then
 				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
-					rm -rff ffmpeg
+					rm -rf ffmpeg
 					echo "Failed to get a FFmpeg checkout"
 					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
 					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
