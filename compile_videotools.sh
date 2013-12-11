@@ -277,7 +277,9 @@ if [ -f "libbluray-git/bootstrap" ]; then
 	if [[ "$oldHead" != "$newHead" ]]; then
 		make uninstall
 		make clean
-		/bootstrap
+		if [[ ! -f "configure" ]]; then
+			./bootstrap
+		fi
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
