@@ -407,9 +407,9 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdnav $bits\007"
 		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
-		tar xf libdvdnav-4.2.1-rc1.tar.xz
-		rm libdvdnav-4.2.1-rc1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc2.tar.xz
+		tar xf libdvdnav-4.2.1-rc2.tar.xz
+		rm libdvdnav-4.2.1-rc2.tar.xz
 		cd libdvdnav-4.2.1
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
@@ -744,7 +744,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --enable- !@#$%^&*-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install
 
