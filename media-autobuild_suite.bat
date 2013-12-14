@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 0.99
+::	This is version 1.0
 ::	Project stared at 2013-09-24. Last bigger modification was on 2013-12-05
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -53,6 +53,7 @@
 ::	2013-12-08 little fixes, fix libjpeg and libjasper, patch imagemagick, fix libass for mplayer, patchfiles to local, add libmodplug and libzvbi
 ::	2013-12-09 add frei0r and some fixes 
 ::	2013-12-10 add sox
+::	2013-12-14 change compiler to rev.1
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -426,7 +427,7 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev0.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev1.7z"
 
 		:instMingW32
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
@@ -454,7 +455,7 @@ if %build64%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "https://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev0.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev1.7z"
 		
 		:instMingW64
 		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
