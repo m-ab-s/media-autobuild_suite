@@ -381,9 +381,9 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdread $bits\007"
 		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
-		tar xf libdvdread-4.2.1-rc1.tar.xz
-		rm libdvdread-4.2.1-rc1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc2.tar.xz
+		tar xf libdvdread-4.2.1-rc2.tar.xz
+		rm libdvdread-4.2.1-rc2.tar.xz
 		cd libdvdread-4.2.1
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
