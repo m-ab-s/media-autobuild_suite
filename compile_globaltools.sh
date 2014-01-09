@@ -608,21 +608,21 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
 	echo -------------------------------------------------
-	echo "libass-0.10.1 is already compiled"
+	echo "libass-0.10.2 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libass $bits\007"
-		if [ -d "libass-0.10.1" ]; then rm -rf libass-0.10.1; fi
-		wget -c http://libass.googlecode.com/files/libass-0.10.1.tar.gz
-		tar xf libass-0.10.1.tar.gz
-		rm libass-0.10.1.tar.gz
-		cd libass-0.10.1
+		if [ -d "libass-0.10.2" ]; then rm -rf libass-0.10.2; fi
+		wget -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
+		tar xf libass-0.10.2.tar.gz
+		rm libass-0.10.2.tar.gz
+		cd libass-0.10.2
 		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
 		
-		do_checkIfExist libass-0.10.1 libass.a
+		do_checkIfExist libass-0.10.2 libass.a
 fi
 
 cd $LOCALBUILDDIR
