@@ -38,9 +38,9 @@ Included Tools and Libraries
 
  - a52dec
  - bzip2
- - exiv2
+ - exiv2 (standalone)
  - fdkaac (standalone and lib for ffmpeg)
- - ffmpeg
+ - ffmpeg (standalone)
  - faac (standalone and lib for ffmpeg)
  - fftw
  - flac (standalone)
@@ -52,7 +52,7 @@ Included Tools and Libraries
  - gsm
  - gnutls (standalone and lib for ffmpeg)
  - lame (standalone and lib for ffmpeg)
- - ImageMagick (standalone (32 bit))
+ - ImageMagick (standalone)
  - jpeg
  - jpeg2000
  - jpegturbo
@@ -90,7 +90,7 @@ Included Tools and Libraries
  - schroedinger
  - sdl (for ffplay)
  - sdl_image
- - sox
+ - sox (standalone)
  - speex (standalone and lib for ffmpeg)
  - theora
  - vlc player
