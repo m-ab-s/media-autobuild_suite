@@ -54,6 +54,7 @@
 ::	2013-12-09 add frei0r and some fixes 
 ::	2013-12-10 add sox
 ::	2013-12-14 change compiler to rev.1
+::	2014-01-13 change compiler to rev.2 and fix check
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -427,7 +428,7 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev1.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev2.7z"
 
 		:instMingW32
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
@@ -455,7 +456,7 @@ if %build64%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev1.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev2.7z"
 		
 		:instMingW64
 		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z

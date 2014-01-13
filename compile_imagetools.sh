@@ -186,7 +186,7 @@ if [ -f "$LOCALDESTDIR/bin/magick32/bin/magick.exe" ]; then
 		make install
 		strip --strip-all $LOCALDESTDIR/bin/magick32/bin/*.exe
 		
-		do_checkIfExist ImageMagick-git magick32/magick.exe
+		do_checkIfExist ImageMagick-git magick32/bin/magick.exe
 	else
 		echo -------------------------------------------------
 		echo "ImageMagick is already up to date"
