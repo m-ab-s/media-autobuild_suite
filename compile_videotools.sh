@@ -136,7 +136,12 @@ fi
 		cd build/msys
 		make clean
 		rm -rf *
-		rm $LOCALDESTDIR/bin/x265-16bit.exe
+		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.dll.a" ]; then rm $LOCALDESTDIR/lib/libx265.dll.a; fi
+		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
 		make -j $cpuCount
@@ -167,6 +172,13 @@ SET(CMAKE_ASM_YASM_COMPILER yasm)
 EOF
 
 		cd build/msys
+		
+		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.dll.a" ]; then rm $LOCALDESTDIR/lib/libx265.dll.a; fi
+		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
 		make -j $cpuCount
