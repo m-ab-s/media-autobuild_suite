@@ -757,7 +757,7 @@ if [[ $mplayer = "y" ]]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3' --enable-static --enable-runtime-cpudetection --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --enable-static --enable-runtime-cpudetection --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install
 
