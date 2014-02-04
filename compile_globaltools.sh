@@ -30,7 +30,7 @@ do_checkIfExist() {
 	local fileName="$2"
 	local fileExtension=${fileName##*.}
 	if [[ "$fileExtension" = "exe" ]]; then
-		if [ -f "$LOCALDESTDIR/bin/$fileName" ]; then
+		if [ -f "$GLOBALDESTDIR/bin/$fileName" ]; then
 			echo -
 			echo -------------------------------------------------
 			echo "build $packetName done..."
@@ -52,7 +52,7 @@ do_checkIfExist() {
 				sleep 15
 		fi	
 	elif [[ "$fileExtension" = "a" ]]; then
-		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
+		if [ -f "$GLOBALDESTDIR/lib/$fileName" ]; then
 			echo -
 			echo -------------------------------------------------
 			echo "build $packetName done..."
@@ -79,7 +79,7 @@ do_checkIfExist() {
 buildProcess() {
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libz.a" ]; then
 	echo -------------------------------------------------
 	echo "zlib-1.2.8 is already compiled"
 	echo -------------------------------------------------
@@ -92,24 +92,24 @@ if [ -f "$LOCALDESTDIR/lib/libz.a" ]; then
 		cd zlib-1.2.8
 		sed 's/-O3/-O3 -mms-bitfields -mthreads/' win32/Makefile.gcc >Makefile.gcc
 		make IMPLIB='libz.dll.a' -fMakefile.gcc
-		install libz.a $LOCALDESTDIR/lib
-		install zlib.h $LOCALDESTDIR/include
-		install zconf.h $LOCALDESTDIR/include
+		install libz.a $GLOBALDESTDIR/lib
+		install zlib.h $GLOBALDESTDIR/include
+		install zconf.h $GLOBALDESTDIR/include
 
-		if [ ! -f $LOCALDESTDIR/lib/pkgconfig/zlib.pc ]; then
-			echo "prefix=$LOCALDESTDIR" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "exec_prefix=$LOCALDESTDIR" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "libdir=$LOCALDESTDIR/lib" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "sharedlibdir=$LOCALDESTDIR/lib" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "includedir=$LOCALDESTDIR/include" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Name: zlib" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Description: zlib compression library" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Version: 1.2.8" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Requires:" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Libs: -L\${libdir} -L\${sharedlibdir} -lz" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
-			echo "Cflags: -I${includedir}" >> $LOCALDESTDIR/lib/pkgconfig/zlib.pc
+		if [ ! -f $GLOBALDESTDIR/lib/pkgconfig/zlib.pc ]; then
+			echo "prefix=$GLOBALDESTDIR" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "exec_prefix=$GLOBALDESTDIR" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "libdir=$GLOBALDESTDIR/lib" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "sharedlibdir=$GLOBALDESTDIR/lib" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "includedir=$GLOBALDESTDIR/include" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Name: zlib" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Description: zlib compression library" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Version: 1.2.8" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Requires:" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Libs: -L\${libdir} -L\${sharedlibdir} -lz" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
+			echo "Cflags: -I${includedir}" >> $GLOBALDESTDIR/lib/pkgconfig/zlib.pc
 		fi
 
 		do_checkIfExist zlib-1.2.8 libz.a
@@ -117,7 +117,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin/bzip2.exe" ]; then
+if [ -f "$GLOBALDESTDIR/bin/bzip2.exe" ]; then
 	echo -------------------------------------------------
 	echo "bzip2-1.0.6 is already compiled"
 	echo -------------------------------------------------
@@ -129,17 +129,17 @@ if [ -f "$LOCALDESTDIR/bin/bzip2.exe" ]; then
 		rm bzip2-1.0.6.tar.gz
 		cd bzip2-1.0.6
 		make
-		cp bzip2.exe $LOCALDESTDIR/bin/
-		cp bzip2recover.exe $LOCALDESTDIR/bin/
-		cp bzlib.h $LOCALDESTDIR/include/
-		cp libbz2.a $LOCALDESTDIR/lib
+		cp bzip2.exe $GLOBALDESTDIR/bin/
+		cp bzip2recover.exe $GLOBALDESTDIR/bin/
+		cp bzlib.h $GLOBALDESTDIR/include/
+		cp libbz2.a $GLOBALDESTDIR/lib
 		
 		do_checkIfExist bzip2-1.0.6 bzip2.exe
 fi	
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdl.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libdl.a" ]; then
 	echo -------------------------------------------------
 	echo "dlfcn-win32-r19 is already compiled"
 	echo -------------------------------------------------
@@ -150,7 +150,7 @@ if [ -f "$LOCALDESTDIR/lib/libdl.a" ]; then
 		tar xf dlfcn-win32-r19.tar.bz2
 		rm dlfcn-win32-r19.tar.bz2
 		cd dlfcn-win32-r19
-		./configure --prefix=$LOCALDESTDIR --libdir=$LOCALDESTDIR/lib --incdir=$LOCALDESTDIR/include --disable-shared --enable-static
+		./configure --prefix=$GLOBALDESTDIR --libdir=$GLOBALDESTDIR/lib --incdir=$GLOBALDESTDIR/include --disable-shared --enable-static
 		make
 		make install
 		
@@ -159,7 +159,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libpthread.a" ]; then
 	echo -------------------------------------------------
 	echo "pthreads-w32-2-9-1-release is already compiled"
 	echo -------------------------------------------------
@@ -171,9 +171,9 @@ if [ -f "$LOCALDESTDIR/lib/libpthread.a" ]; then
 		rm pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
 		make clean GC-static
-		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthreadGC2.a || exit 1
-		cp libpthreadGC2.a $LOCALDESTDIR/lib/libpthread.a || exit 1
-		cp pthread.h sched.h semaphore.h $LOCALDESTDIR/include || exit 1
+		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthreadGC2.a || exit 1
+		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthread.a || exit 1
+		cp pthread.h sched.h semaphore.h $GLOBALDESTDIR/include || exit 1
 		
 		do_checkIfExist pthreads-w32-2-9-1-release libpthread.a
 fi
@@ -189,7 +189,7 @@ cd $LOCALBUILDDIR
 #		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
 #		tar xf nasm-2.10.09.tar.gz
 #		cd nasm-2.10.09
-#		./configure --prefix=/$LOCALDESTDIR
+#		./configure --prefix=/$GLOBALDESTDIR
 #		if [[ $bits = "64bit" ]]; then
 #			sed -i 's/ -mthreads//g' Makefile
 #			sed -i 's/ -mthreads//g' rdoff/Makefile
@@ -201,7 +201,7 @@ cd $LOCALBUILDDIR
 #		rm nasm-2.10.09.tar.gz
 #fi	
 
-if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
+if [ -f "$GLOBALDESTDIR/bin/pkg-config.exe" ]; then
 	echo -------------------------------------------------
 	echo "pkg-config-lite-0.28-1 is already compiled"
 	echo -------------------------------------------------
@@ -212,12 +212,12 @@ if [ -f "$LOCALDESTDIR/bin/pkg-config.exe" ]; then
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		rm pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --with-pc-path="/local32/lib/pkgconfig"
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --with-pc-path="/global32/lib/pkgconfig"
 		make -j $cpuCount
 		make install
 
-if [ ! -f ${LOCALDESTDIR}/bin/pkg-config.sh ]; then
-cat >  ${LOCALDESTDIR}/bin/pkg-config.sh << "EOF"
+if [ ! -f ${GLOBALDESTDIR}/bin/pkg-config.sh ]; then
+cat >  ${GLOBALDESTDIR}/bin/pkg-config.sh << "EOF"
 #!/bin/sh
 if pkg-config "$@" > /dev/null 2>&1 ; then
 res=true
@@ -228,10 +228,10 @@ pkg-config "$@" | tr -d \\r && $res
 EOF
 fi
 
-	chmod ugo+x ${LOCALDESTDIR}/bin/pkg-config.sh
-	echo "PKG_CONFIG=${LOCALDESTDIR}/bin/pkg-config.sh" >> ${LOCALDESTDIR}/etc/profile.local
-	echo "export PKG_CONFIG" >> ${LOCALDESTDIR}/etc/profile.local
-	source ${LOCALDESTDIR}/etc/profile.local
+	chmod ugo+x ${GLOBALDESTDIR}/bin/pkg-config.sh
+	echo "PKG_CONFIG=${GLOBALDESTDIR}/bin/pkg-config.sh" >> ${GLOBALDESTDIR}/etc/profile.local
+	echo "export PKG_CONFIG" >> ${GLOBALDESTDIR}/etc/profile.local
+	source ${GLOBALDESTDIR}/etc/profile.local
 
 	do_checkIfExist pkg-config-lite-0.28-1 pkg-config.exe
 fi
@@ -246,7 +246,7 @@ cd $LOCALBUILDDIR
 #		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
 #		tar xf libtool-2.4.2.tar.gz
 #		cd libtool-2.4.2
-#		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+#		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 #		make -j $cpuCount
 #		make install
 #		echo "finish" > compile.done
@@ -254,7 +254,7 @@ cd $LOCALBUILDDIR
 #		rm libtool-2.4.2.tar.gz
 #fi
 
-if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	echo -------------------------------------------------
 	echo "libpng-1.6.8 is already compiled"
 	echo -------------------------------------------------
@@ -265,7 +265,7 @@ if [ -f "$LOCALDESTDIR/lib/libpng.a" ]; then
 		tar xf libpng-1.6.8.tar.gz
 		rm libpng-1.6.8.tar.gz
 		cd libpng-1.6.8
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -274,7 +274,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "jpeg-9 is already compiled"
 	echo -------------------------------------------------
@@ -285,7 +285,7 @@ if [ -f "$LOCALDESTDIR/lib/libjpeg.a" ]; then
 		tar xf jpegsrc.v9.tar.gz
 		rm jpegsrc.v9.tar.gz
 		cd jpeg-9
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		
@@ -294,7 +294,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "openjpeg_v1_4_sources_r697 is already compiled"
 	echo -------------------------------------------------
@@ -305,24 +305,24 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		rm openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		
 		if [[ $bits = "32bit" ]]; then
-			sed -i "s/\/usr\/lib/\/local32\/lib/" Makefile
+			sed -i "s/\/usr\/lib/\/global32\/lib/" Makefile
 		else
-			sed -i "s/\/usr\/lib/\/local64\/lib/" Makefile
+			sed -i "s/\/usr\/lib/\/global64\/lib/" Makefile
 		fi
 		
 		make
 		make install
-		cp libopenjpeg.pc $PKG_CONFIG_PATH
+		cp libopenjpeg.pc $GLOBALDESTDIR/lib/pkgconfig
 		
 		do_checkIfExist openjpeg_v1_4_sources_r697 libopenjpeg.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libturbojpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "libjpeg-turbo-1.3.0 is already compiled"
 	echo -------------------------------------------------
@@ -333,17 +333,17 @@ if [ -f "$LOCALDESTDIR/lib/libturbojpeg.a" ]; then
 		tar xf libjpeg-turbo-1.3.0.tar.gz
 		rm libjpeg-turbo-1.3.0.tar.gz
 		cd libjpeg-turbo-1.3.0
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		#sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$LOCALDESTDIR/include/jmorecfg.h"
+		#sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$GLOBALDESTDIR/include/jmorecfg.h"
 		
 		do_checkIfExist libjpeg-turbo-1.3.0 libturbojpeg.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libjasper.a" ]; then
 	echo -------------------------------------------------
 	echo "jasper-1.900.1 is already compiled"
 	echo -------------------------------------------------
@@ -354,7 +354,7 @@ if [ -f "$LOCALDESTDIR/lib/libjasper.a" ]; then
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-static=no
 		make -j $cpuCount
 		make install
 		
@@ -363,7 +363,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libtiff.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libtiff.a" ]; then
 	echo -------------------------------------------------
 	echo "tiff-4.0.3 is already compiled"
 	echo -------------------------------------------------
@@ -374,7 +374,7 @@ if [ -f "$LOCALDESTDIR/lib/libtiff.a" ]; then
 		tar xf tiff-4.0.3.tar.gz
 		rm tiff-4.0.3.tar.gz
 		cd tiff-4.0.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -383,7 +383,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
+if [ -f "$GLOBALDESTDIR/include/d3dx.h" ]; then
 	echo -------------------------------------------------
 	echo "dx7headers is already compiled"
 	echo -------------------------------------------------
@@ -396,10 +396,13 @@ if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
 		/opt/bin/7za x dx7headers.tar
 		rm dx7headers.tar
 		cd $LOCALBUILDDIR
-		cp dx7headers/* $LOCALDESTDIR/include
+		cp dx7headers/* $GLOBALDESTDIR/include
 		rm dx7headers.tgz
 		
-		if [ -f "$LOCALDESTDIR/include/d3dx.h" ]; then
+		if [ -f "$GLOBALDESTDIR/include/d3dx.h" ]; then
+			if [[ $deleteSource = "y" ]]; then
+				rm -rf dx7headers
+			fi 
 			echo -
 			echo -------------------------------------------------
 			echo "build dx7headers done..."
@@ -416,7 +419,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libiconv.a" ]; then
 	echo -------------------------------------------------
 	echo "libiconv-1.14 is already compiled"
 	echo -------------------------------------------------
@@ -427,7 +430,7 @@ if [ -f "$LOCALDESTDIR/lib/libiconv.a" ]; then
 		tar xf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$LOCALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+		./configure --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$GLOBALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
 
@@ -436,7 +439,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libasprintf.a" ]; then
     echo -------------------------------------------------
     echo "gettext-0.18.3.1-runtime is already compiled"
     echo -------------------------------------------------
@@ -449,7 +452,7 @@ if [ -f "$LOCALDESTDIR/lib/libasprintf.a" ]; then
 		cd gettext-0.18.3.1-runtime
 		cat gettext-tools/woe32dll/gettextlib-exports.c | grep -v rpl_opt > gettext-tools/woe32dll/gettextlib-exports.c.new
 		mv gettext-tools/woe32dll/gettextlib-exports.c.new gettext-tools/woe32dll/gettextlib-exports.c
-		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="$LDFLAGS -static -static-libgcc -DPTW32_STATIC_LIB" 
+		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="$LDFLAGS -static -static-libgcc -DPTW32_STATIC_LIB" 
 		cd gettext-runtime
 		make -j $cpuCount
 		make install
@@ -459,7 +462,7 @@ fi
 		
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
+if [ -f "$GLOBALDESTDIR/bin/msgmerge.exe" ]; then
     echo -------------------------------------------------
     echo "gettext-0.18.3.1-static is already compiled"
     echo -------------------------------------------------
@@ -470,17 +473,17 @@ if [ -f "$LOCALDESTDIR/bin/msgmerge.exe" ]; then
 		rm gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-static
 		cd gettext-0.18.3.1-static
-		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
-		install gettext-tools/src/*.exe $LOCALDESTDIR/bin
-		install gettext-tools/misc/autopoint $LOCALDESTDIR/bin
+		install gettext-tools/src/*.exe $GLOBALDESTDIR/bin
+		install gettext-tools/misc/autopoint $GLOBALDESTDIR/bin
 		
 		do_checkIfExist gettext-0.18.3.1-static msgmerge.exe
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin/iconv.exe" ]; then
+if [ -f "$GLOBALDESTDIR/bin/iconv.exe" ]; then
     echo -------------------------------------------------
     echo "libiconv-1.14 is already compiled"
     echo -------------------------------------------------
@@ -491,7 +494,7 @@ if [ -f "$LOCALDESTDIR/bin/iconv.exe" ]; then
 		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make clean
 		make -j $cpuCount
 		make install
@@ -501,7 +504,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libfreetype.a" ]; then
 	echo -------------------------------------------------
 	echo "freetype-2.4.10 is already compiled"
 	echo -------------------------------------------------
@@ -513,7 +516,7 @@ if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
 		tar xf freetype-2.4.10.tar.gz
 		rm freetype-2.4.10.tar.gz
 		cd freetype-2.4.10
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -522,7 +525,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libexpat.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libexpat.a" ]; then
 	echo -------------------------------------------------
 	echo "expat-2.1.0 is already compiled"
 	echo -------------------------------------------------
@@ -533,7 +536,7 @@ if [ -f "$LOCALDESTDIR/lib/libexpat.a" ]; then
 		tar xf expat-2.1.0.tar.gz
 		rm expat-2.1.0.tar.gz
 		cd expat-2.1.0
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -542,7 +545,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libfontconfig.a" ]; then
 	echo -------------------------------------------------
 	echo "fontconfig-2.10.2 is already compiled"
 	echo -------------------------------------------------
@@ -553,17 +556,17 @@ if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
 		tar xf fontconfig-2.10.2.tar.gz
 		rm fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
-		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$PKG_CONFIG_PATH/fontconfig.pc"
+		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$GLOBALDESTDIR/lib/pkgconfig/fontconfig.pc"
 		
 		do_checkIfExist fontconfig-2.10.2 libfontconfig.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libfribidi.a" ]; then
 	echo -------------------------------------------------
 	echo "fribidi-0.19.4 is already compiled"
 	echo -------------------------------------------------
@@ -576,13 +579,13 @@ if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 		cd fribidi-0.19.4
 		wget --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
 		make install		
 
-if [ ! -f ${LOCALDESTDIR}/bin/fribidi-config ]; then
-cat > ${LOCALDESTDIR}/bin/fribidi-config << "EOF"
+if [ ! -f ${GLOBALDESTDIR}/bin/fribidi-config ]; then
+cat > ${GLOBALDESTDIR}/bin/fribidi-config << "EOF"
 #!/bin/sh
 case $1 in
   --version)
@@ -606,28 +609,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
-	echo -------------------------------------------------
-	echo "libass-0.10.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libass $bits\007"
-		if [ -d "libass-0.10.2" ]; then rm -rf libass-0.10.2; fi
-		wget -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
-		tar xf libass-0.10.2.tar.gz
-		rm libass-0.10.2.tar.gz
-		cd libass-0.10.2
-		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$PKG_CONFIG_PATH/libass.pc"
-		
-		do_checkIfExist libass-0.10.2 libass.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL-1.2.15 is already compiled"
 	echo -------------------------------------------------
@@ -638,16 +620,16 @@ if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
 		tar xf SDL-1.2.15.tar.gz
 		rm SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
 		if [[ $bits = "32bit" ]]; then
-			sed -i "s/-mwindows//" "/local32/bin/sdl-config"
-			sed -i "s/-mwindows//" "/local32/lib/pkgconfig/sdl.pc"
+			sed -i "s/-mwindows//" "/global32/bin/sdl-config"
+			sed -i "s/-mwindows//" "/global32/lib/pkgconfig/sdl.pc"
 		else
-			sed -i "s/-mwindows//" "/local64/bin/sdl-config"
-			sed -i "s/-mwindows//" "/local64/lib/pkgconfig/sdl.pc"
+			sed -i "s/-mwindows//" "/global64/bin/sdl-config"
+			sed -i "s/-mwindows//" "/global64/lib/pkgconfig/sdl.pc"
 		fi
 		
 		do_checkIfExist SDL-1.2.15 libSDL.a
@@ -655,7 +637,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libSDL_image.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libSDL_image.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL_image-1.2.12 is already compiled"
 	echo -------------------------------------------------
@@ -666,7 +648,7 @@ if [ -f "$LOCALDESTDIR/lib/libSDL_image.a" ]; then
 		tar xf SDL_image-1.2.12.tar.gz
 		rm SDL_image-1.2.12.tar.gz
 		cd SDL_image-1.2.12
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -679,7 +661,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgmp.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libgmp.a" ]; then
 	echo -------------------------------------------------
 	echo "gmp-5.1.3 is already compiled"
 	echo -------------------------------------------------
@@ -690,7 +672,7 @@ if [ -f "$LOCALDESTDIR/lib/libgmp.a" ]; then
 		tar xf gmp-5.1.3.tar.bz2
 		rm gmp-5.1.3.tar.bz2
 		cd gmp-5.1.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-cxx --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-cxx --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		
@@ -699,7 +681,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libnettle.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libnettle.a" ]; then
 	echo -------------------------------------------------
 	echo "nettle-2.7.1 is already compiled"
 	echo -------------------------------------------------
@@ -710,7 +692,7 @@ if [ -f "$LOCALDESTDIR/lib/libnettle.a" ]; then
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
 		cd nettle-2.7.1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -719,7 +701,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgpg-error.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libgpg-error.a" ]; then
 	echo -------------------------------------------------
 	echo "libgpg-error-1.12 is already compiled"
 	echo -------------------------------------------------
@@ -730,7 +712,7 @@ if [ -f "$LOCALDESTDIR/lib/libgpg-error.a" ]; then
 		tar xf libgpg-error-1.12.tar.bz2
 		rm libgpg-error-1.12.tar.bz2
 		cd libgpg-error-1.12
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
 		sed -i 's/iconv --silent/iconv -s/g' potomo
 		make -j $cpuCount
 		make install
@@ -740,7 +722,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
 	echo "libgcrypt-1.5.3 is already compiled"
 	echo -------------------------------------------------
@@ -751,7 +733,7 @@ if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 		tar xf libgcrypt-1.5.3.tar.bz2
 		rm libgcrypt-1.5.3.tar.bz2
 		cd libgcrypt-1.5.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		
@@ -760,7 +742,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
 	echo "gnutls-3.2.3 is already compiled"
 	echo -------------------------------------------------
@@ -771,15 +753,15 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		tar xf gnutls-3.2.3.tar.xz
 		rm gnutls-3.2.3.tar.xz
 		cd gnutls-3.2.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
-		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $PKG_CONFIG_PATH/gnutls.pc
+		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $GLOBALDESTDIR/lib/pkgconfig/gnutls.pc
 		
 		if [[ $bits = "32bit" ]]; then
-			sed -i 's/-L\/local32\/lib .*/-L\/local32\/lib/' $PKG_CONFIG_PATH/gnutls.pc
+			sed -i 's/-L\/global32\/lib .*/-L\/global32\/lib/' $GLOBALDESTDIR/lib/pkgconfig/gnutls.pc
 		else
-			sed -i 's/-L\/local64\/lib .*/-L\/local64\/lib/' $PKG_CONFIG_PATH/gnutls.pc
+			sed -i 's/-L\/global64\/lib .*/-L\/global64\/lib/' $GLOBALDESTDIR/lib/pkgconfig/gnutls.pc
 		fi
 		
 		do_checkIfExist gnutls-3.2.3 libgnutls.a
@@ -787,7 +769,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin/rtmpdump.exe" ]; then
+if [ -f "$GLOBALDESTDIR/bin/rtmpdump.exe" ]; then
 	echo -------------------------------------------------
 	echo "rtmpdump is already compiled"
 	echo -------------------------------------------------
@@ -798,15 +780,15 @@ if [ -f "$LOCALDESTDIR/bin/rtmpdump.exe" ]; then
 		cd rtmpdump
 		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv $(LIBZ)/' Makefile
 		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl/' Makefile
-		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR CRYPTO=GNUTLS SHARED= SYS=mingw install
-		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $PKG_CONFIG_PATH/librtmp.pc
+		make LDFLAGS="$LDFLAGS" prefix=$GLOBALDESTDIR CRYPTO=GNUTLS SHARED= SYS=mingw install
+		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $GLOBALDESTDIR/lib/pkgconfig/librtmp.pc
 		
 		do_checkIfExist rtmpdump rtmpdump.exe
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/liblzo2.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/liblzo2.a" ]; then
 	echo -------------------------------------------------
 	echo "lzo-2.06 is already compiled"
 	echo -------------------------------------------------
@@ -817,7 +799,7 @@ if [ -f "$LOCALDESTDIR/lib/liblzo2.a" ]; then
 		tar xf lzo-2.06.tar.gz
 		rm lzo-2.06.tar.gz
 		cd lzo-2.06
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -826,7 +808,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libdca.a" ]; then
 	echo -------------------------------------------------
 	echo "libdca is already compiled"
 	echo -------------------------------------------------
@@ -836,7 +818,7 @@ if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
 		svn co svn://svn.videolan.org/libdca/trunk libdca
 		cd libdca
 		./bootstrap
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -845,7 +827,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libxml2.a" ]; then
 	echo -------------------------------------------------
 	echo "libxml2-2.9.1 is already compiled"
 	echo -------------------------------------------------
@@ -856,18 +838,18 @@ if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
 		cd libxml2-2.9.1
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
-		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
-		cp $LOCALDESTDIR/lib/xml2.la $LOCALDESTDIR/lib/libxml2.la
+		cp $GLOBALDESTDIR/lib/xml2.a $GLOBALDESTDIR/lib/libxml2.a
+		cp $GLOBALDESTDIR/lib/xml2.la $GLOBALDESTDIR/lib/libxml2.la
 		
 		do_checkIfExist libxml2-2.9.1 libxml2.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/liblua.a" ]; then
 	echo -------------------------------------------------
 	echo "lua-5.1.4 is already compiled"
 	echo -------------------------------------------------
@@ -880,64 +862,22 @@ if [ -f "$LOCALDESTDIR/lib/liblua.a" ]; then
 		cd lua-5.1.4
 		
 		if [[ $bits = "32bit" ]]; then
-			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/local32/" Makefile
+			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/global32/" Makefile
 		else
-			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/local64/" Makefile
+			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/global64/" Makefile
 		fi
 			
 		sed -i "s/CC= gcc/local/CC= gcc -static-libgcc/" src/Makefile
 		make mingw
 		make install
-		cp src/lua51.dll $LOCALDESTDIR/bin
+		cp src/lua51.dll $GLOBALDESTDIR/bin
 		
 		do_checkIfExist lua-5.1.4 liblua.a
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
-	echo -------------------------------------------------
-	echo "orc-0.4.18 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile orc $bits\007"
-		if [ -d "orc-0.4.18" ]; then rm -rf orc-0.4.18; fi
-		wget -c http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz
-		tar xf orc-0.4.18.tar.gz
-		rm orc-0.4.18.tar.gz
-		cd orc-0.4.18
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist orc-0.4.18 liborc-0.4.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
-	echo -------------------------------------------------
-	echo "schroedinger-1.0.11 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile schroedinger $bits\007"
-		if [ -d "schroedinger-1.0.11" ]; then rm -rf schroedinger-1.0.11; fi
-		wget -c http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz
-		tar xf schroedinger-1.0.11.tar.gz
-		rm schroedinger-1.0.11.tar.gz
-		cd schroedinger-1.0.11
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-		sed -i 's/testsuite//' Makefile
-		make -j $cpuCount
-		make install
-		sed -i 's/-lschroedinger-1.0$/-lschroedinger-1.0 -lorc-0.4/' "$PKG_CONFIG_PATH/schroedinger-1.0.pc"
-		
-		do_checkIfExist schroedinger-1.0.11 libschroedinger-1.0.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
+if [ -f "$GLOBALDESTDIR/lib/libilbc.a" ]; then
 	echo -------------------------------------------------
 	echo "libilbc is already compiled"
 	echo -------------------------------------------------
@@ -949,7 +889,7 @@ if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
 		if [[ ! -f "configure" ]]; then
 			autoreconf -fiv
 		fi
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -959,7 +899,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $qt4 = "y" ]]; then
-	if [ -f "$LOCALDESTDIR/bin/designer.exe" ]; then
+	if [ -f "$GLOBALDESTDIR/bin/designer.exe" ]; then
 		echo -------------------------------------------------
 		echo "qt-4.8.5 is already compiled"
 		echo -------------------------------------------------
@@ -976,15 +916,15 @@ if [[ $qt4 = "y" ]]; then
 			sed -i 's/!contains(QT_CONFIG, no-jpeg):!contains(QT_CONFIG, jpeg):SUBDIRS += jpeg/!contains(QT_CONFIG, no-libjpeg):!contains(QT_CONFIG, libjpeg):SUBDIRS += jpeg/' "src/plugins/imageformats/imageformats.pro"
 			sed -i 's/#if defined(Q_OS_WIN64) && !defined(Q_CC_GNU)/#if defined(Q_OS_WIN64)/' "src/corelib/tools/qsimd.cpp"
 			sed -i 's/SUBDIRS += demos/#SUBDIRS += demos/' "projects.pro"
-			./configure.exe -prefix $LOCALDESTDIR -platform win32-g++ -static -release -opensource -confirm-license -nomake examples -qt-libjpeg -sse
+			./configure.exe -prefix $GLOBALDESTDIR -platform win32-g++ -static -release -opensource -confirm-license -nomake examples -qt-libjpeg -sse
 			mingw32-make -j $cpuCount
 			mingw32-make install
 			
-			cp ./plugins/imageformats/*.a $LOCALDESTDIR/lib
-			cp ./plugins/accessible/libqtaccessiblewidgets.a  $LOCALDESTDIR/lib
+			cp ./plugins/imageformats/*.a $GLOBALDESTDIR/lib
+			cp ./plugins/accessible/libqtaccessiblewidgets.a  $GLOBALDESTDIR/lib
 			sed -i 's/\.\.\\.\.\\lib\\pkgconfig\\//' lib/pkgconfig/*.pc
 			sed -i 's/Libs: -L${libdir} -lQtGui/Libs: -L${libdir} -lcomctl32 -lqjpeg -lqtaccessiblewidgets -lQtGui/' "lib/pkgconfig/QtGui.pc"
-			cp lib/pkgconfig/*.pc $PKG_CONFIG_PATH
+			cp lib/pkgconfig/*.pc $GLOBALDESTDIR/lib/pkgconfig
 			
 			do_checkIfExist qt-everywhere-opensource-src-4.8.5 designer.exe
 	fi
@@ -997,7 +937,7 @@ if [[ $build32 = "yes" ]]; then
 	echo "compile global tools 32 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local32/etc/profile.local
+	source /global32/etc/profile.local
 	bits='32bit'
 	targetHost='i686-w64-mingw32'
 	buildProcess
@@ -1013,7 +953,7 @@ if [[ $build64 = "yes" ]]; then
 	echo "compile global tools 64 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local64/etc/profile.local
+	source /global64/etc/profile.local
 	bits='64bit'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess

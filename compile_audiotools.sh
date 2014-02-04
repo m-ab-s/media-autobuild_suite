@@ -1,5 +1,3 @@
-source /local32/etc/profile.local
-
 # set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 while true; do
@@ -512,7 +510,7 @@ if [[ $build32 = "yes" ]]; then
 	echo "compile audio tools 32 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local32/etc/profile.local
+	source /global32/etc/profile.local
 	bits='32bit'
 	targetHost='i686-w64-mingw32'
 	buildProcess
@@ -528,7 +526,7 @@ if [[ $build64 = "yes" ]]; then
 	echo "compile audio tools 64 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local64/etc/profile.local
+	source /global64/etc/profile.local
 	bits='64bit'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess

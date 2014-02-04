@@ -147,8 +147,8 @@ if [ -f "$LOCALDESTDIR/bin/exrdisplay.exe" ]; then
 		cd ..
 		do_checkIfExist OpenEXR-git exrheader.exe
 		
-		sed -i 's/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread -lstdc++/' "$PKG_CONFIG_PATH/IlmBase.pc"
-		sed -i 's/Libs: -L${libdir} -lIlmImf/Libs: -L${libdir} -lIlmImf -lstdc++/' "$PKG_CONFIG_PATH/OpenEXR.pc"
+		sed -i 's/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread/Libs: -L${libdir} -lImath -lHalf -lIex -lIexMath -lIlmThread -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/IlmBase.pc"
+		sed -i 's/Libs: -L${libdir} -lIlmImf/Libs: -L${libdir} -lIlmImf -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/OpenEXR.pc"
 		
 		echo -ne "\033]0;compile OpenEXR_Viewers $bits\007"
 		cd OpenEXR_Viewers
@@ -251,7 +251,7 @@ if [[ $build32 = "yes" ]]; then
 	echo "compile image tools 32 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local32/etc/profile.local
+	source /global32/etc/profile.local
 	bits='32bit'
 	targetHost='i686-w64-mingw32'
 	buildProcess
@@ -267,7 +267,7 @@ if [[ $build64 = "yes" ]]; then
 	echo "compile image tools 64 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local64/etc/profile.local
+	source /global64/etc/profile.local
 	bits='64bit'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess

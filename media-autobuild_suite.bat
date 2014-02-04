@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.0
-::	Project stared at 2013-09-24. Last bigger modification was on 2013-12-05
+::	This is version 1.1
+::	Project stared at 2013-09-24. Last bigger modification was on 2014-02-02
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -55,6 +55,7 @@
 ::	2013-12-10 add sox
 ::	2013-12-14 change compiler to rev.1
 ::	2014-01-13 change compiler to rev.2 and fix check
+::	2014-02-02 add global32 and global64 folders to the environment. Make it more easy to build some part of tools new
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -477,6 +478,18 @@ if %build64%==yes (
 
 :makeDIR
 if %build32%==yes (
+	if not exist %instdir%\global32 (
+		echo.-------------------------------------------------------------------------------
+		echo.create global32 folders
+		echo.-------------------------------------------------------------------------------
+		mkdir %instdir%\global32
+		mkdir %instdir%\global32\bin
+		mkdir %instdir%\global32\etc
+		mkdir %instdir%\global32\include
+		mkdir %instdir%\global32\lib
+		mkdir %instdir%\global32\lib\pkgconfig
+		mkdir %instdir%\global32\share
+		)
 	if not exist %instdir%\build32 mkdir %instdir%\build32
 	if not exist %instdir%\local32\share (
 		echo.-------------------------------------------------------------------------------
@@ -489,9 +502,21 @@ if %build32%==yes (
 		mkdir %instdir%\local32\lib
 		mkdir %instdir%\local32\lib\pkgconfig
 		mkdir %instdir%\local32\share
-		)
+		)	
 	)
 if %build64%==yes (
+	if not exist %instdir%\global64 (
+		echo.-------------------------------------------------------------------------------
+		echo.create global64 folders
+		echo.-------------------------------------------------------------------------------
+		mkdir %instdir%\global64
+		mkdir %instdir%\global64\bin
+		mkdir %instdir%\global64\etc
+		mkdir %instdir%\global64\include
+		mkdir %instdir%\global64\lib
+		mkdir %instdir%\global64\lib\pkgconfig
+		mkdir %instdir%\global64\share
+		)
 	if not exist %instdir%\build64 mkdir %instdir%\build64
 	if not exist %instdir%\local64\share (
 		echo.-------------------------------------------------------------------------------
@@ -511,9 +536,11 @@ if %build64%==yes (
 if exist %instdir%\conf-env.sh GOTO runConfFile
 if exist %instdir%\msys\1.0\etc\userconf.cfg GOTO writeProfile32
 	echo mount '%instdir%\opt\' /opt>>%instdir%\conf-env.sh
+	echo mount '%instdir%\global32\' /global32>>%instdir%\conf-env.sh
 	echo mount '%instdir%\local32\' /local32>>%instdir%\conf-env.sh
 	echo mount '%instdir%\build32\' /build32>>%instdir%\conf-env.sh
 	echo mount '%instdir%\mingw32\' /mingw32>>%instdir%\conf-env.sh
+	echo mount '%instdir%\global64\' /global64>>%instdir%\conf-env.sh
 	echo mount '%instdir%\local64\' /local64>>%instdir%\conf-env.sh
 	echo mount '%instdir%\build64\' /build64>>%instdir%\conf-env.sh
 	echo mount '%instdir%\mingw64\' /mingw64>>%instdir%\conf-env.sh
@@ -535,68 +562,70 @@ if exist %instdir%\msys\1.0\etc\userconf.cfg GOTO writeProfile32
 
 :writeProfile32
 if %build32%==yes (
-	if exist %instdir%\local32\etc\profile.local GOTO writeProfile64
+	if exist %instdir%\global32\etc\profile.local GOTO writeProfile64
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 32 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local32\etc\profile.local
-		echo.# /local32/etc/profile.local>>%instdir%\local32\etc\profile.local
-		echo.#>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local32\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
-		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profile.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
-		echo.LDFLAGS="-L/local32/lib -mthreads">>%instdir%\local32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.PATH=".:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\local32\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local32\etc\profile.local
-		echo.export PATH PS1>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.# package build directory>>%instdir%\local32\etc\profile.local
-		echo.LOCALBUILDDIR=/build32>>%instdir%\local32\etc\profile.local
-		echo.# package installation prefix>>%instdir%\local32\etc\profile.local
-		echo.LOCALDESTDIR=/local32>>%instdir%\local32\etc\profile.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local32\etc\profile.local
+		echo.#>>%instdir%\global32\etc\profile.local
+		echo.# /global32/etc/profile.local>>%instdir%\global32\etc\profile.local
+		echo.#>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.alias dir='ls -la --color=auto'>>%instdir%\global32\etc\profile.local
+		echo.alias ls='ls --color=auto'>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
+		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
+		echo.CFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
+		echo.CXXFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
+		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global32\etc\profile.local
+		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
+		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.# package build directory>>%instdir%\global32\etc\profile.local
+		echo.LOCALBUILDDIR=/build32>>%instdir%\global32\etc\profile.local
+		echo.# package installation prefix>>%instdir%\global32\etc\profile.local
+		echo.GLOBALDESTDIR=/global32>>%instdir%\global32\etc\profile.local
+		echo.LOCALDESTDIR=/local32>>%instdir%\global32\etc\profile.local
+		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global32\etc\profile.local
 		)
 		
 :writeProfile64
 if %build64%==yes (
-	if exist %instdir%\local64\etc\profile.local GOTO loginProfile
+	if exist %instdir%\global64\etc\profile.local GOTO loginProfile
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 64 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local64\etc\profile.local
-		echo.# /local64/etc/profile.local>>%instdir%\local64\etc\profile.local
-		echo.#>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local64\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
-		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profile.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
-		echo.LDFLAGS="-L/local64/lib">>%instdir%\local64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.PATH=".:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\local64\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local64\etc\profile.local
-		echo.export PATH PS1>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.# package build directory>>%instdir%\local64\etc\profile.local
-		echo.LOCALBUILDDIR=/build64>>%instdir%\local64\etc\profile.local
-		echo.# package installation prefix>>%instdir%\local64\etc\profile.local
-		echo.LOCALDESTDIR=/local64>>%instdir%\local64\etc\profile.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profile.local
+		echo.#>>%instdir%\global64\etc\profile.local
+		echo.# /global64/etc/profile.local>>%instdir%\global64\etc\profile.local
+		echo.#>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.alias dir='ls -la --color=auto'>>%instdir%\global64\etc\profile.local
+		echo.alias ls='ls --color=auto'>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
+		echo.CPPFLAGS="-I/global64/include -I/local64/include">>%instdir%\global64\etc\profile.local
+		echo.CFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
+		echo.CXXFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
+		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global64\etc\profile.local
+		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
+		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.# package build directory>>%instdir%\global64\etc\profile.local
+		echo.LOCALBUILDDIR=/build64>>%instdir%\global64\etc\profile.local
+		echo.# package installation prefix>>%instdir%\global64\etc\profile.local
+		echo.GLOBALDESTDIR=/global64>>%instdir%\global64\etc\profile.local
+		echo.LOCALDESTDIR=/local64>>%instdir%\global64\etc\profile.local
+		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global64\etc\profile.local
 		)
 	
 :loginProfile
@@ -610,8 +639,8 @@ if %build64%==yes (
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /local64/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /local64/etc/profile.local>>%instdir%\profile.sh
+	echo.if [ -f /global64/etc/profile.local ]; then>>%instdir%\profile.sh
+	 echo.       source /global64/etc/profile.local>>%instdir%\profile.sh
 	echo.fi>>%instdir%\profile.sh
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh
@@ -629,8 +658,8 @@ if %build64%==yes (
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /local32/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /local32/etc/profile.local>>%instdir%\profile.sh
+	echo.if [ -f /global32/etc/profile.local ]; then>>%instdir%\profile.sh
+	 echo.       source /global32/etc/profile.local>>%instdir%\profile.sh
 	echo.fi>>%instdir%\profile.sh
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh

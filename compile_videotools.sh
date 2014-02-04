@@ -232,7 +232,7 @@ if [ -f "libvpx-git/configure" ]; then
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
 	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
-	if [ -f "$PKG_CONFIG_PATH/vpx.pc" ]; then rm $PKG_CONFIG_PATH/vpx.pc; fi
+	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
@@ -348,6 +348,27 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
+	echo -------------------------------------------------
+	echo "libass-0.10.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libass $bits\007"
+		if [ -d "libass-0.10.2" ]; then rm -rf libass-0.10.2; fi
+		wget -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
+		tar xf libass-0.10.2.tar.gz
+		rm libass-0.10.2.tar.gz
+		cd libass-0.10.2
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
+		
+		do_checkIfExist libass-0.10.2 libass.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	echo -------------------------------------------------
 	echo "xavs is already compiled"
@@ -405,7 +426,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 		make -j $cpuCount
 		make install
 		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
-		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$PKG_CONFIG_PATH/dvdread.pc"
+		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
 		
 		do_checkIfExist libdvdread-4.2.1 libdvdread.a
 fi
@@ -554,11 +575,53 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 		rm libmodplug-0.8.8.4.tar.gz
 		cd libmodplug-0.8.8.4
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $PKG_CONFIG_PATH/libmodplug.pc
+		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
 		make -j $cpuCount
 		make install
 		
 		do_checkIfExist libmodplug-0.8.8.4 libmodplug.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
+	echo -------------------------------------------------
+	echo "orc-0.4.18 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile orc $bits\007"
+		if [ -d "orc-0.4.18" ]; then rm -rf orc-0.4.18; fi
+		wget -c http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz
+		tar xf orc-0.4.18.tar.gz
+		rm orc-0.4.18.tar.gz
+		cd orc-0.4.18
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist orc-0.4.18 liborc-0.4.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
+	echo -------------------------------------------------
+	echo "schroedinger-1.0.11 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile schroedinger $bits\007"
+		if [ -d "schroedinger-1.0.11" ]; then rm -rf schroedinger-1.0.11; fi
+		wget -c http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz
+		tar xf schroedinger-1.0.11.tar.gz
+		rm schroedinger-1.0.11.tar.gz
+		cd schroedinger-1.0.11
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		sed -i 's/testsuite//' Makefile
+		make -j $cpuCount
+		make install
+		sed -i 's/-lschroedinger-1.0$/-lschroedinger-1.0 -lorc-0.4/' "$LOCALDESTDIR/lib/pkgconfig/schroedinger-1.0.pc"
+		
+		do_checkIfExist schroedinger-1.0.11 libschroedinger-1.0.a
 fi
 
 cd $LOCALBUILDDIR
@@ -582,7 +645,7 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 		cd src
 		make -j $cpuCount
 		make install
-		cp ../zvbi-0.2.pc $PKG_CONFIG_PATH
+		cp ../zvbi-0.2.pc $LOCALDESTDIR/lib/pkgconfig
 		
 		do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
@@ -622,7 +685,7 @@ if [[ $mp4box = "y" ]]; then
 		else 
 			echo -ne "\033]0;compile mp4box_gpac $bits\007"
 			if [ -d "mp4box_gpac" ]; then rm -rf mp4box_gpac; fi
-			svn co svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
+			svn checkout svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
 			cd mp4box_gpac
 			./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
 			cp config.h include/gpac/internal
@@ -698,14 +761,14 @@ if [[ $ffmpeg = "y" ]]; then
 			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -rf $LOCALDESTDIR/lib/libavfilter.a; fi
 			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -rf $LOCALDESTDIR/lib/libavformat.a; fi
 			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -rf $LOCALDESTDIR/lib/libpostproc.a; fi
-			if [ -f "$PKG_CONFIG_PATH/libavcodec.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavcodec.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavutil.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavutil.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libpostproc.pc" ]; then rm -rf $PKG_CONFIG_PATH/libpostproc.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libswresample.pc" ]; then rm -rf $PKG_CONFIG_PATH/libswresample.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libswscale.pc" ]; then rm -rf $PKG_CONFIG_PATH/libswscale.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavdevice.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavdevice.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavfilter.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavfilter.pc; fi
-			if [ -f "$PKG_CONFIG_PATH/libavformat.pc" ]; then rm -rf $PKG_CONFIG_PATH/libavformat.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavcodec.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavutil.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavutil.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libpostproc.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswresample.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libswresample.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswscale.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libswscale.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavdevice.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavfilter.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc; fi
+			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavformat.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavformat.pc; fi
 
 			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
@@ -848,7 +911,7 @@ if [[ $build32 = "yes" ]]; then
 	echo "compile video tools 32 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local32/etc/profile.local
+	source /global32/etc/profile.local
 	bits='32bit'
 	targetHost='i686-w64-mingw32'
 	buildProcess
@@ -864,7 +927,7 @@ if [[ $build64 = "yes" ]]; then
 	echo "compile video tools 64 bit"
 	echo
 	echo "-------------------------------------------------------------------------------"
-	source /local64/etc/profile.local
+	source /global64/etc/profile.local
 	bits='64bit'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess
