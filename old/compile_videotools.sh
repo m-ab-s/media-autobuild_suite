@@ -8,6 +8,7 @@ while true; do
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
+--vlc=* ) vlc="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
@@ -455,6 +456,26 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		do_checkIfExist libdvdread-4.2.1 libdvdnav.a
 fi
 
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libmpeg2.a" ]; then
+	echo -------------------------------------------------
+	echo "libmpeg2-0.5.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libmpeg2 $bits\007"
+		if [ -d "libmpeg2-0.5.1" ]; then rm -rf libmpeg2-0.5.1; fi
+		wget -c http://libmpeg2.sourceforge.net/files/libmpeg2-0.5.1.tar.gz
+		tar xf libmpeg2-0.5.1.tar.gz
+		rm libmpeg2-0.5.1.tar.gz
+		cd libmpeg2-0.5.1
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libmpeg2-0.5.1 libmpeg2.a
+fi
+
 if [[ $bits = "32bit" ]]; then
 	cd $LOCALBUILDDIR
 
@@ -775,54 +796,17 @@ if [[ $nonfree = "y" ]]; then
 fi	
 
 if [[ $mplayer = "y" ]]; then
-
-if [ -f "mplayer-svn/configure" ]; then
-		echo -ne "\033]0;compile mplayer $bits\007"
-		cd mplayer-svn
-		oldRevision=`svnversion`
-		svn update
-		newRevision=`newRevision`
-		
-		if [ -d "ffmpeg" ]; then 
-			cd ffmpeg 
-			oldHead=`git rev-parse HEAD`
-			git pull origin master
-			newHead=`git rev-parse HEAD`
-			cd ..
-		fi	
-		
-		if [[ "$oldRevision" != "$newRevision"  ]] || [[ "$oldHead" != "$newHead"  ]] || [ ! -d "ffmpeg" ]; then
-			make uninstall
-			make clean
-			
-			if ! test -e ffmpeg ; then
-				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
-					rm -rf ffmpeg
-					echo "Failed to get a FFmpeg checkout"
-					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
-					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
-					echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-					echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
-					exit 1
-				fi
-				touch ffmpeg/mp_auto_pull
-			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --enable-static --enable-runtime-cpudetection --enable-ass-internal --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
-			make
-			make install
-
-			do_checkIfExist mplayer-svn mplayer.exe
-			
-			else
-			echo -------------------------------------------------
-			echo "mplayer is already up to date"
-			echo -------------------------------------------------
-		fi
-		else
+	if [ -f "$LOCALDESTDIR/bin/mplayer.exe" ]; then
+		echo -------------------------------------------------
+		echo "mplayer is already compiled"
+		echo -------------------------------------------------
+		else 
 			echo -ne "\033]0;compile mplayer $bits\007"
-			
-			svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
-			cd mplayer-svn
+			if [ -d mplayer-checkout* ]; then rm -rf mplayer-checkout*; fi
+			wget -c http://www.mplayerhq.hu/MPlayer/releases/mplayer-checkout-snapshot.tar.bz2
+			tar xf mplayer-checkout-snapshot.tar.bz2
+			rm mplayer-checkout-snapshot.tar.bz2
+			cd mplayer-checkout*
 			
 			if ! test -e ffmpeg ; then
 				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
@@ -844,6 +828,81 @@ if [ -f "mplayer-svn/configure" ]; then
 	fi
 fi
 
+cd $LOCALBUILDDIR
+
+if [[ $vlc = "y" ]]; then
+	if [ -f "vlc-git/bootstrap" ]; then
+		echo -ne "\033]0;compile vlc $bits\007"
+		cd vlc-git
+		oldHead=`git rev-parse HEAD`
+		git pull origin master
+		newHead=`git rev-parse HEAD`
+		if [[ "$oldHead" != "$newHead" ]]; then
+		make clean
+		rm -rf _win32
+		rm -rf $LOCALDESTDIR/bin/vlc-2.2.0-git
+		
+		grep -q -e 'CC="$CC -static-libgcc"' configure.ac || sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
+		grep -q -e 'CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac || sed -i '/		CC="$CC -static-libgcc"/ a\		CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac
+		sed -i 's/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>\/dev\/null || hostname`", \[host which ran configure\])/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", \[host which ran configure\])/' configure.ac
+		
+		if [[ ! -f "configure" ]]; then
+			./bootstrap
+		fi 
+		./configure --host=$targetHost --enable-qt --disable-libgcrypt #--disable-sdl
+		make -j $cpuCount
+		
+		sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
+		sed -i "s/.*cp .*builddir.*npapi-vlc.*//g" Makefile
+		for file in ./*/vlc.exe; do
+			rm $file # try to force a rebuild...
+		done
+		make package-win-common
+		strip --strip-all ./vlc-2.2.0-git/*.dll
+		strip --strip-all ./vlc-2.2.0-git/plugins/*/*.dll
+		strip --strip-all ./vlc-2.2.0-git/*.exe
+		rm ./vlc-2.2.0-git/plugins/*/*.dll.a
+		rm ./vlc-2.2.0-git/plugins/*/*.la
+		mv vlc-2.2.0-git $LOCALDESTDIR/bin
+		
+		do_checkIfExist vlc-2.2.0-git vlc-2.2.0-git/vlc.exe
+		
+		else
+			echo -------------------------------------------------
+			echo "vlc is already up to date"
+			echo -------------------------------------------------
+		fi
+		else
+		echo -ne "\033]0;compile vlc $bits\007"
+			git clone https://github.com/videolan/vlc.git vlc-git
+			cd vlc-git
+			sed -i '/SYS=mingw32/ a\		CC="$CC -static-libgcc"' configure.ac
+			sed -i '/		CC="$CC -static-libgcc"/ a\		CXX="$CXX -static-libgcc -static-libstdc++"' configure.ac
+			sed -i 's/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>\/dev\/null || hostname`", \[host which ran configure\])/AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", \[host which ran configure\])/' configure.ac
+			cp -v /usr/share/aclocal/* m4/
+			if [[ ! -f "configure" ]]; then
+				./bootstrap
+			fi 
+			./configure --host=$targetHost --disable-libgcrypt --enable-qt #--disable-sdl
+			make -j $cpuCount
+			
+			sed -i "s/package-win-common: package-win-install build-npapi/package-win-common: package-win-install/" Makefile
+			sed -i "s/.*cp .*builddir.*npapi-vlc.*//g" Makefile
+			for file in ./*/vlc.exe; do
+				rm $file # try to force a rebuild...
+			done
+			make package-win-common
+			strip --strip-all ./vlc-2.2.0-git/*.dll
+			strip --strip-all ./vlc-2.2.0-git/plugins/*/*.dll
+			strip --strip-all ./vlc-2.2.0-git/*.exe
+			rm ./vlc-2.2.0-git/plugins/*/*.dll.a
+			rm ./vlc-2.2.0-git/plugins/*/*.la
+			if [ -d "$LOCALDESTDIR/bin/vlc-2.2.0-git" ]; then rm -rf $LOCALDESTDIR/bin/vlc-2.2.0-git; fi
+			mv vlc-2.2.0-git $LOCALDESTDIR/bin
+
+			do_checkIfExist vlc-2.2.0-git vlc-2.2.0-git/vlc.exe
+	fi
+fi
 }
 
 if [[ $build32 = "yes" ]]; then

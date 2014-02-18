@@ -6,6 +6,7 @@ while true; do
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
+--qt4=* ) qt4="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -236,6 +237,22 @@ fi
 fi
 
 cd $LOCALBUILDDIR
+
+#if [ -f "libtool-2.4.2/compile.done" ]; then
+#	echo -------------------------------------------------
+#	echo "libtool-2.4.2 is already compiled"
+#	echo -------------------------------------------------
+#	else 
+#		wget -c ftp://ftp.gnu.org/gnu/libtool/libtool-2.4.2.tar.gz
+#		tar xf libtool-2.4.2.tar.gz
+#		cd libtool-2.4.2
+#		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+#		make -j $cpuCount
+#		make install
+#		echo "finish" > compile.done
+#		cd $LOCALBUILDDIR
+#		rm libtool-2.4.2.tar.gz
+#fi
 
 if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	echo -------------------------------------------------
@@ -877,6 +894,40 @@ if [ -f "$GLOBALDESTDIR/lib/libilbc.a" ]; then
 		make install
 		
 		do_checkIfExist libilbc libilbc.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [[ $qt4 = "y" ]]; then
+	if [ -f "$GLOBALDESTDIR/bin/designer.exe" ]; then
+		echo -------------------------------------------------
+		echo "qt-4.8.5 is already compiled"
+		echo -------------------------------------------------
+		else 
+			echo -ne "\033]0;compile qt4 $bits\007"
+			if [ -d "qt-everywhere-opensource-src-4.8.5" ]; then rm -rf qt-everywhere-opensource-src-4.8.5; fi
+			wget -c http://download.qt-project.org/official_releases/qt/4.8/4.8.5/qt-everywhere-opensource-src-4.8.5.zip
+			unzip -o qt-everywhere-opensource-src-4.8.5.zip
+			rm qt-everywhere-opensource-src-4.8.5.zip
+			cd qt-everywhere-opensource-src-4.8.5
+			
+			sed -i 's/QMAKE_LFLAGS		=/QMAKE_LFLAGS		= -static -static-libgcc -static-libstdc++/' "mkspecs/win32-g++/qmake.conf"
+			sed -i 's/LFLAGS      = -static-libgcc -s/LFLAGS      = -static -static-libgcc -static-libstdc++ -s/' "qmake/Makefile.win32-g++"
+			sed -i 's/!contains(QT_CONFIG, no-jpeg):!contains(QT_CONFIG, jpeg):SUBDIRS += jpeg/!contains(QT_CONFIG, no-libjpeg):!contains(QT_CONFIG, libjpeg):SUBDIRS += jpeg/' "src/plugins/imageformats/imageformats.pro"
+			sed -i 's/#if defined(Q_OS_WIN64) && !defined(Q_CC_GNU)/#if defined(Q_OS_WIN64)/' "src/corelib/tools/qsimd.cpp"
+			sed -i 's/SUBDIRS += demos/#SUBDIRS += demos/' "projects.pro"
+			./configure.exe -prefix $GLOBALDESTDIR -platform win32-g++ -static -release -opensource -confirm-license -nomake examples -qt-libjpeg -sse
+			mingw32-make -j $cpuCount
+			mingw32-make install
+			
+			cp ./plugins/imageformats/*.a $GLOBALDESTDIR/lib
+			cp ./plugins/accessible/libqtaccessiblewidgets.a  $GLOBALDESTDIR/lib
+			sed -i 's/\.\.\\.\.\\lib\\pkgconfig\\//' lib/pkgconfig/*.pc
+			sed -i 's/Libs: -L${libdir} -lQtGui/Libs: -L${libdir} -lcomctl32 -lqjpeg -lqtaccessiblewidgets -lQtGui/' "lib/pkgconfig/QtGui.pc"
+			cp lib/pkgconfig/*.pc $GLOBALDESTDIR/lib/pkgconfig
+			
+			do_checkIfExist qt-everywhere-opensource-src-4.8.5 designer.exe
+	fi
 fi
 }
 

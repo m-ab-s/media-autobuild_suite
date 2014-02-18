@@ -38,10 +38,13 @@ Included Tools and Libraries
 
  - a52dec
  - bzip2
+ - exiv2 (standalone)
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg (standalone)
  - faac (standalone and lib for ffmpeg)
+ - fftw
  - flac (standalone)
+ - fltk
  - fontconfig
  - freetype
  - frei0r
@@ -49,6 +52,7 @@ Included Tools and Libraries
  - gsm
  - gnutls (standalone and lib for ffmpeg)
  - lame (standalone and lib for ffmpeg)
+ - ImageMagick (standalone)
  - jpeg
  - jpeg2000
  - jpegturbo
@@ -76,13 +80,16 @@ Included Tools and Libraries
  - mplayer (standalone)
  - orc
  - opencore-amr
+ - openEXR (standalone and lib for ImageMagick)
  - openjpeg
  - ogg
  - opus
  - opus-tools (standalone)
+ - qt4
  - rtmp (standalone and lib for ffmpeg)
  - schroedinger
  - sdl (for ffplay)
+ - sdl_image
  - sox (standalone)
  - speex (standalone and lib for ffmpeg)
  - theora

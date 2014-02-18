@@ -56,7 +56,6 @@
 ::	2013-12-14 change compiler to rev.1
 ::	2014-01-13 change compiler to rev.2 and fix check
 ::	2014-02-02 add global32 and global64 folders to the environment. Make it more easy to build some part of tools new
-::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -74,6 +73,8 @@ if not exist %ini% (
 	echo.ffmpeg=^0>>%ini%
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
+	echo.vlc=^0>>%ini%
+	echo.image=^0>>%ini%
 	echo.cores=^0>>%ini%
 	echo.deleteSource=^0>>%ini%
 	)
@@ -83,6 +84,8 @@ for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%c in ('findstr /i ffmpeg %ini%') do set ffmpegINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
+for /F "tokens=2 delims==" %%f in ('findstr /i vlc %ini%') do set vlcINI=%%f
+for /F "tokens=2 delims==" %%g in ('findstr /i image %ini%') do set imageINI=%%g
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
 
@@ -212,6 +215,56 @@ if %buildmplayer%==2 (
 	set "mplayer=n"
 	)
 if %buildmplayer% GTR 2 GOTO mplayer
+
+:magick
+if %imageINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static image tools [openEXR, ImageMagick]:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildmagick="build ImageMagick:"
+	) else (
+		set buildmagick=%imageINI%
+	)
+	
+if %buildmagick%==1 (
+	set "magick=y"
+	)
+if %buildmagick%==2 (
+	set "magick=n"
+	)
+if %buildmagick% GTR 2 GOTO magick
+
+:vlc
+if %vlcINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build vlc player:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildvlc="build vlc:"
+	) else (
+		set buildvlc=%vlcINI%
+		)
+	
+if %buildvlc%==1 (
+	set "vlc=y"
+	set "qt4=y"
+	)
+if %buildvlc%==2 (
+	set "vlc=n"
+	set "qt4=n"
+	)
+if %buildvlc% GTR 2 GOTO vlc
 
 :numCores
 if %coresINI%==0 (
@@ -797,7 +850,7 @@ echo.
 echo.- compile global tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
+%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --qt4=%qt4%
 echo. compile global tools done...
 
 :: audio tools
@@ -840,8 +893,32 @@ echo.
 echo.- compile video tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
-echo. compile video tools done...	
+%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --vlc=%vlc% --nonfree=%binary%
+echo. compile video tools done...
+	
+::imagemagick	
+if %magick%==y (
+		if not exist %instdir%\compile_imagetools.sh (
+			echo -------------------------------------------------------------------------------
+			echo.
+			echo.- get script for image tools:
+			echo.
+			echo -------------------------------------------------------------------------------
+			if not exist %instdir%\media-autobuild_suite.zip (
+				%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+				)
+				%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_imagetools.sh
+			)
+
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- compile image tools:
+		echo.
+		echo -------------------------------------------------------------------------------
+		%instdir%\mintty.lnk %instdir%\compile_imagetools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
+		echo. compile image tools done...
+	)
+	
 	
 echo -------------------------------------------------------------------------------
 echo.
