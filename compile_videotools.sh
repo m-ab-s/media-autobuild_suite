@@ -781,7 +781,7 @@ if [ -f "mplayer-svn/configure" ]; then
 		cd mplayer-svn
 		oldRevision=`svnversion`
 		svn update
-		newRevision=`newRevision`
+		newRevision=`svnversion`
 		
 		if [ -d "ffmpeg" ]; then 
 			cd ffmpeg 
