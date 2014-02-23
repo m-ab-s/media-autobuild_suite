@@ -657,26 +657,46 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	if [ -f "$LOCALDESTDIR/bin/mp4box.exe" ]; then
-		echo -------------------------------------------------
-		echo "mp4box_gpac is already compiled"
-		echo -------------------------------------------------
-		else 
-			echo -ne "\033]0;compile mp4box_gpac $bits\007"
-			if [ -d "mp4box_gpac" ]; then rm -rf mp4box_gpac; fi
-			svn checkout svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box_gpac
-			cd mp4box_gpac
+	if [ -f "mp4box-svn/configure" ]; then
+		echo -ne "\033]0;compile mp4box-svn $bits\007"
+		cd mplayer-svn
+		oldRevision=`svnversion`
+		svn update
+		newRevision=`svnversion`
+		if [[ "$oldRevision" != "$newRevision"  ]]; then
+			rm $LOCALDESTDIR/bin/MP4Box.exe
+			make clean
 			./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
-			cp config.h include/gpac/internal
-			cd src
-			make -j $cpuCount
-			cd ..
-			cd applications/mp4box
-			make -j $cpuCount
-			cd ../..
-			cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
-			
-			do_checkIfExist mp4box_gpac MP4Box.exe
+				cp config.h include/gpac/internal
+				cd src
+				make -j $cpuCount
+				cd ..
+				cd applications/mp4box
+				make -j $cpuCount
+				cd ../..
+				cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
+				
+				do_checkIfExist mp4box-svn MP4Box.exe
+		else
+			echo -------------------------------------------------
+			echo "MP4Box is already up to date"
+			echo -------------------------------------------------
+		fi
+	else
+		echo -ne "\033]0;compile mp4box-svn $bits\007"
+		svn checkout svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
+		cd mp4box-svn
+		./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
+		cp config.h include/gpac/internal
+		cd src
+		make -j $cpuCount
+		cd ..
+		cd applications/mp4box
+		make -j $cpuCount
+		cd ../..
+		cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
+		
+		do_checkIfExist mp4box-svn MP4Box.exe
 	fi
 fi
 
@@ -840,7 +860,7 @@ if [ -f "mplayer-svn/configure" ]; then
 			make
 			make install
 
-			do_checkIfExist mplayer-checkout mplayer.exe
+			do_checkIfExist mplayer-svn mplayer.exe
 	fi
 fi
 
