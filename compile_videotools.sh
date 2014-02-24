@@ -31,8 +31,10 @@ do_checkIfExist() {
 			if [[ $deleteSource = "y" ]]; then
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
-						cd $LOCALBUILDDIR
-						rm -rf $LOCALBUILDDIR/$packetName
+						if [[ ! "${packetName: -4}" = "-svn" ]]; then
+							cd $LOCALBUILDDIR
+							rm -rf $LOCALBUILDDIR/$packetName
+						fi	
 					fi
 				fi
 			fi
@@ -53,8 +55,10 @@ do_checkIfExist() {
 			if [[ $deleteSource = "y" ]]; then
 				if [[ ! "${packetName: -4}" = "-git" ]]; then
 					if [[ ! "${packetName: -3}" = "-hg" ]]; then
-						cd $LOCALBUILDDIR
-						rm -rf $LOCALBUILDDIR/$packetName
+						if [[ ! "${packetName: -4}" = "-svn" ]]; then
+							cd $LOCALBUILDDIR
+							rm -rf $LOCALBUILDDIR/$packetName
+						fi	
 					fi
 				fi
 			fi
