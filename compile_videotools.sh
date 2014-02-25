@@ -663,7 +663,7 @@ cd $LOCALBUILDDIR
 if [[ $mp4box = "y" ]]; then
 	if [ -f "mp4box-svn/configure" ]; then
 		echo -ne "\033]0;compile mp4box-svn $bits\007"
-		cd mplayer-svn
+		cd mp4box-svn
 		oldRevision=`svnversion`
 		svn update
 		newRevision=`svnversion`
