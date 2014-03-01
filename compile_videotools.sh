@@ -85,16 +85,18 @@ if [ -f "x264-git/configure" ]; then
 		rm $LOCALDESTDIR/bin/x264-10bit.exe
 		make uninstall
 		make clean
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-		make -j $cpuCount
-		make install
-		make clean
-
+		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
-		do_checkIfExist x264-git x264-10bit.exe
+		make clean
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x264-git x264.exe
 	else
 		echo -------------------------------------------------
 		echo "x264 is already up to date"
@@ -104,16 +106,17 @@ if [ -f "x264-git/configure" ]; then
 	echo -ne "\033]0;compile x264 $bits\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-		make -j $cpuCount
-		make install
-		make clean
-
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
-		do_checkIfExist x264-git x264-10bit.exe
+		make clean
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x264-git x264.exe
 fi
 
 cd $LOCALBUILDDIR
