@@ -244,7 +244,7 @@ if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
 		if [ -d "libpng-1.6.8" ]; then rm -rf libpng-1.6.8; fi
-		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.8/libpng-1.6.8.tar.gz"
+		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.9/libpng-1.6.9.tar.gz"
 		tar xf libpng-1.6.8.tar.gz
 		rm libpng-1.6.8.tar.gz
 		cd libpng-1.6.8
