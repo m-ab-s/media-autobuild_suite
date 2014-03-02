@@ -120,6 +120,12 @@ if [ -f "x264-git/configure" ]; then
 		make -j $cpuCount
 		make install
 		
+		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
+			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+			make -j $cpuCount
+			make install
+		fi
+		
 		do_checkIfExist x264-git x264.exe
 fi
 
