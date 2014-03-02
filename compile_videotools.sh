@@ -471,7 +471,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		make install
 		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
 		
-		do_checkIfExist libdvdread-4.2.1 libdvdnav.a
+		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
 fi
 
 if [[ $bits = "32bit" ]]; then
@@ -484,9 +484,9 @@ if [[ $bits = "32bit" ]]; then
 		else
 			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -rf MediaInfo_CLI_GNU_FromSource; fi
-			wget -c http://mediaarea.net/download/binary/mediainfo/0.7.65/MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
-			tar xf MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
-			rm MediaInfo_CLI_0.7.65_GNU_FromSource.tar.bz2
+			wget -c http://mediaarea.net/download/binary/mediainfo/0.7.67/MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
+			tar xf MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
+			rm MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
 			cd MediaInfo_CLI_GNU_FromSource
 			
 			sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
@@ -496,7 +496,7 @@ if [[ $bits = "32bit" ]]; then
 			source CLI_Compile.sh
 			cp MediaInfo/Project/GNU/CLI/mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
 			
-			do_checkIfExist MediaInfo_CLI mediainfo.exe
+			do_checkIfExist MediaInfo_CLI_GNU_FromSource mediainfo.exe
 	fi
 fi
 
