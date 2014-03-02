@@ -239,20 +239,20 @@ cd $LOCALBUILDDIR
 
 if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	echo -------------------------------------------------
-	echo "libpng-1.6.8 is already compiled"
+	echo "libpng-1.6.9 is already compiled"
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
-		if [ -d "libpng-1.6.8" ]; then rm -rf libpng-1.6.8; fi
+		if [ -d "libpng-1.6.9" ]; then rm -rf libpng-1.6.9; fi
 		wget -c "http://downloads.sourceforge.net/project/libpng/libpng16/1.6.9/libpng-1.6.9.tar.gz"
-		tar xf libpng-1.6.8.tar.gz
-		rm libpng-1.6.8.tar.gz
-		cd libpng-1.6.8
+		tar xf libpng-1.6.9.tar.gz
+		rm libpng-1.6.9.tar.gz
+		cd libpng-1.6.9
 		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist libpng-1.6.8 libpng.a
+		do_checkIfExist libpng-1.6.9 libpng.a
 fi
 
 cd $LOCALBUILDDIR
