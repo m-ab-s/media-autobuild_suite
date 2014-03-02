@@ -96,6 +96,10 @@ if [ -f "x264-git/configure" ]; then
 		make -j $cpuCount
 		make install
 		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		make -j $cpuCount
+		make install
+		
 		do_checkIfExist x264-git x264.exe
 	else
 		echo -------------------------------------------------
@@ -149,17 +153,18 @@ fi
 		if [ -f "$LOCALDESTDIR/lib/libx265.dll.a" ]; then rm $LOCALDESTDIR/lib/libx265.dll.a; fi
 		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
-		make -j $cpuCount
-		make install
-		make clean
-		rm -rf *
-
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
 		
-		do_checkIfExist x265-git x265-16bit.exe
+		make clean
+		rm -rf *
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x265-git x265.exe
 	else
 		echo -------------------------------------------------
 		echo "x265 is already up to date"
@@ -186,17 +191,18 @@ EOF
 		if [ -f "$LOCALDESTDIR/lib/libx265.dll.a" ]; then rm $LOCALDESTDIR/lib/libx265.dll.a; fi
 		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
-		make -j $cpuCount
-		make install
-		make clean
-		rm -rf *
-
 		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
 		
-		do_checkIfExist x265-git x265-16bit.exe
+		make clean
+		rm -rf *
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source 
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x265-git x265.exe
 fi
 
 cd $LOCALBUILDDIR
