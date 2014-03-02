@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.1
+::	This is version 1.3
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-02-02
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -57,6 +57,7 @@
 ::	2014-01-13 change compiler to rev.2 and fix check
 ::	2014-02-02 add global32 and global64 folders to the environment. Make it more easy to build some part of tools new
 ::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
+::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
 ::
 ::-------------------------------------------------------------------------------------
 
