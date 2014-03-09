@@ -246,6 +246,7 @@ if [ -f "libvpx-git/configure" ]; then
 	echo -ne "\033]0;compile libvpx $bits\007"
 	cd libvpx-git
 	oldHead=`git rev-parse HEAD`
+	git reset --hard
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
