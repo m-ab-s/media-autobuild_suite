@@ -139,16 +139,6 @@ if [ -f "x265-hg/toolchain.cmake" ]; then
 	hg update
 	newHead=`hg id --id`
 	if [[ "$oldHead" != "$newHead" ]]; then
-	
-if [ ! -f "toolchain.cmake" ]; then
-cat > toolchain.cmake << "EOF"
-SET(CMAKE_SYSTEM_NAME Windows)
-SET(CMAKE_C_COMPILER gcc -static-libgcc)
-SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
-SET(CMAKE_RC_COMPILER windres)
-SET(CMAKE_ASM_YASM_COMPILER yasm)
-EOF
-fi
 		cd build/msys
 		make clean
 		rm -rf *
@@ -158,14 +148,14 @@ fi
 		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
 		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF
+		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CFLAGS -static-libgcc -D_WIN32_WINNT=0x0600" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc"
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
 		
 		make clean
 		rm -rf *
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CFLAGS -static-libgcc -D_WIN32_WINNT=0x0600" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc"
 		make -j $cpuCount
 		make install
 		
@@ -179,13 +169,6 @@ fi
 	echo -ne "\033]0;compile x265 $bits\007"
 		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
 		cd x265-hg
-cat > toolchain.cmake << "EOF"
-SET(CMAKE_SYSTEM_NAME Windows)
-SET(CMAKE_C_COMPILER gcc -static-libgcc)
-SET(CMAKE_CXX_COMPILER g++ -static-libgcc)
-SET(CMAKE_RC_COMPILER windres)
-SET(CMAKE_ASM_YASM_COMPILER yasm)
-EOF
 
 		cd build/msys
 		
@@ -195,14 +178,14 @@ EOF
 		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
 		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF
+			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CFLAGS -static-libgcc -D_WIN32_WINNT=0x0600" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc"
 		make -j $cpuCount
 		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
 		
 		make clean
 		rm -rf *
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CFLAGS -static-libgcc -D_WIN32_WINNT=0x0600" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc"
 		make -j $cpuCount
 		make install
 		
