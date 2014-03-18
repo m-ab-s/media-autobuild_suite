@@ -206,7 +206,7 @@ EOF
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist x265-git x265.exe
+		do_checkIfExist x265-hg x265.exe
 fi
 
 cd $LOCALBUILDDIR
