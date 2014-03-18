@@ -243,17 +243,17 @@ if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
-		if [ -d libpng-* ]; then rm -rf libpng-*; fi
-		wget -c "http://download.sourceforge.net/libpng/libpng-1.6.10.tar.gz"
-		tar xf libpng-1.6.10.tar.gz
-		rm libpng-1.6.10.tar.gz
-		cd libpng-1.6.10
+		if [ -d libpng ]; then rm -rf libpng; fi
+		wget -c -O libpng.tar.xz "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/*.tar.xz"
+		tar xf libpng.tar.xz
+		rm libpng.tar.xz
+		mv libpng-* libpng
+		cd libpng
 		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
-		png='libpng-*'
-		do_checkIfExist libpng-1.6.10 libpng.a
+		do_checkIfExist libpng libpng.a
 fi
 
 cd $LOCALBUILDDIR
