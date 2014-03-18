@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-03-02
+modified: 2014-03-18
 
 ---
 
@@ -69,7 +69,6 @@ Included Tools and Libraries
  - libutvideo
  - libxml2
  - libzvbi
- - lua
  - mediainfo cli (only 32 bit)
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
@@ -86,7 +85,6 @@ Included Tools and Libraries
  - sox (standalone)
  - speex (standalone and lib for ffmpeg)
  - theora
- - vlc player
  - vidstab
  - vpx (standalone and lib for ffmpeg)
  - vo-aacenc

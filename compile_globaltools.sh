@@ -833,34 +833,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$GLOBALDESTDIR/lib/liblua.a" ]; then
-	echo -------------------------------------------------
-	echo "lua-5.1.4 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile lua $bits\007"
-		if [ -d "lua-5.1.4" ]; then rm -rf lua-5.1.4; fi
-		wget -c http://www.lua.org/ftp/lua-5.1.4.tar.gz
-		tar xf lua-5.1.4.tar.gz
-		rm lua-5.1.4.tar.gz
-		cd lua-5.1.4
-		
-		if [[ $bits = "32bit" ]]; then
-			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/global32/" Makefile
-		else
-			sed -i "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \/global64/" Makefile
-		fi
-			
-		sed -i "s/CC= gcc/local/CC= gcc -static-libgcc/" src/Makefile
-		make mingw
-		make install
-		cp src/lua51.dll $GLOBALDESTDIR/bin
-		
-		do_checkIfExist lua-5.1.4 liblua.a
-fi
-
-cd $LOCALBUILDDIR
-
 if [ -f "$GLOBALDESTDIR/lib/libilbc.a" ]; then
 	echo -------------------------------------------------
 	echo "libilbc is already compiled"
