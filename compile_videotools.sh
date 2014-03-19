@@ -131,7 +131,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "x265-hg/toolchain.cmake" ]; then
+if [ -f "x265-hg/source/CMakeLists.txt" ]; then
 	echo -ne "\033]0;compile x265 $bits\007"
 	cd x265-hg
 	oldHead=`hg id --id`
