@@ -58,6 +58,7 @@
 ::	2014-02-02 add global32 and global64 folders to the environment. Make it more easy to build some part of tools new
 ::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
 ::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
+::	2014-03-23 change compiler to rev.3
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -377,7 +378,7 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev2.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
 
 		:instMingW32
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
@@ -405,7 +406,7 @@ if %build64%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev2.7z"
+		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
 		
 		:instMingW64
 		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
