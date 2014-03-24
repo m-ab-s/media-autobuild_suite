@@ -314,7 +314,7 @@ if exist "%instdir%\bin\msgmerge.exe" GOTO autoTools
 	%instdir%\bin\mingw-get upgrade msys-core-bin=1.0.17-1
 	
 :autoTools
-if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO mingw32
+if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- Download and install AutoTools, libcrypt, Glib and PKG-CONFIG
@@ -364,6 +364,10 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO mingw32
 	echo.echo '%userName%'>%instdir%\msys\1.0\bin\whoami
 	
 	cd %instdir%
+
+:pkg
+if exist "%instdir%\share\aclocal\pkg.m4" GOTO mingw32
+copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
 	
 ::------------------------------------------------------------------
 ::download and install mingw compiler:

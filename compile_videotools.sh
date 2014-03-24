@@ -414,15 +414,14 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdread $bits\007"
 		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1-rc1.tar.xz
-		tar xf libdvdread-4.2.1-rc1.tar.xz
-		rm libdvdread-4.2.1-rc1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
+		tar xf libdvdread-4.2.1.tar.xz
+		rm libdvdread-4.2.1.tar.xz
 		cd libdvdread-4.2.1
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
 		fi	
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
-		sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
 		make -j $cpuCount
 		make install
 		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
@@ -440,11 +439,10 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdnav $bits\007"
 		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1-rc1.tar.xz
-		tar xf libdvdnav-4.2.1-rc1.tar.xz
-		rm libdvdnav-4.2.1-rc1.tar.xz
+		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+		tar xf libdvdnav-4.2.1.tar.xz
+		rm libdvdnav-4.2.1.tar.xz
 		cd libdvdnav-4.2.1
-		#cp -v /usr/share/aclocal/* m4/
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
 		fi
