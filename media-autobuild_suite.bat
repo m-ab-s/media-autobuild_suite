@@ -368,6 +368,7 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 :pkg
 if exist "%instdir%\share\aclocal\pkg.m4" GOTO mingw32
 copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
+echo.copy pkg.m4 to %instdir%\share\aclocal
 	
 ::------------------------------------------------------------------
 ::download and install mingw compiler:
