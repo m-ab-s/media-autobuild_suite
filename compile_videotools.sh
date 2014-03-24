@@ -713,8 +713,8 @@ if [[ $ffmpeg = "y" ]]; then
 	
 unamestr=`uname`
 libx265=""
-if [[ ! "$unamestr" == 'MINGW32_NT-5.1' ]]; then 
-	if [[ ! "$unamestr" == 'MINGW32_NT-5.2' ]]; then
+if [[ "$unamestr" != 'MINGW32_NT-5.1' ]]; then 
+	if [[ "$unamestr" != 'MINGW32_NT-5.2' ]]; then
 		libx265="--enable-libx265"
 	fi
 fi
