@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-03-18
+modified: 2014-03-25
 
 ---
 
@@ -30,7 +30,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v1.3**
+Current release is **v1.4**
 
 
 Included Tools and Libraries
@@ -63,6 +63,7 @@ Included Tools and Libraries
  - libmodplug
  - libmpeg2
  - libpng
+ - libsndflie
  - libsoxr
  - libtiff
  - libtwolame
@@ -90,6 +91,7 @@ Included Tools and Libraries
  - vo-aacenc
  - vo-amrwbenc
  - vorbis
+ - wavpack
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
  - x265 (standalone and lib for ffmpeg)
