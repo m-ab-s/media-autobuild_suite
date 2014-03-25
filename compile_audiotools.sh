@@ -579,7 +579,7 @@ fi
 	
 cd $LOCALBUILDDIR
 	
-if [ -f "sox-git/autogen.sh" ]; then
+if [ -f "sox-git/configure.ac" ]; then
 	echo -ne "\033]0;compile sox $bits\007"
 	cd sox-git
 	oldHead=`git rev-parse HEAD`
