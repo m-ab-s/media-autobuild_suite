@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.3
+::	This is version 1.4
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-02-02
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -59,6 +59,7 @@
 ::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
 ::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
 ::	2014-03-23 change compiler to rev.3
+::	2014-03-25 add python to the opt tools
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -366,14 +367,23 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 	cd %instdir%
 
 :pkg
-if exist "%instdir%\share\aclocal\pkg.m4" GOTO mingw32
+if exist "%instdir%\share\aclocal\pkg.m4" GOTO python
 copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
 echo.copy pkg.m4 to %instdir%\share\aclocal
 	
+:python
+if exist "%instdir%\opt\python27\python.exe" GOTO mingw32
+cd %instdir%\opt
+mkdir python27
+%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
+del python-2.7.2.msi
+cd %instdir%
+
 ::------------------------------------------------------------------
 ::download and install mingw compiler:
 ::------------------------------------------------------------------	
-	
+
 :mingw32
 if %build32%==yes (
 	if exist "%instdir%\mingw32\bin\gcc.exe" GOTO mingw64
@@ -536,7 +546,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -570,7 +580,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
