@@ -484,24 +484,150 @@ if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
 fi
 
 cd $LOCALBUILDDIR
+
+if [ -f "WavPack-git/autogen.sh" ]; then
+	echo -ne "\033]0;compile WavPack $bits\007"
+	cd WavPack-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
 		
-if [ -f "$LOCALDESTDIR/bin/sox.exe" ]; then
-	echo -------------------------------------------------
-	echo "sox-14.4.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile sox $bits\007"
-		if [ -d "sox-14.4.1" ]; then rm -rf sox-14.4.1; fi
-		wget -c http://downloads.sourceforge.net/project/sox/sox/14.4.1/sox-14.4.1.tar.gz
-		tar xf sox-14.4.1.tar.gz
-		rm sox-14.4.1.tar.gz
-		cd sox-14.4.1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+	
+		make uninstall
+		make clean
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
+		
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist sox-14.4.1 sox.exe
+		do_checkIfExist WavPack-git libwavpack.a
+
+	else
+		echo -------------------------------------------------
+		echo "WavPack is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		echo -ne "\033]0;compile WavPack $bits\007"
+		
+		git clone git://github.com/dbry/WavPack.git WavPack-git
+		cd WavPack-git
+		
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
+			
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist WavPack-git libwavpack.a
 fi
+	
+cd $LOCALBUILDDIR
+
+if [ -f "libsndfile-git/autogen.sh" ]; then
+	echo -ne "\033]0;compile libsndfile $bits\007"
+	cd libsndfile-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+	
+		make uninstall
+		make clean
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
+		
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libsndfile-git libsndfile.a
+
+	else
+		echo -------------------------------------------------
+		echo "libsndfile is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		echo -ne "\033]0;compile libsndfile $bits\007"
+		
+		git clone git://github.com/erikd/libsndfile.git libsndfile-git
+		cd libsndfile-git
+		
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+		fi
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
+		
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libsndfile-git libsndfile.a
+fi
+	
+cd $LOCALBUILDDIR
+	
+if [ -f "sox-git/autogen.sh" ]; then
+	echo -ne "\033]0;compile sox $bits\007"
+	cd sox-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		mv $LOCALDESTDIR/lib/libgsm.a $LOCALDESTDIR/lib/tmp_libgsm.a
+		if [[ ! -f ./configure ]]; then
+			autoreconf -i
+		fi
+	
+		make uninstall
+		make clean
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		
+		make -j $cpuCount
+		make install
+		mv $LOCALDESTDIR/lib/tmp_libgsm.a $LOCALDESTDIR/lib/libgsm.a
+		
+		do_checkIfExist sox-git sox.exe
+		
+	else
+		echo -------------------------------------------------
+		echo "sox is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		echo -ne "\033]0;compile sox $bits\007"
+		
+		git clone git://git.code.sf.net/p/sox/code sox-git
+		cd sox-git
+		
+		mv $LOCALDESTDIR/lib/libgsm.a $LOCALDESTDIR/lib/tmp_libgsm.a
+		
+		if [[ ! -f ./configure ]]; then
+			autoreconf -i
+		fi
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+			
+		make -j $cpuCount
+		make install
+		mv $LOCALDESTDIR/lib/tmp_libgsm.a $LOCALDESTDIR/lib/libgsm.a
+		
+		do_checkIfExist sox-git sox.exe
+fi
+
 }
 
 if [[ $build32 = "yes" ]]; then

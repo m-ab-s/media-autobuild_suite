@@ -59,7 +59,7 @@
 ::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
 ::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
 ::	2014-03-23 change compiler to rev.3
-::	2014-03-25 add python to the opt tools
+::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
 ::
 ::-------------------------------------------------------------------------------------
 
