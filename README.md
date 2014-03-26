@@ -63,7 +63,7 @@ Included Tools and Libraries
  - libmodplug
  - libmpeg2
  - libpng
- - libsndflie
+ - libsndfile
  - libsoxr
  - libtiff
  - libtwolame
