@@ -60,7 +60,7 @@
 ::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
 ::	2014-03-23 change compiler to rev.3
 ::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
-::	2014-04-02 fix x264 10bit exe and change shell to utf-8 
+::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -643,7 +643,7 @@ if not exist "%instdir%\opt\bin\git.exe" (
 	echo.download and install PortableGit
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://msysgit.googlecode.com/files/PortableGit-1.8.3-preview20130601.7z"
+	%instdir%\msys\1.0\bin\wget -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
 	%instdir%\opt\bin\7za x PortableGit-1.8.3-preview20130601.7z -aoa
 	%instdir%\msys\1.0\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
 	%instdir%\msys\1.0\bin\mv ReleaseNotes.rtf README.portable doc\git
@@ -656,7 +656,7 @@ if not exist "%instdir%\opt\bin\svn.exe" (
 	echo.download and install svn
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.3/apache22/svn-win32-1.8.3.zip"
+	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
 	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.3.zip
 	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.3/* .
 	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.3
@@ -671,7 +671,7 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	echo.download and install cmake
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.11.1-win32-x86.zip"
+	%instdir%\msys\1.0\bin\wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
 	%instdir%\msys\1.0\bin\unzip cmake-2.8.11.1-win32-x86.zip
 	%instdir%\msys\1.0\bin\cp -va cmake-2.8.11.1-win32-x86/* .
 	%instdir%\msys\1.0\bin\rm cmake-2.8.11.1-win32-x86.zip
@@ -690,6 +690,23 @@ if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	%instdir%\msys\1.0\bin\rm tortoisehg-2.4.1-hg-2.2.2-x86.msi
 	%instdir%\msys\1.0\bin\rm -r -f %instdir%\opt\hg-temp
 	cd ..
+	)
+
+if not exist "%instdir%\opt\bin\pdflatex.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install pdftex-w32
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
+	%instdir%\msys\1.0\bin\tar xf pdftex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar xf makeindex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar xf dvipsk-w32.tar.xz
+	%instdir%\msys\1.0\bin\rm pdftex-w32.tar.xz
+	%instdir%\msys\1.0\bin\rm makeindex-w32.tar.xz
+	%instdir%\msys\1.0\bin\rm dvipsk-w32.tar.xz
+	cd ..
 	)		
 
 cd %instdir%
@@ -698,7 +715,7 @@ cd %instdir%
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\doxygen.exe GOTO checkDoxygen64
 	cd %instdir%\build32
-	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.5.windows.bin.zip"
+	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
 	cd %instdir%\mingw32\bin
 	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.5.windows.bin.zip
 	del %instdir%\build32\doxygen-1.8.5.windows.bin.zip
@@ -708,7 +725,7 @@ if %build32%==yes (
 if %build64%==yes (
 	if exist %instdir%\mingw64\bin\doxygen.exe GOTO checkYasm32
 	cd %instdir%\build64
-	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.5.windows.x64.bin.zip"
+	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
 	cd %instdir%\mingw64\bin
 	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.5.windows.x64.bin.zip
 	del %instdir%\build64\doxygen-1.8.5.windows.x64.bin.zip
