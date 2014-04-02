@@ -88,6 +88,9 @@ if [ -f "x264-git/configure" ]; then
 		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
 		make clean
@@ -112,7 +115,12 @@ if [ -f "x264-git/configure" ]; then
 		cd x264-git
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
+		
+		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
+		fi
 		
 		make clean
 		
