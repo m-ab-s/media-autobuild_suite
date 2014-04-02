@@ -115,8 +115,8 @@ if [ -f "x264-git/configure" ]; then
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
 		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-			make uninstall
-			make clean
+			rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
+			rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
 		fi
 		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
