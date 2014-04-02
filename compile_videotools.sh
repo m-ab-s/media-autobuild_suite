@@ -114,7 +114,7 @@ if [ -f "x264-git/configure" ]; then
 	echo -ne "\033]0;compile x264 $bits\007"
 		git clone http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
-		if [ -f "$LOCALDESTDIR/bin/x264.exe" ]; then
+		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
 			make uninstall
 			make clean
 		fi
