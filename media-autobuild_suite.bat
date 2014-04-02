@@ -60,6 +60,7 @@
 ::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
 ::	2014-03-23 change compiler to rev.3
 ::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
+::	2014-04-02 fix x264 10bit exe and change shell to utf-8 
 ::
 ::-------------------------------------------------------------------------------------
 
