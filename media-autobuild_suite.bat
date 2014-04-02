@@ -764,6 +764,8 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 ::mintty seetings, color, transparency, etc.
 :minttySettings
 if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
+	for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
+	
 	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
@@ -775,7 +777,7 @@ if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
 	echo.Columns=90>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.Rows=30>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.Locale=de_DE>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
-	echo.Charset=ISO-8859-1>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Charset=UTF-8>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.Term=xterm-256color>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.CursorType=block>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.Black=38,39,41>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
