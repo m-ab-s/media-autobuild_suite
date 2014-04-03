@@ -700,12 +700,15 @@ if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
 	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
 	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
-	%instdir%\msys\1.0\bin\tar xf pdftex-w32.tar.xz
-	%instdir%\msys\1.0\bin\tar xf makeindex-w32.tar.xz
-	%instdir%\msys\1.0\bin\tar xf dvipsk-w32.tar.xz
-	%instdir%\msys\1.0\bin\rm pdftex-w32.tar.xz
-	%instdir%\msys\1.0\bin\rm makeindex-w32.tar.xz
-	%instdir%\msys\1.0\bin\rm dvipsk-w32.tar.xz
+	%instdir%\msys\1.0\bin\xz -d pdftex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf pdftex-w32.tar
+	%instdir%\msys\1.0\bin\xz -d makeindex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf makeindex-w32.tar
+	%instdir%\msys\1.0\bin\xz -d dvipsk-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf dvipsk-w32.tar
+	%instdir%\msys\1.0\bin\rm pdftex-w32.tar
+	%instdir%\msys\1.0\bin\rm makeindex-w32.tar
+	%instdir%\msys\1.0\bin\rm dvipsk-w32.tar
 	cd ..
 	)		
 
