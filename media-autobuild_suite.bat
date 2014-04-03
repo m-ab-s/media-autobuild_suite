@@ -368,17 +368,11 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 	cd %instdir%
 
 :pkg
-if exist "%instdir%\share\aclocal\pkg.m4" GOTO python
-copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
-echo.copy pkg.m4 to %instdir%\share\aclocal
+if exist "%instdir%\share\aclocal\pkg.m4" GOTO mingw32
+	copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
+	echo.copy pkg.m4 to %instdir%\share\aclocal
 	
-:python
-if exist "%instdir%\opt\python27\python.exe" GOTO mingw32
-cd %instdir%\opt
-mkdir python27
-%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
-msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
-del python-2.7.2.msi
+
 cd %instdir%
 
 ::------------------------------------------------------------------
@@ -679,6 +673,15 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	cd ..
 	)
 	
+if not exist "%instdir%\opt\python27\python.exe" (
+	cd %instdir%\opt
+	mkdir python27
+	%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+	msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
+	del python-2.7.2.msi
+	cd ..
+)
+
 if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.-------------------------------------------------------------------------------
 	echo.download and install TortoiseHg
