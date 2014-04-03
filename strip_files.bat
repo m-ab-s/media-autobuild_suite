@@ -4,7 +4,7 @@ title strip tools
 
 set instdir=%CD%
 
-if %build32%==yes (
+if exist "%instdir%\local32\bin" (
 	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
 		%instdir%\mingw32\bin\strip --strip-all %%C 
 		echo.%%C done...
@@ -15,7 +15,7 @@ if %build32%==yes (
 		)
 	)
 	
-if %build64%==yes (
+if exist "%instdir%\local64\bin" (
 	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
 		%instdir%\mingw64\bin\strip --strip-all %%C 
 		echo.%%C done...
