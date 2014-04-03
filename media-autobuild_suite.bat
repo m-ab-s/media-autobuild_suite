@@ -644,10 +644,10 @@ if not exist "%instdir%\opt\bin\git.exe" (
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
 	%instdir%\msys\1.0\bin\wget -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
-	%instdir%\opt\bin\7za x PortableGit-1.8.3-preview20130601.7z -aoa
+	%instdir%\opt\bin\7za x PortableGit-1.9.0-preview20140217.7z -aoa
 	%instdir%\msys\1.0\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
 	%instdir%\msys\1.0\bin\mv ReleaseNotes.rtf README.portable doc\git
-	%instdir%\msys\1.0\bin\rm PortableGit-1.8.3-preview20130601.7z
+	%instdir%\msys\1.0\bin\rm PortableGit-1.9.0-preview20140217.7z
 	cd ..
 	)
 
@@ -657,12 +657,12 @@ if not exist "%instdir%\opt\bin\svn.exe" (
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
 	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
-	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.3.zip
-	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.3/* .
-	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.3
-	%instdir%\msys\1.0\bin\mv README.txt doc\svn-win32-1.8.3
-	%instdir%\msys\1.0\bin\rm svn-win32-1.8.3.zip
-	%instdir%\msys\1.0\bin\rm -r svn-win32-1.8.3
+	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.8.zip
+	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.8/* .
+	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.8
+	%instdir%\msys\1.0\bin\mv README.txt doc\svn-win32-1.8.8
+	%instdir%\msys\1.0\bin\rm svn-win32-1.8.8.zip
+	%instdir%\msys\1.0\bin\rm -r svn-win32-1.8.8
 	cd ..
 	)
 
@@ -672,10 +672,10 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
 	%instdir%\msys\1.0\bin\wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
-	%instdir%\msys\1.0\bin\unzip cmake-2.8.11.1-win32-x86.zip
-	%instdir%\msys\1.0\bin\cp -va cmake-2.8.11.1-win32-x86/* .
-	%instdir%\msys\1.0\bin\rm cmake-2.8.11.1-win32-x86.zip
-	%instdir%\msys\1.0\bin\rm -r cmake-2.8.11.1-win32-x86
+	%instdir%\msys\1.0\bin\unzip cmake-2.8.12.2-win32-x86.zip
+	%instdir%\msys\1.0\bin\cp -va cmake-2.8.12.2-win32-x86/* .
+	%instdir%\msys\1.0\bin\rm cmake-2.8.12.2-win32-x86.zip
+	%instdir%\msys\1.0\bin\rm -r cmake-2.8.12.2-win32-x86
 	cd ..
 	)
 	
@@ -717,8 +717,8 @@ if %build32%==yes (
 	cd %instdir%\build32
 	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
 	cd %instdir%\mingw32\bin
-	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.5.windows.bin.zip
-	del %instdir%\build32\doxygen-1.8.5.windows.bin.zip
+	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.6.windows.bin.zip
+	del %instdir%\build32\doxygen-1.8.6.windows.bin.zip
 	)
 	
 :checkDoxygen64
@@ -727,8 +727,8 @@ if %build64%==yes (
 	cd %instdir%\build64
 	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
 	cd %instdir%\mingw64\bin
-	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.5.windows.x64.bin.zip
-	del %instdir%\build64\doxygen-1.8.5.windows.x64.bin.zip
+	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
+	del %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
 	)
 	
 :checkYasm32	
