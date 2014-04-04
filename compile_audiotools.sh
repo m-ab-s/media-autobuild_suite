@@ -338,7 +338,9 @@ if [ -f "$LOCALDESTDIR/bin/fdkaac.exe" ]; then
 			echo "Cflags: -I${includedir}" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
 		fi
 
-		do_checkIfExist fdk-aac fdkaac.exe
+		do_checkIfExist bin-fdk-aac fdkaac.exe
+		do_checkIfExist lib-fdk-aac fdkaac.exe
+		do_checkIfExist patch-fdk-aac fdkaac.exe
 fi
 
 cd $LOCALBUILDDIR
