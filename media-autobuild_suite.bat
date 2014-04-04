@@ -61,6 +61,7 @@
 ::	2014-03-23 change compiler to rev.3
 ::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
 ::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
+::	2014-04-04 add strip files to main batch
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -80,6 +81,7 @@ if not exist %ini% (
 	echo.mplayer=^0>>%ini%
 	echo.cores=^0>>%ini%
 	echo.deleteSource=^0>>%ini%
+	echo.strip=^0>>%ini%
 	)
 
 for /F "tokens=2 delims==" %%a in ('findstr /i arch %ini%') do set archINI=%%a
@@ -89,6 +91,7 @@ for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
+for /F "tokens=2 delims==" %%i in ('findstr /i strip %ini%') do set stripINI=%%i
 
 :selectSystem
 if %archINI%==0 (
@@ -260,6 +263,30 @@ if %deleteS%==2 (
 	set "deleteSource=n"
 	)
 if %deleteS% GTR 2 GOTO delete
+
+:stripEXE
+if %stripINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. strip compiled files:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P stripF="strip files:"
+	) else (
+		set stripF=%stripINI%
+	)
+	
+if %stripF%==1 (
+	set "stripFile=y"
+	)
+if %stripF%==2 (
+	set "stripFile=n"
+	)
+if %stripF% GTR 2 GOTO stripEXE
 
 ::------------------------------------------------------------------
 ::download and install basic msys system:
@@ -787,8 +814,8 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	
 ::mintty seetings, color, transparency, etc.
 :minttySettings
+for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
 if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
-	for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
 	
 	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
@@ -886,6 +913,55 @@ echo ---------------------------------------------------------------------------
 %instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
 echo. compile video tools done...	
 	
+:: strip compiled files
+if %stripFile%==y (
+echo -------------------------------------------------------------------------------
+echo.
+echo.- stripping bins:
+echo.
+echo -------------------------------------------------------------------------------
+
+if %build32%==yes (
+	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%C
+				echo.strip %%~nC%%~xC 32Bit done...
+				)
+			)
+		)
+		
+	FOR /R "%instdir%\local32\bin" %%D IN (*.dll) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%D
+				echo.strip %%~nD%%~xD 32Bit done...
+				)
+			)
+		)
+	)	
+	
+if %build64%==yes (
+	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%C
+				echo.strip %%~nC%%~xC 64Bit done...
+				)
+			)
+		)
+		
+	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%D
+				echo.strip %%~nD%%~xD 64Bit done...
+				)
+			)
+		)
+	)
+)
+
 echo -------------------------------------------------------------------------------
 echo.
 echo. compiling done...
