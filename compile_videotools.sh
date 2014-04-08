@@ -717,7 +717,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ $ffmpeg = "y" ]]; then
+if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	if [[ $nonfree = "y" ]]; then
 		extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
 	  else
@@ -726,13 +726,11 @@ if [[ $ffmpeg = "y" ]]; then
 		fi
 	fi
 	
-unamestr=`uname`
 libx265=""
-if [[ "$unamestr" != 'MINGW32_NT-5.1' ]]; then 
-	if [[ "$unamestr" != 'MINGW32_NT-5.2' ]]; then
-		libx265="--enable-libx265"
-	fi
+if [[ $ffmpeg = "w" ]]; then
+	libx265="--enable-libx265"
 fi
+
 	
 	echo "-------------------------------------------------------------------------------"
 	echo "compile ffmpeg $bits"

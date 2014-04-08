@@ -156,6 +156,7 @@ if %ffmpegINI%==0 (
 	echo. Build static ffmpeg binary:
 	echo. 1 = yes
 	echo. 2 = no
+	echo. 3 = with x265 [experimental]
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -170,7 +171,10 @@ if %buildffmpeg%==1 (
 if %buildffmpeg%==2 (
 	set "ffmpeg=n"
 	)
-if %buildffmpeg% GTR 2 GOTO ffmpeg
+if %buildffmpeg%==3 (
+	set "ffmpeg=w"
+	)
+if %buildffmpeg% GTR 3 GOTO ffmpeg
 
 :mp4boxStatic
 if %mp4boxINI%==0 (
