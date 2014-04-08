@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.4
+::	This is version 1.5
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-02-02
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -62,6 +62,7 @@
 ::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
 ::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
 ::	2014-04-04 add strip files to main batch
+::	2014-04-08 ask for x265 in ffmpeg
 ::
 ::-------------------------------------------------------------------------------------
 
