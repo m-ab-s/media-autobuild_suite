@@ -216,7 +216,7 @@ if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 	else 
 		echo -ne "\033]0;compile xvidcore $bits\007"
 		if [ -d "xvidcore" ]; then rm -rf xvidcore; fi
-		wget -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xvid.org/downloads/xvidcore-1.3.2.tar.gz
 		tar xf xvidcore-1.3.2.tar.gz
 		rm xvidcore-1.3.2.tar.gz
 		cd xvidcore/build/generic
@@ -370,7 +370,7 @@ if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
 	else 
 		echo -ne "\033]0;compile libass $bits\007"
 		if [ -d "libass-0.10.2" ]; then rm -rf libass-0.10.2; fi
-		wget -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
 		tar xf libass-0.10.2.tar.gz
 		rm libass-0.10.2.tar.gz
 		cd libass-0.10.2
@@ -409,7 +409,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
 	else 
 			echo -ne "\033]0;compile libdvdcss $bits\007"
 			if [ -d "libdvdcss-1.2.13" ]; then rm -rf libdvdcss-1.2.13; fi
-			wget -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
+			wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
 			tar xf libdvdcss-1.2.13.tar.bz2
 			rm libdvdcss-1.2.13.tar.bz2
 			cd libdvdcss-1.2.13
@@ -429,7 +429,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdread $bits\007"
 		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
 		tar xf libdvdread-4.2.1.tar.xz
 		rm libdvdread-4.2.1.tar.xz
 		cd libdvdread-4.2.1
@@ -455,7 +455,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	else 
 		echo -ne "\033]0;compile libdvdnav $bits\007"
 		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
-		wget -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
 		tar xf libdvdnav-4.2.1.tar.xz
 		rm libdvdnav-4.2.1.tar.xz
 		cd libdvdnav-4.2.1
@@ -480,7 +480,7 @@ if [[ $bits = "32bit" ]]; then
 		else
 			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -rf MediaInfo_CLI_GNU_FromSource; fi
-			wget -c http://mediaarea.net/download/binary/mediainfo/0.7.67/MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
+			wget --tries=20 --retry-connrefused --waitretry=2 -c http://mediaarea.net/download/binary/mediainfo/0.7.67/MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
 			tar xf MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
 			rm MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
 			cd MediaInfo_CLI_GNU_FromSource
@@ -539,7 +539,7 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 	else 
 		echo -ne "\033]0;compile libcaca $bits\007"
 		if [ -d "libcaca-0.99.beta18" ]; then rm -rf libcaca-0.99.beta18; fi
-		wget -c http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz
 		tar xf libcaca-0.99.beta18.tar.gz
 		rm libcaca-0.99.beta18.tar.gz
 		cd libcaca-0.99.beta18
@@ -564,7 +564,7 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
 		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
-		wget -c http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
 		tar xf libmodplug-0.8.8.4.tar.gz
 		rm libmodplug-0.8.8.4.tar.gz
 		cd libmodplug-0.8.8.4
@@ -585,7 +585,7 @@ if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
 	else 
 		echo -ne "\033]0;compile orc $bits\007"
 		if [ -d "orc-0.4.18" ]; then rm -rf orc-0.4.18; fi
-		wget -c http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://code.entropywave.com/download/orc/orc-0.4.18.tar.gz
 		tar xf orc-0.4.18.tar.gz
 		rm orc-0.4.18.tar.gz
 		cd orc-0.4.18
@@ -605,7 +605,7 @@ if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
 	else 
 		echo -ne "\033]0;compile schroedinger $bits\007"
 		if [ -d "schroedinger-1.0.11" ]; then rm -rf schroedinger-1.0.11; fi
-		wget -c http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://diracvideo.org/download/schroedinger/schroedinger-1.0.11.tar.gz
 		tar xf schroedinger-1.0.11.tar.gz
 		rm schroedinger-1.0.11.tar.gz
 		cd schroedinger-1.0.11
@@ -627,12 +627,12 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
 		if [ -d "zvbi-0.2.35" ]; then rm -rf zvbi-0.2.35; fi
-		wget -c http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
 		tar xf zvbi-0.2.35.tar.bz2
 		rm zvbi-0.2.35.tar.bz2
 		cd zvbi-0.2.35
-		wget --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch
-		wget --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch
 		patch -p0 < zvbi-win32.patch
 		patch -p0 < zvbi-ioctl.patch
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
@@ -653,7 +653,7 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
 		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
-		wget --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4

@@ -85,7 +85,7 @@ if [ -f "$GLOBALDESTDIR/lib/libz.a" ]; then
 	else 
 		echo -ne "\033]0;compile zlib $bits\007"
 		if [ -d "zlib-1.2.8" ]; then rm -rf zlib-1.2.8; fi
-		wget -c http://www.zlib.net/zlib-1.2.8.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.zlib.net/zlib-1.2.8.tar.gz
 		tar xf zlib-1.2.8.tar.gz
 		rm zlib-1.2.8.tar.gz
 		cd zlib-1.2.8
@@ -123,7 +123,7 @@ if [ -f "$GLOBALDESTDIR/bin/bzip2.exe" ]; then
 	else 
 		echo -ne "\033]0;compile bzip2 $bits\007"
 		if [ -d "bzip2-1.0.6" ]; then rm -rf bzip2-1.0.6; fi
-		wget -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://bzip.org/1.0.6/bzip2-1.0.6.tar.gz
 		tar xf bzip2-1.0.6.tar.gz
 		rm bzip2-1.0.6.tar.gz
 		cd bzip2-1.0.6
@@ -145,7 +145,7 @@ if [ -f "$GLOBALDESTDIR/lib/libdl.a" ]; then
 	else 
 		echo -ne "\033]0;compile dlfcn-win32 $bits\007"
 		if [ -d "dlfcn-win32-r19" ]; then rm -rf dlfcn-win32-r19; fi
-		wget -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
 		tar xf dlfcn-win32-r19.tar.bz2
 		rm dlfcn-win32-r19.tar.bz2
 		cd dlfcn-win32-r19
@@ -165,7 +165,7 @@ if [ -f "$GLOBALDESTDIR/lib/libpthread.a" ]; then
 	else 
 		echo -ne "\033]0;compile pthreads-w32 $bits\007"
 		if [ -d "pthreads-w32-2-9-1-release" ]; then rm -rf pthreads-w32-2-9-1-release; fi
-		wget -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
 		tar xf pthreads-w32-2-9-1-release.tar.gz
 		rm pthreads-w32-2-9-1-release.tar.gz
 		cd pthreads-w32-2-9-1-release
@@ -185,7 +185,7 @@ cd $LOCALBUILDDIR
 #	echo "nasm-2.10.09 is already compiled"
 #	echo -------------------------------------------------
 #	else 
-#		wget -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
+#		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
 #		tar xf nasm-2.10.09.tar.gz
 #		cd nasm-2.10.09
 #		./configure --prefix=/$GLOBALDESTDIR
@@ -207,7 +207,7 @@ if [ -f "$GLOBALDESTDIR/bin/pkg-config.exe" ]; then
 	else 
 		echo -ne "\033]0;compile pkg-config-lite $bits\007"
 		if [ -d "pkg-config-lite-0.28-1" ]; then rm -rf pkg-config-lite-0.28-1; fi
-		wget -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1.tar.gz
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		rm pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
@@ -244,7 +244,7 @@ if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
 		if [ -d libpng ]; then rm -rf libpng; fi
-		wget -c -O libpng.tar.xz "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/*.tar.xz"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libpng.tar.xz "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/*.tar.xz"
 		tar xf libpng.tar.xz
 		rm libpng.tar.xz
 		mv libpng-* libpng
@@ -265,7 +265,7 @@ if [ -f "$GLOBALDESTDIR/lib/libjpeg.a" ]; then
 	else 
 		echo -ne "\033]0;compile jpeg-9 $bits\007"
 		if [ -d "jpeg-9" ]; then rm -rf jpeg-9; fi
-		wget -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.ijg.org/files/jpegsrc.v9.tar.gz
 		tar xf jpegsrc.v9.tar.gz
 		rm jpegsrc.v9.tar.gz
 		cd jpeg-9
@@ -285,7 +285,7 @@ if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 	else 
 		echo -ne "\033]0;compile openjpeg $bits\007"
 		if [ -d "openjpeg_v1_4_sources_r697" ]; then rm -rf openjpeg_v1_4_sources_r697; fi
-		wget -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://openjpeg.googlecode.com/files/openjpeg_v1_4_sources_r697.tgz"
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		rm openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
@@ -313,7 +313,7 @@ if [ -f "$GLOBALDESTDIR/lib/libturbojpeg.a" ]; then
 	else 
 		echo -ne "\033]0;compile libjpeg-turbo $bits\007"
 		if [ -d "libjpeg-turbo-1.3.0" ]; then rm -rf libjpeg-turbo-1.3.0; fi
-		wget -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
 		tar xf libjpeg-turbo-1.3.0.tar.gz
 		rm libjpeg-turbo-1.3.0.tar.gz
 		cd libjpeg-turbo-1.3.0
@@ -334,7 +334,7 @@ if [ -f "$GLOBALDESTDIR/lib/libjasper.a" ]; then
 	else 
 		echo -ne "\033]0;compile jasper $bits\007"
 		if [ -d "jasper-1.900.1" ]; then rm -rf jasper-1.900.1; fi
-		wget -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
@@ -354,7 +354,7 @@ if [ -f "$GLOBALDESTDIR/lib/libtiff.a" ]; then
 	else 
 		echo -ne "\033]0;compile tiff $bits\007"
 		if [ -d "tiff-4.0.3" ]; then rm -rf tiff-4.0.3; fi
-		wget -c ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
 		tar xf tiff-4.0.3.tar.gz
 		rm tiff-4.0.3.tar.gz
 		cd tiff-4.0.3
@@ -373,7 +373,7 @@ if [ -f "$GLOBALDESTDIR/include/d3dx.h" ]; then
 	echo -------------------------------------------------
 	else 
 		if [ -d "dx7headers" ]; then rm -rf dx7headers; fi
-		wget -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://www.mplayerhq.hu/MPlayer/contrib/win32/dx7headers.tgz"
 		mkdir dx7headers
 		cd dx7headers
 		/opt/bin/7za x ../dx7headers.tgz
@@ -410,7 +410,7 @@ if [ -f "$GLOBALDESTDIR/lib/libiconv.a" ]; then
 	else 
 		echo -ne "\033]0;compile libiconv $bits\007"
 		if [ -d "libiconv-1.14" ]; then rm -rf libiconv-1.14; fi
-		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
@@ -430,7 +430,7 @@ if [ -f "$GLOBALDESTDIR/lib/libasprintf.a" ]; then
     else 
 		echo -ne "\033]0;compile gettext-runtime $bits\007"
 		if [ -d "gettext-0.18.3.1-runtime" ]; then rm -rf gettext-0.18.3.1-runtime; fi
-		wget -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/pub/gnu/gettext/gettext-0.18.3.1.tar.gz
 		tar xzf gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-runtime
 		cd gettext-0.18.3.1-runtime
@@ -474,7 +474,7 @@ if [ -f "$GLOBALDESTDIR/bin/iconv.exe" ]; then
     else 
 		echo -ne "\033]0;compile libiconv $bits\007"
 		if [ -d "libiconv-1.14" ]; then rm -rf libiconv-1.14; fi
-		wget -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.14.tar.gz
 		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
@@ -495,8 +495,8 @@ if [ -f "$GLOBALDESTDIR/lib/libfreetype.a" ]; then
 	else 
 		echo -ne "\033]0;compile freetype $bits\007"
 		if [ -d "freetype-2.4.10" ]; then rm -rf freetype-2.4.10; fi
-		#wget -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
-		wget -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
+		#wget --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
 		tar xf freetype-2.4.10.tar.gz
 		rm freetype-2.4.10.tar.gz
 		cd freetype-2.4.10
@@ -516,7 +516,7 @@ if [ -f "$GLOBALDESTDIR/lib/libexpat.a" ]; then
 	else 
 		echo -ne "\033]0;compile expat $bits\007"
 		if [ -d "expat-2.1.0" ]; then rm -rf expat-2.1.0; fi
-		wget -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
 		tar xf expat-2.1.0.tar.gz
 		rm expat-2.1.0.tar.gz
 		cd expat-2.1.0
@@ -536,7 +536,7 @@ if [ -f "$GLOBALDESTDIR/lib/libfontconfig.a" ]; then
 	else 
 		echo -ne "\033]0;compile fontconfig $bits\007"
 		if [ -d "fontconfig-2.10.2" ]; then rm -rf fontconfig-2.10.2; fi
-		wget -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
 		tar xf fontconfig-2.10.2.tar.gz
 		rm fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
@@ -557,11 +557,11 @@ if [ -f "$GLOBALDESTDIR/lib/libfribidi.a" ]; then
 	else 
 		echo -ne "\033]0;compile fribidi $bits\007"
 		if [ -d "fribidi-0.19.4" ]; then rm -rf fribidi-0.19.4; fi
-		wget -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
 		tar xf fribidi-0.19.4.tar.bz2
 		rm fribidi-0.19.4.tar.bz2
 		cd fribidi-0.19.4
-		wget --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
 		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
@@ -600,7 +600,7 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 	else 
 		echo -ne "\033]0;compile SDL $bits\007"
 		if [ -d "SDL-1.2.15" ]; then rm -rf SDL-1.2.15; fi
-		wget -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
 		rm SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
@@ -628,7 +628,7 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL_image.a" ]; then
 	else 
 		echo -ne "\033]0;compile SDL_imagae $bits\007"
 		if [ -d "SDL_image-1.2.12" ]; then rm -rf SDL_image-1.2.12; fi
-		wget -c http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
 		tar xf SDL_image-1.2.12.tar.gz
 		rm SDL_image-1.2.12.tar.gz
 		cd SDL_image-1.2.12
@@ -652,7 +652,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgmp.a" ]; then
 	else 
 		echo -ne "\033]0;compile gmp $bits\007"
 		if [ -d "gmp-5.1.3" ]; then rm -rf gmp-5.1.3; fi
-		wget ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
 		tar xf gmp-5.1.3.tar.bz2
 		rm gmp-5.1.3.tar.bz2
 		cd gmp-5.1.3
@@ -672,7 +672,7 @@ if [ -f "$GLOBALDESTDIR/lib/libnettle.a" ]; then
 	else 
 		echo -ne "\033]0;compile nettle $bits\007"
 		if [ -d "nettle-2.7.1" ]; then rm -rf nettle-2.7.1; fi
-		wget -c http://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
 		cd nettle-2.7.1
@@ -692,7 +692,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgpg-error.a" ]; then
 	else 
 		echo -ne "\033]0;compile libgpg-error $bits\007"
 		if [ -d "libgpg-error-1.12" ]; then rm -rf libgpg-error-1.12; fi
-		wget ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.12.tar.bz2
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgpg-error/libgpg-error-1.12.tar.bz2
 		tar xf libgpg-error-1.12.tar.bz2
 		rm libgpg-error-1.12.tar.bz2
 		cd libgpg-error-1.12
@@ -713,7 +713,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgcrypt.a" ]; then
 	else 
 		echo -ne "\033]0;compile libgcrypt $bits\007"
 		if [ -d "libgcrypt-1.5.3" ]; then rm -rf libgcrypt-1.5.3; fi
-		wget ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.5.3.tar.bz2
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.5.3.tar.bz2
 		tar xf libgcrypt-1.5.3.tar.bz2
 		rm libgcrypt-1.5.3.tar.bz2
 		cd libgcrypt-1.5.3
@@ -733,7 +733,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgnutls.a" ]; then
 	else 
 		echo -ne "\033]0;compile gnutls $bits\007"
 		if [ -d "gnutls-3.2.3" ]; then rm -rf gnutls-3.2.3; fi
-		wget ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.3.tar.xz
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.3.tar.xz
 		tar xf gnutls-3.2.3.tar.xz
 		rm gnutls-3.2.3.tar.xz
 		cd gnutls-3.2.3
@@ -779,7 +779,7 @@ if [ -f "$GLOBALDESTDIR/lib/liblzo2.a" ]; then
 	else 
 		echo -ne "\033]0;compile lzo $bits\007"
 		if [ -d "lzo-2.06" ]; then rm -rf lzo-2.06; fi
-		wget -c http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.oberhumer.com/opensource/lzo/download/lzo-2.06.tar.gz
 		tar xf lzo-2.06.tar.gz
 		rm lzo-2.06.tar.gz
 		cd lzo-2.06
@@ -818,7 +818,7 @@ if [ -f "$GLOBALDESTDIR/lib/libxml2.a" ]; then
 	else 
 		echo -ne "\033]0;compile libxml2 $bits\007"
 		if [ -d "libxml2-2.9.1" ]; then rm -rf libxml2-2.9.1; fi
-		wget -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
 		cd libxml2-2.9.1

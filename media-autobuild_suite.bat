@@ -317,7 +317,7 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO mingw-dtk
 	echo.- Download and install 7za
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\msys\1.0\bin\wget.exe -c "http://downloads.sourceforge.net/sevenzip/7za920.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/sevenzip/7za920.zip"
 	mkdir opt
 	cd opt
 	mkdir bin
@@ -339,7 +339,7 @@ if exist "%instdir%\bin\msgmerge.exe" GOTO autoTools
 	echo.
 	echo -------------------------------------------------------------------------------
 	del /Q %instdir%\var\lib\mingw-get\data\mingw*
-	%instdir%\msys\1.0\bin\wget.exe -c "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mingw-dtk_jb.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mingw-dtk_jb.zip"
 	cd %instdir%\var\lib\mingw-get\data
 	%instdir%\opt\bin\7za.exe x %instdir%\mingw-dtk_jb.zip
 	cd %instdir%
@@ -355,16 +355,16 @@ if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 	echo.
 	echo -------------------------------------------------------------------------------
 	cd %instdir%\msys\1.0
-	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/autoconf/autoconf-2.68-1/autoconf-2.68-1-msys-1.0.17-bin.tar.lzma/download
-	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/automake/automake-1.11.1-1/automake-1.11.1-1-msys-1.0.13-bin.tar.lzma/download
-	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/libtool/libtool-2.4-1/libtool-2.4-1-msys-1.0.15-bin.tar.lzma/download
-	%instdir%\msys\1.0\bin\wget.exe -c http://prdownloads.sourceforge.net/mingw/libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
-	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/perl/perl-5.8.8-1/perl-5.8.8-1-msys-1.0.17-bin.tar.lzma/download
-	%instdir%\msys\1.0\bin\wget.exe -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/m4/m4-1.4.14-1/m4-1.4.14-1-msys-1.0.13-bin.tar.lzma/download
-	%instdir%\msys\1.0\bin\wget.exe -c http://ftp.acc.umu.se/pub/GNOME/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip
-	%instdir%\msys\1.0\bin\wget.exe -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.23-3_win32.zip
-	%instdir%\msys\1.0\bin\wget.exe -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-dev_0.23-3_win32.zip
-	%instdir%\msys\1.0\bin\wget.exe -c http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/autoconf/autoconf-2.68-1/autoconf-2.68-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/automake/automake-1.11.1-1/automake-1.11.1-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/libtool/libtool-2.4-1/libtool-2.4-1-msys-1.0.15-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://prdownloads.sourceforge.net/mingw/libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/perl/perl-5.8.8-1/perl-5.8.8-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/m4/m4-1.4.14-1/m4-1.4.14-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.acc.umu.se/pub/GNOME/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-dev_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip
 	
 	%instdir%\msys\1.0\bin\lzma -d autoconf-2.68-1-msys-1.0.17-bin.tar.lzma
 	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf autoconf-2.68-1-msys-1.0.17-bin.tar
@@ -420,7 +420,7 @@ if %build32%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
 
 		:instMingW32
 		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
@@ -448,7 +448,7 @@ if %build64%==yes (
 		echo.
 		echo -------------------------------------------------------------------------------
 		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-		%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
 		
 		:instMingW64
 		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
@@ -669,7 +669,7 @@ if not exist "%instdir%\opt\bin\git.exe" (
 	echo.download and install PortableGit
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
 	%instdir%\opt\bin\7za x PortableGit-1.9.0-preview20140217.7z -aoa
 	%instdir%\msys\1.0\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
 	%instdir%\msys\1.0\bin\mv ReleaseNotes.rtf README.portable doc\git
@@ -682,7 +682,7 @@ if not exist "%instdir%\opt\bin\svn.exe" (
 	echo.download and install svn
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
 	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.8.zip
 	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.8/* .
 	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.8
@@ -697,7 +697,7 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	echo.download and install cmake
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
 	%instdir%\msys\1.0\bin\unzip cmake-2.8.12.2-win32-x86.zip
 	%instdir%\msys\1.0\bin\cp -va cmake-2.8.12.2-win32-x86/* .
 	%instdir%\msys\1.0\bin\rm cmake-2.8.12.2-win32-x86.zip
@@ -708,7 +708,7 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 if not exist "%instdir%\opt\python27\python.exe" (
 	cd %instdir%\opt
 	mkdir python27
-	%instdir%\msys\1.0\bin\wget.exe -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
 	msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
 	del python-2.7.2.msi
 	cd ..
@@ -719,7 +719,7 @@ if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.download and install TortoiseHg
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.4.1-hg-2.2.2-x86.msi"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.4.1-hg-2.2.2-x86.msi"
 	msiexec /a tortoisehg-2.4.1-hg-2.2.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
 	%instdir%\msys\1.0\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
 	%instdir%\msys\1.0\bin\rm tortoisehg-2.4.1-hg-2.2.2-x86.msi
@@ -732,9 +732,9 @@ if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	echo.download and install pdftex-w32
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
-	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
-	%instdir%\msys\1.0\bin\wget -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
 	%instdir%\msys\1.0\bin\xz -d pdftex-w32.tar.xz
 	%instdir%\msys\1.0\bin\tar -xf pdftex-w32.tar
 	%instdir%\msys\1.0\bin\xz -d makeindex-w32.tar.xz
@@ -753,7 +753,7 @@ cd %instdir%
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\doxygen.exe GOTO checkDoxygen64
 	cd %instdir%\build32
-	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
 	cd %instdir%\mingw32\bin
 	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.6.windows.bin.zip
 	del %instdir%\build32\doxygen-1.8.6.windows.bin.zip
@@ -763,7 +763,7 @@ if %build32%==yes (
 if %build64%==yes (
 	if exist %instdir%\mingw64\bin\doxygen.exe GOTO checkYasm32
 	cd %instdir%\build64
-	%instdir%\msys\1.0\bin\wget -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
 	cd %instdir%\mingw64\bin
 	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
 	del %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
@@ -773,7 +773,7 @@ if %build64%==yes (
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\yasm.exe GOTO checkYasm64
 	cd %instdir%\build32
-	%instdir%\msys\1.0\bin\wget -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win32.exe"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win32.exe"
 	ren yasm-1.2.0-win32.exe yasm.exe
 	copy yasm.exe %instdir%\mingw32\bin
 	del yasm.exe
@@ -783,7 +783,7 @@ if %build32%==yes (
 if %build64%==yes (
 	if exist %instdir%\mingw64\bin\yasm.exe GOTO getMintty
 	cd %instdir%\build64
-	%instdir%\msys\1.0\bin\wget -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
 	ren yasm-1.2.0-win64.exe yasm.exe
 	copy yasm.exe %instdir%\mingw64\bin
 	del yasm.exe
@@ -798,7 +798,7 @@ if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
 	echo. (it is recommended to don't use the windows cmd, it is not stable)
 	echo.
 	echo -------------------------------------------------------------------------------
-	%instdir%\msys\1.0\bin\wget -c http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mintty-1.1.3-msys.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mintty-1.1.3-msys.zip
 	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\bin mintty.exe
 	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\share\doc readme-msys.html
 	
@@ -861,7 +861,7 @@ if exist %instdir%\compile_globaltools.sh GOTO compileGobal
 	echo.
 	echo -------------------------------------------------------------------------------
 	if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		
 		:unpackglobal
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_globaltools.sh
@@ -883,7 +883,7 @@ if exist %instdir%\compile_audiotools.sh GOTO compileAudio
 	echo.
 	echo -------------------------------------------------------------------------------
 	if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 	
 		:unpackAudio
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools.sh
@@ -905,7 +905,7 @@ if not exist %instdir%\compile_videotools.sh (
 	echo.
 	echo -------------------------------------------------------------------------------
 	if not exist %instdir%\media-autobuild_suite.zip (
-		%instdir%\msys\1.0\bin\wget --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		)
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
 	)
