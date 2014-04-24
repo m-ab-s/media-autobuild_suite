@@ -100,7 +100,7 @@ if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
 		tar xf libogg-1.3.1.tar.gz
 		rm libogg-1.3.1.tar.gz
 		cd libogg-1.3.1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -120,7 +120,7 @@ if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
 		tar xf libvorbis-1.3.3.tar.xz
 		rm libvorbis-1.3.3.tar.xz
 		cd libvorbis-1.3.3
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -140,7 +140,7 @@ if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
 		tar xf libtheora-1.1.1.tar.bz2
 		rm libtheora-1.1.1.tar.bz2
 		cd libtheora-1.1.1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 
@@ -160,7 +160,7 @@ if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
 		tar xf speex-1.2rc1.tar.gz
 		rm speex-1.2rc1.tar.gz
 		cd speex-1.2rc1
-		./configure --prefix=$LOCALDESTDIR --enable-shared=no 
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no 
 		make -j $cpuCount
 		make install
 		
@@ -180,7 +180,7 @@ if [ -f "$LOCALDESTDIR/bin/flac.exe" ]; then
 		tar xf flac-1.3.0.tar.xz
 		rm flac-1.3.0.tar.xz
 		cd flac-1.3.0
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-xmms-plugin --enable-shared=no --enable-static
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-xmms-plugin --enable-shared=no --enable-static
 		make -j $cpuCount
 		make install
 		
@@ -200,7 +200,7 @@ if [ -f "$LOCALDESTDIR/bin/lame.exe" ]; then
 		tar xf lame-3.99.5.tar.gz
 		rm lame-3.99.5.tar.gz
 		cd lame-3.99.5
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-expopt=full --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-expopt=full --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -220,7 +220,7 @@ if [ -f "$LOCALDESTDIR/lib/libvo-aacenc.a" ]; then
 		tar xf vo-aacenc-0.1.3.tar.gz
 		rm vo-aacenc-0.1.3.tar.gz
 		cd vo-aacenc-0.1.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -240,7 +240,7 @@ if [ -f "$LOCALDESTDIR/lib/libopencore-amrnb.a" ]; then
 		tar xf opencore-amr-0.1.3.tar.gz
 		rm opencore-amr-0.1.3.tar.gz
 		cd opencore-amr-0.1.3
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -260,7 +260,7 @@ if [ -f "$LOCALDESTDIR/lib/libvo-amrwbenc.a" ]; then
 		tar xf vo-amrwbenc-0.1.2.tar.gz
 		rm vo-amrwbenc-0.1.2.tar.gz
 		cd vo-amrwbenc-0.1.2
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -357,7 +357,7 @@ if [ -f "$LOCALDESTDIR/bin/faac.exe" ]; then
 		rm faac-1.28.tar.gz
 		cd faac-1.28
 		sh bootstrap 
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --without-mp4v2
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --without-mp4v2
 		make -j $cpuCount
 		make install
 		
@@ -378,7 +378,7 @@ if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
 		tar xf opus-1.0.3.tar.gz
 		rm opus-1.0.3.tar.gz
 		cd opus-1.0.3
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
         make -j $cpuCount
         make install
 		
@@ -398,7 +398,7 @@ if [ -f "$LOCALDESTDIR/bin/opusenc.exe" ]; then
 		tar xf opus-tools-0.1.7.tar.gz
 		rm opus-tools-0.1.7.tar.gz
 		cd opus-tools-0.1.7
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         make -j $cpuCount
         make install
         
@@ -418,7 +418,7 @@ if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
 		tar xf a52dec-0.7.4.tar.gz
 		rm a52dec-0.7.4.tar.gz
 		cd a52dec-0.7.4
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -438,7 +438,7 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 		tar xf libmad-0.15.1b.tar.gz
 		rm libmad-0.15.1b.tar.gz
 		cd libmad-0.15.1b
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
 		make -j $cpuCount
 		make install
 		
@@ -474,11 +474,11 @@ if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
 	else 
 		echo -ne "\033]0;compile twolame $bits\007"
 		if [ -d "twolame-0.3.13" ]; then rm -rf twolame-0.3.13; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O twolame-0.3.13.tar.gz http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
 		tar xf twolame-0.3.13.tar.gz
 		rm twolame-0.3.13.tar.gz
 		cd twolame-0.3.13
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
 		make -j $cpuCount
 		make install
 		
@@ -502,7 +502,7 @@ if [ -f "WavPack-git/autogen.sh" ]; then
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
 		
 		make -j $cpuCount
 		make install
@@ -524,7 +524,7 @@ if [ -f "WavPack-git/autogen.sh" ]; then
 			./autogen.sh
 		fi
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-mmx
 			
 		make -j $cpuCount
 		make install
@@ -549,7 +549,7 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
 		
 		make -j $cpuCount
 		make install
@@ -571,7 +571,7 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 			./autogen.sh
 		fi
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-external-libs
 		
 		make -j $cpuCount
 		make install
@@ -596,7 +596,7 @@ if [ -f "sox-git/configure.ac" ]; then
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		
 		make -j $cpuCount
 		make install
@@ -621,7 +621,7 @@ if [ -f "sox-git/configure.ac" ]; then
 			autoreconf -i
 		fi
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 			
 		make -j $cpuCount
 		make install
@@ -640,6 +640,7 @@ if [[ $build32 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global32/etc/profile.local
 	bits='32bit'
+	targetBuild='i686-w64-mingw32'
 	targetHost='i686-w64-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
@@ -656,6 +657,7 @@ if [[ $build64 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global64/etc/profile.local
 	bits='64bit'
+	targetBuild='x86_64-pc-mingw32'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
