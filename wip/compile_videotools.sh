@@ -251,10 +251,10 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="$CFLAGS -static-libgcc -static-libstdc++"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="$CFLAGS -static-libgcc -static-libstdc++"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-32bit-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
@@ -262,8 +262,6 @@ if [ -f "libvpx-git/configure" ]; then
 		#endif' vpx/src/svc_encodeframe.c
         make -j $cpuCount
         make install
-		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
-		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
 		
 		do_checkIfExist libvpx-git vpxenc.exe
 	else
@@ -276,10 +274,10 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="$CFLAGS -static-libgcc -static-libstdc++"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="$CFLAGS -static-libgcc -static-libstdc++"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-32bit-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
@@ -287,8 +285,6 @@ if [ -f "libvpx-git/configure" ]; then
 		#endif' vpx/src/svc_encodeframe.c
 		make -j $cpuCount
 		make install
-		cp vpxdec.exe $LOCALDESTDIR/bin/vpxdec.exe
-		cp vpxenc.exe $LOCALDESTDIR/bin/vpxenc.exe
 		
 		do_checkIfExist libvpx-git vpxenc.exe
 fi
