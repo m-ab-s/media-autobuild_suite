@@ -452,11 +452,11 @@ if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
 	echo.exit>>pacman.sh
 
 if %build32%==yes (
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-crt-svn mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn>>pacman.sh
+	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-sqlite3 mingw-w64-i686-yasm>>pacman.sh
 	)	
 	
 if %build64%==yes (
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-crt-svn mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-yasm>>pacman.sh
 	)
 	
 	%instdir%\mintty.lnk %instdir%\pacman.sh
@@ -650,19 +650,6 @@ if %build64%==yes (
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
 
-if not exist "%instdir%\opt\bin\cmake.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install cmake
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
-	%instdir%\msys64\bin\unzip cmake-2.8.12.2-win32-x86.zip
-	%instdir%\msys64\bin\cp -va cmake-2.8.12.2-win32-x86/* .
-	%instdir%\msys64\bin\rm cmake-2.8.12.2-win32-x86.zip
-	%instdir%\msys64\bin\rm -r cmake-2.8.12.2-win32-x86
-	cd ..
-	)
-
 if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	echo.-------------------------------------------------------------------------------
 	echo.download and install pdftex-w32
@@ -705,47 +692,6 @@ if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	cd ..
 	)
 
-cd %instdir%
-
-:checkDoxygen32	
-if %build32%==yes (
-	if exist %instdir%\msys64\mingw32\bin\doxygen.exe GOTO checkDoxygen64
-	cd %instdir%\build32
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
-	cd %instdir%\msys64\mingw32\bin
-	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.6.windows.bin.zip
-	del %instdir%\build32\doxygen-1.8.6.windows.bin.zip
-	)
-	
-:checkDoxygen64
-if %build64%==yes (
-	if exist %instdir%\msys64\mingw64\bin\doxygen.exe GOTO checkYasm32
-	cd %instdir%\build64
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
-	cd %instdir%\msys64\mingw64\bin
-	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
-	del %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
-	)
-	
-:checkYasm32	
-if %build32%==yes (
-	if exist %instdir%\msys64\mingw32\bin\yasm.exe GOTO checkYasm64
-	cd %instdir%\build32
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win32.exe"
-	ren yasm-1.2.0-win32.exe yasm.exe
-	copy yasm.exe %instdir%\msys64\mingw32\bin
-	del yasm.exe
-	)	
-	
-:checkYasm64	
-if %build64%==yes (
-	if exist %instdir%\msys64\mingw64\bin\yasm.exe GOTO compileGobal
-	cd %instdir%\build64
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
-	ren yasm-1.2.0-win64.exe yasm.exe
-	copy yasm.exe %instdir%\msys64\mingw64\bin
-	del yasm.exe
-	)	
 cd %instdir%
 
 :compileGlobals
