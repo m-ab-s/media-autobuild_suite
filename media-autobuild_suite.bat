@@ -876,7 +876,7 @@ if %build32%==yes (
 	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A == %date% (
-				%instdir%\mingw32\bin\strip --strip-all %%C
+				%instdir%\msys64\mingw64\bin\strip --strip-all %%C
 				echo.strip %%~nC%%~xC 32Bit done...
 				)
 			)
@@ -885,7 +885,7 @@ if %build32%==yes (
 	FOR /R "%instdir%\local32\bin" %%D IN (*.dll) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
 			IF %%A == %date% (
-				%instdir%\mingw32\bin\strip --strip-all %%D
+				%instdir%\msys64\mingw64\bin\strip --strip-all %%D
 				echo.strip %%~nD%%~xD 32Bit done...
 				)
 			)
@@ -896,7 +896,7 @@ if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A == %date% (
-				%instdir%\mingw32\bin\strip --strip-all %%C
+				%instdir%\msys64\mingw64\bin\strip --strip-all %%C
 				echo.strip %%~nC%%~xC 64Bit done...
 				)
 			)
@@ -905,7 +905,7 @@ if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
 			IF %%A == %date% (
-				%instdir%\mingw32\bin\strip --strip-all %%D
+				%instdir%\msys64\mingw64\bin\strip --strip-all %%D
 				echo.strip %%~nD%%~xD 64Bit done...
 				)
 			)
