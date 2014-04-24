@@ -1,2 +1,3 @@
 make mingw-w64 libs static (iconv for lame.exe, libgomp, etc.)
+libstdc++6.dll for x265
 copy gcc to cc
