@@ -448,7 +448,7 @@ if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool libtool m4 man patch pkg-config scons swig xmlto make tar zip unzip git subversion wget>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool libtool m4 man patch pkg-config scons swig xmlto make tar zip unzip git subversion wget>>pacman.sh
 	echo.exit>>pacman.sh
 
 if %build32%==yes (
