@@ -86,21 +86,21 @@ if [ -f "x264-git/configure" ]; then
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 		make -j $cpuCount
 		make install
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 		make -j $cpuCount
 		make install
 		
@@ -119,11 +119,11 @@ if [ -f "x264-git/configure" ]; then
 			rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
 		fi
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 		make -j $cpuCount
 		
 		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
-			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 			make -j $cpuCount
 			cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		fi
@@ -131,12 +131,12 @@ if [ -f "x264-git/configure" ]; then
 		make uninstall
 		make clean
 		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 		make -j $cpuCount
 		make install
 		
 		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
-			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
 			make -j $cpuCount
 			make install
 		fi
@@ -223,7 +223,7 @@ if [ -f "$LOCALDESTDIR/lib/libxvidcore.a" ]; then
 		if [[ $bits = "64bit" ]]; then
 			extra='--build=x86_64-unknown-linux-gnu --disable-assembly'
 		fi
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR $extra
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR $extra
 		sed -i "s/-mno-cygwin//" platform.inc
 		make -j $cpuCount
 		make install
@@ -255,7 +255,7 @@ if [ -f "libvpx-git/configure" ]; then
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
 			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-32bit-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
 		#define strtok_r strtok_s\
@@ -280,7 +280,7 @@ if [ -f "libvpx-git/configure" ]; then
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
 			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-32bit-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
 		#define strtok_r strtok_s\
@@ -307,7 +307,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 		if [[ ! -f "configure" ]]; then
 			./bootstrap
 		fi
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		
@@ -322,7 +322,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 		git clone git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 
@@ -340,7 +340,9 @@ if [ -f "libutvideo-git/configure" ]; then
 	if [[ "$oldHead" != "$newHead" ]]; then
 		make uninstall
 		make clean
-		./configure --prefix=$LOCALDESTDIR
+		sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
+		sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure		
+		./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 		make -j $cpuCount
 		make install
 		
@@ -354,7 +356,9 @@ else
 	echo -ne "\033]0;compile libutvideo $bits\007"
 	git clone git://github.com/qyot27/libutvideo.git libutvideo-git
 	cd libutvideo-git
-	./configure --prefix=$LOCALDESTDIR
+	sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
+	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure			
+	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 	make -j $cpuCount
 	make install
 	
@@ -374,7 +378,7 @@ if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
 		tar xf libass-0.10.2.tar.gz
 		rm libass-0.10.2.tar.gz
 		cd libass-0.10.2
-		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
@@ -391,9 +395,9 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	else 
 		echo -ne "\033]0;compile xavs $bits\007"
 		if [ -d "xavs" ]; then rm -rf xavs; fi
-		svn checkout --trust-server-cert https://svn.code.sf.net/p/xavs/code/trunk/ xavs
+		svn checkout --trust-server-cert  --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR
 		make -j $cpuCount
 		make install
 		
@@ -413,7 +417,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
 			tar xf libdvdcss-1.2.13.tar.bz2
 			rm libdvdcss-1.2.13.tar.bz2
 			cd libdvdcss-1.2.13
-			./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 			make -j $cpuCount
 			make install
 			
@@ -436,7 +440,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
 		fi	
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
 		sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
 		make -j $cpuCount
 		make install
@@ -462,7 +466,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		if [[ ! -f ./configure ]]; then
 			./autogen.sh
 		fi
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
 		make -j $cpuCount
 		make install
 		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
@@ -480,15 +484,23 @@ if [[ $bits = "32bit" ]]; then
 		else
 			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -rf MediaInfo_CLI_GNU_FromSource; fi
-			wget --tries=20 --retry-connrefused --waitretry=2 -c http://mediaarea.net/download/binary/mediainfo/0.7.67/MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
-			tar xf MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
-			rm MediaInfo_CLI_0.7.67_GNU_FromSource.tar.bz2
+			wget --tries=20 --retry-connrefused --waitretry=2 -c http://mediaarea.net/download/binary/mediainfo/0.7.68/MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
+			tar xf MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
+			rm MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
 			cd MediaInfo_CLI_GNU_FromSource
 			
 			sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
 			sed -i 's/make -s -j$numprocs/make -s -j $cpuCount/' CLI_Compile.sh
-			sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
 			
+			if [[ $bits = "64bit" ]]; then
+				sed -i 's/.\/configure $ZenLib_Options $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 $ZenLib_Options $*/' CLI_Compile.sh
+				sed -i 's/.\/configure $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 $*/' CLI_Compile.sh
+				sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
+			else
+				sed -i 's/.\/configure $ZenLib_Options $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 $ZenLib_Options $*/' CLI_Compile.sh
+				sed -i 's/.\/configure $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 $*/' CLI_Compile.sh
+				sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
+			fi
 			source CLI_Compile.sh
 			cp MediaInfo/Project/GNU/CLI/mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
 			
@@ -547,7 +559,7 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 		sed -i "s/__declspec(dllexport)//g" *.h
 		sed -i "s/__declspec(dllimport)//g" *.h 
 		cd ..
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
 		sed -i 's/ln -sf/$(LN_S)/' "caca/Makefile" "cxx/Makefile" "doc/Makefile"
 		make -j $cpuCount
 		make install
@@ -564,11 +576,11 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
 		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libmodplug-0.8.8.4.tar.gz http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
 		tar xf libmodplug-0.8.8.4.tar.gz
 		rm libmodplug-0.8.8.4.tar.gz
 		cd libmodplug-0.8.8.4
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
 		make -j $cpuCount
 		make install
@@ -589,7 +601,7 @@ if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
 		tar xf orc-0.4.18.tar.gz
 		rm orc-0.4.18.tar.gz
 		cd orc-0.4.18
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -609,7 +621,7 @@ if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
 		tar xf schroedinger-1.0.11.tar.gz
 		rm schroedinger-1.0.11.tar.gz
 		cd schroedinger-1.0.11
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		sed -i 's/testsuite//' Makefile
 		make -j $cpuCount
 		make install
@@ -627,7 +639,7 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
 		if [ -d "zvbi-0.2.35" ]; then rm -rf zvbi-0.2.35; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O zvbi-0.2.35.tar.bz2 http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
 		tar xf zvbi-0.2.35.tar.bz2
 		rm zvbi-0.2.35.tar.bz2
 		cd zvbi-0.2.35
@@ -635,7 +647,7 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch
 		patch -p0 < zvbi-win32.patch
 		patch -p0 < zvbi-ioctl.patch
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
 		cd src
 		make -j $cpuCount
 		make install
@@ -681,7 +693,7 @@ if [[ $mp4box = "y" ]]; then
 		if [[ "$oldRevision" != "$newRevision"  ]]; then
 			rm $LOCALDESTDIR/bin/MP4Box.exe
 			make clean
-			./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
+			./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
 				cp config.h include/gpac/internal
 				cd src
 				make -j $cpuCount
@@ -701,7 +713,7 @@ if [[ $mp4box = "y" ]]; then
 		echo -ne "\033]0;compile mp4box-svn $bits\007"
 		svn checkout svn://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
 		cd mp4box-svn
-		./configure --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
+		./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no
 		cp config.h include/gpac/internal
 		cd src
 		make -j $cpuCount
@@ -752,7 +764,7 @@ fi
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
@@ -799,7 +811,7 @@ fi
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32' --disable-debug --enable-gpl --enable-version3 --enable-postproc --enable-w32threads --enable-runtime-cpudetect --enable-memalign-hack --disable-shared --enable-static --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
@@ -895,6 +907,8 @@ if [[ $build32 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global32/etc/profile.local
 	bits='32bit'
+	cross='i686-w64-mingw32-'
+	targetBuild='i686-w64-mingw32'
 	targetHost='i686-w64-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
@@ -911,6 +925,8 @@ if [[ $build64 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global64/etc/profile.local
 	bits='64bit'
+	cross='x86_64-w64-mingw32-'
+	targetBuild='x86_64-pc-mingw32'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
