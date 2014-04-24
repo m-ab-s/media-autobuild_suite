@@ -244,7 +244,7 @@ if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
 		if [ -d libpng ]; then rm -rf libpng; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libpng.tar.xz "ftp://ftp.simplesystems.org/pub/libpng/png/src/libpng16/*.tar.xz"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O -O libpng.tar.xz "http://sourceforge.net/projects/libpng/files/latest/download?source=files"
 		tar xf libpng.tar.xz
 		rm libpng.tar.xz
 		mv libpng-* libpng
