@@ -1,0 +1,2 @@
+make mingw-w64 libs static
+copy gcc to cc
