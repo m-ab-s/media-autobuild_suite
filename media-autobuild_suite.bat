@@ -379,9 +379,10 @@ if exist %instdir%\mintty.lnk GOTO updatebase
 	cscript /nologo %instdir%\setlink.vbs 
 	del %instdir%\setlink.vbs 	
 
-	echo.exit>exit.sh
-	%instdir%\mintty.lnk %instdir%\exit.sh
-	del exit.sh
+	echo.sleep ^5>firstrun.sh
+	echo.exit>firstrun.sh
+	%instdir%\mintty.lnk %instdir%\firstrun.sh
+	del firstrun.sh
 	
 	for /f %%i in ('dir %instdir%\msys64\home /B') do set userFolder=%%i
 	
@@ -447,7 +448,7 @@ if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool m4 man nasm patch pkg-config scons swig xmlto make zip unzip git subversion wget>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool m4 man nasm patch pkg-config scons swig xmlto make tar zip unzip git subversion wget>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\mintty.lnk %instdir%\pacman.sh
 	del pacman.sh
