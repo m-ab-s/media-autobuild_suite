@@ -211,7 +211,7 @@ if [ -f "$GLOBALDESTDIR/bin/pkg-config.exe" ]; then
 		tar xf pkg-config-lite-0.28-1.tar.gz
 		rm pkg-config-lite-0.28-1.tar.gz
 		cd pkg-config-lite-0.28-1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --with-pc-path="/global32/lib/pkgconfig"
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --with-pc-path="/global32/lib/pkgconfig"
 		make -j $cpuCount
 		make install
 
@@ -244,12 +244,12 @@ if [ -f "$GLOBALDESTDIR/lib/libpng.a" ]; then
 	else
 		echo -ne "\033]0;compile libpng $bits\007"
 		if [ -d libpng ]; then rm -rf libpng; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libpng.tar.xz "http://sourceforge.net/projects/libpng/files/latest/download?source=files"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O -O libpng.tar.xz "http://sourceforge.net/projects/libpng/files/latest/download?source=files"
 		tar xf libpng.tar.xz
 		rm libpng.tar.xz
 		mv libpng-* libpng
 		cd libpng
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -269,7 +269,7 @@ if [ -f "$GLOBALDESTDIR/lib/libjpeg.a" ]; then
 		tar xf jpegsrc.v9.tar.gz
 		rm jpegsrc.v9.tar.gz
 		cd jpeg-9
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		
@@ -289,7 +289,7 @@ if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 		tar xf openjpeg_v1_4_sources_r697.tgz
 		rm openjpeg_v1_4_sources_r697.tgz
 		cd openjpeg_v1_4_sources_r697
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		
 		if [[ $bits = "32bit" ]]; then
 			sed -i "s/\/usr\/lib/\/global32\/lib/" Makefile
@@ -313,11 +313,11 @@ if [ -f "$GLOBALDESTDIR/lib/libturbojpeg.a" ]; then
 	else 
 		echo -ne "\033]0;compile libjpeg-turbo $bits\007"
 		if [ -d "libjpeg-turbo-1.3.0" ]; then rm -rf libjpeg-turbo-1.3.0; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libjpeg-turbo-1.3.0.tar.gz "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
+		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://sourceforge.net/projects/libjpeg-turbo/files/1.3.0/libjpeg-turbo-1.3.0.tar.gz/download"
 		tar xf libjpeg-turbo-1.3.0.tar.gz
 		rm libjpeg-turbo-1.3.0.tar.gz
 		cd libjpeg-turbo-1.3.0
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		#sed -i 's/typedef int boolean;/\/\/typedef int boolean;/' "$GLOBALDESTDIR/include/jmorecfg.h"
@@ -338,7 +338,7 @@ if [ -f "$GLOBALDESTDIR/lib/libjasper.a" ]; then
 		unzip jasper-1.900.1.zip
 		rm jasper-1.900.1.zip
 		cd jasper-1.900.1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-static=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-static=no
 		make -j $cpuCount
 		make install
 		
@@ -358,7 +358,7 @@ if [ -f "$GLOBALDESTDIR/lib/libtiff.a" ]; then
 		tar xf tiff-4.0.3.tar.gz
 		rm tiff-4.0.3.tar.gz
 		cd tiff-4.0.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -414,7 +414,7 @@ if [ -f "$GLOBALDESTDIR/lib/libiconv.a" ]; then
 		tar xf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$GLOBALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+		./configure --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="-L$GLOBALDESTDIR/lib -mthreads -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 		make -j $cpuCount
 		make install
 
@@ -436,7 +436,7 @@ if [ -f "$GLOBALDESTDIR/lib/libasprintf.a" ]; then
 		cd gettext-0.18.3.1-runtime
 		cat gettext-tools/woe32dll/gettextlib-exports.c | grep -v rpl_opt > gettext-tools/woe32dll/gettextlib-exports.c.new
 		mv gettext-tools/woe32dll/gettextlib-exports.c.new gettext-tools/woe32dll/gettextlib-exports.c
-		CFLAGS="$CFLAGS -O2" ./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="$LDFLAGS -static -static-libgcc -DPTW32_STATIC_LIB" 
+		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable LDFLAGS="$LDFLAGS -static -static-libgcc -DPTW32_STATIC_LIB" 
 		cd gettext-runtime
 		make -j $cpuCount
 		make install
@@ -457,7 +457,7 @@ if [ -f "$GLOBALDESTDIR/bin/msgmerge.exe" ]; then
 		rm gettext-0.18.3.1.tar.gz
 		mv gettext-0.18.3.1 gettext-0.18.3.1-static
 		cd gettext-0.18.3.1-static
-		CFLAGS="$CFLAGS -O2" ./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		CFLAGS="$CFLAGS -O2" ./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --enable-relocatable --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make -j $cpuCount
 		install gettext-tools/src/*.exe $GLOBALDESTDIR/bin
 		install gettext-tools/misc/autopoint $GLOBALDESTDIR/bin
@@ -478,7 +478,7 @@ if [ -f "$GLOBALDESTDIR/bin/iconv.exe" ]; then
 		tar xzf libiconv-1.14.tar.gz
 		rm libiconv-1.14.tar.gz
 		cd libiconv-1.14
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no --enable-static=yes LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB" 
 		make clean
 		make -j $cpuCount
 		make install
@@ -500,7 +500,7 @@ if [ -f "$GLOBALDESTDIR/lib/libfreetype.a" ]; then
 		tar xf freetype-2.4.10.tar.gz
 		rm freetype-2.4.10.tar.gz
 		cd freetype-2.4.10
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -516,11 +516,11 @@ if [ -f "$GLOBALDESTDIR/lib/libexpat.a" ]; then
 	else 
 		echo -ne "\033]0;compile expat $bits\007"
 		if [ -d "expat-2.1.0" ]; then rm -rf expat-2.1.0; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O expat-2.1.0.tar.gz http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/expat/files/expat/2.1.0/expat-2.1.0.tar.gz/download
 		tar xf expat-2.1.0.tar.gz
 		rm expat-2.1.0.tar.gz
 		cd expat-2.1.0
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -540,7 +540,7 @@ if [ -f "$GLOBALDESTDIR/lib/libfontconfig.a" ]; then
 		tar xf fontconfig-2.10.2.tar.gz
 		rm fontconfig-2.10.2.tar.gz
 		cd fontconfig-2.10.2
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$GLOBALDESTDIR/lib/pkgconfig/fontconfig.pc"
@@ -563,7 +563,7 @@ if [ -f "$GLOBALDESTDIR/lib/libfribidi.a" ]; then
 		cd fribidi-0.19.4
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
 		make install		
@@ -604,7 +604,7 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 		tar xf SDL-1.2.15.tar.gz
 		rm SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -632,7 +632,7 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL_image.a" ]; then
 		tar xf SDL_image-1.2.12.tar.gz
 		rm SDL_image-1.2.12.tar.gz
 		cd SDL_image-1.2.12
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		
@@ -656,7 +656,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgmp.a" ]; then
 		tar xf gmp-5.1.3.tar.bz2
 		rm gmp-5.1.3.tar.bz2
 		cd gmp-5.1.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-cxx --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-cxx --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		
@@ -676,7 +676,7 @@ if [ -f "$GLOBALDESTDIR/lib/libnettle.a" ]; then
 		tar xf nettle-2.7.1.tar.gz
 		rm nettle-2.7.1.tar.gz
 		cd nettle-2.7.1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -696,7 +696,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgpg-error.a" ]; then
 		tar xf libgpg-error-1.12.tar.bz2
 		rm libgpg-error-1.12.tar.bz2
 		cd libgpg-error-1.12
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
 		sed -i 's/iconv --silent/iconv -s/g' potomo
 		make -j $cpuCount
 		make install
@@ -717,7 +717,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgcrypt.a" ]; then
 		tar xf libgcrypt-1.5.3.tar.bz2
 		rm libgcrypt-1.5.3.tar.bz2
 		cd libgcrypt-1.5.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		
@@ -737,7 +737,7 @@ if [ -f "$GLOBALDESTDIR/lib/libgnutls.a" ]; then
 		tar xf gnutls-3.2.3.tar.xz
 		rm gnutls-3.2.3.tar.xz
 		cd gnutls-3.2.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $GLOBALDESTDIR/lib/pkgconfig/gnutls.pc
@@ -783,7 +783,7 @@ if [ -f "$GLOBALDESTDIR/lib/liblzo2.a" ]; then
 		tar xf lzo-2.06.tar.gz
 		rm lzo-2.06.tar.gz
 		cd lzo-2.06
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -802,7 +802,7 @@ if [ -f "$GLOBALDESTDIR/lib/libdca.a" ]; then
 		svn co svn://svn.videolan.org/libdca/trunk libdca
 		cd libdca
 		./bootstrap
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -822,7 +822,7 @@ if [ -f "$GLOBALDESTDIR/lib/libxml2.a" ]; then
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
 		cd libxml2-2.9.1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared --enable-static
 		make -j $cpuCount
 		make install
 		cp $GLOBALDESTDIR/lib/xml2.a $GLOBALDESTDIR/lib/libxml2.a
@@ -845,7 +845,7 @@ if [ -f "$GLOBALDESTDIR/lib/libilbc.a" ]; then
 		if [[ ! -f "configure" ]]; then
 			autoreconf -fiv
 		fi
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
+		./configure --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
@@ -861,7 +861,6 @@ if [[ $build32 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global32/etc/profile.local
 	bits='32bit'
-	targetBuild='i686-w64-mingw32'
 	targetHost='i686-w64-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
@@ -878,7 +877,6 @@ if [[ $build64 = "yes" ]]; then
 	echo "-------------------------------------------------------------------------------"
 	source /global64/etc/profile.local
 	bits='64bit'
-	targetBuild='x86_64-pc-mingw32'
 	targetHost='x86_64-pc-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"

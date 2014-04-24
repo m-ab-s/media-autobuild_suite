@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.7
-::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
+::	This is version 1.5
+::	Project stared at 2013-09-24. Last bigger modification was on 2014-02-02
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -63,9 +63,6 @@
 ::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
 ::	2014-04-04 add strip files to main batch
 ::	2014-04-08 ask for x265 in ffmpeg
-::	2014-04-21 start to changing msys1 to msys2
-::	2014-04-22 lang. detect for mintty
-::	2014-04-24 add tools, update mediainfo version
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -300,158 +297,176 @@ if %stripF% GTR 2 GOTO stripEXE
 ::download and install basic msys system:
 ::------------------------------------------------------------------
 
-if exist "%instdir%\opt" GOTO check7zip
-	echo -------------------------------------------------------------
+if exist "%instdir%\msys\1.0\msys.bat" GOTO 7za
+	echo -------------------------------------------------------------------------------
 	echo.
-	echo - Download wget
+	echo.- Download and install msys basic system
 	echo.
-	echo -------------------------------------------------------------
-	if exist "%instdir%\install-wget" del "%instdir%\install-wget.js"
+	echo -------------------------------------------------------------------------------
 	
-	echo.var wshell = new ActiveXObject("WScript.Shell"); var htmldoc = new ActiveXObject("htmlfile"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(100); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media_compressor/wget.zip"; html = http_get(base_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>"%instdir%\install-wget.js"
+	echo.var wshell = new ActiveXObject("WScript.Shell");var htmldoc = new ActiveXObject("htmlfile");var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP");var adodb = new ActiveXObject("ADODB.Stream");var FSO = new ActiveXObject("Scripting.FileSystemObject");;function http_get(url, is_binary){ xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4);  WScript.Sleep(100); if (xmlhttp.status != 200) { WScript.Echo("http get failed: " + xmlhttp.status);  WScript.Quit(2); }; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText;}; function url_decompose_filename(url) { return url.split('/').pop().split('?').shift(); }; function save_binary(path, data) { adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2);}; function pick_from_sf_file_list(html, cond) { htmldoc.open(); htmldoc.write(html); var tr = htmldoc.getElementById("files_list").getElementsByTagName("tr"); for (var i = 0; i ^< tr.length; ++i) {  title = tr[i].title;  if (cond(title)) return title; }; return null;}; function download_mingw_get() { var base_url = "http://sourceforge.net/projects/mingw/files/Installer/mingw-get/"; var html = http_get(base_url, false); var project_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("mingw-get") ^>= 0; }); var project_url = base_url + project_name + "/"; html = http_get(project_url, false); var dlp_name = pick_from_sf_file_list(html, function(title) { return title.indexOf("bin.zip") ^>= 0; }); var dlp_url = project_url + dlp_name + "/download"; html = http_get(dlp_url, false); htmldoc.open(); htmldoc.write(html); var div = htmldoc.getElementById("downloading"); var url = div.getElementsByTagName("a")[1].href; var filename = url.split('/').pop().split('?').shift(); var installer_data = http_get(url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename) }; function extract_zip(zip_file, dstdir) { var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0);}; function install_mingw(zip_file, packages) { var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir); wshell.Run("bin\\mingw-get install " + packages, 10, true); var fstab = FSO.GetAbsolutePathName("msys\\1.0\\etc\\fstab"); var fp = FSO.CreateTextFile(fstab, true); fp.WriteLine(rootdir.replace(/\\/g,"/") + "\t/mingw"); fp.Close(); FSO.GetFile(zip_file).Delete();}; var packages = "msys-base msys-coreutils msys-wget msys-zip msys-unzip"; install_mingw(download_mingw_get(), packages)>>build_msys.js
+	
+	cscript build_msys.js
+	del build_msys.js
+	del mingw-get-0.6*
 
-	cscript "%instdir%\install-wget.js"
-	del "%instdir%\install-wget.js"
-	del "%instdir%\wget.zip"
-	rmdir /s /q help
-	rmdir /s /q license
-	rmdir /s /q readme
-	
-:check7zip
-if exist "%instdir%\opt\bin\7za.exe" GOTO checkmsys2
-	echo -------------------------------------------------------------
+:7za
+if exist "%instdir%\opt\bin\7za.exe" GOTO mingw-dtk
+	echo -------------------------------------------------------------------------------
 	echo.
-	echo - Download and install 7zip
+	echo.- Download and install 7za
 	echo.
-	echo.
-	echo -------------------------------------------------------------
-	"%instdir%\wget" -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
-	
-	7za920.exe
-	
-	del "%instdir%\7za920.exe"
+	echo -------------------------------------------------------------------------------
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/sevenzip/7za920.zip"
 	mkdir opt
 	cd opt
 	mkdir bin
 	mkdir doc
 	cd doc
 	mkdir 7za920
+	cd ..
+	cd bin
+	%instdir%\msys\1.0\bin\unzip %instdir%/7za920.zip
+	%instdir%\msys\1.0\bin\mv license.txt readme.txt 7-zip.chm ../doc/7za920
+	cd ..\..
+	del 7za920.zip
+	
+:mingw-dtk
+if exist "%instdir%\bin\msgmerge.exe" GOTO autoTools
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- Download and install ming-developer-toolkit
+	echo.
+	echo -------------------------------------------------------------------------------
+	del /Q %instdir%\var\lib\mingw-get\data\mingw*
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mingw-dtk_jb.zip"
+	cd %instdir%\var\lib\mingw-get\data
+	%instdir%\opt\bin\7za.exe x %instdir%\mingw-dtk_jb.zip
 	cd %instdir%
+	del mingw-dtk_jb.zip
+	%instdir%\bin\mingw-get install mingw-developer-toolkit pkginfo
+	%instdir%\bin\mingw-get upgrade msys-core-bin=1.0.17-1
 	
-	move 7zip-license.txt opt\doc\7za920
-	move 7zip-readme.txt opt\doc\7za920
-	move 7-zip.chm opt\doc\7za920
-	move 7za.exe opt\bin
-	
-:checkmsys2
-if exist "%instdir%\msys64\msys2_shell.bat" GOTO getMintty
+:autoTools
+if exist "%instdir%\msys\1.0\share\aclocal\pkg.m4" GOTO pkg
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- Download and install msys2 basic system
+	echo.- Download and install AutoTools, libcrypt, Glib and PKG-CONFIG
 	echo.
 	echo -------------------------------------------------------------------------------
+	cd %instdir%\msys\1.0
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/autoconf/autoconf-2.68-1/autoconf-2.68-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/automake/automake-1.11.1-1/automake-1.11.1-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/msysdev/libtool/libtool-2.4-1/libtool-2.4-1-msys-1.0.15-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://prdownloads.sourceforge.net/mingw/libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/perl/perl-5.8.8-1/perl-5.8.8-1-msys-1.0.17-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://sourceforge.net/projects/mingw/files/MSYS/Extension/m4/m4-1.4.14-1/m4-1.4.14-1-msys-1.0.13-bin.tar.lzma/download
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.acc.umu.se/pub/GNOME/binaries/win32/glib/2.28/glib_2.28.8-1_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/pkg-config-dev_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/gettext-runtime_0.18.1.1-2_win32.zip
 	
-	"%instdir%\wget" -P "%instdir%" -O msys2-base.tar.xz "http://sourceforge.net/projects/msys2/files/latest/download?source=files"
+	%instdir%\msys\1.0\bin\lzma -d autoconf-2.68-1-msys-1.0.17-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf autoconf-2.68-1-msys-1.0.17-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d automake-1.11.1-1-msys-1.0.13-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf automake-1.11.1-1-msys-1.0.13-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d libtool-2.4-1-msys-1.0.15-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf libtool-2.4-1-msys-1.0.15-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar
+	%instdir%\msys\1.0\bin\lzma -d perl-5.8.8-1-msys-1.0.17-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf perl-5.8.8-1-msys-1.0.17-bin.tar
+	%instdir%\msys\1.0\bin\lzma -d m4-1.4.14-1-msys-1.0.13-bin.tar.lzma
+	%instdir%\msys\1.0\bin\tar --keep-newer-files -xf m4-1.4.14-1-msys-1.0.13-bin.tar
+	%instdir%\msys\1.0\bin\unzip -n glib_2.28.8-1_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n pkg-config_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n pkg-config-dev_0.23-3_win32.zip
+	%instdir%\msys\1.0\bin\unzip -n gettext-runtime_0.18.1.1-2_win32.zip
 	
-	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
-	%instdir%\opt\bin\7za.exe x msys2-base.tar
-	del msys2-base.tar.xz
-	del msys2-base.tar
-	del wget.exe
+	del autoconf-2.68-1-msys-1.0.17-bin.tar
+	del automake-1.11.1-1-msys-1.0.13-bin.tar
+	del libtool-2.4-1-msys-1.0.15-bin.tar
+	del libcrypt-1.1_1-2-msys-1.0.11-dll-0.tar
+	del perl-5.8.8-1-msys-1.0.17-bin.tar
+	del m4-1.4.14-1-msys-1.0.13-bin.tar
+	del glib_2.28.8-1_win32.zip
+	del pkg-config_0.23-3_win32.zip
+	del pkg-config-dev_0.23-3_win32.zip
+	del gettext-runtime_0.18.1.1-2_win32.zip
 	
-:getMintty
-if exist %instdir%\mintty.lnk GOTO updatebase
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- set mintty shell shortcut and make a first run
-	echo.
-	echo -------------------------------------------------------------------------------
+	for /f %%a in ('dir %instdir%\msys\1.0\home /B') do set userName=%%a
+	echo.echo '%userName%'>%instdir%\msys\1.0\bin\whoami
 	
-	echo.Set Shell = CreateObject^("WScript.Shell"^)>>%instdir%\setlink.vbs
-	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
-	echo.link.Arguments = "/bin/sh -l" >>%instdir%\setlink.vbs
-	echo.link.Description = "msys2 shell console">>%instdir%\setlink.vbs
-	echo.link.TargetPath = "%instdir%\msys64\bin\mintty.exe">>%instdir%\setlink.vbs
-	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
-	echo.link.WorkingDirectory = "%instdir%\msys64\bin">>%instdir%\setlink.vbs
-	echo.link.Save>>%instdir%\setlink.vbs
+	cd %instdir%
 
-	cscript /nologo %instdir%\setlink.vbs 
-	del %instdir%\setlink.vbs 	
-
-	echo.exit>exit.sh
-	%instdir%\mintty.lnk %instdir%\exit.sh
-	del exit.sh
+:pkg
+if exist "%instdir%\share\aclocal\pkg.m4" GOTO mingw32
+	copy %instdir%\msys\1.0\share\aclocal\pkg.m4 %instdir%\share\aclocal
+	echo.copy pkg.m4 to %instdir%\share\aclocal
 	
-	for /f %%i in ('dir %instdir%\msys64\home /B') do set userFolder=%%i
-	
-	Setlocal EnableDelayedExpansion 
 
-	for /F "tokens=3 delims= " %%g in ('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage') do (
-	if [%%g] EQU [0407] (
-		set lang=de_DE
-		) else (
-			set land=C
+cd %instdir%
+
+::------------------------------------------------------------------
+::download and install mingw compiler:
+::------------------------------------------------------------------	
+
+:mingw32
+if %build32%==yes (
+	if exist "%instdir%\mingw32\bin\gcc.exe" GOTO mingw64
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- Download and install mingw 32bit compiler to mingw32
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
+
+		:instMingW32
+		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
+		%instdir%\msys\1.0\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
+		del mingw32-gcc-4.8.2.7z
+		
+		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
+			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
+			)
+		if not exist "%instdir%\mingw32\bin\cc.exe" (
+			echo.
+			echo.download from compiler mingw32 fail...
+			echo.try again or fix download
+			echo.
+			GOTO mingw32
 			)
 	)
-	set lng=!lang!
-	Setlocal DisableDelayedExpansion 
-	
-	echo.BoldAsFont=no>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BackgroundColour=57,57,57>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.ForegroundColour=221,221,221>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Transparency=medium>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.FontHeight=^9>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.FontSmoothing=full>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.AllowBlinking=yes>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Font=DejaVu Sans Mono>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Columns=90>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Rows=30>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Locale=%lng%>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Charset=UTF-8>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Term=xterm-256color>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.CursorType=block>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Black=38,39,41>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Red=249,38,113>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Green=166,226,46>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Yellow=253,151,31>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Blue=102,217,239>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Magenta=158,111,254>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Cyan=94,113,117>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.White=248,248,242>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldBlack=85,68,68>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldRed=249,38,113>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldGreen=166,226,46>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldYellow=253,151,31>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldBlue=102,217,239>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldMagenta=158,111,254>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldCyan=163,186,191>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.BoldWhite=248,248,242>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	
-:updatebase
-echo.-------------------------------------------------------------------------------
-echo.updating msys2 system
-echo.-------------------------------------------------------------------------------
-echo.pacman --noconfirm -Sy>>updateMSYS2.sh
-echo.pacman --noconfirm -Su>>updateMSYS2.sh
-echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
-echo.echo "updating msys2 done...">>updateMSYS2.sh
-echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
-echo.sleep ^5>>updateMSYS2.sh
-echo.exit>>updateMSYS2.sh
-%instdir%\mintty.lnk %instdir%\updateMSYS2.sh
-del updateMSYS2.sh
+		
+:mingw64
+if %build64%==yes (
+	if exist "%instdir%\mingw64\bin\gcc.exe" GOTO makeDIR
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- Download and install mingw 64bit compiler to mingw64
+		echo.
+		echo -------------------------------------------------------------------------------
+		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
+		
+		:instMingW64
+		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
+		%instdir%\msys\1.0\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
+		del mingw64-gcc-4.8.2.7z
 
-:installbase
-if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
-	echo.-------------------------------------------------------------------------------
-	echo.install msys2 base system
-	echo.-------------------------------------------------------------------------------
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool m4 man nasm patch pkg-config scons swig xmlto make zip unzip git subversion wget>>pacman.sh
-	echo.exit>>pacman.sh
-	%instdir%\mintty.lnk %instdir%\pacman.sh
-	del pacman.sh
-	
+		FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
+			%instdir%\msys\1.0\bin\mv  %%C %%C.dyn
+			)
+		if not exist "%instdir%\mingw64\bin\cc.exe" (
+			echo.
+			echo.download from compiler mingw64 fail...
+			echo.try again or fix download
+			echo.
+			GOTO mingw64
+			)	
+	)
+
 :makeDIR
 if %build32%==yes (
 	if not exist %instdir%\global32 (
@@ -480,7 +495,6 @@ if %build32%==yes (
 		mkdir %instdir%\local32\share
 		)	
 	)
-	
 if %build64%==yes (
 	if not exist %instdir%\global64 (
 		echo.-------------------------------------------------------------------------------
@@ -509,79 +523,29 @@ if %build64%==yes (
 		)
 	)
 	
-::------------------------------------------------------------------
-::download and install mingw compiler:
-::------------------------------------------------------------------	
-
-:mingw32
-if %build32%==yes (
-	if exist "%instdir%\mingw32\bin\gcc.exe" GOTO mingw64
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- Download and install mingw 32bit compiler to mingw32
-		echo.
-		echo -------------------------------------------------------------------------------
-		if exist mingw32-gcc-4.8.0.7z GOTO instMingW32
-		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw32-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win32/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/i686-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
-
-		:instMingW32
-		%instdir%\opt\bin\7za.exe x mingw32-gcc-4.8.2.7z
-		%instdir%\msys64\bin\cp %instdir%\mingw32\bin\gcc.exe %instdir%\mingw32\bin\cc.exe
-		del mingw32-gcc-4.8.2.7z
-		
-		FOR /R "%instdir%\mingw32" %%C IN (*.dll.a) DO (
-			%instdir%\msys64\bin\mv  %%C %%C.dyn
-			)
-		if not exist "%instdir%\mingw32\bin\cc.exe" (
-			echo.
-			echo.download from compiler mingw32 fail...
-			echo.try again or fix download
-			echo.
-			GOTO mingw32
-			)
-	)
-		
-:mingw64
-if %build64%==yes (
-	if exist "%instdir%\mingw64\bin\gcc.exe" GOTO writeConfFile
-		echo -------------------------------------------------------------------------------
-		echo.
-		echo.- Download and install mingw 64bit compiler to mingw64
-		echo.
-		echo -------------------------------------------------------------------------------
-		if exist mingw64-gcc-4.8.0.7z GOTO instMingW64
-		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate -O mingw64-gcc-4.8.2.7z "http://downloads.sourceforge.net/project/mingw-w64/Toolchains targetting Win64/Personal Builds/mingw-builds/4.8.2/threads-win32/sjlj/x86_64-4.8.2-release-win32-sjlj-rt_v3-rev3.7z"
-		
-		:instMingW64
-		%instdir%\opt\bin\7za.exe x mingw64-gcc-4.8.2.7z
-		%instdir%\msys64\bin\cp %instdir%\mingw64\bin\gcc.exe %instdir%\mingw64\bin\cc.exe
-		del mingw64-gcc-4.8.2.7z
-
-		FOR /R "%instdir%\mingw64" %%C IN (*.dll.a) DO (
-			%instdir%\msys64\bin\mv  %%C %%C.dyn
-			)
-		if not exist "%instdir%\mingw64\bin\cc.exe" (
-			echo.
-			echo.download from compiler mingw64 fail...
-			echo.try again or fix download
-			echo.
-			GOTO mingw64
-			)	
-	)
-	
 :writeConfFile
-if exist %instdir%\msys64\etc\fstabconf.cfg GOTO writeProfile32
-	echo.>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\opt\ /opt>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\global32\ /global32>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\local32\ /local32>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\build32\ /build32>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\mingw32\ /mingw32>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\global64\ /global64>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\local64\ /local64>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\build64\ /build64>>%instdir%\msys64\etc\fstab.
-	echo.%instdir%\mingw64\ /mingw64>>%instdir%\msys64\etc\fstab.
-	echo.new mount done. see in fstab>> %instdir%\msys64\etc\fstabconf.cfg
+if exist %instdir%\conf-env.sh GOTO runConfFile
+if exist %instdir%\msys\1.0\etc\userconf.cfg GOTO writeProfile32
+	echo mount '%instdir%\opt\' /opt>>%instdir%\conf-env.sh
+	echo mount '%instdir%\global32\' /global32>>%instdir%\conf-env.sh
+	echo mount '%instdir%\local32\' /local32>>%instdir%\conf-env.sh
+	echo mount '%instdir%\build32\' /build32>>%instdir%\conf-env.sh
+	echo mount '%instdir%\mingw32\' /mingw32>>%instdir%\conf-env.sh
+	echo mount '%instdir%\global64\' /global64>>%instdir%\conf-env.sh
+	echo mount '%instdir%\local64\' /local64>>%instdir%\conf-env.sh
+	echo mount '%instdir%\build64\' /build64>>%instdir%\conf-env.sh
+	echo mount '%instdir%\mingw64\' /mingw64>>%instdir%\conf-env.sh
+
+:runConfFile
+if exist %instdir%\msys\1.0\etc\userconf.cfg GOTO writeProfile32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- mounting build folders
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\msys\1.0\bin\sh -l %instdir%\conf-env.sh
+	echo new mount done. see in fstap>> %instdir%\msys\1.0\etc\userconf.cfg
+	del %instdir%\conf-env.sh
 
 ::------------------------------------------------------------------
 :: write config profiles:
@@ -609,7 +573,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -643,7 +607,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
@@ -656,7 +620,7 @@ if %build64%==yes (
 		)
 	
 :loginProfile
-if exist %instdir%\msys64\etc\userprofile.cfg GOTO extraPacks
+if exist %instdir%\msys\1.0\etc\userprofile.cfg GOTO extraPacks
 
 if %build64%==yes (
 	if %build32%==yes GOTO loginProfile32
@@ -672,8 +636,8 @@ if %build64%==yes (
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh
 
-	%instdir%\msys64\bin\sh -l %instdir%\profile.sh
-	echo 64 bit build system add to profile. see profile>>%instdir%\msys64\etc\userprofile.cfg
+	%instdir%\msys\1.0\bin\sh -l %instdir%\profile.sh
+	echo 64 bit build system add to profile. see profile>>%instdir%\msys\1.0\etc\userprofile.cfg
 	del %instdir%\profile.sh
 	GOTO extraPacks
 	)
@@ -691,52 +655,60 @@ if %build64%==yes (
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh
 
-	%instdir%\msys64\bin\sh -l %instdir%\profile.sh
-	echo 32 bit build system add to profile. see profile>>%instdir%\msys64\etc\userprofile.cfg
+	%instdir%\msys\1.0\bin\sh -l %instdir%\profile.sh
+	echo 32 bit build system add to profile. see profile>>%instdir%\msys\1.0\etc\userprofile.cfg
 	del %instdir%\profile.sh
-	
+
 :extraPacks
 ::------------------------------------------------------------------
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
+
+if not exist "%instdir%\opt\bin\git.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install PortableGit
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
+	%instdir%\opt\bin\7za x PortableGit-1.9.0-preview20140217.7z -aoa
+	%instdir%\msys\1.0\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
+	%instdir%\msys\1.0\bin\mv ReleaseNotes.rtf README.portable doc\git
+	%instdir%\msys\1.0\bin\rm PortableGit-1.9.0-preview20140217.7z
+	cd ..
+	)
+
+if not exist "%instdir%\opt\bin\svn.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install svn
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
+	%instdir%\msys\1.0\bin\unzip svn-win32-1.8.8.zip
+	%instdir%\msys\1.0\bin\cp -va svn-win32-1.8.8/* .
+	%instdir%\msys\1.0\bin\mkdir -p doc\svn-win32-1.8.8
+	%instdir%\msys\1.0\bin\mv README.txt doc\svn-win32-1.8.8
+	%instdir%\msys\1.0\bin\rm svn-win32-1.8.8.zip
+	%instdir%\msys\1.0\bin\rm -r svn-win32-1.8.8
+	cd ..
+	)
 
 if not exist "%instdir%\opt\bin\cmake.exe" (
 	echo.-------------------------------------------------------------------------------
 	echo.download and install cmake
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
-	%instdir%\msys64\bin\unzip cmake-2.8.12.2-win32-x86.zip
-	%instdir%\msys64\bin\cp -va cmake-2.8.12.2-win32-x86/* .
-	%instdir%\msys64\bin\rm cmake-2.8.12.2-win32-x86.zip
-	%instdir%\msys64\bin\rm -r cmake-2.8.12.2-win32-x86
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.cmake.org/files/v2.8/cmake-2.8.12.2-win32-x86.zip"
+	%instdir%\msys\1.0\bin\unzip cmake-2.8.12.2-win32-x86.zip
+	%instdir%\msys\1.0\bin\cp -va cmake-2.8.12.2-win32-x86/* .
+	%instdir%\msys\1.0\bin\rm cmake-2.8.12.2-win32-x86.zip
+	%instdir%\msys\1.0\bin\rm -r cmake-2.8.12.2-win32-x86
 	cd ..
 	)
-
-if not exist "%instdir%\opt\bin\pdflatex.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install pdftex-w32
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
-	%instdir%\msys64\bin\xz -d pdftex-w32.tar.xz
-	%instdir%\msys64\bin\tar -xf pdftex-w32.tar
-	%instdir%\msys64\bin\xz -d makeindex-w32.tar.xz
-	%instdir%\msys64\bin\tar -xf makeindex-w32.tar
-	%instdir%\msys64\bin\xz -d dvipsk-w32.tar.xz
-	%instdir%\msys64\bin\tar -xf dvipsk-w32.tar
-	%instdir%\msys64\bin\rm pdftex-w32.tar
-	%instdir%\msys64\bin\rm makeindex-w32.tar
-	%instdir%\msys64\bin\rm dvipsk-w32.tar
-	cd ..
-	)		
-
+	
 if not exist "%instdir%\opt\python27\python.exe" (
 	cd %instdir%\opt
 	mkdir python27
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
 	msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
 	del python-2.7.2.msi
 	cd ..
@@ -747,13 +719,33 @@ if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.download and install TortoiseHg
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "http://bitbucket.org/tortoisehg/files/downloads/tortoisehg-2.11.2-hg-2.9.2-x86.msi"
-	msiexec /a tortoisehg-2.11.2-hg-2.9.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
-	%instdir%\msys64\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
-	%instdir%\msys64\bin\rm tortoisehg-2.11.2-hg-2.9.2-x86.msi
-	%instdir%\msys64\bin\rm -r -f %instdir%\opt\hg-temp
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.4.1-hg-2.2.2-x86.msi"
+	msiexec /a tortoisehg-2.4.1-hg-2.2.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
+	%instdir%\msys\1.0\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
+	%instdir%\msys\1.0\bin\rm tortoisehg-2.4.1-hg-2.2.2-x86.msi
+	%instdir%\msys\1.0\bin\rm -r -f %instdir%\opt\hg-temp
 	cd ..
 	)
+
+if not exist "%instdir%\opt\bin\pdflatex.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install pdftex-w32
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
+	%instdir%\msys\1.0\bin\xz -d pdftex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf pdftex-w32.tar
+	%instdir%\msys\1.0\bin\xz -d makeindex-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf makeindex-w32.tar
+	%instdir%\msys\1.0\bin\xz -d dvipsk-w32.tar.xz
+	%instdir%\msys\1.0\bin\tar -xf dvipsk-w32.tar
+	%instdir%\msys\1.0\bin\rm pdftex-w32.tar
+	%instdir%\msys\1.0\bin\rm makeindex-w32.tar
+	%instdir%\msys\1.0\bin\rm dvipsk-w32.tar
+	cd ..
+	)		
 
 cd %instdir%
 
@@ -761,7 +753,7 @@ cd %instdir%
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\doxygen.exe GOTO checkDoxygen64
 	cd %instdir%\build32
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.bin.zip"
 	cd %instdir%\mingw32\bin
 	%instdir%\opt\bin\7za x %instdir%\build32\doxygen-1.8.6.windows.bin.zip
 	del %instdir%\build32\doxygen-1.8.6.windows.bin.zip
@@ -771,7 +763,7 @@ if %build32%==yes (
 if %build64%==yes (
 	if exist %instdir%\mingw64\bin\doxygen.exe GOTO checkYasm32
 	cd %instdir%\build64
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.6.windows.x64.bin.zip"
 	cd %instdir%\mingw64\bin
 	%instdir%\opt\bin\7za x %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
 	del %instdir%\build64\doxygen-1.8.6.windows.x64.bin.zip
@@ -781,7 +773,7 @@ if %build64%==yes (
 if %build32%==yes (
 	if exist %instdir%\mingw32\bin\yasm.exe GOTO checkYasm64
 	cd %instdir%\build32
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win32.exe"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win32.exe"
 	ren yasm-1.2.0-win32.exe yasm.exe
 	copy yasm.exe %instdir%\mingw32\bin
 	del yasm.exe
@@ -789,14 +781,77 @@ if %build32%==yes (
 	
 :checkYasm64	
 if %build64%==yes (
-	if exist %instdir%\mingw64\bin\yasm.exe GOTO compileGobal
+	if exist %instdir%\mingw64\bin\yasm.exe GOTO getMintty
 	cd %instdir%\build64
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
 	ren yasm-1.2.0-win64.exe yasm.exe
 	copy yasm.exe %instdir%\mingw64\bin
 	del yasm.exe
 	)	
 cd %instdir%
+
+:getMintty
+if exist %instdir%\msys\1.0\bin\mintty.exe GOTO minttySettings
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- download and install mintty (a nice shell console tool):
+	echo. (it is recommended to don't use the windows cmd, it is not stable)
+	echo.
+	echo -------------------------------------------------------------------------------
+	%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c http://blog.pixelcrusher.de/downloads/media-autobuild_suite/mintty-1.1.3-msys.zip
+	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\bin mintty.exe
+	%instdir%\opt\bin\7za.exe e -r -y %instdir%\mintty-1.1.3-msys.zip -o%instdir%\msys\1.0\share\doc readme-msys.html
+	
+	for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
+	
+	echo.Set Shell = CreateObject^("WScript.Shell"^)>>%instdir%\setlink.vbs
+	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
+	echo.link.Arguments = "/bin/sh -l" >>%instdir%\setlink.vbs
+	echo.link.Description = "msys shell console">>%instdir%\setlink.vbs
+	echo.link.TargetPath = "%instdir%\msys\1.0\bin\mintty.exe">>%instdir%\setlink.vbs
+	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
+	echo.link.WorkingDirectory = "%instdir%\msys\1.0\bin">>%instdir%\setlink.vbs
+	echo.link.Save>>%instdir%\setlink.vbs
+
+	cscript /nologo %instdir%\setlink.vbs 
+	del %instdir%\mintty-1.1.3-msys.zip 
+	del %instdir%\setlink.vbs 
+	
+::mintty seetings, color, transparency, etc.
+:minttySettings
+for /f %%i in ('dir %instdir%\msys\1.0\home /B') do set userFolder=%%i
+if exist %instdir%\msys\1.0\home\%userFolder%\.minttyrc GOTO compileGlobals
+	
+	echo.BoldAsFont=no>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BackgroundColour=57,57,57>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.ForegroundColour=221,221,221>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Transparency=medium>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.FontHeight=^9>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.FontSmoothing=full>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.AllowBlinking=yes>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Font=DejaVu Sans Mono>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Columns=90>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Rows=30>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Locale=de_DE>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Charset=UTF-8>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Term=xterm-256color>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.CursorType=block>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Black=38,39,41>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Red=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Green=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Yellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Blue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Magenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.Cyan=94,113,117>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.White=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldBlack=85,68,68>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldRed=249,38,113>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldGreen=166,226,46>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldYellow=253,151,31>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldBlue=102,217,239>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldMagenta=158,111,254>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldCyan=163,186,191>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
+	echo.BoldWhite=248,248,242>>%instdir%\msys\1.0\home\%userFolder%\.minttyrc
 
 :compileGlobals
 if exist %instdir%\compile_globaltools.sh GOTO compileGobal
@@ -806,7 +861,7 @@ if exist %instdir%\compile_globaltools.sh GOTO compileGobal
 	echo.
 	echo -------------------------------------------------------------------------------
 	if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal
-		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		
 		:unpackglobal
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_globaltools.sh
@@ -828,7 +883,7 @@ if exist %instdir%\compile_audiotools.sh GOTO compileAudio
 	echo.
 	echo -------------------------------------------------------------------------------
 	if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio
-		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 	
 		:unpackAudio
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools.sh
@@ -850,7 +905,7 @@ if not exist %instdir%\compile_videotools.sh (
 	echo.
 	echo -------------------------------------------------------------------------------
 	if not exist %instdir%\media-autobuild_suite.zip (
-		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		%instdir%\msys\1.0\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		)
 		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
 	)
