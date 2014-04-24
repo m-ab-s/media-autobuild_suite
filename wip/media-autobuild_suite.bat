@@ -63,7 +63,9 @@
 ::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
 ::	2014-04-04 add strip files to main batch
 ::	2014-04-08 ask for x265 in ffmpeg
-::	2014-04-21 changing msys to msys2
+::	2014-04-21 start to changing msys1 to msys2
+::	2014-04-22 lang. detect for mintty
+::	2014-04-24 add tools
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -358,7 +360,7 @@ if exist "%instdir%\msys64\msys2_shell.bat" GOTO getMintty
 	del wget.exe
 	
 :getMintty
-if exist %instdir%\mintty.lnk GOTO installbase
+if exist %instdir%\mintty.lnk GOTO updatebase
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- set mintty shell shortcut and make a first run
@@ -383,6 +385,18 @@ if exist %instdir%\mintty.lnk GOTO installbase
 	
 	for /f %%i in ('dir %instdir%\msys64\home /B') do set userFolder=%%i
 	
+	Setlocal EnableDelayedExpansion 
+
+	for /F "tokens=3 delims= " %%g in ('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage') do (
+	if [%%g] EQU [0407] (
+		set lang=de_DE
+		) else (
+			set land=C
+			)
+	)
+	set lng=!lang!
+	Setlocal DisableDelayedExpansion 
+	
 	echo.BoldAsFont=no>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.ForegroundColour=221,221,221>>%instdir%\msys64\home\%userFolder%\.minttyrc
@@ -393,7 +407,7 @@ if exist %instdir%\mintty.lnk GOTO installbase
 	echo.Font=DejaVu Sans Mono>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Columns=90>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Rows=30>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Locale=de_DE>>%instdir%\msys64\home\%userFolder%\.minttyrc
+	echo.Locale=%lng%>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Charset=UTF-8>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Term=xterm-256color>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.CursorType=block>>%instdir%\msys64\home\%userFolder%\.minttyrc
@@ -414,17 +428,26 @@ if exist %instdir%\mintty.lnk GOTO installbase
 	echo.BoldCyan=163,186,191>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.BoldWhite=248,248,242>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	
+:updatebase
+echo.-------------------------------------------------------------------------------
+echo.updating msys2 system
+echo.-------------------------------------------------------------------------------
+echo.pacman --noconfirm -Sy>>updateMSYS2.sh
+echo.pacman --noconfirm -Su>>updateMSYS2.sh
+echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
+echo.echo "updating msys2 done...">>updateMSYS2.sh
+echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
+echo.sleep ^5>>updateMSYS2.sh
+echo.exit>>updateMSYS2.sh
+%instdir%\mintty.lnk %instdir%\updateMSYS2.sh
+del updateMSYS2.sh
+
 :installbase
 if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
-	echo.pacman --noconfirm -Sy>>pacman.sh
-	echo.pacman --noconfirm -Su>>pacman.sh
-	echo.exit>>pacman.sh
-	del pacman.sh
-	::maybe VCS for git svn hg
-	echo.pacman --noconfirm -S make gettext base-devel>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool m4 man nasm patch pkg-config scons swig xmlto make zip unzip git subversion wget>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\mintty.lnk %instdir%\pacman.sh
 	del pacman.sh
@@ -457,6 +480,7 @@ if %build32%==yes (
 		mkdir %instdir%\local32\share
 		)	
 	)
+	
 if %build64%==yes (
 	if not exist %instdir%\global64 (
 		echo.-------------------------------------------------------------------------------
@@ -546,29 +570,18 @@ if %build64%==yes (
 	)
 	
 :writeConfFile
-if exist %instdir%\conf-env.sh GOTO runConfFile
-if exist %instdir%\msys64\etc\userconf.cfg GOTO writeProfile32
-	echo.mount '%instdir%\opt\' /opt>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\global32\' /global32>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\local32\' /local32>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\build32\' /build32>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\mingw32\' /mingw32>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\global64\' /global64>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\local64\' /local64>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\build64\' /build64>>%instdir%\conf-env.sh
-	echo.mount '%instdir%\mingw64\' /mingw64>>%instdir%\conf-env.sh
-
-:runConfFile
-if exist %instdir%\msys64\etc\userconf.cfg GOTO writeProfile32
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- mounting build folders
-	echo.
-	echo -------------------------------------------------------------------------------
-	%instdir%\msys64\bin\sh -l %instdir%\conf-env.sh
-	echo new mount done. see in fstap>> %instdir%\msys64\etc\userconf.cfg
-	::del %instdir%\conf-env.sh
-	
+if exist %instdir%\msys64\etc\fstabconf.cfg GOTO writeProfile32
+	echo.>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\opt\ /opt>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\global32\ /global32>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\local32\ /local32>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\build32\ /build32>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\mingw32\ /mingw32>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\global64\ /global64>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\local64\ /local64>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\build64\ /build64>>%instdir%\msys64\etc\fstab.
+	echo.%instdir%\mingw64\ /mingw64>>%instdir%\msys64\etc\fstab.
+	echo.new mount done. see in fstab>> %instdir%\msys64\etc\fstabconf.cfg
 
 ::------------------------------------------------------------------
 :: write config profiles:
@@ -596,7 +609,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -630,7 +643,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
@@ -643,7 +656,7 @@ if %build64%==yes (
 		)
 	
 :loginProfile
-if exist %instdir%\msys64\etc\userprofile.cfg GOTO mingw32
+if exist %instdir%\msys64\etc\userprofile.cfg GOTO extraPacks
 
 if %build64%==yes (
 	if %build32%==yes GOTO loginProfile32
@@ -687,34 +700,6 @@ if %build64%==yes (
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
 
-if not exist "%instdir%\opt\bin\git.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install PortableGit
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://msysgit.googlecode.com/files/PortableGit-1.9.0-preview20140217.7z"
-	%instdir%\opt\bin\7za x PortableGit-1.9.0-preview20140217.7z -aoa
-	%instdir%\msys64\bin\rm git-bash.bat git-cmd.bat "Git Bash.vbs"
-	%instdir%\msys64\bin\mv ReleaseNotes.rtf README.portable doc\git
-	%instdir%\msys64\bin\rm PortableGit-1.9.0-preview20140217.7z
-	cd ..
-	)
-
-if not exist "%instdir%\opt\bin\svn.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install svn
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/project/win32svn/1.8.8/apache22/svn-win32-1.8.8.zip"
-	%instdir%\msys64\bin\unzip svn-win32-1.8.8.zip
-	%instdir%\msys64\bin\cp -va svn-win32-1.8.8/* .
-	%instdir%\msys64\bin\mkdir -p doc\svn-win32-1.8.8
-	%instdir%\msys64\bin\mv README.txt doc\svn-win32-1.8.8
-	%instdir%\msys64\bin\rm svn-win32-1.8.8.zip
-	%instdir%\msys64\bin\rm -r svn-win32-1.8.8
-	cd ..
-	)
-
 if not exist "%instdir%\opt\bin\cmake.exe" (
 	echo.-------------------------------------------------------------------------------
 	echo.download and install cmake
@@ -725,19 +710,6 @@ if not exist "%instdir%\opt\bin\cmake.exe" (
 	%instdir%\msys64\bin\cp -va cmake-2.8.12.2-win32-x86/* .
 	%instdir%\msys64\bin\rm cmake-2.8.12.2-win32-x86.zip
 	%instdir%\msys64\bin\rm -r cmake-2.8.12.2-win32-x86
-	cd ..
-	)
-
-if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install TortoiseHg
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "https://bitbucket.org/tortoisehg/thg/downloads/tortoisehg-2.4.1-hg-2.2.2-x86.msi"
-	msiexec /a tortoisehg-2.4.1-hg-2.2.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
-	%instdir%\msys64\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
-	%instdir%\msys64\bin\rm tortoisehg-2.4.1-hg-2.2.2-x86.msi
-	%instdir%\msys64\bin\rm -r -f %instdir%\opt\hg-temp
 	cd ..
 	)
 
@@ -760,6 +732,28 @@ if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	%instdir%\msys64\bin\rm dvipsk-w32.tar
 	cd ..
 	)		
+
+if not exist "%instdir%\opt\python27\python.exe" (
+	cd %instdir%\opt
+	mkdir python27
+	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+	msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
+	del python-2.7.2.msi
+	cd ..
+)
+
+if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
+	echo.-------------------------------------------------------------------------------
+	echo.download and install TortoiseHg
+	echo.-------------------------------------------------------------------------------
+	cd %instdir%\opt
+	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "http://bitbucket.org/tortoisehg/files/downloads/tortoisehg-2.11.2-hg-2.9.2-x86.msi"
+	msiexec /a tortoisehg-2.11.2-hg-2.9.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
+	%instdir%\msys64\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
+	%instdir%\msys64\bin\rm tortoisehg-2.11.2-hg-2.9.2-x86.msi
+	%instdir%\msys64\bin\rm -r -f %instdir%\opt\hg-temp
+	cd ..
+	)
 
 cd %instdir%
 
@@ -795,7 +789,7 @@ if %build32%==yes (
 	
 :checkYasm64	
 if %build64%==yes (
-	if exist %instdir%\mingw64\bin\yasm.exe GOTO getMintty
+	if exist %instdir%\mingw64\bin\yasm.exe GOTO compileGobal
 	cd %instdir%\build64
 	%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://www.tortall.net/projects/yasm/releases/yasm-1.2.0-win64.exe"
 	ren yasm-1.2.0-win64.exe yasm.exe
@@ -803,5 +797,138 @@ if %build64%==yes (
 	del yasm.exe
 	)	
 cd %instdir%
-:end 
-	pause
+
+:compileGlobals
+if exist %instdir%\compile_globaltools.sh GOTO compileGobal
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- get script for global tools:
+	echo.
+	echo -------------------------------------------------------------------------------
+	if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal
+		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		
+		:unpackglobal
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_globaltools.sh
+
+:compileGobal
+echo -------------------------------------------------------------------------------
+echo.
+echo.- compile global tools:
+echo.
+echo -------------------------------------------------------------------------------
+%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
+echo. compile global tools done...
+
+:: audio tools
+if exist %instdir%\compile_audiotools.sh GOTO compileAudio
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- get script for audio tools:
+	echo.
+	echo -------------------------------------------------------------------------------
+	if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio
+		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+	
+		:unpackAudio
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools.sh
+
+:compileAudio
+echo -------------------------------------------------------------------------------
+echo.
+echo.- compile audio tools:
+echo.
+echo -------------------------------------------------------------------------------
+%instdir%\mintty.lnk %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --nonfree=%binary%
+echo. compile audio tools done...
+
+:: video tools
+if not exist %instdir%\compile_videotools.sh (
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- get script for video tools:
+	echo.
+	echo -------------------------------------------------------------------------------
+	if not exist %instdir%\media-autobuild_suite.zip (
+		%instdir%\msys64\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
+		)
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
+	)
+
+echo -------------------------------------------------------------------------------
+echo.
+echo.- compile video tools:
+echo.
+echo -------------------------------------------------------------------------------
+%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
+echo. compile video tools done...	
+	
+:: strip compiled files
+if %stripFile%==y (
+echo -------------------------------------------------------------------------------
+echo.
+echo.- stripping bins:
+echo.
+echo -------------------------------------------------------------------------------
+
+if %build32%==yes (
+	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%C
+				echo.strip %%~nC%%~xC 32Bit done...
+				)
+			)
+		)
+		
+	FOR /R "%instdir%\local32\bin" %%D IN (*.dll) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%D
+				echo.strip %%~nD%%~xD 32Bit done...
+				)
+			)
+		)
+	)	
+	
+if %build64%==yes (
+	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%C
+				echo.strip %%~nC%%~xC 64Bit done...
+				)
+			)
+		)
+		
+	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
+		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
+			IF %%A == %date% (
+				%instdir%\mingw32\bin\strip --strip-all %%D
+				echo.strip %%~nD%%~xD 64Bit done...
+				)
+			)
+		)
+	)
+)
+
+echo -------------------------------------------------------------------------------
+echo.
+echo. compiling done...
+echo.
+echo -------------------------------------------------------------------------------
+
+ping 127.0.0.0 -n 3 >nul
+echo.
+echo Window close in 15
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
+echo Window close in 10
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
+echo Window close in 5
+echo.
+ping 127.0.0.0 -n 5 >nul
+echo.
