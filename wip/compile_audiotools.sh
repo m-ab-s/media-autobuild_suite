@@ -466,26 +466,6 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 fi
 
 cd $LOCALBUILDDIR
-		
-if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
-	echo -------------------------------------------------
-	echo "twolame-0.3.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile twolame $bits\007"
-		if [ -d "twolame-0.3.13" ]; then rm -rf twolame-0.3.13; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O twolame-0.3.13.tar.gz http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
-		tar xf twolame-0.3.13.tar.gz
-		rm twolame-0.3.13.tar.gz
-		cd twolame-0.3.13
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist twolame-0.3.13 libtwolame.a
-fi
-
-cd $LOCALBUILDDIR
 
 if [ -f "WavPack-git/autogen.sh" ]; then
 	echo -ne "\033]0;compile WavPack $bits\007"
@@ -577,6 +557,26 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 		make install
 		
 		do_checkIfExist libsndfile-git libsndfile.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
+	echo -------------------------------------------------
+	echo "twolame-0.3.13 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile twolame $bits\007"
+		if [ -d "twolame-0.3.13" ]; then rm -rf twolame-0.3.13; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O twolame-0.3.13.tar.gz http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
+		tar xf twolame-0.3.13.tar.gz
+		rm twolame-0.3.13.tar.gz
+		cd twolame-0.3.13
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist twolame-0.3.13 libtwolame.a
 fi
 	
 cd $LOCALBUILDDIR
