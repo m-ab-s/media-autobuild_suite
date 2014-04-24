@@ -609,7 +609,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -643,7 +643,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
