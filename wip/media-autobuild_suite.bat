@@ -300,7 +300,7 @@ if %stripF% GTR 2 GOTO stripEXE
 ::download and install basic msys system:
 ::------------------------------------------------------------------
 
-if exist "%instdir%\opt" GOTO check7zip
+if exist "%instdir%\msys64" GOTO check7zip
 	echo -------------------------------------------------------------
 	echo.
 	echo - Download wget
@@ -360,7 +360,7 @@ if exist "%instdir%\msys64\msys2_shell.bat" GOTO getMintty
 	del wget.exe
 	
 :getMintty
-if exist %instdir%\mintty.lnk GOTO updatebase
+if exist %instdir%\mintty.lnk GOTO minttySettings
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- set mintty shell shortcut and make a first run
@@ -384,20 +384,10 @@ if exist %instdir%\mintty.lnk GOTO updatebase
 	%instdir%\mintty.lnk %instdir%\firstrun.sh
 	del firstrun.sh
 	
-	for /f %%i in ('dir %instdir%\msys64\home /B') do set userFolder=%%i
-	
-	Setlocal EnableDelayedExpansion 
+:minttySettings
+for /f %%i in ('dir %instdir%\msys64\home /B') do set userFolder=%%i
+if exist %instdir%\msys64\home\%userFolder%\.minttyrc GOTO updatebase
 
-	for /F "tokens=3 delims= " %%g in ('reg query "hklm\system\controlset001\control\nls\language" /v Installlanguage') do (
-	if [%%g] EQU [0407] (
-		set lang=de_DE
-		) else (
-			set land=C
-			)
-	)
-	set lng=!lang!
-	Setlocal DisableDelayedExpansion 
-	
 	echo.BoldAsFont=no>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.ForegroundColour=221,221,221>>%instdir%\msys64\home\%userFolder%\.minttyrc
@@ -408,8 +398,6 @@ if exist %instdir%\mintty.lnk GOTO updatebase
 	echo.Font=DejaVu Sans Mono>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Columns=90>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Rows=30>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Locale=%lng%>>%instdir%\msys64\home\%userFolder%\.minttyrc
-	echo.Charset=UTF-8>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Term=xterm-256color>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.CursorType=block>>%instdir%\msys64\home\%userFolder%\.minttyrc
 	echo.Black=38,39,41>>%instdir%\msys64\home\%userFolder%\.minttyrc
@@ -444,25 +432,110 @@ echo.exit>>updateMSYS2.sh
 del updateMSYS2.sh
 
 :installbase
-if exist %instdir%\msys64\bin\make.exe GOTO makeDIR
+if exist %instdir%\msys64\bin\make.exe GOTO checkdyn
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
 	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex gdb gperf groff help2man intltool libtool m4 man patch pkg-config scons swig xmlto make tar zip unzip git subversion wget>>pacman.sh
-	echo.exit>>pacman.sh
 
 if %build32%==yes (
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-sqlite3 mingw-w64-i686-yasm>>pacman.sh
+	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-sqlite3 mingw-w64-i686-yasm mingw-w64-i686-libxml2>>pacman.sh
 	)	
 	
 if %build64%==yes (
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-yasm>>pacman.sh
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-yasm mingw-w64-x86_64-libxml2>>pacman.sh
 	)
 	
+	echo.sleep ^3>>pacman.sh
+	echo.exit>>pacman.sh
 	%instdir%\mintty.lnk %instdir%\pacman.sh
 	del pacman.sh
 	
-:makeDIR
+:checkdyn
+echo.-------------------------------------------------------------------------------
+echo.check for dynamic libs
+echo.-------------------------------------------------------------------------------
+
+Setlocal EnableDelayedExpansion
+if %build32%==yes (
+	FOR %%C IN (%instdir%\msys64\mingw32\lib\*.dll.a) DO (
+		set file=%%C
+		set name=!file:~0,-6!
+		if exist !name!.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		)
+	)
+
+if %build64%==yes (
+	FOR %%C IN (%instdir%\msys64\mingw64\lib\*.dll.a) DO (
+		set file=%%C
+		set name=!file:~0,-6!
+		if exist !name!.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		)
+	)
+Setlocal DisableDelayedExpansion
+
+if %build32%==yes (
+	FOR /R "%instdir%\msys64\mingw32" %%C IN (*.dll.a) DO (
+		if %%C==%%~dC%%~pClibgomp.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibgfortran.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)	
+		if %%C==%%~dC%%~pClibquadmath.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)		
+		if %%C==%%~dC%%~pClibltdl.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibstdc++.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibwinpthread.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibssp.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibhogweed.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		)
+	)
+
+if %build64%==yes (
+	FOR /R "%instdir%\msys64\mingw64" %%C IN (*.dll.a) DO (
+		if %%C==%%~dC%%~pClibgomp.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibgfortran.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)	
+		if %%C==%%~dC%%~pClibquadmath.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)		
+		if %%C==%%~dC%%~pClibltdl.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibstdc++.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibwinpthread.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibssp.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		if %%C==%%~dC%%~pClibhogweed.dll.a (
+			%instdir%\msys64\bin\mv  %%C %%C.dyn
+			)
+		)
+	)
+
 if %build32%==yes (
 	if not exist %instdir%\global32 (
 		echo.-------------------------------------------------------------------------------
@@ -559,7 +632,7 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -593,7 +666,7 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/mingw/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
@@ -668,7 +741,7 @@ if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	%instdir%\msys64\bin\rm makeindex-w32.tar
 	%instdir%\msys64\bin\rm dvipsk-w32.tar
 	cd ..
-	)		
+	)
 
 if not exist "%instdir%\opt\python27\python.exe" (
 	cd %instdir%\opt

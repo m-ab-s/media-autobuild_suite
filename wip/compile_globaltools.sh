@@ -179,27 +179,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-#maybe we don't need this...
-#if [ -f "nasm-2.10.09/compile.done" ]; then
-#	echo -------------------------------------------------
-#	echo "nasm-2.10.09 is already compiled"
-#	echo -------------------------------------------------
-#	else 
-#		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.nasm.us/pub/nasm/releasebuilds/2.10.09/nasm-2.10.09.tar.gz
-#		tar xf nasm-2.10.09.tar.gz
-#		cd nasm-2.10.09
-#		./configure --prefix=/$GLOBALDESTDIR
-#		if [[ $bits = "64bit" ]]; then
-#			sed -i 's/ -mthreads//g' Makefile
-#			sed -i 's/ -mthreads//g' rdoff/Makefile
-#		fi
-#		make -j $cpuCount
-#		make install
-#		echo "finish" > compile.done
-#		cd $LOCALBUILDDIR
-#		rm nasm-2.10.09.tar.gz
-#fi	
-
 if [ -f "$GLOBALDESTDIR/bin/pkg-config.exe" ]; then
 	echo -------------------------------------------------
 	echo "pkg-config-lite-0.28-1 is already compiled"
