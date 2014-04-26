@@ -11,6 +11,11 @@ modified: 2014-04-24
 
 ---
 
+INFO:
+The current version ist broken at the moment. I will change the compiler system completely to msys2, but it makes some problems. When you need a working version take an older revision:
+https://github.com/jb-alvarado/media-autobuild_suite/tree/2bccf8cd99eeb2e6766d579dd42cb4a15989703c
+ 
+
 media-autobuild_suite
 =========
 
