@@ -68,67 +68,6 @@ do_checkIfExist() {
 buildProcess() {
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgsm.a" ]; then
-	echo -------------------------------------------------
-	echo "gsm-1.0.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile gsm $bits\007"
-		if [ -d "gsm-1.0.13" ]; then rm -rf gsm-1.0.13; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.imagemagick.org/download/delegates/ffmpeg/gsm-1.0.13.tar.bz2
-		tar xf gsm-1.0.13.tar.bz2
-		rm gsm-1.0.13.tar.bz2
-		cd gsm-1.0.13
-		make -j $cpuCount
-		mkdir $LOCALDESTDIR/include/gsm
-		cp inc/gsm.h  $LOCALDESTDIR/include/gsm
-		cp lib/libgsm.a $LOCALDESTDIR/lib
-		
-		do_checkIfExist gsm-1.0.13 libgsm.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libogg.a" ]; then
-	echo -------------------------------------------------
-	echo "libogg-1.3.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libogg $bits\007"
-		if [ -d "libogg-1.3.1" ]; then rm -rf libogg-1.3.1; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/ogg/libogg-1.3.1.tar.gz
-		tar xf libogg-1.3.1.tar.gz
-		rm libogg-1.3.1.tar.gz
-		cd libogg-1.3.1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libogg-1.3.1 libogg.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libvorbis.a" ]; then
-	echo -------------------------------------------------
-	echo "libvorbis-1.3.3 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libvorbis $bits\007"
-		if [ -d "libvorbis-1.3.3" ]; then rm -rf libvorbis-1.3.3; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.3.tar.xz
-		tar xf libvorbis-1.3.3.tar.xz
-		rm libvorbis-1.3.3.tar.xz
-		cd libvorbis-1.3.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libvorbis-1.3.3 libvorbis.a
-fi
-
-cd $LOCALBUILDDIR
-
 if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
 	echo -------------------------------------------------
 	echo "libtheora-1.1.1 is already compiled"
@@ -180,31 +119,11 @@ if [ -f "$LOCALDESTDIR/bin/flac.exe" ]; then
 		tar xf flac-1.3.0.tar.xz
 		rm flac-1.3.0.tar.xz
 		cd flac-1.3.0
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-xmms-plugin --enable-shared=no --enable-static
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
 		make -j $cpuCount
 		make install
 		
 		do_checkIfExist flac-1.3.0 flac.exe
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/bin/lame.exe" ]; then
-	echo -------------------------------------------------
-	echo "lame-3.99.5 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile lame $bits\007"
-		if [ -d "lame-3.99.5" ]; then rm -rf lame-3.99.5; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O lame-3.99.5.tar.gz http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz/download 
-		tar xf lame-3.99.5.tar.gz
-		rm lame-3.99.5.tar.gz
-		cd lame-3.99.5
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-expopt=full --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist lame-3.99.5 lame.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -588,7 +507,12 @@ if [ -f "sox-git/configure.ac" ]; then
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
-		mv $LOCALDESTDIR/lib/libgsm.a $LOCALDESTDIR/lib/tmp_libgsm.a
+		if [[ $bits = "32bit" ]]; then
+			mv /mingw32/lib/libgsm.a /mingw32/lib/tmp_libgsm.a
+		else
+			mv /mingw64/lib/libgsm.a /mingw64/lib/tmp_libgsm.a
+		fi
+		
 		if [[ ! -f ./configure ]]; then
 			autoreconf -i
 		fi
@@ -600,7 +524,11 @@ if [ -f "sox-git/configure.ac" ]; then
 		
 		make -j $cpuCount
 		make install
-		mv $LOCALDESTDIR/lib/tmp_libgsm.a $LOCALDESTDIR/lib/libgsm.a
+		if [[ $bits = "32bit" ]]; then
+			mv /mingw32/lib/tmp_libgsm.a /mingw32/lib/libgsm.a
+		else
+			mv /mingw64/lib/tmp_libgsm.a /mingw64/lib/libgsm.a
+		fi
 		
 		do_checkIfExist sox-git sox.exe
 		
@@ -615,8 +543,12 @@ if [ -f "sox-git/configure.ac" ]; then
 		git clone git://git.code.sf.net/p/sox/code sox-git
 		cd sox-git
 		
-		mv $LOCALDESTDIR/lib/libgsm.a $LOCALDESTDIR/lib/tmp_libgsm.a
-		
+		if [[ $bits = "32bit" ]]; then
+			mv /mingw32/lib/libgsm.a /mingw32/lib/tmp_libgsm.a
+		else
+			mv /mingw64/lib/libgsm.a /mingw64/lib/tmp_libgsm.a
+		fi
+			
 		if [[ ! -f ./configure ]]; then
 			autoreconf -i
 		fi
@@ -625,8 +557,12 @@ if [ -f "sox-git/configure.ac" ]; then
 			
 		make -j $cpuCount
 		make install
-		mv $LOCALDESTDIR/lib/tmp_libgsm.a $LOCALDESTDIR/lib/libgsm.a
-		
+		if [[ $bits = "32bit" ]]; then
+			mv /mingw32/lib/tmp_libgsm.a /mingw32/lib/libgsm.a
+		else
+			mv /mingw64/lib/tmp_libgsm.a /mingw64/lib/libgsm.a
+		fi
+
 		do_checkIfExist sox-git sox.exe
 fi
 
