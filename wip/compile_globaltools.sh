@@ -246,6 +246,34 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
+	echo -------------------------------------------------
+	echo "SDL-1.2.15 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile SDL $bits\007"
+		if [ -d "SDL-1.2.15" ]; then rm -rf SDL-1.2.15; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
+		tar xf SDL-1.2.15.tar.gz
+		rm SDL-1.2.15.tar.gz
+		cd SDL-1.2.15
+		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+		
+		if [[ $bits = "32bit" ]]; then
+			sed -i "s/-mwindows//" "/global32/bin/sdl-config"
+			sed -i "s/-mwindows//" "/global32/lib/pkgconfig/sdl.pc"
+		else
+			sed -i "s/-mwindows//" "/global64/bin/sdl-config"
+			sed -i "s/-mwindows//" "/global64/lib/pkgconfig/sdl.pc"
+		fi
+		
+		do_checkIfExist SDL-1.2.15 libSDL.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$GLOBALDESTDIR/lib/libSDL_image.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL_image-1.2.12 is already compiled"
