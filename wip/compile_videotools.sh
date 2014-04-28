@@ -144,68 +144,68 @@ if [ -f "x264-git/configure" ]; then
 		do_checkIfExist x264-git x264.exe
 fi
 
-cd $LOCALBUILDDIR
+#cd $LOCALBUILDDIR
+#
+#if [ -f "x265-hg/source/CMakeLists.txt" ]; then
+#	echo -ne "\033]0;compile x265 $bits\007"
+#	cd x265-hg
+#	oldHead=`hg id --id`
+#	hg pull
+#	hg update
+#	newHead=`hg id --id`
+#	if [[ "$oldHead" != "$newHead" ]]; then
+#		cd build/msys
+#		make clean
+#		rm -rf *
+#		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+#		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+#		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+#		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+#		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+#		
+#		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+#		make -j $cpuCount
+#		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+#		
+#		make clean
+#		rm -rf *
+#		
+#		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+#		make -j $cpuCount
+#		make install
+		
+#		do_checkIfExist x265-git x265.exe
+#	else
+#		echo -------------------------------------------------
+#		echo "x265 is already up to date"
+#		echo -------------------------------------------------
+#	fi
+#	else
+#	echo -ne "\033]0;compile x265 $bits\007"
+#		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
+#		cd x265-hg
 
-if [ -f "x265-hg/source/CMakeLists.txt" ]; then
-	echo -ne "\033]0;compile x265 $bits\007"
-	cd x265-hg
-	oldHead=`hg id --id`
-	hg pull
-	hg update
-	newHead=`hg id --id`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		cd build/msys
-		make clean
-		rm -rf *
-		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+#		cd build/msys
 		
-		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+#		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+#		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+#		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+#		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+#		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
 		
-		make clean
-		rm -rf *
+#			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+#		make -j $cpuCount
+#		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		make install
+#		make clean
+#		rm -rf *
 		
-		do_checkIfExist x265-git x265.exe
-	else
-		echo -------------------------------------------------
-		echo "x265 is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-	echo -ne "\033]0;compile x265 $bits\007"
-		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
-		cd x265-hg
-
-		cd build/msys
+#		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+#		make -j $cpuCount
+#		make install
 		
-		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
-		
-			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
-		
-		make clean
-		rm -rf *
-		
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist x265-hg x265.exe
-fi
+#		do_checkIfExist x265-hg x265.exe
+#fi
 
 cd $LOCALBUILDDIR
 
@@ -222,10 +222,10 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++"
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
@@ -245,10 +245,10 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++"
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
@@ -709,7 +709,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	
 libx265=""
 if [[ $ffmpeg = "w" ]]; then
-	libx265="--enable-libx265"
+#	libx265="--enable-libx265" no x265 for the moment
 fi
 
 	

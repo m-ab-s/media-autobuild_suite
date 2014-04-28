@@ -67,7 +67,8 @@
 ::	2014-04-22 lang. detect for mintty
 ::	2014-04-24 add tools, update mediainfo version, start to change the compilers to native msys2 mingw-w64
 ::	2014-04-26 change many libs and tools to native mingw libs, fix new compiler options
-::	2014-04-26 use more tools from the compiler, fix options. most work at the moment but no mediainfo and no ffmpeg
+::	2014-04-27 use more tools from the compiler, fix options. most work at the moment but no mediainfo and no ffmpeg
+::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
 ::
 ::-------------------------------------------------------------------------------------
 
