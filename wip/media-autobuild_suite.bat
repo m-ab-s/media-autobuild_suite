@@ -349,7 +349,7 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO checkmsys2
 	echo.
 	echo.
 	echo -------------------------------------------------------------
-	"%instdir%\wget" -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
 	
 	7za920.exe
 	
@@ -376,12 +376,25 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" -P "%instdir%" -O msys2-base.tar.xz "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140216.tar.xz"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140216.tar.xz"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
 	del msys2-base.tar
+	if not exist %instdir%\%msys2%\bin\msys-2.0.dll (
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- Download from msys2 32 bit basic system failed, 
+		echo.- please download it manuel from:
+		echo.- http://downloads.sourceforge.net/project/msys2
+		echo.- and copy the folder to:
+		echo.- %instdir%
+		echo.- and start the batch script again!
+		echo.
+		echo -------------------------------------------------------------------------------
+		pause
+		)
 	del wget.exe
 	)
 	
@@ -393,7 +406,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" -P "%instdir%" -O msys2-base.tar.xz "http://sourceforge.net/projects/msys2/files/latest/download?source=files"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://sourceforge.net/projects/msys2/files/latest/download?source=files"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -742,27 +755,7 @@ if %build64%==yes (
 :loginProfile
 if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO extraPacks
 
-if %build64%==yes (
-	if %build32%==yes GOTO loginProfile32
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- write default profile (64 bit)
-	echo.
-	echo -------------------------------------------------------------------------------
-	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /global64/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /global64/etc/profile.local>>%instdir%\profile.sh
-	echo.fi>>%instdir%\profile.sh
-	echo.>>%instdir%\profile.sh
-	echo.EOF>>%instdir%\profile.sh
-
-	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
-	echo 64 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
-	del %instdir%\profile.sh
-	GOTO extraPacks
-	)
-	
-:loginProfile32
+if %build32%==no GOTO loginProfile64
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- write default profile (32 bit)
@@ -777,6 +770,24 @@ if %build64%==yes (
 
 	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
 	echo 32 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
+	del %instdir%\profile.sh
+	GOTO extraPacks
+	
+:loginProfile64
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- write default profile (64 bit)
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
+	echo.if [ -f /global64/etc/profile.local ]; then>>%instdir%\profile.sh
+	 echo.       source /global64/etc/profile.local>>%instdir%\profile.sh
+	echo.fi>>%instdir%\profile.sh
+	echo.>>%instdir%\profile.sh
+	echo.EOF>>%instdir%\profile.sh
+
+	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
+	echo 64 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
 	del %instdir%\profile.sh
 	
 :extraPacks
