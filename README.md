@@ -92,8 +92,8 @@ Included Tools and Libraries
  - wavpack
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
- - x265 (standalone and lib for ffmpeg) not working at the moment
- - x265 16 bit (standalone) not working at the moment
+ - x265 (standalone and lib for ffmpeg) only the 64 bit version working at the moment
+ - x265 16 bit (standalone) not working only the 64 bit version working at the moment
  - xavs (standalone and lib for ffmpeg)
  - xvid
 
