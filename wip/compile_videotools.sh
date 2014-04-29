@@ -475,7 +475,7 @@ fi
 #	fi
 #fi
 
-#cd $LOCALBUILDDIR
+cd $LOCALBUILDDIR
 
 if [ -f "vidstab-git/Makefile" ]; then
 	echo -ne "\033]0;compile vidstab $bits\007"
@@ -709,7 +709,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	
 libx265=""
 if [[ $ffmpeg = "w" ]]; then
-#	libx265="--enable-libx265" no x265 for the moment
+	libx265="" #--enable-libx265 no x265 for the moment
 fi
 
 	
@@ -735,7 +735,7 @@ fi
 			grep -q -e '"-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC"' configure || sed -i 's/append CFLAGS $($cflags_filter "$@")/append CFLAGS $($cflags_filter "$@") "-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC"/g' configure
 			grep -q -e '"-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32"' configure || sed -i 's/prepend extralibs $($ldflags_filter "$@")/prepend extralibs $($ldflags_filter "$@") "-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32"/g' configure
 			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv' --disable-debug --enable-gpl --enable-version3 --enable-runtime-cpudetect --disable-shared --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --enable-gpl --enable-version3 --enable-runtime-cpudetect --disable-shared --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
@@ -784,7 +784,7 @@ fi
 			grep -q -e '"-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC"' configure || sed -i 's/append CFLAGS $($cflags_filter "$@")/append CFLAGS $($cflags_filter "$@") "-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC"/g' configure
 			grep -q -e '"-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32"' configure || sed -i 's/prepend extralibs $($ldflags_filter "$@")/prepend extralibs $($ldflags_filter "$@") "-lxml2 -lz -liconv -lws2_32 -lstdc++ -lpng -lm -lpthread -lwsock32"/g' configure
 			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv' --disable-debug --enable-gpl --enable-version3 --enable-runtime-cpudetect --disable-shared --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --enable-gpl --enable-version3 --enable-runtime-cpudetect --disable-shared --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras
 			make -j $cpuCount
 			make install
 			
