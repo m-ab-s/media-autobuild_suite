@@ -7,14 +7,10 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-04-24
+modified: 2014-04-29
 
 ---
 
-INFO:
-The current version ist broken at the moment. I will change the compiler system completely to msys2, but it makes some problems. When you need a working version take an older revision:
-https://github.com/jb-alvarado/media-autobuild_suite/tree/2bccf8cd99eeb2e6766d579dd42cb4a15989703c
- 
 
 media-autobuild_suite
 =========
@@ -35,14 +31,13 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v1.7**
+Current release is **v1.95**
 
 
 Included Tools and Libraries
 --------
 
  - a52dec
- - bzip2
  - fdkaac (standalone and lib for ffmpeg)
  - ffmpeg (standalone)
  - faac (standalone and lib for ffmpeg)
@@ -50,10 +45,9 @@ Included Tools and Libraries
  - fontconfig
  - freetype
  - frei0r
- - gettext
  - gsm
  - gnutls (standalone and lib for ffmpeg)
- - lame (standalone and lib for ffmpeg)
+ - lame
  - jpeg
  - jpeg2000
  - jpegturbo
@@ -66,7 +60,6 @@ Included Tools and Libraries
  - libilbc
  - libmad
  - libmodplug
- - libmpeg2
  - libpng
  - libsndfile
  - libsoxr
@@ -92,18 +85,17 @@ Included Tools and Libraries
  - speex (standalone and lib for ffmpeg)
  - theora
  - vidstab
- - vpx (standalone and lib for ffmpeg)
+ - vpx
  - vo-aacenc
  - vo-amrwbenc
  - vorbis
  - wavpack
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
- - x265 (standalone and lib for ffmpeg)
- - x265 16 bit (standalone)
+ - x265 (standalone and lib for ffmpeg) not working at the moment
+ - x265 16 bit (standalone) not working at the moment
  - xavs (standalone and lib for ffmpeg)
  - xvid
- - zlib
 
 
 --------
@@ -122,9 +114,9 @@ For using it:
  
 The Script write a ini-file witch you can edit, so you don't need to follow the questions every time.
 
-For all you need ~15 GB disk space.
+For all you need ~5 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Build all from the begin take around ~7 hours (the cross compile script from rdp is much faster).
+Build all from the begin take around ~5 hours (the cross compile script from rdp is much faster).
 
 Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, ImageMagick, x264, x265, libvpx, libbluray and vlc have automatic update from git, so by them you don't need to delete files or folders. 
 
