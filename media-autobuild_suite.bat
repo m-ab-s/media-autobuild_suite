@@ -69,7 +69,7 @@
 ::	2014-04-26 change many libs and tools to native mingw libs, fix new compiler options
 ::	2014-04-27 use more tools from the compiler, fix options. most work at the moment but no mediainfo and no ffmpeg
 ::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
-::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. x265 and mediainfo not work for now
+::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. mediainfo not work for now and x265 only works in 64 bit
 ::
 ::-------------------------------------------------------------------------------------
 
