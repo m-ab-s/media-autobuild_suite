@@ -224,15 +224,13 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
-		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
-		#define strtok_r strtok_s\
-		#endif' vpx/src/svc_encodeframe.c
+
         make -j $cpuCount
         make install
 		
@@ -247,15 +245,13 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --disable-examples --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
-		grep -q -e '#if defined(_WIN32) || defined(_WIN64)' vpx/src/svc_encodeframe.c || sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
-		#define strtok_r strtok_s\
-		#endif' vpx/src/svc_encodeframe.c
+
 		make -j $cpuCount
 		make install
 		
