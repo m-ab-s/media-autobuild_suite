@@ -432,9 +432,6 @@ if [[ $build32 = "yes" ]]; then
 	echo
 	echo "-------------------------------------------------------------------------------"
 	source /global32/etc/profile.local
-	bits='32bit'
-	targetBuild='i686-w64-mingw32'
-	targetHost='i686-w64-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
 	echo "compile global tools 32 bit done..."
@@ -449,9 +446,6 @@ if [[ $build64 = "yes" ]]; then
 	echo
 	echo "-------------------------------------------------------------------------------"
 	source /global64/etc/profile.local
-	bits='64bit'
-	targetBuild='x86_64-pc-mingw32'
-	targetHost='x86_64-pc-mingw32'
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
 	echo "compile global tools 64 bit done..."

@@ -70,6 +70,7 @@
 ::	2014-04-27 use more tools from the compiler, fix options. most work at the moment but no mediainfo and no ffmpeg
 ::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
 ::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. mediainfo not work for now and x265 only works in 64 bit
+::	2014-05-01 change compiler build and target infos to the profile
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -723,6 +724,11 @@ if %build32%==yes (
 		echo.GLOBALDESTDIR=/global32>>%instdir%\global32\etc\profile.local
 		echo.LOCALDESTDIR=/local32>>%instdir%\global32\etc\profile.local
 		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.bits='32bit'>>%instdir%\global32\etc\profile.local
+		echo.targetBuild='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
+		echo.targetHost='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
+		echo.cross='i686-w64-mingw32-'>>%instdir%\global32\etc\profile.local
 		)
 		
 :writeProfile64
@@ -757,6 +763,11 @@ if %build64%==yes (
 		echo.GLOBALDESTDIR=/global64>>%instdir%\global64\etc\profile.local
 		echo.LOCALDESTDIR=/local64>>%instdir%\global64\etc\profile.local
 		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.bits='64bit'>>%instdir%\global64\etc\profile.local
+		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
+		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
+		echo.cross='x86_64-w64-mingw32-'>>%instdir%\global64\etc\profile.local
 		)
 	
 :loginProfile
