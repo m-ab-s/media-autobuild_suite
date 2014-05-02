@@ -721,6 +721,7 @@ fi
 		echo -ne "\033]0;compile ffmpeg $bits\007"
 		cd ffmpeg-git
 		oldHead=`git rev-parse HEAD`
+		git stash
 		git pull origin master
 		newHead=`git rev-parse HEAD`
 		if [[ "$oldHead" != "$newHead" ]]; then
