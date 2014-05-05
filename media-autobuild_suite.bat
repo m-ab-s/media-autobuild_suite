@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.95
+::	This is version 1.98
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -71,6 +71,7 @@
 ::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
 ::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. mediainfo not work for now and x265 only works in 64 bit
 ::	2014-05-01 change compiler build and target infos to the profile
+::	2014-05-04 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -480,12 +481,14 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO updatebase
 echo.-------------------------------------------------------------------------------
 echo.updating msys2 system
 echo.-------------------------------------------------------------------------------
+if exist %instdir%\updateMSYS2.sh del %instdir%\updateMSYS2.sh
+echo.echo -ne "\033]0;update msys2 system\007">>updateMSYS2.sh
 echo.pacman --noconfirm -Sy>>updateMSYS2.sh
 echo.pacman --noconfirm -Su>>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
 echo.echo "updating msys2 done...">>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
-echo.sleep ^5>>updateMSYS2.sh
+echo.sleep ^3>>updateMSYS2.sh
 echo.exit>>updateMSYS2.sh
 %instdir%\mintty.lnk %instdir%\updateMSYS2.sh
 del updateMSYS2.sh
@@ -495,6 +498,8 @@ if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
+	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
+	echo.echo -ne "\033]0;install base system\007">>pacman.sh
 	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex groff help2man intltool libtool m4 man patch pkg-config scons xmlto make tar zip unzip git subversion wget>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
@@ -504,6 +509,11 @@ if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
 :getmingw32
 if %build32%==yes (
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
+	echo.-------------------------------------------------------------------------------
+	echo.install 32 bit compiler
+	echo.-------------------------------------------------------------------------------
+	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
+	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
 	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
@@ -514,6 +524,11 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 :getmingw64	
 if %build64%==yes (
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
+	echo.-------------------------------------------------------------------------------
+	echo.install 64 bit compiler
+	echo.-------------------------------------------------------------------------------
+	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
+	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
 	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn  mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
@@ -529,9 +544,10 @@ echo.---------------------------------------------------------------------------
 Setlocal EnableDelayedExpansion
 
 if %build32%==yes (
-if exist %instdir%\%msys2%\mingw32\lib\xvidcore.a (
+if exist %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a (
 	del %instdir%\%msys2%\mingw32\bin\xvidcore.dll
 	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.a %instdir%\%msys2%\mingw32\lib\libxvidcore.a
+	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a.dyn
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw32" %%C IN (*.dll.a) DO (
@@ -545,9 +561,10 @@ if exist %instdir%\%msys2%\mingw32\lib\xvidcore.a (
 	)
 
 if %build64%==yes (
-if exist %instdir%\%msys2%\mingw64\lib\xvidcore.a (
+if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
 	del %instdir%\%msys2%\mingw64\bin\xvidcore.dll
 	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.a %instdir%\%msys2%\mingw64\lib\libxvidcore.a
+	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a.dyn
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw64" %%C IN (*.dll.a) DO (
@@ -902,7 +919,7 @@ if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A == %date% (
-				%instdir%\%msys2%\mingw32\bin\strip --strip-all %%C
+				%instdir%\%msys2%\mingw64\bin\strip --strip-all %%C
 				echo.strip %%~nC%%~xC 64Bit done...
 				)
 			)
@@ -911,7 +928,7 @@ if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
 			IF %%A == %date% (
-				%instdir%\%msys2%\mingw32\bin\strip --strip-all %%D
+				%instdir%\%msys2%\mingw64\bin\strip --strip-all %%D
 				echo.strip %%~nD%%~xD 64Bit done...
 				)
 			)

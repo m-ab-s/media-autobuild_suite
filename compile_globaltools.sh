@@ -94,28 +94,7 @@ if [ -f "$GLOBALDESTDIR/lib/libdl.a" ]; then
 		make install
 		
 		do_checkIfExist dlfcn-win32-r19 libdl.a
-fi		
-
-#cd $LOCALBUILDDIR
-
-#if [ -f "$GLOBALDESTDIR/lib/libpthread.a" ]; then
-#	echo -------------------------------------------------
-#	echo "pthreads-w32-2-9-1-release is already compiled"
-#	echo -------------------------------------------------
-#	else 
-#		echo -ne "\033]0;compile pthreads-w32 $bits\007"
-#		if [ -d "pthreads-w32-2-9-1-release" ]; then rm -rf pthreads-w32-2-9-1-release; fi
-#		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
-#		tar xf pthreads-w32-2-9-1-release.tar.gz
-#		rm pthreads-w32-2-9-1-release.tar.gz
-#		cd pthreads-w32-2-9-1-release
-#		make clean GC-static
-#		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthreadGC2.a || exit 1
-#		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthread.a || exit 1
-#		cp pthread.h sched.h semaphore.h $GLOBALDESTDIR/include || exit 1
-		
-#		do_checkIfExist pthreads-w32-2-9-1-release libpthread.a
-#fi
+fi
 
 cd $LOCALBUILDDIR
 
@@ -134,7 +113,6 @@ if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 				
 		make
 		make install
-		cp libopenjpeg.pc $GLOBALDESTDIR/lib/pkgconfig
 		
 		do_checkIfExist openjpeg-1.5.1 libopenjpeg.a
 fi
@@ -163,57 +141,56 @@ cd $LOCALBUILDDIR
 
 if [ -f "$GLOBALDESTDIR/lib/libfreetype.a" ]; then
 	echo -------------------------------------------------
-	echo "freetype-2.4.10 is already compiled"
+	echo "freetype-2.5.3 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile freetype $bits\007"
-		if [ -d "freetype-2.4.10" ]; then rm -rf freetype-2.4.10; fi
-		#wget --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.0/freetype-2.5.0.1.tar.gz"
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.savannah.gnu.org/releases/freetype/freetype-2.4.10.tar.gz
-		tar xf freetype-2.4.10.tar.gz
-		rm freetype-2.4.10.tar.gz
-		cd freetype-2.4.10
+		if [ -d "freetype-2.5.3" ]; then rm -rf freetype-2.5.3; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.savannah.gnu.org/releases/freetype/freetype-2.5.3.tar.gz
+		tar xf freetype-2.5.3.tar.gz
+		rm freetype-2.5.3.tar.gz
+		cd freetype-2.5.3
 		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --disable-shared
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist freetype-2.4.10 libfreetype.a
+		do_checkIfExist freetype-2.5.3 libfreetype.a
 fi
 
 cd $LOCALBUILDDIR
 
 if [ -f "$GLOBALDESTDIR/lib/libfontconfig.a" ]; then
 	echo -------------------------------------------------
-	echo "fontconfig-2.10.2 is already compiled"
+	echo "fontconfig-2.11.1 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fontconfig $bits\007"
-		if [ -d "fontconfig-2.10.2" ]; then rm -rf fontconfig-2.10.2; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.10.2.tar.gz
-		tar xf fontconfig-2.10.2.tar.gz
-		rm fontconfig-2.10.2.tar.gz
-		cd fontconfig-2.10.2
+		if [ -d "fontconfig-2.11.1" ]; then rm -rf fontconfig-2.11.1; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz
+		tar xf fontconfig-2.11.1.tar.gz
+		rm fontconfig-2.11.1.tar.gz
+		cd fontconfig-2.11.1
 		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$GLOBALDESTDIR/lib/pkgconfig/fontconfig.pc"
 		
-		do_checkIfExist fontconfig-2.10.2 libfontconfig.a
+		do_checkIfExist fontconfig-2.11.1 libfontconfig.a
 fi
 
 cd $LOCALBUILDDIR
 
 if [ -f "$GLOBALDESTDIR/lib/libfribidi.a" ]; then
 	echo -------------------------------------------------
-	echo "fribidi-0.19.4 is already compiled"
+	echo "fribidi-0.19.6 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fribidi $bits\007"
-		if [ -d "fribidi-0.19.4" ]; then rm -rf fribidi-0.19.4; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.4.tar.bz2
-		tar xf fribidi-0.19.4.tar.bz2
-		rm fribidi-0.19.4.tar.bz2
-		cd fribidi-0.19.4
+		if [ -d "fribidi-0.19.6" ]; then rm -rf fribidi-0.19.6; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.6.tar.bz2
+		tar xf fribidi-0.19.6.tar.bz2
+		rm fribidi-0.19.6.tar.bz2
+		cd fribidi-0.19.6
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
 		patch -p0 < fribidi.diff
 		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
@@ -241,7 +218,7 @@ esac
 EOF
 fi
 
-		do_checkIfExist fribidi-0.19.4 libfribidi.a
+		do_checkIfExist fribidi-0.19.6 libfribidi.a
 fi
 
 cd $LOCALBUILDDIR
@@ -261,13 +238,8 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 		make -j $cpuCount
 		make install
 		
-		if [[ $bits = "32bit" ]]; then
-			sed -i "s/-mwindows//" "/global32/bin/sdl-config"
-			sed -i "s/-mwindows//" "/global32/lib/pkgconfig/sdl.pc"
-		else
-			sed -i "s/-mwindows//" "/global64/bin/sdl-config"
-			sed -i "s/-mwindows//" "/global64/lib/pkgconfig/sdl.pc"
-		fi
+		sed -i "s/-mwindows//" "$GLOBALDESTDIR/bin/sdl-config"
+		sed -i "s/-mwindows//" "$GLOBALDESTDIR/lib/pkgconfig/sdl.pc"
 		
 		do_checkIfExist SDL-1.2.15 libSDL.a
 fi
