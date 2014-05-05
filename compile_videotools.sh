@@ -851,7 +851,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				touch ffmpeg/mp_auto_pull
 			fi
 			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
-			make
+			make -j $cpuCount
 			make install
 
 			do_checkIfExist mplayer-svn mplayer.exe
@@ -880,7 +880,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				touch ffmpeg/mp_auto_pull
 			fi
 			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
-			make
+			make -j $cpuCount
 			make install
 
 			do_checkIfExist mplayer-svn mplayer.exe
