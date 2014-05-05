@@ -116,7 +116,7 @@ The Script write a ini-file witch you can edit, so you don't need to follow the 
 
 For all you need ~5 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Build all from the begin take around ~2 hours.
+Build all from the begin take around ~3 hours.
 
 Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, x264, x265, libvpx, libbluray, sox and some other tools have automatic update from git, so by them you don't need to delete files or folders. 
 
