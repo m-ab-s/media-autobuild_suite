@@ -125,8 +125,8 @@ if [ -f "x264-git/configure" ]; then
 		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
 			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
 			make -j $cpuCount
-			cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		fi
+		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
 		
 		make uninstall
 		make clean
@@ -224,10 +224,10 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -245,10 +245,10 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -static-libstdc++ -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -721,7 +721,6 @@ fi
 		echo -ne "\033]0;compile ffmpeg $bits\007"
 		cd ffmpeg-git
 		oldHead=`git rev-parse HEAD`
-		git stash
 		git pull origin master
 		newHead=`git rev-parse HEAD`
 		if [[ "$oldHead" != "$newHead" ]]; then

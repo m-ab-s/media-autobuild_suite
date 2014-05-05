@@ -509,7 +509,6 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.exit>>mingw32.sh
 	%instdir%\mintty.lnk %instdir%\mingw32.sh
 	del mingw32.sh
-	copy %instdir%\%msys2%\mingw32\bin\gcc.exe %instdir%\%msys2%\mingw32\bin\cc.exe
 	)
 
 :getmingw64	
@@ -520,7 +519,6 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.exit>>mingw64.sh
 	%instdir%\mintty.lnk %instdir%\mingw64.sh
 	del mingw64.sh
-	copy %instdir%\%msys2%\mingw64\bin\gcc.exe %instdir%\%msys2%\mingw64\bin\cc.exe
 	)
 
 :checkdyn
@@ -729,6 +727,8 @@ if %build32%==yes (
 		echo.targetBuild='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
 		echo.targetHost='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
 		echo.cross='i686-w64-mingw32-'>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.alias cc=/mingw32/bin/gcc>>%instdir%\global32\etc\profile.local
 		)
 		
 :writeProfile64
@@ -768,6 +768,8 @@ if %build64%==yes (
 		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
 		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
 		echo.cross='x86_64-w64-mingw32-'>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.alias cc=/mingw64/bin/gcc>>%instdir%\global64\etc\profile.local
 		)
 	
 :loginProfile
