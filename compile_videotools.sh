@@ -146,7 +146,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ $bits = "64bit" ]]; then
+#if [[ $bits = "64bit" ]]; then
 	if [ -f "x265-hg/source/CMakeLists.txt" ]; then
 		echo -ne "\033]0;compile x265 $bits\007"
 		cd x265-hg
@@ -207,7 +207,7 @@ if [[ $bits = "64bit" ]]; then
 			
 			do_checkIfExist x265-hg x265.exe
 	fi
-fi
+#fi
 
 cd $LOCALBUILDDIR
 
@@ -224,10 +224,10 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -245,10 +245,10 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static -static-libgcc -DPTW32_STATIC_LIB"
+			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -439,39 +439,44 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
 fi
 
-#if [[ $bits = "32bit" ]]; then
-#	cd $LOCALBUILDDIR
-#
-#	if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
-#		echo -------------------------------------------------
-#		echo "MediaInfo_CLI is already compiled"
-#		echo -------------------------------------------------
-#		else
-#			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-#			if [ -d "MediaInfo_CLI_GNU_FromSource" ]; then rm -rf MediaInfo_CLI_GNU_FromSource; fi
-#			wget --tries=20 --retry-connrefused --waitretry=2 -c http://mediaarea.net/download/binary/mediainfo/0.7.68/MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
-#			tar xf MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
-#			rm MediaInfo_CLI_0.7.68_GNU_FromSource.tar.bz2
-#			cd MediaInfo_CLI_GNU_FromSource
-#			
-#			sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
-#			sed -i 's/make -s -j$numprocs/make -s -j $cpuCount/' CLI_Compile.sh
-#			
-#			if [[ $bits = "64bit" ]]; then
-#				sed -i 's/.\/configure $ZenLib_Options $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 $ZenLib_Options $*/' CLI_Compile.sh
-#				sed -i 's/.\/configure $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 $*/' CLI_Compile.sh
-#				sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --build=x86_64-pc-mingw32 --host=x86_64-pc-mingw32 --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
-#			else
-#				sed -i 's/.\/configure $ZenLib_Options $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 $ZenLib_Options $*/' CLI_Compile.sh
-#				sed -i 's/.\/configure $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 $*/' CLI_Compile.sh
-#				sed -i 's/.\/configure --enable-staticlibs $\*/.\/configure --build=i686-w64-mingw32 --host=i686-w64-mingw32 --enable-staticlibs $* --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"/' CLI_Compile.sh
-#			fi
-#			source CLI_Compile.sh
-#			cp MediaInfo/Project/GNU/CLI/mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
+if [[ $bits = "32bit" ]]; then
+	cd $LOCALBUILDDIR
+
+	if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
+		echo -------------------------------------------------
+		echo "MediaInfo_CLI is already compiled"
+		echo -------------------------------------------------
+		else
+			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
+			if [ -d "mediainfo" ]; then rm -rf mediainfo; fi
+			wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mediainfo/source/mediainfo/0.7.69/mediainfo_0.7.69_AllInclusive.7z
+			mkdir mediainfo
+			cd mediainfo
+			7za x ../mediainfo_0.7.69_AllInclusive.7z
+			rm ../mediainfo_0.7.69_AllInclusive.7z
 			
-#			do_checkIfExist MediaInfo_CLI_GNU_FromSource mediainfo.exe
-#	fi
-#fi
+			sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
+			cd ZenLib/Project/GNU/Library
+			
+			./autogen
+			./configure --build=$targetBuild --host=$targetHost
+			make -j $cpuCount
+			
+			cd ../../../../MediaInfoLib/Project/GNU/Library
+			./autogen
+			./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
+			make -j $cpuCount
+			
+			cd ../../../../MediaInfo/Project/GNU/CLI
+			./autogen
+			./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
+			make -j $cpuCount
+			
+			cp mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
+
+			do_checkIfExist mediainfo mediainfo.exe
+	fi
+fi
 
 cd $LOCALBUILDDIR
 
@@ -526,7 +531,7 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 		sed -i "s/__declspec(dllexport)//g" *.h
 		sed -i "s/__declspec(dllimport)//g" *.h 
 		cd ..
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-cxx --disable-csharp --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-cxx --disable-csharp --disable-ncurses --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
 		sed -i 's/ln -sf/$(LN_S)/' "caca/Makefile" "cxx/Makefile" "doc/Makefile"
 		make -j $cpuCount
 		make install
@@ -707,9 +712,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	
 libx265=""
 if [[ $ffmpeg = "w" ]]; then
-	if [[ $bits = "64bit" ]]; then
-		libx265="--enable-libx265" # x265 only for 64 bit for the moment
-	fi
+	libx265="--enable-libx265"
 fi
 
 	
@@ -847,7 +850,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install
 
@@ -876,7 +879,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make
 			make install
 

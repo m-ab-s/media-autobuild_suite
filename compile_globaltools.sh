@@ -96,26 +96,26 @@ if [ -f "$GLOBALDESTDIR/lib/libdl.a" ]; then
 		do_checkIfExist dlfcn-win32-r19 libdl.a
 fi		
 
-cd $LOCALBUILDDIR
+#cd $LOCALBUILDDIR
 
-if [ -f "$GLOBALDESTDIR/lib/libpthread.a" ]; then
-	echo -------------------------------------------------
-	echo "pthreads-w32-2-9-1-release is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile pthreads-w32 $bits\007"
-		if [ -d "pthreads-w32-2-9-1-release" ]; then rm -rf pthreads-w32-2-9-1-release; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
-		tar xf pthreads-w32-2-9-1-release.tar.gz
-		rm pthreads-w32-2-9-1-release.tar.gz
-		cd pthreads-w32-2-9-1-release
-		make clean GC-static
-		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthreadGC2.a || exit 1
-		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthread.a || exit 1
-		cp pthread.h sched.h semaphore.h $GLOBALDESTDIR/include || exit 1
+#if [ -f "$GLOBALDESTDIR/lib/libpthread.a" ]; then
+#	echo -------------------------------------------------
+#	echo "pthreads-w32-2-9-1-release is already compiled"
+#	echo -------------------------------------------------
+#	else 
+#		echo -ne "\033]0;compile pthreads-w32 $bits\007"
+#		if [ -d "pthreads-w32-2-9-1-release" ]; then rm -rf pthreads-w32-2-9-1-release; fi
+#		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz
+#		tar xf pthreads-w32-2-9-1-release.tar.gz
+#		rm pthreads-w32-2-9-1-release.tar.gz
+#		cd pthreads-w32-2-9-1-release
+#		make clean GC-static
+#		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthreadGC2.a || exit 1
+#		cp libpthreadGC2.a $GLOBALDESTDIR/lib/libpthread.a || exit 1
+#		cp pthread.h sched.h semaphore.h $GLOBALDESTDIR/include || exit 1
 		
-		do_checkIfExist pthreads-w32-2-9-1-release libpthread.a
-fi
+#		do_checkIfExist pthreads-w32-2-9-1-release libpthread.a
+#fi
 
 cd $LOCALBUILDDIR
 

@@ -527,26 +527,6 @@ echo.check for dynamic libs
 echo.-------------------------------------------------------------------------------
 
 Setlocal EnableDelayedExpansion
-if %build32%==yes (
-	FOR %%C IN (%instdir%\%msys2%\mingw32\lib\*.dll.a) DO (
-		set file=%%C
-		set name=!file:~0,-6!
-		if exist !name!.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		)
-	)
-
-if %build64%==yes (
-	FOR %%C IN (%instdir%\%msys2%\mingw64\lib\*.dll.a) DO (
-		set file=%%C
-		set name=!file:~0,-6!
-		if exist !name!.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		)
-	)
-Setlocal DisableDelayedExpansion
 
 if %build32%==yes (
 if exist %instdir%\%msys2%\mingw32\lib\xvidcore.a (
@@ -555,28 +535,10 @@ if exist %instdir%\%msys2%\mingw32\lib\xvidcore.a (
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw32" %%C IN (*.dll.a) DO (
-		if %%C==%%~dC%%~pClibgomp.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibgfortran.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)	
-		if %%C==%%~dC%%~pClibquadmath.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)		
-		if %%C==%%~dC%%~pClibltdl.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibstdc++.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibwinpthread.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibssp.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibhogweed.dll.a (
+		set file=%%C
+		set name=!file:~0,-6!
+		if exist %%C.dyn del %%C.dyn
+		if exist !name!.a (
 			%instdir%\%msys2%\bin\mv %%C %%C.dyn
 			)
 		)
@@ -589,32 +551,16 @@ if exist %instdir%\%msys2%\mingw64\lib\xvidcore.a (
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw64" %%C IN (*.dll.a) DO (
-		if %%C==%%~dC%%~pClibgomp.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibgfortran.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)	
-		if %%C==%%~dC%%~pClibquadmath.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)		
-		if %%C==%%~dC%%~pClibltdl.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibstdc++.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibwinpthread.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibssp.dll.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
-			)
-		if %%C==%%~dC%%~pClibhogweed.dll.a (
+		set file=%%C
+		set name=!file:~0,-6!
+		if exist %%C.dyn del %%C.dyn
+		if exist !name!.a (
 			%instdir%\%msys2%\bin\mv %%C %%C.dyn
 			)
 		)
 	)
+	
+Setlocal DisableDelayedExpansion
 
 if %build32%==yes (
 	if not exist %instdir%\global32 (

@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v1.95**
+Current release is **v1.97**
 
 
 Included Tools and Libraries
@@ -92,8 +92,8 @@ Included Tools and Libraries
  - wavpack
  - x264 (standalone and lib for ffmpeg)
  - x264 10 bit (standalone)
- - x265 (standalone and lib for ffmpeg) only the 64 bit version working at the moment
- - x265 16 bit (standalone) not working only the 64 bit version working at the moment
+ - x265 (standalone and lib for ffmpeg)
+ - x265 16 bit (standalone)
  - xavs (standalone and lib for ffmpeg)
  - xvid
 
@@ -116,9 +116,9 @@ The Script write a ini-file witch you can edit, so you don't need to follow the 
 
 For all you need ~5 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Build all from the begin take around ~5 hours (the cross compile script from rdp is much faster).
+Build all from the begin take around ~2 hours.
 
-Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, ImageMagick, x264, x265, libvpx, libbluray and vlc have automatic update from git, so by them you don't need to delete files or folders. 
+Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, x264, x265, libvpx, libbluray, sox and some other tools have automatic update from git, so by them you don't need to delete files or folders. 
 
 For saving space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in build32 and build64.
 Have fun!
