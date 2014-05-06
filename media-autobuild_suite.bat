@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 1.98
+::	This is version 2.0
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -71,7 +71,8 @@
 ::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
 ::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. mediainfo not work for now and x265 only works in 64 bit
 ::	2014-05-01 change compiler build and target infos to the profile
-::	2014-05-04 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
+::	2014-05-05 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
+::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
 ::
 ::-------------------------------------------------------------------------------------
 

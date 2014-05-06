@@ -224,10 +224,10 @@ if [ -f "libvpx-git/configure" ]; then
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
 		make clean
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
+			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
+			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -245,10 +245,10 @@ if [ -f "libvpx-git/configure" ]; then
 		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
-			./configure --target=x86_64-win64-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
+			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 		else
-			./configure --target=x86-win32-gcc --prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --extra-cflags="-static-libgcc -DPTW32_STATIC_LIB"
+			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
 			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
 		fi 
 
@@ -850,7 +850,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make -j $cpuCount
 			make install
 
@@ -879,7 +879,7 @@ if [ -f "mplayer-svn/configure" ]; then
 				fi
 				touch ffmpeg/mp_auto_pull
 			fi
-			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 			make -j $cpuCount
 			make install
 

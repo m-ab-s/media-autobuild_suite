@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-04
+modified: 2014-05-06
 
 ---
 
@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v1.98**
+Current release is **v2.0**
 
 
 Included Tools and Libraries
@@ -85,7 +85,7 @@ Included Tools and Libraries
  - speex (standalone and lib for ffmpeg)
  - theora
  - vidstab
- - vpx
+ - vpx (standalone and lib for ffmpeg)
  - vo-aacenc
  - vo-amrwbenc
  - vorbis
