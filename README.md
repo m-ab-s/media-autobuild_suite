@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-06
+modified: 2014-05-07
 
 ---
 
@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.0**
+Current release is **v2.01**
 
 
 Included Tools and Libraries
@@ -51,6 +51,7 @@ Included Tools and Libraries
  - jpeg
  - jpeg2000
  - jpegturbo
+ - kvazaar
  - libass
  - libbluray
  - libcaca

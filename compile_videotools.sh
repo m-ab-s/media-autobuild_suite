@@ -213,7 +213,6 @@ if [ -f "libvpx-git/configure" ]; then
 	echo -ne "\033]0;compile libvpx $bits\007"
 	cd libvpx-git
 	oldHead=`git rev-parse HEAD`
-	git reset --hard
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	if [[ "$oldHead" != "$newHead" ]]; then
@@ -254,6 +253,48 @@ if [ -f "libvpx-git/configure" ]; then
 		make install
 		
 		do_checkIfExist libvpx-git libvpx.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "kvazaar-git/SConstruct" ]; then
+	echo -ne "\033]0;compile kvazaar $bits\007"
+	cd kvazaar-git
+	oldHead=`git rev-parse HEAD`
+	git reset --hard
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		cd src
+		make clean
+		if [[ $bits = "64bit" ]]; then
+			make ARCH=x86_64
+		else
+			make ARCH=i686
+		fi 
+
+		cp kvazaar.exe $LOCALDESTDIR/bin
+		
+		do_checkIfExist kvazaar-git kvazaar.exe
+	else
+		echo -------------------------------------------------
+		echo "kvazaar-git is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		echo -ne "\033]0;compile kvazaar $bits\007"
+		git clone https://github.com/ultravideo/kvazaar.git kvazaar-git
+		cd kvazaar-git/src
+
+		if [[ $bits = "64bit" ]]; then
+			make ARCH=x86_64
+		else
+			make ARCH=i686
+		fi 
+
+		cp kvazaar.exe $LOCALDESTDIR/bin
+		
+		do_checkIfExist kvazaar-git kvazaar.exe
 fi
 
 cd $LOCALBUILDDIR

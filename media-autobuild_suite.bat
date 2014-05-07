@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.0
+::	This is version 2.01
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -73,7 +73,7 @@
 ::	2014-05-01 change compiler build and target infos to the profile
 ::	2014-05-05 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
 ::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
-::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python.
+::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
 ::
 ::-------------------------------------------------------------------------------------
 
