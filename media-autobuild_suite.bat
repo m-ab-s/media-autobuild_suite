@@ -73,6 +73,7 @@
 ::	2014-05-01 change compiler build and target infos to the profile
 ::	2014-05-05 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
 ::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
+::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python.
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -668,6 +669,11 @@ if %build32%==yes (
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global32\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global32\etc\profile.local
+		echo.alias cc=/mingw32/bin/gcc>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global32\etc\profile.local
+		echo.MANPATH="/usr/share/man:/mingw32/share/man:/global32/man:/global32/share/man:/local32/man:/local32/share/man">>%instdir%\global32\etc\profile.local
+		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/global32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
 		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
@@ -676,7 +682,10 @@ if %build32%==yes (
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global32\etc\profile.local
+		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
+		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/TortoiseHg:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -691,8 +700,6 @@ if %build32%==yes (
 		echo.targetBuild='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
 		echo.targetHost='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
 		echo.cross='i686-w64-mingw32-'>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.alias cc=/mingw32/bin/gcc>>%instdir%\global32\etc\profile.local
 		)
 		
 :writeProfile64
@@ -709,6 +716,11 @@ if %build64%==yes (
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global64\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global64\etc\profile.local
+		echo.alias cc=/mingw64/bin/gcc>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global64\etc\profile.local
+		echo.MANPATH="/usr/share/man:/mingw64/share/man:/global64/man:/global64/share/man:/local64/man:/local64/share/man">>%instdir%\global64\etc\profile.local
+		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/global64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
 		echo.CPPFLAGS="-I/global64/include -I/local64/include">>%instdir%\global64\etc\profile.local
@@ -717,7 +729,10 @@ if %build64%==yes (
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:/bin:/opt/bin:/opt/TortoiseHg:/opt/Python27:/opt/Python27/Tools/Scripts">>%instdir%\global64\etc\profile.local
+		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
+		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/TortoiseHg:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
@@ -732,8 +747,6 @@ if %build64%==yes (
 		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
 		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
 		echo.cross='x86_64-w64-mingw32-'>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.alias cc=/mingw64/bin/gcc>>%instdir%\global64\etc\profile.local
 		)
 	
 :loginProfile
@@ -798,15 +811,6 @@ if not exist "%instdir%\opt\bin\pdflatex.exe" (
 	%instdir%\%msys2%\bin\rm dvipsk-w32.tar
 	cd ..
 	)
-
-if not exist "%instdir%\opt\python27\python.exe" (
-	cd %instdir%\opt
-	mkdir python27
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c --no-check-certificate https://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
-	msiexec /a %instdir%\opt\python-2.7.2.msi /qb TARGETDIR=%instdir%\opt\python27
-	del python-2.7.2.msi
-	cd ..
-)
 
 if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.-------------------------------------------------------------------------------
@@ -900,17 +904,9 @@ if %build32%==yes (
 	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A == %date% (
+				%instdir%\%msys2%\mingw32\bin\strip %%C
 				%instdir%\%msys2%\mingw32\bin\strip --strip-all %%C
 				echo.strip %%~nC%%~xC 32Bit done...
-				)
-			)
-		)
-		
-	FOR /R "%instdir%\local32\bin" %%D IN (*.dll) DO (
-		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
-			IF %%A == %date% (
-				%instdir%\%msys2%\mingw32\bin\strip --strip-all %%D
-				echo.strip %%~nD%%~xD 32Bit done...
 				)
 			)
 		)
@@ -920,17 +916,9 @@ if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A == %date% (
+				%instdir%\%msys2%\mingw64\bin\strip %%C
 				%instdir%\%msys2%\mingw64\bin\strip --strip-all %%C
 				echo.strip %%~nC%%~xC 64Bit done...
-				)
-			)
-		)
-		
-	FOR /R "%instdir%\local64\bin" %%D IN (*.dll) DO (
-		FOR /F "tokens=1 delims= " %%A IN ( "%%~tD" ) DO (
-			IF %%A == %date% (
-				%instdir%\%msys2%\mingw64\bin\strip --strip-all %%D
-				echo.strip %%~nD%%~xD 64Bit done...
 				)
 			)
 		)

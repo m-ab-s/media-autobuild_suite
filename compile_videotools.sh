@@ -146,68 +146,66 @@ fi
 
 cd $LOCALBUILDDIR
 
-#if [[ $bits = "64bit" ]]; then
-	if [ -f "x265-hg/source/CMakeLists.txt" ]; then
-		echo -ne "\033]0;compile x265 $bits\007"
-		cd x265-hg
-		oldHead=`hg id --id`
-		hg pull
-		hg update
-		newHead=`hg id --id`
-		if [[ "$oldHead" != "$newHead" ]]; then
-			cd build/msys
-			make clean
-			rm -rf *
-			if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-			if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-			if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-			if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
-			
-			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-			make -j $cpuCount
-			cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
-			
-			make clean
-			rm -rf *
-			
-			cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-			make -j $cpuCount
-			make install
-			
-			do_checkIfExist x265-git x265.exe
-		else
-			echo -------------------------------------------------
-			echo "x265 is already up to date"
-			echo -------------------------------------------------
-		fi
-		else
-		echo -ne "\033]0;compile x265 $bits\007"
-			hg clone https://bitbucket.org/multicoreware/x265 x265-hg
-			cd x265-hg
-
-			cd build/msys
-			
-			if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-			if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-			if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-			if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
-			
-				cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-			make -j $cpuCount
-			cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
-			
-			make clean
-			rm -rf *
-			
-			cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-			make -j $cpuCount
-			make install
-			
-			do_checkIfExist x265-hg x265.exe
+if [ -f "x265-hg/source/CMakeLists.txt" ]; then
+	echo -ne "\033]0;compile x265 $bits\007"
+	cd x265-hg
+	oldHead=`hg id --id`
+	hg pull
+	hg update
+	newHead=`hg id --id`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		cd build/msys
+		make clean
+		rm -rf *
+		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+		
+		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		make clean
+		rm -rf *
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x265-git x265.exe
+	else
+		echo -------------------------------------------------
+		echo "x265 is already up to date"
+		echo -------------------------------------------------
 	fi
-#fi
+	else
+	echo -ne "\033]0;compile x265 $bits\007"
+		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
+		cd x265-hg
+
+		cd build/msys
+		
+		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+		
+			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+		
+		make clean
+		rm -rf *
+		
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x265-hg x265.exe
+fi
 
 cd $LOCALBUILDDIR
 
@@ -710,11 +708,10 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 		fi
 	fi
 	
-libx265=""
-if [[ $ffmpeg = "w" ]]; then
-	libx265="--enable-libx265"
-fi
-
+	libx265=""
+	if [[ $ffmpeg = "w" ]]; then
+		libx265="--enable-libx265"
+	fi
 	
 	echo "-------------------------------------------------------------------------------"
 	echo "compile ffmpeg $bits"
