@@ -453,6 +453,7 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 	if [[ "$oldHead" != "$newHead" ]]; then
 		
 		if [[ ! -f ./configure ]]; then
+			sed -i 's/(python --version)/(python2 --version)/g' autogen.sh
 			./autogen.sh
 		fi
 	
@@ -478,6 +479,7 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 		cd libsndfile-git
 		
 		if [[ ! -f ./configure ]]; then
+			sed -i 's/(python --version)/(python2 --version)/g' autogen.sh
 			./autogen.sh
 		fi
 		

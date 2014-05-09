@@ -669,7 +669,8 @@ if %build32%==yes (
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global32\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global32\etc\profile.local
-		echo.alias cc=/mingw32/bin/gcc>>%instdir%\global32\etc\profile.local
+		echo.cc='/mingw32/bin/gcc.exe'>>%instdir%\global32\etc\profile.local
+		echo.python='/usr/bin/python2.exe'>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global32\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw32/share/man:/global32/man:/global32/share/man:/local32/man:/local32/share/man">>%instdir%\global32\etc\profile.local
@@ -716,7 +717,8 @@ if %build64%==yes (
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global64\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global64\etc\profile.local
-		echo.alias cc=/mingw64/bin/gcc>>%instdir%\global64\etc\profile.local
+		echo.cc='/mingw64/bin/gcc.exe'>>%instdir%\global64\etc\profile.local
+		echo.python='/usr/bin/python2.exe'>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global64\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/global64/man:/global64/share/man:/local64/man:/local64/share/man">>%instdir%\global64\etc\profile.local
