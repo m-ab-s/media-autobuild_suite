@@ -75,7 +75,7 @@
 ::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
 ::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
 ::	2014-05-12 no need for fribidi patch and sed, change libass to git download
-::	2014-05-13 fix fdkaac bin
+::	2014-05-13 fix fdkaac bin, new msys32 download link
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -384,7 +384,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140216.tar.xz"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140507.tar.xz"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -396,7 +396,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 		echo.- Download from msys2 32 bit basic system failed, 
 		echo.- please download it manuel from:
 		echo.- http://downloads.sourceforge.net/project/msys2
-		echo.- and copy the folder to:
+		echo.- and copy the uncompressed folder to:
 		echo.- %instdir%
 		echo.- and start the batch script again!
 		echo.
