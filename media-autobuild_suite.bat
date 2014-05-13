@@ -75,6 +75,7 @@
 ::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
 ::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
 ::	2014-05-12 no need for fribidi patch and sed, change libass to git download
+::	2014-05-13 fix fdkaac bin
 ::
 ::-------------------------------------------------------------------------------------
 

@@ -223,34 +223,33 @@ if [ -f "$LOCALDESTDIR/bin/fdkaac.exe" ]; then
 		make install
 
 		cp libfdk-aac.a $LOCALDESTDIR/lib/libfdk-aac.a
-
+sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
+#define strtok_r strtok_s\
+#endif' vpx/src/svc_encodeframe.c
 		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
 		unzip bin-fdk-aac.zip
 		rm bin-fdk-aac.zip 
 		mv fdkaac-master bin-fdk-aac
-		cp  patch-fdk-aac/files/AppMakefile bin-fdk-aac/Makefile
-		cp  patch-fdk-aac/files/config.h bin-fdk-aac/config.h
+		cp patch-fdk-aac/files/AppMakefile bin-fdk-aac/Makefile
+		cp patch-fdk-aac/files/config.h bin-fdk-aac/config.h
 		cd bin-fdk-aac
 		
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/aacenc.o src/aacenc.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/caf_reader.o src/caf_reader.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/extrapolater.o src/extrapolater.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/lpc.o src/lpc.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/lpcm.o src/lpcm.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/m4af.o src/m4af.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/main.o src/main.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/metadata.o src/metadata.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/parson.o src/parson.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/pcm_readhelper.o src/pcm_readhelper.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/pcm_sint16_converter.o src/pcm_sint16_converter.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/progress.o src/progress.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/wav_reader.o src/wav_reader.c
-		gcc -O2 -DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include  -c -o src/compat_posix.o src/compat_posix.c
+		if [[ $bits = "32bit" ]]; then
+			sed -i 's/PREFIX=\/mingw/PREFIX=\/local32/g' Makefile
+			sed -i '/PREFIX=\/local32/ a\CC=gcc' Makefile
+			sed -i 's/CPPFLAGS=-DHAVE_CONFIG_H -I./CPPFLAGS=-DHAVE_CONFIG_H -I. -I\/local32\/include/g' Makefile
+			sed -i 's/$(CC) -o$@ $(OBJS) -static -lfdk-aac/$(CC) -o$@ $(OBJS) -static -L\/local32\/lib -lfdk-aac/g' Makefile
+		else
+			sed -i 's/PREFIX=\/mingw/PREFIX=\/local64/g' Makefile
+			sed -i '/PREFIX=\/local64/ a\CC=gcc' Makefile
+			sed -i 's/CPPFLAGS=-DHAVE_CONFIG_H -I./CPPFLAGS=-DHAVE_CONFIG_H -I. -I\/local64\/include/g' Makefile
+			sed -i 's/$(CC) -o$@ $(OBJS) -static -lfdk-aac/$(CC) -o$@ $(OBJS) -static -L\/local64\/lib -lfdk-aac/g' Makefile
+		fi
 		
-		gcc -ofdkaac.exe src/aacenc.o src/caf_reader.o src/extrapolater.o src/lpc.o src/lpcm.o src/m4af.o src/main.o src/metadata.o src/parson.o src/pcm_readhelper.o src/pcm_sint16_converter.o src/progress.o src/wav_reader.o src/compat_posix.o -L$LOCALDESTDIR/lib -static -lfdk-aac
-
-		cp fdkaac.exe $LOCALDESTDIR/bin
+		make
+		make install
+		
 		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
 		rm $LOCALDESTDIR/lib/libfdk-aac.dll.a
 
