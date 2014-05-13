@@ -370,24 +370,43 @@ else
 fi
 
 cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libass.a" ]; then
-	echo -------------------------------------------------
-	echo "libass-0.10.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libass $bits\007"
-		if [ -d "libass-0.10.2" ]; then rm -rf libass-0.10.2; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://libass.googlecode.com/files/libass-0.10.2.tar.gz
-		tar xf libass-0.10.2.tar.gz
-		rm libass-0.10.2.tar.gz
-		cd libass-0.10.2
+		
+if [ -f "libass-git/configure" ]; then
+	echo -ne "\033]0;compile libass $bits\007"
+	cd libass-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	if [[ "$oldHead" != "$newHead" ]]; then
+		make uninstall
+		make clean
+		if [[ ! -f "configure" ]]; then
+			./autogen.sh
+		fi
 		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
+		
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
 		
-		do_checkIfExist libass-0.10.2 libass.a
+		do_checkIfExist libbluray-git libbluray.a
+	else
+		echo -------------------------------------------------
+		echo "libass is already up to date"
+		echo -------------------------------------------------
+	fi
+	else
+		echo -ne "\033]0;compile libass $bits\007"
+		git clone https://github.com/libass/libass.git libass-git
+		cd libass-git
+		./autogen.sh
+		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		make -j $cpuCount
+		make install
+
+		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
+		
+		do_checkIfExist libass-git libass.a
 fi
 
 cd $LOCALBUILDDIR
@@ -399,7 +418,7 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	else 
 		echo -ne "\033]0;compile xavs $bits\007"
 		if [ -d "xavs" ]; then rm -rf xavs; fi
-		svn checkout --trust-server-cert  --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
+		svn checkout --trust-server-cert --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR
 		make -j $cpuCount

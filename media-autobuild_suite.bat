@@ -74,6 +74,7 @@
 ::	2014-05-05 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
 ::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
 ::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
+::	2014-05-12 no need for fribidi patch and sed, change libass to git download
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -531,7 +532,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
 	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn  mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3>>mingw64.sh
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
 	%instdir%\mintty.lnk %instdir%\mingw64.sh
@@ -676,12 +677,14 @@ if %build32%==yes (
 		echo.MANPATH="/usr/share/man:/mingw32/share/man:/global32/man:/global32/share/man:/local32/man:/local32/share/man">>%instdir%\global32\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
+		echo.MSYSTEM=MINGW32>>%instdir%\global32\etc\profile.local
+		echo.>>%instdir%\global32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/global32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
 		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
 		echo.CFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.CXXFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global32\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
@@ -724,12 +727,14 @@ if %build64%==yes (
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/global64/man:/global64/share/man:/local64/man:/local64/share/man">>%instdir%\global64\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
+		echo.MSYSTEM=MINGW32>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/global64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
 		echo.CPPFLAGS="-I/global64/include -I/local64/include">>%instdir%\global64\etc\profile.local
 		echo.CFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.CXXFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS>>%instdir%\global64\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local

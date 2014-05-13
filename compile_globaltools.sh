@@ -184,19 +184,17 @@ if [ -f "$GLOBALDESTDIR/lib/libfribidi.a" ]; then
 	echo -------------------------------------------------
 	echo "fribidi-0.19.6 is already compiled"
 	echo -------------------------------------------------
-	else 
+	else
 		echo -ne "\033]0;compile fribidi $bits\007"
 		if [ -d "fribidi-0.19.6" ]; then rm -rf fribidi-0.19.6; fi
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.6.tar.bz2
 		tar xf fribidi-0.19.6.tar.bz2
 		rm fribidi-0.19.6.tar.bz2
 		cd fribidi-0.19.6
-		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/fribidi.diff
-		patch -p0 < fribidi.diff
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
-		sed -i 's/-export-symbols-regex "^fribidi_.*" $(am__append_1)/-export-symbols-regex "^fribidi_.*" # $(am__append_1)/g' "lib/Makefile"
 		make -j $cpuCount
-		make install		
+		make install
 
 if [ ! -f ${GLOBALDESTDIR}/bin/fribidi-config ]; then
 cat > ${GLOBALDESTDIR}/bin/fribidi-config << "EOF"
@@ -218,7 +216,7 @@ esac
 EOF
 fi
 
-		do_checkIfExist fribidi-0.19.6 libfribidi.a
+	do_checkIfExist fribidi-0.19.6 libfribidi.a
 fi
 
 cd $LOCALBUILDDIR
