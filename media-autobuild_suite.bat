@@ -384,7 +384,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140507.tar.xz"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -P "%instdir%" -O msys2-base.tar.xz "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140507.tar.xz"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
