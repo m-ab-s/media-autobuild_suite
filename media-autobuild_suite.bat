@@ -443,9 +443,9 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	cscript /nologo %instdir%\setlink.vbs 
 	del %instdir%\setlink.vbs 	
 
-	echo.sleep ^5>firstrun.sh
-	echo.exit>firstrun.sh
-	%instdir%\mintty.lnk %instdir%\firstrun.sh
+	echo.sleep ^5>>firstrun.sh
+	echo.exit>>firstrun.sh
+	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\firstrun.sh
 	del firstrun.sh
 	
 :minttySettings
@@ -494,7 +494,7 @@ echo.echo "updating msys2 done...">>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
 echo.sleep ^3>>updateMSYS2.sh
 echo.exit>>updateMSYS2.sh
-%instdir%\mintty.lnk %instdir%\updateMSYS2.sh
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\updateMSYS2.sh
 del updateMSYS2.sh
 
 :installbase
@@ -507,7 +507,7 @@ if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
 	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex groff help2man intltool libtool m4 man patch pkg-config scons xmlto make tar zip unzip git subversion wget>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
-	%instdir%\mintty.lnk %instdir%\pacman.sh
+	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
 	del pacman.sh
 
 :getmingw32
@@ -521,7 +521,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
-	%instdir%\mintty.lnk %instdir%\mingw32.sh
+	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
 	del mingw32.sh
 	)
 
@@ -536,7 +536,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
-	%instdir%\mintty.lnk %instdir%\mingw64.sh
+	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh
 	del mingw64.sh
 	)
 
@@ -854,7 +854,7 @@ echo.
 echo.- compile global tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
 echo. compile global tools done...
 
 :: audio tools
@@ -876,7 +876,7 @@ echo.
 echo.- compile audio tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --nonfree=%binary%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --nonfree=%binary%
 echo. compile audio tools done...
 
 :: video tools
@@ -897,7 +897,7 @@ echo.
 echo.- compile video tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\mintty.lnk %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
 echo. compile video tools done...	
 	
 :: strip compiled files
