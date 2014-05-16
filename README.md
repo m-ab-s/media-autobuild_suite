@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-14
+modified: 2014-05-15
 
 ---
 
@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.1**
+Current release is **v2.11**
 
 
 Included Tools and Libraries
@@ -69,7 +69,7 @@ Included Tools and Libraries
  - libutvideo
  - libxml2
  - libzvbi
- - mediainfo cli (only 32 bit)
+ - mediainfo cli
  - mp3lame (standalone and lib for ffmpeg)
  - mp4box (standalone)
  - mplayer (standalone)

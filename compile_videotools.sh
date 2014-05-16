@@ -389,7 +389,7 @@ if [ -f "libass-git/configure" ]; then
 		
 		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
 		
-		do_checkIfExist libbluray-git libbluray.a
+		do_checkIfExist libass-git libass.a
 	else
 		echo -------------------------------------------------
 		echo "libass is already up to date"
@@ -497,43 +497,55 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
 fi
 
-if [[ $bits = "32bit" ]]; then
-	cd $LOCALBUILDDIR
+cd $LOCALBUILDDIR
 
-	if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
-		echo -------------------------------------------------
-		echo "MediaInfo_CLI is already compiled"
-		echo -------------------------------------------------
-		else
-			echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-			if [ -d "mediainfo" ]; then rm -rf mediainfo; fi
-			wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mediainfo/source/mediainfo/0.7.69/mediainfo_0.7.69_AllInclusive.7z
-			mkdir mediainfo
-			cd mediainfo
-			7za x ../mediainfo_0.7.69_AllInclusive.7z
-			rm ../mediainfo_0.7.69_AllInclusive.7z
-			
-			sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
-			cd ZenLib/Project/GNU/Library
-			
-			./autogen
-			./configure --build=$targetBuild --host=$targetHost
-			make -j $cpuCount
-			
-			cd ../../../../MediaInfoLib/Project/GNU/Library
-			./autogen
-			./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
-			make -j $cpuCount
-			
-			cd ../../../../MediaInfo/Project/GNU/CLI
-			./autogen
-			./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
-			make -j $cpuCount
-			
-			cp mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
+if [ -f "$LOCALDESTDIR/bin/mediainfo.exe" ]; then
+	echo -------------------------------------------------
+	echo "MediaInfo_CLI is already compiled"
+	echo -------------------------------------------------
+	else
+		echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
+		if [ -d "mediainfo" ]; then rm -rf mediainfo; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mediainfo/source/mediainfo/0.7.69/mediainfo_0.7.69_AllInclusive.7z
+		mkdir mediainfo
+		cd mediainfo
+		7za x ../mediainfo_0.7.69_AllInclusive.7z
+		rm ../mediainfo_0.7.69_AllInclusive.7z
+		
+		sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
+		cd ZenLib/Project/GNU/Library
+		
+		./autogen
+		./configure --build=$targetBuild --host=$targetHost
+		
+		if [[ $bits = "64bit" ]]; then
+			sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+		fi
+		make -j $cpuCount
+		
+		cd ../../../../MediaInfoLib/Project/GNU/Library
+		./autogen
+		./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
+		
+		if [[ $bits = "64bit" ]]; then
+			sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+		fi
+		
+		make -j $cpuCount
+		
+		cd ../../../../MediaInfo/Project/GNU/CLI
+		./autogen
+		./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
+		
+		if [[ $bits = "64bit" ]]; then
+			sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+		fi
+		
+		make -j $cpuCount
+		
+		cp mediainfo.exe $LOCALDESTDIR/bin/mediainfo.exe
 
-			do_checkIfExist mediainfo mediainfo.exe
-	fi
+		do_checkIfExist mediainfo mediainfo.exe
 fi
 
 cd $LOCALBUILDDIR

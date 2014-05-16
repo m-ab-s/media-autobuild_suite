@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.1
+::	This is version 2.11
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -76,7 +76,8 @@
 ::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
 ::	2014-05-12 no need for fribidi patch and sed, change libass to git download
 ::	2014-05-13 fix fdkaac bin, new msys32 download link
-::	2014-05-14 fix issues with windows xp and fix wget download 
+::	2014-05-14 fix issues with windows xp and fix wget download
+::	2014-05-15 change cc and python alias, add mediainfo 64 bit
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -672,8 +673,8 @@ if %build32%==yes (
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global32\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global32\etc\profile.local
-		echo.cc='/mingw32/bin/gcc.exe'>>%instdir%\global32\etc\profile.local
-		echo.python='/usr/bin/python2.exe'>>%instdir%\global32\etc\profile.local
+		echo.alias CC='/mingw32/bin/gcc.exe'>>%instdir%\global32\etc\profile.local
+		echo.alias python='/usr/bin/python2.exe'>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global32\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw32/share/man:/global32/man:/global32/share/man:/local32/man:/local32/share/man">>%instdir%\global32\etc\profile.local
@@ -722,8 +723,8 @@ if %build64%==yes (
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\global64\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\global64\etc\profile.local
-		echo.cc='/mingw64/bin/gcc.exe'>>%instdir%\global64\etc\profile.local
-		echo.python='/usr/bin/python2.exe'>>%instdir%\global64\etc\profile.local
+		echo.alias CC='/mingw64/bin/gcc.exe'>>%instdir%\global64\etc\profile.local
+		echo.alias python='/usr/bin/python2.exe'>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global64\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/global64/man:/global64/share/man:/local64/man:/local64/share/man">>%instdir%\global64\etc\profile.local
@@ -800,26 +801,6 @@ if %build32%==no GOTO loginProfile64
 ::------------------------------------------------------------------
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
-
-if not exist "%instdir%\opt\bin\pdflatex.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install pdftex-w32
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/pdftex-w32.tar.xz"
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/makeindex-w32.tar.xz"
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c "http://ctan.ijs.si/mirror/w32tex/current/dvipsk-w32.tar.xz"
-	%instdir%\%msys2%\bin\xz -d pdftex-w32.tar.xz
-	%instdir%\%msys2%\bin\tar -xf pdftex-w32.tar
-	%instdir%\%msys2%\bin\xz -d makeindex-w32.tar.xz
-	%instdir%\%msys2%\bin\tar -xf makeindex-w32.tar
-	%instdir%\%msys2%\bin\xz -d dvipsk-w32.tar.xz
-	%instdir%\%msys2%\bin\tar -xf dvipsk-w32.tar
-	%instdir%\%msys2%\bin\rm pdftex-w32.tar
-	%instdir%\%msys2%\bin\rm makeindex-w32.tar
-	%instdir%\%msys2%\bin\rm dvipsk-w32.tar
-	cd ..
-	)
 
 if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
 	echo.-------------------------------------------------------------------------------
