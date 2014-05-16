@@ -77,7 +77,7 @@
 ::	2014-05-12 no need for fribidi patch and sed, change libass to git download
 ::	2014-05-13 fix fdkaac bin, new msys32 download link
 ::	2014-05-14 fix issues with windows xp and fix wget download
-::	2014-05-15 change cc and python alias, add mediainfo 64 bit
+::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -681,18 +681,19 @@ if %build32%==yes (
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\global32\etc\profile.local
+		echo.HGENCODING=UTF-8>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/global32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
 		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
 		echo.CFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.CXXFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global32\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM HGENCODING>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/TortoiseHg:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/Mercurial:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -731,18 +732,20 @@ if %build64%==yes (
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\global64\etc\profile.local
+		echo.HGENCODING=UTF-8>>%instdir%\global64\etc\profile.local
+		echo.>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/global64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
 		echo.CPPFLAGS="-I/global64/include -I/local64/include">>%instdir%\global64\etc\profile.local
 		echo.CFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.CXXFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global64\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM HGENCODING>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/TortoiseHg:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/Mercurial:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
@@ -802,16 +805,16 @@ if %build32%==no GOTO loginProfile64
 :: get extra packs and compile global tools:
 ::------------------------------------------------------------------
 
-if not exist "%instdir%\opt\TortoiseHg\hg.exe" (
+if not exist "%instdir%\opt\Mercurial\hg.exe" (
 	echo.-------------------------------------------------------------------------------
-	echo.download and install TortoiseHg
+	echo.download and install Mercurial
 	echo.-------------------------------------------------------------------------------
 	cd %instdir%\opt
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "http://bitbucket.org/tortoisehg/files/downloads/tortoisehg-2.11.2-hg-2.9.2-x86.msi"
-	msiexec /a tortoisehg-2.11.2-hg-2.9.2-x86.msi /qb TARGETDIR=%instdir%\opt\hg-temp
-	%instdir%\%msys2%\bin\cp -va %instdir%\opt\hg-temp\PFiles\TortoiseHg %instdir%\opt
-	%instdir%\%msys2%\bin\rm tortoisehg-2.11.2-hg-2.9.2-x86.msi
-	%instdir%\%msys2%\bin\rm -r -f %instdir%\opt\hg-temp
+	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "https://bitbucket.org/tortoisehg/files/downloads/mercurial-3.0.0-x86.msi"
+	msiexec /a mercurial-3.0.0-x86.msi /qb TARGETDIR=%instdir%\opt\mercurial-temp
+	%instdir%\%msys2%\bin\mv %instdir%\opt\mercurial-temp\PFiles\Mercurial %instdir%\opt
+	%instdir%\%msys2%\bin\rm mercurial-3.0.0-x86.msi
+	%instdir%\%msys2%\bin\rm -r -f %instdir%\opt\mercurial-temp
 	cd ..
 	)
 
