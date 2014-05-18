@@ -78,26 +78,6 @@ do_checkIfExist() {
 buildProcess() {
 cd $LOCALBUILDDIR
 
-if [ -f "$GLOBALDESTDIR/lib/libdl.a" ]; then
-	echo -------------------------------------------------
-	echo "dlfcn-win32-r19 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile dlfcn-win32 $bits\007"
-		if [ -d "dlfcn-win32-r19" ]; then rm -rf dlfcn-win32-r19; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dlfcn-win32.googlecode.com/files/dlfcn-win32-r19.tar.bz2
-		tar xf dlfcn-win32-r19.tar.bz2
-		rm dlfcn-win32-r19.tar.bz2
-		cd dlfcn-win32-r19
-		./configure --prefix=$GLOBALDESTDIR --libdir=$GLOBALDESTDIR/lib --incdir=$GLOBALDESTDIR/include --disable-shared --enable-static
-		make
-		make install
-		
-		do_checkIfExist dlfcn-win32-r19 libdl.a
-fi
-
-cd $LOCALBUILDDIR
-
 if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
 	echo "openjpeg-1.5.1 is already compiled"
@@ -115,26 +95,6 @@ if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 		make install
 		
 		do_checkIfExist openjpeg-1.5.1 libopenjpeg.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$GLOBALDESTDIR/lib/libjasper.a" ]; then
-	echo -------------------------------------------------
-	echo "jasper-1.900.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile jasper $bits\007"
-		if [ -d "jasper-1.900.1" ]; then rm -rf jasper-1.900.1; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
-		unzip jasper-1.900.1.zip
-		rm jasper-1.900.1.zip
-		cd jasper-1.900.1
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-static=no
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist jasper-1.900.1 libjasper.a
 fi
 
 cd $LOCALBUILDDIR
@@ -242,26 +202,6 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 		do_checkIfExist SDL-1.2.15 libSDL.a
 fi
 
-cd $LOCALBUILDDIR
-
-if [ -f "$GLOBALDESTDIR/lib/libSDL_image.a" ]; then
-	echo -------------------------------------------------
-	echo "SDL_image-1.2.12 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile SDL_imagae $bits\007"
-		if [ -d "SDL_image-1.2.12" ]; then rm -rf SDL_image-1.2.12; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
-		tar xf SDL_image-1.2.12.tar.gz
-		rm SDL_image-1.2.12.tar.gz
-		cd SDL_image-1.2.12
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist SDL_image-1.2.12 libSDL_image.a
-fi
-
 #----------------------
 # crypto engine
 #----------------------
@@ -322,7 +262,7 @@ if [ -f "$GLOBALDESTDIR/bin/rtmpdump.exe" ]; then
 	else 
 		echo -ne "\033]0;compile rtmpdump $bits\007"
 		if [ -d "rtmpdump" ]; then rm -rf rtmpdump; fi
-		git clone git://git.ffmpeg.org/rtmpdump rtmpdump
+		git clone --depth 1 git://git.ffmpeg.org/rtmpdump rtmpdump
 		cd rtmpdump
 		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 $(LIBZ)/' Makefile
 		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl/' Makefile
@@ -382,7 +322,7 @@ if [ -f "$GLOBALDESTDIR/lib/libilbc.a" ]; then
 	else 
 		echo -ne "\033]0;compile libilbc $bits\007"
 		if [ -d "libilbc" ]; then rm -rf libilbc; fi
-		git clone https://github.com/dekkers/libilbc.git libilbc
+		git clone --depth 1 https://github.com/dekkers/libilbc.git libilbc
 		cd libilbc
 		if [[ ! -f "configure" ]]; then
 			autoreconf -fiv

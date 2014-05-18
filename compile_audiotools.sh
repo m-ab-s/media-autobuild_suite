@@ -426,7 +426,7 @@ if [ -f "WavPack-git/autogen.sh" ]; then
 	else
 		echo -ne "\033]0;compile WavPack $bits\007"
 		
-		git clone git://github.com/dbry/WavPack.git WavPack-git
+		git clone --depth 1 git://github.com/dbry/WavPack.git WavPack-git
 		cd WavPack-git
 		
 		if [[ ! -f ./configure ]]; then
@@ -474,7 +474,7 @@ if [ -f "libsndfile-git/autogen.sh" ]; then
 	else
 		echo -ne "\033]0;compile libsndfile $bits\007"
 		
-		git clone git://github.com/erikd/libsndfile.git libsndfile-git
+		git clone --depth 1 git://github.com/erikd/libsndfile.git libsndfile-git
 		cd libsndfile-git
 		
 		if [[ ! -f ./configure ]]; then
@@ -552,7 +552,7 @@ if [ -f "sox-git/configure.ac" ]; then
 	else
 		echo -ne "\033]0;compile sox $bits\007"
 		
-		git clone git://git.code.sf.net/p/sox/code sox-git
+		git clone --depth 1 git://git.code.sf.net/p/sox/code sox-git
 		cd sox-git
 		
 		if [[ $bits = "32bit" ]]; then

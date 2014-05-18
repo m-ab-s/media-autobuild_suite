@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.11
+::	This is version 2.12
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -78,6 +78,7 @@
 ::	2014-05-13 fix fdkaac bin, new msys32 download link
 ::	2014-05-14 fix issues with windows xp and fix wget download
 ::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
+::	2014-05-17 change git download depth to 1, add sed for kvazaar
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -195,7 +196,6 @@ if %ffmpegINI%==0 (
 	echo. Build static ffmpeg binary:
 	echo. 1 = yes
 	echo. 2 = no
-	echo. 3 = with x265 [experimental]
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -210,10 +210,7 @@ if %buildffmpeg%==1 (
 if %buildffmpeg%==2 (
 	set "ffmpeg=n"
 	)
-if %buildffmpeg%==3 (
-	set "ffmpeg=w"
-	)
-if %buildffmpeg% GTR 3 GOTO ffmpeg
+if %buildffmpeg% GTR 2 GOTO ffmpeg
 
 :mp4boxStatic
 if %mp4boxINI%==0 (
@@ -359,8 +356,14 @@ if exist "%instdir%\opt\bin\7za.exe" GOTO checkmsys2
 	echo.
 	echo.
 	echo -------------------------------------------------------------
+	if not exist "%instdir%\%msys2%\bin\wget.exe" GOTO get7zip
+	"%instdir%\%msys2%\bin\wget.exe" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
+	GOTO install7zip
+	
+	:get7zip
 	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
 	
+	:install7zip
 	7za920.exe
 	
 	del "%instdir%\7za920.exe"
@@ -520,7 +523,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
 	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3>>mingw32.sh
+	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-svn mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-svn mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-svn mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
@@ -535,7 +538,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
 	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3>>mingw64.sh
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-svn mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-svn mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-svn mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh

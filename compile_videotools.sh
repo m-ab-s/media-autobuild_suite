@@ -112,7 +112,7 @@ if [ -f "x264-git/configure" ]; then
 	fi
 	else
 	echo -ne "\033]0;compile x264 $bits\007"
-		git clone http://repo.or.cz/r/x264.git x264-git
+		git clone --depth 1 http://repo.or.cz/r/x264.git x264-git
 		cd x264-git
 		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
 			rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
@@ -239,7 +239,7 @@ if [ -f "libvpx-git/configure" ]; then
 	fi
 	else
 		echo -ne "\033]0;compile libvpx $bits\007"
-		git clone http://git.chromium.org/webm/libvpx.git libvpx-git
+		git clone --depth 1 http://git.chromium.org/webm/libvpx.git libvpx-git
 		cd libvpx-git
 		if [[ $bits = "64bit" ]]; then
 			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
@@ -267,6 +267,9 @@ if [ -f "kvazaar-git/SConstruct" ]; then
 	if [[ "$oldHead" != "$newHead" ]]; then
 		cd src
 		make clean
+		
+		sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
+		
 		if [[ $bits = "64bit" ]]; then
 			make ARCH=x86_64
 		else
@@ -283,9 +286,11 @@ if [ -f "kvazaar-git/SConstruct" ]; then
 	fi
 	else
 		echo -ne "\033]0;compile kvazaar $bits\007"
-		git clone https://github.com/ultravideo/kvazaar.git kvazaar-git
+		git clone --depth 1 https://github.com/ultravideo/kvazaar.git kvazaar-git
 		cd kvazaar-git/src
 
+		sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
+		
 		if [[ $bits = "64bit" ]]; then
 			make ARCH=x86_64
 		else
@@ -323,7 +328,7 @@ if [ -f "libbluray-git/bootstrap" ]; then
 	fi
 	else
 		echo -ne "\033]0;compile libbluray $bits\007"
-		git clone git://git.videolan.org/libbluray.git libbluray-git
+		git clone --depth 1 git://git.videolan.org/libbluray.git libbluray-git
 		cd libbluray-git
 		./bootstrap
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
@@ -358,7 +363,7 @@ if [ -f "libutvideo-git/configure" ]; then
 	fi
 else
 	echo -ne "\033]0;compile libutvideo $bits\007"
-	git clone git://github.com/qyot27/libutvideo.git libutvideo-git
+	git clone --depth 1 git://github.com/qyot27/libutvideo.git libutvideo-git
 	cd libutvideo-git
 	sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
 	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure			
@@ -397,7 +402,7 @@ if [ -f "libass-git/configure" ]; then
 	fi
 	else
 		echo -ne "\033]0;compile libass $bits\007"
-		git clone https://github.com/libass/libass.git libass-git
+		git clone --depth 1 https://github.com/libass/libass.git libass-git
 		cd libass-git
 		./autogen.sh
 		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
@@ -572,7 +577,7 @@ if [ -f "vidstab-git/Makefile" ]; then
 	fi
 	else
 	echo -ne "\033]0;compile vidstab $bits\007"
-		git clone https://github.com/georgmartius/vid.stab.git vidstab-git
+		git clone --depth 1 https://github.com/georgmartius/vid.stab.git vidstab-git
 		cd vidstab-git
 		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
 		 sed -i "s/SHARED/STATIC/" CMakeLists.txt
@@ -775,14 +780,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	if [[ $nonfree = "y" ]]; then
 		extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
 	  else
-		if  [[ $nonfree = "n" ]]; then
-		  extras="" 
-		fi
-	fi
-	
-	libx265=""
-	if [[ $ffmpeg = "w" ]]; then
-		libx265="--enable-libx265"
+		extras="" 
 	fi
 	
 	echo "-------------------------------------------------------------------------------"
@@ -805,7 +803,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 				arch='x86_64'
 			fi
 			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
 			
 			if [[ $bits = "32bit" ]]; then
 				sed -i "s/--target-os=mingw32 --prefix=\/local32 //g" config.h
@@ -852,7 +850,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavfilter.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc; fi
 			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavformat.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavformat.pc; fi
 
-			git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+			git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
 			cd ffmpeg-git
 			
 			if [[ $bits = "32bit" ]]; then
@@ -861,7 +859,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 				arch='x86_64'
 			fi	
 			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 $libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
+			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
 			
 			if [[ $bits = "32bit" ]]; then
 				sed -i "s/--target-os=mingw32 --prefix=\/local32 //g" config.h
