@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.12**
+Current release is **v2.13**
 
 
 Included Tools and Libraries

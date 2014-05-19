@@ -1,5 +1,8 @@
 # set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
+compile="false"
+x264Bin="no"
+newFfmpeg="no"
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
@@ -75,343 +78,262 @@ do_checkIfExist() {
 buildProcess() {
 cd $LOCALBUILDDIR
 
-if [ -f "x264-git/configure" ]; then
-	echo -ne "\033]0;compile x264 $bits\007"
+echo -ne "\033]0;compile x264 $bits\007"
+if [ ! -f "x264-git/configure" ]; then
+	git clone --depth 1 http://repo.or.cz/r/x264.git x264-git
+	compile="true"
 	cd x264-git
-	oldHead=`git rev-parse HEAD`
+else 	
+	cd x264-git
+	oldHeadx264=`git rev-parse HEAD`
 	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		rm $LOCALDESTDIR/bin/x264-10bit.exe
-		make uninstall
-		make clean
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
-		make -j $cpuCount
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
-		make -j $cpuCount
-		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
-		
-		make uninstall
-		make clean
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-		make -j $cpuCount
-		make install
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist x264-git x264.exe
-	else
-		echo -------------------------------------------------
-		echo "x264 is already up to date"
-		echo -------------------------------------------------
+	newHeadx264=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadx264" != "$newHeadx264" ]] || [[ $compile == "true" ]]; then
+	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+		rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
+		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
 	fi
-	else
-	echo -ne "\033]0;compile x264 $bits\007"
-		git clone --depth 1 http://repo.or.cz/r/x264.git x264-git
-		cd x264-git
-		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-			rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
-			rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
-		fi
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
-		make -j $cpuCount
-		
-		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
-			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10
-			make -j $cpuCount
-		fi
-		cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
-		
-		make uninstall
+	if [ -f "libx264.a" ]; then
 		make clean
-		
-		./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-		make -j $cpuCount
-		make install
-		
-		if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then
-			./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread
-			make -j $cpuCount
-			make install
-		fi
-		
-		do_checkIfExist x264-git x264.exe
+	fi
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist x264-git libx264.a
+	compile="false"
+	x264Bin="yes"
+else
+	echo -------------------------------------------------
+	echo "x264 is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "x265-hg/source/CMakeLists.txt" ]; then
-	echo -ne "\033]0;compile x265 $bits\007"
+echo -ne "\033]0;compile x265 $bits\007"
+if [ ! -f "x265-hg/source/CMakeLists.txt" ]; then
+	hg clone https://bitbucket.org/multicoreware/x265 x265-hg
+	compile="true"
 	cd x265-hg
-	oldHead=`hg id --id`
+else 	
+	cd x265-hg
+	oldHeadx265=`hg id --id`
 	hg pull
 	hg update
-	newHead=`hg id --id`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		cd build/msys
-		make clean
-		rm -rf *
-		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
-		
-		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
-		
-		make clean
-		rm -rf *
-		
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist x265-git x265.exe
-	else
-		echo -------------------------------------------------
-		echo "x265 is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-	echo -ne "\033]0;compile x265 $bits\007"
-		hg clone https://bitbucket.org/multicoreware/x265 x265-hg
-		cd x265-hg
+	newHeadx265=`hg id --id`
+fi
 
-		cd build/msys
-		
-		if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
-		if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-		if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-		if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-		if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
-		
-			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
-		
-		make clean
-		rm -rf *
-		
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist x265-hg x265.exe
+if [[ "$oldHeadx265" != "$newHeadx265" ]] || [[ $compile == "true" ]]; then
+	cd build/msys
+	make clean
+	rm -rf *
+	if [ -f "$LOCALDESTDIR/bin/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin/x265-16bit.exe; fi
+	if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
+	if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
+	if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
+	if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+
+	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	make -j $cpuCount
+	cp x265.exe $LOCALDESTDIR/bin/x265-16bit.exe
+
+	make clean
+	rm -rf *
+
+	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	make -j $cpuCount
+	make install
+
+	do_checkIfExist x265-git x265.exe
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "x265 is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "libvpx-git/configure" ]; then
-	echo -ne "\033]0;compile libvpx $bits\007"
+echo -ne "\033]0;compile libvpx $bits\007"
+if [ ! -f "libvpx-git/configure" ]; then
+	git clone --depth 1 http://git.chromium.org/webm/libvpx.git libvpx-git
+	compile="true"
 	cd libvpx-git
-	oldHead=`git rev-parse HEAD`
+else 	
+	cd libvpx-git
+	oldHeadvpx=`git rev-parse HEAD`
 	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
+	newHeadvpx=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadvpx" != "$newHeadvpx" ]] || [[ $compile == "true" ]]; then
 	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
 	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
-		make clean
-		if [[ $bits = "64bit" ]]; then
-			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
-		else
-			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
-		fi 
-
-        make -j $cpuCount
-        make install
-		
-		do_checkIfExist libvpx-git libvpx.a
+	make clean
+	if [[ $bits = "64bit" ]]; then
+		LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
+		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
 	else
-		echo -------------------------------------------------
-		echo "libvpx-git is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-		echo -ne "\033]0;compile libvpx $bits\007"
-		git clone --depth 1 http://git.chromium.org/webm/libvpx.git libvpx-git
-		cd libvpx-git
-		if [[ $bits = "64bit" ]]; then
-			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
-		else
-			LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
-			sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
-		fi 
+		LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
+		sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+	fi 
 
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libvpx-git libvpx.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "kvazaar-git/SConstruct" ]; then
-	echo -ne "\033]0;compile kvazaar $bits\007"
-	cd kvazaar-git
-	oldHead=`git rev-parse HEAD`
-	git reset --hard
-	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		cd src
-		make clean
-		
-		sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
-		
-		if [[ $bits = "64bit" ]]; then
-			make ARCH=x86_64
-		else
-			make ARCH=i686
-		fi 
-
-		cp kvazaar.exe $LOCALDESTDIR/bin
-		
-		do_checkIfExist kvazaar-git kvazaar.exe
-	else
-		echo -------------------------------------------------
-		echo "kvazaar-git is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-		echo -ne "\033]0;compile kvazaar $bits\007"
-		git clone --depth 1 https://github.com/ultravideo/kvazaar.git kvazaar-git
-		cd kvazaar-git/src
-
-		sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
-		
-		if [[ $bits = "64bit" ]]; then
-			make ARCH=x86_64
-		else
-			make ARCH=i686
-		fi 
-
-		cp kvazaar.exe $LOCALDESTDIR/bin
-		
-		do_checkIfExist kvazaar-git kvazaar.exe
-fi
-
-cd $LOCALBUILDDIR
-		
-if [ -f "libbluray-git/bootstrap" ]; then
-	echo -ne "\033]0;compile libbluray $bits\007"
-	cd libbluray-git
-	oldHead=`git rev-parse HEAD`
-	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		make uninstall
-		make clean
-		if [[ ! -f "configure" ]]; then
-			./bootstrap
-		fi
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libbluray-git libbluray.a
-	else
-		echo -------------------------------------------------
-		echo "libbluray is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-		echo -ne "\033]0;compile libbluray $bits\007"
-		git clone --depth 1 git://git.videolan.org/libbluray.git libbluray-git
-		cd libbluray-git
-		./bootstrap
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
-		make -j $cpuCount
-		make install
-
-		do_checkIfExist libbluray-git libbluray.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "libutvideo-git/configure" ]; then
-	echo -ne "\033]0;compile libutvideo $bits\007"
-	cd libutvideo-git
-	oldHead=`git rev-parse HEAD`
-	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		make uninstall
-		make clean
-		sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
-		sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure		
-		./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libutvideo-git libutvideo.a
-	else
-		echo -------------------------------------------------
-		echo "libutvideo is already up to date"
-		echo -------------------------------------------------
-	fi
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist libvpx-git libvpx.a
+	compile="false"
 else
-	echo -ne "\033]0;compile libutvideo $bits\007"
+	echo -------------------------------------------------
+	echo "libvpx-git is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+echo -ne "\033]0;compile kvazaar $bits\007"
+if [ ! -f "kvazaar-git/SConstruct" ]; then
+	git clone --depth 1 https://github.com/ultravideo/kvazaar.git kvazaar-git
+	compile="true"
+	cd kvazaar-git
+else 	
+	cd kvazaar-git
+	oldHeadkva=`git rev-parse HEAD`
+	git pull origin master
+	newHeadkva=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadkva" != "$newHeadkva" ]] || [[ $compile == "true" ]]; then
+	cd src
+	make clean
+		
+	sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
+		
+	if [[ $bits = "64bit" ]]; then
+		make ARCH=x86_64
+	else
+		make ARCH=i686
+	fi 
+
+	cp kvazaar.exe $LOCALDESTDIR/bin
+	
+	do_checkIfExist kvazaar-git kvazaar.exe
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "kvazaar-git is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+	
+echo -ne "\033]0;compile libbluray $bits\007"
+if [ ! -f "libbluray-git/bootstrap" ]; then
+	git clone --depth 1 git://git.videolan.org/libbluray.git libbluray-git
+	compile="true"
+	cd libbluray-git
+else 	
+	cd libbluray-git
+	oldHeadblu=`git rev-parse HEAD`
+	git pull origin master
+	newHeadblu=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadblu" != "$newHeadblu" ]] || [[ $compile == "true" ]]; then
+	if [ -f $LOCALDESTDIR/lib/libbluray.a ]; then
+		make uninstall
+		make clean
+	fi
+	
+	if [[ ! -f "configure" ]]; then
+		./bootstrap
+	fi
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-static
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist libbluray-git libbluray.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libbluray is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+echo -ne "\033]0;compile libutvideo $bits\007"
+if [ ! -f "libutvideo-git/configure" ]; then
 	git clone --depth 1 git://github.com/qyot27/libutvideo.git libutvideo-git
+	compile="true"
 	cd libutvideo-git
+else 	
+	cd libutvideo-git
+	oldHeadutv=`git rev-parse HEAD`
+	git pull origin master
+	newHeadutv=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadutv" != "$newHeadutv" ]] || [[ $compile == "true" ]]; then
+	if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
+		make uninstall
+		make clean
+	fi
+	
 	sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
-	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure			
+	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure		
 	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 	make -j $cpuCount
 	make install
 	
 	do_checkIfExist libutvideo-git libutvideo.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libutvideo is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
-		
-if [ -f "libass-git/configure" ]; then
-	echo -ne "\033]0;compile libass $bits\007"
+
+echo -ne "\033]0;compile libass $bits\007"		
+if [ ! -f "libass-git/configure" ]; then
+	git clone --depth 1 https://github.com/libass/libass.git libass-git
+	compile="true"
 	cd libass-git
-	oldHead=`git rev-parse HEAD`
+else 	
+	cd libass-git
+	oldHeadass=`git rev-parse HEAD`
 	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
+	newHeadass=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadass" != "$newHeadass" ]] || [[ $compile == "true" ]]; then
+	if [ -f $LOCALDESTDIR/lib/libass.a ]; then
 		make uninstall
 		make clean
-		if [[ ! -f "configure" ]]; then
-			./autogen.sh
-		fi
-		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
-		
-		do_checkIfExist libass-git libass.a
-	else
-		echo -------------------------------------------------
-		echo "libass is already up to date"
-		echo -------------------------------------------------
 	fi
-	else
-		echo -ne "\033]0;compile libass $bits\007"
-		git clone --depth 1 https://github.com/libass/libass.git libass-git
-		cd libass-git
+	
+	if [[ ! -f "configure" ]]; then
 		./autogen.sh
-		CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-		make -j $cpuCount
-		make install
-
-		sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
-		
-		do_checkIfExist libass-git libass.a
+	fi
+	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+	make -j $cpuCount
+	make install
+	
+	sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
+	
+	do_checkIfExist libass-git libass.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libass is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -555,36 +477,32 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "vidstab-git/Makefile" ]; then
-	echo -ne "\033]0;compile vidstab $bits\007"
+echo -ne "\033]0;compile vidstab $bits\007"
+if [ ! -f "vidstab-git/Makefile" ]; then
+	git clone --depth 1 https://github.com/georgmartius/vid.stab.git vidstab-git
+	compile="true"
 	cd vidstab-git
-	oldHead=`git rev-parse HEAD`
+else 	
+	cd vidstab-git
+	oldHeadvid=`git rev-parse HEAD`
 	git pull origin master
-	newHead=`git rev-parse HEAD`
-	if [[ "$oldHead" != "$newHead" ]]; then
-		make uninstall
-		make clean
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
-		sed -i "s/SHARED/STATIC/" CMakeLists.txt
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist vidstab-git libvidstab.a
-	else
-		echo -------------------------------------------------
-		echo "vidstab is already up to date"
-		echo -------------------------------------------------
-	fi
-	else
-	echo -ne "\033]0;compile vidstab $bits\007"
-		git clone --depth 1 https://github.com/georgmartius/vid.stab.git vidstab-git
-		cd vidstab-git
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
-		 sed -i "s/SHARED/STATIC/" CMakeLists.txt
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist vidstab-git libvidstab.a
+	newHeadvid=`git rev-parse HEAD`
+fi
+
+if [[ "$oldHeadvid" != "$newHeadvid" ]] || [[ $compile == "true" ]]; then
+	make uninstall
+	make clean
+	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
+	sed -i "s/SHARED/STATIC/" CMakeLists.txt
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist vidstab-git libvidstab.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "vidstab is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -731,35 +649,24 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	if [ -f "mp4box-svn/configure" ]; then
-		echo -ne "\033]0;compile mp4box-svn $bits\007"
+	echo -ne "\033]0;compile mp4box-svn $bits\007"
+	if [ ! -f "mp4box-svn/configure" ]; then
+		svn checkout http://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
+		compile="true"
 		cd mp4box-svn
-		oldRevision=`svnversion`
+	else 	
+		cd mp4box-svn
+		oldRevisionbox=`svnversion`
 		svn update
-		newRevision=`svnversion`
-		if [[ "$oldRevision" != "$newRevision"  ]]; then
+		newRevisionbox=`svnversion`
+	fi
+
+	if [[ "$oldRevisionbox" != "$newRevisionbox"  ]] || [[ $compile == "true" ]]; then
+		if [ -f $LOCALDESTDIR/bin/MP4Box.exe ]; then
 			rm $LOCALDESTDIR/bin/MP4Box.exe
 			make clean
-			./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
-				cp config.h include/gpac/internal
-				cd src
-				make -j $cpuCount
-				
-				cd ../applications/mp4box
-				make -j $cpuCount
-				cd ../..
-				cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
-				
-				do_checkIfExist mp4box-svn MP4Box.exe
-		else
-			echo -------------------------------------------------
-			echo "MP4Box is already up to date"
-			echo -------------------------------------------------
 		fi
-	else
-		echo -ne "\033]0;compile mp4box-svn $bits\007"
-		svn checkout http://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
-		cd mp4box-svn
+		
 		./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
 		cp config.h include/gpac/internal
 		cd src
@@ -771,6 +678,11 @@ if [[ $mp4box = "y" ]]; then
 		cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin
 		
 		do_checkIfExist mp4box-svn MP4Box.exe
+		compile="false"
+	else
+		echo -------------------------------------------------
+		echo "MP4Box is already up to date"
+		echo -------------------------------------------------
 	fi
 fi
 
@@ -787,15 +699,46 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	echo "compile ffmpeg $bits"
 	echo "-------------------------------------------------------------------------------"
 
-	if [ -f "ffmpeg-git/configure" ]; then
-		echo -ne "\033]0;compile ffmpeg $bits\007"
+	echo -ne "\033]0;compile ffmpeg $bits\007"
+	if [ ! -f "ffmpeg-git/configure" ]; then
+		git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+		compile="true"
 		cd ffmpeg-git
-		oldHead=`git rev-parse HEAD`
+	else 	
+		cd ffmpeg-git
+		oldHeadffm=`git rev-parse HEAD`
 		git pull origin master
-		newHead=`git rev-parse HEAD`
-		if [[ "$oldHead" != "$newHead" ]]; then
-			make uninstall
+		newHeadffm=`git rev-parse HEAD`
+	fi
+		
+	if [[ "$oldHeadffm" != "$newHeadffm" ]] || [[ $compile == "true" ]]; then
+		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then 
+			rm -rf $LOCALDESTDIR/include/libavutil
+			rm -rf $LOCALDESTDIR/include/libavcodec
+			rm -rf $LOCALDESTDIR/include/libpostproc
+			rm -rf $LOCALDESTDIR/include/libswresample
+			rm -rf $LOCALDESTDIR/include/libswscale
+			rm -rf $LOCALDESTDIR/include/libavdevice
+			rm -rf $LOCALDESTDIR/include/libavfilter
+			rm -rf $LOCALDESTDIR/include/libavformat
+			rm -rf $LOCALDESTDIR/lib/libavutil.a
+			rm -rf $LOCALDESTDIR/lib/libswresample.a
+			rm -rf $LOCALDESTDIR/lib/libswscale.a
+			rm -rf $LOCALDESTDIR/lib/libavcodec.a
+			rm -rf $LOCALDESTDIR/lib/libavdevice.a
+			rm -rf $LOCALDESTDIR/lib/libavfilter.a
+			rm -rf $LOCALDESTDIR/lib/libavformat.a
+			rm -rf $LOCALDESTDIR/lib/libpostproc.a
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
 			make clean
+		fi
 			
 			if [[ $bits = "32bit" ]]; then
 				arch='x86'
@@ -817,63 +760,38 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 			make install
 			
 			do_checkIfExist ffmpeg-git ffmpeg.exe
+			compile="false"
+			newFfmpeg="yes"
 		else
 			echo -------------------------------------------------
 			echo "ffmpeg is already up to date"
 			echo -------------------------------------------------
 		fi
-		else
-			echo -ne "\033]0;compile ffmpeg $bits\007"
-			cd $LOCALBUILDDIR
-			if [ -d "$LOCALDESTDIR/include/libavutil" ]; then rm -rf $LOCALDESTDIR/include/libavutil; fi
-			if [ -d "$LOCALDESTDIR/include/libavcodec" ]; then rm -rf $LOCALDESTDIR/include/libavcodec; fi
-			if [ -d "$LOCALDESTDIR/include/libpostproc" ]; then rm -rf $LOCALDESTDIR/include/libpostproc; fi
-			if [ -d "$LOCALDESTDIR/include/libswresample" ]; then rm -rf $LOCALDESTDIR/include/libswresample; fi
-			if [ -d "$LOCALDESTDIR/include/libswscale" ]; then rm -rf $LOCALDESTDIR/include/libswscale; fi
-			if [ -d "$LOCALDESTDIR/include/libavdevice" ]; then rm -rf $LOCALDESTDIR/include/libavdevice; fi
-			if [ -d "$LOCALDESTDIR/include/libavfilter" ]; then rm -rf $LOCALDESTDIR/include/libavfilter; fi
-			if [ -d "$LOCALDESTDIR/include/libavformat" ]; then rm -rf $LOCALDESTDIR/include/libavformat; fi
-			if [ -f "$LOCALDESTDIR/lib/libavutil.a" ]; then rm -rf $LOCALDESTDIR/lib/libavutil.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libswresample.a" ]; then rm -rf $LOCALDESTDIR/lib/libswresample.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libswscale.a" ]; then rm -rf $LOCALDESTDIR/lib/libswscale.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then rm -rf $LOCALDESTDIR/lib/libavcodec.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavdevice.a" ]; then rm -rf $LOCALDESTDIR/lib/libavdevice.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavfilter.a" ]; then rm -rf $LOCALDESTDIR/lib/libavfilter.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libavformat.a" ]; then rm -rf $LOCALDESTDIR/lib/libavformat.a; fi
-			if [ -f "$LOCALDESTDIR/lib/libpostproc.a" ]; then rm -rf $LOCALDESTDIR/lib/libpostproc.a; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavcodec.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavutil.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavutil.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libpostproc.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswresample.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libswresample.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libswscale.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libswscale.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavdevice.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavfilter.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc; fi
-			if [ -f "$LOCALDESTDIR/lib/pkgconfig/libavformat.pc" ]; then rm -rf $LOCALDESTDIR/lib/pkgconfig/libavformat.pc; fi
+fi
 
-			git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
-			cd ffmpeg-git
-			
-			if [[ $bits = "32bit" ]]; then
-				arch='x86'
-			else
-				arch='x86_64'
-			fi	
-			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
-			
-			if [[ $bits = "32bit" ]]; then
-				sed -i "s/--target-os=mingw32 --prefix=\/local32 //g" config.h
-			else
-				sed -i "s/--target-os=mingw32 --prefix=\/local64 //g" config.h
-			fi
-			
-			sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'//g" config.h
-			
-			make -j $cpuCount
-			make install
-			
-			do_checkIfExist ffmpeg-git ffmpeg.exe
-	fi
+cd $LOCALBUILDDIR
+
+echo -ne "\033]0;compile x264 bins $bits\007"
+if [[ $x264Bin == "yes" ]] || [[ $newFfmpeg == "yes" ]]; then
+	cd x264-git
+	make uninstall
+	make clean
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli --bit-depth=10 --extra-ldflags='-lsoxr'
+	make -j $cpuCount
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10 --extra-ldflags='-lsoxr'
+	make -j $cpuCount
+	
+	cp x264.exe $LOCALDESTDIR/bin/x264-10bit.exe
+	make clean
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli --extra-ldflags='-lsoxr'
+	make -j $cpuCount
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --extra-ldflags='-lsoxr'
+	make -j $cpuCount
+	make install
 fi
 
 cd $LOCALBUILDDIR
@@ -885,72 +803,53 @@ if [[ $nonfree = "y" ]]; then
 fi	
 
 if [[ $mplayer = "y" ]]; then
-
-if [ -f "mplayer-svn/configure" ]; then
-		echo -ne "\033]0;compile mplayer $bits\007"
+	echo -ne "\033]0;compile mplayer $bits\007"
+	if [ ! -f "mplayer-svn/configure" ]; then
+		svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
+		compile="true"
 		cd mplayer-svn
-		oldRevision=`svnversion`
+	else 	
+		cd mplayer-svn
+		oldRevisionmpl=`svnversion`
 		svn update
-		newRevision=`svnversion`
-		
+		newRevisionmpl=`svnversion`
 		if [ -d "ffmpeg" ]; then 
 			cd ffmpeg 
-			oldHead=`git rev-parse HEAD`
+			oldHeadfm=`git rev-parse HEAD`
 			git pull origin master
-			newHead=`git rev-parse HEAD`
+			newHeadfm=`git rev-parse HEAD`
 			cd ..
-		fi	
-		
-		if [[ "$oldRevision" != "$newRevision"  ]] || [[ "$oldHead" != "$newHead"  ]] || [ ! -d "ffmpeg" ]; then
+		fi
+	fi
+
+	if [[ "$oldRevisionmpl" != "$newRevisionmpl"  ]] || [[ "$oldHeadfm" != "$newHeadfm"  ]] || [ ! -d "ffmpeg" ]; then
+		if [ -f $LOCALDESTDIR/bin/mplayer.exe ]; then
 			make uninstall
 			make clean
-			
-			if ! test -e ffmpeg ; then
-				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
-					rm -rf ffmpeg
-					echo "Failed to get a FFmpeg checkout"
-					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
-					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
-					echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-					echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
-					exit 1
-				fi
-				touch ffmpeg/mp_auto_pull
-			fi
-			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
-			make -j $cpuCount
-			make install
-
-			do_checkIfExist mplayer-svn mplayer.exe
-			
-			else
-			echo -------------------------------------------------
-			echo "mplayer is already up to date"
-			echo -------------------------------------------------
 		fi
-		else
-			echo -ne "\033]0;compile mplayer $bits\007"
-			
-			svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
-			cd mplayer-svn
-			
-			if ! test -e ffmpeg ; then
-				if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
-					rm -rf ffmpeg
-					echo "Failed to get a FFmpeg checkout"
-					echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
-					echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
-					echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-					echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
-					exit 1
-				fi
-				touch ffmpeg/mp_auto_pull
+		
+		if ! test -e ffmpeg ; then
+			if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
+				rm -rf ffmpeg
+				echo "Failed to get a FFmpeg checkout"
+				echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
+				echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
+				echo "To use a github mirror via http (e.g. because a firewall blocks git):"
+				echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
+				exit 1
 			fi
-			./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
-			make -j $cpuCount
-			make install
+			touch ffmpeg/mp_auto_pull
+		fi
+		./configure --prefix=$LOCALDESTDIR --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+		make -j $cpuCount
+		make install
 
-			do_checkIfExist mplayer-svn mplayer.exe
+		do_checkIfExist mplayer-svn mplayer.exe
+		compile="false"
+		else
+		echo -------------------------------------------------
+		echo "mplayer is already up to date"
+		echo -------------------------------------------------
 	fi
 fi
 

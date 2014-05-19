@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.12
+::	This is version 2.13
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -79,6 +79,7 @@
 ::	2014-05-14 fix issues with windows xp and fix wget download
 ::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
 ::	2014-05-17 change git download depth to 1, add sed for kvazaar
+::	2014-05-18 simplify git clone/updates
 ::
 ::-------------------------------------------------------------------------------------
 
