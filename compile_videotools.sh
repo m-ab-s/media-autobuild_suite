@@ -19,6 +19,48 @@ while true; do
   esac
 done
 
+# get git clone, or update
+do_git() {
+local gitURL="$1"
+local gitFolder="$2"
+echo -ne "\033]0;compile $gitFolder $bits\007"
+if [ ! -d $gitFolder ]; then
+	git clone --depth 1 $gitURL $gitFolder
+	compile="true"
+	cd $gitFolder
+else 	
+	cd $gitFolder
+	oldHead=`git rev-parse HEAD`
+	git pull origin master
+	newHead=`git rev-parse HEAD`
+	
+	if [[ "$oldHead" != "$newHead" ]]; then 
+		compile="true"
+	fi
+fi
+}
+
+# get svn checkout, or update
+do_svn() {
+local svnURL="$1"
+local svnFolder="$2"
+echo -ne "\033]0;compile $svnFolder $bits\007"
+if [ ! -d $svnFolder ]; then
+	svn checkout $svnURL $svnFolder
+	compile="true"
+	cd $svnFolder
+else 	
+	cd $svnFolder
+	oldRevision=`svnversion`
+	svn update
+	newRevision=`svnversion`
+	
+	if [[ "$oldRevision" != "$newRevision" ]]; then 
+		compile="true"
+	fi
+fi
+}	
+	
 # check if compiled file exist
 do_checkIfExist() {
 	local packetName="$1"
@@ -78,19 +120,9 @@ do_checkIfExist() {
 buildProcess() {
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile x264 $bits\007"
-if [ ! -f "x264-git/configure" ]; then
-	git clone --depth 1 http://repo.or.cz/r/x264.git x264-git
-	compile="true"
-	cd x264-git
-else 	
-	cd x264-git
-	oldHeadx264=`git rev-parse HEAD`
-	git pull origin master
-	newHeadx264=`git rev-parse HEAD`
-fi
+do_git "http://repo.or.cz/r/x264.git" x264-git
 
-if [[ "$oldHeadx264" != "$newHeadx264" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
 		rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
 		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
@@ -158,19 +190,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libvpx $bits\007"
-if [ ! -f "libvpx-git/configure" ]; then
-	git clone --depth 1 http://git.chromium.org/webm/libvpx.git libvpx-git
-	compile="true"
-	cd libvpx-git
-else 	
-	cd libvpx-git
-	oldHeadvpx=`git rev-parse HEAD`
-	git pull origin master
-	newHeadvpx=`git rev-parse HEAD`
-fi
+do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git
 
-if [[ "$oldHeadvpx" != "$newHeadvpx" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
 	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
 	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
@@ -196,19 +218,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile kvazaar $bits\007"
-if [ ! -f "kvazaar-git/SConstruct" ]; then
-	git clone --depth 1 https://github.com/ultravideo/kvazaar.git kvazaar-git
-	compile="true"
-	cd kvazaar-git
-else 	
-	cd kvazaar-git
-	oldHeadkva=`git rev-parse HEAD`
-	git pull origin master
-	newHeadkva=`git rev-parse HEAD`
-fi
+do_git https://github.com/ultravideo/kvazaar.git kvazaar-git
 
-if [[ "$oldHeadkva" != "$newHeadkva" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	cd src
 	make clean
 		
@@ -232,19 +244,9 @@ fi
 
 cd $LOCALBUILDDIR
 	
-echo -ne "\033]0;compile libbluray $bits\007"
-if [ ! -f "libbluray-git/bootstrap" ]; then
-	git clone --depth 1 git://git.videolan.org/libbluray.git libbluray-git
-	compile="true"
-	cd libbluray-git
-else 	
-	cd libbluray-git
-	oldHeadblu=`git rev-parse HEAD`
-	git pull origin master
-	newHeadblu=`git rev-parse HEAD`
-fi
+do_git git://git.videolan.org/libbluray.git libbluray-git
 
-if [[ "$oldHeadblu" != "$newHeadblu" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libbluray.a ]; then
 		make uninstall
 		make clean
@@ -267,19 +269,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libutvideo $bits\007"
-if [ ! -f "libutvideo-git/configure" ]; then
-	git clone --depth 1 git://github.com/qyot27/libutvideo.git libutvideo-git
-	compile="true"
-	cd libutvideo-git
-else 	
-	cd libutvideo-git
-	oldHeadutv=`git rev-parse HEAD`
-	git pull origin master
-	newHeadutv=`git rev-parse HEAD`
-fi
+do_git git://github.com/qyot27/libutvideo.git libutvideo-git
 
-if [[ "$oldHeadutv" != "$newHeadutv" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
 		make uninstall
 		make clean
@@ -301,19 +293,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libass $bits\007"		
-if [ ! -f "libass-git/configure" ]; then
-	git clone --depth 1 https://github.com/libass/libass.git libass-git
-	compile="true"
-	cd libass-git
-else 	
-	cd libass-git
-	oldHeadass=`git rev-parse HEAD`
-	git pull origin master
-	newHeadass=`git rev-parse HEAD`
-fi
+do_git https://github.com/libass/libass.git libass-git
 
-if [[ "$oldHeadass" != "$newHeadass" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libass.a ]; then
 		make uninstall
 		make clean
@@ -477,19 +459,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile vidstab $bits\007"
-if [ ! -f "vidstab-git/Makefile" ]; then
-	git clone --depth 1 https://github.com/georgmartius/vid.stab.git vidstab-git
-	compile="true"
-	cd vidstab-git
-else 	
-	cd vidstab-git
-	oldHeadvid=`git rev-parse HEAD`
-	git pull origin master
-	newHeadvid=`git rev-parse HEAD`
-fi
+do_git https://github.com/georgmartius/vid.stab.git vidstab-git
 
-if [[ "$oldHeadvid" != "$newHeadvid" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	make uninstall
 	make clean
 	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
@@ -649,19 +621,9 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	echo -ne "\033]0;compile mp4box-svn $bits\007"
-	if [ ! -f "mp4box-svn/configure" ]; then
-		svn checkout http://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
-		compile="true"
-		cd mp4box-svn
-	else 	
-		cd mp4box-svn
-		oldRevisionbox=`svnversion`
-		svn update
-		newRevisionbox=`svnversion`
-	fi
+	do_svn http://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
 
-	if [[ "$oldRevisionbox" != "$newRevisionbox"  ]] || [[ $compile == "true" ]]; then
+	if [[ $compile == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin/MP4Box.exe ]; then
 			rm $LOCALDESTDIR/bin/MP4Box.exe
 			make clean
@@ -699,19 +661,9 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	echo "compile ffmpeg $bits"
 	echo "-------------------------------------------------------------------------------"
 
-	echo -ne "\033]0;compile ffmpeg $bits\007"
-	if [ ! -f "ffmpeg-git/configure" ]; then
-		git clone --depth 1 https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
-		compile="true"
-		cd ffmpeg-git
-	else 	
-		cd ffmpeg-git
-		oldHeadffm=`git rev-parse HEAD`
-		git pull origin master
-		newHeadffm=`git rev-parse HEAD`
-	fi
-		
-	if [[ "$oldHeadffm" != "$newHeadffm" ]] || [[ $compile == "true" ]]; then
+	do_git https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+
+	if [[ $compile == "true" ]]; then
 		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then 
 			rm -rf $LOCALDESTDIR/include/libavutil
 			rm -rf $LOCALDESTDIR/include/libavcodec
@@ -803,26 +755,11 @@ if [[ $nonfree = "y" ]]; then
 fi	
 
 if [[ $mplayer = "y" ]]; then
-	echo -ne "\033]0;compile mplayer $bits\007"
-	if [ ! -f "mplayer-svn/configure" ]; then
-		svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
-		compile="true"
-		cd mplayer-svn
-	else 	
-		cd mplayer-svn
-		oldRevisionmpl=`svnversion`
-		svn update
-		newRevisionmpl=`svnversion`
-		if [ -d "ffmpeg" ]; then 
-			cd ffmpeg 
-			oldHeadfm=`git rev-parse HEAD`
-			git pull origin master
-			newHeadfm=`git rev-parse HEAD`
-			cd ..
-		fi
-	fi
+	do_svn svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
+	
+	do_git git://source.ffmpeg.org/ffmpeg.git ffmpeg
 
-	if [[ "$oldRevisionmpl" != "$newRevisionmpl"  ]] || [[ "$oldHeadfm" != "$newHeadfm"  ]] || [ ! -d "ffmpeg" ]; then
+	if [[ $compile == "true" ]] || [ ! -d "ffmpeg" ]; then
 		if [ -f $LOCALDESTDIR/bin/mplayer.exe ]; then
 			make uninstall
 			make clean
