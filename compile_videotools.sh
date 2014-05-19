@@ -59,7 +59,29 @@ else
 		compile="true"
 	fi
 fi
-}	
+}
+
+# get hg clone, or update
+do_hg() {
+local hgURL="$1"
+local hgFolder="$2"
+echo -ne "\033]0;compile $hgFolder $bits\007"
+if [ ! -d $hgFolder ]; then
+	hg clone $hgURL $hgFolder
+	compile="true"
+	cd $hgFolder
+else 	
+	cd $hgFolder
+	oldHead=`hg id --id`
+	hg pull
+	hg update
+	newHead=`hg id --id`
+	
+	if [[ "$oldHead" != "$newHead" ]]; then 
+		compile="true"
+	fi
+fi
+}
 	
 # check if compiled file exist
 do_checkIfExist() {
@@ -146,20 +168,9 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile x265 $bits\007"
-if [ ! -f "x265-hg/source/CMakeLists.txt" ]; then
-	hg clone https://bitbucket.org/multicoreware/x265 x265-hg
-	compile="true"
-	cd x265-hg
-else 	
-	cd x265-hg
-	oldHeadx265=`hg id --id`
-	hg pull
-	hg update
-	newHeadx265=`hg id --id`
-fi
+do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
 
-if [[ "$oldHeadx265" != "$newHeadx265" ]] || [[ $compile == "true" ]]; then
+if [[ $compile == "true" ]]; then
 	cd build/msys
 	make clean
 	rm -rf *
@@ -218,7 +229,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git https://github.com/ultravideo/kvazaar.git kvazaar-git
+do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
 
 if [[ $compile == "true" ]]; then
 	cd src
@@ -244,7 +255,7 @@ fi
 
 cd $LOCALBUILDDIR
 	
-do_git git://git.videolan.org/libbluray.git libbluray-git
+do_git "git://git.videolan.org/libbluray.git" libbluray-git
 
 if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libbluray.a ]; then
@@ -269,7 +280,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git git://github.com/qyot27/libutvideo.git libutvideo-git
+do_git "git://github.com/qyot27/libutvideo.git" libutvideo-git
 
 if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
@@ -293,7 +304,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git https://github.com/libass/libass.git libass-git
+do_git "https://github.com/libass/libass.git" libass-git
 
 if [[ $compile == "true" ]]; then
 	if [ -f $LOCALDESTDIR/lib/libass.a ]; then
@@ -459,7 +470,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git https://github.com/georgmartius/vid.stab.git vidstab-git
+do_git "https://github.com/georgmartius/vid.stab.git" vidstab-git
 
 if [[ $compile == "true" ]]; then
 	make uninstall
@@ -621,7 +632,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	do_svn http://svn.code.sf.net/p/gpac/code/trunk/gpac mp4box-svn
+	do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" mp4box-svn
 
 	if [[ $compile == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin/MP4Box.exe ]; then
@@ -661,7 +672,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 	echo "compile ffmpeg $bits"
 	echo "-------------------------------------------------------------------------------"
 
-	do_git https://github.com/FFmpeg/FFmpeg.git ffmpeg-git
+	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
 
 	if [[ $compile == "true" ]]; then
 		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then 
@@ -755,9 +766,9 @@ if [[ $nonfree = "y" ]]; then
 fi	
 
 if [[ $mplayer = "y" ]]; then
-	do_svn svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn
+	do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer-svn
 	
-	do_git git://source.ffmpeg.org/ffmpeg.git ffmpeg
+	do_git "git://source.ffmpeg.org/ffmpeg.git" ffmpeg
 
 	if [[ $compile == "true" ]] || [ ! -d "ffmpeg" ]; then
 		if [ -f $LOCALDESTDIR/bin/mplayer.exe ]; then
