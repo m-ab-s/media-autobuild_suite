@@ -37,66 +37,65 @@ Current release is **v2.13**
 Included Tools and Libraries
 --------
 
- - a52dec
- - fdkaac (standalone and lib for ffmpeg)
- - ffmpeg (standalone)
- - faac (standalone and lib for ffmpeg)
- - flac (standalone)
- - fontconfig
- - freetype
- - frei0r
- - gsm
- - gnutls (standalone and lib for ffmpeg)
- - lame
- - jpeg
- - jpeg2000
- - jpegturbo
- - kvazaar
- - libass
- - libbluray
- - libcaca
- - libdvdcss
- - libdvdnav
- - libdvdread
- - libilbc
- - libmad
- - libmodplug
- - libpng
- - libsndfile
- - libsoxr
- - libtiff
- - libtwolame
- - libutvideo
- - libxml2
- - libzvbi
- - mediainfo cli
- - mp3lame (standalone and lib for ffmpeg)
- - mp4box (standalone)
- - mplayer (standalone)
- - orc
- - opencore-amr
- - openjpeg
- - ogg
- - opus
- - opus-tools (standalone)
- - rtmp (standalone and lib for ffmpeg)
- - schroedinger
- - sdl (for ffplay)
- - sox (standalone)
- - speex (standalone and lib for ffmpeg)
- - theora
- - vidstab
- - vpx (standalone and lib for ffmpeg)
- - vo-aacenc
- - vo-amrwbenc
- - vorbis
- - wavpack
- - x264 (standalone and lib for ffmpeg)
- - x264 10 bit (standalone)
- - x265 (standalone and lib for ffmpeg)
- - x265 16 bit (standalone)
- - xavs (standalone and lib for ffmpeg)
- - xvid
+ - ffmpeg with that Libraries:
+	- fdkaac
+	- faac
+	- fontconfig
+	- freetype
+	- frei0r
+	- gsm
+	- gnutls
+	- libass
+	- libbluray
+	- libcaca
+	- libilbc
+	- libmodplug
+	- libpng
+	- libsoxr
+	- libtiff
+	- libtwolame
+	- libutvideo
+	- libzvbi
+	- mp3lame
+	- opencore-amr
+	- openjpeg
+	- ogg
+	- opus
+	- rtmp
+	- schroedinger
+	- sdl
+	- speex
+	- theora
+	- vidstab
+	- vpx
+	- vo-aacenc
+	- vo-amrwbenc
+	- vorbis
+	- wavpack
+	- x264
+	- x265
+	- xavs
+	- xvid
+	
+ - other tools
+	- fdkaac
+	- faac
+	- flac
+	- gnutls
+	- kvazaar
+	- libsndfile
+	- mediainfo cli
+	- mp3lame
+	- mp4box
+	- mplayer
+	- opus-tools
+	- rtmp
+	- speex
+	- sox 
+	- vpx
+	- x264 (8 and 10 bit)
+	- x265 (8 and 16 bit)
+	- xavs	
 
 
 --------
