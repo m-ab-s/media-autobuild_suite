@@ -79,7 +79,7 @@
 ::	2014-05-14 fix issues with windows xp and fix wget download
 ::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
 ::	2014-05-17 change git download depth to 1, add sed for kvazaar
-::	2014-05-18 simplify git clone/updates
+::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -846,47 +846,25 @@ echo ---------------------------------------------------------------------------
 %instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
 echo. compile global tools done...
 
-:: audio tools
-if exist %instdir%\compile_audiotools.sh GOTO compileAudio
+:: local tools
+if not exist %instdir%\compile_localtools.sh (
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- get script for audio tools:
-	echo.
-	echo -------------------------------------------------------------------------------
-	if exist %instdir%\media-autobuild_suite.zip GOTO unpackAudio
-		%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-	
-		:unpackAudio
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_audiotools.sh
-
-:compileAudio
-echo -------------------------------------------------------------------------------
-echo.
-echo.- compile audio tools:
-echo.
-echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_audiotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --nonfree=%binary%
-echo. compile audio tools done...
-
-:: video tools
-if not exist %instdir%\compile_videotools.sh (
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- get script for video tools:
+	echo.- get script for local tools:
 	echo.
 	echo -------------------------------------------------------------------------------
 	if not exist %instdir%\media-autobuild_suite.zip (
 		%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
 		)
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_videotools.sh
+		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_localtools.sh
 	)
 
 echo -------------------------------------------------------------------------------
 echo.
-echo.- compile video tools:
+echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_videotools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
 echo. compile video tools done...	
 	
 :: strip compiled files
