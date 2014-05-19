@@ -34,10 +34,10 @@ Download
 Current release is **v2.13**
 
 
-Included Tools and Libraries
+Included Tools And Libraries
 --------
 
- - ffmpeg with that Libraries:
+ - ffmpeg with that libraries:
 	- fdkaac
 	- faac
 	- fontconfig
