@@ -26,6 +26,9 @@ local gitFolder="$2"
 echo -ne "\033]0;compile $gitFolder $bits\007"
 if [ ! -d $gitFolder ]; then
 	git clone --depth 1 $gitURL $gitFolder
+	if [ ! -d $gitFolder ]; then
+		git clone $gitURL $gitFolder
+	fi
 	compile="true"
 	cd $gitFolder
 else 	
