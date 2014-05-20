@@ -95,6 +95,8 @@ if [ -f "$GLOBALDESTDIR/lib/libopenjpeg.a" ]; then
 		make install
 		
 		do_checkIfExist openjpeg-1.5.1 libopenjpeg.a
+		cp $GLOBALDESTDIR/include/openjpeg-1.5/openjpeg.h $GLOBALDESTDIR/include
+		
 fi
 
 cd $LOCALBUILDDIR

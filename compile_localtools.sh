@@ -709,7 +709,77 @@ else
 fi
 
 cd $LOCALBUILDDIR
-	
+
+if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
+echo -------------------------------------------------
+echo "libdvdcss-1.2.13 is already compiled"
+echo -------------------------------------------------
+else
+echo -ne "\033]0;compile libdvdcss $bits\007"
+if [ -d "libdvdcss-1.2.13" ]; then rm -rf libdvdcss-1.2.13; fi
+wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
+tar xf libdvdcss-1.2.13.tar.bz2
+rm libdvdcss-1.2.13.tar.bz2
+cd libdvdcss-1.2.13
+./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-apidoc
+make -j $cpuCount
+make install
+
+do_checkIfExist libdvdcss-1.2.13 libdvdcss.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
+echo -------------------------------------------------
+echo "libdvdread-4.2.1 is already compiled"
+echo -------------------------------------------------
+else
+echo -ne "\033]0;compile libdvdread $bits\007"
+if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
+wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
+tar xf libdvdread-4.2.1.tar.xz
+rm libdvdread-4.2.1.tar.xz
+cd libdvdread-4.2.1
+if [[ ! -f ./configure ]]; then
+./autogen.sh
+fi	
+./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
+make -j $cpuCount
+make install
+sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
+sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
+
+do_checkIfExist libdvdread-4.2.1 libdvdread.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
+echo -------------------------------------------------
+echo "libdvdnav-4.2.1 is already compiled"
+echo -------------------------------------------------
+else
+echo -ne "\033]0;compile libdvdnav $bits\007"
+if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
+wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
+tar xf libdvdnav-4.2.1.tar.xz
+rm libdvdnav-4.2.1.tar.xz
+cd libdvdnav-4.2.1
+if [[ ! -f ./configure ]]; then
+./autogen.sh
+fi
+./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
+make -j $cpuCount
+make install
+sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
+
+do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
+fi
+
+cd $LOCALBUILDDIR
+
 do_git "git://git.videolan.org/libbluray.git" libbluray-git
 
 if [[ $compile == "true" ]]; then
@@ -800,76 +870,6 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 		make install
 		
 		do_checkIfExist xavs libxavs.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdcss-1.2.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libdvdcss $bits\007"
-		if [ -d "libdvdcss-1.2.13" ]; then rm -rf libdvdcss-1.2.13; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
-		tar xf libdvdcss-1.2.13.tar.bz2
-		rm libdvdcss-1.2.13.tar.bz2
-		cd libdvdcss-1.2.13
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-apidoc
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libdvdcss-1.2.13 libdvdcss.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdread-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libdvdread $bits\007"
-		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
-		tar xf libdvdread-4.2.1.tar.xz
-		rm libdvdread-4.2.1.tar.xz
-		cd libdvdread-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi	
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
-		sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
-		make -j $cpuCount
-		make install
-		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin/dvdread-config
-		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
-		
-		do_checkIfExist libdvdread-4.2.1 libdvdread.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdnav-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libdvdnav $bits\007"
-		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
-		tar xf libdvdnav-4.2.1.tar.xz
-		rm libdvdnav-4.2.1.tar.xz
-		cd libdvdnav-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin/dvdread-config
-		make -j $cpuCount
-		make install
-		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin/dvdnav-config
-		
-		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
 fi
 
 cd $LOCALBUILDDIR

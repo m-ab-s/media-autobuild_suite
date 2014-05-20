@@ -80,6 +80,7 @@
 ::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
 ::	2014-05-17 change git download depth to 1, add sed for kvazaar
 ::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
+::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx
 ::
 ::-------------------------------------------------------------------------------------
 
