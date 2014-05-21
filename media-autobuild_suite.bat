@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.13
+::	This is version 2.2
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -80,7 +80,7 @@
 ::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
 ::	2014-05-17 change git download depth to 1, add sed for kvazaar
 ::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
-::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx
+::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx, remove external mercurial and using internal, remove opt folder and using p7zip internal
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -511,11 +511,12 @@ if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
 	echo.echo -ne "\033]0;install base system\007">>pacman.sh
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex groff help2man intltool libtool m4 man patch pkg-config scons xmlto make tar zip unzip git subversion wget>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex groff help2man intltool libtool m4 man patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
 	del pacman.sh
+	rd /s/q opt
 
 :getmingw32
 if %build32%==yes (
@@ -768,7 +769,7 @@ if %build64%==yes (
 		)
 	
 :loginProfile
-if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO extraPacks
+if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO compileGlobals
 
 if %build32%==no GOTO loginProfile64
 	echo -------------------------------------------------------------------------------
@@ -786,7 +787,7 @@ if %build32%==no GOTO loginProfile64
 	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
 	echo 32 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
 	del %instdir%\profile.sh
-	GOTO extraPacks
+	GOTO compileGlobals
 	
 :loginProfile64
 	echo -------------------------------------------------------------------------------
@@ -804,41 +805,9 @@ if %build32%==no GOTO loginProfile64
 	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
 	echo 64 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
 	del %instdir%\profile.sh
-	
-:extraPacks
-::------------------------------------------------------------------
-:: get extra packs and compile global tools:
-::------------------------------------------------------------------
-
-if not exist "%instdir%\opt\Mercurial\hg.exe" (
-	echo.-------------------------------------------------------------------------------
-	echo.download and install Mercurial
-	echo.-------------------------------------------------------------------------------
-	cd %instdir%\opt
-	%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c "https://bitbucket.org/tortoisehg/files/downloads/mercurial-3.0.0-x86.msi"
-	msiexec /a mercurial-3.0.0-x86.msi /qb TARGETDIR=%instdir%\opt\mercurial-temp
-	%instdir%\%msys2%\bin\mv %instdir%\opt\mercurial-temp\PFiles\Mercurial %instdir%\opt
-	%instdir%\%msys2%\bin\rm mercurial-3.0.0-x86.msi
-	%instdir%\%msys2%\bin\rm -r -f %instdir%\opt\mercurial-temp
-	cd ..
-	)
-
-cd %instdir%
 
 :compileGlobals
-if exist %instdir%\compile_globaltools.sh GOTO compileGobal
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- get script for global tools:
-	echo.
-	echo -------------------------------------------------------------------------------
-	if exist %instdir%\media-autobuild_suite.zip GOTO unpackglobal
-		%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		
-		:unpackglobal
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_globaltools.sh
-
-:compileGobal
+cd %instdir%
 echo -------------------------------------------------------------------------------
 echo.
 echo.- compile global tools:
@@ -846,19 +815,6 @@ echo.
 echo -------------------------------------------------------------------------------
 %instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
 echo. compile global tools done...
-
-:: local tools
-if not exist %instdir%\compile_localtools.sh (
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- get script for local tools:
-	echo.
-	echo -------------------------------------------------------------------------------
-	if not exist %instdir%\media-autobuild_suite.zip (
-		%instdir%\%msys2%\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O media-autobuild_suite.zip https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip
-		)
-		%instdir%\opt\bin\7za.exe e -r -y %instdir%\media-autobuild_suite.zip -o%instdir% compile_localtools.sh
-	)
 
 echo -------------------------------------------------------------------------------
 echo.
