@@ -1236,7 +1236,9 @@ fi
 if [[ $mplayer = "y" ]]; then
 	do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer-svn
 	
-	do_git "git://source.ffmpeg.org/ffmpeg.git" ffmpeg
+	if [[ -f ffmpeg/configure ]]; then
+		do_git "git://source.ffmpeg.org/ffmpeg.git" ffmpeg
+	fi
 
 	if [[ $compile == "true" ]] || [ ! -d "ffmpeg" ]; then
 		if [ -f $LOCALDESTDIR/bin/mplayer.exe ]; then
