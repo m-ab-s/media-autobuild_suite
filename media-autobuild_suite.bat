@@ -333,7 +333,7 @@ if %stripF% GTR 2 GOTO stripEXE
 ::------------------------------------------------------------------
 ::download and install basic msys system:
 ::------------------------------------------------------------------
-if exist "%instdir%\%msys2%" GOTO check7zip
+if exist "%instdir%\%msys2%" GOTO getMintty
 	echo -------------------------------------------------------------
 	echo.
 	echo - Download wget
@@ -699,7 +699,7 @@ if %build32%==yes (
 		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/Mercurial:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
+		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
@@ -751,7 +751,7 @@ if %build64%==yes (
 		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:/opt/bin:/opt/Mercurial:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
+		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
 		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
 		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
