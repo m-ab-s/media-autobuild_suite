@@ -863,7 +863,8 @@ if %build32%==yes (
 			)
 		)
 	)	
-
+)
+if %stripFile%==y (	
 if %build64%==yes (
 	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
