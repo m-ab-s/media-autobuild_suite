@@ -305,7 +305,11 @@ if [ -f "$LOCALDESTDIR/bin/fdkaac.exe" ]; then
 		make install
 
 		cp libfdk-aac.a $LOCALDESTDIR/lib/libfdk-aac.a
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 0c7de6454f97368f2c7900ea969f5ea806467669
 		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
 		unzip bin-fdk-aac.zip
