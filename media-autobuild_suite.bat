@@ -505,7 +505,7 @@ echo.exit>>updateMSYS2.sh
 del updateMSYS2.sh
 
 :installbase
-if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
+if exist %instdir%\%msys2%\bin\make.exe GOTO sethgBat
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
@@ -517,6 +517,21 @@ if exist %instdir%\%msys2%\bin\make.exe GOTO getmingw32
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
 	del pacman.sh
 	rd /s/q opt
+
+:sethgBat
+if exist %instdir%\%msys2%\bin\hg.bat GOTO getmingw32
+echo.@echo off>>%instdir%\%msys2%\bin\hg.bat
+echo.>>%instdir%\%msys2%\bin\hg.bat
+echo.setlocal>>%instdir%\%msys2%\bin\hg.bat
+echo.set HG=^%%~f0>>%instdir%\%msys2%\bin\hg.bat
+echo.>>%instdir%\%msys2%\bin\hg.bat
+echo.set PYTHONHOME=>>%instdir%\%msys2%\bin\hg.bat
+echo.set in=^%%*>>%instdir%\%msys2%\bin\hg.bat
+echo.set out=^%%in: ^{= ^"^{^%%>>%instdir%\%msys2%\bin\hg.bat
+echo.set out=^%%out:^} =^}^" ^%%>>%instdir%\%msys2%\bin\hg.bat
+echo.>>%instdir%\%msys2%\bin\hg.bat
+echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\bin\hg.bat
+
 
 :getmingw32
 if %build32%==yes (

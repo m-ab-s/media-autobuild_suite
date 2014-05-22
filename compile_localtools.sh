@@ -626,19 +626,6 @@ cd $LOCALBUILDDIR
 do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
 
 if [[ $compile == "true" ]]; then
-	sed -i '/set(X265_LATEST_TAG/d' source/cmake/version.cmake
-	sed -i '/set(X265_TAG_DISTANCE/d' source/cmake/version.cmake
-	sed -i '/set(HG_REVISION_ID/d' source/cmake/version.cmake
-	cd .hg
-	tag=`hg log -r. --template "{latesttag}"`
-	distance=`hg log -r. --template "{latesttagdistance}"`
-	node=`hg log -r. --template "{node|short}"`
-	cd ..
-	sed -i '/if(X265_LATEST_TAG MATCHES "^r")/i \
-	set(X265_LATEST_TAG '\"$tag\"') \
-	set(X265_TAG_DISTANCE '\"$distance\"') \
-	set(HG_REVISION_ID '\"$node\"')' source/cmake/version.cmake
-	
 	cd build/msys
 	make clean
 	rm -rf *
@@ -1236,11 +1223,15 @@ fi
 if [[ $mplayer = "y" ]]; then
 	do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer-svn
 	
-	if [[ -f ffmpeg/configure ]]; then
-		do_git "git://source.ffmpeg.org/ffmpeg.git" ffmpeg
-	fi
+	if [ -d "ffmpeg" ]; then
+		cd ffmpeg
+		oldHead=`git rev-parse HEAD`
+		git pull origin master
+		newHead=`git rev-parse HEAD`
+		cd ..
+	fi 
 
-	if [[ $compile == "true" ]] || [ ! -d "ffmpeg" ]; then
+	if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [ ! -d "ffmpeg" ]; then
 		if [ -f $LOCALDESTDIR/bin/mplayer.exe ]; then
 			make uninstall
 			make clean
