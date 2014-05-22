@@ -305,9 +305,7 @@ if [ -f "$LOCALDESTDIR/bin/fdkaac.exe" ]; then
 		make install
 
 		cp libfdk-aac.a $LOCALDESTDIR/lib/libfdk-aac.a
-sed -i '/#include "vpx\/vpx_encoder.h"/ a\#if defined(_WIN32) || defined(_WIN64)\
-#define strtok_r strtok_s\
-#endif' vpx/src/svc_encodeframe.c
+
 		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
 		unzip bin-fdk-aac.zip

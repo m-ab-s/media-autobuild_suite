@@ -462,7 +462,7 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	
 :minttySettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
-if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO updatebase
+if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
 
 	echo.BoldAsFont=no>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.BackgroundColour=57,57,57>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
@@ -493,6 +493,28 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO updatebase
 	echo.BoldCyan=163,186,191>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.BoldWhite=248,248,242>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	
+:hgsettings
+for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
+if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO updatebase
+	echo.[ui]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.username = %userFolder%>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.verbose = True>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.editor = vim>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.[web]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.cacerts=/usr/ssl/cert.pem>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.[extensions]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.color =>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.[color]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.modified = magenta bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.added = green bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.removed = red bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.deleted = cyan bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.unknown = blue bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	echo.status.ignored = black bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+
 :updatebase
 echo.-------------------------------------------------------------------------------
 echo.updating msys2 system
@@ -707,14 +729,13 @@ if %build32%==yes (
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\global32\etc\profile.local
-		echo.HGENCODING=UTF-8>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/global32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
 		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
 		echo.CFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.CXXFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
 		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM HGENCODING>>%instdir%\global32\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global32\etc\profile.local
 		echo.>>%instdir%\global32\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
@@ -758,7 +779,6 @@ if %build64%==yes (
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\global64\etc\profile.local
-		echo.HGENCODING=UTF-8>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/global64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
@@ -766,7 +786,7 @@ if %build64%==yes (
 		echo.CFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.CXXFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
 		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM HGENCODING>>%instdir%\global64\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global64\etc\profile.local
 		echo.>>%instdir%\global64\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local
@@ -794,7 +814,7 @@ if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO compileGlobals
 if %build32%==no GOTO loginProfile64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- write default profile (32 bit)
+	echo.- write default profile [32 bit]
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
