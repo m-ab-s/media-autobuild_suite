@@ -1,0 +1,15 @@
+diff -uprN ./include/opus_defines.h ./include/opus_defines.h
+--- ./include/opus_defines.h   2013-11-29 15:17:15.000000000 -0500
++++ ./include/opus_defines.h   2013-12-06 01:44:24.656150129 -0500
+@@ -65,11 +65,7 @@ extern "C" {
+ 
+ #ifndef OPUS_EXPORT
+ # if defined(WIN32)
+-#  ifdef OPUS_BUILD
+-#   define OPUS_EXPORT __declspec(dllexport)
+-#  else
+ #   define OPUS_EXPORT
+-#  endif
+ # elif defined(__GNUC__) && defined(OPUS_BUILD)
+ #  define OPUS_EXPORT __attribute__ ((visibility ("default")))
+ # else

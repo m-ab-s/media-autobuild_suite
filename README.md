@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-20
+modified: 2014-05-21
 
 ---
 
@@ -31,13 +31,13 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.2**
+Current release is **v2.25**
 
 
 Included Tools And Libraries
 --------
 
- - ffmpeg with that libraries:
+ - ffmpeg (shared or static) with that libraries:
 	- fdkaac
 	- faac
 	- fontconfig
@@ -54,7 +54,7 @@ Included Tools And Libraries
 	- libsoxr
 	- libtiff
 	- libtwolame
-	- libutvideo
+	- libutvideo (only in the static ffmpeg version)
 	- libzvbi
 	- mp3lame
 	- opencore-amr

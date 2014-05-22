@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.2
+::	This is version 2.25
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -81,6 +81,7 @@
 ::	2014-05-17 change git download depth to 1, add sed for kvazaar
 ::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
 ::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx, remove external mercurial and using internal, remove opt folder and using p7zip internal
+::	2014-05-21 add hg.bat, change opus version and add ffmpeg shared
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -195,9 +196,10 @@ if %ffmpegINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo. Build static ffmpeg binary:
-	echo. 1 = yes
+	echo. Build ffmpeg binary:
+	echo. 1 = yes (static)
 	echo. 2 = no
+	echo. 3 = shared
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -211,6 +213,9 @@ if %buildffmpeg%==1 (
 	)
 if %buildffmpeg%==2 (
 	set "ffmpeg=n"
+	)
+if %buildffmpeg%==3 (
+	set "ffmpeg=s"
 	)
 if %buildffmpeg% GTR 2 GOTO ffmpeg
 

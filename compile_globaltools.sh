@@ -194,7 +194,7 @@ if [ -f "$GLOBALDESTDIR/lib/libSDL.a" ]; then
 		tar xf SDL-1.2.15.tar.gz
 		rm SDL-1.2.15.tar.gz
 		cd SDL-1.2.15
-		./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
+		CFLAGS="-DDECLSPEC=" ./configure --build=$targetBuild --host=$targetHost --prefix=$GLOBALDESTDIR --enable-shared=no
 		make -j $cpuCount
 		make install
 		

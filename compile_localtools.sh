@@ -380,40 +380,42 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
     echo -------------------------------------------------
-    echo "opus-1.0.3 is already compiled"
+    echo "opus-1.1 is already compiled"
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus $bits\007"
-		if [ -d "opus-1.0.3" ]; then rm -rf opus-1.0.3; fi
-      wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-1.0.3.tar.gz
-		tar xf opus-1.0.3.tar.gz
-		rm opus-1.0.3.tar.gz
-		cd opus-1.0.3
+		if [ -d "opus-1.1" ]; then rm -rf opus-1.1; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz
+		tar xf opus-1.1.tar.gz
+		rm opus-1.1.tar.gz
+		cd opus-1.1
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch
+		patch -p0 < opus11.patch
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
         make -j $cpuCount
         make install
 		
-		do_checkIfExist opus-1.0.3 libopus.a
+		do_checkIfExist opus-1.1 libopus.a
 fi
 
 cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/bin/opusenc.exe" ]; then
     echo -------------------------------------------------
-    echo "opus-tools-0.1.7 is already compiled"
+    echo "opus-tools-0.1.8 is already compiled"
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus-tools $bits\007"
-		if [ -d "opus-tools-0.1.7" ]; then rm -rf opus-tools-0.1.7; fi
-      wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://ftp.mozilla.org/pub/mozilla.org/opus/opus-tools-0.1.7.tar.gz
-		tar xf opus-tools-0.1.7.tar.gz
-		rm opus-tools-0.1.7.tar.gz
-		cd opus-tools-0.1.7
+		if [ -d "opus-tools-0.1.8" ]; then rm -rf opus-tools-0.1.8; fi
+      wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.8.tar.gz
+		tar xf opus-tools-0.1.8.tar.gz
+		rm opus-tools-0.1.8.tar.gz
+		cd opus-tools-0.1.8
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         make -j $cpuCount
         make install
         
-		do_checkIfExist opus-tools-0.1.7 opusenc.exe
+		do_checkIfExist opus-tools-0.1.8 opusenc.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -814,7 +816,9 @@ if [[ $compile == "true" ]]; then
 	fi
 	
 	sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
-	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure		
+	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure
+	#grep -q -e '#include <windows.h>' utv_core/Codec.h || sed -i '/#define CBGROSSWIDTH_WINDOWS ((size_t)-1)/ a\#include <windows.h>\
+	#define DLLEXPORT' utv_core/Codec.h	
 	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 	make -j $cpuCount
 	make install
@@ -1116,7 +1120,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
+if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 	if [[ $nonfree = "y" ]]; then
 		extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
 	  else
@@ -1163,8 +1167,13 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 			else
 				arch='x86_64'
 			fi
-			
-			./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
+			if [[ $ffmpeg = "s" ]]; then
+				LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin/ffmpegSHARED --disable-debug --disable-static --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
+			else
+				./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv'
+				
+				newFfmpeg="yes"
+			fi
 			
 			if [[ $bits = "32bit" ]]; then
 				sed -i "s/--target-os=mingw32 --prefix=\/local32 //g" config.h
@@ -1179,7 +1188,6 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "w" ]]; then
 			
 			do_checkIfExist ffmpeg-git ffmpeg.exe
 			compile="false"
-			newFfmpeg="yes"
 		else
 			echo -------------------------------------------------
 			echo "ffmpeg is already up to date"
