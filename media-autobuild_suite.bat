@@ -197,7 +197,7 @@ if %ffmpegINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo. Build ffmpeg binary:
-	echo. 1 = yes (static)
+	echo. 1 = yes [static]
 	echo. 2 = no
 	echo. 3 = shared
 	echo.
@@ -217,7 +217,7 @@ if %buildffmpeg%==2 (
 if %buildffmpeg%==3 (
 	set "ffmpeg=s"
 	)
-if %buildffmpeg% GTR 2 GOTO ffmpeg
+if %buildffmpeg% GTR 3 GOTO ffmpeg
 
 :mp4boxStatic
 if %mp4boxINI%==0 (
