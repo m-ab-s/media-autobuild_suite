@@ -100,7 +100,7 @@ if exist %ini% GOTO msysset
 	echo.
 	echo. Select the msys2 system:
 	echo. 1 = 32 bit msys2
-	echo. 2 = 64 bit msys2 (recommended)
+	echo. 2 = 64 bit msys2 [recommended]
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ if exist %ini% GOTO msysset
 	echo.msys2Arch=^%msys2Arch%>>%ini%
 	echo.arch=^0>>%ini%
 	echo.free=^0>>%ini%
-	echo.ffmpeg=^0>>%ini%
+	echo.ffmpegB=^0>>%ini%
 	echo.ffmpegUpdate=^0>>%ini%
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
@@ -121,15 +121,15 @@ if exist %ini% GOTO msysset
 
 :msysset	
 for /F "tokens=2 delims==" %%a in ('findstr /i msys2Arch %ini%') do set msys2ArchINI=%%a
-for /F "tokens=2 delims==" %%a in ('findstr /i arch %ini%') do set archINI=%%a
+for /F "tokens=2 delims==" %%j in ('findstr /i arch %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
-for /F "tokens=2 delims==" %%c in ('findstr /i ffmpeg %ini%') do set ffmpegINI=%%c
+for /F "tokens=2 delims==" %%f in ('findstr /i ffmpegB %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i ffmpegUpdate %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
-for /F "tokens=2 delims==" %%i in ('findstr /i strip %ini%') do set stripINI=%%i
+for /F "tokens=2 delims==" %%k in ('findstr /i strip %ini%') do set stripINI=%%k
 
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 (
