@@ -1,6 +1,7 @@
 # set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
 cpuCount=1
 compile="false"
+buildFFmpeg="false"
 x264Bin="no"
 newFfmpeg="no"
 while true; do
@@ -10,6 +11,7 @@ while true; do
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
+--ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
@@ -495,6 +497,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist WavPack-git libwavpack.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "WavPack is already up to date"
@@ -614,6 +617,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist x264-git libx264.a
 	compile="false"
+	buildFFmpeg="true"
 	x264Bin="yes"
 else
 	echo -------------------------------------------------
@@ -648,6 +652,7 @@ if [[ $compile == "true" ]]; then
 
 	do_checkIfExist x265-git x265.exe
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "x265 is already up to date"
@@ -676,6 +681,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libvpx-git libvpx.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "libvpx-git is already up to date"
@@ -797,6 +803,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libbluray-git libbluray.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "libbluray is already up to date"
@@ -823,6 +830,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libutvideo-git libutvideo.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "libutvideo is already up to date"
@@ -850,6 +858,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libass-git libass.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "libass is already up to date"
@@ -939,6 +948,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist vidstab-git libvidstab.a
 	compile="false"
+	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "vidstab is already up to date"
@@ -1131,7 +1141,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
 	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
 
-	if [[ $compile == "true" ]]; then
+	if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
 		if [ -d "$LOCALDESTDIR/include/libavutil" ]; then 
 			rm -rf $LOCALDESTDIR/include/libavutil
 			rm -rf $LOCALDESTDIR/include/libavcodec

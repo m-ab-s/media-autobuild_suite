@@ -82,6 +82,7 @@
 ::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
 ::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx, remove external mercurial and using internal, remove opt folder and using p7zip internal
 ::	2014-05-21 add hg.bat, change opus version and add ffmpeg shared
+::	2014-05-23 add update function to ffmpeg when a lib get a new update
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -111,6 +112,7 @@ if exist %ini% GOTO msysset
 	echo.arch=^0>>%ini%
 	echo.free=^0>>%ini%
 	echo.ffmpeg=^0>>%ini%
+	echo.ffmpegUpdate=^0>>%ini%
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
 	echo.cores=^0>>%ini%
@@ -122,6 +124,7 @@ for /F "tokens=2 delims==" %%a in ('findstr /i msys2Arch %ini%') do set msys2Arc
 for /F "tokens=2 delims==" %%a in ('findstr /i arch %ini%') do set archINI=%%a
 for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%c in ('findstr /i ffmpeg %ini%') do set ffmpegINI=%%c
+for /F "tokens=2 delims==" %%c in ('findstr /i ffmpegUpdate %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
@@ -218,6 +221,30 @@ if %buildffmpeg%==3 (
 	set "ffmpeg=s"
 	)
 if %buildffmpeg% GTR 3 GOTO ffmpeg
+
+:ffmpegUp
+if %ffmpegUpdateINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build ffmpeg new when lib has updated:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildffmpegUp="build ffmpeg if lib is new:"
+	) else (
+		set buildffmpegUp=%ffmpegUpdateINI%
+		)
+
+if %buildffmpegUp%==1 (
+	set "ffmpegUpdate=y"
+	)
+if %buildffmpegUp%==2 (
+	set "ffmpegUpdate=n"
+	)
+if %buildffmpegUp% GTR 2 GOTO ffmpegUp
 
 :mp4boxStatic
 if %mp4boxINI%==0 (
@@ -861,7 +888,7 @@ echo.
 echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --mplayer=%mplayer% --nonfree=%binary%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --nonfree=%binary%
 echo. compile video tools done...	
 	
 :: strip compiled files
