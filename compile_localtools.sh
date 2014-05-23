@@ -693,19 +693,24 @@ cd $LOCALBUILDDIR
 do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
 
 if [[ $compile == "true" ]]; then
-	cd src
-	make clean
-		
-	sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' Makefile
+	if [ -d "scons_build_x86" ]; then 
+		rm -rf scons_build_x86
+	fi
+	if [ -d "scons_build_x64" ]; then
+		rm -rf scons_build_x64
+	fi
+	
+	sed -i "s/'Windows'/'MINGW32_NT-6.1'/g" SConstruct
+	sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' src/Makefile
 		
 	if [[ $bits = "64bit" ]]; then
-		make ARCH=x86_64
+		scons x64
+		cp scons_build_x64/kvazaar.exe $LOCALDESTDIR/bin
 	else
-		make ARCH=i686
+		scons x86
+		cp scons_build_x86/kvazaar.exe $LOCALDESTDIR/bin
 	fi 
 
-	cp kvazaar.exe $LOCALDESTDIR/bin
-	
 	do_checkIfExist kvazaar-git kvazaar.exe
 	compile="false"
 else
