@@ -958,7 +958,7 @@ if [[ $compile == "true" ]]; then
 	if [[ "$bits" = "32bit" ]]; then
 		make ARCH=i686 DFLAGS="-m32 -O2 -march=native -pthread"
 	else
-		make ARCH=x86_64 DFLAGS="-m32 -O2 -march=native -pthread"
+		make ARCH=x86_64 DFLAGS="-m64 -O2 -march=native -pthread"
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
