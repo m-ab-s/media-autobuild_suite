@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-21
+modified: 2014-05-27
 
 ---
 
@@ -31,7 +31,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.25**
+Current release is **v2.5**
 
 
 Included Tools And Libraries

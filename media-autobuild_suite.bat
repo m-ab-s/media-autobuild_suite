@@ -24,8 +24,8 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.25
-::	Project stared at 2013-09-24. Last bigger modification was on 2014-4-21
+::	This is version 2.5
+::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
 ::	2013-10-01 change pkg-config, add mp4box, and reorder code
@@ -83,6 +83,7 @@
 ::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx, remove external mercurial and using internal, remove opt folder and using p7zip internal
 ::	2014-05-21 add hg.bat, change opus version and add ffmpeg shared
 ::	2014-05-23 add update function to ffmpeg when a lib get a new update
+::	2014-05-27 merge global and local tools and sort bin folders
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -661,18 +662,6 @@ if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
 Setlocal DisableDelayedExpansion
 
 if %build32%==yes (
-	if not exist %instdir%\global32 (
-		echo.-------------------------------------------------------------------------------
-		echo.create global32 folders
-		echo.-------------------------------------------------------------------------------
-		mkdir %instdir%\global32
-		mkdir %instdir%\global32\bin
-		mkdir %instdir%\global32\etc
-		mkdir %instdir%\global32\include
-		mkdir %instdir%\global32\lib
-		mkdir %instdir%\global32\lib\pkgconfig
-		mkdir %instdir%\global32\share
-		)
 	if not exist %instdir%\build32 mkdir %instdir%\build32
 	if not exist %instdir%\local32\share (
 		echo.-------------------------------------------------------------------------------
@@ -680,27 +669,19 @@ if %build32%==yes (
 		echo.-------------------------------------------------------------------------------
 		mkdir %instdir%\local32
 		mkdir %instdir%\local32\bin
+		mkdir %instdir%\local32\bin-audio
+		mkdir %instdir%\local32\bin-global
+		mkdir %instdir%\local32\bin-video
 		mkdir %instdir%\local32\etc
 		mkdir %instdir%\local32\include
 		mkdir %instdir%\local32\lib
 		mkdir %instdir%\local32\lib\pkgconfig
 		mkdir %instdir%\local32\share
+		mkdir %instdir%\local32\uninstall
 		)	
 	)
 	
 if %build64%==yes (
-	if not exist %instdir%\global64 (
-		echo.-------------------------------------------------------------------------------
-		echo.create global64 folders
-		echo.-------------------------------------------------------------------------------
-		mkdir %instdir%\global64
-		mkdir %instdir%\global64\bin
-		mkdir %instdir%\global64\etc
-		mkdir %instdir%\global64\include
-		mkdir %instdir%\global64\lib
-		mkdir %instdir%\global64\lib\pkgconfig
-		mkdir %instdir%\global64\share
-		)
 	if not exist %instdir%\build64 mkdir %instdir%\build64
 	if not exist %instdir%\local64\share (
 		echo.-------------------------------------------------------------------------------
@@ -708,11 +689,15 @@ if %build64%==yes (
 		echo.-------------------------------------------------------------------------------
 		mkdir %instdir%\local64
 		mkdir %instdir%\local64\bin
+		mkdir %instdir%\local64\bin-audio
+		mkdir %instdir%\local64\bin-global
+		mkdir %instdir%\local64\bin-video
 		mkdir %instdir%\local64\etc
 		mkdir %instdir%\local64\include
 		mkdir %instdir%\local64\lib
 		mkdir %instdir%\local64\lib\pkgconfig
 		mkdir %instdir%\local64\share
+		mkdir %instdir%\local64\uninstall
 		)
 	)
 	
@@ -720,11 +705,9 @@ if %build64%==yes (
 if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
 	echo.>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\opt\ /opt>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\global32\ /global32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\build32\ /build32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\%msys2%\mingw32\ /mingw32>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\global64\ /global64>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\build64\ /build64>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\%msys2%\mingw64\ /mingw64>>%instdir%\%msys2%\etc\fstab.
@@ -736,107 +719,104 @@ if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
 
 :writeProfile32
 if %build32%==yes (
-	if exist %instdir%\global32\etc\profile.local GOTO writeProfile64
+	if exist %instdir%\local32\etc\profile.local GOTO writeProfile64
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 32 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\global32\etc\profile.local
-		echo.# /global32/etc/profile.local>>%instdir%\global32\etc\profile.local
-		echo.#>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\global32\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\global32\etc\profile.local
-		echo.alias CC='/mingw32/bin/gcc.exe'>>%instdir%\global32\etc\profile.local
-		echo.alias python='/usr/bin/python2.exe'>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global32\etc\profile.local
-		echo.MANPATH="/usr/share/man:/mingw32/share/man:/global32/man:/global32/share/man:/local32/man:/local32/share/man">>%instdir%\global32\etc\profile.local
-		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.MSYSTEM=MINGW32>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/global32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\global32\etc\profile.local
-		echo.CPPFLAGS="-I/global32/include -I/local32/include">>%instdir%\global32\etc\profile.local
-		echo.CFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
-		echo.CXXFLAGS="-I/global32/include -I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\global32\etc\profile.local
-		echo.LDFLAGS="-L/global32/lib -L/local32/lib -mthreads">>%instdir%\global32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.PYTHONHOME=/usr>>%instdir%\global32\etc\profile.local
-		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.PATH=".:/global32/bin:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global32\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global32\etc\profile.local
-		echo.export PATH PS1>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.# package build directory>>%instdir%\global32\etc\profile.local
-		echo.LOCALBUILDDIR=/build32>>%instdir%\global32\etc\profile.local
-		echo.# package installation prefix>>%instdir%\global32\etc\profile.local
-		echo.GLOBALDESTDIR=/global32>>%instdir%\global32\etc\profile.local
-		echo.LOCALDESTDIR=/local32>>%instdir%\global32\etc\profile.local
-		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global32\etc\profile.local
-		echo.>>%instdir%\global32\etc\profile.local
-		echo.bits='32bit'>>%instdir%\global32\etc\profile.local
-		echo.targetBuild='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
-		echo.targetHost='i686-w64-mingw32'>>%instdir%\global32\etc\profile.local
-		echo.cross='i686-w64-mingw32-'>>%instdir%\global32\etc\profile.local
+		echo.#>>%instdir%\local32\etc\profile.local
+		echo.# /local32/etc/profile.local>>%instdir%\local32\etc\profile.local
+		echo.#>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.alias dir='ls -la --color=auto'>>%instdir%\local32\etc\profile.local
+		echo.alias ls='ls --color=auto'>>%instdir%\local32\etc\profile.local
+		echo.alias CC='/mingw32/bin/gcc.exe'>>%instdir%\local32\etc\profile.local
+		echo.alias python='/usr/bin/python2.exe'>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local32\etc\profile.local
+		echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man">>%instdir%\local32\etc\profile.local
+		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.MSYSTEM=MINGW32>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
+		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profile.local
+		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
+		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
+		echo.LDFLAGS="-L/local32/lib -mthreads">>%instdir%\local32\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.PYTHONHOME=/usr>>%instdir%\local32\etc\profile.local
+		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\local32\etc\profile.local
+		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local32\etc\profile.local
+		echo.export PATH PS1>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.# package build directory>>%instdir%\local32\etc\profile.local
+		echo.LOCALBUILDDIR=/build32>>%instdir%\local32\etc\profile.local
+		echo.# package installation prefix>>%instdir%\local32\etc\profile.local
+		echo.LOCALDESTDIR=/local32>>%instdir%\local32\etc\profile.local
+		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local32\etc\profile.local
+		echo.>>%instdir%\local32\etc\profile.local
+		echo.bits='32bit'>>%instdir%\local32\etc\profile.local
+		echo.targetBuild='i686-w64-mingw32'>>%instdir%\local32\etc\profile.local
+		echo.targetHost='i686-w64-mingw32'>>%instdir%\local32\etc\profile.local
+		echo.cross='i686-w64-mingw32-'>>%instdir%\local32\etc\profile.local
 		)
 		
 :writeProfile64
 if %build64%==yes (
-	if exist %instdir%\global64\etc\profile.local GOTO loginProfile
+	if exist %instdir%\local64\etc\profile.local GOTO loginProfile
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write profile for 64 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\global64\etc\profile.local
-		echo.# /global64/etc/profile.local>>%instdir%\global64\etc\profile.local
-		echo.#>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\global64\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\global64\etc\profile.local
-		echo.alias CC='/mingw64/bin/gcc.exe'>>%instdir%\global64\etc\profile.local
-		echo.alias python='/usr/bin/python2.exe'>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\global64\etc\profile.local
-		echo.MANPATH="/usr/share/man:/mingw64/share/man:/global64/man:/global64/share/man:/local64/man:/local64/share/man">>%instdir%\global64\etc\profile.local
-		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.MSYSTEM=MINGW32>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/global64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\global64\etc\profile.local
-		echo.CPPFLAGS="-I/global64/include -I/local64/include">>%instdir%\global64\etc\profile.local
-		echo.CFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
-		echo.CXXFLAGS="-I/global64/include -I/local64/include -mms-bitfields -mthreads">>%instdir%\global64\etc\profile.local
-		echo.LDFLAGS="-L/global64/lib -L/local64/lib">>%instdir%\global64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.PYTHONHOME=/usr>>%instdir%\global64\etc\profile.local
-		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.PATH=".:/global64/bin:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\global64\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\global64\etc\profile.local
-		echo.export PATH PS1>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.# package build directory>>%instdir%\global64\etc\profile.local
-		echo.LOCALBUILDDIR=/build64>>%instdir%\global64\etc\profile.local
-		echo.# package installation prefix>>%instdir%\global64\etc\profile.local
-		echo.GLOBALDESTDIR=/global64>>%instdir%\global64\etc\profile.local
-		echo.LOCALDESTDIR=/local64>>%instdir%\global64\etc\profile.local
-		echo.export LOCALBUILDDIR GLOBALDESTDIR LOCALDESTDIR>>%instdir%\global64\etc\profile.local
-		echo.>>%instdir%\global64\etc\profile.local
-		echo.bits='64bit'>>%instdir%\global64\etc\profile.local
-		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
-		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\global64\etc\profile.local
-		echo.cross='x86_64-w64-mingw32-'>>%instdir%\global64\etc\profile.local
+		echo.#>>%instdir%\local64\etc\profile.local
+		echo.# /local64/etc/profile.local>>%instdir%\local64\etc\profile.local
+		echo.#>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.alias dir='ls -la --color=auto'>>%instdir%\local64\etc\profile.local
+		echo.alias ls='ls --color=auto'>>%instdir%\local64\etc\profile.local
+		echo.alias CC='/mingw64/bin/gcc.exe'>>%instdir%\local64\etc\profile.local
+		echo.alias python='/usr/bin/python2.exe'>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local64\etc\profile.local
+		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
+		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.MSYSTEM=MINGW32>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
+		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profile.local
+		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
+		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
+		echo.LDFLAGS="-L/local64/lib">>%instdir%\local64\etc\profile.local
+		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.PYTHONHOME=/usr>>%instdir%\local64\etc\profile.local
+		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\local64\etc\profile.local
+		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local64\etc\profile.local
+		echo.export PATH PS1>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.# package build directory>>%instdir%\local64\etc\profile.local
+		echo.LOCALBUILDDIR=/build64>>%instdir%\local64\etc\profile.local
+		echo.# package installation prefix>>%instdir%\local64\etc\profile.local
+		echo.LOCALDESTDIR=/local64>>%instdir%\local64\etc\profile.local
+		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profile.local
+		echo.>>%instdir%\local64\etc\profile.local
+		echo.bits='64bit'>>%instdir%\local64\etc\profile.local
+		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\local64\etc\profile.local
+		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\local64\etc\profile.local
+		echo.cross='x86_64-w64-mingw32-'>>%instdir%\local64\etc\profile.local
 		)
 	
 :loginProfile
-if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO compileGlobals
+if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO compileLocals
 
 if %build32%==no GOTO loginProfile64
 	echo -------------------------------------------------------------------------------
@@ -845,8 +825,8 @@ if %build32%==no GOTO loginProfile64
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /global32/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /global32/etc/profile.local>>%instdir%\profile.sh
+	echo.if [ -f /local32/etc/profile.local ]; then>>%instdir%\profile.sh
+	 echo.       source /local32/etc/profile.local>>%instdir%\profile.sh
 	echo.fi>>%instdir%\profile.sh
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh
@@ -854,17 +834,17 @@ if %build32%==no GOTO loginProfile64
 	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
 	echo 32 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
 	del %instdir%\profile.sh
-	GOTO compileGlobals
+	GOTO compileLocals
 	
 :loginProfile64
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.- write default profile (64 bit)
+	echo.- write default profile [64 bit]
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /global64/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /global64/etc/profile.local>>%instdir%\profile.sh
+	echo.if [ -f /local64/etc/profile.local ]; then>>%instdir%\profile.sh
+	 echo.       source /local64/etc/profile.local>>%instdir%\profile.sh
 	echo.fi>>%instdir%\profile.sh
 	echo.>>%instdir%\profile.sh
 	echo.EOF>>%instdir%\profile.sh
@@ -873,16 +853,8 @@ if %build32%==no GOTO loginProfile64
 	echo 64 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
 	del %instdir%\profile.sh
 
-:compileGlobals
+:compileLocals
 cd %instdir%
-echo -------------------------------------------------------------------------------
-echo.
-echo.- compile global tools:
-echo.
-echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_globaltools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource%
-echo. compile global tools done...
-
 echo -------------------------------------------------------------------------------
 echo.
 echo.- compile local tools:
@@ -900,7 +872,7 @@ echo.
 echo -------------------------------------------------------------------------------
 
 if %build32%==yes (
-	FOR /R "%instdir%\local32\bin" %%C IN (*.exe) DO (
+	FOR /R "%instdir%\local32" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A==%date% (
 				%instdir%\%msys2%\mingw32\bin\strip %%C
@@ -913,7 +885,7 @@ if %build32%==yes (
 )
 if %stripFile%==y (	
 if %build64%==yes (
-	FOR /R "%instdir%\local64\bin" %%C IN (*.exe) DO (
+	FOR /R "%instdir%\local64" %%C IN (*.exe) DO (
 		FOR /F "tokens=1 delims= " %%A IN ( "%%~tC" ) DO (
 			IF %%A==%date% (
 				%instdir%\%msys2%\mingw64\bin\strip %%C
