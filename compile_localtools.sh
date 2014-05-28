@@ -714,6 +714,35 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 fi
 
 cd $LOCALBUILDDIR
+	
+do_svn "svn://scm.orgis.org/mpg123/trunk" mpg123-git
+
+if [[ $compile == "true" ]]; then	
+	if [[ ! -f ./configure ]]; then
+		autoreconf -i
+	else
+		make uninstall
+		make clean
+	fi
+	
+	if [[ $bits = "32bit" ]]; then
+		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
+	else
+		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86-64 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
+	fi
+
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist mpg123-git bin-audio/mpg123.exe
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "mpg123 is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
 		
 if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 	echo -------------------------------------------------
@@ -735,7 +764,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git  git://github.com/dbry/WavPack.git WavPack-git
+do_git "git://github.com/dbry/WavPack.git" WavPack-git
 
 if [[ $compile == "true" ]]; then
 	if [[ ! -f ./configure ]]; then
