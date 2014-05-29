@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-27
+modified: 2014-05-28
 
 ---
 
@@ -87,6 +87,7 @@ Included Tools And Libraries
 	- mediainfo cli
 	- mp3lame
 	- mp4box
+	- mpg123
 	- mplayer
 	- opus-tools
 	- rtmp
