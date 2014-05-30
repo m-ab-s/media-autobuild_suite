@@ -315,7 +315,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		rm gnutls-3.3.3.tar.xz
 		cd gnutls-3.3.3
 		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld --without-p11-kit
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld --without-p11-kit --enable-local-libopts 
 		make -j $cpuCount
 		make install
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
