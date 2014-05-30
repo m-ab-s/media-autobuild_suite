@@ -285,35 +285,36 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
-	echo "libgcrypt-1.5.3 is already compiled"
+	echo "libgcrypt-1.6.1 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libgcrypt $bits\007"
-		if [ -d "libgcrypt-1.5.3" ]; then rm -rf libgcrypt-1.5.3; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.5.3.tar.bz2
-		tar xf libgcrypt-1.5.3.tar.bz2
-		rm libgcrypt-1.5.3.tar.bz2
-		cd libgcrypt-1.5.3
+		if [ -d "libgcrypt-1.6.1" ]; then rm -rf libgcrypt-1.6.1; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.1.tar.bz2
+		tar xf libgcrypt-1.6.1.tar.bz2
+		rm libgcrypt-1.6.1.tar.bz2
+		cd libgcrypt-1.6.1
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist libgcrypt-1.5.3 libgcrypt.a
+		do_checkIfExist libgcrypt-1.6.1 libgcrypt.a
 fi
 
 cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
-	echo "gnutls-3.2.3 is already compiled"
+	echo "gnutls-3.3.3 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile gnutls $bits\007"
-		if [ -d "gnutls-3.2.3" ]; then rm -rf gnutls-3.2.3; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.2/gnutls-3.2.3.tar.xz
-		tar xf gnutls-3.2.3.tar.xz
-		rm gnutls-3.2.3.tar.xz
-		cd gnutls-3.2.3
+		if [ -d "gnutls-3.3.3" ]; then rm -rf gnutls-3.3.3; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.3.tar.xz
+		tar xf gnutls-3.3.3.tar.xz
+		rm gnutls-3.3.3.tar.xz
+		cd gnutls-3.3.3
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-threads=win32 --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld --without-p11-kit
 		make -j $cpuCount
 		make install
@@ -325,7 +326,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 			sed -i 's/-L\/global64\/lib .*/-L\/global64\/lib/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 		fi
 		
-		do_checkIfExist gnutls-3.2.3 libgnutls.a
+		do_checkIfExist gnutls-3.3.3 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
@@ -726,7 +727,7 @@ if [[ $compile == "true" ]]; then
 	fi
 	
 	if [[ $bits = "32bit" ]]; then
-		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no --enable-fifo=yes
 	else
 		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86-64 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
 	fi
@@ -884,7 +885,7 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "http://repo.or.cz/r/x264.git" x264-git
+do_git "git://git.videolan.org/x264.git" x264-git
 
 if [[ $compile == "true" ]]; then
 	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
@@ -1001,48 +1002,54 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdvdcss.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdcss-1.2.13 is already compiled"
-	echo -------------------------------------------------
-	else
-		echo -ne "\033]0;compile libdvdcss $bits\007"
-		if [ -d "libdvdcss-1.2.13" ]; then rm -rf libdvdcss-1.2.13; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/pub/videolan/libdvdcss/1.2.13/libdvdcss-1.2.13.tar.bz2
-		tar xf libdvdcss-1.2.13.tar.bz2
-		rm libdvdcss-1.2.13.tar.bz2
-		cd libdvdcss-1.2.13
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
-		make -j $cpuCount
-		make install
+do_git "git://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
 
-		do_checkIfExist libdvdcss-1.2.13 libdvdcss.a
+if [[ $compile == "true" ]]; then
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
+	make -j $cpuCount
+	make install
+
+	do_checkIfExist libdvdcss-git libdvdcss.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libdvdcss-git is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdvdread.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdread-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else
-		echo -ne "\033]0;compile libdvdread $bits\007"
-		if [ -d "libdvdread-4.2.1" ]; then rm -rf libdvdread-4.2.1; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdread-4.2.1.tar.xz
-		tar xf libdvdread-4.2.1.tar.xz
-		rm libdvdread-4.2.1.tar.xz
-		cd libdvdread-4.2.1
-		if [[ ! -f ./configure ]]; then
-			./autogen.sh
-		fi	
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
-		sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
-		make -j $cpuCount
-		make install
-		sed -i "s/-ldvdread.*/-ldvdread -ldvdcss -ldl/" $LOCALDESTDIR/bin-video/dvdread-config
-		sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
+do_git "git://git.videolan.org/libdvdread.git" libdvdread-git
 
-		do_checkIfExist libdvdread-4.2.1 libdvdread.a
+if [[ $compile == "true" ]]; then
+
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+	
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+	sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
+	make -j $cpuCount
+	make install
+	
+	sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
+
+	do_checkIfExist libdvdread-git libdvdread.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libdvdread-git is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1061,7 +1068,7 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 		if [[ ! -f ./configure ]]; then
 		./autogen.sh
 		fi
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --with-dvdread-config=$LOCALDESTDIR/bin-video/dvdread-config
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
 		make -j $cpuCount
 		make install
 		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin-video/dvdnav-config
@@ -1258,15 +1265,15 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 	echo -------------------------------------------------
-	echo "libcaca-0.99.beta18 is already compiled"
+	echo "libcaca-0.99.beta19 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libcaca $bits\007"
-		if [ -d "libcaca-0.99.beta18" ]; then rm -rf libcaca-0.99.beta18; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://caca.zoy.org/files/libcaca/libcaca-0.99.beta18.tar.gz
-		tar xf libcaca-0.99.beta18.tar.gz
-		rm libcaca-0.99.beta18.tar.gz
-		cd libcaca-0.99.beta18
+		if [ -d "libcaca-0.99.beta19" ]; then rm -rf libcaca-0.99.beta19; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://caca.zoy.org/raw-attachment/wiki/libcaca/libcaca-0.99.beta19.tar.gz
+		tar xf libcaca-0.99.beta19.tar.gz
+		rm libcaca-0.99.beta19.tar.gz
+		cd libcaca-0.99.beta19
 		cd caca
 		sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" string.c
 		sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" figfont.c
@@ -1278,28 +1285,28 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist libcaca-0.99.beta18 libcaca.a
+		do_checkIfExist libcaca-0.99.beta19 libcaca.a
 fi
 
 cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 	echo -------------------------------------------------
-	echo "libmodplug-0.8.8.4 is already compiled"
+	echo "libmodplug-0.8.8.5 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
-		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libmodplug-0.8.8.4.tar.gz http://sourceforge.net/projects/modplug-xmms/files/libmodplug/0.8.8.4/libmodplug-0.8.8.4.tar.gz/download
-		tar xf libmodplug-0.8.8.4.tar.gz
-		rm libmodplug-0.8.8.4.tar.gz
-		cd libmodplug-0.8.8.4
+		if [ -d "libmodplug-0.8.8.5" ]; then rm -rf libmodplug-0.8.8.5; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libmodplug-0.8.8.5.tar.gz http://downloads.sourceforge.net/project/modplug-xmms/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz
+		tar xf libmodplug-0.8.8.5.tar.gz
+		rm libmodplug-0.8.8.5.tar.gz
+		cd libmodplug-0.8.8.5
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist libmodplug-0.8.8.4 libmodplug.a
+		do_checkIfExist libmodplug-0.8.8.5 libmodplug.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1555,7 +1562,7 @@ if [[ $mplayer = "y" ]]; then
 		cd ..
 	fi 
 
-	if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [ ! -d "ffmpeg" ]; then
+	if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
 			make uninstall
 			make clean
@@ -1573,7 +1580,7 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin-video/dvdnav-config --with-dvdread-config=$LOCALDESTDIR/bin-video/dvdread-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+		./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin-video/dvdnav-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
 		make -j $cpuCount
 		make install
 
