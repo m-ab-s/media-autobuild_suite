@@ -163,6 +163,7 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 		tar xf openjpeg-1.5.1.tar.gz
 		rm openjpeg-1.5.1.tar.gz
 		cd openjpeg-1.5.1
+		
 		cmake -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="$CFLAGS -DOPJ_STATIC"
 				
 		make -j $cpuCount
@@ -409,6 +410,39 @@ if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
 		
 		do_checkIfExist libilbc libilbc.a
 fi
+
+cd $LOCALBUILDDIR
+	
+do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
+
+if [[ $compile == "true" ]]; then	
+	if [ -d "build" ]; then
+		cd build
+		make uninstall
+		rm $LOCALDESTDIR/bin-global/metacopy.exe
+		rm $LOCALDESTDIR/bin-global/path-test.exe
+		rm $LOCALDESTDIR/bin-global/exiv2.exe
+		rm -rf *
+	else
+		mkdir build
+		cd build
+	fi
+	
+	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off
+	make -j $cpuCount
+	make install
+	mv $LOCALDESTDIR/bin/metacopy.exe $LOCALDESTDIR/bin-global
+	mv $LOCALDESTDIR/bin/path-test.exe $LOCALDESTDIR/bin-global
+	mv $LOCALDESTDIR/bin/exiv2.exe $LOCALDESTDIR/bin-global
+	
+	do_checkIfExist exiv2-svn bin-global/exiv2.exe
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "exiv2 is already up to date"
+	echo -------------------------------------------------
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile global tools $bits done..."
@@ -715,35 +749,6 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 fi
 
 cd $LOCALBUILDDIR
-	
-do_svn "svn://scm.orgis.org/mpg123/trunk" mpg123-git
-
-if [[ $compile == "true" ]]; then	
-	if [[ ! -f ./configure ]]; then
-		autoreconf -i
-	else
-		make uninstall
-		make clean
-	fi
-	
-	if [[ $bits = "32bit" ]]; then
-		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no --enable-fifo=yes
-	else
-		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86-64 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
-	fi
-
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist mpg123-git bin-audio/mpg123.exe
-	compile="false"
-else
-	echo -------------------------------------------------
-	echo "mpg123 is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
 		
 if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 	echo -------------------------------------------------
@@ -761,6 +766,65 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 		make install
 		
 		do_checkIfExist soxr-0.1.1-Source libsoxr.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
+	echo -------------------------------------------------
+	echo "openal-soft-1.15.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libOpenAL $bits\007"
+		if [ -d "openal-soft-1.15.1" ]; then rm -rf openal-soft-1.15.1; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://kcat.strangesoft.net/openal-releases/openal-soft-1.15.1.tar.bz2
+		tar xf openal-soft-1.15.1.tar.bz2
+		rm openal-soft-1.15.1.tar.bz2
+		cd openal-soft-1.15.1
+		
+		sed -i "s/ __declspec(dllimport)//g" include/AL/al.h
+		sed -i "s/ __declspec(dllimport)//g" include/AL/alc.h
+		
+		cd build
+		
+		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:bool=off -DLIBTYPE=STATIC -DEXAMPLES:BOOL=off -DEXTRA_LIBS="-lsoxr" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static"
+		make -j $cpuCount
+		make install
+
+		mv $LOCALDESTDIR/bin/openal-info.exe $LOCALDESTDIR/bin-audio
+		mv $LOCALDESTDIR/bin/makehrtf.exe $LOCALDESTDIR/bin-audio
+		cp $LOCALDESTDIR/lib/libOpenAL32.a $LOCALDESTDIR/lib/libOpenAL.a
+		
+		do_checkIfExist libtheora-1.1.1 libOpenAL32.a
+fi
+
+cd $LOCALBUILDDIR
+	
+do_svn "svn://scm.orgis.org/mpg123/trunk" mpg123-git
+
+if [[ $compile == "true" ]]; then	
+	if [[ ! -f ./configure ]]; then
+		autoreconf -i
+	else
+		make uninstall
+		make clean
+	fi
+	
+	if [[ $bits = "32bit" ]]; then
+		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
+	else
+		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86-64 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
+	fi
+
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist mpg123-git bin-audio/mpg123.exe
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "mpg123 is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1245,9 +1309,20 @@ cd $LOCALBUILDDIR
 do_git "https://github.com/georgmartius/vid.stab.git" vidstab-git
 
 if [[ $compile == "true" ]]; then
-	make uninstall
-	make clean
-	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
+	if [ -d "build" ]; then
+		cd build
+		make uninstall
+		make clean
+		rm -rf *
+	else
+		mkdir build
+		cd build
+	fi
+	
+	sed -i "s/# add_library (vidstab STATIC \${SOURCES})/add_library (vidstab STATIC \${SOURCES})/g" ../CMakeLists.txt
+	sed -i "s/add_library (vidstab SHARED \${SOURCES})/# add_library (vidstab SHARED \${SOURCES})/g" ../CMakeLists.txt
+	
+	cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
 	sed -i "s/SHARED/STATIC/" CMakeLists.txt
 	make -j $cpuCount
 	make install

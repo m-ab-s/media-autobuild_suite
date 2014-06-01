@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-05-30
+modified: 2014-06-01
 
 ---
 
@@ -16,14 +16,12 @@ media-autobuild_suite
 =========
 
 This tool is inspire by the very nice, linux cross compile, tool from Roger Pack(rdp):
-
 https://github.com/rdp/ffmpeg-windows-build-helpers
 
 It is based on msys2 and tested under Windows 7.
-
+http://sourceforge.net/projects/msys2/
 
 I use some jscipt parts from nu774:
-
 https://github.com/nu774/fdkaac_autobuild
 
 Thanks to both of them!
@@ -34,7 +32,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.51**
+Current release is **v2.52**
 
 
 Included Tools And Libraries
@@ -81,6 +79,7 @@ Included Tools And Libraries
 	- xvid
 	
  - other tools
+	- exiv2
 	- fdkaac
 	- faac
 	- flac

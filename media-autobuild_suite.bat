@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.51
+::	This is version 2.52
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -86,6 +86,7 @@
 ::	2014-05-27 merge global and local tools and sort bin folders
 ::	2014-05-28 add mpg123, change wget.zip
 ::	2014-05-30 change libdvdcss and libdvdread to git, update libcrypt: gnutls; libcaca; libmodplug
+::	2014-06-01 add openAL and exiv2
 ::
 ::-------------------------------------------------------------------------------------
 
