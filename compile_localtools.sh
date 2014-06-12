@@ -1045,14 +1045,12 @@ cd $LOCALBUILDDIR
 do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
 
 if [[ $compile == "true" ]]; then
-	sed -i "s/CCFLAGS = $(DFLAGS) -I. -Wall -Wtype-limits/CCFLAGS = $(DFLAGS)/g" src/Makefile
-	sed -i 's/LD = gcc -pthread -lrt/LD = gcc -pthread/g' src/Makefile
 	cd src
 
 	if [[ "$bits" = "32bit" ]]; then
-		make ARCH=i686 DFLAGS="-m32 -O2 -march=native -pthread"
+		make ARCH=i686 LD="gcc -pthread"
 	else
-		make ARCH=x86_64 DFLAGS="-m64 -O2 -march=native -pthread"
+		make ARCH=x86_64 LD="gcc -pthread"
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
