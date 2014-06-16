@@ -319,13 +319,8 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --disable-doc --disable-tests --disable-shared --with-gnu-ld --without-p11-kit --enable-local-libopts 
 		make -j $cpuCount
 		make install
-		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 		
-		if [[ $bits = "32bit" ]]; then
-			sed -i 's/-L\/local32\/lib .*/-L\/local32\/lib/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-		else
-			sed -i 's/-L\/local64\/lib .*/-L\/local64\/lib/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-		fi
+		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 		
 		do_checkIfExist gnutls-3.3.3 libgnutls.a
 fi
@@ -597,21 +592,12 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 		mv fdk-aac-master lib-fdk-aac
 		cp patch-fdk-aac/files/LibMakefile lib-fdk-aac/Makefile
 		cp patch-fdk-aac/files/libfdk-aac.version lib-fdk-aac/libfdk-aac.version
-		
-		if [[ $bits = "32bit" ]]; then
-				sed -i 's/PREFIX=\/mingw/PREFIX=\/local32/g' lib-fdk-aac/Makefile
-			else
-				sed -i 's/PREFIX=\/mingw/PREFIX=\/local64/g' lib-fdk-aac/Makefile
-			fi
 
 		sed -i 's/cd stage && zip -r $(PREFIX)\/libfdk-aac-win32-bin.zip \* \& cd \.\.//g' lib-fdk-aac/Makefile
-		sed -i 's/$(CC)/gcc/g' lib-fdk-aac/Makefile
 		cd lib-fdk-aac
-		make -j $cpuCount
-		make install
-
-		cp libfdk-aac.a $LOCALDESTDIR/lib/libfdk-aac.a
-
+		CC=gcc make -j $cpuCount PREFIX=$LOCALDESTDIR
+		make install PREFIX=$LOCALDESTDIR
+		
 		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
 		unzip bin-fdk-aac.zip
