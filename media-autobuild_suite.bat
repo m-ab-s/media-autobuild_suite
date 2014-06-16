@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.52
+::	This is version 2.53
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -88,6 +88,7 @@
 ::	2014-05-30 change libdvdcss and libdvdread to git, update libcrypt: gnutls; libcaca; libmodplug
 ::	2014-06-01 add openAL and exiv2
 ::	2014-06-12 fix kvazaar and vpxenc.exe 32 bit
+::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -552,8 +553,7 @@ echo.updating msys2 system
 echo.-------------------------------------------------------------------------------
 if exist %instdir%\updateMSYS2.sh del %instdir%\updateMSYS2.sh
 echo.echo -ne "\033]0;update msys2 system\007">>updateMSYS2.sh
-echo.pacman --noconfirm -Sy>>updateMSYS2.sh
-echo.pacman --noconfirm -Su>>updateMSYS2.sh
+echo.pacman --noconfirm -Syu --force>>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
 echo.echo "updating msys2 done...">>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
@@ -819,42 +819,33 @@ if %build64%==yes (
 		)
 	
 :loginProfile
-if exist %instdir%\%msys2%\etc\userprofile.cfg GOTO compileLocals
-
 if %build32%==no GOTO loginProfile64
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- write default profile [32 bit]
-	echo.
-	echo -------------------------------------------------------------------------------
-	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /local32/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /local32/etc/profile.local>>%instdir%\profile.sh
-	echo.fi>>%instdir%\profile.sh
-	echo.>>%instdir%\profile.sh
-	echo.EOF>>%instdir%\profile.sh
+	%instdir%\%msys2%\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- write default profile [32 bit]
+		echo.
+		echo -------------------------------------------------------------------------------
+		echo.>>%instdir%\%msys2%\etc\profile.
+		echo.if [ -f /local32/etc/profile.local ]; then>>%instdir%\%msys2%\etc\profile.
+		echo.       source /local32/etc/profile.local>>%instdir%\%msys2%\etc\profile.
+		echo.fi>>%instdir%\%msys2%\etc\profile.
+	)
 
-	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
-	echo 32 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
-	del %instdir%\profile.sh
 	GOTO compileLocals
 	
 :loginProfile64
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- write default profile [64 bit]
-	echo.
-	echo -------------------------------------------------------------------------------
-	echo.cat ^>^> /etc/profile ^<^< "EOF">>%instdir%\profile.sh
-	echo.if [ -f /local64/etc/profile.local ]; then>>%instdir%\profile.sh
-	 echo.       source /local64/etc/profile.local>>%instdir%\profile.sh
-	echo.fi>>%instdir%\profile.sh
-	echo.>>%instdir%\profile.sh
-	echo.EOF>>%instdir%\profile.sh
-
-	%instdir%\%msys2%\bin\sh -l %instdir%\profile.sh
-	echo 64 bit build system add to profile. see profile>>%instdir%\%msys2%\etc\userprofile.cfg
-	del %instdir%\profile.sh
+	%instdir%\%msys2%\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- write default profile [64 bit]
+		echo.
+		echo -------------------------------------------------------------------------------
+		echo.>>%instdir%\%msys2%\etc\profile.
+		echo.if [ -f /local64/etc/profile.local ]; then>>%instdir%\%msys2%\etc\profile.
+		echo.       source /local64/etc/profile.local>>%instdir%\%msys2%\etc\profile.
+		echo.fi>>%instdir%\%msys2%\etc\profile.
+	)
 
 :compileLocals
 cd %instdir%
