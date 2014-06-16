@@ -88,7 +88,7 @@
 ::	2014-05-30 change libdvdcss and libdvdread to git, update libcrypt: gnutls; libcaca; libmodplug
 ::	2014-06-01 add openAL and exiv2
 ::	2014-06-12 fix kvazaar and vpxenc.exe 32 bit
-::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx
+::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
 ::
 ::-------------------------------------------------------------------------------------
 
