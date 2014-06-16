@@ -1180,14 +1180,10 @@ if [[ $compile == "true" ]]; then
 		make uninstall
 		make clean
 	fi
-	
-	sed -i 's/AR="${AR-${cross_prefix}ar}"/AR="${AR-ar}"/g' configure
-	sed -i 's/RANLIB="${RANLIB-${cross_prefix}ranlib}"/RANLIB="${RANLIB-ranlib}"/g' configure
-	#grep -q -e '#include <windows.h>' utv_core/Codec.h || sed -i '/#define CBGROSSWIDTH_WINDOWS ((size_t)-1)/ a\#include <windows.h>\
-	#define DLLEXPORT' utv_core/Codec.h	
+
 	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-	make -j $cpuCount
-	make install
+	make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
+	make install RANLIBX="${RANLIB-ranlib}"
 	
 	do_checkIfExist libutvideo-git libutvideo.a
 	compile="false"
