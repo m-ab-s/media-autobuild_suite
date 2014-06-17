@@ -1681,6 +1681,8 @@ if [[ $mpv = "y" ]]; then
 			mkdir $LOCALDESTDIR/bin-video/mpv/lua
 			cp player/lua/*.lua $LOCALDESTDIR/bin-video/mpv/lua
 		fi
+		
+		do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
 	fi
 fi
 	
