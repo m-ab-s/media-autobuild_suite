@@ -87,7 +87,6 @@ Included Tools And Libraries
 	- kvazaar
 	- libsndfile
 	- mediainfo cli
-	- mp3lame
 	- mp4box
 	- mpg123
 	- mplayer
