@@ -58,6 +58,7 @@ Included Tools And Libraries
 	- libutvideo (only in the static ffmpeg version)
 	- libzvbi
 	- mp3lame
+	- openal
 	- opencore-amr
 	- openjpeg
 	- ogg
