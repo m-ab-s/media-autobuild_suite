@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-06-16
+modified: 2014-06-17
 
 ---
 
@@ -32,7 +32,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.53**
+Current release is **v2.6**
 
 
 Included Tools And Libraries
@@ -90,6 +90,7 @@ Included Tools And Libraries
 	- mp4box
 	- mpg123
 	- mplayer
+	- mpv
 	- opus-tools
 	- rtmp
 	- speex

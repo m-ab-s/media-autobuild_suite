@@ -13,6 +13,7 @@ while true; do
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
+--mpv=* ) mpv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
@@ -1658,6 +1659,31 @@ if [[ $mplayer = "y" ]]; then
 	fi
 fi
 
+cd $LOCALBUILDDIR
+
+if [[ $mpv = "y" ]]; then
+	do_git "git://github.com/mpv-player/mpv.git" mpv-git
+	
+	if [[ $compile == "true" ]] || [[ $newFfmpeg == "yes" ]]; then
+		if [ ! -f waf ]; then
+			python2 ./bootstrap.py
+		else
+			python2 ./waf clean
+			rm -rf $LOCALDESTDIR/bin-video/mpv
+		fi
+		
+		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" CC=gcc python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build
+		
+		python2 ./waf build -j $cpuCount
+		python2 ./waf install
+		
+		if [ ! -d "$LOCALDESTDIR/bin-video/mpv/lua" ]; then
+			mkdir $LOCALDESTDIR/bin-video/mpv/lua
+			cp player/lua/*.lua $LOCALDESTDIR/bin-video/mpv/lua
+		fi
+	fi
+fi
+	
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile video tools $bits done..."

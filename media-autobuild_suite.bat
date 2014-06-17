@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.53
+::	This is version 2.6
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -89,6 +89,7 @@
 ::	2014-06-01 add openAL and exiv2
 ::	2014-06-12 fix kvazaar and vpxenc.exe 32 bit
 ::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
+::	2014-06-17 add mpv
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -121,6 +122,7 @@ if exist %ini% GOTO msysset
 	echo.ffmpegUpdate=^0>>%ini%
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
+	echo.mpv=^0>>%ini%
 	echo.cores=^0>>%ini%
 	echo.deleteSource=^0>>%ini%
 	echo.strip=^0>>%ini%
@@ -133,6 +135,7 @@ for /F "tokens=2 delims==" %%f in ('findstr /i ffmpegB %ini%') do set ffmpegINI=
 for /F "tokens=2 delims==" %%c in ('findstr /i ffmpegUpdate %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
+for /F "tokens=2 delims==" %%l in ('findstr /i mpv %ini%') do set mpvINI=%%l
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i strip %ini%') do set stripINI=%%k
@@ -299,6 +302,30 @@ if %buildmplayer%==2 (
 	set "mplayer=n"
 	)
 if %buildmplayer% GTR 2 GOTO mplayer
+
+:mpv
+if %mpvINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static mpv binary:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildmpv="build mpv:"
+	) else (
+		set buildmpv=%mpvINI%
+		)
+		
+if %buildmpv%==1 (
+	set "mpv=y"
+	)
+if %buildmpv%==2 (
+	set "mpv=n"
+	)
+if %buildmpv% GTR 2 GOTO mpv
 
 :numCores
 if %coresINI%==0 (
@@ -599,7 +626,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
 	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper>>mingw32.sh
+	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
@@ -614,7 +641,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
 	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper>>mingw64.sh
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
 	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh
@@ -854,7 +881,7 @@ echo.
 echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --nonfree=%binary%
+%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --nonfree=%binary%
 echo. compile video tools done...	
 	
 :: strip compiled files
