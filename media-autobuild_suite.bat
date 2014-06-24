@@ -90,6 +90,7 @@
 ::	2014-06-12 fix kvazaar and vpxenc.exe 32 bit
 ::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
 ::	2014-06-17 add mpv
+::	2014-06-24 update ssl cert, new msys2 version: folder structure has change
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -455,7 +456,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -P "%instdir%" -O msys2-base.tar.xz "https://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140507.tar.xz"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140624.tar.xz"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -485,7 +486,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://sourceforge.net/projects/msys2/files/latest/download?source=files"
+	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20140624.tar.xz"
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -506,9 +507,9 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
 	echo.link.Arguments = "/bin/sh -l" >>%instdir%\setlink.vbs
 	echo.link.Description = "msys2 shell console">>%instdir%\setlink.vbs
-	echo.link.TargetPath = "%instdir%\%msys2%\bin\mintty.exe">>%instdir%\setlink.vbs
+	echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe">>%instdir%\setlink.vbs
 	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
-	echo.link.WorkingDirectory = "%instdir%\%msys2%\bin">>%instdir%\setlink.vbs
+	echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin">>%instdir%\setlink.vbs
 	echo.link.Save>>%instdir%\setlink.vbs
 
 	cscript /nologo %instdir%\setlink.vbs 
@@ -516,9 +517,9 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 
 	echo.sleep ^5>>firstrun.sh
 	echo.exit>>firstrun.sh
-	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\firstrun.sh
+	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\firstrun.sh
 	del firstrun.sh
-	
+
 :minttySettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
 if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
@@ -586,36 +587,46 @@ echo.echo "updating msys2 done...">>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
 echo.sleep ^3>>updateMSYS2.sh
 echo.exit>>updateMSYS2.sh
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\updateMSYS2.sh
+%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\updateMSYS2.sh
 del updateMSYS2.sh
 
 :installbase
-if exist %instdir%\%msys2%\bin\make.exe GOTO sethgBat
+if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
 	echo.echo -ne "\033]0;install base system\007">>pacman.sh
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix flex groff help2man intltool libtool m4 man patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
-	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
+	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
 	del pacman.sh
 	rd /s/q opt
+	
+	for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
+		if %%~zi==0 (
+			echo.update-ca-trust>>cert.sh
+			echo.sleep ^3>>cert.sh
+			echo.exit>>cert.sh
+			%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\cert.sh
+			del cert.sh
+			)
+		)
 
 :sethgBat
-if exist %instdir%\%msys2%\bin\hg.bat GOTO getmingw32
-echo.@echo off>>%instdir%\%msys2%\bin\hg.bat
-echo.>>%instdir%\%msys2%\bin\hg.bat
-echo.setlocal>>%instdir%\%msys2%\bin\hg.bat
-echo.set HG=^%%~f0>>%instdir%\%msys2%\bin\hg.bat
-echo.>>%instdir%\%msys2%\bin\hg.bat
-echo.set PYTHONHOME=>>%instdir%\%msys2%\bin\hg.bat
-echo.set in=^%%*>>%instdir%\%msys2%\bin\hg.bat
-echo.set out=^%%in: ^{= ^"^{^%%>>%instdir%\%msys2%\bin\hg.bat
-echo.set out=^%%out:^} =^}^" ^%%>>%instdir%\%msys2%\bin\hg.bat
-echo.>>%instdir%\%msys2%\bin\hg.bat
-echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\bin\hg.bat
+if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
+echo.@echo off>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.setlocal>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.set HG=^%%~f0>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.set PYTHONHOME=>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.set in=^%%*>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.set out=^%%in: ^{= ^"^{^%%>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.set out=^%%out:^} =^}^" ^%%>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.>>%instdir%\%msys2%\usr\bin\hg.bat
+echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\usr\bin\hg.bat
 
 
 :getmingw32
@@ -629,7 +640,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
-	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
+	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
 	del mingw32.sh
 	)
 
@@ -644,7 +655,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
-	%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh
+	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh
 	del mingw64.sh
 	)
 
@@ -658,8 +669,8 @@ Setlocal EnableDelayedExpansion
 if %build32%==yes (
 if exist %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a (
 	del %instdir%\%msys2%\mingw32\bin\xvidcore.dll
-	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.a %instdir%\%msys2%\mingw32\lib\libxvidcore.a
-	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a.dyn
+	%instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.a %instdir%\%msys2%\mingw32\lib\libxvidcore.a
+	%instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a.dyn
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw32" %%C IN (*.dll.a) DO (
@@ -667,7 +678,7 @@ if exist %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a (
 		set name=!file:~0,-6!
 		if exist %%C.dyn del %%C.dyn
 		if exist !name!.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
+			%instdir%\%msys2%\usr\bin\mv %%C %%C.dyn
 			)
 		)
 	)
@@ -675,8 +686,8 @@ if exist %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a (
 if %build64%==yes (
 if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
 	del %instdir%\%msys2%\mingw64\bin\xvidcore.dll
-	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.a %instdir%\%msys2%\mingw64\lib\libxvidcore.a
-	%instdir%\%msys2%\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a.dyn
+	%instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.a %instdir%\%msys2%\mingw64\lib\libxvidcore.a
+	%instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a.dyn
 	)
 
 	FOR /R "%instdir%\%msys2%\mingw64" %%C IN (*.dll.a) DO (
@@ -684,7 +695,7 @@ if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
 		set name=!file:~0,-6!
 		if exist %%C.dyn del %%C.dyn
 		if exist !name!.a (
-			%instdir%\%msys2%\bin\mv %%C %%C.dyn
+			%instdir%\%msys2%\usr\bin\mv %%C %%C.dyn
 			)
 		)
 	)
@@ -733,8 +744,10 @@ if %build64%==yes (
 	
 :writeConfFile
 if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
+	%instdir%\%msys2%\usr\bin\grep -q -e 'cygdrive' %instdir%\%msys2%\etc\fstab. || (
+	echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
+	)
 	echo.>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\opt\ /opt>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\build32\ /build32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\%msys2%\mingw32\ /mingw32>>%instdir%\%msys2%\etc\fstab.
@@ -847,7 +860,7 @@ if %build64%==yes (
 	
 :loginProfile
 if %build32%==no GOTO loginProfile64
-	%instdir%\%msys2%\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
+	%instdir%\%msys2%\usr\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write default profile [32 bit]
@@ -862,7 +875,7 @@ if %build32%==no GOTO loginProfile64
 	GOTO compileLocals
 	
 :loginProfile64
-	%instdir%\%msys2%\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
+	%instdir%\%msys2%\usr\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- write default profile [64 bit]
@@ -881,7 +894,7 @@ echo.
 echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --nonfree=%binary%
+%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --nonfree=%binary%
 echo. compile video tools done...	
 	
 :: strip compiled files
