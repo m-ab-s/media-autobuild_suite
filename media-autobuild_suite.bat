@@ -465,8 +465,10 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
 	grep "%p%"') do (
 	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-i686.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
+	GOTO unzip32
 	)
 	
+	:unzip32
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
@@ -509,8 +511,10 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
 	grep "%p%"') do (
 	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-x86_64.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
+	GOTO unzip64
 	)
 	
+	:unzip64
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
