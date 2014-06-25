@@ -91,6 +91,7 @@
 ::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
 ::	2014-06-17 add mpv
 ::	2014-06-24 update ssl cert, new msys2 version: folder structure has change
+::	2014-06-24 get always the newest msys2 version
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -412,8 +413,6 @@ if exist "%instdir%\%msys2%" GOTO getMintty
 	cscript "%instdir%\install-wget.js"
 	del "%instdir%\install-wget.js"
 	del "%instdir%\wget.zip"
-	del "%instdir%\wget_COPYING.txt"
-	del "%instdir%\wget_README.txt"
 	
 :check7zip
 if exist "%instdir%\opt\bin\7za.exe" GOTO checkmsys2
@@ -456,7 +455,17 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/i686/msys2-base-i686-20140624.tar.xz"
+	set p=msys2-base-i686-*.*tar.xz
+	for /f "tokens=*" %%b in ('^
+	wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^|
+	sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" ^|
+	awk "/<tbody>/,/<\/tbody>/" ^|
+	grep "tr.*title.*class.*file" ^|
+	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
+	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
+	grep "%p%"') do (
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-i686.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
+	)
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -475,7 +484,11 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 		echo -------------------------------------------------------------------------------
 		pause
 		)
+	del awk.exe
+	del grep.exe
+	del sed.exe
 	del wget.exe
+	del COPYING.txt
 	)
 	
 if %msys2%==msys64 (
@@ -486,13 +499,27 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	"%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" -O msys2-base.tar.xz "http://downloads.sourceforge.net/project/msys2/Base/x86_64/msys2-base-x86_64-20140624.tar.xz"
+	set p=msys2-base-x86_64-*.*tar.xz
+	for /f "tokens=*" %%b in ('^
+	wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^|
+	sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" ^|
+	awk "/<tbody>/,/<\/tbody>/" ^|
+	grep "tr.*title.*class.*file" ^|
+	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
+	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
+	grep "%p%"') do (
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-x86_64.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
+	)
 	
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
 	del msys2-base.tar
+	del awk.exe
+	del grep.exe
+	del sed.exe
 	del wget.exe
+	del COPYING.txt
 	)
 	
 :getMintty
