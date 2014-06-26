@@ -593,11 +593,14 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 		mv fdk-aac-master lib-fdk-aac
 		cp patch-fdk-aac/files/LibMakefile lib-fdk-aac/Makefile
 		cp patch-fdk-aac/files/libfdk-aac.version lib-fdk-aac/libfdk-aac.version
+		rm -rf patch-fdk-aac
 
 		sed -i 's/cd stage && zip -r $(PREFIX)\/libfdk-aac-win32-bin.zip \* \& cd \.\.//g' lib-fdk-aac/Makefile
 		cd lib-fdk-aac
 		CC=gcc make -j $cpuCount PREFIX=$LOCALDESTDIR
 		make install PREFIX=$LOCALDESTDIR
+		
+		do_checkIfExist lib-fdk-aac libfdk-aac.a
 		
 		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
@@ -784,7 +787,7 @@ if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
 		mv $LOCALDESTDIR/bin/makehrtf.exe $LOCALDESTDIR/bin-audio
 		cp $LOCALDESTDIR/lib/libOpenAL32.a $LOCALDESTDIR/lib/libOpenAL.a
 		
-		do_checkIfExist libtheora-1.1.1 libOpenAL32.a
+		do_checkIfExist openal-soft-1.15.1 libOpenAL32.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1291,7 +1294,7 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 		
 		cp mediainfo.exe $LOCALDESTDIR/bin-video/mediainfo.exe
 
-		do_checkIfExist bin-video/mediainfo.exe
+		do_checkIfExist mediainfo bin-video/mediainfo.exe
 fi
 
 cd $LOCALBUILDDIR
