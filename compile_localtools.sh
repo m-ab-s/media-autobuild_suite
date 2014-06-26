@@ -1255,11 +1255,15 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 	else
 		echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 		if [ -d "mediainfo" ]; then rm -rf mediainfo; fi
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mediainfo/source/mediainfo/0.7.69/mediainfo_0.7.69_AllInclusive.7z
+		a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
+
+		b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
+
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O mediainfo.7z "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download"
 		mkdir mediainfo
 		cd mediainfo
-		7za x ../mediainfo_0.7.69_AllInclusive.7z
-		rm ../mediainfo_0.7.69_AllInclusive.7z
+		7za x ../mediainfo.7z
+		rm ../mediainfo.7z
 		
 		sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
 		cd ZenLib/Project/GNU/Library

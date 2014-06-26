@@ -91,7 +91,8 @@
 ::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
 ::	2014-06-17 add mpv
 ::	2014-06-24 update ssl cert, new msys2 version: folder structure has change
-::	2014-06-24 get always the newest msys2 version
+::	2014-06-25 get always the newest msys2 version
+::	2014-06-26 get always the newest mediainfo version
 ::
 ::-------------------------------------------------------------------------------------
 
