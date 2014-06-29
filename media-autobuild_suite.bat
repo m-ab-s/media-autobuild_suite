@@ -465,7 +465,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
 	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
 	grep "%p%"') do (
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-i686.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
 	GOTO unzip32
 	)
 	
@@ -511,7 +511,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
 	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
 	grep "%p%"') do (
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base-x86_64.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
 	GOTO unzip64
 	)
 	

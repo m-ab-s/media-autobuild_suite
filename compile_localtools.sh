@@ -593,7 +593,6 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 		mv fdk-aac-master lib-fdk-aac
 		cp patch-fdk-aac/files/LibMakefile lib-fdk-aac/Makefile
 		cp patch-fdk-aac/files/libfdk-aac.version lib-fdk-aac/libfdk-aac.version
-		rm -rf patch-fdk-aac
 
 		sed -i 's/cd stage && zip -r $(PREFIX)\/libfdk-aac-win32-bin.zip \* \& cd \.\.//g' lib-fdk-aac/Makefile
 		cd lib-fdk-aac
@@ -609,6 +608,7 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 		mv fdkaac-master bin-fdk-aac
 		cp patch-fdk-aac/files/AppMakefile bin-fdk-aac/Makefile
 		cp patch-fdk-aac/files/config.h bin-fdk-aac/config.h
+		rm -rf patch-fdk-aac
 		cd bin-fdk-aac
 		
 		make PREFIX=$LOCALDESTDIR/bin-audio CC="gcc -L$LOCALDESTDIR/lib -lfdk-aac" CPPFLAGS="-DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include"
