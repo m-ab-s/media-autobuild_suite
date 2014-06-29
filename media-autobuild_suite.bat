@@ -456,20 +456,8 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	set p=msys2-base-i686-*.*tar.xz
-	for /f "tokens=*" %%b in ('^
-	wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^|
-	sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" ^|
-	awk "/<tbody>/,/<\/tbody>/" ^|
-	grep "tr.*title.*class.*file" ^|
-	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
-	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
-	grep "%p%"') do (
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
-	GOTO unzip32
-	)
-	
-	:unzip32
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-20140624.tar.xz/download
+
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
@@ -501,21 +489,9 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.- Download and install msys2 basic system
 	echo.
 	echo -------------------------------------------------------------------------------
-	
-	set p=msys2-base-x86_64-*.*tar.xz
-	for /f "tokens=*" %%b in ('^
-	wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^|
-	sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" ^|
-	awk "/<tbody>/,/<\/tbody>/" ^|
-	grep "tr.*title.*class.*file" ^|
-	sed "s/^.*title=\d034//g;s/\d034 class.*$//g" ^|
-	grep -v "^$" ^| awk "{ sub("""\r$""", """"""); print }" ^|
-	grep "%p%"') do (
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
-	GOTO unzip64
-	)
-	
-	:unzip64
+
+	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-20140624.tar.xz/download
+
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
