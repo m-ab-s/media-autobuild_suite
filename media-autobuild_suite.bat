@@ -456,7 +456,8 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/msys2-base-i686-20140624.tar.xz/download
+	for /F %%b in ( 'wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^| grep -o -P "(?<=tr title=).*(?<=class=)" ^| grep -m 1 -o "msys2-base-i686-*.*tar.xz"' ) do wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
+
 
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
@@ -475,9 +476,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 		echo -------------------------------------------------------------------------------
 		pause
 		)
-	del awk.exe
 	del grep.exe
-	del sed.exe
 	del wget.exe
 	del COPYING.txt
 	)
@@ -490,15 +489,27 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	echo.
 	echo -------------------------------------------------------------------------------
 
-	wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/msys2-base-x86_64-20140624.tar.xz/download
+	for /F %%b in ( 'wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^| grep -o -P "(?<=tr title=).*(?<=class=)" ^| grep -m 1 -o "msys2-base-x86_64-*.*tar.xz"' ) do wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
+
 
 	%instdir%\opt\bin\7za.exe x msys2-base.tar.xz
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
 	del msys2-base.tar
-	del awk.exe
+	if not exist %instdir%\%msys2%\bin\msys-2.0.dll (
+		echo -------------------------------------------------------------------------------
+		echo.
+		echo.- Download from msys2 64 bit basic system failed, 
+		echo.- please download it manuel from:
+		echo.- http://downloads.sourceforge.net/project/msys2
+		echo.- and copy the uncompressed folder to:
+		echo.- %instdir%
+		echo.- and start the batch script again!
+		echo.
+		echo -------------------------------------------------------------------------------
+		pause
+		)
 	del grep.exe
-	del sed.exe
 	del wget.exe
 	del COPYING.txt
 	)
