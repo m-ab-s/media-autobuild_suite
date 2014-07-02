@@ -423,7 +423,7 @@ if [[ $compile == "true" ]]; then
 		mkdir build
 		cd build
 	fi
-	
+	../src/svn_version.sh
 	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off
 	make -j $cpuCount
 	make install
