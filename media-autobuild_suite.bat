@@ -463,7 +463,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
 	del msys2-base.tar
-	if not exist %instdir%\%msys2%\bin\msys-2.0.dll (
+	if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- Download from msys2 32 bit basic system failed, 
@@ -496,7 +496,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 	%instdir%\opt\bin\7za.exe x msys2-base.tar
 	del msys2-base.tar.xz
 	del msys2-base.tar
-	if not exist %instdir%\%msys2%\bin\msys-2.0.dll (
+	if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 		echo -------------------------------------------------------------------------------
 		echo.
 		echo.- Download from msys2 64 bit basic system failed, 
