@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.6
+::	This is version 2.61
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -93,6 +93,7 @@
 ::	2014-06-24 update ssl cert, new msys2 version: folder structure has change
 ::	2014-06-25 get always the newest msys2 version
 ::	2014-06-26 get always the newest mediainfo version
+::	2014-07-03 fix get newest msys2 version and new fstab check and mount
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -762,10 +763,23 @@ if %build64%==yes (
 	)
 	
 :writeConfFile
-if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
-	%instdir%\%msys2%\usr\bin\grep -q -e 'cygdrive' %instdir%\%msys2%\etc\fstab || (
-	echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
-	)
+if %build32%==yes (
+	set searchStr=local32
+	) else (
+		set searchStr=local64
+		)
+for /f "tokens=2 delims=/" %%a in ('findstr /i %searchStr% %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if %searchRes%==local32 GOTO writeProfile32
+if %searchRes%==local64 GOTO writeProfile32
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- write fstab mount file
+	echo.
+	echo -------------------------------------------------------------------------------
+	
+	for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
+	if not "%cygdrive%"=="yes" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
+
 	echo.>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\build32\ /build32>>%instdir%\%msys2%\etc\fstab.
@@ -773,7 +787,6 @@ if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
 	echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\build64\ /build64>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\%msys2%\mingw64\ /mingw64>>%instdir%\%msys2%\etc\fstab.
-	echo.new mount done. see in fstab>> %instdir%\%msys2%\etc\fstabconf.cfg
 
 ::------------------------------------------------------------------
 :: write config profiles:
