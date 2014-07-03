@@ -763,7 +763,7 @@ if %build64%==yes (
 	
 :writeConfFile
 if exist %instdir%\%msys2%\etc\fstabconf.cfg GOTO writeProfile32
-	%instdir%\%msys2%\usr\bin\grep -q -e 'cygdrive' %instdir%\%msys2%\etc\fstab. || (
+	%instdir%\%msys2%\usr\bin\grep -q -e 'cygdrive' %instdir%\%msys2%\etc\fstab || (
 	echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
 	)
 	echo.>>%instdir%\%msys2%\etc\fstab.
