@@ -26,11 +26,13 @@ done
 do_git() {
 local gitURL="$1"
 local gitFolder="$2"
+local gitDepth="$3"
 echo -ne "\033]0;compile $gitFolder $bits\007"
 if [ ! -d $gitFolder ]; then
-	git clone --depth 1 $gitURL $gitFolder
-	if [ ! -d $gitFolder ]; then
+	if [[ $gitDepth == "noDepth" ]]; then
 		git clone $gitURL $gitFolder
+	else
+		git clone --depth 1 $gitURL $gitFolder
 	fi
 	compile="true"
 	cd $gitFolder
@@ -941,7 +943,7 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "git://git.videolan.org/x264.git" x264-git
+do_git "git://git.videolan.org/x264.git" x264-git noDepth
 
 if [[ $compile == "true" ]]; then
 	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
@@ -1003,7 +1005,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git
+do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git noDepth
 
 if [[ $compile == "true" ]]; then
 	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
