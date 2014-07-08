@@ -284,14 +284,13 @@ fi
 #----------------------
 # crypto engine
 #----------------------
-
 cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
 	echo "libgcrypt-1.6.1 is already compiled"
 	echo -------------------------------------------------
-	else 
+	else
 		echo -ne "\033]0;compile libgcrypt $bits\007"
 		if [ -d "libgcrypt-1.6.1" ]; then rm -rf libgcrypt-1.6.1; fi
 		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.1.tar.bz2
@@ -301,7 +300,7 @@ if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
-		
+
 		do_checkIfExist libgcrypt-1.6.1 libgcrypt.a
 fi
 
