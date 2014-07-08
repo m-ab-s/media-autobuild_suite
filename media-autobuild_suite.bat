@@ -761,24 +761,32 @@ if %build64%==yes (
 		mkdir %instdir%\local64\uninstall
 		)
 	)
-	
-:writeConfFile
+
 if %build32%==yes (
 	set searchStr=local32
 	) else (
 		set searchStr=local64
 		)
+
+if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
+
 for /f "tokens=2 delims=/" %%a in ('findstr /i %searchStr% %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if %searchRes%==local32 GOTO writeProfile32
-if %searchRes%==local64 GOTO writeProfile32
+
+if "%searchRes%"=="local32" GOTO writeProfile32
+if "%searchRes%"=="local64" GOTO writeProfile32
+
+	:writeFstab
+	set cygdrive=no
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- write fstab mount file
 	echo.
 	echo -------------------------------------------------------------------------------
 	
-	for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
-	if not "%cygdrive%"=="yes" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
+	if exist %instdir%\%msys2%\etc\fstab. (
+		for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
+		)
+	if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
 
 	echo.>>%instdir%\%msys2%\etc\fstab.
 	echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
