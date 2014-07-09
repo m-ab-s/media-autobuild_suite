@@ -935,7 +935,7 @@ echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
 %instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --nonfree=%binary%
-echo. compile video tools done...	
+echo. compile local tools done...	
 	
 :: strip compiled files
 if %stripFile%==y (

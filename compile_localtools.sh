@@ -329,21 +329,24 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-video/rtmpdump.exe" ]; then
-	echo -------------------------------------------------
-	echo "rtmpdump is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile rtmpdump $bits\007"
-		if [ -d "rtmpdump" ]; then rm -rf rtmpdump; fi
-		git clone --depth 1 git://git.ffmpeg.org/rtmpdump rtmpdump
-		cd rtmpdump
-		sed -i 's/LIB_GNUTLS=.*/LIB_GNUTLS=-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 $(LIBZ)/' Makefile
-		sed -i 's/LIBS_mingw=.*/LIBS_mingw=-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl/' Makefile
-		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv"
+do_git "git://git.ffmpeg.org/rtmpdump" rtmpdump-git
+
+if [[ $compile == "true" ]]; then
+	if [[ $LOCALDESTDIR/lib/librtmp.a ]]; then
+		rm -rf $LOCALDESTDIR/include/librtmp
+		rm $LOCALDESTDIR/lib/librtmp.a
+		rm $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+		rm $LOCALDESTDIR/man/man3/librtmp.3
+		rm $LOCALDESTDIR/bin-video/rtmpdump.exe $LOCALDESTDIR/bin-video/rtmpsuck.exe $LOCALDESTDIR/bin-video/rtmpsrv.exe $LOCALDESTDIR/bin-video/rtmpgw.exe
+		rm $LOCALDESTDIR/man/man1/rtmpdump.1 
+		rm $LOCALDESTDIR/man/man8/rtmpgw.8
+		make clean
+	fi
+		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl" 
 		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 		
 		do_checkIfExist rtmpdump librtmp.a
+		compile="false"
 fi
 
 cd $LOCALBUILDDIR
