@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-07-03
+modified: 2014-07-07
 
 ---
 
@@ -24,8 +24,10 @@ http://sourceforge.net/projects/msys2/
 I use some jscipt parts from nu774:
 https://github.com/nu774/fdkaac_autobuild
 
-Thanks to both of them!
+Thanks to all of them!
 
+
+For Informations about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
 
 Download
 --------
