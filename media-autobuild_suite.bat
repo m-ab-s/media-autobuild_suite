@@ -94,6 +94,7 @@
 ::	2014-06-25 get always the newest msys2 version
 ::	2014-06-26 get always the newest mediainfo version
 ::	2014-07-03 fix get newest msys2 version and new fstab check and mount
+::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix 
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -127,6 +128,7 @@ if exist %ini% GOTO msysset
 	echo.mp4box=^0>>%ini%
 	echo.mplayer=^0>>%ini%
 	echo.mpv=^0>>%ini%
+	echo.mkv=^0>>%ini%
 	echo.cores=^0>>%ini%
 	echo.deleteSource=^0>>%ini%
 	echo.strip=^0>>%ini%
@@ -140,6 +142,7 @@ for /F "tokens=2 delims==" %%c in ('findstr /i ffmpegUpdate %ini%') do set ffmpe
 for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%l in ('findstr /i mpv %ini%') do set mpvINI=%%l
+for /F "tokens=2 delims==" %%m in ('findstr /i mkv %ini%') do set mkvINI=%%m
 for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i strip %ini%') do set stripINI=%%k
@@ -330,6 +333,30 @@ if %buildmpv%==2 (
 	set "mpv=n"
 	)
 if %buildmpv% GTR 2 GOTO mpv
+
+:mkv
+if %mkvINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build static mkv binarys:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildmkv="build mkv:"
+	) else (
+		set buildmkv=%mkvINI%
+		)
+		
+if %buildmkv%==1 (
+	set "mkv=y"
+	)
+if %buildmkv%==2 (
+	set "mkv=n"
+	)
+if %buildmkv% GTR 2 GOTO mkv
 
 :numCores
 if %coresINI%==0 (
@@ -617,7 +644,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
 	echo.echo -ne "\033]0;install base system\007">>pacman.sh
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial>>pacman.sh
+	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\pacman.sh
@@ -657,7 +684,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
 	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error>>mingw32.sh
+	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\mingw32.sh
@@ -672,7 +699,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
 	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error>>mingw64.sh
+	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\mingw64.sh
@@ -934,7 +961,7 @@ echo.
 echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --nonfree=%binary%
+%instdir%\%msys2%\usr\bin\mintty.exe /bin/sh -l %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%
 echo. compile local tools done...	
 	
 :: strip compiled files

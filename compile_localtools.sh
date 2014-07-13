@@ -14,6 +14,7 @@ while true; do
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --mpv=* ) mpv="${1#*=}"; shift ;;
+--mkv=* ) mkv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
     -- ) shift; break ;;
@@ -392,6 +393,28 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/lib/libmagic.a" ]; then
+	echo -------------------------------------------------
+	echo "file-5.19[libmagic] is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile file $bits\007"
+		if [ -d "file-5.19" ]; then rm -rf file-5.19; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.astron.com/pub/file/file-5.19.tar.gz
+		tar xf file-5.19.tar.gz
+		rm file-5.19.tar.gz
+		cd file-5.19
+		
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
+
+		make CPPFLAGS='-D_REGEX_RE_COMP' -j $cpuCount
+		make install
+		
+		do_checkIfExist file-5.19 libmagic.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
 	echo -------------------------------------------------
 	echo "libilbc is already compiled"
@@ -441,6 +464,28 @@ else
 	echo -------------------------------------------------
 	echo "exiv2 is already up to date"
 	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f $LOCALDESTDIR/lib/libwx_baseu-3.0.a ]; then
+	echo -------------------------------------------------
+	echo "wxWidgets is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile wxWidgets $bits\007"
+		if [ -d "wxWidgets-3.0.1" ]; then rm -rf wxWidgets-3.0.1; fi
+		wget --tries=20 --retry-connrefused --waitretry=2 -c -O wxWidgets-3.0.1.tar.bz2 http://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2/download
+		tar xf wxWidgets-3.0.1.tar.bz2
+		rm wxWidgets-3.0.1.tar.bz2
+		cd wxWidgets-3.0.1
+		
+		CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+		
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist wxWidgets-3.0.1 libwx_baseu-3.0.a
 fi
 
 echo "-------------------------------------------------------------------------------"
@@ -1696,39 +1741,68 @@ if [[ $mpv = "y" ]]; then
 		do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
 	fi
 fi
+
+cd $LOCALBUILDDIR
+
+if [[ $mkv = "y" ]]; then
+	do_git "git://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix-git
+	
+	if [[ $compile == "true" ]]; then
+		if [[ ! -f ./configure ]]; then
+			./autogen.sh
+			git submodule init
+			git submodule update
+		else
+			rake clean
+		fi
+		
+		if [[ ! -f ./mkvinfo.patch ]]; then
+			wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch
+		fi
+		
+		patch -N -p0 < mkvinfo.patch
+		
+		if [[ $bits = "32bit" ]]; then
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=/mingw32/lib
+		else
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=/mingw64/lib
+		fi
+		
+		sed -i "s/EXTRA_CFLAGS =*$/EXTRA_CFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
+		sed -i "s/EXTRA_LDFLAGS =*$/EXTRA_LDFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
+		sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -licon/g" build-config
+		
+		export DRAKETHREADS=$cpuCount
+		
+		drake
+		rake install
+		unset DRAKETHREADS
+
+		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
+	fi
+fi
 	
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile video tools $bits done..."
 echo
 echo "-------------------------------------------------------------------------------"
-	
 }
 
 if [[ $build32 = "yes" ]]; then
-	echo "-------------------------------------------------------------------------------"
-	echo
-	echo "compile local tools 32bit"
-	echo
-	echo "-------------------------------------------------------------------------------"
 	source /local32/etc/profile.local
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
-	echo "compile local tools 32bit done..."
+	echo "compile all tools 32bit done..."
 	echo "-------------------------------------------------------------------------------"
 	sleep 3
 fi
 
 if [[ $build64 = "yes" ]]; then
-	echo "-------------------------------------------------------------------------------"
-	echo
-	echo "compile local tools 64bit"
-	echo
-	echo "-------------------------------------------------------------------------------"
 	source /local64/etc/profile.local
 	buildProcess
 	echo "-------------------------------------------------------------------------------"
-	echo "compile local tools 64bit done..."
+	echo "compile all tools 64bit done..."
 	echo "-------------------------------------------------------------------------------"
 	sleep 3
 fi
