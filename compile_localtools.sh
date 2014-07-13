@@ -1770,7 +1770,7 @@ if [[ $mkv = "y" ]]; then
 		
 		sed -i "s/EXTRA_CFLAGS =*$/EXTRA_CFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
 		sed -i "s/EXTRA_LDFLAGS =*$/EXTRA_LDFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
-		sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -licon/g" build-config
+		sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/g" build-config
 		
 		export DRAKETHREADS=$cpuCount
 		

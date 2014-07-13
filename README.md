@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-07-07
+modified: 2014-07-13
 
 ---
 
@@ -34,7 +34,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.61**
+Current release is **v2.7**
 
 
 Included Tools And Libraries
@@ -85,6 +85,7 @@ Included Tools And Libraries
 	- exiv2
 	- fdkaac
 	- faac
+	- file
 	- flac
 	- gnutls
 	- kvazaar
@@ -93,6 +94,7 @@ Included Tools And Libraries
 	- mp4box
 	- mpg123
 	- mplayer
+	- mkvtoolnix
 	- mpv
 	- opus-tools
 	- rtmp
