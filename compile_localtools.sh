@@ -343,11 +343,16 @@ if [[ $compile == "true" ]]; then
 		rm $LOCALDESTDIR/man/man8/rtmpgw.8
 		make clean
 	fi
-		make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl" 
-		sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-		
-		do_checkIfExist rtmpdump librtmp.a
-		compile="false"
+	
+	make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl" 
+	sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+	
+	do_checkIfExist rtmpdump librtmp.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "rtmpdump is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1739,6 +1744,7 @@ if [[ $mpv = "y" ]]; then
 		fi
 		
 		do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
+		compile="false"
 	fi
 fi
 
@@ -1776,9 +1782,15 @@ if [[ $mkv = "y" ]]; then
 		
 		drake
 		rake install
+		
+		mkdir -p $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc
+		mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/locale $LOCALDESTDIR/bin-video/mkvtoolnix/bin/locale
+		mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/doc/mkvtoolnix/guide $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc/guide
+		cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
 		unset DRAKETHREADS
 
 		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
+		compile="false"
 	fi
 fi
 	
