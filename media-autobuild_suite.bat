@@ -106,7 +106,7 @@ set instdir=%CD%
 set "ini=media-autobuild_suite.ini"
 
 :selectmsys2Arch
-if exist %ini% GOTO msysset
+if exist %ini% GOTO checkINI
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	echo.
@@ -118,7 +118,7 @@ if exist %ini% GOTO msysset
 	echo -------------------------------------------------------------------------------
 	set /P msys2Arch="msys2 system:"
 	if %msys2Arch% GTR 2 GOTO selectmsys2Arch
-	
+
 	echo.[compiler list]>>%ini%
 	echo.msys2Arch=^%msys2Arch%>>%ini%
 	echo.arch=^0>>%ini%
@@ -132,20 +132,48 @@ if exist %ini% GOTO msysset
 	echo.cores=^0>>%ini%
 	echo.deleteSource=^0>>%ini%
 	echo.strip=^0>>%ini%
+	
+	GOTO readINI
 
-:msysset	
-for /F "tokens=2 delims==" %%a in ('findstr /i msys2Arch %ini%') do set msys2ArchINI=%%a
-for /F "tokens=2 delims==" %%j in ('findstr /i arch %ini%') do set archINI=%%j
-for /F "tokens=2 delims==" %%b in ('findstr /i free %ini%') do set freeINI=%%b
-for /F "tokens=2 delims==" %%f in ('findstr /i ffmpegB %ini%') do set ffmpegINI=%%f
-for /F "tokens=2 delims==" %%c in ('findstr /i ffmpegUpdate %ini%') do set ffmpegUpdateINI=%%c
-for /F "tokens=2 delims==" %%d in ('findstr /i mp4box %ini%') do set mp4boxINI=%%d
-for /F "tokens=2 delims==" %%e in ('findstr /i mplayer %ini%') do set mplayerINI=%%e
-for /F "tokens=2 delims==" %%l in ('findstr /i mpv %ini%') do set mpvINI=%%l
-for /F "tokens=2 delims==" %%m in ('findstr /i mkv %ini%') do set mkvINI=%%m
-for /F "tokens=2 delims==" %%h in ('findstr /i cores %ini%') do set coresINI=%%h
-for /F "tokens=2 delims==" %%i in ('findstr /i deleteSource %ini%') do set deleteSourceINI=%%i
-for /F "tokens=2 delims==" %%k in ('findstr /i strip %ini%') do set stripINI=%%k
+:checkINI
+find /i "msys2Arch" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "arch" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "free" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "ffmpegB" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "ffmpegUpdate" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "mp4box" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "mplayer" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "mpv" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "mkv" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "cores" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "deleteSource" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+find /i "strip" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+	
+:readINI
+for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
+for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
+for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
+for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
+for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
+for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
+for /F "tokens=2 delims==" %%e in ('findstr /i "mplayer" %ini%') do set mplayerINI=%%e
+for /F "tokens=2 delims==" %%l in ('findstr /i "mpv" %ini%') do set mpvINI=%%l
+for /F "tokens=2 delims==" %%m in ('findstr /i "mkv" %ini%') do set mkvINI=%%m
+for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%%h
+for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
+for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
 
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 (
