@@ -919,6 +919,7 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libsndfile-git libsndfile.a
 	compile="false"
+	rm autogen.sh
 else
 	echo -------------------------------------------------
 	echo "libsndfile is already up to date"
