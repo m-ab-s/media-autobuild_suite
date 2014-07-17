@@ -83,6 +83,7 @@ Included Tools And Libraries
 	
  - other tools
 	- exiv2
+	- f265
 	- fdkaac
 	- faac
 	- file

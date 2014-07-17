@@ -1725,6 +1725,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
 			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
 			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
 			
 			do_checkIfExist ffmpeg-git bin-video/ffmpeg.exe
 			compile="false"
@@ -1733,6 +1734,35 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			echo "ffmpeg is already up to date"
 			echo -------------------------------------------------
 		fi
+fi
+
+
+if [[ $bits = "64bit" ]]; then
+	cd $LOCALBUILDDIR
+
+	do_git "http://f265.org/repos/f265/" f265-git noDepth
+
+	if [[ $compile == "true" ]]; then
+		if [ -d "build" ]; then
+			rm -rf build
+			rm -rf .sconf_temp
+			rm -f .sconsign.dblite
+			rm -f config.log
+			rm -f options.py
+			rm -f $LOCALDESTDIR/bin-video/f265cli.exe
+		fi
+		
+		scons
+
+		cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
+		
+		do_checkIfExist vidstab-git libvidstab.a
+		compile="false"
+	else
+		echo -------------------------------------------------
+		echo "f265 is already up to date"
+		echo -------------------------------------------------
+	fi
 fi
 
 cd $LOCALBUILDDIR
@@ -1853,6 +1883,7 @@ if [[ $mkv = "y" ]]; then
 			git submodule update
 		else
 			rake clean
+			rm -rf $LOCALDESTDIR/bin-video/mkvtoolnix
 		fi
 		
 		if [[ ! -f ./mkvinfo.patch ]]; then
