@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.7
+::	This is version 2.71
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -94,7 +94,8 @@
 ::	2014-06-25 get always the newest msys2 version
 ::	2014-06-26 get always the newest mediainfo version
 ::	2014-07-03 fix get newest msys2 version and new fstab check and mount
-::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix 
+::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix
+::	2014-07-17 change and optimize the profiles, fix kvazaar for different computers 
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -878,11 +879,13 @@ if %build32%==yes (
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
+		echo.DXSDK_DIR="/mingw32/i686-w64-mingw32">>%instdir%\local32\etc\profile.local
+		echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal">>%instdir%\local32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
 		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profile.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=pentium3">>%instdir%\local32\etc\profile.local
-		echo.LDFLAGS="-L/local32/lib -mthreads">>%instdir%\local32\etc\profile.local
+		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
+		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
+		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\local32\etc\profile.local
@@ -927,11 +930,13 @@ if %build64%==yes (
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
+		echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
+		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal>>%instdir%\local64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
 		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profile.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads">>%instdir%\local64\etc\profile.local
-		echo.LDFLAGS="-L/local64/lib">>%instdir%\local64\etc\profile.local
+		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
+		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
+		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
 		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\local64\etc\profile.local

@@ -919,7 +919,9 @@ if [[ $compile == "true" ]]; then
 	
 	do_checkIfExist libsndfile-git libsndfile.a
 	compile="false"
-	rm autogen.sh
+	if [ -f autogen.sh ]; then
+		rm autogen.sh
+	fi
 else
 	echo -------------------------------------------------
 	echo "libsndfile is already up to date"
@@ -1102,9 +1104,9 @@ if [[ $compile == "true" ]]; then
 	cd src
 
 	if [[ "$bits" = "32bit" ]]; then
-		make ARCH=i686 LD="gcc -pthread"
+		make ARCH=i686 DFLAGS="-O2 -g -Werror -ftree-vectorize" LD="gcc -pthread"
 	else
-		make ARCH=x86_64 LD="gcc -pthread"
+		make ARCH=x86_64 DFLAGS="-O2 -g -Werror -ftree-vectorize" LD="gcc -pthread"
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
