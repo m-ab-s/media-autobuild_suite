@@ -1052,7 +1052,7 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --disable-cli
 	
 	make -j $cpuCount
 	make install
@@ -1742,7 +1742,7 @@ if [[ $bits = "64bit" ]]; then
 
 	do_git "http://f265.org/repos/f265/" f265-git noDepth
 
-	if [[ $compile == "true" ]]; then
+	if [[ $compile == "true" ]] || [[ $newFfmpeg == "yes" ]]; then
 		if [ -d "build" ]; then
 			rm -rf build
 			rm -rf .sconf_temp
@@ -1773,19 +1773,19 @@ if [[ $x264Bin == "yes" ]] || [[ $newFfmpeg == "yes" ]]; then
 	make uninstall
 	make clean
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli --bit-depth=10 --extra-ldflags='-lsoxr'
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --bit-depth=10
 	make -j $cpuCount
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --bit-depth=10 --extra-ldflags='-lsoxr'
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10
 	make -j $cpuCount
 	
 	cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
 	make clean
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli --extra-ldflags='-lsoxr'
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli
 	make -j $cpuCount
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --extra-ldflags='-lsoxr'
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static
 	make -j $cpuCount
 	make install
 	
