@@ -882,7 +882,7 @@ if %build32%==yes (
 		echo.DXSDK_DIR="/mingw32/i686-w64-mingw32">>%instdir%\local32\etc\profile.local
 		echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal">>%instdir%\local32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
-		echo.CPPFLAGS="-I/local32/include">>%instdir%\local32\etc\profile.local
+		echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local32\etc\profile.local
 		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
 		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
 		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
@@ -933,7 +933,7 @@ if %build64%==yes (
 		echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
 		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal>>%instdir%\local64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
-		echo.CPPFLAGS="-I/local64/include">>%instdir%\local64\etc\profile.local
+		echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local64\etc\profile.local
 		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
 		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
 		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
