@@ -886,7 +886,7 @@ if %build32%==yes (
 		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
 		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
 		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
+		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\local32\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local32\etc\profile.local
@@ -937,7 +937,7 @@ if %build64%==yes (
 		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
 		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
 		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
-		echo.export PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
+		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.PYTHONHOME=/usr>>%instdir%\local64\etc\profile.local
 		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local64\etc\profile.local
