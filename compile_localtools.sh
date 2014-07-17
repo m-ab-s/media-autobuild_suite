@@ -162,7 +162,7 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile openjpeg $bits\007"
-		if [ -d "openjpeg-1.5.1" ]; then rm -rf openjpeg-1.5.1; fi
+		rm -rf openjpeg-1.5.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://openjpeg.googlecode.com/files/openjpeg-1.5.1.tar.gz"
 		tar xf openjpeg-1.5.1.tar.gz
 		rm openjpeg-1.5.1.tar.gz
@@ -185,7 +185,7 @@ if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile freetype $bits\007"
-		if [ -d "freetype-2.5.3" ]; then rm -rf freetype-2.5.3; fi
+		rm -rf freetype-2.5.3
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.savannah.gnu.org/releases/freetype/freetype-2.5.3.tar.gz
 		tar xf freetype-2.5.3.tar.gz
 		rm freetype-2.5.3.tar.gz
@@ -205,7 +205,7 @@ if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fontconfig $bits\007"
-		if [ -d "fontconfig-2.11.1" ]; then rm -rf fontconfig-2.11.1; fi
+		rm -rf fontconfig-2.11.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.1.tar.gz
 		tar xf fontconfig-2.11.1.tar.gz
 		rm fontconfig-2.11.1.tar.gz
@@ -226,7 +226,7 @@ if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile fribidi $bits\007"
-		if [ -d "fribidi-0.19.6" ]; then rm -rf fribidi-0.19.6; fi
+		rm -rf fribidi-0.19.6
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.6.tar.bz2
 		tar xf fribidi-0.19.6.tar.bz2
 		rm fribidi-0.19.6.tar.bz2
@@ -267,7 +267,7 @@ if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile SDL $bits\007"
-		if [ -d "SDL-1.2.15" ]; then rm -rf SDL-1.2.15; fi
+		rm -rf SDL-1.2.15
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
 		tar xf SDL-1.2.15.tar.gz
 		rm SDL-1.2.15.tar.gz
@@ -293,7 +293,7 @@ if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile libgcrypt $bits\007"
-		if [ -d "libgcrypt-1.6.1" ]; then rm -rf libgcrypt-1.6.1; fi
+		rm -rf libgcrypt-1.6.1
 		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.1.tar.bz2
 		tar xf libgcrypt-1.6.1.tar.bz2
 		rm libgcrypt-1.6.1.tar.bz2
@@ -313,7 +313,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile gnutls $bits\007"
-		if [ -d "gnutls-3.3.3" ]; then rm -rf gnutls-3.3.3; fi
+		rm -rf gnutls-3.3.3
 		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.3.tar.xz
 		tar xf gnutls-3.3.3.tar.xz
 		rm gnutls-3.3.3.tar.xz
@@ -344,7 +344,8 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl" 
+	make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
+	
 	sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 	
 	do_checkIfExist rtmpdump librtmp.a
@@ -363,11 +364,14 @@ if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libdca $bits\007"
-		if [ -d "libdca" ]; then rm -rf libdca; fi
+		rm -rf libdca
 		svn co svn://svn.videolan.org/libdca/trunk libdca
 		cd libdca
+		
 		./bootstrap
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
+		
 		make -j $cpuCount
 		make install
 		
@@ -382,14 +386,17 @@ if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libxml2 $bits\007"
-		if [ -d "libxml2-2.9.1" ]; then rm -rf libxml2-2.9.1; fi
+		rm -rf libxml2-2.9.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
 		tar xf libxml2-2.9.1.tar.gz
 		rm libxml2-2.9.1.tar.gz
 		cd libxml2-2.9.1
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --enable-static
+		
 		make -j $cpuCount
 		make install
+		
 		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
 		cp $LOCALDESTDIR/lib/xml2.la $LOCALDESTDIR/lib/libxml2.la
 		
@@ -404,7 +411,7 @@ if [ -f "$LOCALDESTDIR/lib/libmagic.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile file $bits\007"
-		if [ -d "file-5.19" ]; then rm -rf file-5.19; fi
+		rm -rf file-5.19
 		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.astron.com/pub/file/file-5.19.tar.gz
 		tar xf file-5.19.tar.gz
 		rm file-5.19.tar.gz
@@ -426,13 +433,16 @@ if [ -f "$LOCALDESTDIR/lib/libilbc.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libilbc $bits\007"
-		if [ -d "libilbc" ]; then rm -rf libilbc; fi
+		rm -rf libilbc
 		git clone --depth 1 https://github.com/dekkers/libilbc.git libilbc
 		cd libilbc
+		
 		if [[ ! -f "configure" ]]; then
 			autoreconf -fiv
 		fi
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
+		
 		make -j $cpuCount
 		make install
 		
@@ -456,9 +466,12 @@ if [[ $compile == "true" ]]; then
 		cd build
 	fi
 	../src/svn_version.sh
+	
 	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off
+	
 	make -j $cpuCount
 	make install
+	
 	mv $LOCALDESTDIR/bin/metacopy.exe $LOCALDESTDIR/bin-global
 	mv $LOCALDESTDIR/bin/path-test.exe $LOCALDESTDIR/bin-global
 	mv $LOCALDESTDIR/bin/exiv2.exe $LOCALDESTDIR/bin-global
@@ -479,7 +492,7 @@ if [ -f $LOCALDESTDIR/lib/libwx_baseu-3.0.a ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile wxWidgets $bits\007"
-		if [ -d "wxWidgets-3.0.1" ]; then rm -rf wxWidgets-3.0.1; fi
+		rm -rf wxWidgets-3.0.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c -O wxWidgets-3.0.1.tar.bz2 http://sourceforge.net/projects/wxwindows/files/3.0.1/wxWidgets-3.0.1.tar.bz2/download
 		tar xf wxWidgets-3.0.1.tar.bz2
 		rm wxWidgets-3.0.1.tar.bz2
@@ -512,12 +525,14 @@ if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libtheora $bits\007"
-		if [ -d "libtheora-1.1.1" ]; then rm -rf libtheora-1.1.1; fi
+		rm -rf libtheora-1.1.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
 		tar xf libtheora-1.1.1.tar.bz2
 		rm libtheora-1.1.1.tar.bz2
 		cd libtheora-1.1.1
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		
 		make -j $cpuCount
 		make install
 
@@ -532,12 +547,14 @@ if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile speex $bits\007"
-		if [ -d "speex-1.2rc1" ]; then rm -rf speex-1.2rc1; fi
+		rm -rf speex-1.2rc1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
 		tar xf speex-1.2rc1.tar.gz
 		rm speex-1.2rc1.tar.gz
 		cd speex-1.2rc1
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no 
+		
 		make -j $cpuCount
 		make install
 		
@@ -552,12 +569,14 @@ if [ -f "$LOCALDESTDIR/bin-audio/flac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile flac $bits\007"
-		if [ -d "flac-1.3.0" ]; then rm -rf flac-1.3.0; fi
+		rm -rf flac-1.3.0
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
 		tar xf flac-1.3.0.tar.xz
 		rm flac-1.3.0.tar.xz
 		cd flac-1.3.0
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
+		
 		make -j $cpuCount
 		make install
 		
@@ -572,12 +591,14 @@ if [ -f "$LOCALDESTDIR/lib/libvo-aacenc.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile vo-aacenc $bits\007"
-		if [ -d "vo-aacenc-0.1.3" ]; then rm -rf vo-aacenc-0.1.3; fi
+		rm -rf vo-aacenc-0.1.3
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz
 		tar xf vo-aacenc-0.1.3.tar.gz
 		rm vo-aacenc-0.1.3.tar.gz
 		cd vo-aacenc-0.1.3
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		
 		make -j $cpuCount
 		make install
 		
@@ -592,12 +613,14 @@ if [ -f "$LOCALDESTDIR/lib/libopencore-amrnb.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile opencore-amr $bits\007"
-		if [ -d "opencore-amr-0.1.3" ]; then rm -rf opencore-amr-0.1.3; fi
+		rm -rf opencore-amr-0.1.3
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
 		tar xf opencore-amr-0.1.3.tar.gz
 		rm opencore-amr-0.1.3.tar.gz
 		cd opencore-amr-0.1.3
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		
 		make -j $cpuCount
 		make install
 		
@@ -612,12 +635,14 @@ if [ -f "$LOCALDESTDIR/lib/libvo-amrwbenc.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile vo-amrwbenc $bits\007"
-		if [ -d "vo-amrwbenc-0.1.2" ]; then rm -rf vo-amrwbenc-0.1.2; fi
+		rm -rf vo-amrwbenc-0.1.2
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz
 		tar xf vo-amrwbenc-0.1.2.tar.gz
 		rm vo-amrwbenc-0.1.2.tar.gz
 		cd vo-amrwbenc-0.1.2
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		
 		make -j $cpuCount
 		make install
 		
@@ -633,9 +658,9 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fdk-aac $bits\007"
-		if [ -d "patch-fdk-aac" ]; then rm -rf patch-fdk-aac; fi
-		if [ -d "lib-fdk-aac" ]; then rm -rf lib-fdk-aac; fi
-		if [ -d "bin-fdk-aac" ]; then rm -rf bin-fdk-aac; fi
+		rm -rf patch-fdk-aac
+		rm -rf lib-fdk-aac
+		rm -rf bin-fdk-aac
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac_autobuild/archive/master.zip -O patch-fdk-aac.zip
 		unzip patch-fdk-aac.zip
 		rm patch-fdk-aac.zip
@@ -696,13 +721,16 @@ if [ -f "$LOCALDESTDIR/bin-audio/faac.exe" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile faac $bits\007"
-		if [ -d "faac-1.28" ]; then rm -rf faac-1.28; fi
+		rm -rf faac-1.28
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
 		tar xf faac-1.28.tar.gz
 		rm faac-1.28.tar.gz
 		cd faac-1.28
-		sh bootstrap 
+		
+		sh bootstrap
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
+		
 		make -j $cpuCount
 		make install
 		
@@ -718,14 +746,17 @@ if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus $bits\007"
-		if [ -d "opus-1.1" ]; then rm -rf opus-1.1; fi
+		rm -rf opus-1.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz
 		tar xf opus-1.1.tar.gz
 		rm opus-1.1.tar.gz
 		cd opus-1.1
+		
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch
 		patch -p0 < opus11.patch
+		
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
+		
         make -j $cpuCount
 		make install
 		
@@ -740,12 +771,14 @@ if [ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]; then
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus-tools $bits\007"
-		if [ -d "opus-tools-0.1.8" ]; then rm -rf opus-tools-0.1.8; fi
-      wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.8.tar.gz
+		rm -rf opus-tools-0.1.8
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.8.tar.gz
 		tar xf opus-tools-0.1.8.tar.gz
 		rm opus-tools-0.1.8.tar.gz
 		cd opus-tools-0.1.8
+		
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+		
         make -j $cpuCount
 		make install
         
@@ -760,12 +793,14 @@ if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile a52dec $bits\007"
-		if [ -d "a52dec-0.7.4" ]; then rm -rf a52dec-0.7.4; fi
+		rm -rf a52dec-0.7.4
 		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
 		tar xf a52dec-0.7.4.tar.gz
 		rm a52dec-0.7.4.tar.gz
 		cd a52dec-0.7.4
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+		
 		make -j $cpuCount
 		make install
 		
@@ -780,12 +815,14 @@ if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmad $bits\007"
-		if [ -d "libmad-0.15.1b" ]; then rm -rf libmad-0.15.1b; fi
+		rm -rf libmad-0.15.1b
 		wget --tries=20 --retry-connrefused --waitretry=2 -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 		tar xf libmad-0.15.1b.tar.gz
 		rm libmad-0.15.1b.tar.gz
 		cd libmad-0.15.1b
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+		
 		make -j $cpuCount
 		make install
 		
@@ -800,12 +837,14 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile soxr-0.1.1 $bits\007"
-		if [ -d "soxr-0.1.1-Source" ]; then rm -rf soxr-0.1.1-Source; fi
+		rm -rf soxr-0.1.1-Source
 		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 		tar xf soxr-0.1.1-Source.tar.xz
 		rm soxr-0.1.1-Source.tar.xz
 		cd soxr-0.1.1-Source
+		
 		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF
+		
 		make -j $cpuCount
 		make install
 		
@@ -820,7 +859,7 @@ if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libOpenAL $bits\007"
-		if [ -d "openal-soft-1.15.1" ]; then rm -rf openal-soft-1.15.1; fi
+		rm -rf openal-soft-1.15.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://kcat.strangesoft.net/openal-releases/openal-soft-1.15.1.tar.bz2
 		tar xf openal-soft-1.15.1.tar.bz2
 		rm openal-soft-1.15.1.tar.bz2
@@ -832,6 +871,7 @@ if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
 		cd build
 		
 		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:bool=off -DLIBTYPE=STATIC -DEXAMPLES:BOOL=off -DEXTRA_LIBS="-lsoxr" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static"
+		
 		make -j $cpuCount
 		make install
 
@@ -936,12 +976,14 @@ if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile twolame $bits\007"
-		if [ -d "twolame-0.3.13" ]; then rm -rf twolame-0.3.13; fi
+		rm -rf twolame-0.3.13
 		wget --tries=20 --retry-connrefused --waitretry=2 -c -O twolame-0.3.13.tar.gz http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
 		tar xf twolame-0.3.13.tar.gz
 		rm twolame-0.3.13.tar.gz
 		cd twolame-0.3.13
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+		
 		make -j $cpuCount
 		make install
 		
@@ -970,6 +1012,7 @@ if [[ $compile == "true" ]]; then
 	
 	make -j $cpuCount
 	make install
+	
 	if [[ $bits = "32bit" ]]; then
 		mv /mingw32/lib/tmp_libgsm.a /mingw32/lib/libgsm.a
 	else
@@ -1010,6 +1053,7 @@ if [[ $compile == "true" ]]; then
 	fi
 	
 	./configure --host=$targetHost --prefix=$LOCALDESTDIR --extra-cflags=-fno-aggressive-loop-optimizations --enable-static --enable-win32thread --disable-cli
+	
 	make -j $cpuCount
 	make install
 	
@@ -1029,16 +1073,16 @@ do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
 
 if [[ $compile == "true" ]]; then
 	cd build/msys
-	make clean
 	rm -rf *
-	if [ -f "$LOCALDESTDIR/bin-video/x265-16bit.exe" ]; then rm $LOCALDESTDIR/bin-video/x265-16bit.exe; fi
-	if [ -f "$LOCALDESTDIR/bin-video/x265.exe" ]; then rm $LOCALDESTDIR/bin-video/x265.exe; fi
-	if [ -f "$LOCALDESTDIR/include/x265.h" ]; then rm $LOCALDESTDIR/include/x265.h; fi
-	if [ -f "$LOCALDESTDIR/include/x265_config.h" ]; then rm $LOCALDESTDIR/include/x265_config.h; fi
-	if [ -f "$LOCALDESTDIR/lib/libx265.a" ]; then rm $LOCALDESTDIR/lib/libx265.a; fi
-	if [ -f "$LOCALDESTDIR/lib/pkgconfig/x265.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/x265.pc; fi
+	rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
+	rm -f $LOCALDESTDIR/bin-video/x265.exe
+	rm -f $LOCALDESTDIR/include/x265.h
+	rm -f $LOCALDESTDIR/include/x265_config.h
+	rm -f $LOCALDESTDIR/lib/libx265.a
+	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
 	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	
 	make -j $cpuCount
 	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
 
@@ -1046,6 +1090,7 @@ if [[ $compile == "true" ]]; then
 	rm -rf *
 
 	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	
 	make -j $cpuCount
 	make install
 
@@ -1063,10 +1108,12 @@ cd $LOCALBUILDDIR
 do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git noDepth
 
 if [[ $compile == "true" ]]; then
-	if [ -d "$LOCALDESTDIR/include/vpx" ]; then rm -rf $LOCALDESTDIR/include/vpx; fi
-	if [ -f "$LOCALDESTDIR/lib/pkgconfig/vpx.pc" ]; then rm $LOCALDESTDIR/lib/pkgconfig/vpx.pc; fi
-	if [ -f "$LOCALDESTDIR/lib/libvpx.a" ]; then rm $LOCALDESTDIR/lib/libvpx.a; fi
-	make clean
+	if [ -d $LOCALDESTDIR/include/vpx ]; then
+		rm -rf $LOCALDESTDIR/include/vpx
+		rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
+		rm -f $LOCALDESTDIR/lib/libvpx.a
+		make clean
+	fi
 	
 	if [[ $bits = "64bit" ]]; then
 		LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect
@@ -1084,6 +1131,7 @@ if [[ $compile == "true" ]]; then
 
 	make -j $cpuCount
 	make install
+	
 	mv $LOCALDESTDIR/bin/vpxdec.exe $LOCALDESTDIR/bin-video
 	mv $LOCALDESTDIR/bin/vpxenc.exe $LOCALDESTDIR/bin-video
 	
@@ -1131,6 +1179,7 @@ if [[ $compile == "true" ]]; then
 	fi
 
 	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
+	
 	make -j $cpuCount
 	make install
 
@@ -1156,7 +1205,9 @@ if [[ $compile == "true" ]]; then
 	fi
 	
 	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+	
 	sed -i 's/#define ATTRIBUTE_PACKED __attribute__ ((packed))/#define ATTRIBUTE_PACKED __attribute__ ((packed,gcc_struct))/' src/dvdread/ifo_types.h
+	
 	make -j $cpuCount
 	make install
 	
@@ -1178,17 +1229,21 @@ if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile libdvdnav $bits\007"
-		if [ -d "libdvdnav-4.2.1" ]; then rm -rf libdvdnav-4.2.1; fi
+		rm -rf libdvdnav-4.2.1
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
 		tar xf libdvdnav-4.2.1.tar.xz
 		rm libdvdnav-4.2.1.tar.xz
 		cd libdvdnav-4.2.1
+		
 		if [[ ! -f ./configure ]]; then
 		./autogen.sh
 		fi
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
+		
 		make -j $cpuCount
 		make install
+		
 		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin-video/dvdnav-config
 
 		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
@@ -1207,7 +1262,9 @@ if [[ $compile == "true" ]]; then
 	if [[ ! -f "configure" ]]; then
 		./bootstrap
 	fi
+	
 	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static
+	
 	make -j $cpuCount
 	make install
 	
@@ -1245,6 +1302,7 @@ if [[ $compile == "true" ]]; then
 	fi
 
 	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
+	
 	make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
 	make install RANLIBX="${RANLIB-ranlib}"
 	
@@ -1270,7 +1328,9 @@ if [[ $compile == "true" ]]; then
 	if [[ ! -f "configure" ]]; then
 		./autogen.sh
 	fi
+	
 	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+	
 	make -j $cpuCount
 	make install
 	
@@ -1293,10 +1353,13 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile xavs $bits\007"
-		if [ -d "xavs" ]; then rm -rf xavs; fi
+		rm -rf xavs
+		
 		svn checkout --trust-server-cert --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
 		cd xavs
+		
 		./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video
+		
 		make -j $cpuCount
 		make install
 		
@@ -1311,12 +1374,14 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-		if [ -d "mediainfo" ]; then rm -rf mediainfo; fi
+		rm -rf mediainfo
+		
 		a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
 
 		b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
 
 		wget --tries=20 --retry-connrefused --waitretry=2 -c -O mediainfo.7z "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download"
+		
 		mkdir mediainfo
 		cd mediainfo
 		7za x ../mediainfo.7z
@@ -1334,7 +1399,9 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 		make -j $cpuCount
 		
 		cd ../../../../MediaInfoLib/Project/GNU/Library
+		
 		./autogen
+		
 		./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
 		
 		if [[ $bits = "64bit" ]]; then
@@ -1377,7 +1444,9 @@ if [[ $compile == "true" ]]; then
 	sed -i "s/add_library (vidstab SHARED \${SOURCES})/# add_library (vidstab SHARED \${SOURCES})/g" ../CMakeLists.txt
 	
 	cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
+	
 	sed -i "s/SHARED/STATIC/" CMakeLists.txt
+	
 	make -j $cpuCount
 	make install
 	
@@ -1398,19 +1467,23 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libcaca $bits\007"
-		if [ -d "libcaca-0.99.beta19" ]; then rm -rf libcaca-0.99.beta19; fi
+		rm -rf libcaca-0.99.beta19
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://caca.zoy.org/raw-attachment/wiki/libcaca/libcaca-0.99.beta19.tar.gz
 		tar xf libcaca-0.99.beta19.tar.gz
 		rm libcaca-0.99.beta19.tar.gz
 		cd libcaca-0.99.beta19
 		cd caca
+		
 		sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" string.c
 		sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" figfont.c
 		sed -i "s/__declspec(dllexport)//g" *.h
 		sed -i "s/__declspec(dllimport)//g" *.h 
 		cd ..
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-cxx --disable-csharp --disable-ncurses --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+		
 		sed -i 's/ln -sf/$(LN_S)/' "caca/Makefile" "cxx/Makefile" "doc/Makefile"
+		
 		make -j $cpuCount
 		make install
 		
@@ -1425,13 +1498,16 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
-		if [ -d "libmodplug-0.8.8.5" ]; then rm -rf libmodplug-0.8.8.5; fi
+		rm -rf libmodplug-0.8.8.5
 		wget --tries=20 --retry-connrefused --waitretry=2 -c -O libmodplug-0.8.8.5.tar.gz http://downloads.sourceforge.net/project/modplug-xmms/libmodplug/0.8.8.5/libmodplug-0.8.8.5.tar.gz
 		tar xf libmodplug-0.8.8.5.tar.gz
 		rm libmodplug-0.8.8.5.tar.gz
 		cd libmodplug-0.8.8.5
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+		
 		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
+		
 		make -j $cpuCount
 		make install
 		
@@ -1446,14 +1522,17 @@ if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile orc $bits\007"
-		if [ -d "orc-0.4.19" ]; then rm -rf orc-0.4.19; fi
+		rm -rf orc-0.4.19
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://gstreamer.freedesktop.org/src/orc/orc-0.4.19.tar.gz
 		tar xf orc-0.4.19.tar.gz
 		rm orc-0.4.19.tar.gz
 		cd orc-0.4.19
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+		
 		make -j $cpuCount
 		make install
+		
 		sed -i 's/toolsdir=${exec_prefix}\/bin/toolsdir=${exec_prefix}\/bin-video/g' "$LOCALDESTDIR/lib/pkgconfig/orc-0.4.pc"
 		
 		do_checkIfExist orc-0.4.19 liborc-0.4.a
@@ -1467,15 +1546,19 @@ if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile schroedinger $bits\007"
-		if [ -d "schroedinger-1.0.11" ]; then rm -rf schroedinger-1.0.11; fi
+		rm -rf schroedinger-1.0.11
 		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/contrib/schroedinger-1.0.11.tar.gz
 		tar xf schroedinger-1.0.11.tar.gz
 		rm schroedinger-1.0.11.tar.gz
 		cd schroedinger-1.0.11
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+		
 		sed -i 's/testsuite//' Makefile
+		
 		make -j $cpuCount
 		make install
+		
 		sed -i 's/-lschroedinger-1.0$/-lschroedinger-1.0 -lorc-0.4/' "$LOCALDESTDIR/lib/pkgconfig/schroedinger-1.0.pc"
 		
 		do_checkIfExist schroedinger-1.0.11 libschroedinger-1.0.a
@@ -1489,19 +1572,24 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libmodplug $bits\007"
-		if [ -d "zvbi-0.2.35" ]; then rm -rf zvbi-0.2.35; fi
+		rm -rf zvbi-0.2.35
 		wget --tries=20 --retry-connrefused --waitretry=2 -c -O zvbi-0.2.35.tar.bz2 http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
 		tar xf zvbi-0.2.35.tar.bz2
 		rm zvbi-0.2.35.tar.bz2
 		cd zvbi-0.2.35
+		
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch
 		patch -p0 < zvbi-win32.patch
 		patch -p0 < zvbi-ioctl.patch
+		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
+		
 		cd src
+		
 		make -j $cpuCount
 		make install
+		
 		cp ../zvbi-0.2.pc $LOCALDESTDIR/lib/pkgconfig
 		
 		do_checkIfExist zvbi-0.2.35 libzvbi.a
@@ -1515,16 +1603,18 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
-		if [ -d "libmodplug-0.8.8.4" ]; then rm -rf libmodplug-0.8.8.4; fi
+		rm -rf frei0r-plugins-1.4
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4
 		mkdir build
 		cd build 
+		
 		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
+		
 		make -j $cpuCount 
-		 	 			make all install
+		make all install
 		
 		do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
@@ -1588,22 +1678,22 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			rm -rf $LOCALDESTDIR/include/libavdevice
 			rm -rf $LOCALDESTDIR/include/libavfilter
 			rm -rf $LOCALDESTDIR/include/libavformat
-			rm -rf $LOCALDESTDIR/lib/libavutil.a
-			rm -rf $LOCALDESTDIR/lib/libswresample.a
-			rm -rf $LOCALDESTDIR/lib/libswscale.a
-			rm -rf $LOCALDESTDIR/lib/libavcodec.a
-			rm -rf $LOCALDESTDIR/lib/libavdevice.a
-			rm -rf $LOCALDESTDIR/lib/libavfilter.a
-			rm -rf $LOCALDESTDIR/lib/libavformat.a
-			rm -rf $LOCALDESTDIR/lib/libpostproc.a
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-			rm -rf $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			rm -f $LOCALDESTDIR/lib/libavutil.a
+			rm -f $LOCALDESTDIR/lib/libswresample.a
+			rm -f $LOCALDESTDIR/lib/libswscale.a
+			rm -f $LOCALDESTDIR/lib/libavcodec.a
+			rm -f $LOCALDESTDIR/lib/libavdevice.a
+			rm -f $LOCALDESTDIR/lib/libavfilter.a
+			rm -f $LOCALDESTDIR/lib/libavformat.a
+			rm -f $LOCALDESTDIR/lib/libpostproc.a
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
 			make clean
 		fi
 			
