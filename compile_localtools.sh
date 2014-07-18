@@ -1756,7 +1756,7 @@ if [[ $bits = "64bit" ]]; then
 
 		cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
 		
-		do_checkIfExist vidstab-git libvidstab.a
+		do_checkIfExist f265-git bin-video/f265cli.exe
 		compile="false"
 	else
 		echo -------------------------------------------------
