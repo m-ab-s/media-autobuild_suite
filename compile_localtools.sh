@@ -465,9 +465,11 @@ if [[ $compile == "true" ]]; then
 		mkdir build
 		cd build
 	fi
-	../src/svn_version.sh
+	cd ../src
+	source svn_version.sh
+	cd ../build
 	
-	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off
+	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off -Wno-dev
 	
 	make -j $cpuCount
 	make install
@@ -1152,9 +1154,9 @@ if [[ $compile == "true" ]]; then
 	cd src
 
 	if [[ "$bits" = "32bit" ]]; then
-		make ARCH=i686 DFLAGS="-O2 -g -Werror -ftree-vectorize" LD="gcc -pthread"
+		make ARCH=i686 LD="gcc -pthread"
 	else
-		make ARCH=x86_64 DFLAGS="-O2 -g -Werror -ftree-vectorize" LD="gcc -pthread"
+		make ARCH=x86_64 LD="gcc -pthread"
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
@@ -1760,6 +1762,7 @@ if [[ $bits = "64bit" ]]; then
 		compile="false"
 	else
 		echo -------------------------------------------------
+		echo "f265 is already up to date"
 		echo "f265 is already up to date"
 		echo -------------------------------------------------
 	fi

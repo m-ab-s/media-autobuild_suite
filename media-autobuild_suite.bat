@@ -608,7 +608,7 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
 	echo.FontSmoothing=full>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.AllowBlinking=yes>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.Font=DejaVu Sans Mono>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Columns=90>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
+	echo.Columns=120>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.Rows=30>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.Term=xterm-256color>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	echo.CursorType=block>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
@@ -883,8 +883,8 @@ if %build32%==yes (
 		echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal">>%instdir%\local32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw32/lib/pkgconfig:/local32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
 		echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local32\etc\profile.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -O2 -pipe">>%instdir%\local32\etc\profile.local
+		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
+		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
 		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
 		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
@@ -934,8 +934,8 @@ if %build64%==yes (
 		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal>>%instdir%\local64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/mingw64/lib/pkgconfig:/local64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
 		echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local64\etc\profile.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -O2 -pipe">>%instdir%\local64\etc\profile.local
+		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
+		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
 		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
 		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
@@ -953,8 +953,8 @@ if %build64%==yes (
 		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.bits='64bit'>>%instdir%\local64\etc\profile.local
-		echo.targetBuild='x86_64-pc-mingw32'>>%instdir%\local64\etc\profile.local
-		echo.targetHost='x86_64-pc-mingw32'>>%instdir%\local64\etc\profile.local
+		echo.targetBuild='x86_64-w64-mingw32'>>%instdir%\local64\etc\profile.local
+		echo.targetHost='x86_64-w64-mingw32'>>%instdir%\local64\etc\profile.local
 		echo.cross='x86_64-w64-mingw32-'>>%instdir%\local64\etc\profile.local
 		)
 	
