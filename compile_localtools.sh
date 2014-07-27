@@ -1156,9 +1156,9 @@ if [[ $compile == "true" ]]; then
 	cd src
 
 	if [[ "$bits" = "32bit" ]]; then
-		make ARCH=i686 LD="gcc -pthread"
+		make ARCH=i686 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
 	else
-		make ARCH=x86_64 LD="gcc -pthread"
+		make ARCH=x86_64 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
