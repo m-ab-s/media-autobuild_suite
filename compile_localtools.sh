@@ -117,9 +117,10 @@ do_checkIfExist() {
 			else
 				echo -------------------------------------------------
 				echo "build $packetName failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again," 
+				echo "or if you know there is no dependences hit enter for continue it"
 				read -p "first close the batch window, then the shell window"
-				sleep 15
+				sleep 5
 		fi	
 	elif [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
 		if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
@@ -141,9 +142,10 @@ do_checkIfExist() {
 			else
 				echo -------------------------------------------------
 				echo "build $packetName failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again"
+				echo "delete the source folder under '$LOCALBUILDDIR' and start again," 
+				echo "or if you know there is no dependences hit enter for continue it"
 				read -p "first close the batch window, then the shell window"
-				sleep 15
+				sleep 5
 		fi	
 	fi
 }

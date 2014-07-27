@@ -11,6 +11,10 @@ modified: 2014-07-17
 
 ---
 
+When things in your life get an idol, what you will do?
+
+**Attention: This project will get delete in to week on 2014-08-10. Please let it me know if you are interested to continue the project, then I transfer it to you. Or please fork it, so it is still alive for others.** Sorry that I don't continue this project and thanks for giving inputs and error reports!  
+
 
 media-autobuild_suite
 =========
