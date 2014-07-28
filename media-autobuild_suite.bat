@@ -794,7 +794,6 @@ if %build32%==yes (
 		mkdir %instdir%\local32\lib
 		mkdir %instdir%\local32\lib\pkgconfig
 		mkdir %instdir%\local32\share
-		mkdir %instdir%\local32\uninstall
 		)	
 	)
 	
@@ -814,7 +813,6 @@ if %build64%==yes (
 		mkdir %instdir%\local64\lib
 		mkdir %instdir%\local64\lib\pkgconfig
 		mkdir %instdir%\local64\share
-		mkdir %instdir%\local64\uninstall
 		)
 	)
 
