@@ -1158,7 +1158,7 @@ if [[ $compile == "true" ]]; then
 	if [[ "$bits" = "32bit" ]]; then
 		make ARCH=i686 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
 	else
-		make ARCH=x86_64 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
+		make ARCH=x86_64 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" ASMFLAGS="-f win64 -DHAVE_ALIGNED_STACK=0 -DARCH_X86_64=1 -I. -I./strategies -I./extras" -j $cpuCount
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
