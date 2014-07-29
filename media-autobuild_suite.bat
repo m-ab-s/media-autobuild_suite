@@ -137,29 +137,29 @@ if exist %ini% GOTO checkINI
 	GOTO readINI
 
 :checkINI
-find /i "msys2Arch" %ini% > nul
+findstr /i "msys2Arch" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "arch" %ini% > nul
+findstr /i "arch" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "free" %ini% > nul
+findstr /i "free" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "ffmpegB" %ini% > nul
+findstr /i "ffmpegB" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "ffmpegUpdate" %ini% > nul
+findstr /i "ffmpegUpdate" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "mp4box" %ini% > nul
+findstr /i "mp4box" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "mplayer" %ini% > nul
+findstr /i "mplayer" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "mpv" %ini% > nul
+findstr /i "mpv" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "mkv" %ini% > nul
+findstr /i "mkv" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "cores" %ini% > nul
+findstr /i "cores" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "deleteSource" %ini% > nul
+findstr /i "deleteSource" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-find /i "strip" %ini% > nul
+findstr /i "strip" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 	
 :readINI
