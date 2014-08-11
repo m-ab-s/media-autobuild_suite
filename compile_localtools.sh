@@ -656,63 +656,53 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $nonfree = "y" ]]; then
+
+do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac-git
+
+if [[ $compile == "true" ]]; then
+	if [[ ! -f ./configure ]]; then
+		./autogen.sh
+	else 
+		make uninstall
+		make clean
+	fi
+
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+	
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist fdk-aac-git libfdk-aac.a
+else
+	echo -------------------------------------------------
+	echo "fdk-aac is already up to date"
+	echo -------------------------------------------------
+fi
+	
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
 	echo -------------------------------------------------
 	echo "bin-fdk-aac is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile fdk-aac $bits\007"
-		rm -rf patch-fdk-aac
-		rm -rf lib-fdk-aac
 		rm -rf bin-fdk-aac
-		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac_autobuild/archive/master.zip -O patch-fdk-aac.zip
-		unzip patch-fdk-aac.zip
-		rm patch-fdk-aac.zip
-		mv fdkaac_autobuild-master patch-fdk-aac
-		
-		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/mstorsjo/fdk-aac/archive/master.zip -O lib-fdk-aac.zip 
-		unzip lib-fdk-aac.zip
-		rm lib-fdk-aac.zip
-		mv fdk-aac-master lib-fdk-aac
-		cp patch-fdk-aac/files/LibMakefile lib-fdk-aac/Makefile
-		cp patch-fdk-aac/files/libfdk-aac.version lib-fdk-aac/libfdk-aac.version
 
-		sed -i 's/cd stage && zip -r $(PREFIX)\/libfdk-aac-win32-bin.zip \* \& cd \.\.//g' lib-fdk-aac/Makefile
-		cd lib-fdk-aac
-		CC=gcc make -j $cpuCount PREFIX=$LOCALDESTDIR
-		make install PREFIX=$LOCALDESTDIR
-		
-		do_checkIfExist lib-fdk-aac libfdk-aac.a
-		
-		cd $LOCALBUILDDIR
 		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip 
 		unzip bin-fdk-aac.zip
 		rm bin-fdk-aac.zip 
 		mv fdkaac-master bin-fdk-aac
-		cp patch-fdk-aac/files/AppMakefile bin-fdk-aac/Makefile
-		cp patch-fdk-aac/files/config.h bin-fdk-aac/config.h
-		rm -rf patch-fdk-aac
 		cd bin-fdk-aac
 		
-		make PREFIX=$LOCALDESTDIR/bin-audio CC="gcc -L$LOCALDESTDIR/lib -lfdk-aac" CPPFLAGS="-DHAVE_CONFIG_H -I. -I$LOCALDESTDIR/include"
-		cp fdkaac.exe $LOCALDESTDIR/bin-audio
-		
-		rm $LOCALDESTDIR/bin/libfdk-aac-0.dll
-		rm $LOCALDESTDIR/lib/libfdk-aac.dll.a
-
-		if [ ! -f $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc ]; then
-			echo "prefix=$LOCALDESTDIR" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "exec_prefix=$LOCALDESTDIR" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "libdir=$LOCALDESTDIR/lib" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "includedir=$LOCALDESTDIR/include" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Name: Fraunhofer FDK AAC Codec Library" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Description: AAC codec library" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Version: 0.3.0" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Libs: -L\${libdir} -lfdk-aac" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Libs.private: -lm" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-			echo "Cflags: -I${includedir}" >> $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
+		if [[ ! -f ./configure ]]; then
+			autoreconf -i
 		fi
+	
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
+		
+		make -j $cpuCount
+		make install
 
 		do_checkIfExist bin-fdk-aac bin-audio/fdkaac.exe
 fi
@@ -1154,7 +1144,10 @@ do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
 
 if [[ $compile == "true" ]]; then
 	cd src
-
+	if [[ -f intra.o ]]; then
+		make clean
+	fi
+	
 	if [[ "$bits" = "32bit" ]]; then
 		make ARCH=i686 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
 	else
