@@ -1429,20 +1429,15 @@ do_git "https://github.com/georgmartius/vid.stab.git" vidstab-git
 if [[ $compile == "true" ]]; then
 	if [ -d "build" ]; then
 		cd build
-		make uninstall
+		rm -rf $LOCALDESTDIR/include/vid.stab
 		make clean
 		rm -rf *
 	else
 		mkdir build
 		cd build
 	fi
-	
-	sed -i "s/# add_library (vidstab STATIC \${SOURCES})/add_library (vidstab STATIC \${SOURCES})/g" ../CMakeLists.txt
-	sed -i "s/add_library (vidstab SHARED \${SOURCES})/# add_library (vidstab SHARED \${SOURCES})/g" ../CMakeLists.txt
-	
-	cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
-	
-	sed -i "s/SHARED/STATIC/" CMakeLists.txt
+
+	cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off
 	
 	make -j $cpuCount
 	make install
