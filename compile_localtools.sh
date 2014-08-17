@@ -1695,7 +1695,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				arch='x86_64'
 			fi
 			if [[ $ffmpeg = "s" ]]; then
-				if [ -d "$LOCALDESTDIR/bin/ffmpegSHARED/bin-video/ffmpeg.exe" ]; then 
+				if [ -d "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
 					rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
 					make distclean
 				fi
@@ -1718,9 +1718,8 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
 				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
 				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+				sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
 			fi
-			
-			sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
 			
 			do_checkIfExist ffmpeg-git bin-video/ffmpeg.exe
 			compile="false"
