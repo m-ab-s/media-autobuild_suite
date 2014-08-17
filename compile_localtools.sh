@@ -116,10 +116,10 @@ do_checkIfExist() {
 			fi
 			else
 				echo -------------------------------------------------
-				echo "build $packetName failed..."
-				echo "delete the source folder under '$LOCALBUILDDIR' and start again," 
-				echo "or if you know there is no dependences hit enter for continue it"
-				read -p "first close the batch window, then the shell window"
+				echo "Build $packetName failed..."
+				echo "Delete the source folder under '$LOCALBUILDDIR' and start again," 
+				echo "or if you know there is no dependences hit enter for continue it."
+				read -p ""
 				sleep 5
 		fi	
 	elif [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
@@ -335,7 +335,7 @@ cd $LOCALBUILDDIR
 do_git "git://git.ffmpeg.org/rtmpdump" rtmpdump-git
 
 if [[ $compile == "true" ]]; then
-	if [[ $LOCALDESTDIR/lib/librtmp.a ]]; then
+	if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
 		rm -rf $LOCALDESTDIR/include/librtmp
 		rm $LOCALDESTDIR/lib/librtmp.a
 		rm $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
@@ -1260,7 +1260,7 @@ if [[ $compile == "true" ]]; then
 		./bootstrap
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
 	
 	make -j $cpuCount
 	make install
@@ -1326,7 +1326,7 @@ if [[ $compile == "true" ]]; then
 		./autogen.sh
 	fi
 	
-	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-harfbuzz
 	
 	make -j $cpuCount
 	make install
@@ -1686,7 +1686,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
-			make clean
+			make distclean
 		fi
 			
 			if [[ $bits = "32bit" ]]; then
@@ -1697,9 +1697,9 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			if [[ $ffmpeg = "s" ]]; then
 				if [ -d "$LOCALDESTDIR/bin/ffmpegSHARED/bin-video/ffmpeg.exe" ]; then 
 					rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-					make clean
+					make distclean
 				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
+				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
 			else
 				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
 				
@@ -1713,10 +1713,13 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			make -j $cpuCount
 			make install
 			
-			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			if [[ ! $ffmpeg = "s" ]]; then
+				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			fi
+			
 			sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
 			
 			do_checkIfExist ffmpeg-git bin-video/ffmpeg.exe
@@ -1823,7 +1826,8 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin-video/dvdnav-config --disable-dvdread-internal --disable-libdvdcss-internal $faac
+		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin-video/dvdnav-config --disable-dvdread-internal --disable-libdvdcss-internal --disable-gif $faac
+		
 		make -j $cpuCount
 		make install
 
@@ -1841,7 +1845,7 @@ cd $LOCALBUILDDIR
 if [[ $mpv = "y" ]]; then
 	do_git "git://github.com/mpv-player/mpv.git" mpv-git
 	
-	if [[ $compile == "true" ]] || [[ $newFfmpeg == "yes" ]]; then
+	if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
 		if [ ! -f waf ]; then
 			python2 ./bootstrap.py
 		else
