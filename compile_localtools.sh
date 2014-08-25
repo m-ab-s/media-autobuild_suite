@@ -1746,18 +1746,19 @@ if [[ $bits = "64bit" ]]; then
 			rm -f .sconsign.dblite
 			rm -f config.log
 			rm -f options.py
-			rm -f $LOCALDESTDIR/bin-video/f265cli.exe
 		fi
 		
 		scons
 
-		cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
+		if [ -f build/f265cli.exe ]; then
+			rm -f $LOCALDESTDIR/bin-video/f265cli.exe
+			cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
+		fi
 		
 		do_checkIfExist f265-git bin-video/f265cli.exe
 		compile="false"
 	else
 		echo -------------------------------------------------
-		echo "f265 is already up to date"
 		echo "f265 is already up to date"
 		echo -------------------------------------------------
 	fi
