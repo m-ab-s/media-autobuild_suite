@@ -657,7 +657,8 @@ echo.updating msys2 system
 echo.-------------------------------------------------------------------------------
 if exist %instdir%\updateMSYS2.sh del %instdir%\updateMSYS2.sh
 echo.echo -ne "\033]0;update msys2 system\007">>updateMSYS2.sh
-echo.pacman --noconfirm -Syu --force>>updateMSYS2.sh
+echo.pacman --noconfirm -Syu --force --ignoregroup base>>updateMSYS2.sh
+echo.pacman --noconfirm -Su --force>>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
 echo.echo "updating msys2 done...">>updateMSYS2.sh
 echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
