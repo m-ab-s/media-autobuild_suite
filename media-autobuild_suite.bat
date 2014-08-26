@@ -930,7 +930,7 @@ if %build64%==yes (
 		echo.MSYSTEM=MINGW32>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
-		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal>>%instdir%\local64\etc\profile.local
+		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal">>%instdir%\local64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
 		echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local64\etc\profile.local
 		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
