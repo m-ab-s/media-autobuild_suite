@@ -1628,13 +1628,18 @@ if [[ $mp4box = "y" ]]; then
 		
 		./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
 		cp config.h include/gpac/internal
+		
+		if [[ $bits = "64bit" ]]; then
+			sed -i 's/ -fPIC//g' config.mak
+		fi
+		
 		cd src
 		make -j $cpuCount
 		
 		cd ../applications/mp4box
 		make -j $cpuCount
-		cd ../..
-		cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
+		
+		cp ../../bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 		
 		do_checkIfExist mp4box-svn bin-video/MP4Box.exe
 		compile="false"
