@@ -1498,10 +1498,12 @@ if [ -f "$LOCALDESTDIR/lib/libmodplug.a" ]; then
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 		
-		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
-		
 		make -j $cpuCount
 		make install
+		
+		sed -i 's/-lmodplug.*/-lmodplug -lstdc++/' $LOCALDESTDIR/lib/pkgconfig/libmodplug.pc
+		sed -i 's/__declspec(dllexport)//' $LOCALDESTDIR/include/libmodplug/modplug.h
+		sed -i 's/__declspec(dllimport)//' $LOCALDESTDIR/include/libmodplug/modplug.h
 		
 		do_checkIfExist libmodplug-0.8.8.5 libmodplug.a
 fi
