@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.71
+::	This is version 2.73
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -96,6 +96,7 @@
 ::	2014-07-03 fix get newest msys2 version and new fstab check and mount
 ::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix
 ::	2014-07-17 change and optimize the profiles, fix kvazaar for different computers, add f265
+::	2014-09-08 no patch for vpx anymore, no seed for libdvdread, little fixes and new write ini function
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -120,21 +121,23 @@ if exist %ini% GOTO checkINI
 	set /P msys2Arch="msys2 system:"
 	if %msys2Arch% GTR 2 GOTO selectmsys2Arch
 
-	echo.[compiler list]>>%ini%
+	echo.[compiler list]>%ini%
 	echo.msys2Arch=^%msys2Arch%>>%ini%
-	echo.arch=^0>>%ini%
-	echo.free=^0>>%ini%
-	echo.ffmpegB=^0>>%ini%
-	echo.ffmpegUpdate=^0>>%ini%
-	echo.mp4box=^0>>%ini%
-	echo.mplayer=^0>>%ini%
-	echo.mpv=^0>>%ini%
-	echo.mkv=^0>>%ini%
-	echo.cores=^0>>%ini%
-	echo.deleteSource=^0>>%ini%
-	echo.strip=^0>>%ini%
 	
-	GOTO readINI
+	set msys2ArchINI=%msys2Arch%
+	set archINI=0
+	set freeINI=0
+	set ffmpegINI=0
+	set ffmpegUpdateINI=0
+	set mp4boxINI=0
+	set mplayerINI=0
+	set mpvINI=0
+	set mkvINI=0
+	set coresINI=0
+	set deleteSourceINI=0
+	set stripINI=0
+
+	GOTO systemVars
 
 :checkINI
 findstr /i "msys2Arch" %ini% > nul
@@ -176,6 +179,7 @@ for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%
 for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
 
+:systemVars
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 (
 	set "msys2=msys32"
@@ -215,6 +219,8 @@ if %buildEnv%==3 (
 	)
 if %buildEnv% GTR 3 GOTO :selectSystem
 
+echo.arch=^%buildEnv%>>%ini%
+
 :selectNonFree
 if %freeINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -239,6 +245,8 @@ if %nonfree%==2 (
 	)
 if %nonfree% GTR 2 GOTO selectNonFree
 
+echo.free=^%nonfree%>>%ini%
+	
 :ffmpeg
 if %ffmpegINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -267,6 +275,8 @@ if %buildffmpeg%==3 (
 	)
 if %buildffmpeg% GTR 3 GOTO ffmpeg
 
+echo.ffmpegB=^%buildffmpeg%>>%ini%
+
 :ffmpegUp
 if %ffmpegUpdateINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -290,6 +300,8 @@ if %buildffmpegUp%==2 (
 	set "ffmpegUpdate=n"
 	)
 if %buildffmpegUp% GTR 2 GOTO ffmpegUp
+
+echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
 :mp4boxStatic
 if %mp4boxINI%==0 (
@@ -315,6 +327,8 @@ if %buildMp4box%==2 (
 	)
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 
+echo.mp4box=^%buildMp4box%>>%ini%
+
 :mplayer
 if %mplayerINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -338,6 +352,8 @@ if %buildmplayer%==2 (
 	set "mplayer=n"
 	)
 if %buildmplayer% GTR 2 GOTO mplayer
+
+echo.mplayer=^%buildmplayer%>>%ini%
 
 :mpv
 if %mpvINI%==0 (
@@ -363,6 +379,8 @@ if %buildmpv%==2 (
 	)
 if %buildmpv% GTR 2 GOTO mpv
 
+echo.mpv=^%buildmpv%>>%ini%
+
 :mkv
 if %mkvINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -387,6 +405,8 @@ if %buildmkv%==2 (
 	)
 if %buildmkv% GTR 2 GOTO mkv
 
+echo.mkv=^%buildmkv%>>%ini%
+
 :numCores
 if %coresINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -406,6 +426,8 @@ if %coresINI%==0 (
 		set cpuCount=%%a
 		)
 if "%cpuCount%"=="" GOTO :numCores
+
+echo.cores=^%cpuCount%>>%ini%
 
 :delete
 if %deleteSourceINI%==0 (
@@ -431,6 +453,8 @@ if %deleteS%==2 (
 	)
 if %deleteS% GTR 2 GOTO delete
 
+echo.deleteSource=^%deleteS%>>%ini%
+
 :stripEXE
 if %stripINI%==0 (
 	echo -------------------------------------------------------------------------------
@@ -454,6 +478,8 @@ if %stripF%==2 (
 	set "stripFile=n"
 	)
 if %stripF% GTR 2 GOTO stripEXE
+
+echo.strip=^%stripF%>>%ini%
 
 ::------------------------------------------------------------------
 ::download and install basic msys system:
