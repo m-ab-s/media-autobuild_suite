@@ -909,7 +909,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://github.com/dbry/WavPack.git" WavPack-git
+do_git "https://github.com/dbry/WavPack.git" WavPack-git
 
 if [[ $compile == "true" ]]; then
 	if [[ ! -f ./configure ]]; then
@@ -935,7 +935,7 @@ fi
 	
 cd $LOCALBUILDDIR
 
-do_git "git://github.com/erikd/libsndfile.git" libsndfile-git
+do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
 
 if [[ $compile == "true" ]]; then
 	if [[ ! -f ./configure ]]; then
@@ -1043,7 +1043,7 @@ if [[ $compile == "true" ]]; then
 		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
 	fi
 	if [ -f "libx264.a" ]; then
-		make clean
+		make distclean
 	fi
 	
 	./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --disable-cli
@@ -1159,7 +1159,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
+do_git "https://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
 
 if [[ $compile == "true" ]]; then
 	if [[ ! -f "configure" ]]; then
@@ -1184,7 +1184,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/libdvdread.git" libdvdread-git
+do_git "https://gitorious.org/videolan/libdvdread.git" libdvdread-git
 
 if [[ $compile == "true" ]]; then
 
@@ -1270,7 +1270,7 @@ cd $LOCALBUILDDIR
 
 echo -ne "\033]0;compile libutvideo-git $bits\007"
 if [ ! -d libutvideo-git ]; then
-	git clone "git://github.com/qyot27/libutvideo.git" libutvideo-git
+	git clone "https://github.com/qyot27/libutvideo.git" libutvideo-git
 	compile="true"
 	cd libutvideo-git
 else 	
@@ -1660,7 +1660,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
 
 	if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
-		if [ -d "$LOCALDESTDIR/$LOCALDESTDIR/bin-video/ffmpeg.exe" ]; then 
+		if [ -f "$LOCALDESTDIR/bin-video/ffmpeg.exe" ]; then 
 			rm -rf $LOCALDESTDIR/include/libavutil
 			rm -rf $LOCALDESTDIR/include/libavcodec
 			rm -rf $LOCALDESTDIR/include/libpostproc
@@ -1694,13 +1694,13 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				arch='x86_64'
 			fi
 			if [[ $ffmpeg = "s" ]]; then
-				if [ -d "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
+				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
 					rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
 					make distclean
 				fi
 				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
 			else
-				if [ -d "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
+				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 					make distclean
 				fi
 				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
@@ -1845,7 +1845,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mpv = "y" ]]; then
-	do_git "git://github.com/mpv-player/mpv.git" mpv-git
+	do_git "https://github.com/mpv-player/mpv.git" mpv-git
 	
 	if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
 		if [ ! -f waf ]; then
@@ -1873,7 +1873,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mkv = "y" ]]; then
-	do_git "git://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix-git
+	do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix-git
 	
 	if [[ $compile == "true" ]]; then
 		if [[ ! -f ./configure ]]; then
