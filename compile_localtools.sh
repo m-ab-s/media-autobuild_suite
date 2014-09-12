@@ -1727,7 +1727,6 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
 			fi
 			
-			do_checkIfExist ffmpeg-git bin-video/ffmpeg.exe
 			compile="false"
 		else
 			echo -------------------------------------------------
