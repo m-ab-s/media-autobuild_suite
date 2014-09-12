@@ -1721,6 +1721,10 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
 				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
 				sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+				
+				do_checkIfExist ffmpeg-git libavcodec.a
+			else 
+				do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
 			fi
 			
 			do_checkIfExist ffmpeg-git bin-video/ffmpeg.exe
