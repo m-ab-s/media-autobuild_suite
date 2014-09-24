@@ -97,6 +97,7 @@
 ::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix
 ::	2014-07-17 change and optimize the profiles, fix kvazaar for different computers, add f265
 ::	2014-09-08 no patch for vpx anymore, no seed for libdvdread, little fixes and new write ini function
+::	2014-09-24 fix ini write function
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -189,6 +190,7 @@ if %msys2Arch%==2 (
 	)
 
 :selectSystem
+set "writeArch=no"
 if %archINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -201,6 +203,7 @@ if %archINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildEnv="Build System:"
+	set "writeArch=yes"
 	) else (
 		set buildEnv=%archINI%
 		)
@@ -217,11 +220,11 @@ if %buildEnv%==3 (
 	set "build32=no"
 	set "build64=yes"
 	)
-if %buildEnv% GTR 3 GOTO :selectSystem
-
-echo.arch=^%buildEnv%>>%ini%
+if %buildEnv% GTR 3 GOTO selectSystem
+if %writeArch%==yes echo.arch=^%buildEnv%>>%ini%
 
 :selectNonFree
+set "writeFree=no"
 if %freeINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -233,6 +236,7 @@ if %freeINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P nonfree="Binaries:"
+	set "writeFree=yes"
 	) else (
 		set nonfree=%freeINI%
 		)
@@ -244,10 +248,10 @@ if %nonfree%==2 (
 	set "binary=n"
 	)
 if %nonfree% GTR 2 GOTO selectNonFree
-
-echo.free=^%nonfree%>>%ini%
+if %writeFree%==yes echo.free=^%nonfree%>>%ini%
 	
 :ffmpeg
+set "writeFF=no"
 if %ffmpegINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -260,6 +264,7 @@ if %ffmpegINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildffmpeg="build ffmpeg:"
+	set "writeFF=yes"
 	) else (
 		set buildffmpeg=%ffmpegINI%
 		)
@@ -274,10 +279,10 @@ if %buildffmpeg%==3 (
 	set "ffmpeg=s"
 	)
 if %buildffmpeg% GTR 3 GOTO ffmpeg
-
-echo.ffmpegB=^%buildffmpeg%>>%ini%
+if %writeFF%==yes echo.ffmpegB=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
+set "writeFFU=no"
 if %ffmpegUpdateINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -289,6 +294,7 @@ if %ffmpegUpdateINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildffmpegUp="build ffmpeg if lib is new:"
+	set "writeFFU=yes"
 	) else (
 		set buildffmpegUp=%ffmpegUpdateINI%
 		)
@@ -300,10 +306,10 @@ if %buildffmpegUp%==2 (
 	set "ffmpegUpdate=n"
 	)
 if %buildffmpegUp% GTR 2 GOTO ffmpegUp
-
-echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
+if %writeFFU%==yes echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
 :mp4boxStatic
+set "writeMP4Box=no"
 if %mp4boxINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -315,6 +321,7 @@ if %mp4boxINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildMp4box="build mp4box:"
+	set "writeMP4Box=yes"
 	) else (
 		set buildMp4box=%mp4boxINI%
 		)
@@ -326,10 +333,10 @@ if %buildMp4box%==2 (
 	set "mp4box=n"
 	)
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
-
-echo.mp4box=^%buildMp4box%>>%ini%
+if %writeMP4Box%==yes echo.mp4box=^%buildMp4box%>>%ini%
 
 :mplayer
+set "writeMPlayer=no"
 if %mplayerINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -341,6 +348,7 @@ if %mplayerINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildmplayer="build mplayer:"
+	set "writeMPlayer=yes"
 	) else (
 		set buildmplayer=%mplayerINI%
 		)
@@ -352,10 +360,10 @@ if %buildmplayer%==2 (
 	set "mplayer=n"
 	)
 if %buildmplayer% GTR 2 GOTO mplayer
-
-echo.mplayer=^%buildmplayer%>>%ini%
+if %writeMPlayer%==yes echo.mplayer=^%buildmplayer%>>%ini%
 
 :mpv
+set "writeMPV=no"
 if %mpvINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -367,6 +375,7 @@ if %mpvINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildmpv="build mpv:"
+	set "writeMPV=yes"
 	) else (
 		set buildmpv=%mpvINI%
 		)
@@ -378,10 +387,10 @@ if %buildmpv%==2 (
 	set "mpv=n"
 	)
 if %buildmpv% GTR 2 GOTO mpv
-
-echo.mpv=^%buildmpv%>>%ini%
+if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
 
 :mkv
+set "writeMKV=no"
 if %mkvINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -393,6 +402,7 @@ if %mkvINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P buildmkv="build mkv:"
+	set "writeMKV=yes"
 	) else (
 		set buildmkv=%mkvINI%
 		)
@@ -404,10 +414,10 @@ if %buildmkv%==2 (
 	set "mkv=n"
 	)
 if %buildmkv% GTR 2 GOTO mkv
-
-echo.mkv=^%buildmkv%>>%ini%
+if %writeMKV%==yes echo.mkv=^%buildmkv%>>%ini%
 
 :numCores
+set "writeCores=no"
 if %coresINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -418,7 +428,7 @@ if %coresINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P cpuCores="Core/Thread Count:"
-	echo -------------------------------------------------------------------------------
+	set "writeCores=yes"
 	) else ( 
 		set cpuCores=%coresINI%
 		)
@@ -426,10 +436,10 @@ if %coresINI%==0 (
 		set cpuCount=%%a
 		)
 if "%cpuCount%"=="" GOTO :numCores
-
-echo.cores=^%cpuCount%>>%ini%
+if %writeCores%==yes echo.cores=^%cpuCount%>>%ini%
 
 :delete
+set "writeDel=no"
 if %deleteSourceINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -441,6 +451,7 @@ if %deleteSourceINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P deleteS="delete source:"
+	set "writeDel=yes"
 	) else (
 		set deleteS=%deleteSourceINI%
 	)
@@ -452,10 +463,10 @@ if %deleteS%==2 (
 	set "deleteSource=n"
 	)
 if %deleteS% GTR 2 GOTO delete
-
-echo.deleteSource=^%deleteS%>>%ini%
+if %writeDel%==yes echo.deleteSource=^%deleteS%>>%ini%
 
 :stripEXE
+set "writeStrip=no"
 if %stripINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -467,6 +478,7 @@ if %stripINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	set /P stripF="strip files:"
+	set "writeStrip=yes"
 	) else (
 		set stripF=%stripINI%
 	)
@@ -478,8 +490,7 @@ if %stripF%==2 (
 	set "stripFile=n"
 	)
 if %stripF% GTR 2 GOTO stripEXE
-
-echo.strip=^%stripF%>>%ini%
+if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
 
 ::------------------------------------------------------------------
 ::download and install basic msys system:
@@ -895,8 +906,8 @@ if %build32%==yes (
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\local32\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\local32\etc\profile.local
-		echo.alias ${CC-cc}='/mingw32/bin/gcc.exe'>>%instdir%\local32\etc\profile.local
-		echo.alias python='/usr/bin/python2.exe'>>%instdir%\local32\etc\profile.local
+		echo.export CC=gcc>>%instdir%\local32\etc\profile.local
+		echo.export python=python2>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local32\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man">>%instdir%\local32\etc\profile.local
@@ -946,8 +957,8 @@ if %build64%==yes (
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.alias dir='ls -la --color=auto'>>%instdir%\local64\etc\profile.local
 		echo.alias ls='ls --color=auto'>>%instdir%\local64\etc\profile.local
-		echo.alias ${CC-cc}='/mingw64/bin/gcc.exe'>>%instdir%\local64\etc\profile.local
-		echo.alias python='/usr/bin/python2.exe'>>%instdir%\local64\etc\profile.local
+		echo.export CC=gcc>>%instdir%\local64\etc\profile.local
+		echo.export python=python2>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local64\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
