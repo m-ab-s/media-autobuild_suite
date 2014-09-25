@@ -453,7 +453,8 @@ fi
 
 cd $LOCALBUILDDIR
 	
-do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
+#do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn - brocken at the moment
+do_git "https://github.com/svn2github/exiv2.git" exiv2-git
 
 if [[ $compile == "true" ]]; then	
 	if [ -d "build" ]; then
@@ -1660,7 +1661,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
 
 	if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
-		if [ -f "$LOCALDESTDIR/bin-video/ffmpeg.exe" ]; then 
+		if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then 
 			rm -rf $LOCALDESTDIR/include/libavutil
 			rm -rf $LOCALDESTDIR/include/libavcodec
 			rm -rf $LOCALDESTDIR/include/libpostproc
