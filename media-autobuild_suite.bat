@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.73
+::	This is version 2.8
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -98,6 +98,7 @@
 ::	2014-07-17 change and optimize the profiles, fix kvazaar for different computers, add f265
 ::	2014-09-08 no patch for vpx anymore, no seed for libdvdread, little fixes and new write ini function
 ::	2014-09-24 fix ini write function
+::	2014-09-29 remove utvideo, remove march from profiles, add --disable-libavdevice to mpv, fix exiv2
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -919,8 +920,8 @@ if %build32%==yes (
 		echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal">>%instdir%\local32\etc\profile.local
 		echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig:/mingw32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
 		echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local32\etc\profile.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -march=i686 -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
+		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
+		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
 		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
 		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
@@ -970,8 +971,8 @@ if %build64%==yes (
 		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal">>%instdir%\local64\etc\profile.local
 		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
 		echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local64\etc\profile.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -march=x86-64 -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
+		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
+		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
 		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
 		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local

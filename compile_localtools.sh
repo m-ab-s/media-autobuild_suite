@@ -192,7 +192,7 @@ if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
 		tar xf freetype-2.5.3.tar.gz
 		rm freetype-2.5.3.tar.gz
 		cd freetype-2.5.3
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-harfbuzz=no
 		make -j $cpuCount
 		make install
 		
@@ -234,7 +234,7 @@ if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
 		rm fribidi-0.19.6.tar.bz2
 		cd fribidi-0.19.6
 		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no --with-glib=no
 		make -j $cpuCount
 		make install
 
@@ -399,9 +399,6 @@ if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
 		make -j $cpuCount
 		make install
 		
-		cp $LOCALDESTDIR/lib/xml2.a $LOCALDESTDIR/lib/libxml2.a
-		cp $LOCALDESTDIR/lib/xml2.la $LOCALDESTDIR/lib/libxml2.la
-		
 		do_checkIfExist libxml2-2.9.1 libxml2.a
 fi
 
@@ -454,7 +451,24 @@ fi
 cd $LOCALBUILDDIR
 	
 #do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn - brocken at the moment
-do_git "https://github.com/svn2github/exiv2.git" exiv2-git
+echo -ne "\033]0;compile exiv2 $bits\007"
+if [ ! -d exiv2-svn ]; then
+	svn checkout --non-recursive https://github.com/svn2github/exiv2/trunk exiv2-svn
+	cd exiv2-svn
+	svn update trunk
+	compile="true"
+	cd trunk
+else 	
+	cd exiv2-svn
+	oldRevision=`svnversion`
+	svn update
+	newRevision=`svnversion`
+	
+	if [[ "$oldRevision" != "$newRevision" ]]; then
+		cd trunk
+		compile="true"
+	fi
+fi
 
 if [[ $compile == "true" ]]; then	
 	if [ -d "build" ]; then
@@ -1269,44 +1283,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libutvideo-git $bits\007"
-if [ ! -d libutvideo-git ]; then
-	git clone "https://github.com/qyot27/libutvideo.git" libutvideo-git
-	compile="true"
-	cd libutvideo-git
-else 	
-	cd libutvideo-git
-	oldHead=`git rev-parse HEAD`
-	git pull origin buildsystem
-	newHead=`git rev-parse HEAD`
-	
-	if [[ "$oldHead" != "$newHead" ]]; then 
-		compile="true"
-	fi
-fi
-
-if [[ $compile == "true" ]]; then
-	if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
-		make uninstall
-		make clean
-	fi
-
-	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-	
-	make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
-	make install RANLIBX="${RANLIB-ranlib}"
-	
-	do_checkIfExist libutvideo-git libutvideo.a
-	compile="false"
-	buildFFmpeg="true"
-else
-	echo -------------------------------------------------
-	echo "libutvideo is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
 do_git "https://github.com/libass/libass.git" libass-git
 
 if [[ $compile == "true" ]]; then
@@ -1595,6 +1571,9 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4
+		
+		sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
+		
 		mkdir build
 		cd build 
 		
@@ -1704,7 +1683,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 					make distclean
 				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libutvideo --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
+				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
 				
 				newFfmpeg="yes"
 			fi
@@ -1859,7 +1838,8 @@ if [[ $mpv = "y" ]]; then
 			rm -rf $LOCALDESTDIR/bin-video/mpv
 		fi
 		
-		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" CC=gcc python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build
+		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build --disable-libavdevice
+
 		
 		python2 ./waf build -j $cpuCount
 		python2 ./waf install
