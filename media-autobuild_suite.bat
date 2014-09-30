@@ -99,6 +99,7 @@
 ::	2014-09-08 no patch for vpx anymore, no seed for libdvdread, little fixes and new write ini function
 ::	2014-09-24 fix ini write function
 ::	2014-09-29 remove utvideo, remove march from profiles, add --disable-libavdevice to mpv, fix exiv2
+::	2014-09-30 remove --disable-libavdevice from mpv
 ::
 ::-------------------------------------------------------------------------------------
 

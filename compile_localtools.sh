@@ -1838,8 +1838,17 @@ if [[ $mpv = "y" ]]; then
 			rm -rf $LOCALDESTDIR/bin-video/mpv
 		fi
 		
-		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build --disable-libavdevice
+		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build
 
+		if [[ $bits = "32bit" ]]; then
+			sed -i "s/LIBPATH_libav = .*/LIBPATH_libav = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
+			sed -i "s/LIBPATH_libavdevice = .*/LIBPATH_libavdevice = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
+			sed -i "s/LIBPATH_libavfilter = .*/LIBPATH_libavfilter = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
+		else
+			sed -i "s/LIBPATH_libav = .*/LIBPATH_libav = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
+			sed -i "s/LIBPATH_libavdevice = .*/LIBPATH_libavdevice = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
+			sed -i "s/LIBPATH_libavfilter = .*/LIBPATH_libavfilter = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
+		fi
 		
 		python2 ./waf build -j $cpuCount
 		python2 ./waf install
