@@ -1227,30 +1227,28 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdvdnav.a" ]; then
-	echo -------------------------------------------------
-	echo "libdvdnav-4.2.1 is already compiled"
-	echo -------------------------------------------------
-	else
-		echo -ne "\033]0;compile libdvdnav $bits\007"
-		rm -rf libdvdnav-4.2.1
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://dvdnav.mplayerhq.hu/releases/libdvdnav-4.2.1.tar.xz
-		tar xf libdvdnav-4.2.1.tar.xz
-		rm libdvdnav-4.2.1.tar.xz
-		cd libdvdnav-4.2.1
-		
-		if [[ ! -f ./configure ]]; then
-		./autogen.sh
-		fi
+do_git "https://gitorious.org/videolan/libdvdnav.git" libdvdnav-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
 		
 		make -j $cpuCount
 		make install
-		
-		sed -i "s/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread/echo -L${exec_prefix}\/lib -ldvdnav -ldvdread -ldl/" $LOCALDESTDIR/bin-video/dvdnav-config
 
-		do_checkIfExist libdvdnav-4.2.1 libdvdnav.a
+		do_checkIfExist libdvdnav-git libdvdnav.a
+		
+else
+	echo -------------------------------------------------
+	echo "libdvdnav-git is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1811,7 +1809,7 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --with-dvdnav-config=$LOCALDESTDIR/bin-video/dvdnav-config --disable-dvdread-internal --disable-libdvdcss-internal --disable-gif $faac
+		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-dvdread-internal --disable-libdvdcss-internal --disable-gif $faac
 		
 		make -j $cpuCount
 		make install
