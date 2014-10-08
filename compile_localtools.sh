@@ -879,7 +879,7 @@ if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
 		
 		cd build
 		
-		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:bool=off -DLIBTYPE=STATIC -DEXAMPLES:BOOL=off -DEXTRA_LIBS="-lsoxr" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static"
+		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:bool=off -DLIBTYPE=STATIC -DEXAMPLES:BOOL=off -DEXTRA_LIBS="-lsoxr" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++ -static"
 		
 		make -j $cpuCount
 		make install
@@ -1090,7 +1090,7 @@ if [[ $compile == "true" ]]; then
 	rm -f $LOCALDESTDIR/lib/libx265.a
 	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
-	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
 	
 	make -j $cpuCount
 	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
@@ -1098,7 +1098,7 @@ if [[ $compile == "true" ]]; then
 	make clean
 	rm -rf *
 
-	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++"
+	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
 	
 	make -j $cpuCount
 	make install
