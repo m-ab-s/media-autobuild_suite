@@ -346,7 +346,7 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	make LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
+	make XCFLAGS="-I/mingw32/include" LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
 	
 	sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 	
@@ -450,25 +450,25 @@ fi
 
 cd $LOCALBUILDDIR
 	
-#do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn - brocken at the moment
-echo -ne "\033]0;compile exiv2 $bits\007"
-if [ ! -d exiv2-svn ]; then
-	svn checkout --non-recursive https://github.com/svn2github/exiv2/trunk exiv2-svn
-	cd exiv2-svn
-	svn update trunk
-	compile="true"
-	cd trunk
-else 	
-	cd exiv2-svn
-	oldRevision=`svnversion`
-	svn update
-	newRevision=`svnversion`
-	
-	if [[ "$oldRevision" != "$newRevision" ]]; then
-		cd trunk
-		compile="true"
-	fi
-fi
+do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
+#echo -ne "\033]0;compile exiv2 $bits\007"
+#if [ ! -d exiv2-svn ]; then
+#	svn checkout --non-recursive https://github.com/svn2github/exiv2/trunk exiv2-svn
+#	cd exiv2-svn
+#	svn update trunk
+#	compile="true"
+#	cd trunk
+#else 	
+#	cd exiv2-svn
+#	oldRevision=`svnversion`
+#	svn update
+#	newRevision=`svnversion`
+#	
+#	if [[ "$oldRevision" != "$newRevision" ]]; then
+#		cd trunk
+#		compile="true"
+#	fi
+#fi
 
 if [[ $compile == "true" ]]; then	
 	if [ -d "build" ]; then
