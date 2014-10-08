@@ -101,6 +101,7 @@
 ::	2014-09-29 remove utvideo, remove march from profiles, add --disable-libavdevice to mpv, fix exiv2
 ::	2014-09-30 remove --disable-libavdevice from mpv
 ::	2014-10-07 change to libdvdnav git, fix mplayer
+::	2014-10-08 change openjpeg version to 1.5.2
 ::
 ::-------------------------------------------------------------------------------------
 

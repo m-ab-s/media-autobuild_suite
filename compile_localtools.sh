@@ -160,22 +160,22 @@ echo "--------------------------------------------------------------------------
 	
 if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 	echo -------------------------------------------------
-	echo "openjpeg-1.5.1 is already compiled"
+	echo "openjpeg-1.5.2 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile openjpeg $bits\007"
-		rm -rf openjpeg-1.5.1
-		wget --tries=20 --retry-connrefused --waitretry=2 -c "http://openjpeg.googlecode.com/files/openjpeg-1.5.1.tar.gz"
-		tar xf openjpeg-1.5.1.tar.gz
-		rm openjpeg-1.5.1.tar.gz
-		cd openjpeg-1.5.1
+		rm -rf openjpeg-1.5.2
+		wget --tries=20 --retry-connrefused --waitretry=2 -O openjpeg-1.5.2.tar.gz -c "http://sourceforge.net/projects/openjpeg.mirror/files/1.5.2/openjpeg-1.5.2.tar.gz/download"
+		tar xf openjpeg-1.5.2.tar.gz
+		rm openjpeg-1.5.2.tar.gz
+		cd openjpeg-1.5.2
 		
-		cmake -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="$CFLAGS -DOPJ_STATIC"
+		cmake -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
 				
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist openjpeg-1.5.1 libopenjpeg.a
+		do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
 		cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
 fi
 
