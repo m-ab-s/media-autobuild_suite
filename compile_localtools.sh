@@ -474,7 +474,7 @@ do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
 #	fi
 #fi
 
-if [[ $compile == "true" ]]; then	
+if [[ $compile == "no" ]]; then	# is deactivated for the moment
 	if [ -d "build" ]; then
 		cd build
 		make uninstall
