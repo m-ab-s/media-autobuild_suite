@@ -455,7 +455,7 @@ fi
 
 cd $LOCALBUILDDIR
 	
-do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
+#do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
 #echo -ne "\033]0;compile exiv2 $bits\007"
 #if [ ! -d exiv2-svn ]; then
 #	svn checkout --non-recursive https://github.com/svn2github/exiv2/trunk exiv2-svn
@@ -487,11 +487,8 @@ if [[ $compile == "no" ]]; then	# is deactivated for the moment
 		mkdir build
 		cd build
 	fi
-	cd ../src
-	source svn_version.sh
-	cd ../build
 	
-	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off -Wno-dev
+	LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off -DCMAKE_BUILD_TYPE=release -Wno-dev
 	
 	make -j $cpuCount
 	make install
@@ -503,9 +500,9 @@ if [[ $compile == "no" ]]; then	# is deactivated for the moment
 	do_checkIfExist exiv2-svn bin-global/exiv2.exe
 	compile="false"
 else
-	echo -------------------------------------------------
-	echo "exiv2 is already up to date"
-	echo -------------------------------------------------
+#	echo -------------------------------------------------
+#	echo "exiv2 is already up to date"
+#	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
