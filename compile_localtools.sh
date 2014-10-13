@@ -499,7 +499,7 @@ if [[ $compile == "no" ]]; then	# is deactivated for the moment
 	
 	do_checkIfExist exiv2-svn bin-global/exiv2.exe
 	compile="false"
-else
+#else
 #	echo -------------------------------------------------
 #	echo "exiv2 is already up to date"
 #	echo -------------------------------------------------
