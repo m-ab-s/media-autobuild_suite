@@ -102,7 +102,7 @@
 ::	2014-09-30 remove --disable-libavdevice from mpv
 ::	2014-10-07 change to libdvdnav git, fix mplayer
 ::	2014-10-08 change openjpeg version to 1.5.2
-::	2014-11-02 deactivate libcaca for windows xp compatibility
+::	2014-11-02 change libcaca for windows xp
 ::
 ::-------------------------------------------------------------------------------------
 

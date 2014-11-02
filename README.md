@@ -52,7 +52,7 @@ Included Tools And Libraries
 	- gnutls
 	- libass
 	- libbluray
-	- libcaca # is deactivated for windows xp compatibility
+	- libcacas
 	- libilbc
 	- libmodplug
 	- libpng
