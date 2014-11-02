@@ -102,6 +102,7 @@
 ::	2014-09-30 remove --disable-libavdevice from mpv
 ::	2014-10-07 change to libdvdnav git, fix mplayer
 ::	2014-10-08 change openjpeg version to 1.5.2
+::	2014-11-02 deactivate libcaca for windows xp compatibility
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -968,7 +969,7 @@ if %build64%==yes (
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
-		echo.MSYSTEM=MINGW32>>%instdir%\local64\etc\profile.local
+		echo.MSYSTEM=MINGW64>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
 		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal">>%instdir%\local64\etc\profile.local
