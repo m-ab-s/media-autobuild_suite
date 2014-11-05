@@ -1284,6 +1284,44 @@ fi
 
 cd $LOCALBUILDDIR
 
+echo -ne "\033]0;compile libutvideo-git $bits\007"
+if [ ! -d libutvideo-git ]; then
+	git clone "https://github.com/qyot27/libutvideo.git" libutvideo-git
+	compile="true"
+	cd libutvideo-git
+else
+	cd libutvideo-git
+	oldHead=`git rev-parse HEAD`
+	git pull origin buildsystem
+	newHead=`git rev-parse HEAD`
+
+	if [[ "$oldHead" != "$newHead" ]]; then
+		compile="true"
+	fi
+fi
+
+if [[ $compile == "true" ]]; then
+	if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
+		make uninstall
+		make clean
+	fi
+
+	./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
+
+	make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
+	make install RANLIBX="${RANLIB-ranlib}"
+
+	do_checkIfExist libutvideo-git libutvideo.a
+	compile="false"
+	buildFFmpeg="true"
+else
+	echo -------------------------------------------------
+	echo "libutvideo is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
 do_git "https://github.com/libass/libass.git" libass-git
 
 if [[ $compile == "true" ]]; then
@@ -1688,7 +1726,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 					make distclean
 				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
+				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
 				
 				newFfmpeg="yes"
 			fi
@@ -1816,7 +1854,7 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-dvdread-internal --disable-libdvdcss-internal --disable-gif $faac
+		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif $faac
 		
 		make -j $cpuCount
 		make install
