@@ -261,28 +261,6 @@ fi
 	do_checkIfExist fribidi-0.19.6 libfribidi.a
 fi
 
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
-	echo -------------------------------------------------
-	echo "SDL-1.2.15 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile SDL $bits\007"
-		rm -rf SDL-1.2.15
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
-		tar xf SDL-1.2.15.tar.gz
-		rm SDL-1.2.15.tar.gz
-		cd SDL-1.2.15
-		CFLAGS="-DDECLSPEC=" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
-		make -j $cpuCount
-		make install
-		
-		sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
-		sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-		
-		do_checkIfExist SDL-1.2.15 libSDL.a
-fi
 
 #----------------------
 # crypto engine
@@ -311,23 +289,24 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
-	echo "gnutls-3.3.3 is already compiled"
+	echo "gnutls-3.3.10 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile gnutls $bits\007"
-		rm -rf gnutls-3.3.3
-		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.3.tar.xz
-		tar xf gnutls-3.3.3.tar.xz
-		rm gnutls-3.3.3.tar.xz
-		cd gnutls-3.3.3
+		rm -rf gnutls-3.3.10
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.10.tar.xz
+		tar xf gnutls-3.3.10.tar.xz
+		rm gnutls-3.3.10.tar.xz
+		cd gnutls-3.3.10
 		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --disable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --enable-cxx --enable-nls --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane #--with-gnu-ld --enable-local-libopts 
+		CFLAGS+=" -DGNULIB_PORTCHECK=1" CXXFLAGS+=" -DGNULIB_PORTCHECK=1" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
+		
 		make -j $cpuCount
 		make install
 		
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 		
-		do_checkIfExist gnutls-3.3.3 libgnutls.a
+		do_checkIfExist gnutls-3.3.10 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
@@ -552,7 +531,7 @@ if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
 		rm libtheora-1.1.1.tar.bz2
 		cd libtheora-1.1.1
 		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-examples
 		
 		make -j $cpuCount
 		make install
@@ -580,28 +559,6 @@ if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
 		make install
 		
 		do_checkIfExist speex-1.2rc1 libspeex.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/bin-audio/flac.exe" ]; then
-	echo -------------------------------------------------
-	echo "flac-1.3.0 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile flac $bits\007"
-		rm -rf flac-1.3.0
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
-		tar xf flac-1.3.0.tar.xz
-		rm flac-1.3.0.tar.xz
-		cd flac-1.3.0
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
-		
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist flac-1.3.0 bin-audio/flac.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -952,57 +909,6 @@ else
 fi
 	
 cd $LOCALBUILDDIR
-
-do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
-
-if [[ $compile == "true" ]]; then
-	if [[ ! -f ./configure ]]; then
-		sed -i 's/(python --version)/(python2 --version)/g' autogen.sh
-		./autogen.sh
-	else 
-		make uninstall
-		make clean
-	fi
-
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --disable-external-libs
-	
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist libsndfile-git libsndfile.a
-	compile="false"
-	if [ -f autogen.sh ]; then
-		rm autogen.sh
-	fi
-else
-	echo -------------------------------------------------
-	echo "libsndfile is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libtwolame.a" ]; then
-	echo -------------------------------------------------
-	echo "twolame-0.3.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile twolame $bits\007"
-		rm -rf twolame-0.3.13
-		wget --tries=20 --retry-connrefused --waitretry=2 -c -O twolame-0.3.13.tar.gz http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download
-		tar xf twolame-0.3.13.tar.gz
-		rm twolame-0.3.13.tar.gz
-		cd twolame-0.3.13
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
-		
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist twolame-0.3.13 libtwolame.a
-fi
-	
-cd $LOCALBUILDDIR
 	
 do_git "git://git.code.sf.net/p/sox/code" sox-git
 
@@ -1037,6 +943,26 @@ else
 	echo -------------------------------------------------
 	echo "sox is already up to date"
 	echo -------------------------------------------------
+fi
+
+if [ -f "$LOCALDESTDIR/bin-audio/cd-paranoia.exe" ]; then
+	echo -------------------------------------------------
+	echo "libcdio-paranoia-10.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libcdio-paranoia $bits\007"
+		rm -rf libcdio-paranoia-10.2+0.93+1
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+0.93+1.tar.gz
+		tar libcdio-paranoia-10.2+0.93+1.tar.gz
+		rm libcdio-paranoia-10.2+0.93+1.tar.gz
+		cd libcdio-paranoia-10.2+0.93+1
+
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --disable-example-progs
+		
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libcdio-paranoia-10.2 bin-audio/cd-paranoia.exe
 fi
 
 echo "-------------------------------------------------------------------------------"
@@ -1177,85 +1103,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
-
-if [[ $compile == "true" ]]; then
-	if [[ ! -f "configure" ]]; then
-		autoreconf -fiv
-	else 
-		make uninstall
-		make clean
-	fi
-
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
-	
-	make -j $cpuCount
-	make install
-
-	do_checkIfExist libdvdcss-git libdvdcss.a
-	compile="false"
-else
-	echo -------------------------------------------------
-	echo "libdvdcss-git is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "https://gitorious.org/videolan/libdvdread.git" libdvdread-git
-
-if [[ $compile == "true" ]]; then
-
-	if [[ ! -f "configure" ]]; then
-		autoreconf -fiv
-	else 
-		make uninstall
-		make clean
-	fi
-	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
-	
-	make -j $cpuCount
-	make install
-	
-	sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
-
-	do_checkIfExist libdvdread-git libdvdread.a
-	compile="false"
-else
-	echo -------------------------------------------------
-	echo "libdvdread-git is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "https://gitorious.org/videolan/libdvdnav.git" libdvdnav-git
-
-if [[ $compile == "true" ]]; then
-
-	if [[ ! -f "configure" ]]; then
-		autoreconf -fiv
-	else 
-		make uninstall
-		make clean
-	fi
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
-		
-		make -j $cpuCount
-		make install
-
-		do_checkIfExist libdvdnav-git libdvdnav.a
-		
-else
-	echo -------------------------------------------------
-	echo "libdvdnav-git is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
 do_git "git://git.videolan.org/libbluray.git" libbluray-git
 
 if [[ $compile == "true" ]]; then
@@ -1283,6 +1130,7 @@ else
 fi
 
 cd $LOCALBUILDDIR
+
 
 echo -ne "\033]0;compile libutvideo-git $bits\007"
 if [ ! -d libutvideo-git ]; then
@@ -1317,36 +1165,6 @@ if [[ $compile == "true" ]]; then
 else
 	echo -------------------------------------------------
 	echo "libutvideo is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "https://github.com/libass/libass.git" libass-git
-
-if [[ $compile == "true" ]]; then
-	if [ -f $LOCALDESTDIR/lib/libass.a ]; then
-		make uninstall
-		make clean
-	fi
-	
-	if [[ ! -f "configure" ]]; then
-		./autogen.sh
-	fi
-	
-	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-harfbuzz
-	
-	make -j $cpuCount
-	make install
-	
-	sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
-	
-	do_checkIfExist libass-git libass.a
-	compile="false"
-	buildFFmpeg="true"
-else
-	echo -------------------------------------------------
-	echo "libass is already up to date"
 	echo -------------------------------------------------
 fi
 
@@ -1522,56 +1340,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/liborc-0.4.a" ]; then
-	echo -------------------------------------------------
-	echo "orc-0.4.18 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile orc $bits\007"
-		rm -rf orc-0.4.19
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://gstreamer.freedesktop.org/src/orc/orc-0.4.19.tar.gz
-		tar xf orc-0.4.19.tar.gz
-		rm orc-0.4.19.tar.gz
-		cd orc-0.4.19
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-		
-		make -j $cpuCount
-		make install
-		
-		sed -i 's/toolsdir=${exec_prefix}\/bin/toolsdir=${exec_prefix}\/bin-video/g' "$LOCALDESTDIR/lib/pkgconfig/orc-0.4.pc"
-		
-		do_checkIfExist orc-0.4.19 liborc-0.4.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libschroedinger-1.0.a" ]; then
-	echo -------------------------------------------------
-	echo "schroedinger-1.0.11 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile schroedinger $bits\007"
-		rm -rf schroedinger-1.0.11
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://download.videolan.org/contrib/schroedinger-1.0.11.tar.gz
-		tar xf schroedinger-1.0.11.tar.gz
-		rm schroedinger-1.0.11.tar.gz
-		cd schroedinger-1.0.11
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-		
-		sed -i 's/testsuite//' Makefile
-		
-		make -j $cpuCount
-		make install
-		
-		sed -i 's/-lschroedinger-1.0$/-lschroedinger-1.0 -lorc-0.4/' "$LOCALDESTDIR/lib/pkgconfig/schroedinger-1.0.pc"
-		
-		do_checkIfExist schroedinger-1.0.11 libschroedinger-1.0.a
-fi
-
-cd $LOCALBUILDDIR
-
 if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 	echo -------------------------------------------------
 	echo "zvbi-0.2.35 is already compiled"
@@ -1721,19 +1489,19 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 					rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
 					make distclean
 				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
+				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			else
 				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 					make distclean
 				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'
+				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 				
 				newFfmpeg="yes"
 			fi
 
 			sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
 			
-			sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-Wl,--allow-multiple-definition'//g" config.h
+			sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 			
 			make -j $cpuCount
 			make install

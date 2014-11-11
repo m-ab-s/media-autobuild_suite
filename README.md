@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-09-29
+modified: 2014-11-11
 
 ---
 
@@ -36,7 +36,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.8**
+Current release is **v2.9**
 
 
 Included Tools And Libraries
@@ -59,6 +59,7 @@ Included Tools And Libraries
 	- libsoxr
 	- libtiff
 	- libtwolame
+	- libutvideo (only static)
 	- libzvbi
 	- mp3lame
 	- openal
