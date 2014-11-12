@@ -945,26 +945,6 @@ else
 	echo -------------------------------------------------
 fi
 
-if [ -f "$LOCALDESTDIR/bin-audio/cd-paranoia.exe" ]; then
-	echo -------------------------------------------------
-	echo "libcdio-paranoia-10.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libcdio-paranoia $bits\007"
-		rm -rf libcdio-paranoia-10.2+0.93+1
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+0.93+1.tar.gz
-		tar libcdio-paranoia-10.2+0.93+1.tar.gz
-		rm libcdio-paranoia-10.2+0.93+1.tar.gz
-		cd libcdio-paranoia-10.2+0.93+1
-
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --disable-example-progs
-		
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libcdio-paranoia-10.2 bin-audio/cd-paranoia.exe
-fi
-
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile audio tools $bits done..."
