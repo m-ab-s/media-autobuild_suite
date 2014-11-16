@@ -992,7 +992,7 @@ if [[ $compile == "true" ]]; then
 		make distclean
 	fi
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --disable-cli
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --disable-cli --enable-win32thread
 	
 	make -j $cpuCount
 	make install
@@ -1567,19 +1567,19 @@ if [[ $x264Bin == "yes" ]] || [[ $newFfmpeg == "yes" ]]; then
 	make uninstall
 	make clean
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --bit-depth=10
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --bit-depth=10 --enable-win32thread
 	make -j $cpuCount
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
 	make -j $cpuCount
 	
 	cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
 	make clean
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --enable-win32thread
 	make -j $cpuCount
 	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
 	make -j $cpuCount
 	make install
 	
