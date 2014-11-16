@@ -981,70 +981,6 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "git://git.videolan.org/x264.git" x264-git noDepth
-
-if [[ $compile == "true" ]]; then
-	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-		rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
-		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
-	fi
-	if [ -f "libx264.a" ]; then
-		make distclean
-	fi
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --disable-cli --enable-win32thread
-	
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist x264-git libx264.a
-	compile="false"
-	buildFFmpeg="true"
-	x264Bin="yes"
-else
-	echo -------------------------------------------------
-	echo "x264 is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
-
-if [[ $compile == "true" ]]; then
-	cd build/msys
-	rm -rf *
-	rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
-	rm -f $LOCALDESTDIR/bin-video/x265.exe
-	rm -f $LOCALDESTDIR/include/x265.h
-	rm -f $LOCALDESTDIR/include/x265_config.h
-	rm -f $LOCALDESTDIR/lib/libx265.a
-	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
-
-	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
-	
-	make -j $cpuCount
-	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
-
-	make clean
-	rm -rf *
-
-	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
-	
-	make -j $cpuCount
-	make install
-
-	do_checkIfExist x265-git bin-video/x265.exe
-	compile="false"
-	buildFFmpeg="true"
-else
-	echo -------------------------------------------------
-	echo "x265 is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
 do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git noDepth
 
 if [[ $compile == "true" ]]; then
@@ -1405,7 +1341,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-	do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" mp4box-svn
+	do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" gpac-svn
 
 	if [[ $compile == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
@@ -1413,8 +1349,7 @@ if [[ $mp4box = "y" ]]; then
 			make clean
 		fi
 		
-		./configure --build=$targetBuild --host=$targetHost --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
-		cp config.h include/gpac/internal
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
 		
 		if [[ $bits = "64bit" ]]; then
 			sed -i 's/ -fPIC//g' config.mak
@@ -1426,15 +1361,151 @@ if [[ $mp4box = "y" ]]; then
 		cd ../applications/mp4box
 		make -j $cpuCount
 		
-		cp ../../bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
+		cd ../..
+		make install-lib
+		rm -f $LOCALDESTDIR/bin/libgpac.dll
+		rm -f $LOCALDESTDIR/lib/libgpac.dll.a
+
+		cp ./bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 		
-		do_checkIfExist mp4box-svn bin-video/MP4Box.exe
+		do_checkIfExist gpac-svn bin-video/MP4Box.exe
 		compile="false"
 	else
 		echo -------------------------------------------------
-		echo "MP4Box is already up to date"
+		echo "gpac-svn is already up to date"
 		echo -------------------------------------------------
 	fi
+fi
+
+cd $LOCALBUILDDIR
+
+do_git "git://git.videolan.org/x264.git" x264-git noDepth
+
+if [[ $compile == "true" ]]; then
+	cd $LOCALBUILDDIR
+
+	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
+
+	echo "-------------------------------------------------------------------------------"
+	echo "compile ffmpeg $bits libs"
+	echo "-------------------------------------------------------------------------------"
+
+	if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then 
+		rm -rf $LOCALDESTDIR/include/libavutil
+		rm -rf $LOCALDESTDIR/include/libavcodec
+		rm -rf $LOCALDESTDIR/include/libpostproc
+		rm -rf $LOCALDESTDIR/include/libswresample
+		rm -rf $LOCALDESTDIR/include/libswscale
+		rm -rf $LOCALDESTDIR/include/libavdevice
+		rm -rf $LOCALDESTDIR/include/libavfilter
+		rm -rf $LOCALDESTDIR/include/libavformat
+		rm -f $LOCALDESTDIR/lib/libavutil.a
+		rm -f $LOCALDESTDIR/lib/libswresample.a
+		rm -f $LOCALDESTDIR/lib/libswscale.a
+		rm -f $LOCALDESTDIR/lib/libavcodec.a
+		rm -f $LOCALDESTDIR/lib/libavdevice.a
+		rm -f $LOCALDESTDIR/lib/libavfilter.a
+		rm -f $LOCALDESTDIR/lib/libavformat.a
+		rm -f $LOCALDESTDIR/lib/libpostproc.a
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+	fi
+	
+	if [ -f "config.mak" ]; then
+		make distclean
+	fi
+		
+	if [[ $bits = "32bit" ]]; then
+		arch='x86'
+	else
+		arch='x86_64'
+	fi
+
+	./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs
+
+	make -j $cpuCount
+	make install
+	
+	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+		
+	do_checkIfExist ffmpeg-lib libavcodec.a
+
+	cd $LOCALBUILDDIR/x264-git
+	
+	echo -ne "\033]0;compile x264-git $bits\007"
+	
+	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+		rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
+		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
+	fi
+	
+	if [ -f "libx264.a" ]; then
+		make distclean
+	fi
+	
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
+	make -j $cpuCount
+	
+	cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
+	make clean
+
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
+
+	make -j $cpuCount
+	make install
+	
+	do_checkIfExist x264-git libx264.a
+	compile="false"
+	buildFFmpeg="true"
+else
+	echo -------------------------------------------------
+	echo "x264 is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
+
+if [[ $compile == "true" ]]; then
+	cd build/msys
+	rm -rf *
+	rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
+	rm -f $LOCALDESTDIR/bin-video/x265.exe
+	rm -f $LOCALDESTDIR/include/x265.h
+	rm -f $LOCALDESTDIR/include/x265_config.h
+	rm -f $LOCALDESTDIR/lib/libx265.a
+	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
+
+	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+	
+	make -j $cpuCount
+	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
+
+	make clean
+	rm -rf *
+
+	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+	
+	make -j $cpuCount
+	make install
+
+	do_checkIfExist x265-git bin-video/x265.exe
+	compile="false"
+	buildFFmpeg="true"
+else
+	echo -------------------------------------------------
+	echo "x265 is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1478,56 +1549,59 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
 			rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+		fi
+		
+		if [ -f "config.mak" ]; then
 			make distclean
 		fi
 			
-			if [[ $bits = "32bit" ]]; then
-				arch='x86'
-			else
-				arch='x86_64'
-			fi
-			if [[ $ffmpeg = "s" ]]; then
-				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
-					rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-					make distclean
-				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
-			else
-				if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
-					make distclean
-				fi
-				CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
-				
-				newFfmpeg="yes"
-			fi
-
-			sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
-			
-			sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
-			
-			make -j $cpuCount
-			make install
-			
-			if [[ ! $ffmpeg = "s" ]]; then
-				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-				sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
-				sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-				
-				do_checkIfExist ffmpeg-git libavcodec.a
-			else 
-				do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
-			fi
-			
-			compile="false"
+		if [[ $bits = "32bit" ]]; then
+			arch='x86'
 		else
-			echo -------------------------------------------------
-			echo "ffmpeg is already up to date"
-			echo -------------------------------------------------
+			arch='x86_64'
 		fi
-fi
+			
+		if [[ $ffmpeg = "s" ]]; then
+			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
+				rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
+				make distclean
+			fi
+			CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+		else
+			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
+				make distclean
+			fi
+			CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+			
+			newFfmpeg="yes"
+		fi
 
+		sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
+		
+		sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+		
+		make -j $cpuCount
+		make install
+		
+		if [[ ! $ffmpeg = "s" ]]; then
+			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+			sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+			
+			do_checkIfExist ffmpeg-git libavcodec.a
+		else 
+			do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
+		fi
+			
+		compile="false"
+	else
+		echo -------------------------------------------------
+		echo "ffmpeg is already up to date"
+		echo -------------------------------------------------
+	fi
+fi
 
 if [[ $bits = "64bit" ]]; then
 	cd $LOCALBUILDDIR
@@ -1557,34 +1631,6 @@ if [[ $bits = "64bit" ]]; then
 		echo "f265 is already up to date"
 		echo -------------------------------------------------
 	fi
-fi
-
-cd $LOCALBUILDDIR
-
-echo -ne "\033]0;compile x264 bins $bits\007"
-if [[ $x264Bin == "yes" ]] || [[ $newFfmpeg == "yes" ]]; then
-	cd x264-git
-	make uninstall
-	make clean
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --bit-depth=10 --enable-win32thread
-	make -j $cpuCount
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
-	make -j $cpuCount
-	
-	cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
-	make clean
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --disable-cli --enable-win32thread
-	make -j $cpuCount
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist x264-git bin-video/x264.exe
-	
 fi
 
 cd $LOCALBUILDDIR

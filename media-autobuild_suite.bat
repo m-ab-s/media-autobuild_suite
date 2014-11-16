@@ -24,7 +24,7 @@
 :: History ---------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 2.9
+::	This is version 3.0
 ::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
 ::	2013-09-29 add ffmpeg, rtmp and other tools
 ::	2013-09-30 reorder code and some small things
@@ -104,6 +104,7 @@
 ::	2014-10-08 change openjpeg version to 1.5.2
 ::	2014-11-02 change libcaca for windows xp
 ::	2014-11-11 fix gnutls, fix msys32, take more libs from mingw
+::	2014-11-16 build x264 with smaller ffmpeg-lib anf gpac
 ::
 ::-------------------------------------------------------------------------------------
 

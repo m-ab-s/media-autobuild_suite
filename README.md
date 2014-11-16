@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-11-11
+modified: 2014-11-16
 
 ---
 
@@ -36,7 +36,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v2.9**
+Current release is **v3.0**
 
 
 Included Tools And Libraries
@@ -104,7 +104,7 @@ Included Tools And Libraries
 	- speex
 	- sox 
 	- vpx
-	- x264 (8 and 10 bit)
+	- x264 (8 and 10 bit, with gpac[mp4 output])
 	- x265 (8 and 16 bit)
 	- xavs	
 
