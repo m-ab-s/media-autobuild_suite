@@ -269,20 +269,20 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 	echo -------------------------------------------------
-	echo "libgcrypt-1.6.1 is already compiled"
+	echo "libgcrypt-1.6.2 is already compiled"
 	echo -------------------------------------------------
 	else
 		echo -ne "\033]0;compile libgcrypt $bits\007"
-		rm -rf libgcrypt-1.6.1
-		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.1.tar.bz2
-		tar xf libgcrypt-1.6.1.tar.bz2
-		rm libgcrypt-1.6.1.tar.bz2
-		cd libgcrypt-1.6.1
+		rm -rf libgcrypt-1.6.2
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2
+		tar xf libgcrypt-1.6.2.tar.bz2
+		rm libgcrypt-1.6.2.tar.bz2
+		cd libgcrypt-1.6.2
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gnu-ld
 		make -j $cpuCount
 		make install
 
-		do_checkIfExist libgcrypt-1.6.1 libgcrypt.a
+		do_checkIfExist libgcrypt-1.6.2 libgcrypt.a
 fi
 
 cd $LOCALBUILDDIR
@@ -299,7 +299,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		rm gnutls-3.3.10.tar.xz
 		cd gnutls-3.3.10
 		
-		CFLAGS+=" -DGNULIB_PORTCHECK=1" CXXFLAGS+=" -DGNULIB_PORTCHECK=1" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
 		
 		make -j $cpuCount
 		make install
@@ -1053,7 +1053,7 @@ if [[ $compile == "true" ]]; then
 		./bootstrap
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
 	
 	make -j $cpuCount
 	make install
