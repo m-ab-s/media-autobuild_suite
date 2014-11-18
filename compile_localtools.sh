@@ -1041,34 +1041,27 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/libbluray.git" libbluray-git
+if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
+	echo -------------------------------------------------
+	echo "libbluray-0.6.2 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libbluray $bits\007"
+		rm -rf libcaca-0.99.beta19
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.6.2/libbluray-0.6.2.tar.bz2
+		tar xf libbluray-0.6.2.tar.bz2
+		rm libbluray-0.6.2.tar.bz2
+		cd libbluray-0.6.2
 
-if [[ $compile == "true" ]]; then
-	if [ -f $LOCALDESTDIR/lib/libbluray.a ]; then
-		make uninstall
-		make clean
-	fi
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
 	
-	if [[ ! -f "configure" ]]; then
-		./bootstrap
-	fi
-	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
-	
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist libbluray-git libbluray.a
-	compile="false"
-	buildFFmpeg="true"
-else
-	echo -------------------------------------------------
-	echo "libbluray is already up to date"
-	echo -------------------------------------------------
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libbluray-0.6.2 libbluray.a
 fi
 
 cd $LOCALBUILDDIR
-
 
 echo -ne "\033]0;compile libutvideo-git $bits\007"
 if [ ! -d libutvideo-git ]; then
@@ -1346,6 +1339,7 @@ if [[ $mp4box = "y" ]]; then
 	if [[ $compile == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
 			rm $LOCALDESTDIR/bin-video/MP4Box.exe
+			make uninstall
 			make clean
 		fi
 		
