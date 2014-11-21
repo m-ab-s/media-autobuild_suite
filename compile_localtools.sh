@@ -1700,6 +1700,7 @@ if [[ $build64 = "yes" ]]; then
 	sleep 3
 fi
 
+echo
 echo "Window close in 15"
 echo 
 sleep 5
