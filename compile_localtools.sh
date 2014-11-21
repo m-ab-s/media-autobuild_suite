@@ -17,6 +17,7 @@ while true; do
 --mkv=* ) mkv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
+--stripping* ) stripping="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -278,7 +279,12 @@ if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
 		tar xf libgcrypt-1.6.2.tar.bz2
 		rm libgcrypt-1.6.2.tar.bz2
 		cd libgcrypt-1.6.2
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gnu-ld
+		
+		if [[ "$bits" = "32bit" ]]; then
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
+		else
+			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX --disable-asm --disable-padlock-support		
+		fi
 		make -j $cpuCount
 		make install
 
@@ -325,12 +331,8 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	if [[ $bits = "32bit" ]]; then
-		make XCFLAGS="-I/mingw32/include" LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
-	else
-		make XCFLAGS="-I/mingw64/include" LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
-	fi
-	
+	make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
+
 	sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 	
 	do_checkIfExist rtmpdump librtmp.a
@@ -758,22 +760,22 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]; then
     echo -------------------------------------------------
-    echo "opus-tools-0.1.8 is already compiled"
+    echo "opus-tools-0.1.9 is already compiled"
     echo -------------------------------------------------
     else 
 		echo -ne "\033]0;compile opus-tools $bits\007"
-		rm -rf opus-tools-0.1.8
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.8.tar.gz
-		tar xf opus-tools-0.1.8.tar.gz
-		rm opus-tools-0.1.8.tar.gz
-		cd opus-tools-0.1.8
+		rm -rf opus-tools-0.1.9
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz
+		tar xf opus-tools-0.1.9.tar.gz
+		rm opus-tools-0.1.9.tar.gz
+		cd opus-tools-0.1.9
 		
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 		
         make -j $cpuCount
 		make install
         
-		do_checkIfExist opus-tools-0.1.8 bin-audio/opusenc.exe
+		do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
 fi
 
 cd $LOCALBUILDDIR
@@ -843,103 +845,11 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 fi
 
 cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libOpenAL32.a" ]; then
-	echo -------------------------------------------------
-	echo "openal-soft-1.15.1 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libOpenAL $bits\007"
-		rm -rf openal-soft-1.15.1
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://kcat.strangesoft.net/openal-releases/openal-soft-1.15.1.tar.bz2
-		tar xf openal-soft-1.15.1.tar.bz2
-		rm openal-soft-1.15.1.tar.bz2
-		cd openal-soft-1.15.1
-		
-		sed -i "s/ __declspec(dllimport)//g" include/AL/al.h
-		sed -i "s/ __declspec(dllimport)//g" include/AL/alc.h
-		
-		cd build
-		
-		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:bool=off -DLIBTYPE=STATIC -DEXAMPLES:BOOL=off -DEXTRA_LIBS="-lsoxr" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++ -static"
-		
-		make -j $cpuCount
-		make install
-
-		sed -i '10s/$/ -lole32/' $LOCALDESTDIR/lib/pkgconfig/openal.pc
-		
-		mv $LOCALDESTDIR/bin/openal-info.exe $LOCALDESTDIR/bin-audio
-		mv $LOCALDESTDIR/bin/makehrtf.exe $LOCALDESTDIR/bin-audio
-		cp $LOCALDESTDIR/lib/libOpenAL32.a $LOCALDESTDIR/lib/libOpenAL.a
-		
-		do_checkIfExist openal-soft-1.15.1 libOpenAL32.a
-fi
-
-cd $LOCALBUILDDIR
-	
-do_svn "svn://scm.orgis.org/mpg123/trunk" mpg123-git
-
-if [[ $compile == "true" ]]; then	
-	if [[ ! -f ./configure ]]; then
-		autoreconf -i
-	else
-		make uninstall
-		make clean
-	fi
-	
-	if [[ $bits = "32bit" ]]; then
-		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
-	else
-		./configure --build=$targetBuild --host=$targetHost --with-cpu=x86-64 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-static=yes --enable-shared=no
-	fi
-
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist mpg123-git bin-audio/mpg123.exe
-	compile="false"
-else
-	echo -------------------------------------------------
-	echo "mpg123 is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "https://github.com/dbry/WavPack.git" WavPack-git
-
-if [[ $compile == "true" ]]; then
-	if [[ ! -f ./configure ]]; then
-		./autogen.sh
-	else 
-		make uninstall
-		make clean
-	fi
-
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --enable-mmx
-	
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist WavPack-git libwavpack.a
-	compile="false"
-	buildFFmpeg="true"
-else
-	echo -------------------------------------------------
-	echo "WavPack is already up to date"
-	echo -------------------------------------------------
-fi
-	
-cd $LOCALBUILDDIR
 	
 do_git "git://git.code.sf.net/p/sox/code" sox-git
 
 if [[ $compile == "true" ]]; then
-	if [[ $bits = "32bit" ]]; then
-		mv /mingw32/lib/libgsm.a /mingw32/lib/tmp_libgsm.a
-	else
-		mv /mingw64/lib/libgsm.a /mingw64/lib/tmp_libgsm.a
-	fi
+		mv $MINGW_PREFIX/lib/libgsm.a $MINGW_PREFIX/lib/tmp_libgsm.a
 	
 	if [[ ! -f ./configure ]]; then
 		autoreconf -i
@@ -948,16 +858,12 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
 	
 	make -j $cpuCount
 	make install
 	
-	if [[ $bits = "32bit" ]]; then
-		mv /mingw32/lib/tmp_libgsm.a /mingw32/lib/libgsm.a
-	else
-		mv /mingw64/lib/tmp_libgsm.a /mingw64/lib/libgsm.a
-	fi
+		mv $MINGW_PREFIX/lib/tmp_libgsm.a $MINGW_PREFIX/lib/libgsm.a
 	
 	do_checkIfExist sox-git bin-audio/sox.exe
 	compile="false"
@@ -1565,7 +1471,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 				make distclean
 			fi
-			CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-openal --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+			CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lglib-2.0 -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			
 			newFfmpeg="yes"
 		fi
@@ -1664,7 +1570,7 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DAL_LIBTYPE_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lOpenAL32 -lwinmm -lole32' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-openal --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif $faac
+		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif $faac
 		
 		make -j $cpuCount
 		make install
@@ -1691,7 +1597,7 @@ if [[ $mpv = "y" ]]; then
 			rm -rf $LOCALDESTDIR/bin-video/mpv
 		fi
 		
-		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-openal --enable-sdl2 --disable-manpage-build --disable-pdf-build
+		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-sdl2 --disable-manpage-build --disable-pdf-build
 
 		if [[ $bits = "32bit" ]]; then
 			sed -i "s/LIBPATH_libav = .*/LIBPATH_libav = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
@@ -1737,11 +1643,7 @@ if [[ $mkv = "y" ]]; then
 		
 		patch -N -p0 < mkvinfo.patch
 		
-		if [[ $bits = "32bit" ]]; then
-			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=/mingw32/lib
-		else
-			./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=/mingw64/lib
-		fi
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=$MINGW_PREFIX/lib
 		
 		sed -i "s/EXTRA_CFLAGS = *$/EXTRA_CFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
 		sed -i "s/EXTRA_LDFLAGS = *$/EXTRA_LDFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
@@ -1763,6 +1665,16 @@ if [[ $mkv = "y" ]]; then
 	fi
 fi
 	
+if [[ $stripping = "y" ]]; then
+	cd $LOCALDESTDIR
+	FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
+	
+	for f in $FILES; do 
+		strip --strip-all $f
+		echo "strip $f done..."
+	done
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile video tools $bits done..."
@@ -1788,4 +1700,14 @@ if [[ $build64 = "yes" ]]; then
 	sleep 3
 fi
 
-sleep 3
+echo "Window close in 15"
+echo 
+sleep 5
+echo 
+echo "Window close in 10"
+echo
+sleep 5
+echo
+echo "Window close in 5"
+sleep 5
+
