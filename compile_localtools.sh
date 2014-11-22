@@ -1692,6 +1692,7 @@ if [[ $mkv = "y" ]]; then
 fi
 	
 if [[ $stripping = "y" ]]; then
+	echo -ne "\033]0;strip $bits binaries\007"
 	cd $LOCALDESTDIR
 	FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
 	
@@ -1726,6 +1727,7 @@ if [[ $build64 = "yes" ]]; then
 	sleep 3
 fi
 
+echo -ne "\033]0;compiling done...\007"
 echo
 echo "Window close in 15"
 echo 
