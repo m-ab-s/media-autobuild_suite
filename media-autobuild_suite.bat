@@ -991,7 +991,7 @@ if %build64%==yes (
 		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local64\etc\profile.local
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\local64\etc\profile.local
-		echo.MINGW_PREFIX="/mingw32">>%instdir%\local64\etc\profile.local
+		echo.MINGW_PREFIX="/mingw64">>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.MSYSTEM=MINGW64>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
