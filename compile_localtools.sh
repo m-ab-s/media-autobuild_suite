@@ -975,6 +975,7 @@ if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile libbluray $bits\007"
+		rm -rf libbluray-0.6.2
 		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.6.2/libbluray-0.6.2.tar.bz2
 		tar xf libbluray-0.6.2.tar.bz2
 		rm libbluray-0.6.2.tar.bz2
