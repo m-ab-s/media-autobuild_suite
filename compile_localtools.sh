@@ -18,6 +18,7 @@ while true; do
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
+--packing* ) packing="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1701,6 +1702,30 @@ if [[ $stripping = "y" ]]; then
 		echo "strip $f done..."
 	done
 fi
+
+if [[ $packing = "y" ]]; then
+	if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
+		echo -ne "\033]0;Download UPX\007"
+		cd $LOCALBUILDDIR
+		rm -rf upx391w
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://upx.sourceforge.net/download/upx391w.zip
+		unzip upx391w.zip
+		rm upx391w.zip
+	fi
+	echo -ne "\033]0;pack $bits binaries\007"
+	cd $LOCALDESTDIR
+	FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
+	
+	for f in $FILES; do
+		if [[ $stripping = "y" ]]; then
+			$LOCALBUILDDIR/upx391w/upx.exe -9 -q $f
+		else
+			$LOCALBUILDDIR/upx391w/upx.exe -9 -q --strip-relocs=0 $f
+		fi
+		echo "pack $f done..."
+	done
+fi
+
 
 echo "-------------------------------------------------------------------------------"
 echo
