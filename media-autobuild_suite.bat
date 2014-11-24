@@ -107,6 +107,7 @@
 ::	2014-11-16 build x264 with smaller ffmpeg-lib anf gpac
 ::	2014-11-21 some cosmetics, change some libs to mingw, remove libopenAL
 ::	2014-11-22 take modplug from mingw, add sdl and libass back again.
+::  2014-11-24 add upx for smaller files (around 50%)
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -146,6 +147,7 @@ if exist %ini% GOTO checkINI
 	set coresINI=0
 	set deleteSourceINI=0
 	set stripINI=0
+	set packINI=0
 
 	GOTO systemVars
 
@@ -174,6 +176,8 @@ findstr /i "deleteSource" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "strip" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "pack" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch	
 	
 :readINI
 for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
@@ -188,6 +192,7 @@ for /F "tokens=2 delims==" %%m in ('findstr /i "mkv" %ini%') do set mkvINI=%%m
 for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
+for /F "tokens=2 delims==" %%g in ('findstr /i "pack" %ini%') do set packINI=%%g
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
@@ -500,6 +505,33 @@ if %stripF%==2 (
 	)
 if %stripF% GTR 2 GOTO stripEXE
 if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
+
+:packEXE
+set "writePack=no"
+if %packINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. pack compiled files:
+	echo. 1 = yes
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P packF="pack files:"
+	set "writePack=yes"
+	) else (
+		set packF=%packINI%
+	)
+	
+if %packF%==1 (
+	set "packFile=y"
+	)
+if %packF%==2 (
+	set "packFile=n"
+	)
+if %packF% GTR 2 GOTO packEXE
+if %writePack%==yes echo.pack=^%packF%>>%ini%
 
 ::------------------------------------------------------------------
 ::download and install basic msys system:
@@ -1063,6 +1095,6 @@ echo.
 echo.- compile local tools:
 echo.
 echo -------------------------------------------------------------------------------
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
