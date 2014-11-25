@@ -19,95 +19,9 @@
 ::    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ::-------------------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
-
-::-------------------------------------------------------------------------------------
-:: History ---------------------------------------------------------------------------
-::-------------------------------------------------------------------------------------
 ::
-::	This is version 3.1
-::	Project stared at 2013-09-24. Last bigger modification was on 2014-05-27
-::	2013-09-29 add ffmpeg, rtmp and other tools
-::	2013-09-30 reorder code and some small things
-::	2013-10-01 change pkg-config, add mp4box, and reorder code
-::	2013-10-03 add libs (faac, and some others) and change ffmpeg download to github
-::	2013-10-06 build the environment new and remove openssl and rtmp
-::	2013-10-08 add libopus and libvpx (thanks to hoary)
-::	2013-10-10 add libass and add build check to the shell scripts
-::	2013-10-13 add libbluray, openjpeg and finally librtmp to ffmpeg
-::	2013-10-14 add utvideo to ffmpeg and change profile parameter to static
-::	2013-10-19 add xavs and opus-tools, update svn and opus version
-::	2013-10-22 some fixes and add mplayer (maybe not the best way)
-::	2013-11-05 update libbluray, fontconfig, add libxml2 and add update function to ffmpeg
-::	2013-11-06 add openexr, jpeg2000 and imagemagick
-::	2013-11-11 add updater for ffmpeg, x264, vpx and libbluray
-::	2013-11-12 add info to the window title, make all mingw libs static, add jpegturbo, openexr and imagemagick for 64 bit
-::	2013-11-18 add gettext, dvdcss, dvdread, dvdnav, qt4, vlc and reorder code.
-::	2013-11-19 add a52dec, libmad, and libmpeg2 and sdl_image
-::	2013-11-24 change compiler version to 4.8.2 and start to simplify code
-::	2013-11-26 add x265
-::	2013-11-27 add function for write settings to ini-file, change downloads from extra packs, finish simplify scripts and mediainfo cli (only 32 bit)
-::	2013-11-29 add vidstab, libtwolame, soxr, libilbc, schroedinger, orc
-::	2013-11-30 add exiv2
-::	2013-12-04 add libcaca
-::	2013-12-05 simplify code - now we only need one *.sh file for 32bit and 64bit compiling. (More edit and add features friendly)
-::	2013-12-08 little fixes, fix libjpeg and libjasper, patch imagemagick, fix libass for mplayer, patchfiles to local, add libmodplug and libzvbi
-::	2013-12-09 add frei0r and some fixes 
-::	2013-12-10 add sox
-::	2013-12-14 change compiler to rev.1
-::	2014-01-13 change compiler to rev.2 and fix check
-::	2014-02-02 add global32 and global64 folders to the environment. Make it more easy to build some part of tools new
-::	2014-02-18 remove vlc, qt4 and imagetools, change mplayer to svn with update function
-::	2014-03-02 change libpng link, add x265 to ffmpeg, new mediainfo version and some fixes
-::	2014-03-23 change compiler to rev.3
-::	2014-03-25 add python to the opt tools, add wavpack, libsndfile and new sox with libsndfile included 
-::	2014-04-02 fix x264 10bit exe and change shell to utf-8, update svn; cmake; git; doxygen and add pdflatex
-::	2014-04-04 add strip files to main batch
-::	2014-04-08 ask for x265 in ffmpeg
-::	2014-04-21 start to changing msys1 to msys2
-::	2014-04-22 lang. detect for mintty
-::	2014-04-24 add tools, update mediainfo version, start to change the compilers to native msys2 mingw-w64
-::	2014-04-26 change many libs and tools to native mingw libs, fix new compiler options
-::	2014-04-27 use more tools from the compiler, fix options. most work at the moment but no mediainfo and no ffmpeg
-::	2014-04-28 all 32 bit tools runing now, 64 bit need to be tested, x265 doesn't work at the moment and also no mediainfo
-::	2014-04-29 fix mp4box, test 64 builds, add ffmpeg extra flags to the configure file. mediainfo not work for now and x265 only works in 64 bit
-::	2014-05-01 change compiler build and target infos to the profile
-::	2014-05-05 fix mediainfo 32 bit, remove un-needed code, simplify code, update versions from mediainfo; freetype; freebidi; fontconfig, remove libthread. x265 32 bit works
-::	2014-05-06 make vpxenc static again. Now all working normal as it was in msys1
-::	2014-05-07 remove external python and use internal, add some variables to the profile: for info, man and new python, add kvazaar h265 encoder
-::	2014-05-12 no need for fribidi patch and sed, change libass to git download
-::	2014-05-13 fix fdkaac bin, new msys32 download link
-::	2014-05-14 fix issues with windows xp and fix wget download
-::	2014-05-15 change cc and python alias, add mediainfo 64 bit, remove pdflatex
-::	2014-05-17 change git download depth to 1, add sed for kvazaar
-::	2014-05-18 simplify git clone/updates, merge audio tools and video tools to local tools.
-::	2014-05-20 copy openjpeg.h to include folder, fix git download for vpx, remove external mercurial and using internal, remove opt folder and using p7zip internal
-::	2014-05-21 add hg.bat, change opus version and add ffmpeg shared
-::	2014-05-23 add update function to ffmpeg when a lib get a new update
-::	2014-05-27 merge global and local tools and sort bin folders
-::	2014-05-28 add mpg123, change wget.zip
-::	2014-05-30 change libdvdcss and libdvdread to git, update libcrypt: gnutls; libcaca; libmodplug
-::	2014-06-01 add openAL and exiv2
-::	2014-06-12 fix kvazaar and vpxenc.exe 32 bit
-::	2014-06-16 other write profile method, change and add sed for ffmpeg, fix patch apply for vpx, add openal to ffmpeg and mplayer
-::	2014-06-17 add mpv
-::	2014-06-24 update ssl cert, new msys2 version: folder structure has change
-::	2014-06-25 get always the newest msys2 version
-::	2014-06-26 get always the newest mediainfo version
-::	2014-07-03 fix get newest msys2 version and new fstab check and mount
-::	2014-07-13 add wxWidgets, add file (for libmagic), add mkvtoolnix
-::	2014-07-17 change and optimize the profiles, fix kvazaar for different computers, add f265
-::	2014-09-08 no patch for vpx anymore, no seed for libdvdread, little fixes and new write ini function
-::	2014-09-24 fix ini write function
-::	2014-09-29 remove utvideo, remove march from profiles, add --disable-libavdevice to mpv, fix exiv2
-::	2014-09-30 remove --disable-libavdevice from mpv
-::	2014-10-07 change to libdvdnav git, fix mplayer
-::	2014-10-08 change openjpeg version to 1.5.2
-::	2014-11-02 change libcaca for windows xp
-::	2014-11-11 fix gnutls, fix msys32, take more libs from mingw
-::	2014-11-16 build x264 with smaller ffmpeg-lib anf gpac
-::	2014-11-21 some cosmetics, change some libs to mingw, remove libopenAL
-::	2014-11-22 take modplug from mingw, add sdl and libass back again.
-::  2014-11-24 add upx for smaller files (around 50%)
+::	This is version 3.1.5
+::	See HISTORY file for more information
 ::
 ::-------------------------------------------------------------------------------------
 
@@ -486,8 +400,9 @@ if %stripINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo. strip compiled files:
-	echo. 1 = yes
-	echo. 2 = no
+	echo. 1 = yes [binaries and libs]
+	echo. 2 = yes [binaries]
+	echo. 3 = no
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -496,14 +411,17 @@ if %stripINI%==0 (
 	) else (
 		set stripF=%stripINI%
 	)
-	
+
 if %stripF%==1 (
-	set "stripFile=y"
+	set "stripFile=a"
 	)
 if %stripF%==2 (
+	set "stripFile=y"
+	)
+if %stripF%==3 (
 	set "stripFile=n"
 	)
-if %stripF% GTR 2 GOTO stripEXE
+if %stripF% GTR 3 GOTO stripEXE
 if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
 
 :packEXE
@@ -512,7 +430,7 @@ if %packINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo. Attention: Some security applications may detect packed binaries as malware. 
+	echo.Attention: Some security applications may detect packed binaries as malware. 
 	echo. pack compiled files:
 	echo. 1 = yes
 	echo. 2 = no
@@ -535,7 +453,7 @@ if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
 ::------------------------------------------------------------------
-::download and install basic msys system:
+::download and install basic msys2 system:
 ::------------------------------------------------------------------
 if exist "%instdir%\%msys2%" GOTO getMintty
 	echo -------------------------------------------------------------
@@ -757,13 +675,17 @@ echo.exit>>updateMSYS2.sh
 del updateMSYS2.sh
 
 :installbase
+if exist "%instdir%\%msys2%\etc\pac-base-old.pk" del "%instdir%\%msys2%\etc\pac-base-old.pk"
+if exist "%instdir%\%msys2%\etc\pac-base-new.pk" ren "%instdir%\%msys2%\etc\pac-base-new.pk" pac-base-old.pk
+	echo.asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>%instdir%\%msys2%\etc\pac-base-new.pk
+
 if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
 	echo.-------------------------------------------------------------------------------
 	echo.install msys2 base system
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
 	echo.echo -ne "\033]0;install base system\007">>pacman.sh
-	echo.pacman --noconfirm -S asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>>pacman.sh
+	echo.pacman --noconfirm -S $(^</etc/base-new.pk^)>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
@@ -797,13 +719,17 @@ echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\usr\bin\hg.bat
 
 :getmingw32
 if %build32%==yes (
+if exist "%instdir%\%msys2%\etc\pac-mingw32-old.pk" del "%instdir%\%msys2%\etc\pac-mingw32-old.pk"
+if exist "%instdir%\%msys2%\etc\pac-mingw32-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw32-new.pk" pac-mingw32-old.pk
+	echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-libsndfile mingw-w64-i686-twolame mingw-w64-i686-libdvdcss mingw-w64-i686-libdvdread mingw-w64-i686-libdvdnav mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-mpg123 mingw-w64-i686-wavpack mingw-w64-i686-libmodplug>%instdir%\%msys2%\etc\pac-mingw32-new.pk
+	
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.-------------------------------------------------------------------------------
 	echo.install 32 bit compiler
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
 	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
-	echo.pacman --noconfirm -S mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-libsndfile mingw-w64-i686-twolame mingw-w64-i686-libdvdcss mingw-w64-i686-libdvdread mingw-w64-i686-libdvdnav mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-mpg123 mingw-w64-i686-wavpack mingw-w64-i686-libmodplug>>mingw32.sh
+	echo.pacman --noconfirm -S $(^</etc/pac-mingw32-new.pk^)>>mingw32.sh
 	echo.sleep ^3>>mingw32.sh
 	echo.exit>>mingw32.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
@@ -812,13 +738,17 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 
 :getmingw64	
 if %build64%==yes (
-if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO checkdyn
+if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\pac-mingw64-old.pk"
+if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
+	echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-libsndfile mingw-w64-x86_64-twolame mingw-w64-x86_64-libdvdcss mingw-w64-x86_64-libdvdread mingw-w64-x86_64-libdvdnav mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug>%instdir%\%msys2%\etc\pac-mingw64-new.pk
+	
+if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO rebase2
 	echo.-------------------------------------------------------------------------------
 	echo.install 64 bit compiler
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
 	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-libsndfile mingw-w64-x86_64-twolame mingw-w64-x86_64-libdvdcss mingw-w64-x86_64-libdvdread mingw-w64-x86_64-libdvdnav mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug>>mingw64.sh
+	echo.pacman --noconfirm -S $(^</etc/pac-mingw64-new.pk^)>>mingw64.sh
 	echo.sleep ^3>>mingw64.sh
 	echo.exit>>mingw64.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
@@ -1091,11 +1021,6 @@ IF ERRORLEVEL == 1 (
 	pause
   )
 
-echo -------------------------------------------------------------------------------
-echo.
-echo.- compile local tools:
-echo.
-echo -------------------------------------------------------------------------------
 start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
