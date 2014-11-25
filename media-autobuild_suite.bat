@@ -512,6 +512,7 @@ if %packINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	echo.
+	echo. Attention: Some security applications may detect packed binaries as malware. 
 	echo. pack compiled files:
 	echo. 1 = yes
 	echo. 2 = no
