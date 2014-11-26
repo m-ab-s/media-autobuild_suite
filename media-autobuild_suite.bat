@@ -754,7 +754,7 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh
+%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh --build32=%build32% --build64=%build64%
 	
 :rebase2
 if %msys2%==msys32 (
