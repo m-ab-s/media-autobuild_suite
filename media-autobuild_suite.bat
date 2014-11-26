@@ -685,7 +685,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\pacman.sh del %instdir%\pacman.sh
 	echo.echo -ne "\033]0;install base system\007">>pacman.sh
-	echo.pacman --noconfirm -S $(^</etc/base-new.pk^)>>pacman.sh
+	echo.pacman --noconfirm -S $(^</etc/pac-base-new.pk^)>>pacman.sh
 	echo.sleep ^3>>pacman.sh
 	echo.exit>>pacman.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
