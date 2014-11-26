@@ -589,10 +589,21 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	cscript /nologo %instdir%\setlink.vbs 
 	del %instdir%\setlink.vbs 	
 
-	echo.sleep ^5>>firstrun.sh
+	echo.sleep ^4>>firstrun.sh
 	echo.exit>>firstrun.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstrun.sh
 	del firstrun.sh
+	
+	echo.-------------------------------------------------------------------------------
+	echo.first update
+	echo.-------------------------------------------------------------------------------
+	if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
+	echo.echo -ne "\033]0;first msys2 update\007">>firstUpdate.sh
+	echo.pacman --noconfirm -Syu --force --ignoregroup base>>firstUpdate.sh
+	echo.pacman --noconfirm -Su --force>>firstUpdate.sh
+	echo.exit>>firstUpdate.sh
+	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
+	del %instdir%\firstUpdate.sh
 
 :minttySettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
@@ -629,7 +640,7 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
 	
 :hgsettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
-if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO updatebase
+if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO rebase
 	echo.[ui]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
 	echo.username = %userFolder%>>%instdir%\%msys2%\home\%userFolder%\.hgrc
 	echo.verbose = True>>%instdir%\%msys2%\home\%userFolder%\.hgrc
@@ -656,23 +667,6 @@ if %msys2%==msys32 (
 	echo.-------------------------------------------------------------------------------
 	call %instdir%\msys32\autorebase.bat
 	)
-	
-:updatebase
-echo.-------------------------------------------------------------------------------
-echo.updating msys2 system
-echo.-------------------------------------------------------------------------------
-if exist %instdir%\updateMSYS2.sh del %instdir%\updateMSYS2.sh
-echo.echo -ne "\033]0;update msys2 system\007">>updateMSYS2.sh
-echo.pacman --noconfirm -Syu --force --ignoregroup base>>updateMSYS2.sh
-echo.pacman --noconfirm -Su --force>>updateMSYS2.sh
-echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
-echo.echo "updating msys2 done...">>updateMSYS2.sh
-echo.echo "-------------------------------------------------------------------------------">>updateMSYS2.sh
-echo.sleep ^4>>updateMSYS2.sh
-echo.exit>>updateMSYS2.sh
-%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\updateMSYS2.sh
-
-del updateMSYS2.sh
 
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base-old.pk" del "%instdir%\%msys2%\etc\pac-base-old.pk"
@@ -742,7 +736,7 @@ if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\p
 if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
 	echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-libsndfile mingw-w64-x86_64-twolame mingw-w64-x86_64-libdvdcss mingw-w64-x86_64-libdvdread mingw-w64-x86_64-libdvdnav mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug>%instdir%\%msys2%\etc\pac-mingw64-new.pk
 	
-if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO rebase2
+if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
 	echo.-------------------------------------------------------------------------------
 	echo.install 64 bit compiler
 	echo.-------------------------------------------------------------------------------
@@ -755,6 +749,13 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO rebase2
 	del mingw64.sh
 	)
 
+:updatebase
+echo.-------------------------------------------------------------------------------
+echo.update autobuild suite
+echo.-------------------------------------------------------------------------------
+
+%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh
+	
 :rebase2
 if %msys2%==msys32 (
 	echo.-------------------------------------------------------------------------------
@@ -858,12 +859,13 @@ if "%searchRes%"=="local32" GOTO writeProfile32
 if "%searchRes%"=="local64" GOTO writeProfile32
 
 	:writeFstab
-	set cygdrive=no
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo.- write fstab mount file
 	echo.
 	echo -------------------------------------------------------------------------------
+	
+	set cygdrive=no
 	
 	if exist %instdir%\%msys2%\etc\fstab. (
 		for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
@@ -995,7 +997,7 @@ if %build32%==no GOTO loginProfile64
 		echo.
 		echo -------------------------------------------------------------------------------
 		echo.>>%instdir%\%msys2%\etc\profile.
-		echo.if [ -f /local32/etc/profile.local ]; then>>%instdir%\%msys2%\etc\profile.
+		echo.if [[ -z "$MSYSTEM" ^&^& -f /local32/etc/profile.local ]]; then>>%instdir%\%msys2%\etc\profile.
 		echo.       source /local32/etc/profile.local>>%instdir%\%msys2%\etc\profile.
 		echo.fi>>%instdir%\%msys2%\etc\profile.
 	)
@@ -1010,12 +1012,13 @@ if %build32%==no GOTO loginProfile64
 		echo.
 		echo -------------------------------------------------------------------------------
 		echo.>>%instdir%\%msys2%\etc\profile.
-		echo.if [ -f /local64/etc/profile.local ]; then>>%instdir%\%msys2%\etc\profile.
+		echo.if [[ -z "$MSYSTEM" ^&^& -f /local64/etc/profile.local ]]; then>>%instdir%\%msys2%\etc\profile.
 		echo.       source /local64/etc/profile.local>>%instdir%\%msys2%\etc\profile.
 		echo.fi>>%instdir%\%msys2%\etc\profile.
 	)
 
 :compileLocals
+cd %instdir%
 IF ERRORLEVEL == 1 (
 	ECHO Something goes wrong...
 	pause
