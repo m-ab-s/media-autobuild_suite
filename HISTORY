@@ -82,3 +82,4 @@
 2014-11-24 add upx for smaller files (around 50%)
 2014-11-25 first step for new update system
 2014-11-26 second step for new update system
+2014-11-28 remove stripping libs
