@@ -400,9 +400,8 @@ if %stripINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo.
 	echo. strip compiled files:
-	echo. 1 = yes [binaries and libs]
-	echo. 2 = yes [binaries]
-	echo. 3 = no
+	echo. 1 = yes
+	echo. 2 = no
 	echo.
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
@@ -413,15 +412,13 @@ if %stripINI%==0 (
 	)
 
 if %stripF%==1 (
-	set "stripFile=a"
-	)
-if %stripF%==2 (
 	set "stripFile=y"
 	)
-if %stripF%==3 (
+if %stripF%==2 (
 	set "stripFile=n"
 	)
-if %stripF% GTR 3 GOTO stripEXE
+
+if %stripF% GTR 2 GOTO stripEXE
 if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
 
 :packEXE

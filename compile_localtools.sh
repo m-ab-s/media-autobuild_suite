@@ -1692,26 +1692,16 @@ if [[ $mkv = "y" ]]; then
 	fi
 fi
 	
-if [[ $stripping = "a" ]] || [[ $stripping = "y" ]]; then
+if [[ $stripping = "y" ]]; then
 	cd $LOCALDESTDIR
 	
-	if [[ $stripping = "a" ]]; then
-		echo -ne "\033]0;strip $bits binaries and libs\007"
-		FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\|a\)" -mmin -600`
-		
-		for f in $FILES; do 
-			strip --strip-all $f
-			echo "strip $f done..."
-		done
-	else
-		echo -ne "\033]0;strip $bits binaries\007"
-		FILES=`find ./bin* -regex ".*\.\(exe\|dll\)" -mmin -600`
-		
-		for f in $FILES; do 
-			strip --strip-all $f
-			echo "strip $f done..."
-		done
-	fi
+	echo -ne "\033]0;strip $bits binaries\007"
+	FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\)" -mmin -600`
+	
+	for f in $FILES; do 
+		strip --strip-all $f
+		echo "strip $f done..."
+	done
 	
 fi
 
