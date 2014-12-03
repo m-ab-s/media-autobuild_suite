@@ -83,3 +83,4 @@
 2014-11-25 first step for new update system
 2014-11-26 second step for new update system
 2014-11-28 remove stripping libs
+2014-12-02 add libdvdcss; libdvdnav; libdvdread back to compile script, add tools (widl etc.)

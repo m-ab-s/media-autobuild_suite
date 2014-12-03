@@ -970,6 +970,85 @@ fi
 
 cd $LOCALBUILDDIR
 
+do_git "https://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
+
+if [[ $compile == "true" ]]; then
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
+	
+	make -j $cpuCount
+	make install
+
+	do_checkIfExist libdvdcss-git libdvdcss.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libdvdcss-git is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+do_git "https://gitorious.org/videolan/libdvdread.git" libdvdread-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+	
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+	
+	make -j $cpuCount
+	make install
+	
+	sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
+
+	do_checkIfExist libdvdread-git libdvdread.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libdvdread-git is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+do_git "https://gitorious.org/videolan/libdvdnav.git" libdvdnav-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+		
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
+		
+		make -j $cpuCount
+		make install
+
+		do_checkIfExist libdvdnav-git libdvdnav.a
+		
+else
+	echo -------------------------------------------------
+	echo "libdvdnav-git is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
 	echo -------------------------------------------------
 	echo "libbluray-0.6.2 is already compiled"
