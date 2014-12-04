@@ -116,9 +116,9 @@ fi
 
 if [[ $build64 = "yes" ]]; then
 		if [ -f "/local64/etc/profile.local" ]; then
-		newProfiles32=`sed -n "/echo.#>>%instdir%.\local64.\etc.\profile.local/,/echo.cross='x86_64-w64-mingw32-'>>%instdir%.\local64.\etc.\profile.local/p" media-autobuild_suite.bat | sed "s/\t\techo.//g;s/>>%instdir%.\local64.\etc.\profile.local//g"`
+		newProfiles64=`sed -n "/echo.#>>%instdir%.\local64.\etc.\profile.local/,/echo.cross='x86_64-w64-mingw32-'>>%instdir%.\local64.\etc.\profile.local/p" media-autobuild_suite.bat | sed "s/\t\techo.//g;s/>>%instdir%.\local64.\etc.\profile.local//g"`
 
-		oldProfiles32=`sed -n "/#/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
+		oldProfiles64=`sed -n "/#/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
 
 		if ! cmp -s <(echo $newProfiles64) <(echo $oldProfiles64); then 
 			echo
