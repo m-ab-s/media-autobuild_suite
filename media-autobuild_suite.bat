@@ -712,7 +712,7 @@ echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\usr\bin\hg.bat
 if %build32%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw32-old.pk" del "%instdir%\%msys2%\etc\pac-mingw32-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw32-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw32-new.pk" pac-mingw32-old.pk
-	echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-libsndfile mingw-w64-i686-twolame mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-mpg123 mingw-w64-i686-wavpack mingw-w64-i686-libmodplug mingw-w64-i686-tools-git>%instdir%\%msys2%\etc\pac-mingw32-new.pk
+	echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-libsndfile mingw-w64-i686-twolame mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-mpg123 mingw-w64-i686-wavpack mingw-w64-i686-libmodplug mingw-w64-i686-tools-git mingw-w64-i686-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw32-new.pk
 	
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.-------------------------------------------------------------------------------
@@ -731,7 +731,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 if %build64%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\pac-mingw64-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
-	echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-libsndfile mingw-w64-x86_64-twolame mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug mingw-w64-x86_64-tools-git>%instdir%\%msys2%\etc\pac-mingw64-new.pk
+	echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-libsndfile mingw-w64-x86_64-twolame mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug mingw-w64-x86_64-tools-git mingw-w64-x86_64-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw64-new.pk
 	
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
 	echo.-------------------------------------------------------------------------------
@@ -902,6 +902,7 @@ if %build32%==yes (
 		echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man">>%instdir%\local32\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\local32\etc\profile.local
 		echo.MINGW_PREFIX="/mingw32">>%instdir%\local32\etc\profile.local
+		echo.MINGW_CHOST="i686-w64-mingw32">>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
 		echo.MSYSTEM=MINGW32>>%instdir%\local32\etc\profile.local
 		echo.>>%instdir%\local32\etc\profile.local
@@ -954,6 +955,7 @@ if %build64%==yes (
 		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
 		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\local64\etc\profile.local
 		echo.MINGW_PREFIX="/mingw64">>%instdir%\local64\etc\profile.local
+		echo.MINGW_CHOST="x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
 		echo.MSYSTEM=MINGW64>>%instdir%\local64\etc\profile.local
 		echo.>>%instdir%\local64\etc\profile.local
@@ -1021,6 +1023,6 @@ IF ERRORLEVEL == 1 (
 	pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\compile_localtools.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit

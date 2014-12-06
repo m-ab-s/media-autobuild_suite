@@ -460,24 +460,6 @@ fi
 cd $LOCALBUILDDIR
 	
 #do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
-#echo -ne "\033]0;compile exiv2 $bits\007"
-#if [ ! -d exiv2-svn ]; then
-#	svn checkout --non-recursive https://github.com/svn2github/exiv2/trunk exiv2-svn
-#	cd exiv2-svn
-#	svn update trunk
-#	compile="true"
-#	cd trunk
-#else 	
-#	cd exiv2-svn
-#	oldRevision=`svnversion`
-#	svn update
-#	newRevision=`svnversion`
-#	
-#	if [[ "$oldRevision" != "$newRevision" ]]; then
-#		cd trunk
-#		compile="true"
-#	fi
-#fi
 
 if [[ $compile == "no" ]]; then	# is deactivated for the moment
 	if [ -d "build" ]; then
@@ -970,31 +952,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://gitorious.org/videolan/libdvdcss.git" libdvdcss-git
-
-if [[ $compile == "true" ]]; then
-	if [[ ! -f "configure" ]]; then
-		autoreconf -fiv
-	else 
-		make uninstall
-		make clean
-	fi
-
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-doc
-	
-	make -j $cpuCount
-	make install
-
-	do_checkIfExist libdvdcss-git libdvdcss.a
-	compile="false"
-else
-	echo -------------------------------------------------
-	echo "libdvdcss-git is already up to date"
-	echo -------------------------------------------------
-fi
-
-cd $LOCALBUILDDIR
-
 do_git "https://gitorious.org/videolan/libdvdread.git" libdvdread-git
 
 if [[ $compile == "true" ]]; then
@@ -1006,12 +963,10 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc CFLAGS="$CFLAGS -DHAVE_DVDCSS_DVDCSS_H" LDFLAGS="$LDFLAGS -ldvdcss"
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc
 	
 	make -j $cpuCount
 	make install
-	
-	sed -i 's/-ldvdread.*/-ldvdread -ldvdcss -ldl/' "$LOCALDESTDIR/lib/pkgconfig/dvdread.pc"
 
 	do_checkIfExist libdvdread-git libdvdread.a
 	compile="false"
@@ -1312,6 +1267,43 @@ if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
 		do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
 
+#cd $LOCALBUILDDIR
+
+#if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
+#	echo -------------------------------------------------
+#	echo "DeckLinkAPI is already compiled"
+#	echo -------------------------------------------------
+#	else 
+#		echo -ne "\033]0;compile DeckLinkAPI $bits\007"
+#		rm -rf Decklink_SDK_10.3.1
+#		wget --tries=20 --retry-connrefused --waitretry=2 -c http://	
+#		unzip -j Blackmagic_DeckLink_SDK_10.3.1.zip "Blackmagic DeckLink SDK 10.3.1/Win/include/*" -d $LOCALBUILDDIR/Decklink_SDK_10.3.1
+#		rm Blackmagic_DeckLink_SDK_10.3.1.zip
+#		cd Decklink_SDK_10.3.1
+		
+#		widl -I$MINGW_PREFIX/$MINGW_CHOST/include -h -u -o DeckLinkAPI.h DeckLinkAPI.idl
+#		cp DeckLinkAPI.h DeckLinkAPI_i.c $LOCALDESTDIR/include
+		
+#		if [ ! -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
+#			echo -------------------------------------------------
+#			echo "Build DeckLinkAPI.h failed..."
+#			echo "Delete the source folder under '$LOCALBUILDDIR' and start again," 
+#			echo "or if you know there is no dependences hit enter for continue it."
+#			read -p ""
+#			sleep 5
+#		else
+#			if [[ $deleteSource = "y" ]]; then
+#				cd ..
+#				rm -rf Decklink_SDK_10.3.1
+#			fi
+#			echo -
+#			echo -------------------------------------------------
+#			echo "build DeckLinkAPI done..."
+#			echo -------------------------------------------------
+#			echo -
+#		fi
+#fi
+
 cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
@@ -1572,19 +1564,19 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 				rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
 				make distclean
 			fi
-			CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+			CPPFLAGS='-DFRIBIDI_ENTRY="" ' LDFLAGS="$LDFLAGS -static-libgcc" ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED --disable-debug --disable-static --disable-doc --disable-w32threads --enable-shared --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 		else
 			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
 				make distclean
 			fi
-			CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+			CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-w32threads --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			
 			newFfmpeg="yes"
 		fi
 
 		sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
 		
-		sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+		sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 		
 		make -j $cpuCount
 		make install
@@ -1676,7 +1668,7 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -ldvdcss -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif $faac
+		CPPFLAGS='-DFRIBIDI_ENTRY="" ' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif $faac
 		
 		make -j $cpuCount
 		make install
@@ -1775,6 +1767,9 @@ if [[ $stripping = "y" ]]; then
 	cd $LOCALDESTDIR
 	
 	echo -ne "\033]0;strip $bits binaries\007"
+	echo
+	echo "-------------------------------------------------------------------------------"
+	echo
 	FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\)" -mmin -600`
 	
 	for f in $FILES; do 
@@ -1794,6 +1789,9 @@ if [[ $packing = "y" ]]; then
 		rm upx391w.zip
 	fi
 	echo -ne "\033]0;pack $bits binaries\007"
+	echo
+	echo "-------------------------------------------------------------------------------"
+	echo
 	cd $LOCALDESTDIR
 	FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
 	
