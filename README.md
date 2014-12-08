@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-11-26
+modified: 2014-12-08
 
 ---
 
@@ -36,13 +36,14 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v3.1.5**
+Current release is **v3.2**
 
 
 Included Tools And Libraries
 --------
 
  - ffmpeg (shared or static) with that libraries:
+	- decklink
 	- fdkaac
 	- faac
 	- fontconfig
