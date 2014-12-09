@@ -572,22 +572,22 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/bin-audio/flac.exe" ]; then
     echo -------------------------------------------------
-    echo "flac-1.3.0 is already compiled"
+    echo "flac-1.3.1 is already compiled"
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile flac $bits\007"
         rm -rf flac-1.3.0
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/flac/flac-1.3.0.tar.xz
-        tar xf flac-1.3.0.tar.xz
-        rm flac-1.3.0.tar.xz
-        cd flac-1.3.0
+        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz
+        tar xf flac-1.3.1.tar.xz
+        rm flac-1.3.1.tar.xz
+        cd flac-1.3.1
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
 
         make -j $cpuCount
         make install
 
-        do_checkIfExist flac-1.3.0 bin-audio/flac.exe
+        do_checkIfExist flac-1.3.1 bin-audio/flac.exe
 fi
 
 cd $LOCALBUILDDIR
