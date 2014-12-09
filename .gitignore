@@ -28,6 +28,21 @@ local.properties
 # PDT-specific
 .buildpath
 
+#################
+## media-autobuild_suite
+#################
+
+## ignore media-autobuild_suite folders and local specific files
+
+build32/
+build64/
+local32/
+local64/
+msys64/
+msys32/
+
+media-autobuild_suite.ini
+mintty.lnk
 
 #################
 ## Visual Studio
