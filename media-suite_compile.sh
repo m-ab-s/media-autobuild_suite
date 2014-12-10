@@ -952,7 +952,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "http://git.videolan.org/git/libdvdread.git" libdvdread-git
+do_git "git://git.videolan.org/libdvdread.git" libdvdread-git
 
 if [[ $compile == "true" ]]; then
 
@@ -978,7 +978,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "http://git.videolan.org/git/libdvdnav.git" libdvdnav-git
+do_git "git://git.videolan.org/libdvdnav.git" libdvdnav-git
 
 if [[ $compile == "true" ]]; then
 
@@ -1368,7 +1368,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "http://git.videolan.org/git/x264.git" x264-git noDepth
+do_git "git://git.videolan.org/x264.git" x264-git noDepth
 
 if [[ $compile == "true" ]]; then
 	cd $LOCALBUILDDIR
