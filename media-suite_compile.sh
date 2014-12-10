@@ -952,7 +952,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://gitorious.org/videolan/libdvdread.git" libdvdread-git
+do_git "http://git.videolan.org/git/libdvdread.git" libdvdread-git
 
 if [[ $compile == "true" ]]; then
 
@@ -978,7 +978,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://gitorious.org/videolan/libdvdnav.git" libdvdnav-git
+do_git "http://git.videolan.org/git/libdvdnav.git" libdvdnav-git
 
 if [[ $compile == "true" ]]; then
 
