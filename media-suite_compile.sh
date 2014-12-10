@@ -1368,7 +1368,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/x264.git" x264-git noDepth
+do_git "http://git.videolan.org/git/x264.git" x264-git noDepth
 
 if [[ $compile == "true" ]]; then
 	cd $LOCALBUILDDIR
