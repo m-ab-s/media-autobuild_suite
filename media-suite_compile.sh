@@ -1682,8 +1682,11 @@ if [[ $mpv = "y" ]]; then
 		if [ ! -f waf ]; then
 			python2 ./bootstrap.py
 		else
-			python2 ./waf clean
+			python2 ./waf distclean
+			rm waf
+			rm -rf .waf-*
 			rm -rf $LOCALDESTDIR/bin-video/mpv
+			python2 ./bootstrap.py
 		fi
 		
 		CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-sdl2 --disable-manpage-build --disable-pdf-build
