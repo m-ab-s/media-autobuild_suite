@@ -318,15 +318,15 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 	echo -------------------------------------------------
-	echo "gnutls-3.3.10 is already compiled"
+	echo "gnutls-3.3.11 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile gnutls $bits\007"
-		rm -rf gnutls-3.3.10
-		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.10.tar.xz
-		tar xf gnutls-3.3.10.tar.xz
-		rm gnutls-3.3.10.tar.xz
-		cd gnutls-3.3.10
+		rm -rf gnutls-3.3.11
+		wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.11.tar.xz
+		tar xf gnutls-3.3.11.tar.xz
+		rm gnutls-3.3.11.tar.xz
+		cd gnutls-3.3.11
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
 		
@@ -335,7 +335,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
 		
 		sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 		
-		do_checkIfExist gnutls-3.3.10 libgnutls.a
+		do_checkIfExist gnutls-3.3.11 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
