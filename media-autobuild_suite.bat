@@ -572,16 +572,17 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	echo.- set mintty shell shortcut and make a first run
 	echo.
 	echo -------------------------------------------------------------------------------
-	
-	echo.Set Shell = CreateObject^("WScript.Shell"^)>>%instdir%\setlink.vbs
-	echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)>>%instdir%\setlink.vbs
-	echo.link.Arguments = "-i /msys2.ico /usr/bin/bash --login" >>%instdir%\setlink.vbs
-	echo.link.Description = "msys2 shell console">>%instdir%\setlink.vbs
-	echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe">>%instdir%\setlink.vbs
-	echo.link.WindowStyle = ^1>>%instdir%\setlink.vbs
-	echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico">>%instdir%\setlink.vbs
-	echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin">>%instdir%\setlink.vbs
-	echo.link.Save>>%instdir%\setlink.vbs
+	(
+		echo.Set Shell = CreateObject^("WScript.Shell"^)
+		echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
+		echo.link.Arguments = "-i /msys2.ico /usr/bin/bash --login"
+		echo.link.Description = "msys2 shell console"
+		echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe"
+		echo.link.WindowStyle = ^1
+		echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
+		echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
+		echo.link.Save
+		)>>%instdir%\setlink.vbs
 
 	cscript /nologo %instdir%\setlink.vbs 
 	del %instdir%\setlink.vbs 	
@@ -595,67 +596,73 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	echo.first update
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
-	echo.echo -ne "\033]0;first msys2 update\007">>firstUpdate.sh
-	echo.pacman --noconfirm -Syu --force --ignoregroup base>>firstUpdate.sh
-	echo.pacman --noconfirm -Su --force>>firstUpdate.sh
-	echo.exit>>firstUpdate.sh
+	(
+		echo.echo -ne "\033]0;first msys2 update\007"
+		echo.pacman --noconfirm -Syu --force --ignoregroup base
+		echo.pacman --noconfirm -Su --force
+		echo.exit
+		)>>%instdir%\firstUpdate.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
+	cls
 	del %instdir%\firstUpdate.sh
 
 :minttySettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
 if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
-
-	echo.BoldAsFont=no>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BackgroundColour=57,57,57>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.ForegroundColour=221,221,221>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Transparency=medium>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.FontHeight=^9>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.FontSmoothing=full>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.AllowBlinking=yes>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Font=DejaVu Sans Mono>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Columns=120>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Rows=30>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Term=xterm-256color>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.CursorType=block>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Black=38,39,41>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Red=249,38,113>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Green=166,226,46>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Yellow=253,151,31>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Blue=102,217,239>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Magenta=158,111,254>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.Cyan=94,113,117>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.White=248,248,242>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldBlack=85,68,68>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldRed=249,38,113>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldGreen=166,226,46>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldYellow=253,151,31>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldBlue=102,217,239>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldMagenta=158,111,254>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldCyan=163,186,191>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
-	echo.BoldWhite=248,248,242>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
+	(
+		echo.BoldAsFont=no
+		echo.BackgroundColour=57,57,57
+		echo.ForegroundColour=221,221,221
+		echo.Transparency=medium
+		echo.FontHeight=^9
+		echo.FontSmoothing=full
+		echo.AllowBlinking=yes
+		echo.Font=DejaVu Sans Mono
+		echo.Columns=120
+		echo.Rows=30
+		echo.Term=xterm-256color
+		echo.CursorType=block
+		echo.Black=38,39,41
+		echo.Red=249,38,113
+		echo.Green=166,226,46
+		echo.Yellow=253,151,31
+		echo.Blue=102,217,239
+		echo.Magenta=158,111,254
+		echo.Cyan=94,113,117
+		echo.White=248,248,242
+		echo.BoldBlack=85,68,68
+		echo.BoldRed=249,38,113
+		echo.BoldGreen=166,226,46
+		echo.BoldYellow=253,151,31
+		echo.BoldBlue=102,217,239
+		echo.BoldMagenta=158,111,254
+		echo.BoldCyan=163,186,191
+		echo.BoldWhite=248,248,242
+		)>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
 	
 :hgsettings
 for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
 if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO rebase
-	echo.[ui]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.username = %userFolder%>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.verbose = True>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.editor = vim>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.[web]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.cacerts=/usr/ssl/cert.pem>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.[extensions]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.color =>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.[color]>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.modified = magenta bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.added = green bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.removed = red bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.deleted = cyan bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.unknown = blue bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
-	echo.status.ignored = black bold>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+	(
+		echo.[ui]
+		echo.username = %userFolder%
+		echo.verbose = True
+		echo.editor = vim
+		echo.
+		echo.[web]
+		echo.cacerts=/usr/ssl/cert.pem
+		echo.
+		echo.[extensions]
+		echo.color =
+		echo.
+		echo.[color]
+		echo.status.modified = magenta bold
+		echo.status.added = green bold
+		echo.status.removed = red bold
+		echo.status.deleted = cyan bold
+		echo.status.unknown = blue bold
+		echo.status.ignored = black bold
+		)>>%instdir%\%msys2%\home\%userFolder%\.hgrc
 
 :rebase
 if %msys2%==msys32 (
@@ -695,17 +702,19 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
 
 :sethgBat
 if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
-echo.@echo off>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.setlocal>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.set HG=^%%~f0>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.set PYTHONHOME=>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.set in=^%%*>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.set out=^%%in: ^{= ^"^{^%%>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.set out=^%%out:^} =^}^" ^%%>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.>>%instdir%\%msys2%\usr\bin\hg.bat
-echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%>>%instdir%\%msys2%\usr\bin\hg.bat
+(
+	echo.@echo off
+	echo.
+	echo.setlocal
+	echo.set HG=^%%~f0
+	echo.
+	echo.set PYTHONHOME=
+	echo.set in=^%%*
+	echo.set out=^%%in: ^{= ^"^{^%%
+	echo.set out=^%%out:^} =^}^" ^%%
+	echo.
+	echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
+	)>>%instdir%\%msys2%\usr\bin\hg.bat
 
 
 :getmingw32
@@ -719,10 +728,12 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 	echo.install 32 bit compiler
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
-	echo.echo -ne "\033]0;install 32 bit compiler\007">>mingw32.sh
-	echo.pacman --noconfirm -S $(^</etc/pac-mingw32-new.pk^)>>mingw32.sh
-	echo.sleep ^3>>mingw32.sh
-	echo.exit>>mingw32.sh
+	(
+		echo.echo -ne "\033]0;install 32 bit compiler\007"
+		echo.pacman --noconfirm -S $(^</etc/pac-mingw32-new.pk^)
+		echo.sleep ^3
+		echo.exit
+		)>>%instdir%\mingw32.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
 	del mingw32.sh
 	)
@@ -738,10 +749,12 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
 	echo.install 64 bit compiler
 	echo.-------------------------------------------------------------------------------
 	if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
-	echo.echo -ne "\033]0;install 64 bit compiler\007">>mingw64.sh
-	echo.pacman --noconfirm -S $(^</etc/pac-mingw64-new.pk^)>>mingw64.sh
-	echo.sleep ^3>>mingw64.sh
-	echo.exit>>mingw64.sh
+		(
+		echo.echo -ne "\033]0;install 64 bit compiler\007"
+		echo.pacman --noconfirm -S $(^</etc/pac-mingw64-new.pk^)
+		echo.sleep ^3
+		echo.exit
+		)>>%instdir%\mingw64.sh
 	%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
 	del mingw64.sh
 	)
@@ -869,14 +882,15 @@ if "%searchRes%"=="local64" GOTO writeProfile32
 		for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
 		)
 	if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
-
-	echo.>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\build32\ /build32>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\%msys2%\mingw32\ /mingw32>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\build64\ /build64>>%instdir%\%msys2%\etc\fstab.
-	echo.%instdir%\%msys2%\mingw64\ /mingw64>>%instdir%\%msys2%\etc\fstab.
+	(
+		echo.
+		echo.%instdir%\local32\ /local32
+		echo.%instdir%\build32\ /build32
+		echo.%instdir%\%msys2%\mingw32\ /mingw32
+		echo.%instdir%\local64\ /local64
+		echo.%instdir%\build64\ /build64
+		echo.%instdir%\%msys2%\mingw64\ /mingw64
+		)>>%instdir%\%msys2%\etc\fstab.
 
 ::------------------------------------------------------------------
 :: write config profiles:
@@ -890,49 +904,51 @@ if %build32%==yes (
 		echo.- write profile for 32 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local32\etc\profile.local
-		echo.# /local32/etc/profile.local>>%instdir%\local32\etc\profile.local
-		echo.#>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local32\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local32\etc\profile.local
-		echo.export CC=gcc>>%instdir%\local32\etc\profile.local
-		echo.export python=python2>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local32\etc\profile.local
-		echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man">>%instdir%\local32\etc\profile.local
-		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info">>%instdir%\local32\etc\profile.local
-		echo.MINGW_PREFIX="/mingw32">>%instdir%\local32\etc\profile.local
-		echo.MINGW_CHOST="i686-w64-mingw32">>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.MSYSTEM=MINGW32>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.DXSDK_DIR="/mingw32/i686-w64-mingw32">>%instdir%\local32\etc\profile.local
-		echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal">>%instdir%\local32\etc\profile.local
-		echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig:/mingw32/lib/pkgconfig">>%instdir%\local32\etc\profile.local
-		echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local32\etc\profile.local
-		echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
-		echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local32\etc\profile.local
-		echo.LDFLAGS="-L/local32/lib -mthreads -pipe">>%instdir%\local32\etc\profile.local
-		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.PYTHONHOME=/usr>>%instdir%\local32\etc\profile.local
-		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\local32\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local32\etc\profile.local
-		echo.export PATH PS1>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.# package build directory>>%instdir%\local32\etc\profile.local
-		echo.LOCALBUILDDIR=/build32>>%instdir%\local32\etc\profile.local
-		echo.# package installation prefix>>%instdir%\local32\etc\profile.local
-		echo.LOCALDESTDIR=/local32>>%instdir%\local32\etc\profile.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local32\etc\profile.local
-		echo.>>%instdir%\local32\etc\profile.local
-		echo.bits='32bit'>>%instdir%\local32\etc\profile.local
-		echo.targetBuild='i686-w64-mingw32'>>%instdir%\local32\etc\profile.local
-		echo.targetHost='i686-w64-mingw32'>>%instdir%\local32\etc\profile.local
-		echo.cross='i686-w64-mingw32-'>>%instdir%\local32\etc\profile.local
+			(
+			echo.#
+			echo.# /local32/etc/profile.local
+			echo.#
+			echo.
+			echo.alias dir='ls -la --color=auto'
+			echo.alias ls='ls --color=auto'
+			echo.export CC=gcc
+			echo.export python=python2
+			echo.
+			echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+			echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man"
+			echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info"
+			echo.MINGW_PREFIX="/mingw32"
+			echo.MINGW_CHOST="i686-w64-mingw32"
+			echo.
+			echo.MSYSTEM=MINGW32
+			echo.
+			echo.DXSDK_DIR="/mingw32/i686-w64-mingw32"
+			echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal"
+			echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig:/mingw32/lib/pkgconfig"
+			echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+			echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe"
+			echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe"
+			echo.LDFLAGS="-L/local32/lib -mthreads -pipe"
+			echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+			echo.
+			echo.PYTHONHOME=/usr
+			echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
+			echo.
+			echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}"
+			echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
+			echo.export PATH PS1
+			echo.
+			echo.# package build directory
+			echo.LOCALBUILDDIR=/build32
+			echo.# package installation prefix
+			echo.LOCALDESTDIR=/local32
+			echo.export LOCALBUILDDIR LOCALDESTDIR
+			echo.
+			echo.bits='32bit'
+			echo.targetBuild='i686-w64-mingw32'
+			echo.targetHost='i686-w64-mingw32'
+			echo.cross='i686-w64-mingw32-'
+			)>>%instdir%\local32\etc\profile.local
 		)
 		
 :writeProfile64
@@ -943,49 +959,51 @@ if %build64%==yes (
 		echo.- write profile for 64 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.#>>%instdir%\local64\etc\profile.local
-		echo.# /local64/etc/profile.local>>%instdir%\local64\etc\profile.local
-		echo.#>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.alias dir='ls -la --color=auto'>>%instdir%\local64\etc\profile.local
-		echo.alias ls='ls --color=auto'>>%instdir%\local64\etc\profile.local
-		echo.export CC=gcc>>%instdir%\local64\etc\profile.local
-		echo.export python=python2>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.MSYS2_PATH="/usr/local/bin:/usr/bin">>%instdir%\local64\etc\profile.local
-		echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man">>%instdir%\local64\etc\profile.local
-		echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info">>%instdir%\local64\etc\profile.local
-		echo.MINGW_PREFIX="/mingw64">>%instdir%\local64\etc\profile.local
-		echo.MINGW_CHOST="x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.MSYSTEM=MINGW64>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32">>%instdir%\local64\etc\profile.local
-		echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal">>%instdir%\local64\etc\profile.local
-		echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig">>%instdir%\local64\etc\profile.local
-		echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1">>%instdir%\local64\etc\profile.local
-		echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
-		echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe">>%instdir%\local64\etc\profile.local
-		echo.LDFLAGS="-L/local64/lib -pipe">>%instdir%\local64\etc\profile.local
-		echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.PYTHONHOME=/usr>>%instdir%\local64\etc\profile.local
-		echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts">>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}">>%instdir%\local64\etc\profile.local
-		echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '>>%instdir%\local64\etc\profile.local
-		echo.export PATH PS1>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.# package build directory>>%instdir%\local64\etc\profile.local
-		echo.LOCALBUILDDIR=/build64>>%instdir%\local64\etc\profile.local
-		echo.# package installation prefix>>%instdir%\local64\etc\profile.local
-		echo.LOCALDESTDIR=/local64>>%instdir%\local64\etc\profile.local
-		echo.export LOCALBUILDDIR LOCALDESTDIR>>%instdir%\local64\etc\profile.local
-		echo.>>%instdir%\local64\etc\profile.local
-		echo.bits='64bit'>>%instdir%\local64\etc\profile.local
-		echo.targetBuild='x86_64-w64-mingw32'>>%instdir%\local64\etc\profile.local
-		echo.targetHost='x86_64-w64-mingw32'>>%instdir%\local64\etc\profile.local
-		echo.cross='x86_64-w64-mingw32-'>>%instdir%\local64\etc\profile.local
+			(
+			echo.#
+			echo.# /local64/etc/profile.local
+			echo.#
+			echo.
+			echo.alias dir='ls -la --color=auto'
+			echo.alias ls='ls --color=auto'
+			echo.export CC=gcc
+			echo.export python=python2
+			echo.
+			echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+			echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man"
+			echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info"
+			echo.MINGW_PREFIX="/mingw64"
+			echo.MINGW_CHOST="x86_64-w64-mingw32"
+			echo.
+			echo.MSYSTEM=MINGW64
+			echo.
+			echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32"
+			echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal"
+			echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig"
+			echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+			echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe"
+			echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe"
+			echo.LDFLAGS="-L/local64/lib -pipe"
+			echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+			echo.
+			echo.PYTHONHOME=/usr
+			echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
+			echo.
+			echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}"
+			echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
+			echo.export PATH PS1
+			echo.
+			echo.# package build directory
+			echo.LOCALBUILDDIR=/build64
+			echo.# package installation prefix
+			echo.LOCALDESTDIR=/local64
+			echo.export LOCALBUILDDIR LOCALDESTDIR
+			echo.
+			echo.bits='64bit'
+			echo.targetBuild='x86_64-w64-mingw32'
+			echo.targetHost='x86_64-w64-mingw32'
+			echo.cross='x86_64-w64-mingw32-'
+			)>>%instdir%\local64\etc\profile.local
 		)
 	
 :loginProfile
@@ -996,10 +1014,12 @@ if %build32%==no GOTO loginProfile64
 		echo.- write default profile [32 bit]
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.>>%instdir%\%msys2%\etc\profile.
-		echo.if [[ -z "$MSYSTEM" ^&^& -f /local32/etc/profile.local ]]; then>>%instdir%\%msys2%\etc\profile.
-		echo.       source /local32/etc/profile.local>>%instdir%\%msys2%\etc\profile.
-		echo.fi>>%instdir%\%msys2%\etc\profile.
+		(
+			echo.
+			echo.if [[ -z "$MSYSTEM" ^&^& -f /local32/etc/profile.local ]]; then
+			echo.       source /local32/etc/profile.local
+			echo.fi
+			)>>%instdir%\%msys2%\etc\profile.
 	)
 
 	GOTO compileLocals
@@ -1011,10 +1031,12 @@ if %build32%==no GOTO loginProfile64
 		echo.- write default profile [64 bit]
 		echo.
 		echo -------------------------------------------------------------------------------
-		echo.>>%instdir%\%msys2%\etc\profile.
-		echo.if [[ -z "$MSYSTEM" ^&^& -f /local64/etc/profile.local ]]; then>>%instdir%\%msys2%\etc\profile.
-		echo.       source /local64/etc/profile.local>>%instdir%\%msys2%\etc\profile.
-		echo.fi>>%instdir%\%msys2%\etc\profile.
+		(
+			echo.
+			echo.if [[ -z "$MSYSTEM" ^&^& -f /local64/etc/profile.local ]]; then
+			echo.       source /local64/etc/profile.local
+			echo.fi
+			)>>%instdir%\%msys2%\etc\profile.
 	)
 
 :compileLocals

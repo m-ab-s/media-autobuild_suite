@@ -99,9 +99,9 @@ cd $iPath/..
 
 if [[ $build32 = "yes" ]]; then
 	if [ -f "/local32/etc/profile.local" ]; then
-		newProfiles32=`sed -n "/echo.#>>%instdir%.\local32.\etc.\profile.local/,/echo.cross='i686-w64-mingw32-'>>%instdir%.\local32.\etc.\profile.local/p" media-autobuild_suite.bat | sed "s/\t\techo.//g;s/>>%instdir%.\local32.\etc.\profile.local//g"`
+		newProfiles32=`sed -n "/echo.# \/local32\/etc\/profile.local/,/echo.cross='i686-w64-mingw32-'/p" media-autobuild_suite.bat | sed "s/echo.//g"`
 
-		oldProfiles32=`sed -n "/#/,/cross='i686-w64-mingw32-'/p" /local32/etc/profile.local`
+		oldProfiles32=`sed -n "/# \/local32\/etc\/profile.local/,/cross='i686-w64-mingw32-'/p" /local32/etc/profile.local`
 
 		if ! cmp -s <(echo $newProfiles32) <(echo $oldProfiles32); then 
 			echo
@@ -116,9 +116,9 @@ fi
 
 if [[ $build64 = "yes" ]]; then
 		if [ -f "/local64/etc/profile.local" ]; then
-		newProfiles64=`sed -n "/echo.#>>%instdir%.\local64.\etc.\profile.local/,/echo.cross='x86_64-w64-mingw32-'>>%instdir%.\local64.\etc.\profile.local/p" media-autobuild_suite.bat | sed "s/\t\techo.//g;s/>>%instdir%.\local64.\etc.\profile.local//g"`
+		newProfiles64=`sed -n "/echo.# \/local64\/etc\/profile.local/,/echo.cross='x86_64-w64-mingw32-'/p" media-autobuild_suite.bat | sed "s/echo.//g"`
 
-		oldProfiles64=`sed -n "/#/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
+		oldProfiles64=`sed -n "/# \/local64\/etc\/profile.local/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
 
 		if ! cmp -s <(echo $newProfiles64) <(echo $oldProfiles64); then 
 			echo
