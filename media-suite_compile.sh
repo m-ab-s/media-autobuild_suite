@@ -863,7 +863,7 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
 	
 	make -j $cpuCount
 	make install

@@ -904,7 +904,7 @@ if %build32%==yes (
 		echo.- write profile for 32 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-			(
+		(
 			echo.#
 			echo.# /local32/etc/profile.local
 			echo.#
@@ -959,7 +959,7 @@ if %build64%==yes (
 		echo.- write profile for 64 bit compiling
 		echo.
 		echo -------------------------------------------------------------------------------
-			(
+		(
 			echo.#
 			echo.# /local64/etc/profile.local
 			echo.#
