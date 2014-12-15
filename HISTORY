@@ -86,3 +86,4 @@
 2014-12-02 add libdvdcss; libdvdnav; libdvdread back to compile script, add tools (widl etc.)
 2014-12-06 remove libdvdcss because of copyright issue 
 2014-12-08 add decklink
+2014-12-15 new freetype version
