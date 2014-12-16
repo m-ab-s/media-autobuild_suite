@@ -1243,7 +1243,7 @@ if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
 	else 
 		echo -ne "\033]0;compile libcaca $bits\007"
 		rm -rf libcaca-0.99.beta19
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://caca.zoy.org/raw-attachment/wiki/libcaca/libcaca-0.99.beta19.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz
 		tar xf libcaca-0.99.beta19.tar.gz
 		rm libcaca-0.99.beta19.tar.gz
 		cd libcaca-0.99.beta19
