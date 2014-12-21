@@ -215,9 +215,10 @@ if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
 		rm fontconfig-2.11.1.tar.gz
 		cd fontconfig-2.11.1
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
+		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' fontconfig.pc
+		
 		make -j $cpuCount
 		make install
-		sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' "$LOCALDESTDIR/lib/pkgconfig/fontconfig.pc"
 		
 		do_checkIfExist fontconfig-2.11.1 libfontconfig.a
 fi
@@ -414,22 +415,22 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libmagic.a" ]; then
 	echo -------------------------------------------------
-	echo "file-5.19[libmagic] is already compiled"
+	echo "file-5.21[libmagic] is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile file $bits\007"
-		rm -rf file-5.19
-		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.astron.com/pub/file/file-5.19.tar.gz
-		tar xf file-5.19.tar.gz
-		rm file-5.19.tar.gz
-		cd file-5.19
+		rm -rf file-5.21
+		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.astron.com/pub/file/file-5.21.tar.gz
+		tar xf file-5.21.tar.gz
+		rm file-5.21.tar.gz
+		cd file-5.21
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
 
 		make CPPFLAGS='-D_REGEX_RE_COMP' -j $cpuCount
 		make install
 		
-		do_checkIfExist file-5.19 libmagic.a
+		do_checkIfExist file-5.21 libmagic.a
 fi
 
 cd $LOCALBUILDDIR
@@ -896,7 +897,7 @@ if [[ $compile == "true" ]]; then
 		make clean
 	fi
 	
-	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
 	
 	make -j $cpuCount
 	make install
