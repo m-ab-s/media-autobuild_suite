@@ -1038,24 +1038,28 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libbluray.a" ]; then
-	echo -------------------------------------------------
-	echo "libbluray-0.6.2 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libbluray $bits\007"
-		rm -rf libbluray-0.6.2
-		wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.videolan.org/pub/videolan/libbluray/0.6.2/libbluray-0.6.2.tar.bz2
-		tar xf libbluray-0.6.2.tar.bz2
-		rm libbluray-0.6.2.tar.bz2
-		cd libbluray-0.6.2
+do_git "git://git.videolan.org/libbluray.git" libbluray-git
 
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
+if [[ $compile == "true" ]]; then
+
+if [[ ! -f "configure" ]]; then
+		autoreconf -fiv
+	else 
+		make uninstall
+		make clean
+	fi
+
+	./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
+
+	make -j $cpuCount
+	make install
 	
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libbluray-0.6.2 libbluray.a
+	do_checkIfExist libbluray-git libbluray.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "libbluray-git is already up to date"
+	echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR

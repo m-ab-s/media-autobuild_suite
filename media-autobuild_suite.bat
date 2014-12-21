@@ -622,6 +622,7 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
 		echo.Rows=30
 		echo.Term=xterm-256color
 		echo.CursorType=block
+		echo.ClicksPlaceCursor=yes
 		echo.Black=38,39,41
 		echo.Red=249,38,113
 		echo.Green=166,226,46
