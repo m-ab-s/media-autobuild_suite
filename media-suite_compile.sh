@@ -1029,7 +1029,7 @@ if [[ $compile == "true" ]]; then
 		make install
 
 		do_checkIfExist libdvdnav-git libdvdnav.a
-		
+		compile="false"
 else
 	echo -------------------------------------------------
 	echo "libdvdnav-git is already up to date"
