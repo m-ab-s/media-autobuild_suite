@@ -135,20 +135,20 @@ Have fun!
 
 
 
-What the individual files does
+What The Individual Files Does
 --------
 
 media-autobuild_suite.bat
-	This file set up the msys2 system and the compiler environment. For a normal using you only have to start this file. Every time you start this batch file it runs truth the process, but after the first time it only check some variables and run a update and after that it only compile this tools what have a new git version.
+ - This file set up the msys2 system and the compiler environment. For a normal using you only have to start this file. Every time you start this batch file it runs truth the process, but after the first time it only check some variables and run a update and after that it only compile this tools what have a new git version.
 	
 media-autobuild_suite.ini
-	This file get generated after by the first start and save the settings what you have selected. Before the next run you can edit it.
+ - This file get generated after by the first start and save the settings what you have selected. Before the next run you can edit it.
 	
 media-suite_compile.sh
-	This is the compiling script, it builds all the libs and tools what we want, like ffmpeg; mplayer; etc. You also can inspect it and see how to compile your own source codes. Normally you can copy the code and past them in the mintty shell (expect make -j $cpuCount, here you need to put your cpu count)
+ - This is the compiling script, it builds all the libs and tools what we want, like ffmpeg; mplayer; etc. You also can inspect it and see how to compile your own source codes. Normally you can copy the code and past them in the mintty shell (expect make -j $cpuCount, here you need to put your cpu count)
 	
 media-suite_update.sh
-	This script runs every time you run the batch file to. It checks that there is new packets what needs to get installed. It check the compiler profiles that if they are up to date. And it makes a msys2 system update.
+ - This script runs every time you run the batch file to. It checks that there is new packets what needs to get installed. It check the compiler profiles that if they are up to date. And it makes a msys2 system update.
 	
 All scripts you can normally override with the newest Version and then rerun the batch process.
 	
