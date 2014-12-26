@@ -20,7 +20,7 @@
 ::-------------------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 3.2
+::	This is version 3.2.1
 ::	See HISTORY file for more information
 ::
 ::-------------------------------------------------------------------------------------
@@ -607,8 +607,7 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 	del %instdir%\firstUpdate.sh
 
 :minttySettings
-for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
-if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
+if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
 	(
 		echo.BoldAsFont=no
 		echo.BackgroundColour=57,57,57
@@ -639,14 +638,13 @@ if exist %instdir%\%msys2%\home\%userFolder%\.minttyrc GOTO hgsettings
 		echo.BoldMagenta=158,111,254
 		echo.BoldCyan=163,186,191
 		echo.BoldWhite=248,248,242
-		)>>%instdir%\%msys2%\home\%userFolder%\.minttyrc
+		)>>%instdir%\%msys2%\home\%USERNAME%\.minttyrc
 	
 :hgsettings
-for /f %%i in ('dir %instdir%\%msys2%\home /B') do set userFolder=%%i
-if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO rebase
+if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO rebase
 	(
 		echo.[ui]
-		echo.username = %userFolder%
+		echo.username = %USERNAME%
 		echo.verbose = True
 		echo.editor = vim
 		echo.
@@ -663,7 +661,7 @@ if exist %instdir%\%msys2%\home\%userFolder%\.hgrc GOTO rebase
 		echo.status.deleted = cyan bold
 		echo.status.unknown = blue bold
 		echo.status.ignored = black bold
-		)>>%instdir%\%msys2%\home\%userFolder%\.hgrc
+		)>>%instdir%\%msys2%\home\%USERNAME%\.hgrc
 
 :rebase
 if %msys2%==msys32 (
