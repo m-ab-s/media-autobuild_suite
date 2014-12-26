@@ -908,9 +908,6 @@ if [[ $compile == "true" ]]; then
 	make install
 
 	do_checkIfExist sox-git bin-audio/sox.exe
-	
-	git fetch origin
-	git reset --hard origin/master
 		
 	compile="false"
 else
@@ -1798,9 +1795,6 @@ if [[ $mkv = "y" ]]; then
 		unset DRAKETHREADS
 
 		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
-		
-		git fetch origin
-		git reset --hard origin/master
 
 		compile="false"
 	fi
