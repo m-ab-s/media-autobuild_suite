@@ -875,7 +875,12 @@ if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
 		rm soxr-0.1.1-Source.tar.xz
 		cd soxr-0.1.1-Source
 		
-		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF
+		sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
+		
+		mkdir build 
+		cd build
+		
+		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF -DUNIX:BOOL=on -Wno-dev
 		
 		make -j $cpuCount
 		make install
@@ -888,7 +893,7 @@ cd $LOCALBUILDDIR
 do_git "git://git.code.sf.net/p/sox/code" sox-git
 
 if [[ $compile == "true" ]]; then
-		mv $MINGW_PREFIX/lib/libgsm.a $MINGW_PREFIX/lib/tmp_libgsm.a
+	sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 	
 	if [[ ! -f ./configure ]]; then
 		autoreconf -i
@@ -901,10 +906,12 @@ if [[ $compile == "true" ]]; then
 	
 	make -j $cpuCount
 	make install
-	
-		mv $MINGW_PREFIX/lib/tmp_libgsm.a $MINGW_PREFIX/lib/libgsm.a
-	
+
 	do_checkIfExist sox-git bin-audio/sox.exe
+	
+	git fetch origin
+	git reset --hard origin/master
+		
 	compile="false"
 else
 	echo -------------------------------------------------
@@ -970,9 +977,9 @@ if [[ $compile == "true" ]]; then
 	fi
 	
 	if [[ "$bits" = "32bit" ]]; then
-		make ARCH=i686 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" -j $cpuCount
+		make ARCH=i686 -j $cpuCount
 	else
-		make ARCH=x86_64 DFLAGS="$DFLAGS -O2 -g -ftree-vectorize" LD="gcc -pthread" ASMFLAGS="-f win64 -DHAVE_ALIGNED_STACK=0 -DARCH_X86_64=1 -I. -I./strategies -I./extras" -j $cpuCount
+		make ARCH=x86_64 -j $cpuCount
 	fi 
 
 	cp kvazaar.exe $LOCALDESTDIR/bin-video
@@ -1791,6 +1798,10 @@ if [[ $mkv = "y" ]]; then
 		unset DRAKETHREADS
 
 		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
+		
+		git fetch origin
+		git reset --hard origin/master
+
 		compile="false"
 	fi
 fi
