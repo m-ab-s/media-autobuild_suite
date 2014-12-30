@@ -1455,7 +1455,7 @@ if [[ $compile == "true" ]]; then
 		arch='x86_64'
 	fi
 
-	CPPFLAGS='-D_POSIX' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs
+	CPPFLAGS='-D_POSIX' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
 
 	make -j $cpuCount
 	make install
