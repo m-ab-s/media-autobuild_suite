@@ -20,7 +20,7 @@
 ::-------------------------------------------------------------------------------------
 ::-------------------------------------------------------------------------------------
 ::
-::	This is version 3.2.1
+::	This is version 3.3
 ::	See HISTORY file for more information
 ::
 ::-------------------------------------------------------------------------------------
@@ -52,6 +52,7 @@ if exist %ini% GOTO checkINI
 	set msys2ArchINI=%msys2Arch%
 	set archINI=0
 	set freeINI=0
+	set ffmbcINI=0
 	set ffmpegINI=0
 	set ffmpegUpdateINI=0
 	set mp4boxINI=0
@@ -72,7 +73,9 @@ findstr /i "arch" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "free" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmpegB" %ini% > nul
+findstr /i "ffmbc" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "ffmbc" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegUpdate" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -97,6 +100,7 @@ findstr /i "pack" %ini% > nul
 for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
 for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
+for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
@@ -177,7 +181,34 @@ if %nonfree%==2 (
 	)
 if %nonfree% GTR 2 GOTO selectNonFree
 if %writeFree%==yes echo.free=^%nonfree%>>%ini%
-	
+
+:ffmbc
+set "writeBC=no"
+if %ffmbcINI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build ffmbc binary:
+	echo. 1 = yes [static]
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildffmbc="build ffmbc:"
+	set "writeBC=yes"
+	) else (
+		set buildffmbc=%ffmbcINI%
+		)
+
+if %buildffmbc%==1 (
+	set "ffmbc=y"
+	)
+if %buildffmbc%==2 (
+	set "ffmbc=n"
+	)
+if %buildffmbc% GTR 2 GOTO ffmbc
+if %writeBC%==yes echo.ffmbc=^%buildffmbc%>>%ini%
+
 :ffmpeg
 set "writeFF=no"
 if %ffmpegINI%==0 (
@@ -427,8 +458,8 @@ if %packINI%==0 (
 	echo -------------------------------------------------------------------------------
 	echo -------------------------------------------------------------------------------
 	echo.
-	echo.Attention: Some security applications may detect packed binaries as malware. 
 	echo. pack compiled files:
+	echo. [Attention: Some security applications may detect packed binaries as malware]
 	echo. 1 = yes
 	echo. 2 = no
 	echo.
@@ -1045,6 +1076,6 @@ IF ERRORLEVEL == 1 (
 	pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit

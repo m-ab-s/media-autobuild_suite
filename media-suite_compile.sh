@@ -10,6 +10,7 @@ while true; do
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
+--ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1534,6 +1535,43 @@ else
 	echo -------------------------------------------------
 	echo "x265 is already up to date"
 	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+if [[ $ffmbc = "y" ]]; then
+	if [ -f "$LOCALDESTDIR/bin-video/ffmbc.exe" ]; then
+		echo -------------------------------------------------
+		echo "ffmbc-0.7.2 is already compiled"
+		echo -------------------------------------------------
+		else 
+			echo -ne "\033]0;compile ffmbc-0.7.2 $bits\007"
+			
+			if [[ $nonfree = "y" ]]; then
+				extras="--enable-nonfree --enable-libfaac"
+			else
+				extras="" 
+			fi
+	
+			rm -rf FFmbc-0.7.2
+			wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O FFmbc-0.7.2.tar.bz2 "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download"
+			tar xf FFmbc-0.7.2.tar.bz2 
+			rm FFmbc-0.7.2.tar.bz2 
+			cd FFmbc-0.7.2
+
+			if [[ $bits = "32bit" ]]; then
+				arch='x86'
+			else
+				arch='x86_64'
+			fi
+			
+			CPPFLAGS='-D_POSIX' ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
+			
+			make -j $cpuCount 
+			make install-progs
+			
+			do_checkIfExist FFmbc-0.7.2 bin-video/ffmbc.exe
+	fi
 fi
 
 cd $LOCALBUILDDIR

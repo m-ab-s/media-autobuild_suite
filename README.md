@@ -7,7 +7,7 @@ author: Jonathan Baecker (jb_alvarado)
 
 created:  2013-09-24
 
-modified: 2014-12-26
+modified: 2015-01-05
 
 ---
 
@@ -36,7 +36,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v3.2.1**
+Current release is **v3.3**
 
 
 Included Tools And Libraries
@@ -87,6 +87,7 @@ Included Tools And Libraries
 	- f265
 	- fdkaac
 	- faac
+	- ffmbc
 	- file
 	- flac
 	- gnutls
