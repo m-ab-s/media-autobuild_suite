@@ -17,7 +17,7 @@ done
 if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -f "/etc/pac-mingw64-old.pk" ]]; then
 	echo
 	echo "-------------------------------------------------------------------------------"
-	echo "check pacman packs..."
+	echo "check pacman packages..."
 	echo "-------------------------------------------------------------------------------"
 	echo
 		
