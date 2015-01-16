@@ -414,6 +414,40 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
+	echo -------------------------------------------------
+	echo "libgnurx-2.5.1 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile libgnurx $bits\007"
+		rm -rf mingw-libgnurx-2.5.1
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz
+		tar xf mingw-libgnurx-2.5.1-src.tar.gz
+		rm mingw-libgnurx-2.5.1-src.tar.gz
+		cd mingw-libgnurx-2.5.1
+		
+		rm -f configure.ac
+
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O Makefile.am https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-Makefile.am
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O configure.ac https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-configure.ac
+		
+		touch NEWS
+		touch AUTHORS
+		libtoolize --copy
+		aclocal
+		autoconf
+		automake --add-missing
+		
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=yes --enable-shared=no
+
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist libgnurx-2.5.1 libgnurx.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libmagic.a" ]; then
 	echo -------------------------------------------------
 	echo "file-5.22[libmagic] is already compiled"
