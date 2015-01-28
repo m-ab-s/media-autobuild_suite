@@ -9,7 +9,7 @@ while true; do
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
---mp4box=* ) mp4box="${1#*=}"; shift ;;fre
+--mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
