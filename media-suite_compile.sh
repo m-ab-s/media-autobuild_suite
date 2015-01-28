@@ -9,7 +9,7 @@ while true; do
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
---mp4box=* ) mp4box="${1#*=}"; shift ;;
+--mp4box=* ) mp4box="${1#*=}"; shift ;;fre
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
@@ -1378,7 +1378,7 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
 		rm -rf frei0r-plugins-1.4
-		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4
