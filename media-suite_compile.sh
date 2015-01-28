@@ -1378,7 +1378,7 @@ if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
 	else 
 		echo -ne "\033]0;compile frei0r $bits\007"
 		rm -rf frei0r-plugins-1.4
-		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/.xsend.php?file=frei0r/releases/frei0r-plugins-1.4.tar.gz
+		wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz
 		tar xf frei0r-plugins-1.4.tar.gz
 		rm frei0r-plugins-1.4.tar.gz
 		cd frei0r-plugins-1.4
