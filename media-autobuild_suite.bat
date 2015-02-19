@@ -953,7 +953,7 @@ if %build32%==yes (
 			echo.MSYSTEM=MINGW32
 			echo.
 			echo.DXSDK_DIR="/mingw32/i686-w64-mingw32"
-			echo.ACLOCAL_PATH="/ming32/share/aclocal:/usr/share/aclocal"
+			echo.ACLOCAL_PATH="/mingw32/share/aclocal:/usr/share/aclocal"
 			echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig:/mingw32/lib/pkgconfig"
 			echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
 			echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe"
@@ -964,7 +964,7 @@ if %build32%==yes (
 			echo.PYTHONHOME=/usr
 			echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
 			echo.
-			echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}"
+			echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
 			echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
 			echo.export PATH PS1
 			echo.
@@ -1008,7 +1008,7 @@ if %build64%==yes (
 			echo.MSYSTEM=MINGW64
 			echo.
 			echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32"
-			echo.ACLOCAL_PATH="/ming64/share/aclocal:/usr/share/aclocal"
+			echo.ACLOCAL_PATH="/mingw64/share/aclocal:/usr/share/aclocal"
 			echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig"
 			echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
 			echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe"
@@ -1019,7 +1019,7 @@ if %build64%==yes (
 			echo.PYTHONHOME=/usr
 			echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
 			echo.
-			echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}"
+			echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
 			echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
 			echo.export PATH PS1
 			echo.

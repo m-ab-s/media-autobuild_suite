@@ -780,7 +780,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-audio/faac.exe" ]; then
+if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
 	echo -------------------------------------------------
 	echo "faac-1.28 is already compiled"
 	echo -------------------------------------------------
@@ -792,14 +792,14 @@ if [ -f "$LOCALDESTDIR/bin-audio/faac.exe" ]; then
 		rm faac-1.28.tar.gz
 		cd faac-1.28
 		
-		sh bootstrap
+		bootstrap
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
 		
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist faac-1.28 bin-audio/faac.exe
+		do_checkIfExist faac-1.28 libfaac.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1755,7 +1755,7 @@ if [[ $mplayer = "y" ]]; then
 	if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
 		if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
 			make uninstall
-			make clean
+			make distclean
 		fi
 		
 		if ! test -e ffmpeg ; then
