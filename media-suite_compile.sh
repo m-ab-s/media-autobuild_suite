@@ -792,7 +792,7 @@ if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
 		rm faac-1.28.tar.gz
 		cd faac-1.28
 		
-		bootstrap
+		sh bootstrap
 		
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
 		
