@@ -939,6 +939,9 @@ if [[ $compile == "true" ]]; then
 	make -j $cpuCount
 	make install
 
+	git fetch origin
+	git reset --hard origin/master
+
 	do_checkIfExist sox-git bin-audio/sox.exe
 		
 	compile="false"
@@ -1862,6 +1865,9 @@ if [[ $mkv = "y" ]]; then
 		mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/doc/mkvtoolnix/guide $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc/guide
 		cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
 		unset DRAKETHREADS
+
+		git fetch origin
+		git reset --hard origin/master
 
 		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
 
