@@ -43,6 +43,7 @@ if [ ! -d $gitFolder ]; then
 else 	
 	cd $gitFolder
 	oldHead=`git rev-parse HEAD`
+	git reset --hard @{u}
 	git pull origin master
 	newHead=`git rev-parse HEAD`
 	
@@ -939,9 +940,6 @@ if [[ $compile == "true" ]]; then
 	make -j $cpuCount
 	make install
 
-	git fetch origin
-	git reset --hard origin/master
-
 	do_checkIfExist sox-git bin-audio/sox.exe
 		
 	compile="false"
@@ -1552,7 +1550,11 @@ if [[ $compile == "true" ]]; then
 	rm -f $LOCALDESTDIR/lib/libx265.a
 	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
-	cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+	if [[ $bits = "32bit" ]]; then
+		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+	else
+		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+	fi
 	
 	make -j $cpuCount
 	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
@@ -1773,12 +1775,17 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
+		if [[ `grep "#include <windows.h>" libmpdemux/ms_hdr.h` == "" ]]; then 
+			sed -i '/#include "config.h"/ a\#include <windows.h>' libmpdemux/ms_hdr.h
+		fi
+		 
 		CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 		
 		make -j $cpuCount
 		make install
 
 		do_checkIfExist mplayer-svn bin-video/mplayer.exe
+		sed -i 's/#include <windows.h>//' libmpdemux/ms_hdr.h
 		compile="false"
 		else
 		echo -------------------------------------------------
@@ -1865,9 +1872,6 @@ if [[ $mkv = "y" ]]; then
 		mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/doc/mkvtoolnix/guide $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc/guide
 		cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
 		unset DRAKETHREADS
-
-		git fetch origin
-		git reset --hard origin/master
 
 		do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
 
