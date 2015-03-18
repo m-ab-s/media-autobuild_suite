@@ -471,7 +471,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/dekkers/libilbc.git" libilbc-git
+do_git "https://github.com/TimothyGu/libilbc.git" libilbc-git
 
 if [[ $compile == "true" ]]; then
 	if [[ ! -f "configure" ]]; then
