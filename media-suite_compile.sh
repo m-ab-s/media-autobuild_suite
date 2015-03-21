@@ -963,7 +963,7 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "http://git.chromium.org/webm/libvpx.git" libvpx-git noDepth
+do_git "https://git.chromium.org/git/webm/libvpx.git" libvpx-git noDepth
 
 if [[ $compile == "true" ]]; then
 	if [ -d $LOCALDESTDIR/include/vpx ]; then
