@@ -1775,9 +1775,6 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
-		if [[ `grep "#include <windows.h>" libmpdemux/ms_hdr.h` == "" ]]; then 
-			sed -i '/#include "config.h"/ a\#include <windows.h>' libmpdemux/ms_hdr.h
-		fi
 		 
 		CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 		
@@ -1785,7 +1782,6 @@ if [[ $mplayer = "y" ]]; then
 		make install
 
 		do_checkIfExist mplayer-svn bin-video/mplayer.exe
-		sed -i 's/#include <windows.h>//' libmpdemux/ms_hdr.h
 		compile="false"
 		else
 		echo -------------------------------------------------
