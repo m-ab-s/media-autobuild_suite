@@ -1713,7 +1713,7 @@ if [[ $bits = "64bit" ]]; then
 
 	do_git "http://f265.org/repos/f265/" f265-git noDepth
 
-	if [[ $compile == "true" ]] || [[ $newFfmpeg == "yes" ]]; then
+	if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
 		if [ -d "build" ]; then
 			rm -rf build
 			rm -rf .sconf_temp
