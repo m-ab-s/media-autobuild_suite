@@ -384,7 +384,7 @@ if [[ $compile == "true" ]]; then
 	fi
 
     make CONFIG_WINDOWS=1 LDFLAGS=-lm
-    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio install
+    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
 
     do_checkIfExist libdcadec-git libdcadec.a
 
