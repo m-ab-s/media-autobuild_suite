@@ -954,6 +954,33 @@ else
 	echo -------------------------------------------------
 fi
 
+cd $LOCALBUILDDIR
+
+do_git "https://bitbucket.org/mpyne/game-music-emu.git" gme-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ -d $LOCALDESTDIR/include/gme ]]; then
+		rm -rf $LOCALDESTDIR/include/gme
+		rm -f $LOCALDESTDIR/lib/libgme.a
+		rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
+		make clean
+	fi
+
+    cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
+
+    make -j $cpuCount
+    make install
+
+    do_checkIfExist gme-git libgme.a
+
+    compile="false"
+else
+    echo -------------------------------------------------
+    echo "gme is already up to date"
+    echo -------------------------------------------------
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile audio tools $bits done..."
@@ -1686,7 +1713,8 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 			--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 			--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack \
-			--enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras \
+			--enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+			--enable-libgme $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 		else
@@ -1704,7 +1732,8 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
 			--enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
 			--enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs \
-			--enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi $extras \
+			--enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+			--enable-libgme $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			
