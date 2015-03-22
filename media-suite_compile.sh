@@ -1045,7 +1045,7 @@ if [[ $compile == "true" ]]; then
         make distclean
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
     make -j $cpuCount
     make install
@@ -1072,7 +1072,7 @@ if [ -f "$LOCALDESTDIR/lib/libbs2b.a" ]; then
         rm libbs2b-3.1.0.tar.gz
         cd libbs2b-3.1.0
         
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
         
         make -j $cpuCount
         make install
