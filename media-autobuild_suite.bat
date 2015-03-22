@@ -54,6 +54,7 @@ if exist %ini% GOTO checkINI
 	set freeINI=0
 	set ffmbcINI=0
 	set x264INI=0
+	set x265INI=0
 	set ffmpegINI=0
 	set ffmpegUpdateINI=0
 	set mp4boxINI=0
@@ -77,6 +78,8 @@ findstr /i "free" %ini% > nul
 findstr /i "ffmbc" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "x264" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "x265" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegB" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -104,7 +107,8 @@ for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2A
 for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set ffmpegINI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
