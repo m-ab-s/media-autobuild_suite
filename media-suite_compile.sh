@@ -371,24 +371,28 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libdca.a" ]; then
-	echo -------------------------------------------------
-	echo "libdca is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile libdca $bits\007"
-		rm -rf libdca
-		svn co svn://svn.videolan.org/libdca/trunk libdca
-		cd libdca
-		
-		./bootstrap
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
-		
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist libdca libdca.a
+do_git "https://github.com/foo86/dcadec.git" libdcadec-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ -d $LOCALDESTDIR/include/gme ]]; then
+		rm -rf $LOCALDESTDIR/include/libdcadec
+		rm -f $LOCALDESTDIR/lib/libdcadec.a
+		rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
+		rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+		make clean
+	fi
+
+    make CONFIG_WINDOWS=1 LDFLAGS=-lm
+    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio install
+
+    do_checkIfExist libdcadec-git libdcadec.a
+
+    compile="false"
+else
+    echo -------------------------------------------------
+    echo "libdcadec is already up to date"
+    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1714,7 +1718,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 			--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack \
 			--enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
-			--enable-libgme $extras \
+			--enable-libgme --enable-libdcadec $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 		else
@@ -1733,7 +1737,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
 			--enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs \
 			--enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
-			--enable-libgme $extras \
+			--enable-libgme --enable-libdcadec $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			
