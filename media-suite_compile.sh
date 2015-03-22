@@ -11,6 +11,7 @@ while true; do
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
+--x264=* ) x264="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1482,90 +1483,112 @@ cd $LOCALBUILDDIR
 do_git "git://git.videolan.org/x264.git" x264-git noDepth
 
 if [[ $compile == "true" ]]; then
-	cd $LOCALBUILDDIR
+	if [[ $x264 == "y" ]]; then
+		cd $LOCALBUILDDIR
 
-	do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
+		do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
 
-	echo "-------------------------------------------------------------------------------"
-	echo "compile ffmpeg $bits libs"
-	echo "-------------------------------------------------------------------------------"
+		echo "-------------------------------------------------------------------------------"
+		echo "compile ffmpeg $bits libs"
+		echo "-------------------------------------------------------------------------------"
 
-	if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then 
-		rm -rf $LOCALDESTDIR/include/libavutil
-		rm -rf $LOCALDESTDIR/include/libavcodec
-		rm -rf $LOCALDESTDIR/include/libpostproc
-		rm -rf $LOCALDESTDIR/include/libswresample
-		rm -rf $LOCALDESTDIR/include/libswscale
-		rm -rf $LOCALDESTDIR/include/libavdevice
-		rm -rf $LOCALDESTDIR/include/libavfilter
-		rm -rf $LOCALDESTDIR/include/libavformat
-		rm -f $LOCALDESTDIR/lib/libavutil.a
-		rm -f $LOCALDESTDIR/lib/libswresample.a
-		rm -f $LOCALDESTDIR/lib/libswscale.a
-		rm -f $LOCALDESTDIR/lib/libavcodec.a
-		rm -f $LOCALDESTDIR/lib/libavdevice.a
-		rm -f $LOCALDESTDIR/lib/libavfilter.a
-		rm -f $LOCALDESTDIR/lib/libavformat.a
-		rm -f $LOCALDESTDIR/lib/libpostproc.a
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-		rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
-	fi
-	
-	if [ -f "config.mak" ]; then
-		make distclean
-	fi
+		if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then 
+			rm -rf $LOCALDESTDIR/include/libavutil
+			rm -rf $LOCALDESTDIR/include/libavcodec
+			rm -rf $LOCALDESTDIR/include/libpostproc
+			rm -rf $LOCALDESTDIR/include/libswresample
+			rm -rf $LOCALDESTDIR/include/libswscale
+			rm -rf $LOCALDESTDIR/include/libavdevice
+			rm -rf $LOCALDESTDIR/include/libavfilter
+			rm -rf $LOCALDESTDIR/include/libavformat
+			rm -f $LOCALDESTDIR/lib/libavutil.a
+			rm -f $LOCALDESTDIR/lib/libswresample.a
+			rm -f $LOCALDESTDIR/lib/libswscale.a
+			rm -f $LOCALDESTDIR/lib/libavcodec.a
+			rm -f $LOCALDESTDIR/lib/libavdevice.a
+			rm -f $LOCALDESTDIR/lib/libavfilter.a
+			rm -f $LOCALDESTDIR/lib/libavformat.a
+			rm -f $LOCALDESTDIR/lib/libpostproc.a
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+			rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+		fi
 		
-	if [[ $bits = "32bit" ]]; then
-		arch='x86'
+		if [ -f "config.mak" ]; then
+			make distclean
+		fi
+			
+		if [[ $bits = "32bit" ]]; then
+			arch='x86'
+		else
+			arch='x86_64'
+		fi
+
+		./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
+
+		make -j $cpuCount
+		make install
+		
+		sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+		sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+		sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+		sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+			
+		do_checkIfExist ffmpeg-lib libavcodec.a
+
+		cd $LOCALBUILDDIR/x264-git
+		
+		echo -ne "\033]0;compile x264-git $bits\007"
+		
+		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+			rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
+			rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
+		fi
+		
+		if [ -f "libx264.a" ]; then
+			make distclean
+		fi
+		
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
+		make -j $cpuCount
+		
+		cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
+		make clean
+
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
+
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist x264-git libx264.a
+		compile="false"
+		buildFFmpeg="true"
 	else
-		arch='x86_64'
+		echo -ne "\033]0;compile libx264-git $bits\007"
+
+		if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+			rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
+			rm -f $LOCALDESTDIR/lib/pkgconfig/x264.pc
+		fi
+
+		if [ -f "libx264.a" ]; then
+			make distclean
+		fi
+
+		./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash --bit-depth=8 --disable-cli
+
+		make -j $cpuCount
+		make install
+
+		do_checkIfExist x264-git libx264.a
+		compile="false"
+		buildFFmpeg="true"
 	fi
-
-	./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
-
-	make -j $cpuCount
-	make install
-	
-	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-	sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
-		
-	do_checkIfExist ffmpeg-lib libavcodec.a
-
-	cd $LOCALBUILDDIR/x264-git
-	
-	echo -ne "\033]0;compile x264-git $bits\007"
-	
-	if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-		rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
-		rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
-	fi
-	
-	if [ -f "libx264.a" ]; then
-		make distclean
-	fi
-	
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
-	make -j $cpuCount
-	
-	cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
-	make clean
-
-	./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
-
-	make -j $cpuCount
-	make install
-	
-	do_checkIfExist x264-git libx264.a
-	compile="false"
-	buildFFmpeg="true"
 else
 	echo -------------------------------------------------
 	echo "x264 is already up to date"

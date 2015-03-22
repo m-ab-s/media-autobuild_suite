@@ -53,6 +53,7 @@ if exist %ini% GOTO checkINI
 	set archINI=0
 	set freeINI=0
 	set ffmbcINI=0
+	set x264INI=0
 	set ffmpegINI=0
 	set ffmpegUpdateINI=0
 	set mp4boxINI=0
@@ -75,7 +76,9 @@ findstr /i "free" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmbc" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmbc" %ini% > nul
+findstr /i "x264" %ini% > nul
+	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "ffmpegB" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegUpdate" %ini% > nul
 	if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -101,6 +104,7 @@ for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2A
 for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
@@ -208,6 +212,33 @@ if %buildffmbc%==2 (
 	)
 if %buildffmbc% GTR 2 GOTO ffmbc
 if %writeBC%==yes echo.ffmbc=^%buildffmbc%>>%ini%
+
+:x264
+set "writex264=no"
+if %x264INI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build x264 binary:
+	echo. 1 = yes [static]
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildx264="build x264:"
+	set "writex264=yes"
+	) else (
+		set buildx264=%x264INI%
+		)
+
+if %buildx264%==1 (
+	set "x264=y"
+	)
+if %buildx264%==2 (
+	set "x264=n"
+	)
+if %buildx264% GTR 2 GOTO x264
+if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
 :ffmpeg
 set "writeFF=no"
