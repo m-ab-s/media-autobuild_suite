@@ -189,20 +189,20 @@ cd $LOCALBUILDDIR
 
 if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
 	echo -------------------------------------------------
-	echo "freetype-2.5.4 is already compiled"
+	echo "freetype-2.5.5 is already compiled"
 	echo -------------------------------------------------
 	else 
 		echo -ne "\033]0;compile freetype $bits\007"
-		rm -rf freetype-2.5.4
-		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/freetype/freetype2/2.5.4/freetype-2.5.4.tar.bz2
-		tar xf freetype-2.5.4.tar.bz2
-		rm freetype-2.5.4.tar.bz2
-		cd freetype-2.5.4
+		rm -rf freetype-2.5.5
+		wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2
+		tar xf freetype-2.5.5.tar.bz2
+		rm freetype-2.5.5.tar.bz2
+		cd freetype-2.5.5
 		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-harfbuzz=no
 		make -j $cpuCount
 		make install
 		
-		do_checkIfExist freetype-2.5.4 libfreetype.a
+		do_checkIfExist freetype-2.5.5 libfreetype.a
 fi
 
 cd $LOCALBUILDDIR
