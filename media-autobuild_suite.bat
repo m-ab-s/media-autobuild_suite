@@ -240,6 +240,33 @@ if %buildx264%==2 (
 if %buildx264% GTR 2 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
+:x265
+set "writex265=no"
+if %x265INI%==0 (
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo. Build x265 binary:
+	echo. 1 = yes [static]
+	echo. 2 = no
+	echo.
+	echo -------------------------------------------------------------------------------
+	echo -------------------------------------------------------------------------------
+	set /P buildx265="build x265:"
+	set "writex265=yes"
+	) else (
+		set buildx265=%x265INI%
+		)
+
+if %buildx265%==1 (
+	set "x265=y"
+	)
+if %buildx265%==2 (
+	set "x265=n"
+	)
+if %buildx265% GTR 2 GOTO x265
+if %writex265%==yes echo.x265=^%buildx265%>>%ini%
+
 :ffmpeg
 set "writeFF=no"
 if %ffmpegINI%==0 (

@@ -12,6 +12,7 @@ while true; do
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --x264=* ) x264="${1#*=}"; shift ;;
+--x265=* ) x265="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1602,31 +1603,37 @@ do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
 if [[ $compile == "true" ]]; then
 	cd build/msys
 	rm -rf *
-	rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
-	rm -f $LOCALDESTDIR/bin-video/x265.exe
 	rm -f $LOCALDESTDIR/include/x265.h
 	rm -f $LOCALDESTDIR/include/x265_config.h
 	rm -f $LOCALDESTDIR/lib/libx265.a
 	rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
-	if [[ $bits = "32bit" ]]; then
-		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+	if [[ $x265 == "y" ]]; then
+
+		rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
+		rm -f $LOCALDESTDIR/bin-video/x265.exe
+
+		if [[ $bits = "32bit" ]]; then
+			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+		else
+			cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+		fi
+		
+		make -j $cpuCount
+		cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
+
+		make clean
+		rm -rf *
+
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
 	else
-		cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+		cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
 	fi
-	
-	make -j $cpuCount
-	cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
-
-	make clean
-	rm -rf *
-
-	cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
 	
 	make -j $cpuCount
 	make install
 
-	do_checkIfExist x265-git bin-video/x265.exe
+	do_checkIfExist x265-git libx265.a
 	compile="false"
 	buildFFmpeg="true"
 else
