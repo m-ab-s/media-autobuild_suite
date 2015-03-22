@@ -528,37 +528,42 @@ if [[ $compile == "no" ]]; then	# is deactivated for the moment
 #	echo -------------------------------------------------
 fi
 
-cd $LOCALBUILDDIR
 
-do_git "git://midipix.org/waio" waio-git
 
-if [[ $compile == "true" ]]; then
-	if [[ $bits = "32bit" ]]; then
-		if [[ -f lib32/libwaio.a ]]; then
-			./build-mingw-nt32 clean
-			rm -rf $LOCALDESTDIR/include/waio
-			rm -f $LOCALDESTDIR/lib/libwaio.a
+if [[ $mpv == "y" && ! $ffmpeg == "s" ]]; then
+
+	cd $LOCALBUILDDIR
+
+	do_git "git://midipix.org/waio" waio-git
+
+	if [[ $compile == "true" ]]; then
+		if [[ $bits = "32bit" ]]; then
+			if [[ -f lib32/libwaio.a ]]; then
+				./build-mingw-nt32 clean
+				rm -rf $LOCALDESTDIR/include/waio
+				rm -f $LOCALDESTDIR/lib/libwaio.a
+			fi
+
+			build-mingw-nt32 AR=i686-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
+
+			cp -r include/waio  $LOCALDESTDIR/include/
+			cp -r lib32/libwaio.a $LOCALDESTDIR/lib/
+		else
+			if [[ -f lib64/libwaio.a ]]; then
+				./build-mingw-nt64 clean
+				rm -rf $LOCALDESTDIR/include/waio
+				rm -f $LOCALDESTDIR/lib/libwaio.a
+			fi
+
+			build-mingw-nt64 AR=x86_64-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
+
+			cp -r include/waio  $LOCALDESTDIR/include/
+			cp -r lib64/libwaio.a $LOCALDESTDIR/lib/
 		fi
-	
-		build-mingw-nt32 AR=i686-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
-		
-		cp -r ./include/waio/  $LOCALDESTDIR/include/waio/
-		cp -r ./lib32/libwaio.a $LOCALDESTDIR/lib/libwaio.a
-	else
-		if [[ -f lib64/libwaio.a ]]; then
-			./build-mingw-nt64 clean
-			rm -rf $LOCALDESTDIR/include/waio
-			rm -f $LOCALDESTDIR/lib/libwaio.a
-		fi
-	
-		build-mingw-nt64 AR=x86_64-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
-		
-		cp -r ./include/waio/  $LOCALDESTDIR/include/waio/
-		cp -r ./lib64/libwaio.a $LOCALDESTDIR/lib/libwaio.a	
-	fi	
 
-    do_checkIfExist waio-git libwaio.a
-    compile="false"
+		do_checkIfExist waio-git libwaio.a
+		compile="false"
+	fi
 fi
 
 cd $LOCALBUILDDIR
