@@ -270,6 +270,52 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [ -f "$LOCALDESTDIR/bin/ragel.exe" ]; then
+    echo -------------------------------------------------
+    echo "ragel-6.9 is already compiled"
+    echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile ragel $bits\007"
+        rm -rf ragel-6.9
+        wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.colm.net/files/ragel/ragel-6.9.tar.gz
+        tar xf ragel-6.9.tar.gz
+        rm ragel-6.9.tar.gz
+        cd ragel-6.9
+        
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global
+        make -j $cpuCount
+        make install
+
+    do_checkIfExist ragel-6.9 bin-global/ragel.exe
+fi
+
+cd $LOCALBUILDDIR
+
+do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz-git
+
+if [[ $compile == "true" ]]; then
+
+	if [[ ! -f "configure" ]]; then
+	    ./autogen.sh -V
+	else
+		make uninstall
+		make clean
+	fi
+
+	./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-icu=no --with-glib=no --with-gobject=no
+	make -j $cpuCount
+	make install
+
+	do_checkIfExist harfbuzz-git libharfbuzz.a
+	compile="false"
+else
+	echo -------------------------------------------------
+	echo "harfbuzz is already up to date"
+	echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
 	echo -------------------------------------------------
 	echo "SDL-1.2.15 is already compiled"
@@ -1189,7 +1235,7 @@ if [[ $compile == "true" ]]; then
 		./autogen.sh
 	fi
 
-	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-harfbuzz
+	CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
 	make -j $cpuCount
 	make install
