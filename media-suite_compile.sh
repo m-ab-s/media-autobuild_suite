@@ -1795,6 +1795,28 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mpv = "y" ]]; then
+
+	do_git "https://github.com/lachs0r/rubberband.git" rubberband-git
+
+	if [[ $compile == "true" ]]; then
+
+		if [[ ! -f "$LOCALDESTDIR/lib/librubberband.a" ]]; then
+			make PREFIX=$LOCALDESTDIR uninstall
+			make clean
+		fi
+
+		make PREFIX=$LOCALDESTDIR install-static
+
+		do_checkIfExist rubberband-git librubberband.a
+		compile="false"
+	else
+		echo -------------------------------------------------
+		echo "rubberband is already up to date"
+		echo -------------------------------------------------
+	fi
+
+	cd $LOCALBUILDDIR
+
 	do_git "https://github.com/mpv-player/mpv.git" mpv-git
 	
 	if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
