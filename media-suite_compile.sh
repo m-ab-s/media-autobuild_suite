@@ -1033,6 +1033,53 @@ else
     echo -------------------------------------------------
 fi
 
+cd $LOCALBUILDDIR
+
+do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
+
+if [[ $compile == "true" ]]; then
+    if [[ ! -f ./configure ]]; then
+        ./autogen.sh -V
+    else 
+        make uninstall
+        make distclean
+    fi
+
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
+
+    make -j $cpuCount
+    make install
+
+    do_checkIfExist libsndfile-git libsndfile.a
+    compile="false"
+else
+    echo -------------------------------------------------
+    echo "libsndfile is already up to date"
+    echo -------------------------------------------------
+fi
+
+cd $LOCALBUILDDIR
+
+if [ -f "$LOCALDESTDIR/lib/libbs2b.a" ]; then
+	echo -------------------------------------------------
+    echo "bs2b-3.1.0 is already compiled"
+    echo -------------------------------------------------
+    else 
+        echo -ne "\033]0;compile libbs2b-3.1.0 $bits\007"
+        rm -rf libbs2b-3.1.0
+        wget --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/bs2b/libbs2b-3.1.0.tar.gz"
+        tar xf libbs2b-3.1.0.tar.gz
+        rm libbs2b-3.1.0.tar.gz
+        cd libbs2b-3.1.0
+        
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+        
+        make -j $cpuCount
+        make install
+        
+        do_checkIfExist libbs2b-3.1.0 libbs2b.a
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile audio tools $bits done..."
@@ -1794,7 +1841,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 			--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack \
 			--enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
-			--enable-libgme --enable-libdcadec $extras \
+			--enable-libgme --enable-libdcadec --enable-libbs2b $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 		else
@@ -1813,7 +1860,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
 			--enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs \
 			--enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
-			--enable-libgme --enable-libdcadec $extras \
+			--enable-libgme --enable-libdcadec --enable-libbs2b $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 			
