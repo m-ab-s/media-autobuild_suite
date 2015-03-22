@@ -1828,7 +1828,6 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 		if [[ $ffmpeg = "s" ]]; then
 			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then 
 				rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-				make distclean
 			fi
 			CPPFLAGS='-DFRIBIDI_ENTRY=""' LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
 			--arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
@@ -1841,13 +1840,10 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 			--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 			--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack \
 			--enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
-			--enable-libgme --enable-libdcadec --enable-libbs2b $extras \
+			--enable-libdcadec --enable-libbs2b $extras \
 			--extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
 			--extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 		else
-			if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
-				make distclean
-			fi
 			CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
 			--arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
 			--disable-debug --disable-shared --disable-doc --disable-w32threads --enable-gpl \
