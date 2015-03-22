@@ -1775,6 +1775,8 @@ if [[ $mplayer = "y" ]]; then
 			fi
 			touch ffmpeg/mp_auto_pull
 		fi
+		
+		sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 		 
 		CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 		
