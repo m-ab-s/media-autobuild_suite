@@ -13,6 +13,7 @@ while true; do
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
+--other265=* ) other265="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1125,29 +1126,33 @@ else
     echo -------------------------------------------------
 fi
 
-cd $LOCALBUILDDIR
+if [[ $other265 = "y" ]]; then
 
-do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
+    cd $LOCALBUILDDIR
 
-if [[ $compile == "true" ]]; then
-    cd src
-    if [[ -f intra.o ]]; then
-        make clean
-    fi
+    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
 
-    if [[ "$bits" = "32bit" ]]; then
-        make ARCH=i686 -j $cpuCount
+    if [[ $compile == "true" ]]; then
+        cd src
+        if [[ -f intra.o ]]; then
+            make clean
+        fi
+
+        if [[ "$bits" = "32bit" ]]; then
+            make ARCH=i686 -j $cpuCount
+        else
+            make ARCH=x86_64 -j $cpuCount
+        fi
+
+        cp kvazaar.exe $LOCALDESTDIR/bin-video
+        do_checkIfExist kvazaar-git bin-video/kvazaar.exe
+        compile="false"
     else
-        make ARCH=x86_64 -j $cpuCount
+        echo -------------------------------------------------
+        echo "kvazaar-git is already up to date"
+        echo -------------------------------------------------
     fi
 
-    cp kvazaar.exe $LOCALDESTDIR/bin-video
-    do_checkIfExist kvazaar-git bin-video/kvazaar.exe
-    compile="false"
-else
-    echo -------------------------------------------------
-    echo "kvazaar-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1888,7 +1893,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     fi
 fi
 
-if [[ $bits = "64bit" ]]; then
+if [[ $bits = "64bit" && $other265 = "y" ]]; then
     cd $LOCALBUILDDIR
 
     do_git "http://f265.org/repos/f265/" f265-git noDepth

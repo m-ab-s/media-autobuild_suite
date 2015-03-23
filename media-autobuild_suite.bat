@@ -55,6 +55,7 @@ if exist %ini% GOTO checkINI
     set ffmbcINI=0
     set x264INI=0
     set x265INI=0
+    set other265INI=0
     set ffmpegINI=0
     set ffmpegUpdateINI=0
     set mp4boxINI=0
@@ -80,6 +81,8 @@ findstr /i "ffmbc" %ini% > nul
 findstr /i "x264" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "x265" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "other265" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegB" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -109,6 +112,7 @@ for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set x265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
@@ -270,6 +274,33 @@ if %buildx265%==2 (
     )
 if %buildx265% GTR 2 GOTO x265
 if %writex265%==yes echo.x265=^%buildx265%>>%ini%
+
+:other265
+set "writeother265=no"
+if %other265INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build H.265 encoders other than x265:
+    echo. 1 = yes [static]
+    echo. 2 = no
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildother265="build other265:"
+    set "writeother265=yes"
+    ) else (
+        set buildother265=%other265INI%
+        )
+
+if %buildother265%==1 (
+    set "other265=y"
+    )
+if %buildother265%==2 (
+    set "other265=n"
+    )
+if %buildother265% GTR 2 GOTO other265
+if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
 
 :ffmpeg
 set "writeFF=no"
