@@ -188,7 +188,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfreetype.a" ]; then
+if [[ `pkg-config --modversion freetype2` = "17.4.11" ]]; then
     echo -------------------------------------------------
     echo "freetype-2.5.5 is already compiled"
     echo -------------------------------------------------
@@ -208,7 +208,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfontconfig.a" ]; then
+if [[ `pkg-config --modversion fontconfig` = "2.11.92" ]]; then
     echo -------------------------------------------------
     echo "fontconfig-2.11.92 is already compiled"
     echo -------------------------------------------------
@@ -230,7 +230,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libfribidi.a" ]; then
+if [[ `pkg-config --modversion fontconfig` = "0.19.6" ]]; then
     echo -------------------------------------------------
     echo "fribidi-0.19.6 is already compiled"
     echo -------------------------------------------------
@@ -271,7 +271,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin/ragel.exe" ]; then
+if [[ `ragel --version | grep "version 6.9"` ]]; then
     echo -------------------------------------------------
     echo "ragel-6.9 is already compiled"
     echo -------------------------------------------------
@@ -317,7 +317,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libSDL.a" ]; then
+if [[ `pkg-config --modversion sdl` = "1.2.15" ]]; then
     echo -------------------------------------------------
     echo "SDL-1.2.15 is already compiled"
     echo -------------------------------------------------
@@ -343,7 +343,7 @@ fi
 #----------------------
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgcrypt.a" ]; then
+if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
     echo -------------------------------------------------
     echo "libgcrypt-1.6.2 is already compiled"
     echo -------------------------------------------------
@@ -368,7 +368,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libgnutls.a" ]; then
+if [[ `pkg-config --modversion gnutls` = "3.3.11" ]]; then
     echo -------------------------------------------------
     echo "gnutls-3.3.11 is already compiled"
     echo -------------------------------------------------
@@ -446,7 +446,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libxml2.a" ]; then
+if [[ `pkg-config --modversion libxml-2.0` = "2.9.1" ]]; then
     echo -------------------------------------------------
     echo "libxml2-2.9.1 is already compiled"
     echo -------------------------------------------------
@@ -502,7 +502,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libmagic.a" ]; then
+if [[ `file --version | grep "file.exe-5.22"` ]]; then
     echo -------------------------------------------------
     echo "file-5.22[libmagic] is already compiled"
     echo -------------------------------------------------
@@ -621,7 +621,7 @@ if [[ $mkv = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    if [ -f $LOCALDESTDIR/lib/libwx_baseu-3.0.a ]; then
+    if [[ `wx-config --version` = "3.0.2" ]]; then
         echo -------------------------------------------------
         echo "wxWidgets is already compiled"
         echo -------------------------------------------------
@@ -656,7 +656,7 @@ echo "compile audio tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-if [ -f "$LOCALDESTDIR/lib/libtheora.a" ]; then
+if [[ `pkg-config --modversion theora` = "1.1.1" ]]; then
     echo -------------------------------------------------
     echo "libtheora-1.1.1 is already compiled"
     echo -------------------------------------------------
@@ -678,7 +678,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libspeex.a" ]; then
+if [[ `pkg-config --modversion speex` = "1.2rc1" ]]; then
     echo -------------------------------------------------
     echo "speex-1.2rc1 is already compiled"
     echo -------------------------------------------------
@@ -700,7 +700,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-audio/flac.exe" ]; then
+if [[ `pkg-config --modversion flac` = "1.3.1" ]]; then
     echo -------------------------------------------------
     echo "flac-1.3.1 is already compiled"
     echo -------------------------------------------------
@@ -722,7 +722,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libvo-aacenc.a" ]; then
+if [[ `pkg-config --modversion vo-aacenc` = "0.1.3" ]]; then
     echo -------------------------------------------------
     echo "vo-aacenc-0.1.3 is already compiled"
     echo -------------------------------------------------
@@ -744,7 +744,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libopencore-amrnb.a" ]; then
+if [[ `pkg-config --modversion opencore-amrnb` = "0.1.3" ]]; then
     echo -------------------------------------------------
     echo "opencore-amr-0.1.3 is already compiled"
     echo -------------------------------------------------
@@ -766,7 +766,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libvo-amrwbenc.a" ]; then
+if [[ `pkg-config --modversion vo-amrwbenc` = "0.1.2" ]]; then
     echo -------------------------------------------------
     echo "vo-amrwbenc-0.1.2 is already compiled"
     echo -------------------------------------------------
@@ -843,7 +843,7 @@ if [[ $mplayer = "y" && $nonfree = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
+    if [[ `faac.exe | grep "FAAC 1.28"` ]]; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
@@ -869,7 +869,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libopus.a" ]; then
+if [[ `pkg-config --modversion opus` = "1.1" ]]; then
     echo -------------------------------------------------
     echo "opus-1.1 is already compiled"
     echo -------------------------------------------------
@@ -894,7 +894,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]; then
+if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
     echo -------------------------------------------------
     echo "opus-tools-0.1.9 is already compiled"
     echo -------------------------------------------------
@@ -918,7 +918,7 @@ if [[ $mp4box = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
+    if [[ `a52dec --help 2>&1 | grep "a52dec-0.7.4"` ]]; then
         echo -------------------------------------------------
         echo "a52dec-0.7.4 is already compiled"
         echo -------------------------------------------------
@@ -964,7 +964,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libsoxr.a" ]; then
+if [[ `pkg-config --modversion soxr` = "0.1.1" ]]; then
     echo -------------------------------------------------
     echo "soxr-0.1.1 is already compiled"
     echo -------------------------------------------------
@@ -1071,7 +1071,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libbs2b.a" ]; then
+if [[ `pkg-config --modversion libbs2b` = "3.1.0" ]]; then
     echo -------------------------------------------------
     echo "bs2b-3.1.0 is already compiled"
     echo -------------------------------------------------
@@ -1424,7 +1424,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libcaca.a" ]; then
+if [[ `pkg-config --modversion caca` = "0.99.beta19" ]]; then
     echo -------------------------------------------------
     echo "libcaca-0.99.beta19 is already compiled"
     echo -------------------------------------------------
@@ -1459,7 +1459,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/lib/libzvbi.a" ]; then
+if [[ `pkg-config --modversion zvbi-0.2` = "0.2.35" ]]; then
     echo -------------------------------------------------
     echo "zvbi-0.2.35 is already compiled"
     echo -------------------------------------------------
@@ -1518,7 +1518,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/include/frei0r.h" ]; then
+if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
     echo -------------------------------------------------
     echo "frei0r is already compiled"
     echo -------------------------------------------------
@@ -1753,7 +1753,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmbc = "y" ]]; then
-    if [ -f "$LOCALDESTDIR/bin-video/ffmbc.exe" ]; then
+    if [[ `ffmbc.exe -version` = "version 0.7.2" ]]; then
         echo -------------------------------------------------
         echo "ffmbc-0.7.2 is already compiled"
         echo -------------------------------------------------
