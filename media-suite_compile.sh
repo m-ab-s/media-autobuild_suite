@@ -813,30 +813,24 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
+do_git "https://github.com/nu774/fdkaac" bin-fdk-aac
+
+if [[ $compile == "true" ]]; then
+    if [[ ! -f ./configure ]]; then
+        autoreconf -i
+    fi
+
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
+
+    make -j $cpuCount
+    make install
+
+    do_checkIfExist bin-fdk-aac bin-audio/fdkaac.exe
+    compile="false"
+else
     echo -------------------------------------------------
-    echo "bin-fdk-aac is already compiled"
+    echo "bin-fdk-aac is already up to date"
     echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile fdk-aac $bits\007"
-        rm -rf bin-fdk-aac
-
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://github.com/nu774/fdkaac/archive/master.zip -O bin-fdk-aac.zip
-        unzip bin-fdk-aac.zip
-        rm bin-fdk-aac.zip
-        mv fdkaac-master bin-fdk-aac
-        cd bin-fdk-aac
-
-        if [[ ! -f ./configure ]]; then
-            autoreconf -i
-        fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist bin-fdk-aac bin-audio/fdkaac.exe
 fi
 
 if [[ $mplayer = "y" && $nonfree = "y" ]]; then
