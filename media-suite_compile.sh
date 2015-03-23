@@ -839,28 +839,32 @@ if [ -f "$LOCALDESTDIR/bin-audio/fdkaac.exe" ]; then
         do_checkIfExist bin-fdk-aac bin-audio/fdkaac.exe
 fi
 
-cd $LOCALBUILDDIR
+if [[ $mplayer = "y" && $nonfree = "y" ]]; then
 
-if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
-    echo -------------------------------------------------
-    echo "faac-1.28 is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile faac $bits\007"
-        rm -rf faac-1.28
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
-        tar xf faac-1.28.tar.gz
-        rm faac-1.28.tar.gz
-        cd faac-1.28
+    cd $LOCALBUILDDIR
 
-        sh bootstrap
+    if [ -f "$LOCALDESTDIR/lib/libfaac.a" ]; then
+        echo -------------------------------------------------
+        echo "faac-1.28 is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile faac $bits\007"
+            rm -rf faac-1.28
+            wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+            tar xf faac-1.28.tar.gz
+            rm faac-1.28.tar.gz
+            cd faac-1.28
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
+            sh bootstrap
 
-        make -j $cpuCount
-        make install
+            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
 
-        do_checkIfExist faac-1.28 libfaac.a
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist faac-1.28 libfaac.a
+    fi
+
 fi
 
 cd $LOCALBUILDDIR
@@ -1787,7 +1791,10 @@ cd $LOCALBUILDDIR
 
 if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     if [[ $nonfree = "y" ]]; then
-        extras="--enable-nonfree --enable-libfaac --enable-libfdk-aac"
+        extras="--enable-nonfree --enable-libfdk-aac"
+        if [[ $mplayer = "y" ]]; then
+            extras+=" --enable-libfaac"
+        fi
       else
         extras=""
     fi
