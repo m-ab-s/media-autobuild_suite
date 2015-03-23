@@ -910,48 +910,52 @@ if [ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]; then
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
 fi
 
-cd $LOCALBUILDDIR
+if [[ $mp4box = "y" ]]; then
 
-if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
-    echo -------------------------------------------------
-    echo "a52dec-0.7.4 is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile a52dec $bits\007"
-        rm -rf a52dec-0.7.4
-        wget --tries=20 --retry-connrefused --waitretry=2 -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
-        tar xf a52dec-0.7.4.tar.gz
-        rm a52dec-0.7.4.tar.gz
-        cd a52dec-0.7.4
+    cd $LOCALBUILDDIR
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+    if [ -f "$LOCALDESTDIR/lib/liba52.a" ]; then
+        echo -------------------------------------------------
+        echo "a52dec-0.7.4 is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile a52dec $bits\007"
+            rm -rf a52dec-0.7.4
+            wget --tries=20 --retry-connrefused --waitretry=2 -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
+            tar xf a52dec-0.7.4.tar.gz
+            rm a52dec-0.7.4.tar.gz
+            cd a52dec-0.7.4
 
-        make -j $cpuCount
-        make install
+            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
-        do_checkIfExist a52dec-0.7.4 liba52.a
-fi
+            make -j $cpuCount
+            make install
 
-cd $LOCALBUILDDIR
+            do_checkIfExist a52dec-0.7.4 liba52.a
+    fi
 
-if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
-    echo -------------------------------------------------
-    echo "libmad-0.15.1b is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile libmad $bits\007"
-        rm -rf libmad-0.15.1b
-        wget --tries=20 --retry-connrefused --waitretry=2 -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
-        tar xf libmad-0.15.1b.tar.gz
-        rm libmad-0.15.1b.tar.gz
-        cd libmad-0.15.1b
+    cd $LOCALBUILDDIR
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
+        echo -------------------------------------------------
+        echo "libmad-0.15.1b is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile libmad $bits\007"
+            rm -rf libmad-0.15.1b
+            wget --tries=20 --retry-connrefused --waitretry=2 -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+            tar xf libmad-0.15.1b.tar.gz
+            rm libmad-0.15.1b.tar.gz
+            cd libmad-0.15.1b
 
-        make -j $cpuCount
-        make install
+            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
 
-        do_checkIfExist libmad-0.15.1b libmad.a
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist libmad-0.15.1b libmad.a
+    fi
+
 fi
 
 cd $LOCALBUILDDIR
