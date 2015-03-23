@@ -617,26 +617,30 @@ if [[ $mpv == "y" && ! $ffmpeg == "s" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
+if [[ $mkv = "y" ]]; then
 
-if [ -f $LOCALDESTDIR/lib/libwx_baseu-3.0.a ]; then
-    echo -------------------------------------------------
-    echo "wxWidgets is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile wxWidgets $bits\007"
-        rm -rf wxWidgets-3.0.2
-        wget --tries=20 --retry-connrefused --waitretry=2 -c -O wxWidgets-3.0.2.tar.bz2 https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2
-        tar xf wxWidgets-3.0.2.tar.bz2
-        rm wxWidgets-3.0.2.tar.bz2
-        cd wxWidgets-3.0.2
+    cd $LOCALBUILDDIR
 
-        CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+    if [ -f $LOCALDESTDIR/lib/libwx_baseu-3.0.a ]; then
+        echo -------------------------------------------------
+        echo "wxWidgets is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile wxWidgets $bits\007"
+            rm -rf wxWidgets-3.0.2
+            wget --tries=20 --retry-connrefused --waitretry=2 -c -O wxWidgets-3.0.2.tar.bz2 https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2
+            tar xf wxWidgets-3.0.2.tar.bz2
+            rm wxWidgets-3.0.2.tar.bz2
+            cd wxWidgets-3.0.2
 
-        make -j $cpuCount
-        make install
+            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
-        do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
+    fi
+
 fi
 
 echo "-------------------------------------------------------------------------------"
