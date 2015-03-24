@@ -99,6 +99,18 @@ else
 fi
 }
 
+# get wget download
+do_wget() {
+local URL="$1"
+local archive="-O $2"
+
+if [ $archive == "-O" ]; then
+    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL
+else
+    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL $archive
+fi
+}
+
 # check if compiled file exist
 do_checkIfExist() {
     local packetName="$1"
@@ -172,7 +184,7 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
     else
         echo -ne "\033]0;compile openjpeg $bits\007"
         rm -rf openjpeg-1.5.2
-        wget --tries=20 --retry-connrefused --waitretry=2 -O openjpeg-1.5.2.tar.gz -c "http://sourceforge.net/projects/openjpeg.mirror/files/1.5.2/openjpeg-1.5.2.tar.gz/download"
+        do_wget "http://sourceforge.net/projects/openjpeg.mirror/files/1.5.2/openjpeg-1.5.2.tar.gz/download" openjpeg-1.5.2.tar.gz
         tar xf openjpeg-1.5.2.tar.gz
         rm openjpeg-1.5.2.tar.gz
         cd openjpeg-1.5.2
@@ -195,7 +207,7 @@ if [[ `pkg-config --modversion freetype2` = "17.4.11" ]]; then
     else
         echo -ne "\033]0;compile freetype $bits\007"
         rm -rf freetype-2.5.5
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2
+        do_wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
         tar xf freetype-2.5.5.tar.bz2
         rm freetype-2.5.5.tar.bz2
         cd freetype-2.5.5
@@ -215,7 +227,7 @@ if [[ `pkg-config --modversion fontconfig` = "2.11.92" ]]; then
     else
         echo -ne "\033]0;compile fontconfig $bits\007"
         rm -rf fontconfig-2.11.92
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz
+        do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
         tar xf fontconfig-2.11.92.tar.gz
         rm fontconfig-2.11.92.tar.gz
         cd fontconfig-2.11.92
@@ -230,14 +242,14 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ `pkg-config --modversion fontconfig` = "0.19.6" ]]; then
+if [[ `pkg-config --modversion fribidi` = "0.19.6" ]]; then
     echo -------------------------------------------------
     echo "fribidi-0.19.6 is already compiled"
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile fribidi $bits\007"
         rm -rf fribidi-0.19.6
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://fribidi.org/download/fribidi-0.19.6.tar.bz2
+        do_wget "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
         tar xf fribidi-0.19.6.tar.bz2
         rm fribidi-0.19.6.tar.bz2
         cd fribidi-0.19.6
@@ -278,7 +290,7 @@ if [[ `ragel --version | grep "version 6.9"` ]]; then
     else
         echo -ne "\033]0;compile ragel $bits\007"
         rm -rf ragel-6.9
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.colm.net/files/ragel/ragel-6.9.tar.gz
+        do_wget "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
         tar xf ragel-6.9.tar.gz
         rm ragel-6.9.tar.gz
         cd ragel-6.9
@@ -324,7 +336,7 @@ if [[ `pkg-config --modversion sdl` = "1.2.15" ]]; then
     else
         echo -ne "\033]0;compile SDL $bits\007"
         rm -rf SDL-1.2.15
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://www.libsdl.org/release/SDL-1.2.15.tar.gz
+        do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
         tar xf SDL-1.2.15.tar.gz
         rm SDL-1.2.15.tar.gz
         cd SDL-1.2.15
@@ -350,7 +362,7 @@ if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
     else
         echo -ne "\033]0;compile libgcrypt $bits\007"
         rm -rf libgcrypt-1.6.2
-        wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2
+        do_wget "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
         tar xf libgcrypt-1.6.2.tar.bz2
         rm libgcrypt-1.6.2.tar.bz2
         cd libgcrypt-1.6.2
@@ -375,7 +387,7 @@ if [[ `pkg-config --modversion gnutls` = "3.3.11" ]]; then
     else
         echo -ne "\033]0;compile gnutls $bits\007"
         rm -rf gnutls-3.3.11
-        wget --tries=20 --retry-connrefused --waitretry=2 ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.11.tar.xz
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.11.tar.xz"
         tar xf gnutls-3.3.11.tar.xz
         rm gnutls-3.3.11.tar.xz
         cd gnutls-3.3.11
@@ -453,7 +465,7 @@ if [[ `pkg-config --modversion libxml-2.0` = "2.9.1" ]]; then
     else
         echo -ne "\033]0;compile libxml2 $bits\007"
         rm -rf libxml2-2.9.1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz
+        do_wget "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
         tar xf libxml2-2.9.1.tar.gz
         rm libxml2-2.9.1.tar.gz
         cd libxml2-2.9.1
@@ -475,15 +487,15 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
     else
         echo -ne "\033]0;compile libgnurx $bits\007"
         rm -rf mingw-libgnurx-2.5.1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz"
         tar xf mingw-libgnurx-2.5.1-src.tar.gz
         rm mingw-libgnurx-2.5.1-src.tar.gz
         cd mingw-libgnurx-2.5.1
 
         rm -f configure.ac
 
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O Makefile.am https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-Makefile.am
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O configure.ac https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-configure.ac
+        do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-Makefile.am" Makefile.am
+        do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-configure.ac" configure.ac
 
         touch NEWS
         touch AUTHORS
@@ -497,7 +509,7 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
         make -j $cpuCount
         make install
 
-        do_checkIfExist libgnurx-2.5.1 libgnurx.a
+        do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
 fi
 
 cd $LOCALBUILDDIR
@@ -509,7 +521,7 @@ if [[ `file --version | grep "file.exe-5.22"` ]]; then
     else
         echo -ne "\033]0;compile file $bits\007"
         rm -rf file-5.22
-        wget --tries=20 --retry-connrefused --waitretry=2 -c ftp://ftp.astron.com/pub/file/file-5.22.tar.gz
+        do_wget "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
         tar xf file-5.22.tar.gz
         rm file-5.22.tar.gz
         cd file-5.22
@@ -628,7 +640,7 @@ if [[ $mkv = "y" ]]; then
         else
             echo -ne "\033]0;compile wxWidgets $bits\007"
             rm -rf wxWidgets-3.0.2
-            wget --tries=20 --retry-connrefused --waitretry=2 -c -O wxWidgets-3.0.2.tar.bz2 https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2
+            do_wget "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2" wxWidgets-3.0.2.tar.bz2
             tar xf wxWidgets-3.0.2.tar.bz2
             rm wxWidgets-3.0.2.tar.bz2
             cd wxWidgets-3.0.2
@@ -663,7 +675,7 @@ if [[ `pkg-config --modversion theora` = "1.1.1" ]]; then
     else
         echo -ne "\033]0;compile libtheora $bits\007"
         rm -rf libtheora-1.1.1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2
+        do_wget "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
         tar xf libtheora-1.1.1.tar.bz2
         rm libtheora-1.1.1.tar.bz2
         cd libtheora-1.1.1
@@ -685,7 +697,7 @@ if [[ `pkg-config --modversion speex` = "1.2rc1" ]]; then
     else
         echo -ne "\033]0;compile speex $bits\007"
         rm -rf speex-1.2rc1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz
+        do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
         tar xf speex-1.2rc1.tar.gz
         rm speex-1.2rc1.tar.gz
         cd speex-1.2rc1
@@ -707,7 +719,7 @@ if [[ `pkg-config --modversion flac` = "1.3.1" ]]; then
     else
         echo -ne "\033]0;compile flac $bits\007"
         rm -rf flac-1.3.1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz
+        do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
         tar xf flac-1.3.1.tar.xz
         rm flac-1.3.1.tar.xz
         cd flac-1.3.1
@@ -729,7 +741,7 @@ if [[ `pkg-config --modversion vo-aacenc` = "0.1.3" ]]; then
     else
         echo -ne "\033]0;compile vo-aacenc $bits\007"
         rm -rf vo-aacenc-0.1.3
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
         tar xf vo-aacenc-0.1.3.tar.gz
         rm vo-aacenc-0.1.3.tar.gz
         cd vo-aacenc-0.1.3
@@ -751,7 +763,7 @@ if [[ `pkg-config --modversion opencore-amrnb` = "0.1.3" ]]; then
     else
         echo -ne "\033]0;compile opencore-amr $bits\007"
         rm -rf opencore-amr-0.1.3
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
         tar xf opencore-amr-0.1.3.tar.gz
         rm opencore-amr-0.1.3.tar.gz
         cd opencore-amr-0.1.3
@@ -773,7 +785,7 @@ if [[ `pkg-config --modversion vo-amrwbenc` = "0.1.2" ]]; then
     else
         echo -ne "\033]0;compile vo-amrwbenc $bits\007"
         rm -rf vo-amrwbenc-0.1.2
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
         tar xf vo-amrwbenc-0.1.2.tar.gz
         rm vo-amrwbenc-0.1.2.tar.gz
         cd vo-amrwbenc-0.1.2
@@ -813,7 +825,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/nu774/fdkaac" bin-fdk-aac
+do_git "https://github.com/nu774/fdkaac" bin-fdk-aac-git
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
@@ -844,7 +856,7 @@ if [[ $mplayer = "y" && $nonfree = "y" ]]; then
         else
             echo -ne "\033]0;compile faac $bits\007"
             rm -rf faac-1.28
-            wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.sourceforge.net/faac/faac-1.28.tar.gz
+            do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
             tar xf faac-1.28.tar.gz
             rm faac-1.28.tar.gz
             cd faac-1.28
@@ -870,12 +882,12 @@ if [[ `pkg-config --modversion opus` = "1.1" ]]; then
     else
         echo -ne "\033]0;compile opus $bits\007"
         rm -rf opus-1.1
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz
+        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
         tar xf opus-1.1.tar.gz
         rm opus-1.1.tar.gz
         cd opus-1.1
 
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch
+        do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
         patch -p0 < opus11.patch
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
@@ -895,7 +907,7 @@ if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
     else
         echo -ne "\033]0;compile opus-tools $bits\007"
         rm -rf opus-tools-0.1.9
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz
+        do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
         tar xf opus-tools-0.1.9.tar.gz
         rm opus-tools-0.1.9.tar.gz
         cd opus-tools-0.1.9
@@ -919,7 +931,7 @@ if [[ $mp4box = "y" ]]; then
         else
             echo -ne "\033]0;compile a52dec $bits\007"
             rm -rf a52dec-0.7.4
-            wget --tries=20 --retry-connrefused --waitretry=2 -c "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
+            do_wget "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
             tar xf a52dec-0.7.4.tar.gz
             rm a52dec-0.7.4.tar.gz
             cd a52dec-0.7.4
@@ -941,7 +953,7 @@ if [[ $mp4box = "y" ]]; then
         else
             echo -ne "\033]0;compile libmad $bits\007"
             rm -rf libmad-0.15.1b
-            wget --tries=20 --retry-connrefused --waitretry=2 -c "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+            do_wget "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
             tar xf libmad-0.15.1b.tar.gz
             rm libmad-0.15.1b.tar.gz
             cd libmad-0.15.1b
@@ -965,7 +977,7 @@ if [[ `pkg-config --modversion soxr` = "0.1.1" ]]; then
     else
         echo -ne "\033]0;compile soxr-0.1.1 $bits\007"
         rm -rf soxr-0.1.1-Source
-        wget --tries=20 --retry-connrefused --waitretry=2 -c "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
+        do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
         tar xf soxr-0.1.1-Source.tar.xz
         rm soxr-0.1.1-Source.tar.xz
         cd soxr-0.1.1-Source
@@ -1044,6 +1056,7 @@ do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
+		sed -i "s/python/python2/" autogen.sh
         ./autogen.sh -V
     else
         make uninstall
@@ -1072,7 +1085,7 @@ if [[ `pkg-config --modversion libbs2b` = "3.1.0" ]]; then
     else
         echo -ne "\033]0;compile libbs2b-3.1.0 $bits\007"
         rm -rf libbs2b-3.1.0
-        wget --tries=20 --retry-connrefused --waitretry=2 -c "http://downloads.sourceforge.net/bs2b/libbs2b-3.1.0.tar.gz"
+        do_wget "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
         tar xf libbs2b-3.1.0.tar.gz
         rm libbs2b-3.1.0.tar.gz
         cd libbs2b-3.1.0
@@ -1342,7 +1355,7 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 
         b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
 
-        wget --tries=20 --retry-connrefused --waitretry=2 -c -O mediainfo.7z "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download"
+        do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
 
         mkdir mediainfo
         cd mediainfo
@@ -1425,7 +1438,7 @@ if [[ `pkg-config --modversion caca` = "0.99.beta19" ]]; then
     else
         echo -ne "\033]0;compile libcaca $bits\007"
         rm -rf libcaca-0.99.beta19
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz
+        do_wget "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
         tar xf libcaca-0.99.beta19.tar.gz
         rm libcaca-0.99.beta19.tar.gz
         cd libcaca-0.99.beta19
@@ -1460,13 +1473,13 @@ if [[ `pkg-config --modversion zvbi-0.2` = "0.2.35" ]]; then
     else
         echo -ne "\033]0;compile libzvbi $bits\007"
         rm -rf zvbi-0.2.35
-        wget --tries=20 --retry-connrefused --waitretry=2 -c -O zvbi-0.2.35.tar.bz2 http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download
+        do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download" zvbi-0.2.35.tar.bz2
         tar xf zvbi-0.2.35.tar.bz2
         rm zvbi-0.2.35.tar.bz2
         cd zvbi-0.2.35
 
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch
+        do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
+        do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
         patch -p0 < zvbi-win32.patch
         patch -p0 < zvbi-ioctl.patch
 
@@ -1491,8 +1504,8 @@ if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
     else
         echo -ne "\033]0;download DeckLinkAPI $bits\007"
         cd $LOCALDESTDIR/include
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI.h
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI_i.c
+        do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI.h"
+        do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI_i.c"
 
         if [ ! -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
             echo -------------------------------------------------
@@ -1519,7 +1532,7 @@ if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
     else
         echo -ne "\033]0;compile frei0r $bits\007"
         rm -rf frei0r-plugins-1.4
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O frei0r-plugins-1.4.tar.gz https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz
+        do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz" frei0r-plugins-1.4.tar.gz
         tar xf frei0r-plugins-1.4.tar.gz
         rm frei0r-plugins-1.4.tar.gz
         cd frei0r-plugins-1.4
@@ -1761,7 +1774,7 @@ if [[ $ffmbc = "y" ]]; then
             fi
 
             rm -rf FFmbc-0.7.2
-            wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c -O FFmbc-0.7.2.tar.bz2 "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download"
+            do_wget "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download" FFmbc-0.7.2.tar.bz2
             tar xf FFmbc-0.7.2.tar.bz2
             rm FFmbc-0.7.2.tar.bz2
             cd FFmbc-0.7.2
@@ -2065,7 +2078,7 @@ if [[ $mkv = "y" ]]; then
         fi
 
         if [[ ! -f ./mkvinfo.patch ]]; then
-            wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch
+            do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
         fi
 
         patch -N -p0 < mkvinfo.patch
@@ -2114,7 +2127,7 @@ if [[ $packing = "y" ]]; then
         echo -ne "\033]0;Download UPX\007"
         cd $LOCALBUILDDIR
         rm -rf upx391w
-        wget --tries=20 --retry-connrefused --waitretry=2 -c http://upx.sourceforge.net/download/upx391w.zip
+        do_wget "http://upx.sourceforge.net/download/upx391w.zip"
         unzip upx391w.zip
         rm upx391w.zip
     fi
