@@ -112,7 +112,7 @@ for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set x265INI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set other265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
