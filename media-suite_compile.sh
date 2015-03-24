@@ -103,8 +103,8 @@ fi
 do_wget() {
 local URL="$1"
 local archive="$2"
-
-if [ $archive == "" ]; then
+echo $archive
+if [[ -z $archive ]]; then
     wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL
 else
     wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
