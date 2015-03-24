@@ -102,12 +102,12 @@ fi
 # get wget download
 do_wget() {
 local URL="$1"
-local archive="-O $2"
+local archive="$2"
 
-if [ $archive == "-O" ]; then
+if [ $archive == "" ]; then
     wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL
 else
-    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL $archive
+    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
 fi
 }
 
@@ -1056,7 +1056,7 @@ do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
-		sed -i "s/python/python2/" autogen.sh
+        sed -i "s/python/python2/" autogen.sh
         ./autogen.sh -V
     else
         make uninstall
