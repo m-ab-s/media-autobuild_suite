@@ -712,7 +712,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ `pkg-config --modversion flac` = "1.3.1" ]]; then
+if [[ `pkg-config --define-variable=PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig" --modversion flac` = "1.3.1" ]]; then
     echo -------------------------------------------------
     echo "flac-1.3.1 is already compiled"
     echo -------------------------------------------------
@@ -1760,7 +1760,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmbc = "y" ]]; then
-    if [ -f "$LOCALDESTDIR/bin-video/ffmbc.exe" ]; then
+    if [[ `ffmbc.exe 2>&1 | grep "version 0.7.2"` ]]; then
         echo -------------------------------------------------
         echo "ffmbc-0.7.2 is already compiled"
         echo -------------------------------------------------
