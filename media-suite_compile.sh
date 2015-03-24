@@ -1717,7 +1717,7 @@ do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
 
 if [[ $compile == "true" ]]; then
     cd build/msys
-    rm -rf *
+    rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
     rm -f $LOCALDESTDIR/include/x265.h
     rm -f $LOCALDESTDIR/include/x265_config.h
     rm -f $LOCALDESTDIR/lib/libx265.a
@@ -1738,7 +1738,7 @@ if [[ $compile == "true" ]]; then
         cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
 
         make clean
-        rm -rf *
+        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
 
         cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
     else
