@@ -1078,6 +1078,28 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [[ `pkg-config --modversion twolame` = "0.3.13" ]]; then
+	echo -------------------------------------------------
+	echo "twolame-0.3.13 is already compiled"
+	echo -------------------------------------------------
+	else 
+		echo -ne "\033]0;compile twolame $bits\007"
+		rm -rf twolame-0.3.13
+		do_wget http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download twolame-0.3.13.tar.gz
+		tar xf twolame-0.3.13.tar.gz
+		rm twolame-0.3.13.tar.gz
+		cd twolame-0.3.13
+		
+		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+		
+		make -j $cpuCount
+		make install
+		
+		do_checkIfExist twolame-0.3.13 libtwolame.a
+fi
+
+cd $LOCALBUILDDIR
+
 if [[ `pkg-config --modversion libbs2b` = "3.1.0" ]]; then
     echo -------------------------------------------------
     echo "bs2b-3.1.0 is already compiled"
