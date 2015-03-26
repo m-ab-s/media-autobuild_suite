@@ -633,7 +633,7 @@ if [[ $mkv = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    if [[ `wx-config --version` = "3.0.2" ]]; then
+    if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
         echo -------------------------------------------------
         echo "wxWidgets is already compiled"
         echo -------------------------------------------------
@@ -1821,10 +1821,7 @@ cd $LOCALBUILDDIR
 if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     if [[ $nonfree = "y" ]]; then
         extras="--enable-nonfree --enable-libfdk-aac"
-        if [[ $mplayer = "y" ]]; then
-            extras+=" --enable-libfaac"
-        fi
-      else
+    else
         extras=""
     fi
 
