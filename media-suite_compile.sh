@@ -2059,11 +2059,6 @@ if [[ $mpv = "y" ]]; then
         python2 ./waf build -j $cpuCount
         python2 ./waf install
 
-        if [ ! -d "$LOCALDESTDIR/bin-video/mpv/lua" ]; then
-            mkdir $LOCALDESTDIR/bin-video/mpv/lua
-            cp player/lua/*.lua $LOCALDESTDIR/bin-video/mpv/lua
-        fi
-
         do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
         compile="false"
     fi
