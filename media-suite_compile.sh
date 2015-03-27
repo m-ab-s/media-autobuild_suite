@@ -1284,21 +1284,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libutvideo-git $bits\007"
-if [ ! -d libutvideo-git ]; then
-    git clone "https://github.com/qyot27/libutvideo.git" libutvideo-git
-    compile="true"
-    cd libutvideo-git
-else
-    cd libutvideo-git
-    oldHead=`git rev-parse HEAD`
-    git pull origin buildsystem
-    newHead=`git rev-parse HEAD`
-
-    if [[ "$oldHead" != "$newHead" ]]; then
-        compile="true"
-    fi
-fi
+do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsystem
 
 if [[ $compile == "true" ]]; then
     if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
