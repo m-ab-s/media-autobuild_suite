@@ -34,20 +34,28 @@ do_git() {
 local gitURL="$1"
 local gitFolder="$2"
 local gitDepth="$3"
+local gitBranch="$4"
+
+if [[ $gitDepth == "noDepth" ]]; then
+    gitDepth=""
+elif [[ $gitDepth == "shallow" ]] || [ ! $gitDepth ]; then
+    gitDepth="--depth 1"
+fi
+
+if [ ! $gitBranch ]; then
+    gitBranch="master"
+fi
+
 echo -ne "\033]0;compile $gitFolder $bits\007"
 if [ ! -d $gitFolder ]; then
-    if [[ $gitDepth == "noDepth" ]]; then
-        git clone $gitURL $gitFolder
-    else
-        git clone --depth 1 $gitURL $gitFolder
-    fi
+    git clone $gitDepth -b $gitBranch $gitURL $gitFolder
     compile="true"
     cd $gitFolder
 else
     cd $gitFolder
     oldHead=`git rev-parse HEAD`
-    git reset --hard @{u}
-    git pull origin master
+    git reset --quiet --hard @{u}
+    git pull origin $gitBranch
     newHead=`git rev-parse HEAD`
 
     if [[ "$oldHead" != "$newHead" ]]; then
