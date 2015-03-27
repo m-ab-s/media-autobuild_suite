@@ -2115,7 +2115,7 @@ if [[ $stripping = "y" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo
-    FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\)" -mmin -600`
+    FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
 
     for f in $FILES; do
         strip --strip-all $f
@@ -2138,7 +2138,7 @@ if [[ $packing = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     cd $LOCALDESTDIR
-    FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
+    FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
 
     for f in $FILES; do
         if [[ $stripping = "y" ]]; then
