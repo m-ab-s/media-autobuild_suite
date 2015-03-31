@@ -2069,7 +2069,7 @@ if [[ $mpv = "y" ]]; then
             rm -f noto-mpv.7z
         fi
 
-        do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
+        do_checkIfExist mpv-git bin-video/mpv.exe
         compile="false"
     fi
 fi
