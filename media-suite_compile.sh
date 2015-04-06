@@ -34,20 +34,28 @@ do_git() {
 local gitURL="$1"
 local gitFolder="$2"
 local gitDepth="$3"
+local gitBranch="$4"
+
+if [[ $gitDepth == "noDepth" ]]; then
+    gitDepth=""
+elif [[ $gitDepth == "shallow" ]] || [ ! $gitDepth ]; then
+    gitDepth="--depth 1"
+fi
+
+if [ ! $gitBranch ]; then
+    gitBranch="master"
+fi
+
 echo -ne "\033]0;compile $gitFolder $bits\007"
 if [ ! -d $gitFolder ]; then
-    if [[ $gitDepth == "noDepth" ]]; then
-        git clone $gitURL $gitFolder
-    else
-        git clone --depth 1 $gitURL $gitFolder
-    fi
+    git clone $gitDepth -b $gitBranch $gitURL $gitFolder
     compile="true"
     cd $gitFolder
 else
     cd $gitFolder
     oldHead=`git rev-parse HEAD`
-    git reset --hard @{u}
-    git pull origin master
+    git reset --quiet --hard @{u}
+    git pull origin $gitBranch
     newHead=`git rev-parse HEAD`
 
     if [[ "$oldHead" != "$newHead" ]]; then
@@ -1276,21 +1284,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-echo -ne "\033]0;compile libutvideo-git $bits\007"
-if [ ! -d libutvideo-git ]; then
-    git clone "https://github.com/qyot27/libutvideo.git" libutvideo-git
-    compile="true"
-    cd libutvideo-git
-else
-    cd libutvideo-git
-    oldHead=`git rev-parse HEAD`
-    git pull origin buildsystem
-    newHead=`git rev-parse HEAD`
-
-    if [[ "$oldHead" != "$newHead" ]]; then
-        compile="true"
-    fi
-fi
+do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsystem
 
 if [[ $compile == "true" ]]; then
     if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
@@ -2058,27 +2052,24 @@ if [[ $mpv = "y" ]]; then
             python2 ./bootstrap.py
         fi
 
-        CFLAGS="$CFLAGS -DCACA_STATIC" LDFLAGS="$LDFLAGS -Wl,--allow-multiple-definition" python2 ./waf configure --prefix=$LOCALDESTDIR/bin-video/mpv --disable-debug-build --enable-static-build --enable-sdl2 --disable-manpage-build --disable-pdf-build
+        CFLAGS="$CFLAGS -DCACA_STATIC" python2 ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build
 
-        if [[ $bits = "32bit" ]]; then
-            sed -i "s/LIBPATH_libav = .*/LIBPATH_libav = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
-            sed -i "s/LIBPATH_libavdevice = .*/LIBPATH_libavdevice = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
-            sed -i "s/LIBPATH_libavfilter = .*/LIBPATH_libavfilter = ['\/local32\/lib', '\/mingw32\/lib']/g" ./build/c4che/_cache.py
-        else
-            sed -i "s/LIBPATH_libav = .*/LIBPATH_libav = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
-            sed -i "s/LIBPATH_libavdevice = .*/LIBPATH_libavdevice = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
-            sed -i "s/LIBPATH_libavfilter = .*/LIBPATH_libavfilter = ['\/local64\/lib', '\/mingw64\/lib']/g" ./build/c4che/_cache.py
-        fi
+        sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
         python2 ./waf build -j $cpuCount
         python2 ./waf install
 
-        if [ ! -d "$LOCALDESTDIR/bin-video/mpv/lua" ]; then
-            mkdir $LOCALDESTDIR/bin-video/mpv/lua
-            cp player/lua/*.lua $LOCALDESTDIR/bin-video/mpv/lua
+        if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
+            mkdir -p $LOCALDESTDIR/bin-video/{mpv,fonts}
+            cd $LOCALDESTDIR/bin-video/mpv
+            do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
+            cd $LOCALDESTDIR/bin-video/fonts
+            do_wget "http://srsfckn.biz/noto-mpv.7z"
+            7z x noto-mpv.7z
+            rm -f noto-mpv.7z
         fi
 
-        do_checkIfExist mpv-git bin-video/mpv/bin/mpv.exe
+        do_checkIfExist mpv-git bin-video/mpv.exe
         compile="false"
     fi
 fi
@@ -2134,7 +2125,7 @@ if [[ $stripping = "y" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo
-    FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\)" -mmin -600`
+    FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
 
     for f in $FILES; do
         strip --strip-all $f
@@ -2157,7 +2148,7 @@ if [[ $packing = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     cd $LOCALDESTDIR
-    FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
+    FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
 
     for f in $FILES; do
         if [[ $stripping = "y" ]]; then

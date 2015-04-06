@@ -41,9 +41,14 @@ if exist %ini% GOTO checkINI
     echo. 1 = 32 bit msys2
     echo. 2 = 64 bit msys2 [recommended]
     echo.
+    echo. If you make a mistake, delete the media-autobuild_suite.ini file
+    echo. and re-run this file.
+    echo.
+    echo. These questions should only be asked once.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P msys2Arch="msys2 system:"
+    set /P msys2Arch="msys2 system: "
     if %msys2Arch% GTR 2 GOTO selectmsys2Arch
 
     echo.[compiler list]>%ini%
@@ -146,7 +151,7 @@ if %archINI%==0 (
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildEnv="Build System:"
+    set /P buildEnv="Build System: "
     set "writeArch=yes"
     ) else (
         set buildEnv=%archINI%
@@ -173,13 +178,14 @@ if %freeINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build nonfree binaries [like fdkaac], is not allow to distribute them:
-    echo. 1 = nonfree binaries
-    echo. 2 = free binaries
+    echo. Include non-free libraries [like fdkaac and faac]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo. [you will not be able to redistribute binaries including these]
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P nonfree="Binaries:"
+    set /P nonfree="Non-free binaries: "
     set "writeFree=yes"
     ) else (
         set nonfree=%freeINI%
@@ -200,13 +206,13 @@ if %ffmbcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build ffmbc binary:
-    echo. 1 = yes [static]
-    echo. 2 = no
+    echo. Build FFMedia Broadcast binary?
+    echo. 1 = Yes [static]
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildffmbc="build ffmbc:"
+    set /P buildffmbc="Build ffmbc: "
     set "writeBC=yes"
     ) else (
         set buildffmbc=%ffmbcINI%
@@ -227,13 +233,13 @@ if %x264INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build x264 binary:
-    echo. 1 = yes [static]
-    echo. 2 = no
+    echo. Build x264 [H.264 encoder] binary?
+    echo. 1 = Yes [static]
+    echo. 2 = Build library only
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildx264="build x264:"
+    set /P buildx264="Build x264: "
     set "writex264=yes"
     ) else (
         set buildx264=%x264INI%
@@ -254,13 +260,13 @@ if %x265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build x265 binary:
-    echo. 1 = yes [static]
-    echo. 2 = no
+    echo. Build x265 [H.265 encoder] binary?
+    echo. 1 = Yes [static]
+    echo. 2 = Build library only
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildx265="build x265:"
+    set /P buildx265="Build x265: "
     set "writex265=yes"
     ) else (
         set buildx265=%x265INI%
@@ -281,13 +287,13 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build H.265 encoders other than x265:
-    echo. 1 = yes [static]
-    echo. 2 = no
+    echo. Build H.265 encoders other than x265?
+    echo. 1 = Yes [static]
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildother265="build other265:"
+    set /P buildother265="Build other265: "
     set "writeother265=yes"
     ) else (
         set buildother265=%other265INI%
@@ -308,14 +314,14 @@ if %ffmpegINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build ffmpeg binary:
-    echo. 1 = yes [static]
-    echo. 2 = no
-    echo. 3 = shared
+    echo. Build FFmpeg binary:
+    echo. 1 = Yes [static] [recommended]
+    echo. 2 = No
+    echo. 3 = Shared
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildffmpeg="build ffmpeg:"
+    set /P buildffmpeg="Build FFmpeg: "
     set "writeFF=yes"
     ) else (
         set buildffmpeg=%ffmpegINI%
@@ -339,13 +345,16 @@ if %ffmpegUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build ffmpeg new when lib has updated:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Always build FFmpeg when libraries have been updated?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. FFmpeg is updated a lot so you only need to select this if you
+    echo. absolutely need updated external libraries in FFmpeg.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildffmpegUp="build ffmpeg if lib is new:"
+    set /P buildffmpegUp="Build ffmpeg if lib is new: "
     set "writeFFU=yes"
     ) else (
         set buildffmpegUp=%ffmpegUpdateINI%
@@ -366,13 +375,13 @@ if %mp4boxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build static mp4box binary:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Build static mp4box [mp4 muxer/toolbox] binary?
+    echo. 1 = Yes
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildMp4box="build mp4box:"
+    set /P buildMp4box="Build mp4box: "
     set "writeMP4Box=yes"
     ) else (
         set buildMp4box=%mp4boxINI%
@@ -393,13 +402,13 @@ if %mplayerINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build static mplayer/mencoder binary:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Build static mplayer/mencoder binary?
+    echo. 1 = Yes
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildmplayer="build mplayer:"
+    set /P buildmplayer="Build mplayer: "
     set "writeMPlayer=yes"
     ) else (
         set buildmplayer=%mplayerINI%
@@ -420,13 +429,13 @@ if %mpvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build static mpv binary:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Build static mpv binary?
+    echo. 1 = Yes
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildmpv="build mpv:"
+    set /P buildmpv="Build mpv: "
     set "writeMPV=yes"
     ) else (
         set buildmpv=%mpvINI%
@@ -447,13 +456,13 @@ if %mkvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build static mkv binarys:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Build static mkvtoolnix binaries?
+    echo. 1 = Yes
+    echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildmkv="build mkv:"
+    set /P buildmkv="Build mkvtoolnix: "
     set "writeMKV=yes"
     ) else (
         set buildmkv=%mkvINI%
@@ -477,9 +486,11 @@ if %coresINI%==0 (
     echo. Number of CPU Cores/Threads for compiling:
     echo. [it is non-recommended to use all cores/threads!]
     echo.
+    echo. Recommended: half of your total number of cores
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P cpuCores="Core/Thread Count:"
+    set /P cpuCores="Core/Thread Count: "
     set "writeCores=yes"
     ) else (
         set cpuCores=%coresINI%
@@ -496,13 +507,15 @@ if %deleteSourceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. delete source folders, after compile is done:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Delete versioned source folders after compile is done?
+    echo. 1 = Yes [recommended]
+    echo. 2 = No
+    echo.
+    echo. This will save a bit of space for libraries not compiled from git/hg/svn.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P deleteS="delete source:"
+    set /P deleteS="Delete source: "
     set "writeDel=yes"
     ) else (
         set deleteS=%deleteSourceINI%
@@ -523,13 +536,15 @@ if %stripINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. strip compiled files:
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Strip compiled files binaries?
+    echo. 1 = Yes [recommended]
+    echo. 2 = No
+    echo.
+    echo. Makes binaries smaller at only a small time cost after compiling.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P stripF="strip files:"
+    set /P stripF="Strip files: "
     set "writeStrip=yes"
     ) else (
         set stripF=%stripINI%
@@ -551,14 +566,16 @@ if %packINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. pack compiled files:
-    echo. [Attention: Some security applications may detect packed binaries as malware]
-    echo. 1 = yes
-    echo. 2 = no
+    echo. Pack compiled files?
+    echo. 1 = Yes
+    echo. 2 = No [recommended]
+    echo.
+    echo. Attention: Some security applications may detect packed binaries as malware.
+    echo. Makes binaries a lot smaller at a big time cost after compiling.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P packF="pack files:"
+    set /P packF="Pack files: "
     set "writePack=yes"
     ) else (
         set packF=%packINI%
@@ -841,7 +858,7 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
 if %build32%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw32-old.pk" del "%instdir%\%msys2%\etc\pac-mingw32-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw32-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw32-new.pk" pac-mingw32-old.pk
-    echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-SDL2 mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-mpg123 mingw-w64-i686-wavpack mingw-w64-i686-libmodplug mingw-w64-i686-tools-git mingw-w64-i686-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw32-new.pk
+    echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-libogg mingw-w64-i686-libvorbis mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-lua mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-schroedinger mingw-w64-i686-portaudio mingw-w64-i686-wavpack mingw-w64-i686-libmodplug mingw-w64-i686-tools-git mingw-w64-i686-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw32-new.pk
 
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
@@ -862,7 +879,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 if %build64%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\pac-mingw64-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
-    echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-mpg123 mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug mingw-w64-x86_64-tools-git mingw-w64-x86_64-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw64-new.pk
+    echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-lua mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-schroedinger mingw-w64-x86_64-portaudio mingw-w64-x86_64-wavpack mingw-w64-x86_64-libmodplug mingw-w64-x86_64-tools-git mingw-w64-x86_64-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw64-new.pk
 
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
