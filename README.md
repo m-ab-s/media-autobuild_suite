@@ -1,17 +1,3 @@
----
-title: media-autobuild_suite
-
-description: A Windows automatic build script for ffmpeg and other media tools
-
-author: Jonathan Baecker (jb_alvarado)
-
-created:  2013-09-24
-
----
-
-**Attention: This project is searching for a new owner. Please let it me know if you are interested to continue this project, then I transfer it to you. Or please fork it, so it is still alive for others.** Sorry that I don't continue this project and thanks for giving inputs and error reports!  
-
-
 media-autobuild_suite
 =========
 
@@ -160,3 +146,7 @@ http://ingar.satgnu.net/devenv/mingw32/base.html
 
 
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
+
+
+
+**Attention: This project is searching for a new owner. Please let it me know if you are interested to continue this project, then I transfer it to you.**
