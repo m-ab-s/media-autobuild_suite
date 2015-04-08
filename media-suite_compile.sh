@@ -2018,6 +2018,31 @@ cd $LOCALBUILDDIR
 
 if [[ $mpv = "y" ]]; then
 
+    do_git "http://luajit.org/git/luajit-2.0.git" luajit-git
+
+    if [[ $compile == "true" ]]; then
+
+        if [[ ! -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
+            make PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global uninstall
+            make clean
+        fi
+
+        make BUILDMODE=static amalg
+        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe install
+
+        # luajit comes with a broken .pc file
+        sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
+
+        do_checkIfExist luajit-git libluajit-5.1.a
+        compile="false"
+    else
+        echo -------------------------------------------------
+        echo "luajit is already up to date"
+        echo -------------------------------------------------
+    fi
+
+    cd $LOCALBUILDDIR
+
     do_git "https://github.com/lachs0r/rubberband.git" rubberband-git
 
     if [[ $compile == "true" ]]; then
@@ -2052,7 +2077,7 @@ if [[ $mpv = "y" ]]; then
             python2 ./bootstrap.py
         fi
 
-        CFLAGS="$CFLAGS -DCACA_STATIC" python2 ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build
+        CFLAGS="$CFLAGS -DCACA_STATIC" python2 ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
