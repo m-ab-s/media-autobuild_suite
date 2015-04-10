@@ -388,17 +388,39 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ `pkg-config --modversion gnutls` = "3.3.11" ]]; then
+if [[ `pkg-config --modversion nettle` = "2.7.1" ]]; then
     echo -------------------------------------------------
-    echo "gnutls-3.3.11 is already compiled"
+    echo "nettle-2.7.1 is already compiled"
+    echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile nettle $bits\007"
+        rm -rf nettle-2.7.1
+        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
+        tar xf nettle-2.7.1.tar.gz
+        rm nettle-2.7.1.tar.gz
+        cd nettle-2.7.1
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist nettle-2.7.1 libnettle.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [[ `pkg-config --modversion gnutls` = "3.3.14" ]]; then
+    echo -------------------------------------------------
+    echo "gnutls-3.3.14 is already compiled"
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile gnutls $bits\007"
-        rm -rf gnutls-3.3.11
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.11.tar.xz"
-        tar xf gnutls-3.3.11.tar.xz
-        rm gnutls-3.3.11.tar.xz
-        cd gnutls-3.3.11
+        rm -rf gnutls-3.3.14
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.14.tar.xz"
+        tar xf gnutls-3.3.14.tar.xz
+        rm gnutls-3.3.14.tar.xz
+        cd gnutls-3.3.14
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
 
@@ -407,7 +429,7 @@ if [[ `pkg-config --modversion gnutls` = "3.3.11" ]]; then
 
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 
-        do_checkIfExist gnutls-3.3.11 libgnutls.a
+        do_checkIfExist gnutls-3.3.14 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
