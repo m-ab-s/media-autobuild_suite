@@ -2040,7 +2040,7 @@ cd $LOCALBUILDDIR
 
 if [[ $mpv = "y" ]]; then
 
-    do_git "http://luajit.org/git/luajit-2.0.git" luajit-git
+    do_git "http://luajit.org/git/luajit-2.0.git" luajit-git noDepth
 
     if [[ $compile == "true" ]]; then
 
