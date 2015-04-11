@@ -134,60 +134,43 @@ do_checkIfExist() {
     local packetName="$1"
     local fileName="$2"
     local fileExtension=${fileName##*.}
-    if [[ "$fileExtension" = "exe" ]]; then
-        if [ -f "$LOCALDESTDIR/$fileName" ]; then
-            echo -
-            echo -------------------------------------------------
-            echo "build $packetName done..."
-            echo -------------------------------------------------
-            echo -
-            if [[ $deleteSource = "y" ]]; then
-                if [[ ! "${packetName: -4}" = "-git" ]]; then
-                    if [[ ! "${packetName: -3}" = "-hg" ]]; then
-                        if [[ ! "${packetName: -4}" = "-svn" ]]; then
-                            cd $LOCALBUILDDIR
-                            rm -rf $LOCALBUILDDIR/$packetName
-                        fi
-                    fi
-                fi
-            else
-                touch build_successful$bits
-            fi
-            else
-                echo -------------------------------------------------
-                echo "Build $packetName failed..."
-                echo "Delete the source folder under '$LOCALBUILDDIR' and start again,"
-                echo "or if you know there is no dependences hit enter for continue it."
-                read -p ""
-                sleep 5
-        fi
-    elif [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
+    local buildSuccess="n"
+
+    if [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
         if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
-            echo -
-            echo -------------------------------------------------
-            echo "build $packetName done..."
-            echo -------------------------------------------------
-            echo -
-            if [[ $deleteSource = "y" ]]; then
-                if [[ ! "${packetName: -4}" = "-git" ]]; then
-                    if [[ ! "${packetName: -3}" = "-hg" ]]; then
-                        if [[ ! "${packetName: -4}" = "-svn" ]]; then
-                            cd $LOCALBUILDDIR
-                            rm -rf $LOCALBUILDDIR/$packetName
-                        fi
+            buildSuccess="y"
+        fi
+    else
+        if [ -f "$LOCALDESTDIR/$fileName" ]; then
+            buildSuccess="y"
+        fi
+    fi
+    
+    if [[ buildSuccess = "y" ]]; then
+        echo -
+        echo -------------------------------------------------
+        echo "build $packetName done..."
+        echo -------------------------------------------------
+        echo -
+        if [[ $deleteSource = "y" ]]; then
+            if [[ ! "${packetName: -4}" = "-git" ]]; then
+                if [[ ! "${packetName: -3}" = "-hg" ]]; then
+                    if [[ ! "${packetName: -4}" = "-svn" ]]; then
+                        cd $LOCALBUILDDIR
+                        rm -rf $LOCALBUILDDIR/$packetName
                     fi
                 fi
-            else
-                touch build_successful$bits
             fi
-            else
-                echo -------------------------------------------------
-                echo "build $packetName failed..."
-                echo "delete the source folder under '$LOCALBUILDDIR' and start again,"
-                echo "or if you know there is no dependences hit enter for continue it"
-                read -p "first close the batch window, then the shell window"
-                sleep 5
         fi
+        touch build_successful$bits
+        cd $LOCALBUILDIR
+    else
+        echo -------------------------------------------------
+        echo "Build of $packetName failed..."
+        echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
+        echo "If you're sure there are no dependencies <Enter> to continue building."
+        read -p "Close this window if you wish to stop building."
+        sleep 5
     fi
 }
 
