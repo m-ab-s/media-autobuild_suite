@@ -87,7 +87,7 @@ else
         compile="true"
         touch recently_updated
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
-            compile="true"
+        compile="true"
     fi
 fi
 }
@@ -1123,23 +1123,23 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ `pkg-config --modversion twolame` = "0.3.13" ]]; then
-	echo -------------------------------------------------
-	echo "twolame-0.3.13 is already compiled"
-	echo -------------------------------------------------
-	else 
-		echo -ne "\033]0;compile twolame $bits\007"
-		rm -rf twolame-0.3.13
-		do_wget http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download twolame-0.3.13.tar.gz
-		tar xf twolame-0.3.13.tar.gz
-		rm twolame-0.3.13.tar.gz
-		cd twolame-0.3.13
-		
-		./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
-		
-		make -j $cpuCount
-		make install
-		
-		do_checkIfExist twolame-0.3.13 libtwolame.a
+    echo -------------------------------------------------
+    echo "twolame-0.3.13 is already compiled"
+    echo -------------------------------------------------
+    else 
+        echo -ne "\033]0;compile twolame $bits\007"
+        rm -rf twolame-0.3.13
+        do_wget http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download twolame-0.3.13.tar.gz
+        tar xf twolame-0.3.13.tar.gz
+        rm twolame-0.3.13.tar.gz
+        cd twolame-0.3.13
+        
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+        
+        make -j $cpuCount
+        make install
+        
+        do_checkIfExist twolame-0.3.13 libtwolame.a
 fi
 
 cd $LOCALBUILDDIR
@@ -1610,21 +1610,21 @@ if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
         echo "nvenc is already installed"
         echo -------------------------------------------------
         else
-		echo -ne "\033]0;install nvenc $bits\007"
-		rm -rf nvenc_5.0.1_sdk
-		do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
-		unzip nvenc_5.0.1_sdk.zip
-		
-		if [[ $build32 = "yes" ]] && [[ ! -f /local32/include/nvEncodeAPI.h ]]; then
-		    cp nvenc_5.0.1_sdk/Samples/common/inc/* /local32/include
-		fi
-		
-		if [[ $build64 = "yes" ]] && [[ ! -f /local64/include/nvEncodeAPI.h ]]; then
-		    cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
-		fi
-	
-        if [[ ! -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then	
-		    echo -------------------------------------------------
+        echo -ne "\033]0;install nvenc $bits\007"
+        rm -rf nvenc_5.0.1_sdk
+        do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
+        unzip nvenc_5.0.1_sdk.zip
+        
+        if [[ $build32 = "yes" ]] && [[ ! -f /local32/include/nvEncodeAPI.h ]]; then
+            cp nvenc_5.0.1_sdk/Samples/common/inc/* /local32/include
+        fi
+        
+        if [[ $build64 = "yes" ]] && [[ ! -f /local64/include/nvEncodeAPI.h ]]; then
+            cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
+        fi
+    
+        if [[ ! -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then    
+            echo -------------------------------------------------
             echo "install nvenc failed..."
             echo "if you know there is no dependences hit enter for continue it,"
             echo "or run script again"
@@ -1955,7 +1955,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
-			--extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+            --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
         else
             CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
@@ -1972,7 +1972,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
-			--extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+            --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             newFfmpeg="yes"
         fi
