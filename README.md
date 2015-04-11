@@ -36,8 +36,10 @@ Included Tools And Libraries
 	- gsm
 	- gnutls
 	- libass
+	- libbs2b
 	- libbluray
-	- libcacas
+	- libdcadec
+	- libcaca
 	- libilbc
 	- libmodplug
 	- libpng
@@ -47,6 +49,7 @@ Included Tools And Libraries
 	- libutvideo (only static)
 	- libzvbi
 	- mp3lame
+	- nvenc
 	- opencore-amr
 	- openjpeg
 	- ogg
