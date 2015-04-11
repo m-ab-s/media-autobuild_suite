@@ -956,7 +956,7 @@ if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
 Setlocal DisableDelayedExpansion
 
 if %build32%==yes (
-    if not exist %instdir%\build32 mkdir %instdir%\build32
+    if not exist %instdir%\build mkdir %instdir%\build
     if not exist %instdir%\local32\share (
         echo.-------------------------------------------------------------------------------
         echo.create local32 folders
@@ -975,7 +975,7 @@ if %build32%==yes (
     )
 
 if %build64%==yes (
-    if not exist %instdir%\build64 mkdir %instdir%\build64
+    if not exist %instdir%\build mkdir %instdir%\build
     if not exist %instdir%\local64\share (
         echo.-------------------------------------------------------------------------------
         echo.create local64 folders
@@ -1022,10 +1022,9 @@ if "%searchRes%"=="local64" GOTO writeProfile32
     (
         echo.
         echo.%instdir%\local32\ /local32
-        echo.%instdir%\build32\ /build32
+        echo.%instdir%\build\ /build
         echo.%instdir%\%msys2%\mingw32\ /mingw32
         echo.%instdir%\local64\ /local64
-        echo.%instdir%\build64\ /build64
         echo.%instdir%\%msys2%\mingw64\ /mingw64
         )>>%instdir%\%msys2%\etc\fstab.
 
@@ -1076,7 +1075,7 @@ if %build32%==yes (
             echo.export PATH PS1
             echo.
             echo.# package build directory
-            echo.LOCALBUILDDIR=/build32
+            echo.LOCALBUILDDIR=/build
             echo.# package installation prefix
             echo.LOCALDESTDIR=/local32
             echo.export LOCALBUILDDIR LOCALDESTDIR
@@ -1131,7 +1130,7 @@ if %build64%==yes (
             echo.export PATH PS1
             echo.
             echo.# package build directory
-            echo.LOCALBUILDDIR=/build64
+            echo.LOCALBUILDDIR=/build
             echo.# package installation prefix
             echo.LOCALDESTDIR=/local64
             echo.export LOCALBUILDDIR LOCALDESTDIR
