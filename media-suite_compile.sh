@@ -1694,7 +1694,7 @@ if [[ $compile == "true" ]]; then
     if [[ $x264 == "y" ]]; then
         cd $LOCALBUILDDIR
 
-        do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
+        do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git noDepth
 
         echo "-------------------------------------------------------------------------------"
         echo "compile ffmpeg $bits libs"
