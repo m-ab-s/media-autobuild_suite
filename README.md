@@ -120,7 +120,7 @@ Have fun!
 
 
 
-What The Individual Files Does
+What The Individual Files Do
 --------
 
 media-autobuild_suite.bat
