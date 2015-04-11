@@ -38,8 +38,9 @@ Included Tools And Libraries
 	- libass
 	- libbs2b
 	- libbluray
-	- libdcadec
 	- libcaca
+	- libdcadec
+	- decklink
 	- libilbc
 	- libmodplug
 	- libpng
