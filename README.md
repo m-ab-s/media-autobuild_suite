@@ -40,7 +40,6 @@ Included Tools And Libraries
 	- libbluray
 	- libcaca
 	- libdcadec
-	- decklink
 	- libilbc
 	- libmodplug
 	- libpng
