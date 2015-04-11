@@ -51,15 +51,19 @@ if [ ! -d $gitFolder ]; then
     git clone $gitDepth -b $gitBranch $gitURL $gitFolder
     compile="true"
     cd $gitFolder
+    touch recently_updated
 else
     cd $gitFolder
-    oldHead=`git rev-parse HEAD`
     git reset --quiet --hard @{u}
+    oldHead=`git rev-parse HEAD`
     git pull origin $gitBranch
     newHead=`git rev-parse HEAD`
 
     if [[ "$oldHead" != "$newHead" ]]; then
         compile="true"
+        touch recently_updated
+    elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
+            compile="true"
     fi
 fi
 }
@@ -81,6 +85,9 @@ else
 
     if [[ "$oldRevision" != "$newRevision" ]]; then
         compile="true"
+        touch recently_updated
+    elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
+            compile="true"
     fi
 fi
 }
@@ -103,6 +110,9 @@ else
 
     if [[ "$oldHead" != "$newHead" ]]; then
         compile="true"
+        touch recently_updated
+    elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
+            compile="true"
     fi
 fi
 }
@@ -140,6 +150,8 @@ do_checkIfExist() {
                         fi
                     fi
                 fi
+            else
+                touch build_successful$bits
             fi
             else
                 echo -------------------------------------------------
@@ -165,6 +177,8 @@ do_checkIfExist() {
                         fi
                     fi
                 fi
+            else
+                touch build_successful$bits
             fi
             else
                 echo -------------------------------------------------
@@ -2231,6 +2245,9 @@ if [[ $build64 = "yes" ]]; then
     echo "-------------------------------------------------------------------------------"
     sleep 3
 fi
+
+find /build -maxdepth 2 -name recently_updated -delete
+find /build -maxdepth 2 -name build_successful* -delete
 
 echo -ne "\033]0;compiling done...\007"
 echo
