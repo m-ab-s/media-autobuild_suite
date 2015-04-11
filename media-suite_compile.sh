@@ -1614,7 +1614,14 @@ if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
 		rm -rf nvenc_5.0.1_sdk
 		do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
 		unzip nvenc_5.0.1_sdk.zip
-		cp nvenc_5.0.1_sdk/Samples/common/inc/* $LOCALDESTDIR/include
+		
+		if [[ $build32 = "yes" ]] && [[ ! -f /local32/include/nvEncodeAPI.h ]]; then
+		    cp nvenc_5.0.1_sdk/Samples/common/inc/* /local32/include
+		fi
+		
+		if [[ $build64 = "yes" ]] && [[ ! -f /local64/include/nvEncodeAPI.h ]]; then
+		    cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
+		fi
 	
         if [[ ! -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then	
 		    echo -------------------------------------------------
