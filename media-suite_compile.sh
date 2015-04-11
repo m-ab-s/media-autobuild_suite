@@ -1636,6 +1636,7 @@ if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
             echo "install nvenc done..."
             echo -------------------------------------------------
             echo -
+			rm nvenc_5.0.1_sdk.zip
         fi
     fi
 fi
