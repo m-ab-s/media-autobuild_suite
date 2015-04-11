@@ -1549,6 +1549,33 @@ fi
 
 cd $LOCALBUILDDIR
 
+if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
+    echo -------------------------------------------------
+    echo "frei0r is already compiled"
+    echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile frei0r $bits\007"
+        rm -rf frei0r-plugins-1.4
+        do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz" frei0r-plugins-1.4.tar.gz
+        tar xf frei0r-plugins-1.4.tar.gz
+        rm frei0r-plugins-1.4.tar.gz
+        cd frei0r-plugins-1.4
+
+        sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
+
+        mkdir build
+        cd build
+
+        cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
+
+        make -j $cpuCount
+        make all install
+
+        do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
+fi
+
+cd $LOCALBUILDDIR
+
 if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
     echo -------------------------------------------------
     echo "DeckLinkAPI is already downloaded"
@@ -1575,31 +1602,35 @@ if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
         fi
 fi
 
-cd $LOCALBUILDDIR
+if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
+    cd $LOCALBUILDDIR
 
-if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
-    echo -------------------------------------------------
-    echo "frei0r is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile frei0r $bits\007"
-        rm -rf frei0r-plugins-1.4
-        do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz" frei0r-plugins-1.4.tar.gz
-        tar xf frei0r-plugins-1.4.tar.gz
-        rm frei0r-plugins-1.4.tar.gz
-        cd frei0r-plugins-1.4
-
-        sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
-
-        mkdir build
-        cd build
-
-        cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
-
-        make -j $cpuCount
-        make all install
-
-        do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
+    if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
+        echo -------------------------------------------------
+        echo "nvenc is already installed"
+        echo -------------------------------------------------
+        else
+		echo -ne "\033]0;install nvenc $bits\007"
+		rm -rf nvenc_5.0.1_sdk
+		do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
+		unzip nvenc_5.0.1_sdk.zip
+		cp nvenc_5.0.1_sdk/Samples/common/inc/* $LOCALDESTDIR/include
+	
+        if [[ ! -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then	
+		    echo -------------------------------------------------
+            echo "install nvenc failed..."
+            echo "if you know there is no dependences hit enter for continue it,"
+            echo "or run script again"
+            read -p ""
+            sleep 5
+        else
+            echo -
+            echo -------------------------------------------------
+            echo "install nvenc done..."
+            echo -------------------------------------------------
+            echo -
+        fi
+    fi
 fi
 
 #------------------------------------------------
@@ -1850,7 +1881,7 @@ cd $LOCALBUILDDIR
 
 if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     if [[ $nonfree = "y" ]]; then
-        extras="--enable-nonfree --enable-libfdk-aac"
+        extras="--enable-nonfree --enable-libfdk-aac --enable-nvenc"
     else
         extras=""
     fi
