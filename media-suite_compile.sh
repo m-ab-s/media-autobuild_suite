@@ -317,7 +317,7 @@ if [[ $compile == "true" ]]; then
         ./autogen.sh -V
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-icu=no --with-glib=no --with-gobject=no
@@ -570,7 +570,7 @@ if [[ $compile == "true" ]]; then
         autoreconf -fiv
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
@@ -834,7 +834,7 @@ if [[ $compile == "true" ]]; then
         ./autogen.sh
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
@@ -1033,7 +1033,7 @@ if [[ $compile == "true" ]]; then
         autoreconf -i
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
@@ -1168,7 +1168,7 @@ if [[ $compile == "true" ]]; then
         rm -rf $LOCALDESTDIR/include/vpx
         rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
         rm -f $LOCALDESTDIR/lib/libvpx.a
-        make clean
+        make distclean
     fi
 
     if [[ $bits = "64bit" ]]; then
@@ -1233,7 +1233,7 @@ if [[ $compile == "true" ]]; then
         autoreconf -fiv
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc
@@ -1259,7 +1259,7 @@ if [[ $compile == "true" ]]; then
         autoreconf -fiv
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
@@ -1285,7 +1285,7 @@ if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
@@ -1308,7 +1308,7 @@ do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsy
 if [[ $compile == "true" ]]; then
     if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
         make uninstall
-        make clean
+        make distclean
     fi
 
     ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
@@ -1330,13 +1330,11 @@ cd $LOCALBUILDDIR
 do_git "https://github.com/libass/libass.git" libass-git
 
 if [[ $compile == "true" ]]; then
-    if [ -f $LOCALDESTDIR/lib/libass.a ]; then
-        make uninstall
-        make clean
-    fi
-
     if [[ ! -f "configure" ]]; then
-        ./autogen.sh
+        autoreconf -fiv
+    else
+        make uninstall
+        make distclean
     fi
 
     CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
