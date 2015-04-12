@@ -464,7 +464,7 @@ if [[ $compile == "true" ]]; then
     if [[ -f dcadec.exe ]]; then
         make clean
     fi
-	
+    
     make CONFIG_WINDOWS=1 LDFLAGS=-lm
     make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
 
@@ -820,14 +820,16 @@ do_git "https://github.com/nu774/fdkaac" bin-fdk-aac-git
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         autoreconf -i
+    else
+        make uninstall
+        make distclean
     fi
-
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
     make -j $cpuCount
     make install
 
-    do_checkIfExist bin-fdk-aac bin-audio/fdkaac.exe
+    do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     compile="false"
 else
     echo -------------------------------------------------
@@ -1014,7 +1016,7 @@ if [[ $compile == "true" ]]; then
         mkdir build
         cd build
     fi
-	
+    
     cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
 
     make -j $cpuCount
@@ -2204,6 +2206,9 @@ find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
 find $LOCALBUILDDIR -maxdepth 2 -name build_successful* -delete
 
 if [[ $deleteSource = "y" ]]; then
+    echo -ne "\033]0;delete source folders\007"
+    echo
+    echo "delete source folders..."
     find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" -exec rm -rf {} \;
 fi
 
