@@ -112,7 +112,7 @@ else
         compile="true"
         touch recently_updated
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
-            compile="true"
+        compile="true"
     fi
 fi
 }
@@ -160,7 +160,7 @@ do_checkIfExist() {
         echo "build $packetName done..."
         echo -------------------------------------------------
         echo -
-        touch build_successful$bits
+        touch $LOCALBUILDDIR/$packetName/build_successful$bits
         cd $LOCALBUILDIR
     else
         echo -------------------------------------------------
