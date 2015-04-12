@@ -54,8 +54,8 @@ if [ ! -d $gitFolder ]; then
     touch recently_updated
 else
     cd $gitFolder
+	oldHead=`git rev-parse HEAD`
     git reset --quiet --hard @{u}
-    oldHead=`git rev-parse HEAD`
     git pull origin $gitBranch
     newHead=`git rev-parse HEAD`
 
@@ -63,7 +63,7 @@ else
         compile="true"
         touch recently_updated
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
-            compile="true"
+        compile="true"
     fi
 fi
 }
@@ -136,7 +136,7 @@ do_wget_tar() {
     # rename archive to what the directory should look like, not what wget outputs
     local archive="$2"
     if [[ -z $archive ]]; then
-        archive=`expr $URL : '.*/(.*\.tar\.\(gz\|bz2\|xz\)\)'`
+        archive=`expr $URL : '.*/\(.*\.tar\.\(gz\|bz2\|xz\)\)'`
     fi
     local dirName=`expr $archive : '\(.*\)\.tar\.\(gz\|bz2\|xz\)'`
 
