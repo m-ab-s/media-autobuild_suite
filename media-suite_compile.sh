@@ -824,6 +824,7 @@ if [[ $compile == "true" ]]; then
         make uninstall
         make distclean
     fi
+    
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
     make -j $cpuCount
@@ -2209,6 +2210,7 @@ if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;delete source folders\007"
     echo
     echo "delete source folders..."
+    echo
     find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" -exec rm -rf {} \;
 fi
 
