@@ -121,20 +121,36 @@ fi
 do_wget() {
 local URL="$1"
 local archive="$2"
-local dirName=`expr $URL : '.*/\(.*\)\.tar\.\(gz\|bz2\|xz\)'`
-echo $archive
+
 if [[ -z $archive ]]; then
     if [[ -z $dirName ]]; then
         wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL
-    else
-        if [[ ! -d $dirName ]]; then
-            wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O - | tar -xaf -
-        fi
-        cd $dirName
     fi
 else
     wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
 fi
+}
+
+do_wget_tar() {
+    local URL="$1"
+    # rename archive to what the directory should look like, not what wget outputs
+    local archive="$2"
+    if [[ -z $archive ]]; then
+        archive=`expr $URL : '.*/(.*\.tar\.\(gz\|bz2\|xz\)\)'`
+    fi
+    local dirName=`expr $archive : '\(.*\)\.tar\.\(gz\|bz2\|xz\)'`
+
+    # if dir exists and no builds were successful, better to redownload
+    if [[ -d $dirName ]] && [[ ! -f $dirName/build_successful* ]]; then
+        rm -rf $dirName
+    fi
+
+    if [[ ! -d $dirName ]]; then
+        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
+        tar -xaf $archive
+        rm -f $archive
+    fi
+    cd $dirName
 }
 
 # check if compiled file exist
@@ -187,7 +203,7 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
     else
         echo -ne "\033]0;compile openjpeg $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
+        do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
         cmake -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
 
@@ -207,7 +223,7 @@ if [[ `pkg-config --modversion freetype2` = "17.4.11" ]]; then
     else
         echo -ne "\033]0;compile freetype $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
+        do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-harfbuzz=no
         make -j $cpuCount
@@ -225,7 +241,7 @@ if [[ `pkg-config --modversion fontconfig` = "2.11.92" ]]; then
     else
         echo -ne "\033]0;compile fontconfig $bits\007"
 
-        do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
+        do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
         sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' fontconfig.pc
@@ -245,7 +261,7 @@ if [[ `pkg-config --modversion fribidi` = "0.19.6" ]]; then
     else
         echo -ne "\033]0;compile fribidi $bits\007"
 
-        do_wget "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
+        do_wget_tar "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no --with-glib=no
         make -j $cpuCount
@@ -283,7 +299,7 @@ if [[ `ragel --version | grep "version 6.9"` ]]; then
     else
         echo -ne "\033]0;compile ragel $bits\007"
 
-        do_wget "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
+        do_wget_tar "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global
         make -j $cpuCount
@@ -326,7 +342,7 @@ if [[ `pkg-config --modversion sdl` = "1.2.15" ]]; then
     else
         echo -ne "\033]0;compile SDL $bits\007"
 
-        do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
+        do_wget_tar "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
 
         CFLAGS="-DDECLSPEC=" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
         make -j $cpuCount
@@ -350,7 +366,7 @@ if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
     else
         echo -ne "\033]0;compile libgcrypt $bits\007"
 
-        do_wget "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
+        do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
 
         if [[ "$bits" = "32bit" ]]; then
             ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
@@ -372,7 +388,7 @@ if [[ `pkg-config --modversion nettle` = "2.7.1" ]]; then
     else
         echo -ne "\033]0;compile nettle $bits\007"
 
-        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
+        do_wget_tar "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
 
@@ -391,7 +407,7 @@ if [[ `pkg-config --modversion gnutls` = "3.3.14" ]]; then
     else
         echo -ne "\033]0;compile gnutls $bits\007"
 
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.14.tar.xz"
+        do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.14.tar.xz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
 
@@ -465,7 +481,7 @@ if [[ `pkg-config --modversion libxml-2.0` = "2.9.1" ]]; then
     else
         echo -ne "\033]0;compile libxml2 $bits\007"
 
-        do_wget "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
+        do_wget_tar "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --enable-static
 
@@ -483,11 +499,8 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile libgnurx $bits\007"
-        rm -rf mingw-libgnurx-2.5.1
-        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1-src.tar.gz
-        tar xf mingw-libgnurx-2.5.1-src.tar.gz
-        rm mingw-libgnurx-2.5.1-src.tar.gz
-        cd mingw-libgnurx-2.5.1
+
+        do_wget_tar "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
 
         rm -f configure.ac
 
@@ -518,7 +531,7 @@ if [[ `file --version | grep "file.exe-5.22"` ]]; then
     else
         echo -ne "\033]0;compile file $bits\007"
 
-        do_wget "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
+        do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
 
@@ -633,11 +646,8 @@ if [[ $mkv = "y" ]]; then
         echo -------------------------------------------------
         else
             echo -ne "\033]0;compile wxWidgets $bits\007"
-            rm -rf wxWidgets-3.0.2
-            do_wget "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2" wxWidgets-3.0.2.tar.bz2
-            tar xf wxWidgets-3.0.2.tar.bz2
-            rm wxWidgets-3.0.2.tar.bz2
-            cd wxWidgets-3.0.2
+
+            do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
 
             CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
@@ -669,7 +679,7 @@ if [[ `pkg-config --modversion theora` = "1.1.1" ]]; then
     else
         echo -ne "\033]0;compile libtheora $bits\007"
 
-        do_wget "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
+        do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-examples
 
@@ -688,7 +698,7 @@ if [[ `pkg-config --modversion speex` = "1.2rc1" ]]; then
     else
         echo -ne "\033]0;compile speex $bits\007"
 
-        do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
+        do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no
 
@@ -707,7 +717,7 @@ if [[ `pkg-config --define-variable=PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig
     else
         echo -ne "\033]0;compile flac $bits\007"
 
-        do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
+        do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
 
@@ -726,7 +736,7 @@ if [[ `pkg-config --modversion vo-aacenc` = "0.1.3" ]]; then
     else
         echo -ne "\033]0;compile vo-aacenc $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
+        do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
@@ -745,7 +755,7 @@ if [[ `pkg-config --modversion opencore-amrnb` = "0.1.3" ]]; then
     else
         echo -ne "\033]0;compile opencore-amr $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
+        do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
@@ -764,7 +774,7 @@ if [[ `pkg-config --modversion vo-amrwbenc` = "0.1.2" ]]; then
     else
         echo -ne "\033]0;compile vo-amrwbenc $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+        do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
@@ -832,7 +842,7 @@ if [[ $mplayer = "y" ]] && [[ $nonfree = "y" ]]; then
         else
             echo -ne "\033]0;compile faac $bits\007"
 
-            do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
+            do_wget_tar "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
 
             sh bootstrap
 
@@ -855,7 +865,7 @@ if [[ `pkg-config --modversion opus` = "1.1" ]]; then
     else
         echo -ne "\033]0;compile opus $bits\007"
 
-        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
+        do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
         patch -p0 < opus11.patch
@@ -877,7 +887,7 @@ if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
     else
         echo -ne "\033]0;compile opus-tools $bits\007"
 
-        do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
+        do_wget_tar "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
@@ -898,7 +908,7 @@ if [[ $mp4box = "y" ]]; then
         else
             echo -ne "\033]0;compile a52dec $bits\007"
 
-            do_wget "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
+            do_wget_tar "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
 
             ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
@@ -917,7 +927,7 @@ if [[ $mp4box = "y" ]]; then
         else
             echo -ne "\033]0;compile libmad $bits\007"
 
-            do_wget "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+            do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 
             ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
 
@@ -938,7 +948,7 @@ if [[ `pkg-config --modversion soxr` = "0.1.1" ]]; then
     else
         echo -ne "\033]0;compile soxr-0.1.1 $bits\007"
 
-        do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
+        do_wget_tar "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 
         sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
 
@@ -1042,11 +1052,8 @@ if [[ `pkg-config --modversion twolame` = "0.3.13" ]]; then
     echo -------------------------------------------------
     else 
         echo -ne "\033]0;compile twolame $bits\007"
-        rm -rf twolame-0.3.13
-        do_wget http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz/download twolame-0.3.13.tar.gz
-        tar xf twolame-0.3.13.tar.gz
-        rm twolame-0.3.13.tar.gz
-        cd twolame-0.3.13
+
+        do_wget_tar "http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz"
         
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
         
@@ -1065,7 +1072,7 @@ if [[ `pkg-config --modversion libbs2b` = "3.1.0" ]]; then
     else
         echo -ne "\033]0;compile libbs2b-3.1.0 $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
+        do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
@@ -1399,7 +1406,7 @@ if [[ `pkg-config --modversion caca` = "0.99.beta19" ]]; then
     else
         echo -ne "\033]0;compile libcaca $bits\007"
 
-        do_wget "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
+        do_wget_tar "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
 
         cd caca
 
@@ -1431,11 +1438,8 @@ if [[ `pkg-config --modversion zvbi-0.2` = "0.2.35" ]]; then
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile libzvbi $bits\007"
-        rm -rf zvbi-0.2.35
-        do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download" zvbi-0.2.35.tar.bz2
-        tar xf zvbi-0.2.35.tar.bz2
-        rm zvbi-0.2.35.tar.bz2
-        cd zvbi-0.2.35
+
+        do_wget_tar "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
 
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
@@ -1462,11 +1466,8 @@ if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile frei0r $bits\007"
-        rm -rf frei0r-plugins-1.4
-        do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz" frei0r-plugins-1.4.tar.gz
-        tar xf frei0r-plugins-1.4.tar.gz
-        rm frei0r-plugins-1.4.tar.gz
-        cd frei0r-plugins-1.4
+
+        do_wget_tar "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
 
         sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
 
@@ -1772,11 +1773,7 @@ if [[ $ffmbc = "y" ]]; then
                 extras=""
             fi
 
-            rm -rf FFmbc-0.7.2
-            do_wget "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download" FFmbc-0.7.2.tar.bz2
-            tar xf FFmbc-0.7.2.tar.bz2
-            rm FFmbc-0.7.2.tar.bz2
-            cd FFmbc-0.7.2
+            do_wget_tar "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download" FFmbc-0.7.2.tar.bz2
 
             if [[ $bits = "32bit" ]]; then
                 arch='x86'
