@@ -1001,14 +1001,21 @@ do_git "https://bitbucket.org/mpyne/game-music-emu.git" gme-git
 
 if [[ $compile == "true" ]]; then
 
-    if [[ -d $LOCALDESTDIR/include/gme ]]; then
-        rm -rf $LOCALDESTDIR/include/gme
-        rm -f $LOCALDESTDIR/lib/libgme.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
+    if [ -d "build" ]; then
+        cd build
+        if [[ -d $LOCALDESTDIR/include/gme ]]; then
+            rm -rf $LOCALDESTDIR/include/gme
+            rm -f $LOCALDESTDIR/lib/libgme.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
+        fi
         make clean
+        rm -rf *
+    else
+        mkdir build
+        cd build
     fi
-
-    cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
+	
+    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
 
     make -j $cpuCount
     make install
