@@ -179,6 +179,7 @@ do_checkIfExist() {
         touch $LOCALBUILDDIR/$packetName/build_successful$bits
         cd $LOCALBUILDIR
     else
+        rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
         echo -------------------------------------------------
         echo "Build of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
