@@ -14,6 +14,7 @@ while true; do
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
 --other265=* ) other265="${1#*=}"; shift ;;
+--mediainfo=* ) mediainfo="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1372,12 +1373,13 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
         do_checkIfExist xavs libxavs.a
 fi
 
-cd $LOCALBUILDDIR
+if [ $mediainfo = "y" ]; then
+    cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
-    echo -------------------------------------------------
-    echo "MediaInfo_CLI is already compiled"
-    echo -------------------------------------------------
+    if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
+        echo -------------------------------------------------
+        echo "MediaInfo_CLI is already compiled"
+        echo -------------------------------------------------
     else
         echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 
@@ -1443,6 +1445,7 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
         cp mediainfo.exe $LOCALDESTDIR/bin-video/mediainfo.exe
 
         do_checkIfExist mediainfo bin-video/mediainfo.exe
+    fi
 fi
 
 cd $LOCALBUILDDIR
