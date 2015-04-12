@@ -461,6 +461,10 @@ if [[ $compile == "true" ]]; then
         make clean
     fi
 
+    if [[ -f dcadec.exe ]]; then
+        make clean
+    fi
+	
     make CONFIG_WINDOWS=1 LDFLAGS=-lm
     make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
 
