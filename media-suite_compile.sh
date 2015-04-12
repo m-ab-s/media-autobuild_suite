@@ -54,7 +54,7 @@ if [ ! -d $gitFolder ]; then
     touch recently_updated
 else
     cd $gitFolder
-	oldHead=`git rev-parse HEAD`
+    oldHead=`git rev-parse HEAD`
     git reset --quiet --hard @{u}
     git pull origin $gitBranch
     newHead=`git rev-parse HEAD`
