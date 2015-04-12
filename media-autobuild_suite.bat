@@ -1182,6 +1182,6 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --x264=%x264% --x265=%x265% --other265=%other265% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
