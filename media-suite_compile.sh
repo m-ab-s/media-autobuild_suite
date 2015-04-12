@@ -1761,7 +1761,7 @@ if [[ $compile == "true" ]]; then
     make -j $cpuCount
     make install
 
-    do_checkIfExist x265-git libx265.a
+    do_checkIfExist x265-hg libx265.a
     compile="false"
     buildFFmpeg="true"
 else
