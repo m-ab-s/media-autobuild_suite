@@ -154,7 +154,7 @@ do_checkIfExist() {
         fi
     fi
     
-    if [[ buildSuccess = "y" ]]; then
+    if [[ $buildSuccess = "y" ]]; then
         echo -
         echo -------------------------------------------------
         echo "build $packetName done..."
