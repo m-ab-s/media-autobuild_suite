@@ -152,16 +152,6 @@ do_checkIfExist() {
         echo "build $packetName done..."
         echo -------------------------------------------------
         echo -
-        if [[ $deleteSource = "y" ]]; then
-            if [[ ! "${packetName: -4}" = "-git" ]]; then
-                if [[ ! "${packetName: -3}" = "-hg" ]]; then
-                    if [[ ! "${packetName: -4}" = "-svn" ]]; then
-                        cd $LOCALBUILDDIR
-                        rm -rf $LOCALBUILDDIR/$packetName
-                    fi
-                fi
-            fi
-        fi
         touch build_successful$bits
         cd $LOCALBUILDIR
     else
@@ -2267,8 +2257,12 @@ if [[ $build64 = "yes" ]]; then
     sleep 3
 fi
 
-find /build -maxdepth 2 -name recently_updated -delete
-find /build -maxdepth 2 -name build_successful* -delete
+find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
+find $LOCALBUILDDIR -maxdepth 2 -name build_successful* -delete
+
+if [[ $deleteSource = "y" ]]; then
+    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" -exec rm -rf {} \;
+fi
 
 echo -ne "\033]0;compiling done...\007"
 echo
