@@ -440,7 +440,7 @@ if [[ $compile == "true" ]]; then
 
     sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 
-    do_checkIfExist rtmpdump librtmp.a
+    do_checkIfExist rtmpdump-git librtmp.a
     compile="false"
 else
     echo -------------------------------------------------
