@@ -1256,7 +1256,7 @@ cd $LOCALBUILDDIR
 do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsystem
 
 if [[ $compile == "true" ]]; then
-    if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
+    if [ -f utv_core/libutvideo.a ]; then
         make uninstall
         make distclean
     fi
