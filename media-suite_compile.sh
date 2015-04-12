@@ -318,11 +318,11 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         ./autogen.sh -V
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-icu=no --with-glib=no --with-gobject=no
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -554,12 +554,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -797,12 +797,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         ./autogen.sh
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -822,12 +822,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         autoreconf -i
     else
-        make uninstall
         make distclean
     fi
     
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -981,12 +981,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         autoreconf -i
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -1042,12 +1042,12 @@ if [[ $compile == "true" ]]; then
         sed -i "s/python/python2/" autogen.sh
         ./autogen.sh -V
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -1182,12 +1182,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -1208,17 +1208,17 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
         make distclean
     fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
 
-        make -j $cpuCount
-        make install
+    make uninstall
+    make -j $cpuCount
+    make install
 
-        do_checkIfExist libdvdnav-git libdvdnav.a
-        compile="false"
+    do_checkIfExist libdvdnav-git libdvdnav.a
+    compile="false"
 else
     echo -------------------------------------------------
     echo "libdvdnav-git is already up to date"
@@ -1234,12 +1234,12 @@ if [[ $compile == "true" ]]; then
 if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
         make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -1257,12 +1257,12 @@ do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsy
 
 if [[ $compile == "true" ]]; then
     if [ -f $LOCALDESTDIR/lib/libutvideo.a ]; then
-        make uninstall
         make distclean
     fi
 
     ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 
+    make uninstall
     make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
     make install RANLIBX="${RANLIB-ranlib}"
 
@@ -1283,12 +1283,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
         make distclean
     fi
 
     CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
+    make uninstall
     make -j $cpuCount
     make install
 
@@ -1576,7 +1576,6 @@ if [[ $mp4box = "y" ]]; then
     if [[ $compile == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
             rm $LOCALDESTDIR/bin-video/MP4Box.exe
-            make uninstall
             make clean
         fi
 
@@ -1585,6 +1584,7 @@ if [[ $mp4box = "y" ]]; then
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -fPIC//g' config.mak
         fi
+        make uninstall
 
         cd src
         make -j $cpuCount
@@ -1975,7 +1975,6 @@ if [[ $mplayer = "y" ]]; then
 
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
-            make uninstall
             make distclean
         fi
 
@@ -1996,6 +1995,7 @@ if [[ $mplayer = "y" ]]; then
 
         CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 
+        make uninstall
         make -j $cpuCount
         make install
 
