@@ -77,6 +77,7 @@ if [ ! -d $svnFolder ]; then
     svn checkout $svnURL $svnFolder
     compile="true"
     cd $svnFolder
+	touch recently_updated
 else
     cd $svnFolder
     oldRevision=`svnversion`
@@ -101,6 +102,7 @@ if [ ! -d $hgFolder ]; then
     hg clone $hgURL $hgFolder
     compile="true"
     cd $hgFolder
+	touch recently_updated
 else
     cd $hgFolder
     oldHead=`hg id --id`
