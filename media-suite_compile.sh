@@ -1121,6 +1121,9 @@ if [[ $compile == "true" ]]; then
         rm -rf $LOCALDESTDIR/include/vpx
         rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
         rm -f $LOCALDESTDIR/lib/libvpx.a
+    fi
+
+    if [ -f libvpx.a ]; then
         make distclean
     fi
 
