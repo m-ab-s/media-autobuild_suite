@@ -62,6 +62,7 @@ else
     if [[ "$oldHead" != "$newHead" ]]; then
         compile="true"
         touch recently_updated
+        rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
         compile="true"
     fi
@@ -87,6 +88,7 @@ else
     if [[ "$oldRevision" != "$newRevision" ]]; then
         compile="true"
         touch recently_updated
+        rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
         compile="true"
     fi
@@ -113,6 +115,7 @@ else
     if [[ "$oldHead" != "$newHead" ]]; then
         compile="true"
         touch recently_updated
+        rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
         compile="true"
     fi
