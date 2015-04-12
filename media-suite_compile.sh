@@ -437,7 +437,7 @@ do_git "https://github.com/foo86/dcadec.git" libdcadec-git
 
 if [[ $compile == "true" ]]; then
 
-    if [[ -d $LOCALDESTDIR/include/gme ]]; then
+    if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
         rm -rf $LOCALDESTDIR/include/libdcadec
         rm -f $LOCALDESTDIR/lib/libdcadec.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
@@ -449,7 +449,6 @@ if [[ $compile == "true" ]]; then
     make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
 
     do_checkIfExist libdcadec-git libdcadec.a
-
     compile="false"
 else
     echo -------------------------------------------------
