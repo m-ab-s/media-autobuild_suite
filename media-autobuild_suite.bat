@@ -1001,6 +1001,13 @@ if %build32%==yes (
 
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
 
+for /f "tokens=2 delims=/" %%b in ('findstr /i build32 %instdir%\%msys2%\etc\fstab.') do set searchRes=oldbuild
+
+if "%searchRes%"=="oldbuild" (
+    del %instdir%\%msys2%\etc\fstab.
+    GOTO writeFstab
+    )
+
 for /f "tokens=2 delims=/" %%a in ('findstr /i %searchStr% %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
 
 if "%searchRes%"=="local32" GOTO writeProfile32
