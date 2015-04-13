@@ -51,8 +51,15 @@ echo -ne "\033]0;compile $gitFolder $bits\007"
 if [ ! -d $gitFolder-git ]; then
     git clone $gitDepth -b $gitBranch $gitURL $gitFolder-git
     compile="true"
-    cd $gitFolder-git
-    touch recently_updated
+    if [[ -d $gitFolder-git ]]; then
+        cd $gitFolder-git
+        touch recently_updated
+    else
+        echo "$gitFolder git seems to be down"
+        echo "Try again later or <Enter> to continue"
+        read -p "if you're sure nothing depends on it."
+        compile="false"
+    fi
 else
     cd $gitFolder-git
     oldHead=`git rev-parse HEAD`
@@ -83,8 +90,15 @@ echo -ne "\033]0;compile $svnFolder $bits\007"
 if [ ! -d $svnFolder-svn ]; then
     svn checkout $svnURL $svnFolder-svn
     compile="true"
-    cd $svnFolder-svn
-    touch recently_updated
+    if [[ -d $svnFolder-svn ]]; then
+        cd $svnFolder-svn
+        touch recently_updated
+    else
+        echo "$svnFolder svn seems to be down"
+        echo "Try again later or <Enter> to continue"
+        read -p "if you're sure nothing depends on it."
+        compile="false"
+    fi
 else
     cd $svnFolder-svn
     oldRevision=`svnversion`
@@ -114,8 +128,15 @@ echo -ne "\033]0;compile $hgFolder $bits\007"
 if [ ! -d $hgFolder-hg ]; then
     hg clone $hgURL $hgFolder-hg
     compile="true"
-    cd $hgFolder-hg
-    touch recently_updated
+    if [[ -d $hgFolder-hg ]]; then
+        cd $hgFolder-hg
+        touch recently_updated
+    else
+        echo "$hgFolder hg seems to be down"
+        echo "Try again later or <Enter> to continue"
+        read -p "if you're sure nothing depends on it."
+        compile="false"
+    fi
 else
     cd $hgFolder-hg
     oldHead=`hg id --id`
