@@ -2373,14 +2373,17 @@ if [[ $mpv = "y" ]]; then
         python2 ./waf build -j $cpuCount
         python2 ./waf install
 
-        if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
-            mkdir -p $LOCALDESTDIR/bin-video/{mpv,fonts}
-            cd $LOCALDESTDIR/bin-video/mpv
+        if [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
-            cd $LOCALDESTDIR/bin-video/fonts
             do_wget "http://srsfckn.biz/noto-mpv.7z"
-            7z x noto-mpv.7z
+            7z x -ofonts noto-mpv.7z
             rm -f noto-mpv.7z
+        fi
+
+        if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
+            mkdir -p $LOCALDESTDIR/bin-video/mpv
+            cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
+            cp -R fonts $LOCALDESTDIR/bin-video/
         fi
 
         do_checkIfExist mpv-git bin-video/mpv.exe
