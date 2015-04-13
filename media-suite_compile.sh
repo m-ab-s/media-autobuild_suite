@@ -35,6 +35,7 @@ local gitURL="$1"
 local gitFolder="$2"
 local gitDepth="$3"
 local gitBranch="$4"
+local gitCheck="$5"
 
 if [[ $gitDepth == "noDepth" ]]; then
     gitDepth=""
@@ -47,13 +48,13 @@ if [ ! $gitBranch ]; then
 fi
 
 echo -ne "\033]0;compile $gitFolder $bits\007"
-if [ ! -d $gitFolder ]; then
-    git clone $gitDepth -b $gitBranch $gitURL $gitFolder
+if [ ! -d $gitFolder-git ]; then
+    git clone $gitDepth -b $gitBranch $gitURL $gitFolder-git
     compile="true"
-    cd $gitFolder
+    cd $gitFolder-git
     touch recently_updated
 else
-    cd $gitFolder
+    cd $gitFolder-git
     oldHead=`git rev-parse HEAD`
     git reset --quiet --hard @{u}
     git pull origin $gitBranch
@@ -65,6 +66,10 @@ else
         rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
         compile="true"
+    elif [[ ! $gitCheck ]] && [[ ! `pkg-config --modversion $gitFolder` ]]; then
+        compile="true"
+    elif [[ ! -z $gitCheck ]] && [[ ! -f $LOCALDESTDIR/$gitCheck ]]; then
+        compile="true"
     fi
 fi
 }
@@ -73,14 +78,15 @@ fi
 do_svn() {
 local svnURL="$1"
 local svnFolder="$2"
+local svnCheck="$3"
 echo -ne "\033]0;compile $svnFolder $bits\007"
-if [ ! -d $svnFolder ]; then
-    svn checkout $svnURL $svnFolder
+if [ ! -d $svnFolder-svn ]; then
+    svn checkout $svnURL $svnFolder-svn
     compile="true"
-    cd $svnFolder
-	touch recently_updated
+    cd $svnFolder-svn
+    touch recently_updated
 else
-    cd $svnFolder
+    cd $svnFolder-svn
     oldRevision=`svnversion`
     svn update
     newRevision=`svnversion`
@@ -91,6 +97,10 @@ else
         rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
         compile="true"
+    elif [[ ! $svnCheck ]] && [[ ! `pkg-config --modversion $svnFolder` ]]; then
+        compile="true"
+    elif [[ ! -z $svnCheck ]] && [[ ! -f $LOCALDESTDIR/$svnCheck ]]; then
+        compile="true"
     fi
 fi
 }
@@ -99,14 +109,15 @@ fi
 do_hg() {
 local hgURL="$1"
 local hgFolder="$2"
+local hgCheck="$3"
 echo -ne "\033]0;compile $hgFolder $bits\007"
-if [ ! -d $hgFolder ]; then
-    hg clone $hgURL $hgFolder
+if [ ! -d $hgFolder-hg ]; then
+    hg clone $hgURL $hgFolder-hg
     compile="true"
-    cd $hgFolder
-	touch recently_updated
+    cd $hgFolder-hg
+    touch recently_updated
 else
-    cd $hgFolder
+    cd $hgFolder-hg
     oldHead=`hg id --id`
     hg pull
     hg update
@@ -117,6 +128,10 @@ else
         touch recently_updated
         rm -f build_successful*
     elif [[ -f recently_updated ]] && [[ ! -f build_successful$bits ]]; then
+        compile="true"
+    elif [[ ! $hgCheck ]] && [[ ! `pkg-config --modversion $hgFolder` ]]; then
+        compile="true"
+    elif [[ ! -z $hgCheck ]] && [[ ! -f $LOCALDESTDIR/$hgCheck ]]; then
         compile="true"
     fi
 fi
@@ -314,7 +329,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz-git
+do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz
 
 if [[ $compile == "true" ]]; then
 
@@ -425,7 +440,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.ffmpeg.org/rtmpdump" rtmpdump-git
+do_git "git://git.ffmpeg.org/rtmpdump" librtmp
 
 if [[ $compile == "true" ]]; then
     if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
@@ -443,7 +458,7 @@ if [[ $compile == "true" ]]; then
 
     sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 
-    do_checkIfExist rtmpdump-git librtmp.a
+    do_checkIfExist librtmp-git librtmp.a
     compile="false"
 else
     echo -------------------------------------------------
@@ -453,7 +468,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/foo86/dcadec.git" libdcadec-git
+do_git "https://github.com/foo86/dcadec.git" dcadec
 
 if [[ $compile == "true" ]]; then
 
@@ -472,7 +487,7 @@ if [[ $compile == "true" ]]; then
     make CONFIG_WINDOWS=1 LDFLAGS=-lm
     make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
 
-    do_checkIfExist libdcadec-git libdcadec.a
+    do_checkIfExist dcadec-git libdcadec.a
     compile="false"
 else
     echo -------------------------------------------------
@@ -551,7 +566,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/TimothyGu/libilbc.git" libilbc-git
+do_git "https://github.com/TimothyGu/libilbc.git" libilbc
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
@@ -612,7 +627,7 @@ if [[ $mpv == "y" && ! $ffmpeg == "s" ]]; then
 
     cd $LOCALBUILDDIR
 
-    do_git "git://midipix.org/waio" waio-git
+    do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
 
     if [[ $compile == "true" ]]; then
         if [[ $bits = "32bit" ]]; then
@@ -794,7 +809,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac-git
+do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
@@ -819,7 +834,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/nu774/fdkaac" bin-fdk-aac-git
+do_git "https://github.com/nu774/fdkaac" bin-fdk-aac shallow master bin-audio/fdkaac.exe
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
@@ -828,7 +843,7 @@ if [[ $compile == "true" ]]; then
         make uninstall
         make distclean
     fi
-    
+
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
     make -j $cpuCount
@@ -976,7 +991,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.code.sf.net/p/sox/code" sox-git
+do_git "git://git.code.sf.net/p/sox/code" sox
 
 if [[ $compile == "true" ]]; then
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
@@ -1004,7 +1019,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://bitbucket.org/mpyne/game-music-emu.git" gme-git
+do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
 
 if [[ $compile == "true" ]]; then
 
@@ -1027,7 +1042,7 @@ if [[ $compile == "true" ]]; then
     make -j $cpuCount
     make install
 
-    do_checkIfExist gme-git libgme.a
+    do_checkIfExist libgme-git libgme.a
 
     compile="false"
 else
@@ -1038,7 +1053,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/erikd/libsndfile.git" libsndfile-git
+do_git "https://github.com/erikd/libsndfile.git" sndfile
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
@@ -1054,7 +1069,7 @@ if [[ $compile == "true" ]]; then
     make -j $cpuCount
     make install
 
-    do_checkIfExist libsndfile-git libsndfile.a
+    do_checkIfExist sndfile-git libsndfile.a
     compile="false"
 else
     echo -------------------------------------------------
@@ -1114,7 +1129,7 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "https://git.chromium.org/git/webm/libvpx.git" libvpx-git noDepth
+do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
 
 if [[ $compile == "true" ]]; then
     if [ -d $LOCALDESTDIR/include/vpx ]; then
@@ -1141,7 +1156,7 @@ if [[ $compile == "true" ]]; then
     mv $LOCALDESTDIR/bin/vpxdec.exe $LOCALDESTDIR/bin-video
     mv $LOCALDESTDIR/bin/vpxenc.exe $LOCALDESTDIR/bin-video
 
-    do_checkIfExist libvpx-git libvpx.a
+    do_checkIfExist vpx-git libvpx.a
     compile="false"
     buildFFmpeg="true"
 else
@@ -1154,7 +1169,7 @@ if [[ $other265 = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar-git
+    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar shallow master bin-video/kvazaar.exe
 
     if [[ $compile == "true" ]]; then
         cd src
@@ -1181,7 +1196,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/libdvdread.git" libdvdread-git
+do_git "git://git.videolan.org/libdvdread.git" dvdread
 
 if [[ $compile == "true" ]]; then
 
@@ -1197,7 +1212,7 @@ if [[ $compile == "true" ]]; then
     make -j $cpuCount
     make install
 
-    do_checkIfExist libdvdread-git libdvdread.a
+    do_checkIfExist dvdread-git libdvdread.a
     compile="false"
 else
     echo -------------------------------------------------
@@ -1207,7 +1222,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/libdvdnav.git" libdvdnav-git
+do_git "git://git.videolan.org/libdvdnav.git" dvdnav
 
 if [[ $compile == "true" ]]; then
 
@@ -1223,7 +1238,7 @@ if [[ $compile == "true" ]]; then
         make -j $cpuCount
         make install
 
-        do_checkIfExist libdvdnav-git libdvdnav.a
+        do_checkIfExist dvdnav-git libdvdnav.a
         compile="false"
 else
     echo -------------------------------------------------
@@ -1233,7 +1248,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/libbluray.git" libbluray-git
+do_git "git://git.videolan.org/libbluray.git" libbluray
 
 if [[ $compile == "true" ]]; then
 
@@ -1259,7 +1274,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/qyot27/libutvideo.git" libutvideo-git shallow buildsystem
+do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow buildsystem
 
 if [[ $compile == "true" ]]; then
     if [ -f utv_core/libutvideo.a ]; then
@@ -1283,7 +1298,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/libass/libass.git" libass-git
+do_git "https://github.com/libass/libass.git" libass
 
 if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
@@ -1391,7 +1406,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/georgmartius/vid.stab.git" vidstab-git
+do_git "https://github.com/georgmartius/vid.stab.git" vidstab
 
 if [[ $compile == "true" ]]; then
     if [ -d "build" ]; then
@@ -1577,7 +1592,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-    do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" gpac-svn
+    do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" gpac bin-video/MP4Box.exe
 
     if [[ $compile == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
@@ -1616,13 +1631,13 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/x264.git" x264-git noDepth
+do_git "git://git.videolan.org/x264.git" x264 noDepth
 
 if [[ $compile == "true" ]]; then
     if [[ $x264 == "y" ]]; then
         cd $LOCALBUILDDIR
 
-        do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git noDepth
+        do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
         echo "-------------------------------------------------------------------------------"
         echo "compile ffmpeg $bits libs"
@@ -1675,7 +1690,7 @@ if [[ $compile == "true" ]]; then
         sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
         sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
 
-        do_checkIfExist ffmpeg-lib libavcodec.a
+        do_checkIfExist ffmpeg-git libavcodec.a
 
         cd $LOCALBUILDDIR/x264-git
 
@@ -1733,7 +1748,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_hg "https://bitbucket.org/multicoreware/x265" x265-hg
+do_hg "https://bitbucket.org/multicoreware/x265" x265
 
 if [[ $compile == "true" ]]; then
     cd build/msys
@@ -1823,7 +1838,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     echo "compile ffmpeg $bits"
     echo "-------------------------------------------------------------------------------"
 
-    do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git noDepth
+    do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
     if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
@@ -1933,7 +1948,7 @@ fi
 if [[ $bits = "64bit" && $other265 = "y" ]]; then
     cd $LOCALBUILDDIR
 
-    do_git "http://f265.org/repos/f265/" f265-git noDepth
+    do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
 
     if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
         if [ -d "build" ]; then
@@ -1969,7 +1984,7 @@ if [[ $nonfree = "y" ]]; then
 fi
 
 if [[ $mplayer = "y" ]]; then
-    do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer-svn
+    do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer bin-video/mplayer.exe
 
     if [ -d "ffmpeg" ]; then
         cd ffmpeg
@@ -2018,7 +2033,7 @@ cd $LOCALBUILDDIR
 
 if [[ $mpv = "y" ]]; then
 
-    do_git "http://luajit.org/git/luajit-2.0.git" luajit-git noDepth
+    do_git "http://luajit.org/git/luajit-2.0.git" luajit noDepth
 
     if [[ $compile == "true" ]]; then
 
@@ -2043,7 +2058,7 @@ if [[ $mpv = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    do_git "https://github.com/lachs0r/rubberband.git" rubberband-git
+    do_git "https://github.com/lachs0r/rubberband.git" rubberband
 
     if [[ $compile == "true" ]]; then
 
@@ -2064,7 +2079,7 @@ if [[ $mpv = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    do_git "https://github.com/mpv-player/mpv.git" mpv-git
+    do_git "https://github.com/mpv-player/mpv.git" mpv shallow master bin-video/mpv.exe
 
     if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
         if [ ! -f waf ]; then
@@ -2102,7 +2117,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mkv = "y" ]]; then
-    do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix-git
+    do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix shallow master bin-video/mkvtoolnix/bin/mkvmerge.exe
 
     if [[ $compile == "true" ]]; then
         if [[ ! -f ./configure ]]; then
