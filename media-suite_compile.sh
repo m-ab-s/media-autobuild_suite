@@ -227,7 +227,7 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
         if [ -d "build" ]; then
             cd build
             if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
-                rm -rf $LOCALDESTDIR/include/openjpeg-1.5
+                rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
                 rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
                 rm -f $LOCALDESTDIR/lib/openjpeg-1.5
             fi
@@ -889,6 +889,14 @@ if [[ `pkg-config --modversion vo-aacenc` = "0.1.3" ]]; then
 
         do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
 
+        if [[ -f ".libs/libvo-aacenc.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/vo-aacenc" ]]; then
+            rm -rf $LOCALDESTDIR/include/vo-aacenc
+            rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
         make -j $cpuCount
@@ -908,6 +916,14 @@ if [[ `pkg-config --modversion opencore-amrnb` = "0.1.3" ]]; then
 
         do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
+        if [[ -f "amrnb/.libs/libopencore-amrnb.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/opencore-amrnb" ]]; then
+            rm -rf $LOCALDESTDIR/include/opencore-amr{nb,wb}
+            rm -rf $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
         make -j $cpuCount
@@ -926,6 +942,14 @@ if [[ `pkg-config --modversion vo-amrwbenc` = "0.1.2" ]]; then
         echo -ne "\033]0;compile vo-amrwbenc $bits\007"
 
         do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+
+        if [[ -f ".libs/libvo-amrwbenc.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/vo-amrwbenc" ]]; then
+            rm -rf $LOCALDESTDIR/include/vo-amrwbenc
+            rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
@@ -1022,6 +1046,14 @@ if [[ `pkg-config --modversion opus` = "1.1" ]]; then
 
         do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 
+        if [[ -f ".libs/libopus.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
+            rm -rf $LOCALDESTDIR/include/opus
+            rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
+        fi
+
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
         patch -p0 < opus11.patch
 
@@ -1043,6 +1075,13 @@ if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
         echo -ne "\033]0;compile opus-tools $bits\007"
 
         do_wget_tar "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
+
+        if [[ -f "opusenc.exe" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/bin-audio/opusenc.exe" ]]; then
+            rm -rf $LOCALDESTDIR/bin-audio/opus*
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
@@ -1229,6 +1268,14 @@ if [[ `pkg-config --modversion twolame` = "0.3.13" ]]; then
         echo -ne "\033]0;compile twolame $bits\007"
 
         do_wget_tar "http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz"
+
+        if [[ -f "libtwolame\.libs\libtwolame.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/twolame.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
+            rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
+        fi
         
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
         
@@ -1248,6 +1295,14 @@ if [[ `pkg-config --modversion libbs2b` = "3.1.0" ]]; then
         echo -ne "\033]0;compile libbs2b-3.1.0 $bits\007"
 
         do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
+
+        if [[ -f "src/.libs/libbs2b.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/bs2b" ]]; then
+            rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
+            rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
 
@@ -1479,10 +1534,20 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile xavs $bits\007"
-        rm -rf xavs
 
-        svn checkout --trust-server-cert --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
+        if [[ ! -d xavs ]]; then
+            svn checkout --trust-server-cert --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
+        fi
+
         cd xavs
+
+        if [[ -f "libxavs.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/xavs.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/xavs.h
+            rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
+        fi
 
         ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video
 
@@ -1500,21 +1565,27 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
     echo -------------------------------------------------
     else
         echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-        rm -rf mediainfo
 
-        a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
+        if [[ ! -d mediainfo ]]; then
+            a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
 
-        b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
+            b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
 
-        do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
+            do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
 
-        mkdir mediainfo
+            mkdir mediainfo
+            7za x -omediainfo mediainfo.7z
+            rm mediainfo.7z
+        fi
+
         cd mediainfo
-        7za x ../mediainfo.7z
-        rm ../mediainfo.7z
 
         sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
         cd ZenLib/Project/GNU/Library
+
+        if [[ -f ".libs/libzen.a" ]]; then
+            make distclean
+        fi
 
         ./autogen
         ./configure --build=$targetBuild --host=$targetHost
@@ -1526,8 +1597,11 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
 
         cd ../../../../MediaInfoLib/Project/GNU/Library
 
-        ./autogen
+        if [[ -f ".libs/libmediainfo.a" ]]; then
+            make distclean
+        fi
 
+        ./autogen
         ./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
 
         if [[ $bits = "64bit" ]]; then
@@ -1537,6 +1611,11 @@ if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
         make -j $cpuCount
 
         cd ../../../../MediaInfo/Project/GNU/CLI
+
+        if [[ -f "mediainfo.exe" ]]; then
+            make distclean
+        fi
+
         ./autogen
         ./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
 
@@ -1558,7 +1637,8 @@ do_git "https://github.com/georgmartius/vid.stab.git" vidstab
 if [[ $compile == "true" ]]; then
     if [ -d "build" ]; then
         cd build
-        rm -rf $LOCALDESTDIR/include/vid.stab
+        rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
+        rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         make clean
         rm -rf *
     else
@@ -1593,6 +1673,14 @@ if [[ `pkg-config --modversion caca` = "0.99.beta19" ]]; then
 
         cd caca
 
+        if [[ -f ".libs/libcaca.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/caca.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
+            rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
+        fi
+
         sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" string.c
         sed -i "s/#if defined(HAVE_VSNPRINTF_S)//g" string.c
         sed -i "s/vsnprintf_s(buf, bufsize, _TRUNCATE, format, args);//g" string.c
@@ -1623,6 +1711,14 @@ if [[ `pkg-config --modversion zvbi-0.2` = "0.2.35" ]]; then
         echo -ne "\033]0;compile libzvbi $bits\007"
 
         do_wget_tar "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
+
+        if [[ -f "src/.libs/libzvbi.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/libzvbi.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/libzvbi.h
+            rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
+        fi
 
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
@@ -1658,8 +1754,7 @@ if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
             cd build
             if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
                 rm -rf $LOCALDESTDIR/include/frei0r.h
-                rm -f $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
-                rm -f $LOCALDESTDIR/lib/frei0r-1
+                rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
             fi
             make clean
             rm -rf *
@@ -2195,7 +2290,8 @@ if [[ $mpv = "y" ]]; then
     if [[ $compile == "true" ]]; then
 
         if [[ ! -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
-            make PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global uninstall
+            rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit $LOCALDESTDIR/lib/lua
+            rm -rf $LOCALDESTDIR/lib/libluajit-5.1a $LOCALDESTDIR/lib/pkgconfig/luajit.pc
             make clean
         fi
 
@@ -2245,7 +2341,7 @@ if [[ $mpv = "y" ]]; then
             python2 ./waf distclean
             rm waf
             rm -rf .waf-*
-            rm -rf $LOCALDESTDIR/bin-video/mpv
+            rm -rf $LOCALDESTDIR/bin-video/mpv.exe
             python2 ./bootstrap.py
         fi
 
