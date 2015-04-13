@@ -336,11 +336,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         ./autogen.sh -V
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/harfbuzz $LOCALDESTDIR/bin-global/hb-fc-list.exe
+        rm -rf $LOCALDESTDIR/lib/libharfbuzz.{l,}a $LOCALDESTDIR/lib/pkgconfig/harfbuzz.pc
         make distclean
     fi
 
-    ./configure --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --with-icu=no --with-glib=no --with-gobject=no
+    ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no
     make -j $cpuCount
     make install
 
@@ -572,11 +573,12 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/ilbc.h
+        rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
         make distclean
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 
     make -j $cpuCount
     make install
@@ -815,7 +817,8 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         ./autogen.sh
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/fdk-aac
+        rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
         make distclean
     fi
 
@@ -840,7 +843,7 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         autoreconf -i
     else
-        make uninstall
+        rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
         make distclean
     fi
 
@@ -999,7 +1002,8 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f ./configure ]]; then
         autoreconf -i
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
+        rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
         make distclean
     fi
 
@@ -1060,7 +1064,8 @@ if [[ $compile == "true" ]]; then
         sed -i "s/python/python2/" autogen.sh
         ./autogen.sh -V
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
+        rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
         make distclean
     fi
 
@@ -1203,7 +1208,8 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/dvdread
+        rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
         make distclean
     fi
 
@@ -1229,7 +1235,8 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/dvdnav
+        rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
         make distclean
     fi
 
@@ -1255,7 +1262,8 @@ if [[ $compile == "true" ]]; then
 if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/bluray
+        rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
         make distclean
     fi
 
@@ -1278,7 +1286,8 @@ do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow buildsystem
 
 if [[ $compile == "true" ]]; then
     if [ -f utv_core/libutvideo.a ]; then
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/utvideo
+        rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
         make distclean
     fi
 
@@ -1304,7 +1313,8 @@ if [[ $compile == "true" ]]; then
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
-        make uninstall
+        rm -rf $LOCALDESTDIR/include/ass
+        rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
         make distclean
     fi
 
@@ -1597,7 +1607,6 @@ if [[ $mp4box = "y" ]]; then
     if [[ $compile == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
             rm $LOCALDESTDIR/bin-video/MP4Box.exe
-            make uninstall
             make clean
         fi
 
@@ -1996,7 +2005,7 @@ if [[ $mplayer = "y" ]]; then
 
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
-            make uninstall
+            rm -f $LOCALDESTDIR/bin-video/mplayer.exe
             make distclean
         fi
 
