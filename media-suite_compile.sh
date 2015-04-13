@@ -258,6 +258,14 @@ if [[ `pkg-config --modversion freetype2` = "17.4.11" ]]; then
 
         do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
+        if [[ -f "objs/.libs/libfreetype.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/freetype2" ]]; then
+            rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
+            rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-harfbuzz=no
         make -j $cpuCount
         make install
@@ -275,6 +283,14 @@ if [[ `pkg-config --modversion fontconfig` = "2.11.92" ]]; then
         echo -ne "\033]0;compile fontconfig $bits\007"
 
         do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
+
+        if [[ -f "src/.libs/libfontconfig.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/fontconfig" ]]; then
+            rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
+            rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
         sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' fontconfig.pc
@@ -295,6 +311,14 @@ if [[ `pkg-config --modversion fribidi` = "0.19.6" ]]; then
         echo -ne "\033]0;compile fribidi $bits\007"
 
         do_wget_tar "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
+
+        if [[ -f "lib/.libs/libfribidi.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/fribidi" ]]; then
+            rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi*
+            rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no --with-glib=no
         make -j $cpuCount
@@ -333,6 +357,13 @@ if [[ `ragel --version | grep "version 6.9"` ]]; then
         echo -ne "\033]0;compile ragel $bits\007"
 
         do_wget_tar "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
+
+        if [[ -f "ragel/ragel.exe" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/bin-global/ragel.exe" ]]; then
+            rm -rf $LOCALDESTDIR/bin-global/ragel.exe
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global
         make -j $cpuCount
@@ -378,6 +409,14 @@ if [[ `pkg-config --modversion sdl` = "1.2.15" ]]; then
 
         do_wget_tar "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
 
+        if [[ -f "build/.libs/libSDL.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/SDL" ]]; then
+            rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
+            rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
+        fi
+
         CFLAGS="-DDECLSPEC=" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
         make -j $cpuCount
         make install
@@ -402,6 +441,14 @@ if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
 
         do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
 
+        if [[ -f "src/.libs/libgcrypt.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/libgcrypt.h $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
+            rm -rf $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+        fi
+
         if [[ "$bits" = "32bit" ]]; then
             ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
         else
@@ -424,6 +471,14 @@ if [[ `pkg-config --modversion nettle` = "2.7.1" ]]; then
 
         do_wget_tar "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
 
+        if [[ -f "libnettle.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/nettle" ]]; then
+            rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/nettle-*.exe
+            rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
 
         make -j $cpuCount
@@ -442,6 +497,14 @@ if [[ `pkg-config --modversion gnutls` = "3.3.14" ]]; then
         echo -ne "\033]0;compile gnutls $bits\007"
 
         do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.14.tar.xz"
+
+        if [[ -f "lib/.libs/libgnutls.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/gnutls" ]]; then
+            rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/bin-global/gnutls-*.exe
+            rm -rf $LOCALDESTDIR/lib/libgnutls* $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
 
@@ -466,6 +529,8 @@ if [[ $compile == "true" ]]; then
         rm $LOCALDESTDIR/bin-video/rtmpdump.exe $LOCALDESTDIR/bin-video/rtmpsuck.exe $LOCALDESTDIR/bin-video/rtmpsrv.exe $LOCALDESTDIR/bin-video/rtmpgw.exe
         rm $LOCALDESTDIR/man/man1/rtmpdump.1
         rm $LOCALDESTDIR/man/man8/rtmpgw.8
+    fi
+    if [[ -f "librtmp/librtmp.a" ]]; then
         make clean
     fi
 
@@ -492,7 +557,6 @@ if [[ $compile == "true" ]]; then
         rm -f $LOCALDESTDIR/lib/libdcadec.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
         rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
-        make clean
     fi
 
     if [[ -f dcadec.exe ]]; then
@@ -521,6 +585,15 @@ if [[ `pkg-config --modversion libxml-2.0` = "2.9.1" ]]; then
 
         do_wget_tar "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
 
+        if [[ -f ".libs/libxml2.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/libxml2" ]]; then
+            rm -rf $LOCALDESTDIR/include/libxml2 $LOCALDESTDIR/bin-global/xml*
+            rm -rf $LOCALDESTDIR/lib/libxml2.{l,}a $LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc
+            rm -rf $LOCALDESTDIR/lib/xml2Conf.sh
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --enable-static
 
         make -j $cpuCount
@@ -540,7 +613,14 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
 
         do_wget_tar "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
 
-        rm -f configure.ac
+        if [[ -f ".libs/libgnurx.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
+            rm -rf $LOCALDESTDIR/lib/libgnurx.{l,}a
+        fi
+
+        rm -f configure.ac Makefile.am
 
         do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-Makefile.am" Makefile.am
         do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-configure.ac" configure.ac
@@ -570,6 +650,14 @@ if [[ `file --version | grep "file.exe-5.22"` ]]; then
         echo -ne "\033]0;compile file $bits\007"
 
         do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
+
+        if [[ -f "src/.libs/libmagic.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/lib/libmagic.a" ]]; then
+            rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
+            rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
 
@@ -720,6 +808,14 @@ if [[ `pkg-config --modversion theora` = "1.1.1" ]]; then
 
         do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 
+        if [[ -f "lib/.libs/libtheora.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/theora" ]]; then
+            rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
+            rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-examples
 
         make -j $cpuCount
@@ -739,6 +835,14 @@ if [[ `pkg-config --modversion speex` = "1.2rc1" ]]; then
 
         do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
 
+        if [[ -f "libspeex/.libs/libspeex.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/speex" ]]; then
+            rm -rf $LOCALDESTDIR/include/speex $LOCALDESTDIR/bin-audio/speex{enc,dec}.exe
+            rm -rf $LOCALDESTDIR/lib/libspeex{,dsp}.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex{,dsp}.pc
+        fi
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no
 
         make -j $cpuCount
@@ -757,6 +861,14 @@ if [[ `pkg-config --define-variable=PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig
         echo -ne "\033]0;compile flac $bits\007"
 
         do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
+
+        if [[ -f "src/libFLAC/.libs/libFLAC.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/FLAC" ]]; then
+            rm -rf $LOCALDESTDIR/include/FLAC{,++} $LOCALDESTDIR/bin-audio/{meta,}flac.exe
+            rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
+        fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
 
