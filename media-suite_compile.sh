@@ -224,7 +224,21 @@ if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
 
         do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
-        cmake -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
+        if [ -d "build" ]; then
+            cd build
+            if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
+                rm -rf $LOCALDESTDIR/include/openjpeg-1.5
+                rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
+                rm -f $LOCALDESTDIR/lib/openjpeg-1.5
+            fi
+            make clean
+            rm -rf *
+        else
+            mkdir build
+            cd build
+        fi
+
+        cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
 
         make -j $cpuCount
         make install
@@ -981,8 +995,19 @@ if [[ `pkg-config --modversion soxr` = "0.1.1" ]]; then
 
         sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
 
-        mkdir build
-        cd build
+        if [ -d "build" ]; then
+            cd build
+            if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
+                rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
+                rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/soxr.pc
+            fi
+            make clean
+            rm -rf *
+        else
+            mkdir build
+            cd build
+        fi
 
         cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF -DUNIX:BOOL=on -Wno-dev
 
@@ -1517,8 +1542,19 @@ if [[ `pkg-config --modversion frei0r` = "1.3.0" ]]; then
 
         sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
 
-        mkdir build
-        cd build
+        if [ -d "build" ]; then
+            cd build
+            if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
+                rm -rf $LOCALDESTDIR/include/frei0r.h
+                rm -f $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
+                rm -f $LOCALDESTDIR/lib/frei0r-1
+            fi
+            make clean
+            rm -rf *
+        else
+            mkdir build
+            cd build
+        fi
 
         cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
 
