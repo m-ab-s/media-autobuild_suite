@@ -1823,7 +1823,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     echo "compile ffmpeg $bits"
     echo "-------------------------------------------------------------------------------"
 
-    do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git
+    do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg-git noDepth
 
     if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
