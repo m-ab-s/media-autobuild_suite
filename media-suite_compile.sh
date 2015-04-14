@@ -1112,48 +1112,6 @@ if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
 fi
 
-if [[ $mp4box = "y" ]]; then
-
-    cd $LOCALBUILDDIR
-
-    if [[ `a52dec --help 2>&1 | grep "a52dec-0.7.4"` ]]; then
-        echo -------------------------------------------------
-        echo "a52dec-0.7.4 is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile a52dec $bits\007"
-
-            do_wget_tar "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
-
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
-
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist a52dec-0.7.4 liba52.a
-    fi
-
-    cd $LOCALBUILDDIR
-
-    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
-        echo -------------------------------------------------
-        echo "libmad-0.15.1b is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile libmad $bits\007"
-
-            do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
-
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
-
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist libmad-0.15.1b libmad.a
-    fi
-
-fi
-
 cd $LOCALBUILDDIR
 
 if [[ `pkg-config --modversion soxr` = "0.1.1" ]]; then
@@ -1866,13 +1824,70 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
+
+    if [[ `a52dec --help 2>&1 | grep "a52dec-0.7.4"` ]]; then
+        echo -------------------------------------------------
+        echo "a52dec-0.7.4 is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile a52dec $bits\007"
+
+            do_wget_tar "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
+
+            if [[ -f "liba52/.libs/liba52.a" ]]; then
+                make distclean
+            fi
+            if [[ -d "$LOCALDESTDIR/include/a52dec" ]]; then
+                rm -rf $LOCALDESTDIR/include/a52dec $LOCALDESTDIR/bin-audio/{a52dec,extract_a52}.exe
+                rm -rf $LOCALDESTDIR/lib/liba52.{l,}a
+            fi
+
+            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist a52dec-0.7.4 liba52.a
+    fi
+
+    cd $LOCALBUILDDIR
+
+    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
+        echo -------------------------------------------------
+        echo "libmad-0.15.1b is already compiled"
+        echo -------------------------------------------------
+        else
+            echo -ne "\033]0;compile libmad $bits\007"
+
+            do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+
+            if [[ -f ".libs/libmad.a" ]]; then
+                make distclean
+            fi
+            if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
+                rm -rf $LOCALDESTDIR/include/mad.h
+                rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
+            fi
+
+            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist libmad-0.15.1b libmad.a
+    fi
+
+    cd $LOCALBUILDDIR
+
     do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" gpac bin-video/MP4Box.exe
 
     if [[ $compile == "true" ]]; then
-        if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
-            rm $LOCALDESTDIR/bin-video/MP4Box.exe
+        if [ -d "$LOCALDESTDIR/include/gpac" ]; then
+            rm -rf $LOCALDESTDIR/bin-video/MP4Box.exe $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
-            rm -f $LOCALDESTDIR/lib/libgpac_static.a
+        fi
+
+        if [[ -f config.mak ]]; then
             make distclean
         fi
 
@@ -1893,7 +1908,7 @@ if [[ $mp4box = "y" ]]; then
         rm -f $LOCALDESTDIR/bin/libgpac.dll
         rm -f $LOCALDESTDIR/lib/libgpac.dll.a
 
-        cp ./bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
+        cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 
         do_checkIfExist gpac-svn bin-video/MP4Box.exe
         compile="false"
