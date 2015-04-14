@@ -77,6 +77,11 @@ else
         compile="true"
     elif [[ ! -z $gitCheck ]] && [[ ! -f $LOCALDESTDIR/$gitCheck ]]; then
         compile="true"
+    else
+        echo -------------------------------------------------
+        echo "$gitFolder is already up to date"
+        echo -------------------------------------------------
+        compile="false"
     fi
 fi
 }
@@ -115,6 +120,11 @@ else
         compile="true"
     elif [[ ! -z $svnCheck ]] && [[ ! -f $LOCALDESTDIR/$svnCheck ]]; then
         compile="true"
+    else
+        echo -------------------------------------------------
+        echo "$svnFolder is already up to date"
+        echo -------------------------------------------------
+        compile="false"
     fi
 fi
 }
@@ -154,6 +164,11 @@ else
         compile="true"
     elif [[ ! -z $hgCheck ]] && [[ ! -f $LOCALDESTDIR/$hgCheck ]]; then
         compile="true"
+    else
+        echo -------------------------------------------------
+        echo "$hgFolder is already up to date"
+        echo -------------------------------------------------
+        compile="false"
     fi
 fi
 }
@@ -413,10 +428,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist harfbuzz-git libharfbuzz.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "harfbuzz is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -561,10 +572,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist librtmp-git librtmp.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "rtmpdump is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -589,10 +596,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist dcadec-git libdcadec.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "libdcadec is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -708,10 +711,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist libilbc-git libilbc.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "libilbc-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1000,10 +999,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist fdk-aac-git libfdk-aac.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "fdk-aac is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1025,10 +1020,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "bin-fdk-aac is already up to date"
-    echo -------------------------------------------------
 fi
 
 if [[ $mplayer = "y" ]] && [[ $nonfree = "y" ]]; then
@@ -1170,10 +1161,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist sox-git bin-audio/sox.exe
 
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "sox is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1204,10 +1191,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist libgme-git libgme.a
 
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "gme is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1231,10 +1214,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist sndfile-git libsndfile.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "libsndfile is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1335,10 +1314,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist vpx-git libvpx.a
     compile="false"
     buildFFmpeg="true"
-else
-    echo -------------------------------------------------
-    echo "libvpx-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 if [[ $other265 = "y" ]]; then
@@ -1362,10 +1337,6 @@ if [[ $other265 = "y" ]]; then
         cp kvazaar.exe $LOCALDESTDIR/bin-video
         do_checkIfExist kvazaar-git bin-video/kvazaar.exe
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "kvazaar-git is already up to date"
-        echo -------------------------------------------------
     fi
 
 fi
@@ -1391,10 +1362,6 @@ if [[ $compile == "true" ]]; then
 
     do_checkIfExist dvdread-git libdvdread.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "libdvdread-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1418,10 +1385,6 @@ if [[ $compile == "true" ]]; then
 
         do_checkIfExist dvdnav-git libdvdnav.a
         compile="false"
-else
-    echo -------------------------------------------------
-    echo "libdvdnav-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1445,10 +1408,6 @@ if [[ ! -f "configure" ]]; then
 
     do_checkIfExist libbluray-git libbluray.a
     compile="false"
-else
-    echo -------------------------------------------------
-    echo "libbluray-git is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1470,10 +1429,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist libutvideo-git libutvideo.a
     compile="false"
     buildFFmpeg="true"
-else
-    echo -------------------------------------------------
-    echo "libutvideo is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1499,10 +1454,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist libass-git libass.a
     compile="false"
     buildFFmpeg="true"
-else
-    echo -------------------------------------------------
-    echo "libass is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1633,10 +1584,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist vidstab-git libvidstab.a
     compile="false"
     buildFFmpeg="true"
-else
-    echo -------------------------------------------------
-    echo "vidstab is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -1912,10 +1859,6 @@ if [[ $mp4box = "y" ]]; then
 
         do_checkIfExist gpac-svn bin-video/MP4Box.exe
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "gpac-svn is already up to date"
-        echo -------------------------------------------------
     fi
 fi
 
@@ -2030,10 +1973,6 @@ if [[ $compile == "true" ]]; then
         compile="false"
         buildFFmpeg="true"
     fi
-else
-    echo -------------------------------------------------
-    echo "x264 is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -2076,10 +2015,6 @@ if [[ $compile == "true" ]]; then
     do_checkIfExist x265-hg libx265.a
     compile="false"
     buildFFmpeg="true"
-else
-    echo -------------------------------------------------
-    echo "x265 is already up to date"
-    echo -------------------------------------------------
 fi
 
 cd $LOCALBUILDDIR
@@ -2228,10 +2163,6 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
         fi
 
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "ffmpeg is already up to date"
-        echo -------------------------------------------------
     fi
 fi
 
@@ -2258,10 +2189,6 @@ if [[ $bits = "64bit" && $other265 = "y" ]]; then
 
         do_checkIfExist f265-git bin-video/f265cli.exe
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "f265 is already up to date"
-        echo -------------------------------------------------
     fi
 fi
 
@@ -2312,10 +2239,6 @@ if [[ $mplayer = "y" ]]; then
 
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
         compile="false"
-        else
-        echo -------------------------------------------------
-        echo "mplayer is already up to date"
-        echo -------------------------------------------------
     fi
 fi
 
@@ -2341,10 +2264,6 @@ if [[ $mpv = "y" ]]; then
 
         do_checkIfExist luajit-git libluajit-5.1.a
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "luajit is already up to date"
-        echo -------------------------------------------------
     fi
 
     cd $LOCALBUILDDIR
@@ -2362,10 +2281,6 @@ if [[ $mpv = "y" ]]; then
 
         do_checkIfExist rubberband-git librubberband.a
         compile="false"
-    else
-        echo -------------------------------------------------
-        echo "rubberband is already up to date"
-        echo -------------------------------------------------
     fi
 
     cd $LOCALBUILDDIR
