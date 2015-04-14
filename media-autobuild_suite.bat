@@ -58,6 +58,7 @@ if exist %ini% GOTO checkINI
     set archINI=0
     set freeINI=0
     set ffmbcINI=0
+    set vpxINI=0
     set x264INI=0
     set x265INI=0
     set other265INI=0
@@ -84,6 +85,8 @@ findstr /i "arch" %ini% > nul
 findstr /i "free" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmbc" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "vpx" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "x264" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -121,6 +124,7 @@ for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2A
 for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "vpx" %ini%') do set vpxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set other265INI=%%f
@@ -234,6 +238,37 @@ if %buildffmbc%==2 (
     )
 if %buildffmbc% GTR 2 GOTO ffmbc
 if %writeBC%==yes echo.ffmbc=^%buildffmbc%>>%ini%
+
+:vpx
+set "writevpx=no"
+if %vpxINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vpx [VP8/VP9 encoder] binary?
+    echo. 1 = Yes [static]
+    echo. 2 = Build library only
+    echo. 3 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvpx="Build vpx: "
+    set "writevpx=yes"
+    ) else (
+        set buildvpx=%vpxINI%
+        )
+
+if %buildvpx%==1 (
+    set "vpx=y"
+    )
+if %buildvpx%==2 (
+    set "vpx=l"
+    )
+if %buildvpx%==3 (
+    set "vpx=n"
+    )
+if %buildvpx% GTR 3 GOTO vpx
+if %writevpx%==yes echo.vpx=^%buildvpx%>>%ini%
 
 :x264
 set "writex264=no"
@@ -1251,6 +1286,6 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --x264=%x264% --x265=%x265% --other265=%other265% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit

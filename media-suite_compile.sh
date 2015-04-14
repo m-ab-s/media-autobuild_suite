@@ -11,6 +11,7 @@ while true; do
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
+--vpx=* ) vpx="${1#*=}"; shift ;;
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
 --other265=* ) other265="${1#*=}"; shift ;;
@@ -1183,35 +1184,39 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
+if [[ ! $vpx = "n" ]]; then
+    do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
 
-if [[ $compile = "true" ]]; then
-    if [ -d $LOCALDESTDIR/include/vpx ]; then
-        rm -rf $LOCALDESTDIR/include/vpx
-        rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
-        rm -f $LOCALDESTDIR/lib/libvpx.a
+    if [[ $compile = "true" ]]; then
+        if [ -d $LOCALDESTDIR/include/vpx ]; then
+            rm -rf $LOCALDESTDIR/include/vpx
+            rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
+            rm -f $LOCALDESTDIR/lib/libvpx.a
+        fi
+
+        if [ -f libvpx.a ]; then
+            make distclean
+        fi
+
+        if [[ $bits = "64bit" ]]; then
+            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
+            sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
+        else
+            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
+            sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
+        fi
+
+        make -j $cpuCount
+        make install
+
+        if [[ $vpx = "y" ]]; then
+            mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video
+        fi
+
+        do_checkIfExist vpx-git libvpx.a
+        buildFFmpeg="true"
     fi
-
-    if [ -f libvpx.a ]; then
-        make distclean
-    fi
-
-    if [[ $bits = "64bit" ]]; then
-        LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
-        sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
-    else
-        LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
-        sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
-    fi
-
-    make -j $cpuCount
-    make install
-
-    mv $LOCALDESTDIR/bin/vpxdec.exe $LOCALDESTDIR/bin-video
-    mv $LOCALDESTDIR/bin/vpxenc.exe $LOCALDESTDIR/bin-video
-
-    do_checkIfExist vpx-git libvpx.a
-    buildFFmpeg="true"
+    builtvpx="--enable-libvpx"
 fi
 
 if [[ $other265 = "y" ]]; then
@@ -1915,7 +1920,7 @@ if [[ $ffmbc = "y" ]]; then
                 make distclean
             fi
         
-            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
+            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
 
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
@@ -1990,7 +1995,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack \
+            --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack \
             --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
@@ -2007,7 +2012,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
             --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
             --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
-            --enable-libopus --enable-libvidstab --enable-libvpx --enable-libwavpack --enable-libxavs \
+            --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack --enable-libxavs \
             --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
