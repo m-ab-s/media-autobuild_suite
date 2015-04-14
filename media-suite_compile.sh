@@ -539,7 +539,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.ffmpeg.org/rtmpdump" librtmp
+do_git "git://git.ffmpeg.org/rtmpdump" librtmp shallow master bin-video/rtmpdump.exe
 
 if [[ $compile == "true" ]]; then
     if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
@@ -874,7 +874,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ `pkg-config --define-variable=PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig" --modversion flac` = "1.3.1" ]]; then
+if [[ `PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig" pkg-config --modversion flac` = "1.3.1" ]]; then
     echo -------------------------------------------------
     echo "flac-1.3.1 is already compiled"
     echo -------------------------------------------------
