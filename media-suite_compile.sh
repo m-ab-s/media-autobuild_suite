@@ -1746,64 +1746,66 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.videolan.org/x264.git" x264 noDepth
+if [[ ! $x264 = "n" ]]; then
+    do_git "git://git.videolan.org/x264.git" x264 noDepth
 
-if [[ $compile = "true" ]]; then
-    if [[ $x264 = "y" ]]; then
-        cd $LOCALBUILDDIR
+    if [[ $compile = "true" ]]; then
+        if [[ $x264 = "y" ]]; then
+            cd $LOCALBUILDDIR
 
-        do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
+            do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
-        if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-            rm -rf $LOCALDESTDIR/include/libavutil
-            rm -rf $LOCALDESTDIR/include/libavcodec
-            rm -rf $LOCALDESTDIR/include/libpostproc
-            rm -rf $LOCALDESTDIR/include/libswresample
-            rm -rf $LOCALDESTDIR/include/libswscale
-            rm -rf $LOCALDESTDIR/include/libavdevice
-            rm -rf $LOCALDESTDIR/include/libavfilter
-            rm -rf $LOCALDESTDIR/include/libavformat
-            rm -f $LOCALDESTDIR/lib/libavutil.a
-            rm -f $LOCALDESTDIR/lib/libswresample.a
-            rm -f $LOCALDESTDIR/lib/libswscale.a
-            rm -f $LOCALDESTDIR/lib/libavcodec.a
-            rm -f $LOCALDESTDIR/lib/libavdevice.a
-            rm -f $LOCALDESTDIR/lib/libavfilter.a
-            rm -f $LOCALDESTDIR/lib/libavformat.a
-            rm -f $LOCALDESTDIR/lib/libpostproc.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+            if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
+                rm -rf $LOCALDESTDIR/include/libavutil
+                rm -rf $LOCALDESTDIR/include/libavcodec
+                rm -rf $LOCALDESTDIR/include/libpostproc
+                rm -rf $LOCALDESTDIR/include/libswresample
+                rm -rf $LOCALDESTDIR/include/libswscale
+                rm -rf $LOCALDESTDIR/include/libavdevice
+                rm -rf $LOCALDESTDIR/include/libavfilter
+                rm -rf $LOCALDESTDIR/include/libavformat
+                rm -f $LOCALDESTDIR/lib/libavutil.a
+                rm -f $LOCALDESTDIR/lib/libswresample.a
+                rm -f $LOCALDESTDIR/lib/libswscale.a
+                rm -f $LOCALDESTDIR/lib/libavcodec.a
+                rm -f $LOCALDESTDIR/lib/libavdevice.a
+                rm -f $LOCALDESTDIR/lib/libavfilter.a
+                rm -f $LOCALDESTDIR/lib/libavformat.a
+                rm -f $LOCALDESTDIR/lib/libpostproc.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+            fi
+
+            if [ -f "config.mak" ]; then
+                make distclean
+            fi
+
+            if [[ $bits = "32bit" ]]; then
+                arch='x86'
+            else
+                arch='x86_64'
+            fi
+
+            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
+
+            make -j $cpuCount
+            make install
+
+            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
+            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
+            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
+            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+
+            do_checkIfExist ffmpeg-git libavcodec.a
+
+            cd $LOCALBUILDDIR/x264-git
         fi
-
-        if [ -f "config.mak" ]; then
-            make distclean
-        fi
-
-        if [[ $bits = "32bit" ]]; then
-            arch='x86'
-        else
-            arch='x86_64'
-        fi
-
-        ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-debug --disable-shared --disable-doc --enable-runtime-cpudetect --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
-
-        make -j $cpuCount
-        make install
-
-        sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-        sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-        sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-        sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
-
-        do_checkIfExist ffmpeg-git libavcodec.a
-
-        cd $LOCALBUILDDIR/x264-git
 
         echo -ne "\033]0;compile x264-git $bits\007"
 
@@ -1816,32 +1818,17 @@ if [[ $compile = "true" ]]; then
             make distclean
         fi
 
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
-        make -j $cpuCount
+        if [[ $x264 = "y" ]]; then
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
+            make -j $cpuCount
 
-        cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
-        make clean
+            cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
+            make clean
 
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist x264-git libx264.a
-        buildFFmpeg="true"
-    else
-        echo -ne "\033]0;compile libx264-git $bits\007"
-
-        if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-            rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/x264.pc
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
+        else
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash --bit-depth=8 --disable-cli
         fi
-
-        if [ -f "libx264.a" ]; then
-            make distclean
-        fi
-
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash --bit-depth=8 --disable-cli
 
         make -j $cpuCount
         make install
@@ -1849,6 +1836,7 @@ if [[ $compile = "true" ]]; then
         do_checkIfExist x264-git libx264.a
         buildFFmpeg="true"
     fi
+    builtx264="--enable-libx264"
 fi
 
 cd $LOCALBUILDDIR
@@ -1919,8 +1907,8 @@ if [[ $ffmbc = "y" ]]; then
             if [ -f "config.log" ]; then
                 make distclean
             fi
-        
-            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
+
+            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
 
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
@@ -1996,7 +1984,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack \
-            --enable-libxavs --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+            --enable-libxavs $builtx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
@@ -2013,7 +2001,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
             --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
             --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack --enable-libxavs \
-            --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+            $builtx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \

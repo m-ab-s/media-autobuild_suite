@@ -279,6 +279,7 @@ if %x264INI%==0 (
     echo. Build x264 [H.264 encoder] binary?
     echo. 1 = Yes [static]
     echo. 2 = Build library only
+    echo. 3 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -292,9 +293,12 @@ if %buildx264%==1 (
     set "x264=y"
     )
 if %buildx264%==2 (
+    set "x264=l"
+    )
+if %buildx264%==3 (
     set "x264=n"
     )
-if %buildx264% GTR 2 GOTO x264
+if %buildx264% GTR 3 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
 :x265
