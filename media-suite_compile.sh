@@ -1871,7 +1871,9 @@ if [[ $mp4box = "y" ]]; then
     if [[ $compile == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/MP4Box.exe ]; then
             rm $LOCALDESTDIR/bin-video/MP4Box.exe
-            make clean
+            rm -rf $LOCALDESTDIR/include/gpac
+            rm -f $LOCALDESTDIR/lib/libgpac_static.a
+            make distclean
         fi
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
