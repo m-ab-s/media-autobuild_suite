@@ -310,6 +310,7 @@ if %x265INI%==0 (
     echo. Build x265 [H.265 encoder] binary?
     echo. 1 = Yes [static]
     echo. 2 = Build library only
+    echo. 3 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -323,9 +324,12 @@ if %buildx265%==1 (
     set "x265=y"
     )
 if %buildx265%==2 (
+    set "x265=l"
+    )
+if %buildx265%==3 (
     set "x265=n"
     )
-if %buildx265% GTR 2 GOTO x265
+if %buildx265% GTR 3 GOTO x265
 if %writex265%==yes echo.x265=^%buildx265%>>%ini%
 
 :other265

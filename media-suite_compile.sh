@@ -1841,43 +1841,46 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_hg "https://bitbucket.org/multicoreware/x265" x265
+if [[ ! $x265 = "n" ]]; then
+    do_hg "https://bitbucket.org/multicoreware/x265" x265
 
-if [[ $compile = "true" ]]; then
-    cd build/msys
-    rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
-    rm -f $LOCALDESTDIR/include/x265.h
-    rm -f $LOCALDESTDIR/include/x265_config.h
-    rm -f $LOCALDESTDIR/lib/libx265.a
-    rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
+    if [[ $compile = "true" ]]; then
+        cd build/msys
+        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
+        rm -f $LOCALDESTDIR/include/x265.h
+        rm -f $LOCALDESTDIR/include/x265_config.h
+        rm -f $LOCALDESTDIR/lib/libx265.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
-    if [[ $x265 == "y" ]]; then
+        if [[ $x265 = "y" ]]; then
 
-        rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
-        rm -f $LOCALDESTDIR/bin-video/x265.exe
+            rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
+            rm -f $LOCALDESTDIR/bin-video/x265.exe
 
-        if [[ $bits = "32bit" ]]; then
-            cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            if [[ $bits = "32bit" ]]; then
+                cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            else
+                cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            fi
+
+            make -j $cpuCount
+            cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
+
+            make clean
+            rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
+
+            cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
         else
-            cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
         fi
 
         make -j $cpuCount
-        cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
+        make install
 
-        make clean
-        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
-
-        cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
-    else
-        cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+        do_checkIfExist x265-hg libx265.a
+        buildFFmpeg="true"
     fi
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist x265-hg libx265.a
-    buildFFmpeg="true"
+    builtx265="--enable-libx265"
 fi
 
 cd $LOCALBUILDDIR
@@ -1984,7 +1987,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack \
-            --enable-libxavs $builtx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+            --enable-libxavs $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
@@ -2001,7 +2004,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
             --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
             --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack --enable-libxavs \
-            $builtx264 --enable-libx265 --enable-libxvid --enable-libzvbi \
+            $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
