@@ -796,10 +796,10 @@ if [[ $mkv = "y" ]]; then
 
             do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
 
-			if [[ -f config.log ]]; then
-				make distclean
-			fi
-			
+            if [[ -f config.log ]]; then
+                make distclean
+            fi
+            
             CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
             make -j $cpuCount
