@@ -2213,12 +2213,16 @@ if [[ $mplayer = "y" ]]; then
 
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
         if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
-            rm -f $LOCALDESTDIR/bin-video/mplayer.exe
+            rm -f $LOCALDESTDIR/bin-video/{mplayer,mencoder}.exe
+        fi
+        if [ -f config.mak ]; then
             make distclean
         fi
 
         if ! test -e ffmpeg ; then
-            if ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
+            if [ ! $ffmpeg = "n" ]; then
+                git clone --depth 1 $LOCALBUILDDIR/ffmpeg-git ffmpeg
+            elif ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
