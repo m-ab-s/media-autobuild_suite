@@ -1039,7 +1039,11 @@ if [[ $mplayer = "y" ]] && [[ $nonfree = "y" ]]; then
 
             do_wget_tar "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
 
-            sh bootstrap
+            if [[ -f configure ]]; then
+                make distclean
+            else            
+                sh bootstrap
+            fi
 
             ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
 
@@ -2045,6 +2049,10 @@ if [[ $ffmbc = "y" ]]; then
                 arch='x86_64'
             fi
 
+            if [ -f "config.log" ]; then
+                make distclean
+            fi
+        
             ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
 
             make SRC_DIR=. -j $cpuCount
