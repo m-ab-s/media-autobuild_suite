@@ -747,42 +747,6 @@ if [[ $compile == "no" ]]; then # is deactivated for the moment
 #   echo -------------------------------------------------
 fi
 
-if [[ $mpv == "y" && ! $ffmpeg == "s" ]]; then
-
-    cd $LOCALBUILDDIR
-
-    do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
-
-    if [[ $compile == "true" ]]; then
-        if [[ $bits = "32bit" ]]; then
-            if [[ -f lib32/libwaio.a ]]; then
-                ./build-mingw-nt32 clean
-                rm -rf $LOCALDESTDIR/include/waio
-                rm -f $LOCALDESTDIR/lib/libwaio.a
-            fi
-
-            build-mingw-nt32 AR=i686-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
-
-            cp -r include/waio  $LOCALDESTDIR/include/
-            cp -r lib32/libwaio.a $LOCALDESTDIR/lib/
-        else
-            if [[ -f lib64/libwaio.a ]]; then
-                ./build-mingw-nt64 clean
-                rm -rf $LOCALDESTDIR/include/waio
-                rm -f $LOCALDESTDIR/lib/libwaio.a
-            fi
-
-            build-mingw-nt64 AR=x86_64-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
-
-            cp -r include/waio  $LOCALDESTDIR/include/
-            cp -r lib64/libwaio.a $LOCALDESTDIR/lib/
-        fi
-
-        do_checkIfExist waio-git libwaio.a
-        compile="false"
-    fi
-fi
-
 if [[ $mkv = "y" ]]; then
 
     cd $LOCALBUILDDIR
@@ -2260,7 +2224,40 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ $mpv = "y" ]]; then
+if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
+
+    do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
+
+    if [[ $compile == "true" ]]; then
+        if [[ $bits = "32bit" ]]; then
+            if [[ -f lib32/libwaio.a ]]; then
+                ./build-mingw-nt32 clean
+                rm -rf $LOCALDESTDIR/include/waio
+                rm -f $LOCALDESTDIR/lib/libwaio.a
+            fi
+
+            build-mingw-nt32 AR=i686-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
+
+            cp -r include/waio  $LOCALDESTDIR/include/
+            cp -r lib32/libwaio.a $LOCALDESTDIR/lib/
+        else
+            if [[ -f lib64/libwaio.a ]]; then
+                ./build-mingw-nt64 clean
+                rm -rf $LOCALDESTDIR/include/waio
+                rm -f $LOCALDESTDIR/lib/libwaio.a
+            fi
+
+            build-mingw-nt64 AR=x86_64-w64-mingw32-gcc-ar LD=ld STRIP=strip lib-static
+
+            cp -r include/waio  $LOCALDESTDIR/include/
+            cp -r lib64/libwaio.a $LOCALDESTDIR/lib/
+        fi
+
+        do_checkIfExist waio-git libwaio.a
+        compile="false"
+    fi
+
+    cd $LOCALBUILDDIR
 
     do_git "http://luajit.org/git/luajit-2.0.git" luajit noDepth
 
@@ -2303,7 +2300,7 @@ if [[ $mpv = "y" ]]; then
 
     do_git "https://github.com/mpv-player/mpv.git" mpv shallow master bin-video/mpv.exe
 
-    if [[ $compile == "true" ]] && [[ ! $ffmpeg == "s" ]] || [[ $newFfmpeg == "yes" ]]; then
+    if [[ $compile == "true" ]] || [[ $newFfmpeg == "yes" ]]; then
         if [ ! -f waf ]; then
             python2 ./bootstrap.py
         else
