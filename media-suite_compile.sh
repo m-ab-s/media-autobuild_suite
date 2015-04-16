@@ -877,7 +877,7 @@ fi
 
 cd $LOCALBUILDDIR
 
-if [[ `PKG_CONFIG_PATH="$LOCALDESTDIR/lib/pkgconfig" pkg-config --modversion flac` = "1.3.1" ]]; then
+if [[ `pkg-config --modversion flac` = "1.3.1" ]]; then
     echo -------------------------------------------------
     echo "flac-1.3.1 is already compiled"
     echo -------------------------------------------------
