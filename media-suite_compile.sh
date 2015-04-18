@@ -15,6 +15,7 @@ while true; do
 --x265=* ) x265="${1#*=}"; shift ;;
 --other265=* ) other265="${1#*=}"; shift ;;
 --mediainfo=* ) mediainfo="${1#*=}"; shift ;;
+--sox=* ) sox="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
@@ -1050,25 +1051,27 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "git://git.code.sf.net/p/sox/code" sox
+if [[ $sox = "y" ]]; then
+    do_git "git://git.code.sf.net/p/sox/code" sox
 
-if [[ $compile = "true" ]]; then
-    sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
+    if [[ $compile = "true" ]]; then
+        sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 
-    if [[ ! -f ./configure ]]; then
-        autoreconf -i
-    else
-        rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
-        rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
-        make distclean
+        if [[ ! -f ./configure ]]; then
+            autoreconf -i
+        else
+            rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
+            rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
+            make distclean
+        fi
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist sox-git bin-audio/sox.exe
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist sox-git bin-audio/sox.exe
 fi
 
 cd $LOCALBUILDDIR

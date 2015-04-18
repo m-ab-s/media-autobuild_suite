@@ -62,6 +62,7 @@ if exist %ini% GOTO checkINI
     set x265INI=0
     set other265INI=0
     set mediainfoINI=0
+    set soxINI=0
     set ffmpegINI=0
     set ffmpegUpdateINI=0
     set mp4boxINI=0
@@ -91,6 +92,8 @@ findstr /i "x265" %ini% > nul
 findstr /i "other265" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "mediainfo" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "soxB" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegB" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -122,6 +125,7 @@ for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set other265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "mediainfo" %ini%') do set mediainfoINI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "soxB" %ini%') do set soxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
@@ -338,6 +342,33 @@ if %buildmediainfo%==2 (
     )
 if %buildmediainfo% GTR 2 GOTO mediainfo
 if %writemediainfo%==yes echo.mediainfo=^%buildmediainfo%>>%ini%
+
+:sox
+set "writesox=no"
+if %soxINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build sox binaries [Sound processing tool]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsox="Build sox: "
+    set "writesox=yes"
+    ) else (
+        set buildsox=%soxINI%
+        )
+
+if %buildsox%==1 (
+    set "sox=y"
+    )
+if %buildsox%==2 (
+    set "sox=n"
+    )
+if %buildsox% GTR 2 GOTO sox
+if %writesox%==yes echo.soxB=^%buildsox%>>%ini%
 
 :ffmpeg
 set "writeFF=no"
@@ -1220,6 +1251,6 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --x264=%x264% --x265=%x265% --other265=%other265% --mediainfo=%mediainfo% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --x264=%x264% --x265=%x265% --other265=%other265% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
