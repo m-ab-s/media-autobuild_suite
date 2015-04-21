@@ -1211,6 +1211,8 @@ if [[ ! $vpx = "n" ]]; then
 
         if [[ $vpx = "y" ]]; then
             mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video
+        else
+            rm -f $LOCALDESTDIR/bin/vpx{enc,dec}.exe
         fi
 
         do_checkIfExist vpx-git libvpx.a
