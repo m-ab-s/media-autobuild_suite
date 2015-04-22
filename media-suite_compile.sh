@@ -2042,18 +2042,18 @@ if [[ $bits = "64bit" && $other265 = "y" ]]; then
     do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
 
     if [[ $compile = "true" ]] && [[ ! $ffmpeg = "s" ]] || [[ $newFfmpeg = "yes" ]]; then
-        if [ -d "build" ]; then
+        if [ -d "build" ] || [[ -f "$LOCALDESTDIR/bin-video/f265cli.exe" ]]; then
             rm -rf build
             rm -rf .sconf_temp
             rm -f .sconsign.dblite
             rm -f config.log
             rm -f options.py
+            rm -f $LOCALDESTDIR/bin-video/f265cli.exe
         fi
 
         scons
 
         if [ -f build/f265cli.exe ]; then
-            rm -f $LOCALDESTDIR/bin-video/f265cli.exe
             cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
         fi
 
