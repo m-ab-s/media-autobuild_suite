@@ -1992,7 +1992,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack \
+            --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx \
             --enable-libxavs $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
@@ -2009,7 +2009,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
             --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
             --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
-            --enable-libopus --enable-libvidstab $builtvpx --enable-libwavpack --enable-libxavs \
+            --enable-libopus --enable-libvidstab $builtvpx --enable-libxavs \
             $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
