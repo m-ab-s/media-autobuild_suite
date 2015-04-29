@@ -1292,7 +1292,6 @@ cd $LOCALBUILDDIR
 do_git "git://git.videolan.org/libbluray.git" libbluray
 
 if [[ $compile = "true" ]]; then
-    git checkout ad6690f223cc017eef33982eb952b7e4f47a48b5
     if [[ ! -f "configure" ]]; then
         autoreconf -fiv
     else
@@ -1305,17 +1304,15 @@ if [[ $compile = "true" ]]; then
 
     make -j $cpuCount
     make install
-    git checkout master
 
     do_checkIfExist libbluray-git libbluray.a
 fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow buildsystem
+do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow 15.1.0
 
 if [[ $compile = "true" ]]; then
-    git checkout 36eb60caaeb9661dad6866af9166d8dbcfaac607
     if [ -f utv_core/libutvideo.a ]; then
         rm -rf $LOCALDESTDIR/include/utvideo
         rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
@@ -1328,7 +1325,7 @@ if [[ $compile = "true" ]]; then
     make install RANLIBX="${RANLIB-ranlib}"
 
     do_checkIfExist libutvideo-git libutvideo.a
-    git checkout buildsystem
+
     buildFFmpeg="true"
 fi
 
