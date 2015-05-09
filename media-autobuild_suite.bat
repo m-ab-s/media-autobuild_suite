@@ -852,6 +852,7 @@ if exist %instdir%\mintty.lnk GOTO minttySettings
 
 :minttySettings
 if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
+if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
     (
         echo.BoldAsFont=no
         echo.BackgroundColour=57,57,57
