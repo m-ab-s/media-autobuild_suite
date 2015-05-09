@@ -1712,7 +1712,12 @@ if [[ $mp4box = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    do_svn "http://svn.code.sf.net/p/gpac/code/trunk/gpac" gpac bin-video/MP4Box.exe
+    # remove old svn source
+    if [[ -d gpac-svn ]]; then
+        rm -rf ./gpac-svn/
+    fi
+
+    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/MP4Box.exe
 
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
@@ -1743,7 +1748,7 @@ if [[ $mp4box = "y" ]]; then
 
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 
-        do_checkIfExist gpac-svn bin-video/MP4Box.exe
+        do_checkIfExist gpac-git bin-video/MP4Box.exe
     fi
 fi
 
