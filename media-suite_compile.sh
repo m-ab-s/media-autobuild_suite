@@ -1717,7 +1717,7 @@ if [[ $mp4box = "y" ]]; then
         rm -rf ./gpac-svn/
     fi
 
-    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/MP4Box.exe
+    do_git "https://github.com/gpac/gpac.git" gpac noDepth master bin-video/MP4Box.exe
 
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
