@@ -198,7 +198,7 @@ do_wget_tar() {
     local dirName=`expr $archive : '\(.*\)\.tar\.\(gz\|bz2\|xz\)'`
 
     # if dir exists and no builds were successful, better to redownload
-    if [[ -d $dirName ]] && [[ ! -f $dirName/build_successful* ]]; then
+    if [[ -d $dirName ]] && [[ ! -f $dirName/build_successful32bit && ! -f $dirName/build_successful64bit ]]; then
         rm -rf $dirName
     fi
 
