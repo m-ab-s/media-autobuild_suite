@@ -41,21 +41,21 @@ local gitBranch="$4"
 local gitCheck="$5"
 compile="true"
 
-if [[ $gitDepth == "noDepth" ]]; then
+if [[ $gitDepth = "noDepth" ]]; then
     gitDepth=""
-elif [[ $gitDepth == "shallow" ]] || [ ! $gitDepth ]; then
+elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
     gitDepth="--depth 1"
 fi
 
-if [ ! $gitBranch ]; then
+if [ -z "$gitBranch" ]; then
     gitBranch="master"
 fi
 
 echo -ne "\033]0;compiling $gitFolder $bits\007"
-if [ ! -d $gitFolder-git ]; then
-    git clone $gitDepth -b $gitBranch $gitURL $gitFolder-git
-    if [[ -d $gitFolder-git ]]; then
-        cd $gitFolder-git
+if [ ! -d "$gitFolder"-git ]; then
+    git clone $gitDepth -b "$gitBranch" "$gitURL" "$gitFolder"-git
+    if [[ -d "$gitFolder"-git ]]; then
+        cd "$gitFolder"-git
         touch recently_updated
     else
         echo "$gitFolder git seems to be down"
@@ -64,18 +64,21 @@ if [ ! -d $gitFolder-git ]; then
         compile="false"
     fi
 else
-    cd $gitFolder-git
-    oldHead=`git rev-parse HEAD`
+    cd "$gitFolder"-git
+    oldHead=$(git rev-parse HEAD)
     git reset --quiet --hard @{u}
-    git pull origin $gitBranch
-    newHead=`git rev-parse HEAD`
+    git pull origin "$gitBranch"
+    newHead=$(git rev-parse HEAD)
+
+    pkg-config --exists "$gitFolder"
+    local pcExists=$?
 
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful*
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ ! $gitCheck && `pkg-config --exists $gitFolder` ]] ||
-         [[ ! -z $gitCheck && ! -f $LOCALDESTDIR/$gitCheck ]]; then
+         [[ -z "$gitCheck" && $pcExists = 1 ]] ||
+         [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
         compile="true"
     else
         echo -------------------------------------------------
@@ -93,10 +96,10 @@ local svnFolder="$2"
 local svnCheck="$3"
 compile="true"
 echo -ne "\033]0;compiling $svnFolder $bits\007"
-if [ ! -d $svnFolder-svn ]; then
-    svn checkout $svnURL $svnFolder-svn
-    if [[ -d $svnFolder-svn ]]; then
-        cd $svnFolder-svn
+if [ ! -d "$svnFolder"-svn ]; then
+    svn checkout "$svnURL" "$svnFolder"-svn
+    if [[ -d "$svnFolder"-svn ]]; then
+        cd "$svnFolder"-svn
         touch recently_updated
     else
         echo "$svnFolder svn seems to be down"
@@ -105,17 +108,20 @@ if [ ! -d $svnFolder-svn ]; then
         compile="false"
     fi
 else
-    cd $svnFolder-svn
-    oldRevision=`svnversion`
+    cd "$svnFolder"-svn
+    oldRevision=$(svnversion)
     svn update
-    newRevision=`svnversion`
+    newRevision=$(svnversion)
+
+    pkg-config --exists "$svnFolder"
+    local pcExists=$?
 
     if [[ "$oldRevision" != "$newRevision" ]]; then
         touch recently_updated
         rm -f build_successful*
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ ! $svnCheck && `pkg-config --exists $svnFolder` ]] ||
-         [[ ! -z $svnCheck && ! -f $LOCALDESTDIR/$svnCheck ]]; then
+         [[ -z "$svnCheck" && $pcExists = 1 ]] ||
+         [[ ! -z "$svnCheck" && ! -f $LOCALDESTDIR/"$svnCheck" ]]; then
         compile="true"
     else
         echo -------------------------------------------------
@@ -133,10 +139,10 @@ local hgFolder="$2"
 local hgCheck="$3"
 compile="true"
 echo -ne "\033]0;compiling $hgFolder $bits\007"
-if [ ! -d $hgFolder-hg ]; then
-    hg clone $hgURL $hgFolder-hg
-    if [[ -d $hgFolder-hg ]]; then
-        cd $hgFolder-hg
+if [ ! -d "$hgFolder"-hg ]; then
+    hg clone "$hgURL" "$hgFolder"-hg
+    if [[ -d "$hgFolder"-hg ]]; then
+        cd "$hgFolder"-hg
         touch recently_updated
     else
         echo "$hgFolder hg seems to be down"
@@ -145,18 +151,21 @@ if [ ! -d $hgFolder-hg ]; then
         compile="false"
     fi
 else
-    cd $hgFolder-hg
-    oldHead=`hg id --id`
+    cd "$hgFolder"-hg
+    oldHead=$(hg id --id)
     hg pull
     hg update
-    newHead=`hg id --id`
+    newHead=$(hg id --id)
+
+    pkg-config --exists "$hgFolder"
+    local pcExists=$?
 
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful*
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ ! $hgCheck && `pkg-config --exists $hgFolder` ]] ||
-         [[ ! -z $hgCheck && ! -f $LOCALDESTDIR/$hgCheck ]]; then
+         [[ -z "$hgCheck" && $pcExists = 1 ]] ||
+         [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
          compile="true"
     else
         echo -------------------------------------------------
