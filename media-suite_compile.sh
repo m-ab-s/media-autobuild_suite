@@ -1869,13 +1869,17 @@ if [[ ! $x265 = "n" ]]; then
         rm -f $LOCALDESTDIR/lib/libx265.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
 
+        if [[ $bits = "32bit" ]]; then
+            xpsupport="-DWINXP_SUPPORT:BOOL=TRUE"
+        fi
+
         if [[ $x265 = "y" ]]; then
 
             rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
             rm -f $LOCALDESTDIR/bin-video/x265.exe
 
             if [[ $bits = "32bit" ]]; then
-                cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+                cmake -G "MSYS Makefiles" $xpsupport -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
             else
                 cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
             fi
@@ -1886,9 +1890,9 @@ if [[ ! $x265 = "n" ]]; then
             make clean
             rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
 
-            cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
         else
-            cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
         fi
 
         make -j $cpuCount
