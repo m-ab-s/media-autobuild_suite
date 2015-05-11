@@ -1738,7 +1738,7 @@ if [[ $mp4box = "y" ]]; then
             make distclean
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --static-mp4box --enable-static-bin --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
 
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -fPIC//g' config.mak
