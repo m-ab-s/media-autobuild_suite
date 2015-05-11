@@ -517,10 +517,10 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_pkgConfig "gnutls = 3.3.14"
+do_pkgConfig "gnutls = 3.3.15"
 
 if [[ $compile = "true" ]]; then
-    do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.14.tar.xz"
+    do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.15.tar.xz"
 
     if [[ -f "lib/.libs/libgnutls.a" ]]; then
         make distclean
@@ -537,7 +537,7 @@ if [[ $compile = "true" ]]; then
 
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
 
-    do_checkIfExist gnutls-3.3.14 libgnutls.a
+    do_checkIfExist gnutls-3.3.15 libgnutls.a
 fi
 
 cd $LOCALBUILDDIR
