@@ -1062,6 +1062,34 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $sox = "y" ]]; then
+
+    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
+        echo -------------------------------------------------
+        echo "libmad-0.15.1b is already compiled"
+        echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile libmad $bits\007"
+
+        do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+
+        if [[ -f ".libs/libmad.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
+            rm -rf $LOCALDESTDIR/include/mad.h
+            rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
+        fi
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist libmad-0.15.1b libmad.a
+    fi
+
+    cd $LOCALBUILDDIR
+
     do_git "git://git.code.sf.net/p/sox/code" sox
 
     if [[ $compile = "true" ]]; then
@@ -1666,60 +1694,6 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-
-    if [[ `a52dec --help 2>&1 | grep "a52dec-0.7.4"` ]]; then
-        echo -------------------------------------------------
-        echo "a52dec-0.7.4 is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile a52dec $bits\007"
-
-            do_wget_tar "http://liba52.sourceforge.net/files/a52dec-0.7.4.tar.gz"
-
-            if [[ -f "liba52/.libs/liba52.a" ]]; then
-                make distclean
-            fi
-            if [[ -d "$LOCALDESTDIR/include/a52dec" ]]; then
-                rm -rf $LOCALDESTDIR/include/a52dec $LOCALDESTDIR/bin-audio/{a52dec,extract_a52}.exe
-                rm -rf $LOCALDESTDIR/lib/liba52.{l,}a
-            fi
-
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
-
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist a52dec-0.7.4 liba52.a
-    fi
-
-    cd $LOCALBUILDDIR
-
-    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
-        echo -------------------------------------------------
-        echo "libmad-0.15.1b is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile libmad $bits\007"
-
-            do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
-
-            if [[ -f ".libs/libmad.a" ]]; then
-                make distclean
-            fi
-            if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
-                rm -rf $LOCALDESTDIR/include/mad.h
-                rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
-            fi
-
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
-
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist libmad-0.15.1b libmad.a
-    fi
-
-    cd $LOCALBUILDDIR
 
     # remove old svn source
     if [[ -d gpac-svn ]]; then
