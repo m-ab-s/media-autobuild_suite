@@ -1042,7 +1042,7 @@ if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
             rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
             rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/soxr.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/soxr{,-lsr}.pc
         fi
         make clean
         rm -rf *
@@ -1051,7 +1051,7 @@ if [[ $compile = "true" ]]; then
         cd build
     fi
 
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE=0 -DBUILD_SHARED_LIBS:bool=off -DBUILD_TESTS:BOOL=OFF -DWITH_OPENMP:BOOL=OFF -DUNIX:BOOL=on -Wno-dev
+    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_SHARED_LIBS:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on -DBUILD_TESTS:bool=off -DWITH_OPENMP:bool=off -DBUILD_LSR_TESTS:bool=off -DUNIX:bool=on
 
     make -j $cpuCount
     make install
