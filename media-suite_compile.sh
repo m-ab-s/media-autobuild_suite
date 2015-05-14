@@ -2,7 +2,6 @@
 cpuCount=1
 compile="false"
 buildFFmpeg="false"
-x264Bin="no"
 newFfmpeg="no"
 while true; do
   case $1 in
@@ -1842,30 +1841,27 @@ if [[ ! $x265 = "n" ]]; then
         rm -f $LOCALDESTDIR/include/x265_config.h
         rm -f $LOCALDESTDIR/lib/libx265.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
+        rm -f $LOCALDESTDIR/bin-video/libx265*.dll
+        rm -f $LOCALDESTDIR/bin-video/x265.exe
 
         if [[ $bits = "32bit" ]]; then
             xpsupport="-DWINXP_SUPPORT:BOOL=TRUE"
+            assembly="-DENABLE_ASSEMBLY=OFF"
         fi
 
+        # shared 16-bit libx265_main10.dll
+        cmake -G "MSYS Makefiles" $xpsupport $assembly -DHIGH_BIT_DEPTH=1 -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+
+        make -j $cpuCount
+        cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
+
+        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
+
         if [[ $x265 = "y" ]]; then
-
-            rm -f $LOCALDESTDIR/bin-video/x265-16bit.exe
-            rm -f $LOCALDESTDIR/bin-video/x265.exe
-
-            if [[ $bits = "32bit" ]]; then
-                cmake -G "MSYS Makefiles" $xpsupport -DHIGH_BIT_DEPTH=1 -DENABLE_ASSEMBLY=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
-            else
-                cmake -G "MSYS Makefiles" -DHIGH_BIT_DEPTH=1 ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
-            fi
-
-            make -j $cpuCount
-            cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
-
-            make clean
-            rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
-
-            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            # 8-bit static x265.exe
+            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=ON  ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++" -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
         else
+            # 8-bit static libx265.a
             cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
         fi
 
