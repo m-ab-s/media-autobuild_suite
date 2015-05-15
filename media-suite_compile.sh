@@ -1852,7 +1852,7 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         # shared 16-bit libx265_main10.dll
-        cmake -G "MSYS Makefiles" $xpsupport $assembly -DHIGH_BIT_DEPTH=1 -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+        cmake -G "MSYS Makefiles" $xpsupport $assembly -DHIGH_BIT_DEPTH=1 -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=ON -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
 
         make -j $cpuCount
         cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
