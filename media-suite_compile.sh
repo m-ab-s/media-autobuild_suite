@@ -1511,6 +1511,8 @@ if [[ $compile = "true" ]]; then
         cd build
     fi
 
+    sed -i 's/${LIB64} STREQUAL "TRUE"/LIB64/' ../CMakeLists.txt
+
     cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off
 
     make -j $cpuCount
