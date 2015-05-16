@@ -1511,7 +1511,8 @@ if [[ $compile = "true" ]]; then
         cd build
     fi
 
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off
+    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off -DUSE_OMP:bool=off
+    sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
 
     make -j $cpuCount
     make install
