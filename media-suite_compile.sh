@@ -2182,13 +2182,13 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
 
     if [[ $compile = "true" ]]; then
         if [[ ! -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
-            rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit $LOCALDESTDIR/lib/lua
-            rm -rf $LOCALDESTDIR/lib/libluajit-5.1a $LOCALDESTDIR/lib/pkgconfig/luajit.pc
+            rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit*.exe $LOCALDESTDIR/lib/lua
+            rm -rf $LOCALDESTDIR/lib/libluajit-5.1.a $LOCALDESTDIR/lib/pkgconfig/luajit.pc
             make clean
         fi
 
         make BUILDMODE=static amalg
-        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe install
+        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
 
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
