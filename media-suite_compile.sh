@@ -1199,6 +1199,29 @@ if [[ $sox = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
+    do_pkgConfig "opusfile = 0.6"
+
+    if [[ $compile = "true" ]]; then
+        do_wget_tar "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
+
+        if [[ -f ".libs/libopusfile.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/opus/opusfile.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
+            rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
+        fi
+
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist opusfile-0.6 libopusfile.a
+    fi
+
+    cd $LOCALBUILDDIR
+
     do_git "git://git.code.sf.net/p/sox/code" sox
 
     if [[ $compile = "true" ]]; then
