@@ -738,43 +738,48 @@ fi
 
 cd $LOCALBUILDDIR
 
-#do_svn "svn://dev.exiv2.org/svn/trunk" exiv2-svn
+do_pkgConfig "ogg = 1.3.2"
 
-if [[ $compile == "no" ]]; then # is deactivated for the moment
-    if [ -d "build" ]; then
-        cd build
-        make uninstall
-        rm $LOCALDESTDIR/bin-global/metacopy.exe
-        rm $LOCALDESTDIR/bin-global/path-test.exe
-        rm $LOCALDESTDIR/bin-global/exiv2.exe
-        rm -rf *
-    else
-        mkdir build
-        cd build
+if [[ $compile = "true" ]]; then
+    do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
+
+    if [[ -f "./src/.libs/libogg.a" ]]; then
+        make distclean
+    fi
+    if [[ -d "$LOCALDESTDIR/include/ogg" ]]; then
+        rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
+        rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     fi
 
-    LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DEXIV2_ENABLE_SHARED:BOOL=off -DCMAKE_BUILD_TYPE=release -DEXIV2_ENABLE_CURL:BOOL=off -DEXIV2_ENABLE_SSH:BOOL=off -Wno-dev
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
     make -j $cpuCount
     make install
 
-    mv $LOCALDESTDIR/bin/metacopy.exe $LOCALDESTDIR/bin-global
-    mv $LOCALDESTDIR/bin/path-test.exe $LOCALDESTDIR/bin-global
-    mv $LOCALDESTDIR/bin/exiv2.exe $LOCALDESTDIR/bin-global
-
-    do_checkIfExist exiv2-svn bin-global/exiv2.exe
-#else
-#   echo -------------------------------------------------
-#   echo "exiv2 is already up to date"
-#   echo -------------------------------------------------
+    do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
+cd $LOCALBUILDDIR
 
+do_pkgConfig "vorbis = 1.3.5"
 
+if [[ $compile = "true" ]]; then
+    do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
+    if [[ -f "./lib/.libs/libvorbis.a" ]]; then
+        make distclean
+    fi
+    if [[ -d "$LOCALDESTDIR/include/vorbis" ]]; then
+        rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
+        rm -rf $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
+    fi
 
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
+    make -j $cpuCount
+    make install
 
+    do_checkIfExist libvorbis-1.3.5 libvorbis.a
 fi
 
 cd $LOCALBUILDDIR
