@@ -566,28 +566,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_git "https://github.com/foo86/dcadec.git" dcadec
-
-if [[ $compile = "true" ]]; then
-    if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
-        rm -rf $LOCALDESTDIR/include/libdcadec
-        rm -f $LOCALDESTDIR/lib/libdcadec.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
-        rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
-    fi
-
-    if [[ -f dcadec.exe ]]; then
-        make clean
-    fi
-    
-    make CONFIG_WINDOWS=1 LDFLAGS=-lm
-    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
-
-    do_checkIfExist dcadec-git libdcadec.a
-fi
-
-cd $LOCALBUILDDIR
-
 do_pkgConfig "libxml-2.0 = 2.9.1"
 
 if [[ $compile = "true" ]]; then
@@ -675,6 +653,68 @@ if [[ `file --version | grep "file.exe-5.22"` ]]; then
         do_checkIfExist file-5.22 libmagic.a
 fi
 
+if [[ $mkv = "y" ]]; then
+
+    cd $LOCALBUILDDIR
+
+    if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
+        echo -------------------------------------------------
+        echo "wxWidgets is already compiled"
+        echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile wxWidgets $bits\007"
+
+        do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
+
+        if [[ -f config.log ]]; then
+            make distclean
+        fi
+
+        CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
+    fi
+
+fi
+
+echo "-------------------------------------------------------------------------------"
+echo
+echo "compile global tools $bits done..."
+echo
+echo "-------------------------------------------------------------------------------"
+
+cd $LOCALBUILDDIR
+echo "-------------------------------------------------------------------------------"
+echo
+echo "compile audio tools $bits"
+echo
+echo "-------------------------------------------------------------------------------"
+
+cd $LOCALBUILDDIR
+
+do_git "https://github.com/foo86/dcadec.git" dcadec
+
+if [[ $compile = "true" ]]; then
+    if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
+        rm -rf $LOCALDESTDIR/include/libdcadec
+        rm -f $LOCALDESTDIR/lib/libdcadec.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
+        rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+    fi
+
+    if [[ -f dcadec.exe ]]; then
+        make clean
+    fi
+
+    make CONFIG_WINDOWS=1 LDFLAGS=-lm
+    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
+
+    do_checkIfExist dcadec-git libdcadec.a
+fi
+
 cd $LOCALBUILDDIR
 
 do_git "https://github.com/TimothyGu/libilbc.git" libilbc
@@ -729,45 +769,15 @@ if [[ $compile == "no" ]]; then # is deactivated for the moment
 #   echo -------------------------------------------------
 fi
 
-if [[ $mkv = "y" ]]; then
 
-    cd $LOCALBUILDDIR
 
-    if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
-        echo -------------------------------------------------
-        echo "wxWidgets is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile wxWidgets $bits\007"
 
-            do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
 
-            if [[ -f config.log ]]; then
-                make distclean
-            fi
-            
-            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
-    fi
 
 fi
 
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile global tools $bits done..."
-echo
-echo "-------------------------------------------------------------------------------"
-
 cd $LOCALBUILDDIR
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile audio tools $bits"
-echo
-echo "-------------------------------------------------------------------------------"
 
 do_pkgConfig "theora = 1.1.1"
 
@@ -782,12 +792,38 @@ if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --disable-examples
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-examples
 
     make -j $cpuCount
     make install
 
     do_checkIfExist libtheora-1.1.1 libtheora.a
+fi
+
+cd $LOCALBUILDDIR
+
+do_pkgConfig "opus = 1.1"
+
+if [[ $compile = "true" ]]; then
+    do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
+
+    if [[ -f ".libs/libopus.a" ]]; then
+        make distclean
+    fi
+    if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
+        rm -rf $LOCALDESTDIR/include/opus
+        rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
+    fi
+
+    do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
+    patch -p0 < opus11.patch
+
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-doc
+
+    make -j $cpuCount
+    make install
+
+    do_checkIfExist opus-1.1 libopus.a
 fi
 
 cd $LOCALBUILDDIR
@@ -805,7 +841,7 @@ if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/lib/libspeex{,dsp}.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex{,dsp}.pc
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-oggtest
 
     make -j $cpuCount
     make install
@@ -828,7 +864,7 @@ if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --enable-shared=no --enable-static
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --disable-shared
 
     make -j $cpuCount
     make install
@@ -977,32 +1013,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_pkgConfig "opus = 1.1"
-
-if [[ $compile = "true" ]]; then
-    do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-
-    if [[ -f ".libs/libopus.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
-        rm -rf $LOCALDESTDIR/include/opus
-        rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
-    fi
-
-    do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
-    patch -p0 < opus11.patch
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no --enable-static --disable-doc
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist opus-1.1 libopus.a
-fi
-
-cd $LOCALBUILDDIR
-
 if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
     echo -------------------------------------------------
     echo "opus-tools-0.1.9 is already compiled"
@@ -1056,59 +1066,6 @@ if [[ $compile = "true" ]]; then
     make install
 
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
-fi
-
-cd $LOCALBUILDDIR
-
-if [[ $sox = "y" ]]; then
-
-    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
-        echo -------------------------------------------------
-        echo "libmad-0.15.1b is already compiled"
-        echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile libmad $bits\007"
-
-        do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
-
-        if [[ -f ".libs/libmad.a" ]]; then
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
-            rm -rf $LOCALDESTDIR/include/mad.h
-            rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
-        fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist libmad-0.15.1b libmad.a
-    fi
-
-    cd $LOCALBUILDDIR
-
-    do_git "git://git.code.sf.net/p/sox/code" sox
-
-    if [[ $compile = "true" ]]; then
-        sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
-
-        if [[ ! -f ./configure ]]; then
-            autoreconf -i
-        else
-            rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
-            rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
-            make distclean
-        fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx' SNDFILE_LIBS="-lsndfile -lFLAC -lvorbis -lvorbisenc -logg"
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist sox-git bin-audio/sox.exe
-    fi
 fi
 
 cd $LOCALBUILDDIR
@@ -1204,6 +1161,59 @@ if [[ $compile = "true" ]]; then
         make install
 
         do_checkIfExist libbs2b-3.1.0 libbs2b.a
+fi
+
+cd $LOCALBUILDDIR
+
+if [[ $sox = "y" ]]; then
+
+    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
+        echo -------------------------------------------------
+        echo "libmad-0.15.1b is already compiled"
+        echo -------------------------------------------------
+    else
+        echo -ne "\033]0;compile libmad $bits\007"
+
+        do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+
+        if [[ -f ".libs/libmad.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
+            rm -rf $LOCALDESTDIR/include/mad.h
+            rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
+        fi
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist libmad-0.15.1b libmad.a
+    fi
+
+    cd $LOCALBUILDDIR
+
+    do_git "git://git.code.sf.net/p/sox/code" sox
+
+    if [[ $compile = "true" ]]; then
+        sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
+
+        if [[ ! -f ./configure ]]; then
+            autoreconf -i
+        else
+            rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
+            rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
+            make distclean
+        fi
+
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist sox-git bin-audio/sox.exe
+    fi
 fi
 
 echo "-------------------------------------------------------------------------------"
