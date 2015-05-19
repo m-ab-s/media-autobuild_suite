@@ -784,29 +784,6 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_pkgConfig "theora = 1.1.1"
-
-if [[ $compile = "true" ]]; then
-    do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-
-    if [[ -f "lib/.libs/libtheora.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/theora" ]]; then
-        rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
-        rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
-    fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-examples
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist libtheora-1.1.1 libtheora.a
-fi
-
-cd $LOCALBUILDDIR
-
 do_pkgConfig "opus = 1.1"
 
 if [[ $compile = "true" ]]; then
@@ -1250,13 +1227,36 @@ echo "compile audio tools $bits done..."
 echo
 echo "-------------------------------------------------------------------------------"
 
-cd $LOCALBUILDDIR
-sleep 3
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
+
+cd $LOCALBUILDDIR
+
+do_pkgConfig "theora = 1.1.1"
+
+if [[ $compile = "true" ]]; then
+    do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
+
+    if [[ -f "lib/.libs/libtheora.a" ]]; then
+        make distclean
+    fi
+    if [[ -d "$LOCALDESTDIR/include/theora" ]]; then
+        rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
+        rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
+    fi
+
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-examples
+
+    make -j $cpuCount
+    make install
+
+    do_checkIfExist libtheora-1.1.1 libtheora.a
+fi
+
+cd $LOCALBUILDDIR
 
 if [[ ! $vpx = "n" ]]; then
     do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
