@@ -968,7 +968,7 @@ if [[ $mplayer = "y" ]] && [[ $nonfree = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
-    if [[ `faac.exe | grep "FAAC 1.28"` ]]; then
+    if [[ `$LOCALDESTDIR/bin-audio/faac.exe | grep "FAAC 1.28"` ]]; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
