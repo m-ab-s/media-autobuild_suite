@@ -1916,7 +1916,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmbc = "y" ]]; then
-    if [[ `ffmbc.exe 2>&1 | grep "version 0.7.2"` ]]; then
+    if [[ `$LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep "version 0.7.2"` ]]; then
         echo -------------------------------------------------
         echo "ffmbc-0.7.2 is already compiled"
         echo -------------------------------------------------
