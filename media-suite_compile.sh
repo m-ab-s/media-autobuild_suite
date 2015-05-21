@@ -1738,11 +1738,11 @@ if [[ $mp4box = "y" ]]; then
         rm -rf ./gpac-svn/
     fi
 
-    do_git "https://github.com/gpac/gpac.git" gpac noDepth master bin-video/MP4Box.exe
+    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/gpac/MP4Box.exe
 
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
-            rm -rf $LOCALDESTDIR/bin-video/MP4Box.exe $LOCALDESTDIR/lib/libgpac*
+            rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
         fi
 
@@ -1750,7 +1750,7 @@ if [[ $mp4box = "y" ]]; then
             make distclean
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64"
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-ldflags="-static-libgcc" --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl --use-jpeg=no --use-ogg=no
 
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -fPIC//g' config.mak
@@ -1764,12 +1764,12 @@ if [[ $mp4box = "y" ]]; then
 
         cd ../..
         make install-lib
-        rm -f $LOCALDESTDIR/bin/libgpac.dll
-        rm -f $LOCALDESTDIR/lib/libgpac.dll.a
+        mkdir -p $LOCALDESTDIR/bin-video/gpac
+        mv $LOCALDESTDIR/bin/libgpac.dll $LOCALDESTDIR/bin-video/gpac/
 
-        cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
+        cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video/gpac/
 
-        do_checkIfExist gpac-git bin-video/MP4Box.exe
+        do_checkIfExist gpac-git bin-video/gpac/MP4Box.exe
     fi
 fi
 
