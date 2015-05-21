@@ -798,7 +798,7 @@ if [[ $compile = "true" ]]; then
     fi
 
     do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
-    patch -p0 < opus11.patch
+    patch -N -p0 < opus11.patch
 
     ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-doc
 
@@ -1613,8 +1613,8 @@ if [[ $compile = "true" ]]; then
 
     do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
     do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
-    patch -p0 < zvbi-win32.patch
-    patch -p0 < zvbi-ioctl.patch
+    patch -N -p0 < zvbi-win32.patch
+    patch -N -p0 < zvbi-ioctl.patch
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
 
