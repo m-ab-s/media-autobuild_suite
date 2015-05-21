@@ -2204,8 +2204,11 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     do_git "https://github.com/lachs0r/rubberband.git" rubberband
 
     if [[ $compile = "true" ]]; then
-        if [[ ! -f "$LOCALDESTDIR/lib/librubberband.a" ]]; then
+        if [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]]; then
             make PREFIX=$LOCALDESTDIR uninstall
+        fi
+		
+		if [[ -f "lib/librubberband.a" ]]; then
             make clean
         fi
 
