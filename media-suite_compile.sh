@@ -1750,26 +1750,19 @@ if [[ $mp4box = "y" ]]; then
             make distclean
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --extra-ldflags="-static-libgcc" --extra-libs="-lws2_32 -lwinmm -lz -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64" --use-ffmpeg=no --use-png=no --disable-ssl --use-jpeg=no --use-ogg=no
+        ./configure --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lz"
 
-        if [[ $bits = "64bit" ]]; then
-            sed -i 's/ -fPIC//g' config.mak
+        if [[ ! -f ./gpac.patch ]]; then
+            do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/gpac.patch"
         fi
+        git apply gpac.patch
 
-        cd src
         make -j $cpuCount
-
-        cd ../applications/mp4box
-        make -j $cpuCount
-
-        cd ../..
         make install-lib
-        mkdir -p $LOCALDESTDIR/bin-video/gpac
-        mv $LOCALDESTDIR/bin/libgpac.dll $LOCALDESTDIR/bin-video/gpac/
 
-        cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video/gpac/
+        cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 
-        do_checkIfExist gpac-git bin-video/gpac/MP4Box.exe
+        do_checkIfExist gpac-git bin-video/MP4Box.exe
     fi
 fi
 
