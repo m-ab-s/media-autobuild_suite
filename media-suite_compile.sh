@@ -1184,12 +1184,12 @@ if [[ $sox = "y" ]]; then
         if [[ -f ".libs/libopusfile.a" ]]; then
             make distclean
         fi
-        if [[ -d "$LOCALDESTDIR/include/opus/opusfile.h" ]]; then
+        if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
             rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
         fi
 
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared LIBS="$LIBS -lole32 -lgdi32"
 
         make -j $cpuCount
         make install
