@@ -426,7 +426,7 @@ if [[ $compile = "true" ]]; then
         make distclean
     fi
 
-    ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no
+    ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
     make -j $cpuCount
     make install
 
@@ -2264,6 +2264,7 @@ if [[ $mkv = "y" ]]; then
         sed -i "s/EXTRA_CFLAGS = *$/EXTRA_CFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
         sed -i "s/EXTRA_LDFLAGS = *$/EXTRA_LDFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
         sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/g" build-config
+		sed -i "s/@\(.*\)@//" build-config
 
         export DRAKETHREADS=$cpuCount
 
