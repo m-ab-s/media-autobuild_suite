@@ -1732,12 +1732,6 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-
-    # remove old svn source
-    if [[ -d gpac-svn ]]; then
-        rm -rf ./gpac-svn/
-    fi
-
     do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/gpac/MP4Box.exe
 
     if [[ $compile = "true" ]]; then
@@ -1751,11 +1745,6 @@ if [[ $mp4box = "y" ]]; then
         fi
 
         ./configure --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lz"
-
-        if [[ ! -f ./gpac.patch ]]; then
-            do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/gpac.patch"
-        fi
-        git apply gpac.patch
 
         make -j $cpuCount
         make install-lib
