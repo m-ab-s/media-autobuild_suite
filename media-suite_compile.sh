@@ -1923,7 +1923,7 @@ if [[ $ffmbc = "y" ]]; then
                 make distclean
             fi
 
-            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ldl'
+            ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
 
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
