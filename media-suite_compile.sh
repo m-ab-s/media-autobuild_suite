@@ -1732,7 +1732,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/gpac/MP4Box.exe
+    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/MP4Box.exe
 
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
@@ -2002,7 +2002,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libxavs $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
+            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
         else
             CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
@@ -2019,7 +2019,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' \
+            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             newFfmpeg="yes"
@@ -2027,7 +2027,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
         sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
 
-        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 
         make -j $cpuCount
         make install
