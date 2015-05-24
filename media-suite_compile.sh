@@ -705,12 +705,12 @@ if [[ $compile = "true" ]]; then
         rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
     fi
 
-    if [[ -f dcadec.exe ]]; then
+    if [[ -f libdcadec/libdcadec.a ]]; then
         make clean
     fi
 
-    make CONFIG_WINDOWS=1 LDFLAGS=-lm
-    make PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-audio PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install
+    make CONFIG_WINDOWS=1 LDFLAGS=-lm lib
+    make PREFIX=$LOCALDESTDIR PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install-lib
 
     do_checkIfExist dcadec-git libdcadec.a
 fi
