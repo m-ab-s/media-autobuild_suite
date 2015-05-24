@@ -1997,6 +1997,11 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             arch='x86_64'
         fi
 
+        if [[ ! -f "ffmpeg-use-pkg-config-for-more-external-libs.patch" ]]; then
+            do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
+        fi
+        patch -N -p0 < ffmpeg-use-pkg-config-for-more-external-libs.patch
+
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
                 rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
