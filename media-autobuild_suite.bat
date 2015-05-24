@@ -919,7 +919,7 @@ if %msys2%==msys32 (
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base-old.pk" del "%instdir%\%msys2%\etc\pac-base-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-base-new.pk" ren "%instdir%\%msys2%\etc\pac-base-new.pk" pac-base-old.pk
-    echo.asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>%instdir%\%msys2%\etc\pac-base-new.pk
+    echo.asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>%instdir%\%msys2%\etc\pac-base-new.pk
 
 if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------

@@ -1083,7 +1083,6 @@ do_git "https://github.com/erikd/libsndfile.git" sndfile
 
 if [[ $compile = "true" ]]; then
     if [[ ! -f ./configure ]]; then
-        sed -i "s/python/python2/" autogen.sh
         ./autogen.sh -V
     else
         rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
@@ -2206,21 +2205,21 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
 
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ ! -f waf ]; then
-            python2 ./bootstrap.py
+            ./bootstrap.py
         else
-            python2 ./waf distclean
+            ./waf distclean
             rm waf
             rm -rf .waf-*
             rm -rf $LOCALDESTDIR/bin-video/mpv.exe
-            python2 ./bootstrap.py
+            ./bootstrap.py
         fi
 
-        CFLAGS="$CFLAGS -DCACA_STATIC" python2 ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
+        CFLAGS="$CFLAGS -DCACA_STATIC" ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
-        python2 ./waf build -j $cpuCount
-        python2 ./waf install
+        ./waf build -j $cpuCount
+        ./waf install
 
         if [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
