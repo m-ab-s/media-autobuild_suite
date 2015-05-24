@@ -2005,7 +2005,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libxavs $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' \
+            --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
         else
             CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
@@ -2022,7 +2022,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
             --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' \
+            --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             newFfmpeg="yes"
@@ -2030,16 +2030,12 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
         sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
 
-        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lstdc++ -lpng -lm -lpthread -lwsock32 -lhogweed -lnettle -lgmp -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv -lole32 -loleaut32 -lorc-0.4' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 
         make -j $cpuCount
         make install
 
         if [[ ! $ffmpeg = "s" ]]; then
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
             sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
 
             do_checkIfExist ffmpeg-git libavcodec.a
