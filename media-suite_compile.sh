@@ -1994,33 +1994,33 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             fi
             CPPFLAGS='-DFRIBIDI_ENTRY=""' LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
-            --disable-debug --disable-static --disable-doc --disable-w32threads --enable-shared \
-            --enable-gpl --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib \
-            --enable-zlib --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
+            --disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 \
+            --disable-static --enable-shared \
+            --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
             --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype \
             --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            --enable-libvo-aacenc --enable-libopus --enable-libvidstab $builtvpx \
-            --enable-libxavs $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
-            --enable-libdcadec --enable-libbs2b $extras \
+            --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
+            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            $builtvpx $builtx264 $builtx265 $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
         else
             CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-            --disable-debug --disable-shared --disable-doc --disable-w32threads --enable-gpl \
-            --enable-version3 --enable-runtime-cpudetect --enable-avfilter --enable-bzlib --enable-zlib \
-            --enable-decklink --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r \
-            --enable-filter=frei0r --enable-libbluray --enable-libcaca --enable-libopenjpeg \
-            --enable-fontconfig --enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc \
-            --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
-            --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame \
-            --enable-libspeex --enable-libtheora --enable-libutvideo --enable-libvorbis --enable-libvo-aacenc \
-            --enable-libopus --enable-libvidstab $builtvpx --enable-libxavs \
-            $builtx264 $builtx265 --enable-libxvid --enable-libzvbi \
-            --enable-libgme --enable-libdcadec --enable-libbs2b $extras \
+            --disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 \
+            --enable-static --disable-shared \
+            --enable-decklink --enable-libutvideo --enable-libgme \
+            --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
+            --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype \
+            --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
+            --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
+            --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
+            --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
+            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            $builtvpx $builtx264 $builtx265 $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
