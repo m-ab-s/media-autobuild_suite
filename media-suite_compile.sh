@@ -1139,7 +1139,8 @@ if [[ $compile = "true" ]]; then
             rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+        sed -i 's/bs2bconvert$(EXEEXT) bs2bstream$(EXEEXT)//' src/Makefile.in
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
         make -j $cpuCount
         make install
