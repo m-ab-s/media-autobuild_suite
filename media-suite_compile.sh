@@ -964,7 +964,7 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
 fi
 
-if [[ $mplayer = "y" ]] && [[ $nonfree = "y" ]]; then
+if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
 
     cd $LOCALBUILDDIR
 
