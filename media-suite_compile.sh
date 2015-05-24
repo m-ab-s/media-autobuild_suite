@@ -1083,14 +1083,17 @@ do_git "https://github.com/erikd/libsndfile.git" sndfile
 
 if [[ $compile = "true" ]]; then
     if [[ ! -f ./configure ]]; then
-        ./autogen.sh -V
+        ./autogen.sh
     else
         rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
         rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
         make distclean
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+
+    # don't compile programs
+    sed -i 's/ examples regtest tests programs//g' Makefile
 
     make -j $cpuCount
     make install
