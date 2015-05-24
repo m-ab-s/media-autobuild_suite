@@ -1898,9 +1898,9 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmbc = "y" ]]; then
-    if [[ `$LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep "version 0.7.2"` ]]; then
+    if [[ `$LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep "version 0.7.4"` ]]; then
         echo -------------------------------------------------
-        echo "ffmbc-0.7.2 is already compiled"
+        echo "ffmbc-0.7.4 is already compiled"
         echo -------------------------------------------------
         else
             echo -ne "\033]0;compile ffmbc $bits\007"
@@ -1911,7 +1911,8 @@ if [[ $ffmbc = "y" ]]; then
                 extras=""
             fi
 
-            do_wget_tar "https://drive.google.com/uc?id=0B0jxxycBojSwTEgtbjRZMXBJREU&export=download" FFmbc-0.7.2.tar.bz2
+            do_wget_tar "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
+
 
             if [[ $bits = "32bit" ]]; then
                 arch='x86'
@@ -1928,7 +1929,7 @@ if [[ $ffmbc = "y" ]]; then
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
 
-            do_checkIfExist FFmbc-0.7.2 bin-video/ffmbc.exe
+            do_checkIfExist FFmbc-0.7.4 bin-video/ffmbc.exe
     fi
 fi
 
