@@ -1575,16 +1575,18 @@ do_pkgConfig "caca = 0.99.beta19"
 if [[ $compile = "true" ]]; then
     do_wget_tar "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
 
-    cd caca
-
-    if [[ -f ".libs/libcaca.a" ]]; then
+    if [[ -f "caca/.libs/libcaca.a" ]]; then
         make distclean
+    else
+        sed -i -e 's/src //g' -e 's/examples //g' -e 's/doc //g' Makefile.am
+        autoreconf -fiv
     fi
     if [[ -f "$LOCALDESTDIR/include/caca.h" ]]; then
         rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
         rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
     fi
 
+    cd caca
     sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" string.c
     sed -i "s/#if defined(HAVE_VSNPRINTF_S)//g" string.c
     sed -i "s/vsnprintf_s(buf, bufsize, _TRUNCATE, format, args);//g" string.c
@@ -1595,9 +1597,9 @@ if [[ $compile = "true" ]]; then
     sed -i "s/__declspec(dllimport)//g" *.h
     cd ..
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-cxx --disable-csharp --disable-ncurses --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --disable-cxx --disable-csharp --disable-ncurses --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
 
-    sed -i 's/ln -sf/$(LN_S)/' "caca/Makefile" "cxx/Makefile" "doc/Makefile"
+    sed -i 's/ln -sf/$(LN_S)/' "doc/Makefile"
 
     make -j $cpuCount
     make install
