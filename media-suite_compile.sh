@@ -1458,8 +1458,11 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
 
         ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video
 
-        make -j $cpuCount
-        make install
+        make -j $cpuCount libxavs.a
+
+        install -m 644 xavs.h $LOCALDESTDIR/include
+        install -m 644 libxavs.a $LOCALDESTDIR/lib
+        install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
 
         do_checkIfExist xavs libxavs.a
 fi
