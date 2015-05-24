@@ -1085,9 +1085,11 @@ if [[ $compile = "true" ]]; then
     if [[ ! -f ./configure ]]; then
         ./autogen.sh
     else
+        make distclean
+    fi
+    if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
         rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
         rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
-        make distclean
     fi
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
@@ -1103,12 +1105,12 @@ fi
 
 cd $LOCALBUILDDIR
 
-do_pkgConfig "twolame = 0.3.13"
+do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
 
 if [[ $compile = "true" ]]; then
-        do_wget_tar "http://sourceforge.net/projects/twolame/files/twolame/0.3.13/twolame-0.3.13.tar.gz"
-
-        if [[ -f "libtwolame\.libs\libtwolame.a" ]]; then
+        if [[ ! -f ./configure ]]; then
+            ./autogen.sh -V
+        else
             make distclean
         fi
         if [[ -f "$LOCALDESTDIR/include/twolame.h" ]]; then
@@ -1116,12 +1118,12 @@ if [[ $compile = "true" ]]; then
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
         
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS="$CPPFLAGS -DLIBTWOLAME_STATIC"
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
         
         make -j $cpuCount
         make install
         
-        do_checkIfExist twolame-0.3.13 libtwolame.a
+        do_checkIfExist twolame-git libtwolame.a
 fi
 
 cd $LOCALBUILDDIR
@@ -2005,7 +2007,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
             --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
             $builtvpx $builtx264 $builtx265 $extras \
-            --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
+            --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
         else
@@ -2022,7 +2024,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
             --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
             $builtvpx $builtx264 $builtx265 $extras \
-            --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' \
+            --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
@@ -2031,7 +2033,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
         sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
 
-        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DLIBTWOLAME_STATIC -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 
         make -j $cpuCount
         make install
@@ -2115,7 +2117,7 @@ if [[ $mplayer = "y" ]]; then
 
         sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 
-        CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DLIBTWOLAME_STATIC -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
+        CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 
         make -j $cpuCount
         make install
