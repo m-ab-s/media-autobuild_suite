@@ -1118,7 +1118,8 @@ if [[ $compile = "true" ]]; then
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
         
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+        sed -i 's/frontend simplefrontend//' Makefile
         
         make -j $cpuCount
         make install
