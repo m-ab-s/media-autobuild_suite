@@ -1775,7 +1775,7 @@ if [[ ! $x264 = "n" ]]; then
         if [[ $x264 = "y" ]]; then
             cd $LOCALBUILDDIR
 
-            do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
+            do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
                 rm -rf $LOCALDESTDIR/include/libavutil
@@ -1818,11 +1818,6 @@ if [[ ! $x264 = "n" ]]; then
 
             make -j $cpuCount
             make install
-
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-            sed -i "s/ -lp11-kit//g" $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
 
             do_checkIfExist ffmpeg-git libavcodec.a
 
