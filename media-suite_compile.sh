@@ -4,9 +4,9 @@ compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_OPTS="--disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3"
-DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
---enable-libbluray --enable-libcaca --extra-cflags=-DCACA_STATIC --enable-libopenjpeg --enable-fontconfig \
---enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug \
+DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r \
+--enable-libbluray --enable-libcaca --extra-cflags=-DCACA_STATIC --enable-libopenjpeg \
+--enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug \
 --extra-cflags=-DMODPLUG_STATIC --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
 --enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex \
 --enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab \
@@ -262,16 +262,13 @@ do_checkIfExist() {
 
 do_pkgConfig() {
     local pkg=${1%% *}
-    compile="true"
     echo -ne "\033]0;compiling $pkg $bits\007"
 
-    pkg-config --exists $1
-
-    if [[ $? = 0 ]]; then
+    if pkg-config --exists "$1"; then
         echo -------------------------------------------------
         echo "$pkg is already compiled"
         echo -------------------------------------------------
-        compile="false"
+        return 1
     fi
 }
 
@@ -311,6 +308,13 @@ do_checkForOption() {
     fi
 }
 
+do_addOption() {
+    local option=${1%% *}
+    if ! do_checkForOption "$option"; then
+        FFMPEG_OPTS="$FFMPEG_OPTS $option"
+    fi
+}
+
 do_removeOption() {
     local option=${1%% *}
     FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
@@ -326,43 +330,33 @@ echo "--------------------------------------------------------------------------
 
 do_getFFmpegConfig
 
-if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
-    echo -------------------------------------------------
-    echo "openjpeg-1.5.2 is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile openjpeg $bits\007"
+if do_checkForOption "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
+    do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
-        do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
-
-        if [ -d "build" ]; then
-            cd build
-            if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
-                rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
-                rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
-                rm -f $LOCALDESTDIR/lib/openjpeg-1.5
-            fi
-            make clean
-            rm -rf *
-        else
-            mkdir build
-            cd build
+    if [ -d "build" ]; then
+        cd build
+        if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
+            rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
+            rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
+            rm -rf $LOCALDESTDIR/lib/openjpeg-1.5
         fi
+        make clean
+        rm -rf *
+    else
+        mkdir build
+        cd build
+    fi
 
-        cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
+    cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC" -DUNIX:BOOL=on
 
-        make -j $cpuCount
-        make install
+    make -j $cpuCount
+    make install
 
-        do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
-        cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
+    do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "freetype2 = 17.4.11"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libfreetype" || do_checkForOption "--enable-libbluray" || do_checkForOption "--enable-libass" && do_pkgConfig "freetype2 = 17.4.11"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
     if [[ -f "objs/.libs/libfreetype.a" ]]; then
@@ -377,14 +371,12 @@ if [[ $compile = "true" ]]; then
     make -j $cpuCount
     make install
 
+    do_addOption "--enable-libfreetype"
     do_checkIfExist freetype-2.5.5 libfreetype.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "fontconfig = 2.11.92"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-fontconfig" || do_checkForOption "--enable-libbluray" || do_checkForOption "--enable-libass" && do_pkgConfig "fontconfig = 2.11.92"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
     if [[ -f "src/.libs/libfontconfig.a" ]]; then
@@ -401,14 +393,12 @@ if [[ $compile = "true" ]]; then
     make -j $cpuCount
     make install
 
+    do_addOption "--enable-fontconfig"
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "fribidi = 0.19.6"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libfribidi" || do_checkForOption "--enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
 
     if [[ -f "lib/.libs/libfribidi.a" ]]; then
@@ -423,36 +413,17 @@ if [[ $compile = "true" ]]; then
     make -j $cpuCount
     make install
 
-if [ ! -f ${LOCALDESTDIR}/bin-global/fribidi-config ]; then
-cat > ${LOCALDESTDIR}/bin-global/fribidi-config << "EOF"
-#!/bin/sh
-case $1 in
-  --version)
-    pkg-config --modversion fribidi
-    ;;
-  --cflags)
-    pkg-config --cflags fribidi
-    ;;
-  --libs)
-    pkg-config --libs fribidi
-    ;;
-  *)
-    false
-    ;;
-esac
-EOF
-fi
-
+    do_addOption "--enable-libfribidi"
     do_checkIfExist fribidi-0.19.6 libfribidi.a
 fi
 
-cd $LOCALBUILDDIR
-
-if [[ `ragel --version | grep "version 6.9"` ]]; then
-    echo -------------------------------------------------
-    echo "ragel-6.9 is already compiled"
-    echo -------------------------------------------------
+if do_checkForOption "--enable-libass"; then
+    if $LOCALDESTDIR/bin-global/ragel --version | grep -q -e "version 6.9"; then
+        echo -------------------------------------------------
+        echo "ragel-6.9 is already compiled"
+        echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile ragel $bits\007"
 
         do_wget_tar "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
@@ -468,34 +439,30 @@ if [[ `ragel --version | grep "version 6.9"` ]]; then
         make -j $cpuCount
         make install
 
-    do_checkIfExist ragel-6.9 bin-global/ragel.exe
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz
-
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        ./autogen.sh -V
-    else
-        rm -rf $LOCALDESTDIR/include/harfbuzz $LOCALDESTDIR/bin-global/hb-fc-list.exe
-        rm -rf $LOCALDESTDIR/lib/libharfbuzz.{l,}a $LOCALDESTDIR/lib/pkgconfig/harfbuzz.pc
-        make distclean
+        do_checkIfExist ragel-6.9 bin-global/ragel.exe
     fi
 
-    ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-    make -j $cpuCount
-    make install
+    cd $LOCALBUILDDIR
+    do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            ./autogen.sh -V
+        else
+            rm -rf $LOCALDESTDIR/include/harfbuzz $LOCALDESTDIR/bin-global/hb-fc-list.exe
+            rm -rf $LOCALDESTDIR/lib/libharfbuzz.{l,}a $LOCALDESTDIR/lib/pkgconfig/harfbuzz.pc
+            make distclean
+        fi
 
-    do_checkIfExist harfbuzz-git libharfbuzz.a
+        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist harfbuzz-git libharfbuzz.a
+    fi
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "sdl = 1.2.15"
-
-if [[ $compile = "true" ]]; then
+if ! do_checkForOption "--disable-sdl" || ! do_checkForOption "--disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
 
     if [[ -f "build/.libs/libSDL.a" ]]; then
@@ -519,114 +486,109 @@ fi
 #----------------------
 # crypto engine
 #----------------------
-cd $LOCALBUILDDIR
 
-if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
-    echo -------------------------------------------------
-    echo "libgcrypt-1.6.2 is already compiled"
-    echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile libgcrypt $bits\007"
+if do_checkForOption "--enable-gnutls" || do_checkForOption "--enable-librtmp" ; then
+    do_addOption "--enable-gnutls"
 
-        do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
+    if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
+        echo -------------------------------------------------
+        echo "libgcrypt-1.6.2 is already compiled"
+        echo -------------------------------------------------
+        else
+            cd $LOCALBUILDDIR
+            echo -ne "\033]0;compile libgcrypt $bits\007"
 
-        if [[ -f "src/.libs/libgcrypt.a" ]]; then
+            do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
+
+            if [[ -f "src/.libs/libgcrypt.a" ]]; then
+                make distclean
+            fi
+            if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
+                rm -rf $LOCALDESTDIR/include/libgcrypt.h $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
+                rm -rf $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+            fi
+
+            if [[ "$bits" = "32bit" ]]; then
+                ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
+            else
+                ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX --disable-asm --disable-padlock-support
+            fi
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist libgcrypt-1.6.2 libgcrypt.a
+    fi
+
+    if do_pkgConfig "nettle = 2.7.1"; then
+        cd $LOCALBUILDDIR
+        do_wget_tar "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
+
+        if [[ -f "libnettle.a" ]]; then
             make distclean
         fi
-        if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
-            rm -rf $LOCALDESTDIR/include/libgcrypt.h $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
-            rm -rf $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+        if [[ -d "$LOCALDESTDIR/include/nettle" ]]; then
+            rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/nettle-*.exe
+            rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
         fi
 
-        if [[ "$bits" = "32bit" ]]; then
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
-        else
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX --disable-asm --disable-padlock-support
-        fi
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
+
         make -j $cpuCount
         make install
 
-        do_checkIfExist libgcrypt-1.6.2 libgcrypt.a
+        do_checkIfExist nettle-2.7.1 libnettle.a
+    fi
+
+    if do_pkgConfig "gnutls = 3.3.15"; then
+        cd $LOCALBUILDDIR
+        do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.15.tar.xz"
+
+        if [[ -f "lib/.libs/libgnutls.a" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/include/gnutls" ]]; then
+            rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/bin-global/gnutls-*.exe
+            rm -rf $LOCALDESTDIR/lib/libgnutls* $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+        fi
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
+
+        make -j $cpuCount
+        make install
+
+        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+
+        do_checkIfExist gnutls-3.3.15 libgnutls.a
+    fi
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-librtmp"; then
+    cd $LOCALBUILDDIR
+    do_git "git://git.ffmpeg.org/rtmpdump" librtmp shallow master bin-video/rtmpdump.exe
+    if [[ $compile = "true" ]]; then
+        if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
+            rm -rf $LOCALDESTDIR/include/librtmp
+            rm $LOCALDESTDIR/lib/librtmp.a
+            rm $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+            rm $LOCALDESTDIR/man/man3/librtmp.3
+            rm $LOCALDESTDIR/bin-video/rtmpdump.exe $LOCALDESTDIR/bin-video/rtmpsuck.exe $LOCALDESTDIR/bin-video/rtmpsrv.exe $LOCALDESTDIR/bin-video/rtmpgw.exe
+            rm $LOCALDESTDIR/man/man1/rtmpdump.1
+            rm $LOCALDESTDIR/man/man8/rtmpgw.8
+        fi
+        if [[ -f "librtmp/librtmp.a" ]]; then
+            make clean
+        fi
 
-do_pkgConfig "nettle = 2.7.1"
+        make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
 
-if [[ $compile = "true" ]]; then
-    do_wget_tar "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
+        sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 
-    if [[ -f "libnettle.a" ]]; then
-        make distclean
+        do_checkIfExist librtmp-git librtmp.a
     fi
-    if [[ -d "$LOCALDESTDIR/include/nettle" ]]; then
-        rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/nettle-*.exe
-        rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
-    fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist nettle-2.7.1 libnettle.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "gnutls = 3.3.15"
-
-if [[ $compile = "true" ]]; then
-    do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.15.tar.xz"
-
-    if [[ -f "lib/.libs/libgnutls.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/gnutls" ]]; then
-        rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/bin-global/gnutls-*.exe
-        rm -rf $LOCALDESTDIR/lib/libgnutls* $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-    fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
-
-    make -j $cpuCount
-    make install
-
-    sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-
-    do_checkIfExist gnutls-3.3.15 libgnutls.a
-fi
-
-cd $LOCALBUILDDIR
-
-do_git "git://git.ffmpeg.org/rtmpdump" librtmp shallow master bin-video/rtmpdump.exe
-
-if [[ $compile = "true" ]]; then
-    if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
-        rm -rf $LOCALDESTDIR/include/librtmp
-        rm $LOCALDESTDIR/lib/librtmp.a
-        rm $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-        rm $LOCALDESTDIR/man/man3/librtmp.3
-        rm $LOCALDESTDIR/bin-video/rtmpdump.exe $LOCALDESTDIR/bin-video/rtmpsuck.exe $LOCALDESTDIR/bin-video/rtmpsrv.exe $LOCALDESTDIR/bin-video/rtmpgw.exe
-        rm $LOCALDESTDIR/man/man1/rtmpdump.1
-        rm $LOCALDESTDIR/man/man8/rtmpgw.8
-    fi
-    if [[ -f "librtmp/librtmp.a" ]]; then
-        make clean
-    fi
-
-    make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
-
-    sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-
-    do_checkIfExist librtmp-git librtmp.a
-fi
-
-cd $LOCALBUILDDIR
-
-do_pkgConfig "libxml-2.0 = 2.9.1"
-
-if [[ $compile = "true" ]]; then
+if do_pkgConfig "libxml-2.0 != 2.9.1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
 
     if [[ -f ".libs/libxml2.a" ]]; then
@@ -646,13 +608,12 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist libxml2-2.9.1 libxml2.a
 fi
 
-cd $LOCALBUILDDIR
-
 if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
     echo -------------------------------------------------
     echo "libgnurx-2.5.1 is already compiled"
     echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
 
         do_wget_tar "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
@@ -684,13 +645,13 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
 fi
 
-cd $LOCALBUILDDIR
-
-if [[ `file --version | grep "file.exe-5.22"` ]]; then
-    echo -------------------------------------------------
-    echo "file-5.22[libmagic] is already compiled"
-    echo -------------------------------------------------
+if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
+    if file --version | grep -q -e "file.exe-5.22"; then
+        echo -------------------------------------------------
+        echo "file-5.22[libmagic] is already compiled"
+        echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
 
         do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
@@ -709,17 +670,16 @@ if [[ `file --version | grep "file.exe-5.22"` ]]; then
         make install
 
         do_checkIfExist file-5.22 libmagic.a
+    fi
 fi
 
 if [[ $mkv = "y" ]]; then
-
-    cd $LOCALBUILDDIR
-
     if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
         echo -------------------------------------------------
         echo "wxWidgets is already compiled"
         echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile wxWidgets $bits\007"
 
         do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
@@ -735,7 +695,6 @@ if [[ $mkv = "y" ]]; then
 
         do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
     fi
-
 fi
 
 echo "-------------------------------------------------------------------------------"
@@ -744,61 +703,58 @@ echo "compile global tools $bits done..."
 echo
 echo "-------------------------------------------------------------------------------"
 
-cd $LOCALBUILDDIR
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile audio tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libdcadec"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/foo86/dcadec.git" dcadec
+    if [[ $compile = "true" ]]; then
+        if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
+            rm -rf $LOCALDESTDIR/include/libdcadec
+            rm -f $LOCALDESTDIR/lib/libdcadec.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
+            rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+        fi
 
-do_git "https://github.com/foo86/dcadec.git" dcadec
+        if [[ -f libdcadec/libdcadec.a ]]; then
+            make clean
+        fi
 
-if [[ $compile = "true" ]]; then
-    if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
-        rm -rf $LOCALDESTDIR/include/libdcadec
-        rm -f $LOCALDESTDIR/lib/libdcadec.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
-        rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+        make CONFIG_WINDOWS=1 LDFLAGS=-lm lib
+        make PREFIX=$LOCALDESTDIR PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install-lib
+
+        do_checkIfExist dcadec-git libdcadec.a
     fi
-
-    if [[ -f libdcadec/libdcadec.a ]]; then
-        make clean
-    fi
-
-    make CONFIG_WINDOWS=1 LDFLAGS=-lm lib
-    make PREFIX=$LOCALDESTDIR PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install-lib
-
-    do_checkIfExist dcadec-git libdcadec.a
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libilbc"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/TimothyGu/libilbc.git" libilbc
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            autoreconf -fiv
+        else
+            rm -rf $LOCALDESTDIR/include/ilbc.h
+            rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
+            make distclean
+        fi
 
-do_git "https://github.com/TimothyGu/libilbc.git" libilbc
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        autoreconf -fiv
-    else
-        rm -rf $LOCALDESTDIR/include/ilbc.h
-        rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
-        make distclean
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist libilbc-git libilbc.a
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist libilbc-git libilbc.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "ogg = 1.3.2"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libtheora" || do_checkForOption "--enable-libvorbis" ||
+    do_checkForOption "--enable-libspeex" && do_pkgConfig "ogg = 1.3.2"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
     if [[ -f "./src/.libs/libogg.a" ]]; then
@@ -817,11 +773,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "vorbis = 1.3.5"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libvorbis" || do_checkForOption "--enable-libtheora" || [[ $sox = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
     if [[ -f "./lib/.libs/libvorbis.a" ]]; then
@@ -840,11 +793,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist libvorbis-1.3.5 libvorbis.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "opus = 1.1"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 
     if [[ -f ".libs/libopus.a" ]]; then
@@ -866,11 +816,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist opus-1.1 libopus.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "speex = 1.2rc1"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
 
     if [[ -f "libspeex/.libs/libspeex.a" ]]; then
@@ -889,11 +836,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist speex-1.2rc1 libspeex.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "flac = 1.3.1"
-
-if [[ $compile = "true" ]]; then
+if do_pkgConfig "flac = 1.3.1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
     if [[ -f "src/libFLAC/.libs/libFLAC.a" ]]; then
@@ -912,11 +856,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist flac-1.3.1 bin-audio/flac.exe
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "vo-aacenc = 0.1.3"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
 
     if [[ -f ".libs/libvo-aacenc.a" ]]; then
@@ -935,11 +876,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "opencore-amrnb = 0.1.3"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libopencore(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 opencore-amrwb = 0.1.3"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
     if [[ -f "amrnb/.libs/libopencore-amrnb.a" ]]; then
@@ -958,11 +896,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist opencore-amr-0.1.3 libopencore-amrnb.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "vo-amrwbenc = 0.1.2"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-vo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
 
     if [[ -f ".libs/libvo-amrwbenc.a" ]]; then
@@ -981,56 +916,52 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f ./configure ]]; then
+            ./autogen.sh
+        else
+            rm -rf $LOCALDESTDIR/include/fdk-aac
+            rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
+            make distclean
+        fi
 
-do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f ./configure ]]; then
-        ./autogen.sh
-    else
-        rm -rf $LOCALDESTDIR/include/fdk-aac
-        rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-        make distclean
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist fdk-aac-git libfdk-aac.a
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/nu774/fdkaac" bin-fdk-aac shallow master bin-audio/fdkaac.exe
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f ./configure ]]; then
+            autoreconf -i
+        else
+            rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
+            make distclean
+        fi
 
-    make -j $cpuCount
-    make install
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
-    do_checkIfExist fdk-aac-git libfdk-aac.a
-fi
+        make -j $cpuCount
+        make install
 
-cd $LOCALBUILDDIR
-
-do_git "https://github.com/nu774/fdkaac" bin-fdk-aac shallow master bin-audio/fdkaac.exe
-
-if [[ $compile = "true" ]]; then
-    if [[ ! -f ./configure ]]; then
-        autoreconf -i
-    else
-        rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
-        make distclean
+        do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
 fi
 
 if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
-
-    cd $LOCALBUILDDIR
-
-    if [[ `$LOCALDESTDIR/bin-audio/faac.exe | grep "FAAC 1.28"` ]]; then
+    if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
         else
+            cd $LOCALBUILDDIR
             echo -ne "\033]0;compile faac $bits\007"
 
             do_wget_tar "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
@@ -1048,16 +979,14 @@ if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
 
             do_checkIfExist faac-1.28 libfaac.a
     fi
-
 fi
 
-cd $LOCALBUILDDIR
-
-if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
+if do_checkForOption "--enable-libopus" && opusenc.exe --version | grep -q -e "opus-tools 0.1.9"; then
     echo -------------------------------------------------
     echo "opus-tools-0.1.9 is already compiled"
     echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile opus-tools $bits\007"
 
         do_wget_tar "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
@@ -1077,11 +1006,8 @@ if [[ `opusenc.exe --version | grep "opus-tools 0.1.9"` ]]; then
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "soxr = 0.1.1"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
@@ -1108,64 +1034,63 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
-
-if [[ $compile = "true" ]]; then
-    if [ -d "build" ]; then
-        cd build
-        if [[ -d $LOCALDESTDIR/include/gme ]]; then
-            rm -rf $LOCALDESTDIR/include/gme
-            rm -f $LOCALDESTDIR/lib/libgme.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
+if do_checkForOption "--enable-libgme"; then
+    cd $LOCALBUILDDIR
+    do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
+    if [[ $compile = "true" ]]; then
+        if [ -d "build" ]; then
+            cd build
+            if [[ -d $LOCALDESTDIR/include/gme ]]; then
+                rm -rf $LOCALDESTDIR/include/gme
+                rm -f $LOCALDESTDIR/lib/libgme.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
+            fi
+            make clean
+            rm -rf *
+        else
+            mkdir build
+            cd build
         fi
-        make clean
-        rm -rf *
-    else
-        mkdir build
-        cd build
+
+        cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist libgme-git libgme.a
     fi
-    
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist libgme-git libgme.a
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libvorbis" || [[ $sox = "y" ]]; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/erikd/libsndfile.git" sndfile
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f ./configure ]]; then
+            ./autogen.sh
+        else
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
+            rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
+        fi
 
-do_git "https://github.com/erikd/libsndfile.git" sndfile
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f ./configure ]]; then
-        ./autogen.sh
-    else
-        make distclean
+        # don't compile programs
+        sed -i 's/ examples regtest tests programs//g' Makefile
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist sndfile-git libsndfile.a
     fi
-    if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
-        rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
-        rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
-    fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-    # don't compile programs
-    sed -i 's/ examples regtest tests programs//g' Makefile
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist sndfile-git libsndfile.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libtwolame"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
+    if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             ./autogen.sh -V
         else
@@ -1175,49 +1100,45 @@ if [[ $compile = "true" ]]; then
             rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
-        
+
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
         sed -i 's/frontend simplefrontend//' Makefile
-        
+
         make -j $cpuCount
         make install
-        
+
         do_checkIfExist twolame-git libtwolame.a
+    fi
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
+    cd $LOCALBUILDDIR
+    do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
 
-do_pkgConfig "libbs2b = 3.1.0"
+    if [[ -f "src/.libs/libbs2b.a" ]]; then
+        make distclean
+    fi
+    if [[ -d "$LOCALDESTDIR/include/bs2b" ]]; then
+        rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
+        rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
+    fi
 
-if [[ $compile = "true" ]]; then
-        do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
+    sed -i 's/bs2bconvert$(EXEEXT) bs2bstream$(EXEEXT)//' src/Makefile.in
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
-        if [[ -f "src/.libs/libbs2b.a" ]]; then
-            make distclean
-        fi
-        if [[ -d "$LOCALDESTDIR/include/bs2b" ]]; then
-            rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
-            rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
-        fi
+    make -j $cpuCount
+    make install
 
-        sed -i 's/bs2bconvert$(EXEEXT) bs2bstream$(EXEEXT)//' src/Makefile.in
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist libbs2b-3.1.0 libbs2b.a
+    do_checkIfExist libbs2b-3.1.0 libbs2b.a
 fi
-
-cd $LOCALBUILDDIR
 
 if [[ $sox = "y" ]]; then
-
     if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
         echo -------------------------------------------------
         echo "libmad-0.15.1b is already compiled"
         echo -------------------------------------------------
     else
+        cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libmad $bits\007"
 
         do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
@@ -1238,11 +1159,8 @@ if [[ $sox = "y" ]]; then
         do_checkIfExist libmad-0.15.1b libmad.a
     fi
 
-    cd $LOCALBUILDDIR
-
-    do_pkgConfig "opusfile = 0.6"
-
-    if [[ $compile = "true" ]]; then
+    if do_pkgConfig "opusfile = 0.6"; then
+        cd $LOCALBUILDDIR
         do_wget_tar "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
 
         if [[ -f ".libs/libopusfile.a" ]]; then
@@ -1262,9 +1180,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-
     do_git "git://git.code.sf.net/p/sox/code" sox
-
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 
@@ -1297,11 +1213,8 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "theora = 1.1.1"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 
     if [[ -f "lib/.libs/libtheora.a" ]]; then
@@ -1320,11 +1233,9 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist libtheora-1.1.1 libtheora.a
 fi
 
-cd $LOCALBUILDDIR
-
 if [[ ! $vpx = "n" ]]; then
+    cd $LOCALBUILDDIR
     do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
-
     if [[ $compile = "true" ]]; then
         if [ -d $LOCALDESTDIR/include/vpx ]; then
             rm -rf $LOCALDESTDIR/include/vpx
@@ -1360,11 +1271,8 @@ if [[ ! $vpx = "n" ]]; then
 fi
 
 if [[ $other265 = "y" ]]; then
-
     cd $LOCALBUILDDIR
-
     do_git "https://github.com/ultravideo/kvazaar.git" kvazaar shallow master bin-video/kvazaar.exe
-
     if [[ $compile = "true" ]]; then
         cd src
         if [[ -f intra.o ]]; then
@@ -1380,14 +1288,12 @@ if [[ $other265 = "y" ]]; then
         cp kvazaar.exe $LOCALDESTDIR/bin-video
         do_checkIfExist kvazaar-git bin-video/kvazaar.exe
     fi
-
 fi
 
 if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
 
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/libdvdread.git" dvdread
-
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1410,7 +1316,6 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
 
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/libdvdnav.git" dvdnav
-
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1432,78 +1337,78 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libbluray"; then
+    cd $LOCALBUILDDIR
+    do_git "git://git.videolan.org/libbluray.git" libbluray
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            autoreconf -fiv
+        else
+            rm -rf $LOCALDESTDIR/include/bluray
+            rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
+            make distclean
+        fi
 
-do_git "git://git.videolan.org/libbluray.git" libbluray
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot --without-libxml2
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        autoreconf -fiv
-    else
-        rm -rf $LOCALDESTDIR/include/bluray
-        rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
-        make distclean
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist libbluray-git libbluray.a
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot LIBXML2_LIBS="-L$LOCALDESTDIR/lib -lxml2" LIBXML2_CFLAGS="-I$LOCALDESTDIR/include/libxml2 -DLIBXML_STATIC"
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist libbluray-git libbluray.a
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libutvideo"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow 15.1.0
+    if [[ $compile = "true" ]]; then
+        if [ -f utv_core/libutvideo.a ]; then
+            rm -rf $LOCALDESTDIR/include/utvideo
+            rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
+            make distclean
+        fi
 
-do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow 15.1.0
+        ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
 
-if [[ $compile = "true" ]]; then
-    if [ -f utv_core/libutvideo.a ]; then
-        rm -rf $LOCALDESTDIR/include/utvideo
-        rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
-        make distclean
+        make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
+        make install RANLIBX="${RANLIB-ranlib}"
+
+        do_checkIfExist libutvideo-git libutvideo.a
+
+        buildFFmpeg="true"
     fi
-
-    ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-
-    make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
-    make install RANLIBX="${RANLIB-ranlib}"
-
-    do_checkIfExist libutvideo-git libutvideo.a
-
-    buildFFmpeg="true"
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libass"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/libass/libass.git" libass
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            autoreconf -fiv
+        else
+            rm -rf $LOCALDESTDIR/include/ass
+            rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
+            make distclean
+        fi
 
-do_git "https://github.com/libass/libass.git" libass
+        CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        autoreconf -fiv
-    else
-        rm -rf $LOCALDESTDIR/include/ass
-        rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
-        make distclean
+        make -j $cpuCount
+        make install
+
+        sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
+
+        do_checkIfExist libass-git libass.a
+        buildFFmpeg="true"
     fi
-
-    CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-
-    make -j $cpuCount
-    make install
-
-    sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
-
-    do_checkIfExist libass-git libass.a
-    buildFFmpeg="true"
 fi
 
-cd $LOCALBUILDDIR
-
-if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
-    echo -------------------------------------------------
-    echo "xavs is already compiled"
-    echo -------------------------------------------------
+if do_checkForOption "--enable-libxavs"; then
+    cd $LOCALBUILDDIR
+    if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
+        echo -------------------------------------------------
+        echo "xavs is already compiled"
+        echo -------------------------------------------------
     else
         echo -ne "\033]0;compile xavs $bits\007"
 
@@ -1530,6 +1435,7 @@ if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
         install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
 
         do_checkIfExist xavs libxavs.a
+    fi
 fi
 
 if [ $mediainfo = "y" ]; then
@@ -1607,37 +1513,34 @@ if [ $mediainfo = "y" ]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
+if do_checkForOption "--enable-libvidstab"; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/georgmartius/vid.stab.git" vidstab
+    if [[ $compile = "true" ]]; then
+        if [ -d "build" ]; then
+            cd build
+            rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
+            rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
+            make clean
+            rm -rf *
+        else
+            mkdir build
+            cd build
+        fi
 
-do_git "https://github.com/georgmartius/vid.stab.git" vidstab
+        cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off -DUSE_OMP:bool=off
+        sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
 
-if [[ $compile = "true" ]]; then
-    if [ -d "build" ]; then
-        cd build
-        rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
-        rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
-        make clean
-        rm -rf *
-    else
-        mkdir build
-        cd build
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist vidstab-git libvidstab.a
+        buildFFmpeg="true"
     fi
-
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off -DUSE_OMP:bool=off
-    sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist vidstab-git libvidstab.a
-    buildFFmpeg="true"
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "caca = 0.99.beta19"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
 
     if [[ -f "caca/.libs/libcaca.a" ]]; then
@@ -1672,11 +1575,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist libcaca-0.99.beta19 libcaca.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "zvbi-0.2 = 0.2.35"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
 
     if [[ -f "src/.libs/libzvbi.a" ]]; then
@@ -1704,11 +1604,8 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
 
-cd $LOCALBUILDDIR
-
-do_pkgConfig "frei0r = 1.3.0"
-
-if [[ $compile = "true" ]]; then
+if do_checkForOption "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
+    cd $LOCALBUILDDIR
     do_wget_tar "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
 
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
@@ -1732,9 +1629,10 @@ if [[ $compile = "true" ]]; then
     make all install
 
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
+    do_addOption "--enable-filter=frei0r"
 fi
 
-if [[ $ffmpeg = "y" ]]; then
+if do_checkForOption "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
 
     if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
@@ -1751,7 +1649,7 @@ if [[ $ffmpeg = "y" ]]; then
     fi
 fi
 
-if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
+if do_checkForOption "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
 
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
@@ -1780,8 +1678,6 @@ fi
 #------------------------------------------------
 # final tools
 #------------------------------------------------
-
-cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
@@ -1817,15 +1713,13 @@ if [[ $mp4box = "y" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
-
 if [[ ! $x264 = "n" ]]; then
+    cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/x264.git" x264 noDepth
 
     if [[ $compile = "true" ]]; then
         if [[ $x264 = "y" ]]; then
             cd $LOCALBUILDDIR
-
             do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
@@ -1907,11 +1801,11 @@ if [[ ! $x264 = "n" ]]; then
     builtx264="--enable-libx264"
 fi
 
-cd $LOCALBUILDDIR
+
 
 if [[ ! $x265 = "n" ]]; then
+    cd $LOCALBUILDDIR
     do_hg "https://bitbucket.org/multicoreware/x265" x265
-
     if [[ $compile = "true" ]]; then
         cd build/msys
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
@@ -1955,7 +1849,7 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmbc = "y" ]]; then
-    if [[ `$LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep "version 0.7.4"` ]]; then
+    if $LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep -q -e "version 0.7.4"; then
         echo -------------------------------------------------
         echo "ffmbc-0.7.4 is already compiled"
         echo -------------------------------------------------
@@ -1990,7 +1884,7 @@ if [[ $ffmbc = "y" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
+
 
 if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
@@ -1998,6 +1892,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     echo "compile ffmpeg $bits"
     echo "-------------------------------------------------------------------------------"
 
+    cd $LOCALBUILDDIR
     do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
@@ -2086,7 +1981,6 @@ fi
 
 if [[ $bits = "64bit" && $other265 = "y" && $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
-
     do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -d "build" ] || [[ -f "$LOCALDESTDIR/bin-video/f265cli.exe" ]]; then
@@ -2161,12 +2055,11 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
+
 
 if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
-
+    cd $LOCALBUILDDIR
     do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
-
     if [[ $compile = "true" ]]; then
         if [[ $bits = "32bit" ]]; then
             if [[ -f lib32/libwaio.a ]]; then
@@ -2196,9 +2089,7 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-
     do_git "http://luajit.org/git/luajit-2.0.git" luajit noDepth
-
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
             rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit*.exe $LOCALDESTDIR/lib/lua
@@ -2219,9 +2110,7 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-
     do_git "https://github.com/lachs0r/rubberband.git" rubberband
-
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]]; then
             make PREFIX=$LOCALDESTDIR uninstall
@@ -2237,9 +2126,7 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-
     do_git "https://github.com/mpv-player/mpv.git" mpv shallow master bin-video/mpv.exe
-
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ ! -f waf ]; then
             ./bootstrap.py
@@ -2275,11 +2162,9 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     fi
 fi
 
-cd $LOCALBUILDDIR
-
 if [[ $mkv = "y" ]]; then
+    cd $LOCALBUILDDIR
     do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix shallow master bin-video/mkvtoolnix/bin/mkvmerge.exe
-
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             ./autogen.sh
