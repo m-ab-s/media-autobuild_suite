@@ -1325,46 +1325,53 @@ if [[ $other265 = "y" ]]; then
 
 fi
 
-cd $LOCALBUILDDIR
+if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
 
-do_git "git://git.videolan.org/libdvdread.git" dvdread
+    cd $LOCALBUILDDIR
+    do_git "git://git.videolan.org/libdvdread.git" dvdread
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        autoreconf -fiv
-    else
-        rm -rf $LOCALDESTDIR/include/dvdread
-        rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
-        make distclean
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            autoreconf -fiv
+        else
+            make distclean
+        fi
+
+        if [[ -d $LOCALDESTDIR/include/dvdread ]]; then
+            rm -rf $LOCALDESTDIR/include/dvdread
+            rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
+        fi
+
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist dvdread-git libdvdread.a
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --disable-apidoc
+    cd $LOCALBUILDDIR
+    do_git "git://git.videolan.org/libdvdnav.git" dvdnav
 
-    make -j $cpuCount
-    make install
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            autoreconf -fiv
+        else
+            make distclean
+        fi
 
-    do_checkIfExist dvdread-git libdvdread.a
-fi
+        if [[ -d $LOCALDESTDIR/include/dvdnav ]]; then
+            rm -rf $LOCALDESTDIR/include/dvdnav
+            rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
+        fi
 
-cd $LOCALBUILDDIR
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
-do_git "git://git.videolan.org/libdvdnav.git" dvdnav
+        make -j $cpuCount
+        make install
 
-if [[ $compile = "true" ]]; then
-    if [[ ! -f "configure" ]]; then
-        autoreconf -fiv
-    else
-        rm -rf $LOCALDESTDIR/include/dvdnav
-        rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
-        make distclean
+        do_checkIfExist dvdnav-git libdvdnav.a
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist dvdnav-git libdvdnav.a
 fi
 
 cd $LOCALBUILDDIR
