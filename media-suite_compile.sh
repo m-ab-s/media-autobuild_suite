@@ -1992,7 +1992,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
-            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b --disable-d3d11va \
             $builtvpx $builtx264 $builtx265 $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
@@ -2011,7 +2011,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
             --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
-            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b --disable-d3d11va \
             $builtvpx $builtx264 $builtx265 $extras \
             --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
