@@ -1676,32 +1676,21 @@ if [[ $compile = "true" ]]; then
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
 
-cd $LOCALBUILDDIR
+if [[ $ffmpeg = "y" ]]; then
+    cd $LOCALBUILDDIR
 
-if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
-    echo -------------------------------------------------
-    echo "DeckLinkAPI is already downloaded"
-    echo -------------------------------------------------
+    if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
+        echo -------------------------------------------------
+        echo "DeckLinkAPI is already downloaded"
+        echo -------------------------------------------------
     else
         echo -ne "\033]0;download DeckLinkAPI $bits\007"
         cd $LOCALDESTDIR/include
         do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI.h"
         do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI_i.c"
 
-        if [ ! -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
-            echo -------------------------------------------------
-            echo "DeckLinkAPI.h download failed..."
-            echo "if you know there is no dependences hit enter for continue it,"
-            echo "or run script again"
-            read -p ""
-            sleep 5
-        else
-            echo -
-            echo -------------------------------------------------
-            echo "download DeckLinkAPI done..."
-            echo -------------------------------------------------
-            echo -
-        fi
+        do_checkIfExist DeckLinkAPI "include/DeckLinkAPI.h"
+    fi
 fi
 
 if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
@@ -1711,7 +1700,7 @@ if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
         echo -------------------------------------------------
         echo "nvenc is already installed"
         echo -------------------------------------------------
-        else
+    else
         echo -ne "\033]0;install nvenc $bits\007"
         rm -rf nvenc_5.0.1_sdk
         do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
@@ -1726,20 +1715,7 @@ if [[ $ffmpeg = "y" ]] && [[ $nonfree = "y" ]]; then
             cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
         fi
     
-        if [[ ! -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then    
-            echo -------------------------------------------------
-            echo "install nvenc failed..."
-            echo "if you know there is no dependences hit enter for continue it,"
-            echo "or run script again"
-            read -p ""
-            sleep 5
-        else
-            echo -
-            echo -------------------------------------------------
-            echo "install nvenc done..."
-            echo -------------------------------------------------
-            echo -
-        fi
+        do_checkIfExist nvEncodeAPI "include/nvEncodeAPI.h"
     fi
 fi
 
