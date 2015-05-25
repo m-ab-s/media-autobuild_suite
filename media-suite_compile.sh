@@ -1997,6 +1997,8 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
             --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+
+            sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" config.h
         else
             CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
@@ -2016,9 +2018,9 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             newFfmpeg="yes"
-        fi
 
-        sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
+            sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
+        fi
 
         sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 
