@@ -1,6 +1,8 @@
---- configure.orig  2015-05-24 19:43:35.249995200 +0100
-+++ configure   2015-05-24 19:43:43.027493900 +0100
-@@ -5047,14 +5047,14 @@
+diff --git a/configure b/configure
+index f6c8e69..ecb1de1 100755
+--- a/configure
++++ b/configure
+@@ -5063,14 +5063,14 @@ enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
  enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
  enabled libdcadec         && require_pkg_config dcadec libdcadec/dca_context.h dcadec_context_create
  enabled libfaac           && require2 libfaac "stdint.h faac.h" faacEncGetVersion -lfaac
@@ -17,7 +19,7 @@
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
                                     check_lib "${gsm_hdr}" gsm_create -lgsm && break;
                                 done || die "ERROR: libgsm not found"; }
-@@ -5063,8 +5063,8 @@
+@@ -5079,8 +5079,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
  enabled libmodplug        && require_pkg_config libmodplug libmodplug/modplug.h ModPlug_Load
  enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
  enabled libnut            && require libnut libnut.h nut_demuxer_init -lnut
@@ -28,7 +30,7 @@
  enabled libopencv         && require_pkg_config opencv opencv/cxcore.h cvCreateImageHeader
  enabled libopenh264       && require_pkg_config openh264 wels/codec_api.h WelsGetCodecVersion
  enabled libopenjpeg       && { check_lib openjpeg.h opj_version -lopenmj2 -DOPJ_STATIC ||
-@@ -5085,8 +5085,8 @@
+@@ -5101,8 +5101,8 @@ enabled libspeex          && require_pkg_config speex speex/speex.h speex_decode
  enabled libstagefright_h264 && require_cpp libstagefright_h264 "binder/ProcessState.h media/stagefright/MetaData.h
      media/stagefright/MediaBufferGroup.h media/stagefright/MediaDebug.h media/stagefright/MediaDefs.h
      media/stagefright/OMXClient.h media/stagefright/OMXCodec.h" android::OMXClient -lstagefright -lmedia -lutils -lbinder -lgnustl_static
@@ -39,7 +41,7 @@
                               { check_lib twolame.h twolame_encode_buffer_float32_interleaved -ltwolame ||
                                 die "ERROR: libtwolame must be installed and version must be >= 0.3.10"; }
  enabled libutvideo        && require_cpp utvideo "stdint.h stdlib.h utvideo/utvideo.h utvideo/Codec.h" 'CCodec*' -lutvideo -lstdc++
-@@ -5094,7 +5094,7 @@
+@@ -5110,7 +5110,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
  enabled libvidstab        && require_pkg_config "vidstab >= 0.98" vid.stab/libvidstab.h vsMotionDetectInit
  enabled libvo_aacenc      && require libvo_aacenc vo-aacenc/voAAC.h voGetAACEncAPI -lvo-aacenc
  enabled libvo_amrwbenc    && require libvo_amrwbenc vo-amrwbenc/enc_if.h E_IF_init -lvo-amrwbenc
