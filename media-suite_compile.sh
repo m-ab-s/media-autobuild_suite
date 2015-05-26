@@ -42,6 +42,7 @@ compile="true"
 
 if [[ $gitDepth = "noDepth" ]]; then
     gitDepth=""
+    local unshallow="--unshallow"
 elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
     gitDepth="--depth 1"
 fi
@@ -66,7 +67,7 @@ else
     cd "$gitFolder"-git
     oldHead=$(git rev-parse HEAD)
     git reset --quiet --hard @{u}
-    git pull origin "$gitBranch"
+    git pull $unshallow origin "$gitBranch"
     newHead=$(git rev-parse HEAD)
 
     pkg-config --exists "$gitFolder"
@@ -1726,8 +1727,8 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $mp4box = "y" ]]; then
-    do_git "https://github.com/gpac/gpac.git" gpac shallow master bin-video/MP4Box.exe
-
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/gpac/gpac.git" gpac noDepth master bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
