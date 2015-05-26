@@ -42,7 +42,7 @@ compile="true"
 
 if [[ $gitDepth = "noDepth" ]]; then
     gitDepth=""
-    local unshallow="--unshallow"
+
 elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
     gitDepth="--depth 1"
 fi
@@ -65,6 +65,9 @@ if [ ! -d "$gitFolder"-git ]; then
     fi
 else
     cd "$gitFolder"-git
+    if [[ $gitDepth = "" && -f .git/shallow ]]; then
+        local unshallow="--unshallow"
+    fi
     oldHead=$(git rev-parse HEAD)
     git reset --quiet --hard @{u}
     git pull $unshallow origin "$gitBranch"
