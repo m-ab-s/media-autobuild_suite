@@ -704,45 +704,18 @@ if exist "%instdir%\%msys2%" GOTO getMintty
     echo - Download wget
     echo.
     echo -------------------------------------------------------------
-    if exist "%instdir%\install-wget" del "%instdir%\install-wget.js"
+    if exist "%instdir%\build\install-wget.js" del "%instdir%\build\install-wget.js"
+	if not exist build mkdir build
+	cd build
+	if exist "%instdir%\build\msys2-base.tar.xz" GOTO unpack
+	
+    echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
 
-    echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>"%instdir%\install-wget.js"
-
-    cscript "%instdir%\install-wget.js"
-    del "%instdir%\install-wget.js"
-    del "%instdir%\wget.zip"
-
-:check7zip
-if exist "%instdir%\opt\bin\7za.exe" GOTO checkmsys2
-    echo -------------------------------------------------------------
-    echo.
-    echo - Download and install 7zip
-    echo.
-    echo.
-    echo -------------------------------------------------------------
-    if not exist "%instdir%\%msys2%\bin\wget.exe" GOTO get7zip
-    "%instdir%\%msys2%\bin\wget.exe" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
-    GOTO install7zip
-
-    :get7zip
-    "%instdir%\wget" --tries=20 --retry-connrefused --waitretry=2 -c -P "%instdir%" "http://blog.pixelcrusher.de/downloads/media_compressor/7za920.exe"
-
-    :install7zip
-    7za920.exe
-
-    del "%instdir%\7za920.exe"
-    mkdir opt
-    cd opt
-    mkdir bin
-    mkdir doc
-    cd doc
-    mkdir 7za920
-    cd %instdir%
-
-    move 7zip-license.txt opt\doc\7za920
-    move 7zip-readme.txt opt\doc\7za920
-    move 7-zip.chm opt\doc\7za920
-    move 7za.exe opt\bin
+    cscript install-wget.js
+    del install-wget.js
+    del wget.zip
+	del 7zip-license.txt
+    del COPYING.txt
 
 :checkmsys2
 if %msys2%==msys32 (
@@ -753,28 +726,7 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     echo.
     echo -------------------------------------------------------------------------------
 
-    for /F %%b in ( 'wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^| grep -o -P "(?<=tr title=).*(?<=class=)" ^| grep -m 1 -o "msys2-base-i686-*.*tar.xz"' ) do wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
-
-    %instdir%\opt\bin\7za.exe x msys2-base.tar.xz
-    %instdir%\opt\bin\7za.exe x msys2-base.tar
-    del msys2-base.tar.xz
-    del msys2-base.tar
-    if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.- Download from msys2 32 bit basic system failed,
-        echo.- please download it manuel from:
-        echo.- http://downloads.sourceforge.net/project/msys2
-        echo.- and copy the uncompressed folder to:
-        echo.- %instdir%
-        echo.- and start the batch script again!
-        echo.
-        echo -------------------------------------------------------------------------------
-        pause
-        )
-    del grep.exe
-    del wget.exe
-    del COPYING.txt
+    for /F %%b in ( '%instdir%\build\wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^| %instdir%\build\grep -o -P "(?<=tr title=).*(?<=class=)" ^| %instdir%\build\grep -m 1 -o "msys2-base-i686-*.*tar.xz"' ) do %instdir%\build\wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
     )
 
 if %msys2%==msys64 (
@@ -785,29 +737,32 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     echo.
     echo -------------------------------------------------------------------------------
 
-    for /F %%b in ( 'wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^| grep -o -P "(?<=tr title=).*(?<=class=)" ^| grep -m 1 -o "msys2-base-x86_64-*.*tar.xz"' ) do wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
-
-    %instdir%\opt\bin\7za.exe x msys2-base.tar.xz
-    %instdir%\opt\bin\7za.exe x msys2-base.tar
-    del msys2-base.tar.xz
-    del msys2-base.tar
-    if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.- Download from msys2 64 bit basic system failed,
-        echo.- please download it manuel from:
-        echo.- http://downloads.sourceforge.net/project/msys2
-        echo.- and copy the uncompressed folder to:
-        echo.- %instdir%
-        echo.- and start the batch script again!
-        echo.
-        echo -------------------------------------------------------------------------------
-        pause
-        )
-    del grep.exe
-    del wget.exe
-    del COPYING.txt
+    for /F %%b in ( '%instdir%\build\wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^| %instdir%\build\grep -o -P "(?<=tr title=).*(?<=class=)" ^| %instdir%\build\grep -m 1 -o "msys2-base-x86_64-*.*tar.xz"' ) do %instdir%\build\wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
     )
+	
+:unpack
+if exist "%instdir%\build\msys2-base.tar.xz" (
+	%instdir%\build\7za.exe x msys2-base.tar.xz -so | %instdir%\build\7za.exe x -aoa -si -ttar -o..
+	del %instdir%\build\msys2-base.tar.xz
+	del %instdir%\build\grep.exe
+	del %instdir%\build\wget.exe
+	del %instdir%\build\7za.exe
+	)
+	
+if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
+	echo -------------------------------------------------------------------------------
+	echo.
+	echo.- Download msys2 basic system failed,
+	echo.- please download it manuel from:
+	echo.- http://downloads.sourceforge.net/project/msys2
+	echo.- and copy the uncompressed folder to:
+	echo.- %instdir%\build
+	echo.- and start the batch script again!
+	echo.
+	echo -------------------------------------------------------------------------------
+	pause
+	GOTO unpack
+	)
 
 :getMintty
 if exist %instdir%\mintty.lnk GOTO minttySettings
@@ -932,7 +887,6 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.exit>>pacman.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
     del pacman.sh
-    rd /s/q opt
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
