@@ -2037,12 +2037,11 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     fi
 fi
 
-if [[ $bits = "64bit" && $other265 = "y" ]]; then
+if [[ $bits = "64bit" && $other265 = "y" && $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
 
     do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
-
-    if [[ $compile = "true" && $ffmpeg = "y" ]] || [[ $ffmpeg = "y" && $newFfmpeg = "yes" ]]; then
+    if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -d "build" ] || [[ -f "$LOCALDESTDIR/bin-video/f265cli.exe" ]]; then
             rm -rf build
             rm -rf .sconf_temp
