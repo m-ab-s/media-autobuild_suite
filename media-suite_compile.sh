@@ -3,14 +3,14 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_OPTS="--disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3"
-DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r \
---enable-libbluray --enable-libcaca --extra-cflags=-DCACA_STATIC --enable-libopenjpeg \
---enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug \
---extra-cflags=-DMODPLUG_STATIC --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
---enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex \
---enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab \
---enable-libxavs --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+FFMPEG_OPTS="--disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 --enable-avisynth"
+DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r \
+--enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-libass --enable-libgsm \
+--enable-libilbc --enable-libmodplug --enable-libmp3lame \
+--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
+--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
+--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
+--enable-libzvbi --enable-libdcadec --enable-libbs2b \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 
@@ -247,10 +247,14 @@ do_checkIfExist() {
         echo "build $packetName done..."
         echo -------------------------------------------------
         echo -
-        touch $LOCALBUILDDIR/$packetName/build_successful$bits
+        if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
+            touch $LOCALBUILDDIR/$packetName/build_successful$bits
+        fi
         cd $LOCALBUILDIR
     else
-        rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
+        if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
+            rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
+        fi
         echo -------------------------------------------------
         echo "Build of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
@@ -280,14 +284,10 @@ do_getFFmpegConfig() {
         FFMPEG_OPTS="$FFMPEG_OPTS $DEFAULT_FFMPEG_OPTS"
     fi
 
-    # add nonfree option if missing
-    if ! ( echo "$FFMPEG_OPTS" | grep -q -e --enable-nonfree ) &&
-        [[ "$nonfree" = "y" ]]; then
-        FFMPEG_OPTS="$FFMPEG_OPTS --enable-nonfree"
-    fi
-
-    # remove non-free libs
-    if [[ ! $nonfree = "y" ]]; then
+    # handle non-free libs
+    if [[ $nonfree = "y" ]]; then
+        do_addOption "--enable-nonfree"
+    else
         do_removeOption "--enable-nonfree"
         do_removeOption "--enable-libfdk-aac"
         do_removeOption "--enable-nvenc"
@@ -299,18 +299,49 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-libutvideo"
         do_removeOption "--enable-libgme"
     fi
+
+    # add options if ffmbc is being compiled
+    if [[ $ffmbc = "y" ]]; then
+        do_addOption "--enable-librtmp"
+        do_addOption "--enable-frei0r"
+        do_addOption "--enable-libopenjpeg"
+        do_addOption "--enable-libass"
+        do_addOption "--enable-libspeex"
+        do_addOption "--enable-libtheora"
+        do_addOption "--enable-libvorbis"
+        do_addOption "--enable-libxavs"
+    fi
+
+    # add options for mplayer
+    if [[ $mplayer = "y" ]]; then
+        do_addOption "--enable-libfreetype"
+        do_addOption "--enable-libbluray"
+    fi
+
+    # add options for static caca and modplug
+    if do_checkForOptions "--enable-libcaca"; then
+        do_addOption "--extra-cflags=-DCACA_STATIC"
+    fi
+    if do_checkForOptions "--enable-libmodplug"; then
+        do_addOption "--extra-cflags=-DMODPLUG_STATIC"
+    fi
 }
 
-do_checkForOption() {
-    local option=${1%% *}
-    if ! echo "$FFMPEG_OPTS" | grep -q -e "$option"; then
-        return 1
-    fi
+do_checkForOptions() {
+    local isPresent=1
+    for option in "$@"; do
+        for option2 in $option; do
+            if echo "$FFMPEG_OPTS" | grep -q -E -e "$option2"; then
+                isPresent=0
+            fi
+        done
+    done
+    return $isPresent
 }
 
 do_addOption() {
     local option=${1%% *}
-    if ! do_checkForOption "$option"; then
+    if ! do_checkForOptions "$option"; then
         FFMPEG_OPTS="$FFMPEG_OPTS $option"
     fi
 }
@@ -330,7 +361,7 @@ echo "--------------------------------------------------------------------------
 
 do_getFFmpegConfig
 
-if do_checkForOption "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
+if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
     do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
     if [ -d "build" ]; then
@@ -355,7 +386,7 @@ if do_checkForOption "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.
     do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
 fi
 
-if do_checkForOption "--enable-libfreetype" || do_checkForOption "--enable-libbluray" || do_checkForOption "--enable-libass" && do_pkgConfig "freetype2 = 17.4.11"; then
+if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" && do_pkgConfig "freetype2 = 17.4.11"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
@@ -371,11 +402,11 @@ if do_checkForOption "--enable-libfreetype" || do_checkForOption "--enable-libbl
     make -j $cpuCount
     make install
 
-    do_addOption "--enable-libfreetype"
     do_checkIfExist freetype-2.5.5 libfreetype.a
+    do_addOption "--enable-libfreetype"
 fi
 
-if do_checkForOption "--enable-fontconfig" || do_checkForOption "--enable-libbluray" || do_checkForOption "--enable-libass" && do_pkgConfig "fontconfig = 2.11.92"; then
+if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && do_pkgConfig "fontconfig = 2.11.92"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
@@ -393,11 +424,11 @@ if do_checkForOption "--enable-fontconfig" || do_checkForOption "--enable-libblu
     make -j $cpuCount
     make install
 
-    do_addOption "--enable-fontconfig"
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
+    do_addOption "--enable-fontconfig"
 fi
 
-if do_checkForOption "--enable-libfribidi" || do_checkForOption "--enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
+if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
 
@@ -409,15 +440,15 @@ if do_checkForOption "--enable-libfribidi" || do_checkForOption "--enable-libass
         rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no --with-glib=no
+    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static --disable-shared --disable-deprecated --with-glib=no
     make -j $cpuCount
     make install
 
-    do_addOption "--enable-libfribidi"
     do_checkIfExist fribidi-0.19.6 libfribidi.a
+    do_addOption "--enable-libfribidi"
 fi
 
-if do_checkForOption "--enable-libass"; then
+if do_checkForOptions "--enable-libass"; then
     if $LOCALDESTDIR/bin-global/ragel --version | grep -q -e "version 6.9"; then
         echo -------------------------------------------------
         echo "ragel-6.9 is already compiled"
@@ -461,7 +492,7 @@ if do_checkForOption "--enable-libass"; then
     fi
 fi
 
-if ! do_checkForOption "--disable-sdl" || ! do_checkForOption "--disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
+if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
 
@@ -487,9 +518,7 @@ fi
 # crypto engine
 #----------------------
 
-if do_checkForOption "--enable-gnutls" || do_checkForOption "--enable-librtmp" ; then
-    do_addOption "--enable-gnutls"
-
+if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
     if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
         echo -------------------------------------------------
         echo "libgcrypt-1.6.2 is already compiled"
@@ -560,9 +589,10 @@ if do_checkForOption "--enable-gnutls" || do_checkForOption "--enable-librtmp" ;
 
         do_checkIfExist gnutls-3.3.15 libgnutls.a
     fi
+    do_addOption "--enable-gnutls"
 fi
 
-if do_checkForOption "--enable-librtmp"; then
+if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
     do_git "git://git.ffmpeg.org/rtmpdump" librtmp shallow master bin-video/rtmpdump.exe
     if [[ $compile = "true" ]]; then
@@ -586,7 +616,6 @@ if do_checkForOption "--enable-librtmp"; then
         do_checkIfExist librtmp-git librtmp.a
     fi
 fi
-
 
 if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
     if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
@@ -689,7 +718,7 @@ echo "compile audio tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-if do_checkForOption "--enable-libdcadec"; then
+if do_checkForOptions "--enable-libdcadec"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/foo86/dcadec.git" dcadec
     if [[ $compile = "true" ]]; then
@@ -711,7 +740,7 @@ if do_checkForOption "--enable-libdcadec"; then
     fi
 fi
 
-if do_checkForOption "--enable-libilbc"; then
+if do_checkForOptions "--enable-libilbc"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/TimothyGu/libilbc.git" libilbc
     if [[ $compile = "true" ]]; then
@@ -732,8 +761,7 @@ if do_checkForOption "--enable-libilbc"; then
     fi
 fi
 
-if do_checkForOption "--enable-libtheora" || do_checkForOption "--enable-libvorbis" ||
-    do_checkForOption "--enable-libspeex" && do_pkgConfig "ogg = 1.3.2"; then
+if do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
@@ -753,7 +781,7 @@ if do_checkForOption "--enable-libtheora" || do_checkForOption "--enable-libvorb
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOption "--enable-libvorbis" || do_checkForOption "--enable-libtheora" || [[ $sox = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
@@ -773,7 +801,7 @@ if do_checkForOption "--enable-libvorbis" || do_checkForOption "--enable-libtheo
     do_checkIfExist libvorbis-1.3.5 libvorbis.a
 fi
 
-if do_checkForOption "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
+if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 
@@ -796,7 +824,7 @@ if do_checkForOption "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opu
     do_checkIfExist opus-1.1 libopus.a
 fi
 
-if do_checkForOption "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
+if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
 
@@ -836,7 +864,7 @@ if do_pkgConfig "flac = 1.3.1"; then
     do_checkIfExist flac-1.3.1 bin-audio/flac.exe
 fi
 
-if do_checkForOption "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
+if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
 
@@ -856,7 +884,7 @@ if do_checkForOption "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
-if do_checkForOption "--enable-libopencore(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 opencore-amrwb = 0.1.3"; then
+if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 opencore-amrwb = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
@@ -876,7 +904,7 @@ if do_checkForOption "--enable-libopencore(wb|nb)" && do_pkgConfig "opencore-amr
     do_checkIfExist opencore-amr-0.1.3 libopencore-amrnb.a
 fi
 
-if do_checkForOption "--enable-vo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
+if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
 
@@ -896,7 +924,7 @@ if do_checkForOption "--enable-vo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
-if do_checkForOption "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
+if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
@@ -961,10 +989,11 @@ if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
     fi
 fi
 
-if do_checkForOption "--enable-libopus" && opusenc.exe --version | grep -q -e "opus-tools 0.1.9"; then
-    echo -------------------------------------------------
-    echo "opus-tools-0.1.9 is already compiled"
-    echo -------------------------------------------------
+if do_checkForOptions "--enable-libopus"; then
+    if opusenc.exe --version | grep -q -e "opus-tools 0.1.9"; then
+        echo -------------------------------------------------
+        echo "opus-tools-0.1.9 is already compiled"
+        echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile opus-tools $bits\007"
@@ -984,9 +1013,10 @@ if do_checkForOption "--enable-libopus" && opusenc.exe --version | grep -q -e "o
         make install
 
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
+    fi
 fi
 
-if do_checkForOption "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
+if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 
@@ -1014,7 +1044,7 @@ if do_checkForOption "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
-if do_checkForOption "--enable-libgme"; then
+if do_checkForOptions "--enable-libgme"; then
     cd $LOCALBUILDDIR
     do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
@@ -1041,7 +1071,7 @@ if do_checkForOption "--enable-libgme"; then
     fi
 fi
 
-if do_checkForOption "--enable-libvorbis" || [[ $sox = "y" ]]; then
+if do_checkForOptions "--enable-libvorbis" || [[ $sox = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
@@ -1067,7 +1097,7 @@ if do_checkForOption "--enable-libvorbis" || [[ $sox = "y" ]]; then
     fi
 fi
 
-if do_checkForOption "--enable-libtwolame"; then
+if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
     if [[ $compile = "true" ]]; then
@@ -1091,7 +1121,7 @@ if do_checkForOption "--enable-libtwolame"; then
     fi
 fi
 
-if do_checkForOption "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
+if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
 
@@ -1193,7 +1223,7 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-if do_checkForOption "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
+if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 
@@ -1317,7 +1347,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     fi
 fi
 
-if do_checkForOption "--enable-libbluray"; then
+if do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
@@ -1338,7 +1368,7 @@ if do_checkForOption "--enable-libbluray"; then
     fi
 fi
 
-if do_checkForOption "--enable-libutvideo"; then
+if do_checkForOptions "--enable-libutvideo"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow 15.1.0
     if [[ $compile = "true" ]]; then
@@ -1359,7 +1389,7 @@ if do_checkForOption "--enable-libutvideo"; then
     fi
 fi
 
-if do_checkForOption "--enable-libass"; then
+if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" ]]; then
@@ -1371,19 +1401,17 @@ if do_checkForOption "--enable-libass"; then
             make distclean
         fi
 
-        CPPFLAGS=' -DFRIBIDI_ENTRY="" ' ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
 
         make -j $cpuCount
         make install
-
-        sed -i 's/-lass -lm/-lass -lfribidi -lm/' "$LOCALDESTDIR/lib/pkgconfig/libass.pc"
 
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
     fi
 fi
 
-if do_checkForOption "--enable-libxavs"; then
+if do_checkForOptions "--enable-libxavs"; then
     cd $LOCALBUILDDIR
     if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
         echo -------------------------------------------------
@@ -1493,7 +1521,7 @@ if [ $mediainfo = "y" ]; then
     fi
 fi
 
-if do_checkForOption "--enable-libvidstab"; then
+if do_checkForOptions "--enable-libvidstab"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
@@ -1519,7 +1547,7 @@ if do_checkForOption "--enable-libvidstab"; then
     fi
 fi
 
-if do_checkForOption "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; then
+if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; then
     cd $LOCALBUILDDIR
     do_wget_tar "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
 
@@ -1555,7 +1583,7 @@ if do_checkForOption "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; th
     do_checkIfExist libcaca-0.99.beta19 libcaca.a
 fi
 
-if do_checkForOption "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
+if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
 
@@ -1584,7 +1612,7 @@ if do_checkForOption "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; the
     do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
 
-if do_checkForOption "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
+if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     cd $LOCALBUILDDIR
     do_wget_tar "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
 
@@ -1612,7 +1640,7 @@ if do_checkForOption "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     do_addOption "--enable-filter=frei0r"
 fi
 
-if do_checkForOption "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
+if do_checkForOptions "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
 
     if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
@@ -1629,7 +1657,7 @@ if do_checkForOption "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
     fi
 fi
 
-if do_checkForOption "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
+if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
     cd $LOCALBUILDDIR
 
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
@@ -1651,7 +1679,7 @@ if do_checkForOption "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
             cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
         fi
     
-        do_checkIfExist nvEncodeAPI "include/nvEncodeAPI.h"
+        do_checkIfExist nvenc_5.0.1_sdk "include/nvEncodeAPI.h"
     fi
 fi
 
@@ -1855,12 +1883,14 @@ if [[ $ffmbc = "y" ]]; then
                 make distclean
             fi
 
+            cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
             ./configure --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
 
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
 
             do_checkIfExist FFmbc-0.7.4 bin-video/ffmbc.exe
+            rm $LOCALDESTDIR/include/openjpeg.h
     fi
 fi
 
@@ -1921,7 +1951,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
                 rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             fi
 
-            CPPFLAGS+=' -DFRIBIDI_ENTRY=""' LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
+            LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
             --disable-static --enable-shared \
             $FFMPEG_OPTS \
@@ -1931,7 +1961,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
             sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" config.h
         else
-            CPPFLAGS+=' -DFRIBIDI_ENTRY=""' ./configure \
+            ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --enable-static --disable-shared \
             $FFMPEG_OPTS \
@@ -2026,7 +2056,7 @@ if [[ $mplayer = "y" ]]; then
 
         sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 
-        CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' --extra-libs='-lxml2 -llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
+        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype $faac
 
         make -j $cpuCount
         make install
