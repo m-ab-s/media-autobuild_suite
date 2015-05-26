@@ -587,31 +587,12 @@ if do_checkForOption "--enable-librtmp"; then
     fi
 fi
 
-if do_pkgConfig "libxml-2.0 != 2.9.1"; then
-    cd $LOCALBUILDDIR
-    do_wget_tar "ftp://xmlsoft.org/libxml2/libxml2-2.9.1.tar.gz"
 
-    if [[ -f ".libs/libxml2.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/libxml2" ]]; then
-        rm -rf $LOCALDESTDIR/include/libxml2 $LOCALDESTDIR/bin-global/xml*
-        rm -rf $LOCALDESTDIR/lib/libxml2.{l,}a $LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc
-        rm -rf $LOCALDESTDIR/lib/xml2Conf.sh
-    fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --enable-static
-
-    make -j $cpuCount
-    make install
-
-    do_checkIfExist libxml2-2.9.1 libxml2.a
-fi
-
-if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
-    echo -------------------------------------------------
-    echo "libgnurx-2.5.1 is already compiled"
-    echo -------------------------------------------------
+if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
+    if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
+        echo -------------------------------------------------
+        echo "libgnurx-2.5.1 is already compiled"
+        echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
@@ -643,9 +624,8 @@ if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
         make install
 
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
-fi
+    fi
 
-if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
     if file --version | grep -q -e "file.exe-5.22"; then
         echo -------------------------------------------------
         echo "file-5.22[libmagic] is already compiled"
