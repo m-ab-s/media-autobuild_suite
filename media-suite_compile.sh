@@ -3,6 +3,17 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
+FFMPEG_OPTS="--disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3"
+DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
+--enable-libbluray --enable-libcaca --extra-cflags=-DCACA_STATIC --enable-libopenjpeg --enable-fontconfig \
+--enable-libfreetype --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug \
+--extra-cflags=-DMODPLUG_STATIC --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb \
+--enable-libvo-amrwbenc --enable-libschroedinger --enable-libsoxr --enable-libtwolame --enable-libspeex \
+--enable-libtheora --enable-libvorbis --enable-libvo-aacenc --enable-libopus --enable-libvidstab \
+--enable-libxavs --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
+--enable-decklink --enable-libutvideo --enable-libgme \
+--enable-nonfree --enable-nvenc --enable-libfdk-aac"
+
 while true; do
   case $1 in
 --cpuCount=* ) cpuCount="${1#*=}"; shift ;;
@@ -264,6 +275,47 @@ do_pkgConfig() {
     fi
 }
 
+do_getFFmpegConfig() {
+    configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
+    if [[ -f $configfile ]]; then
+        FFMPEG_OPTS="$FFMPEG_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
+    else
+        FFMPEG_OPTS="$FFMPEG_OPTS $DEFAULT_FFMPEG_OPTS"
+    fi
+
+    # add nonfree option if missing
+    if ! ( echo "$FFMPEG_OPTS" | grep -q -e --enable-nonfree ) &&
+        [[ "$nonfree" = "y" ]]; then
+        FFMPEG_OPTS="$FFMPEG_OPTS --enable-nonfree"
+    fi
+
+    # remove non-free libs
+    if [[ ! $nonfree = "y" ]]; then
+        do_removeOption "--enable-nonfree"
+        do_removeOption "--enable-libfdk-aac"
+        do_removeOption "--enable-nvenc"
+    fi
+
+    # remove libs that don't work with shared
+    if [[ $ffmpeg = "s" ]]; then
+        do_removeOption "--enable-decklink"
+        do_removeOption "--enable-libutvideo"
+        do_removeOption "--enable-libgme"
+    fi
+}
+
+do_checkForOption() {
+    local option=${1%% *}
+    if ! echo "$FFMPEG_OPTS" | grep -q -e "$option"; then
+        return 1
+    fi
+}
+
+do_removeOption() {
+    local option=${1%% *}
+    FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
+}
+
 buildProcess() {
 cd $LOCALBUILDDIR
 echo "-------------------------------------------------------------------------------"
@@ -271,6 +323,8 @@ echo
 echo "compile global tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
+
+do_getFFmpegConfig
 
 if [ -f "$LOCALDESTDIR/lib/libopenjpeg.a" ]; then
     echo -------------------------------------------------
@@ -1939,11 +1993,6 @@ fi
 cd $LOCALBUILDDIR
 
 if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
-    if [[ $nonfree = "y" ]]; then
-        extras="--enable-nonfree --enable-libfdk-aac --enable-nvenc"
-    else
-        extras=""
-    fi
 
     echo "-------------------------------------------------------------------------------"
     echo "compile ffmpeg $bits"
@@ -1996,39 +2045,23 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
                 rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             fi
-            CPPFLAGS='-DFRIBIDI_ENTRY=""' LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
+
+            CPPFLAGS+=' -DFRIBIDI_ENTRY=""' LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
-            --disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 \
             --disable-static --enable-shared \
-            --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
-            --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype \
-            --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
-            --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
-            --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
-            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
-            $builtvpx $builtx264 $builtx265 $extras \
-            --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lpng -lpthread -lwsock32' \
+            $FFMPEG_OPTS \
+            $builtvpx $builtx264 $builtx265 \
+            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" config.h
         else
-            CPPFLAGS='-DFRIBIDI_ENTRY=""' ./configure \
+            CPPFLAGS+=' -DFRIBIDI_ENTRY=""' ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-            --disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 \
             --enable-static --disable-shared \
-            --enable-decklink --enable-libutvideo --enable-libgme \
-            --enable-librtmp --enable-gnutls --enable-avisynth --enable-frei0r --enable-filter=frei0r \
-            --enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-fontconfig --enable-libfreetype \
-            --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
-            --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
-            --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs \
-            --enable-libxvid --enable-libzvbi --enable-libdcadec --enable-libbs2b \
-            $builtvpx $builtx264 $builtx265 $extras \
-            --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' \
-            --extra-libs='-lpng -lpthread -lwsock32' \
+            $FFMPEG_OPTS \
+            $builtvpx $builtx264 $builtx265 \
+            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
 
             newFfmpeg="yes"
@@ -2036,7 +2069,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
         fi
 
-        sed -i "s/ --extra-cflags='-DPTW32_STATIC_LIB -DCACA_STATIC -DMODPLUG_STATIC' --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+        sed -i "s/ --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
 
         make -j $cpuCount
         make install
