@@ -34,8 +34,7 @@ local.properties
 
 ## ignore media-autobuild_suite folders and local specific files
 
-build32/
-build64/
+build/
 local32/
 local64/
 msys64/
