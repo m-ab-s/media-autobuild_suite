@@ -25,6 +25,7 @@ while true; do
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
 --other265=* ) other265="${1#*=}"; shift ;;
+--flac=* ) flac="${1#*=}"; shift ;;
 --mediainfo=* ) mediainfo="${1#*=}"; shift ;;
 --sox=* ) sox="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
@@ -761,7 +762,7 @@ if do_checkForOptions "--enable-libilbc"; then
     fi
 fi
 
-if do_pkgConfig "ogg = 1.3.2"; then
+if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
@@ -781,7 +782,7 @@ if do_pkgConfig "ogg = 1.3.2"; then
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
@@ -844,7 +845,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
     do_checkIfExist speex-1.2rc1 libspeex.a
 fi
 
-if do_pkgConfig "flac = 1.3.1"; then
+if [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 

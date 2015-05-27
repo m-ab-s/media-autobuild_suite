@@ -62,6 +62,7 @@ if exist %ini% GOTO checkINI
     set x264INI=0
     set x265INI=0
     set other265INI=0
+    set flacINI=0
     set mediainfoINI=0
     set soxINI=0
     set ffmpegINI=0
@@ -93,6 +94,8 @@ findstr /i "x264" %ini% > nul
 findstr /i "x265" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "other265" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "flac" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "mediainfo" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -128,6 +131,7 @@ for /F "tokens=2 delims==" %%f in ('findstr /i "vpx" %ini%') do set vpxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set other265INI=%%f
+for /F "tokens=2 delims==" %%f in ('findstr /i "flac" %ini%') do set flacINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "mediainfo" %ini%') do set mediainfoINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "soxB" %ini%') do set soxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
@@ -358,6 +362,33 @@ if %buildother265%==2 (
     )
 if %buildother265% GTR 2 GOTO other265
 if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
+
+:flac
+set "writeflac=no"
+if %flacINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build FLAC? [Free Lossless Audio Codec]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildflac="Build flac: "
+    set "writeflac=yes"
+    ) else (
+        set buildflac=%flacINI%
+        )
+
+if %buildflac%==1 (
+    set "flac=y"
+    )
+if %buildflac%==2 (
+    set "flac=n"
+    )
+if %buildflac% GTR 2 GOTO flac
+if %writeflac%==yes echo.flac=^%buildflac%>>%ini%
 
 :mediainfo
 set "writemediainfo=no"
@@ -1249,6 +1280,6 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
