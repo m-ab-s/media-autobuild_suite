@@ -846,7 +846,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
     do_checkIfExist speex-1.2rc1 libspeex.a
 fi
 
-if [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
+if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
