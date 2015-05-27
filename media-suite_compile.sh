@@ -30,6 +30,7 @@ while true; do
 --sox=* ) sox="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
+--ffmpegChoice=* ) ffmpegChoice="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --mpv=* ) mpv="${1#*=}"; shift ;;
 --mkv=* ) mkv="${1#*=}"; shift ;;
@@ -279,7 +280,7 @@ do_pkgConfig() {
 
 do_getFFmpegConfig() {
     configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
-    if [[ -f $configfile ]]; then
+    if [[ -f $configfile ]] && [[ $ffmpegChoice = "y" ]]; then
         FFMPEG_OPTS="$FFMPEG_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
     else
         FFMPEG_OPTS="$FFMPEG_OPTS $DEFAULT_FFMPEG_OPTS"

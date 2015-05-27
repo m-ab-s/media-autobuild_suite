@@ -67,6 +67,7 @@ if exist %ini% GOTO checkINI
     set soxINI=0
     set ffmpegINI=0
     set ffmpegUpdateINI=0
+    set ffmpegChoiceINI=0
     set mp4boxINI=0
     set mplayerINI=0
     set mpvINI=0
@@ -105,6 +106,8 @@ findstr /i "ffmpegB" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "ffmpegUpdate" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "ffmpegChoice" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "mp4box" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "mplayer" %ini% > nul
@@ -136,6 +139,7 @@ for /F "tokens=2 delims==" %%f in ('findstr /i "mediainfo" %ini%') do set mediai
 for /F "tokens=2 delims==" %%f in ('findstr /i "soxB" %ini%') do set soxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
 for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
+for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegChoice" %ini%') do set ffmpegChoiceINI=%%c
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i "mplayer" %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%l in ('findstr /i "mpv" %ini%') do set mpvINI=%%l
@@ -504,6 +508,56 @@ if %buildffmpegUp%==2 (
     )
 if %buildffmpegUp% GTR 2 GOTO ffmpegUp
 if %writeFFU%==yes echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
+
+:ffmpegChoice
+set "writeFFC=no"
+if %ffmpegChoiceINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Choose ffmpeg optional libraries?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. If you select yes, we will create a file with the default options
+    echo. we use with FFmpeg. You can remove any that you don't need.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildffmpegChoice="Choose ffmpeg optional libs: "
+    set "writeFFC=yes"
+    ) else (
+        set buildffmpegChoice=%ffmpegChoiceINI%
+        )
+
+if %buildffmpegChoice%==1 (
+    set "ffmpegChoice=y"
+    if not exist "%instdir%\build" ( mkdir "%instdir%/build" )
+    if not exist "%instdir%\build\ffmpeg_options.txt" (
+        (
+            echo.--enable-librtmp --enable-gnutls --enable-frei0r \
+            echo.--enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-libass --enable-libgsm \
+            echo.--enable-libilbc --enable-libmodplug --enable-libmp3lame \
+            echo.--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
+            echo.--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
+            echo.--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
+            echo.--enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            echo.--enable-decklink --enable-libutvideo --enable-libgme \
+            echo.--enable-nonfree --enable-nvenc --enable-libfdk-aac
+            )>>"%instdir%\build\ffmpeg_options.txt"
+        echo -------------------------------------------------------------------------------
+        echo. File with default options has been created in
+        echo. %instdir%\build\ffmpeg_options.txt
+        echo.
+        echo. Edit it now or leave it unedited to compile according to defaults.
+        echo -------------------------------------------------------------------------------
+        pause
+        )
+    )
+if %buildffmpegChoice%==2 (
+    set "ffmpegChoice=n"
+    )
+if %writeFFC%==yes echo.ffmpegChoice=^%buildffmpegChoice%>>%ini%
 
 :mp4boxStatic
 set "writeMP4Box=no"
@@ -1280,6 +1334,6 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
