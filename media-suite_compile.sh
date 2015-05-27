@@ -1702,11 +1702,6 @@ if [[ $mp4box = "y" ]]; then
             make distclean
         fi
 
-        # temp fix
-        if [[ $bits = "32bit" ]]; then
-            git checkout b49ff33d
-        fi
-
         ./configure --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lz"
 
         make -j $cpuCount
@@ -1715,11 +1710,6 @@ if [[ $mp4box = "y" ]]; then
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
 
         do_checkIfExist gpac-git bin-video/MP4Box.exe
-
-        # temp fix
-        if [[ $bits = "32bit" ]]; then
-            git checkout master
-        fi
     fi
 fi
 
