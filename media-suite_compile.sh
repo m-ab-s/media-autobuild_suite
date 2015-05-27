@@ -846,7 +846,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
     do_checkIfExist speex-1.2rc1 libspeex.a
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
+if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $sox = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
@@ -1073,32 +1073,6 @@ if do_checkForOptions "--enable-libgme"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libvorbis" || [[ $sox = "y" ]]; then
-    cd $LOCALBUILDDIR
-    do_git "https://github.com/erikd/libsndfile.git" sndfile
-    if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            ./autogen.sh
-        else
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
-            rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
-            rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
-        fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-        # don't compile programs
-        sed -i 's/ examples regtest tests programs//g' Makefile
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist sndfile-git libsndfile.a
-    fi
-fi
-
 if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
@@ -1145,6 +1119,30 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
 fi
 
 if [[ $sox = "y" ]]; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/erikd/libsndfile.git" sndfile
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f ./configure ]]; then
+            ./autogen.sh
+        else
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
+            rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
+            rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
+        fi
+
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+
+        # don't compile programs
+        sed -i 's/ examples regtest tests programs//g' Makefile
+
+        make -j $cpuCount
+        make install
+
+        do_checkIfExist sndfile-git libsndfile.a
+    fi
+
     if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
         echo -------------------------------------------------
         echo "libmad-0.15.1b is already compiled"
