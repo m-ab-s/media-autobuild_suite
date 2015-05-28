@@ -293,6 +293,7 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-nonfree"
         do_removeOption "--enable-libfdk-aac"
         do_removeOption "--enable-nvenc"
+        do_removeOption "--enable-libfaac"
     fi
 
     # remove libs that don't work with shared
