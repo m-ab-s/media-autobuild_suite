@@ -939,7 +939,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
             make distclean
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
+        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
 
         make -j $cpuCount
         make install
@@ -957,7 +957,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
             make distclean
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
+        CXXFLAGS+=" -O2" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
 
         make -j $cpuCount
         make install
