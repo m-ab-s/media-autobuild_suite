@@ -1976,9 +1976,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
         make -j $cpuCount
         make install
 
-        if [[ ! $ffmpeg = "s" && do_checkForOptions "--enable-libsoxr" ]]; then
-            sed -i "s/Libs: -L\${libdir}  -lswresample -lm/Libs: -L\${libdir}  -lswresample -lm -lsoxr/g" $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-
+        if [[ ! $ffmpeg = "s" ]]; then
             do_checkIfExist ffmpeg-git libavcodec.a
         else
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
