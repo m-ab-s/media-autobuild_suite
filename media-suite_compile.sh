@@ -82,7 +82,7 @@ else
         local unshallow="--unshallow"
     fi
     oldHead=$(git rev-parse HEAD)
-    git reset --quiet --hard @{u}
+    git reset --quiet --hard
     git pull $unshallow origin "$gitBranch"
     newHead=$(git rev-parse HEAD)
 
@@ -421,7 +421,7 @@ if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" &
         rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
     fi
 
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
     sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' fontconfig.pc
 
     make -j $cpuCount
@@ -522,15 +522,15 @@ fi
 #----------------------
 
 if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
-    if [[ `libgcrypt-config --version` = "1.6.2" ]]; then
+    if [[ `libgcrypt-config --version` = "1.6.3" ]]; then
         echo -------------------------------------------------
-        echo "libgcrypt-1.6.2 is already compiled"
+        echo "libgcrypt-1.6.3 is already compiled"
         echo -------------------------------------------------
         else
             cd $LOCALBUILDDIR
             echo -ne "\033]0;compile libgcrypt $bits\007"
 
-            do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.2.tar.bz2"
+            do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
 
             if [[ -f "src/.libs/libgcrypt.a" ]]; then
                 make distclean
@@ -548,7 +548,7 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
             make -j $cpuCount
             make install
 
-            do_checkIfExist libgcrypt-1.6.2 libgcrypt.a
+            do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
     fi
 
     if do_pkgConfig "nettle = 2.7.1"; then
@@ -827,9 +827,9 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
     do_checkIfExist opus-1.1 libopus.a
 fi
 
-if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
+if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc1.tar.gz"
+    do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
 
     if [[ -f "libspeex/.libs/libspeex.a" ]]; then
         make distclean
@@ -844,7 +844,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc1"; then
     make -j $cpuCount
     make install
 
-    do_checkIfExist speex-1.2rc1 libspeex.a
+    do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
 if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $sox = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
