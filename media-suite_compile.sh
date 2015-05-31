@@ -262,7 +262,6 @@ do_checkIfExist() {
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
         echo "If you're sure there are no dependencies <Enter> to continue building."
         read -p "Close this window if you wish to stop building."
-        sleep 5
     fi
 }
 
@@ -352,6 +351,11 @@ do_addOption() {
 do_removeOption() {
     local option=${1%% *}
     FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
+}
+
+do_patch() {
+    local patch=${1%% *}
+    curl --retry 20 --retry-max-time 5 "$patch" | patch -N
 }
 
 buildProcess() {
@@ -816,8 +820,7 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
     fi
 
-    do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
-    patch -N -p0 < opus11.patch
+    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
 
     ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-doc
 
@@ -1596,10 +1599,8 @@ if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; th
         rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
     fi
 
-    do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
-    do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
-    patch -N -p0 < zvbi-win32.patch
-    patch -N -p0 < zvbi-ioctl.patch
+    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
+    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
 
     ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
 
@@ -1912,9 +1913,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             arch='x86_64'
         fi
 
-        rm -f ffmpeg-use-pkg-config-for-more-external-libs.patch
-        do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
-        patch -N -i ffmpeg-use-pkg-config-for-more-external-libs.patch
+        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
 
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
@@ -2153,11 +2152,7 @@ if [[ $mkv = "y" ]]; then
             rm -rf $LOCALDESTDIR/bin-video/mkvtoolnix
         fi
 
-        if [[ ! -f ./mkvinfo.patch ]]; then
-            do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
-        fi
-
-        patch -N -p0 < mkvinfo.patch
+        do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
 
         ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=$MINGW_PREFIX/lib
 
@@ -2236,7 +2231,6 @@ if [[ $build32 = "yes" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "compile all tools 32bit done..."
     echo "-------------------------------------------------------------------------------"
-    sleep 3
 fi
 
 if [[ $build64 = "yes" ]]; then
@@ -2245,7 +2239,6 @@ if [[ $build64 = "yes" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "compile all tools 64bit done..."
     echo "-------------------------------------------------------------------------------"
-    sleep 3
 fi
 
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
