@@ -32,6 +32,15 @@ title media-autobuild_suite
 set instdir=%CD%
 set "ini=media-autobuild_suite.ini"
 
+set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
+automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
+intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems
+
+set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc gettext glew gmp gsm ^
+headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng libtiff mpc nasm pcre ^
+schroedinger sqlite3 tools-git winpthreads-git winstorecompat-git xvidcore yasm
+
+
 :selectmsys2Arch
 if exist %ini% GOTO checkINI
     echo -------------------------------------------------------------------------------
@@ -857,12 +866,13 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 	)
 
 :getMintty
-if exist %instdir%\mintty.lnk GOTO minttySettings
+if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     echo -------------------------------------------------------------------------------
     echo.
     echo.- set mintty shell shortcut and make a first run
     echo.
     echo -------------------------------------------------------------------------------
+    del %instdir\mintty.lnk
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
         echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
@@ -966,19 +976,22 @@ if %msys2%==msys32 (
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base-old.pk" del "%instdir%\%msys2%\etc\pac-base-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-base-new.pk" ren "%instdir%\%msys2%\etc\pac-base-new.pk" pac-base-old.pk
-    echo.asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems>%instdir%\%msys2%\etc\pac-base-new.pk
+
+for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base-new.pk
 
 if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
     echo.install msys2 base system
     echo.-------------------------------------------------------------------------------
     if exist %instdir%\pacman.sh del %instdir%\pacman.sh
-    echo.echo -ne "\033]0;install base system\007">>pacman.sh
-    echo.pacman --noconfirm -S $(^</etc/pac-base-new.pk^)>>pacman.sh
-    echo.sleep ^3>>pacman.sh
-    echo.exit>>pacman.sh
+    (
+    echo.echo -ne "\033]0;install base system\007"
+    echo.pacman --noconfirm -S $(cat /etc/pac-base-new.pk ^| sed -e 's#\\##'^)
+    echo.sleep ^3
+    echo.exit
+        )>>%instdir%\pacman.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
-    del pacman.sh
+    del %instdir%\pacman.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
@@ -1010,7 +1023,8 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
 if %build32%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw32-old.pk" del "%instdir%\%msys2%\etc\pac-mingw32-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw32-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw32-new.pk" pac-mingw32-old.pk
-    echo.mingw-w64-i686-cloog mingw-w64-i686-cmake mingw-w64-i686-crt-git mingw-w64-i686-doxygen mingw-w64-i686-gcc mingw-w64-i686-gcc-ada mingw-w64-i686-gcc-fortran mingw-w64-i686-gcc-libgfortran mingw-w64-i686-gcc-libs mingw-w64-i686-gcc-objc mingw-w64-i686-gettext mingw-w64-i686-glew mingw-w64-i686-gmp mingw-w64-i686-headers-git mingw-w64-i686-libiconv mingw-w64-i686-mpc mingw-w64-i686-winpthreads-git mingw-w64-i686-yasm mingw-w64-i686-lcms2 mingw-w64-i686-libtiff mingw-w64-i686-libpng mingw-w64-i686-libjpeg mingw-w64-i686-gsm mingw-w64-i686-lame mingw-w64-i686-xvidcore mingw-w64-i686-sqlite3 mingw-w64-i686-dlfcn mingw-w64-i686-jasper mingw-w64-i686-libgpg-error mingw-w64-i686-pcre mingw-w64-i686-boost mingw-w64-i686-nasm mingw-w64-i686-libcdio mingw-w64-i686-libcddb mingw-w64-i686-schroedinger mingw-w64-i686-libmodplug mingw-w64-i686-tools-git mingw-w64-i686-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw32-new.pk
+
+for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32-new.pk
 
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
@@ -1019,19 +1033,20 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.pacman --noconfirm -S $(^</etc/pac-mingw32-new.pk^)
+        echo.pacman --noconfirm -S $(cat /etc/pac-mingw32-new.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw32.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
-    del mingw32.sh
+    del %instdir%\mingw32.sh
     )
 
 :getmingw64
 if %build64%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\pac-mingw64-old.pk"
 if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
-    echo.mingw-w64-x86_64-cloog mingw-w64-x86_64-cmake mingw-w64-x86_64-crt-git mingw-w64-x86_64-doxygen mingw-w64-x86_64-gcc mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-gcc-libgfortran mingw-w64-x86_64-gcc-libs mingw-w64-x86_64-gcc-objc mingw-w64-x86_64-gettext mingw-w64-x86_64-glew mingw-w64-x86_64-gmp mingw-w64-x86_64-headers-git mingw-w64-x86_64-libiconv mingw-w64-x86_64-mpc mingw-w64-x86_64-winpthreads-git mingw-w64-x86_64-yasm mingw-w64-x86_64-lcms2 mingw-w64-x86_64-libtiff mingw-w64-x86_64-libpng mingw-w64-x86_64-libjpeg mingw-w64-x86_64-gsm mingw-w64-x86_64-lame mingw-w64-x86_64-xvidcore mingw-w64-x86_64-sqlite3 mingw-w64-x86_64-dlfcn mingw-w64-x86_64-jasper mingw-w64-x86_64-libgpg-error mingw-w64-x86_64-pcre mingw-w64-x86_64-boost mingw-w64-x86_64-nasm mingw-w64-x86_64-libcdio mingw-w64-x86_64-libcddb mingw-w64-x86_64-schroedinger mingw-w64-x86_64-libmodplug mingw-w64-x86_64-tools-git mingw-w64-x86_64-winstorecompat-git>%instdir%\%msys2%\etc\pac-mingw64-new.pk
+
+for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64-new.pk
 
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
@@ -1040,12 +1055,12 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.pacman --noconfirm -S $(^</etc/pac-mingw64-new.pk^)
+        echo.pacman --noconfirm -S $(cat /etc/pac-mingw64-new.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw64.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
-    del mingw64.sh
+    del %instdir%\mingw64.sh
     )
 
 :updatebase
@@ -1341,6 +1356,10 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% --mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh ^
+--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
+--ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
+--sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
+--mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
 
 exit
