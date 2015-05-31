@@ -1722,30 +1722,16 @@ if [[ ! $x264 = "n" ]]; then
             do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/libavutil
-                rm -rf $LOCALDESTDIR/include/libavcodec
+                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
                 rm -rf $LOCALDESTDIR/include/libpostproc
-                rm -rf $LOCALDESTDIR/include/libswresample
-                rm -rf $LOCALDESTDIR/include/libswscale
-                rm -rf $LOCALDESTDIR/include/libavdevice
-                rm -rf $LOCALDESTDIR/include/libavfilter
-                rm -rf $LOCALDESTDIR/include/libavformat
-                rm -f $LOCALDESTDIR/lib/libavutil.a
-                rm -f $LOCALDESTDIR/lib/libswresample.a
-                rm -f $LOCALDESTDIR/lib/libswscale.a
-                rm -f $LOCALDESTDIR/lib/libavcodec.a
-                rm -f $LOCALDESTDIR/lib/libavdevice.a
-                rm -f $LOCALDESTDIR/lib/libavfilter.a
-                rm -f $LOCALDESTDIR/lib/libavformat.a
+                rm -rf $LOCALDESTDIR/include/libsw{scale,resample}
+                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+                rm -f $LOCALDESTDIR/lib/libsw{scale,resample}.a
                 rm -f $LOCALDESTDIR/lib/libpostproc.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libsw{scale,resample}.pc
                 rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+                rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
 
             if [ -f "config.mak" ]; then
@@ -1904,30 +1890,16 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-            rm -rf $LOCALDESTDIR/include/libavutil
-            rm -rf $LOCALDESTDIR/include/libavcodec
+            rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
             rm -rf $LOCALDESTDIR/include/libpostproc
-            rm -rf $LOCALDESTDIR/include/libswresample
-            rm -rf $LOCALDESTDIR/include/libswscale
-            rm -rf $LOCALDESTDIR/include/libavdevice
-            rm -rf $LOCALDESTDIR/include/libavfilter
-            rm -rf $LOCALDESTDIR/include/libavformat
-            rm -f $LOCALDESTDIR/lib/libavutil.a
-            rm -f $LOCALDESTDIR/lib/libswresample.a
-            rm -f $LOCALDESTDIR/lib/libswscale.a
-            rm -f $LOCALDESTDIR/lib/libavcodec.a
-            rm -f $LOCALDESTDIR/lib/libavdevice.a
-            rm -f $LOCALDESTDIR/lib/libavfilter.a
-            rm -f $LOCALDESTDIR/lib/libavformat.a
+            rm -rf $LOCALDESTDIR/include/libsw{scale,resample}
+            rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+            rm -f $LOCALDESTDIR/lib/libsw{scale,resample}.a
             rm -f $LOCALDESTDIR/lib/libpostproc.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavcodec.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavutil.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libsw{scale,resample}.pc
             rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libswresample.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libswscale.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavdevice.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavfilter.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libavformat.pc
+            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
         fi
 
         if [ -f "config.mak" ]; then
