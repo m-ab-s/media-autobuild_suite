@@ -662,8 +662,9 @@ if %mkvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build static mkvtoolnix binaries?
-    echo. 1 = Yes
+    echo. 1 = Yes (Qt GUI^)
     echo. 2 = No
+    echo. 3 = Yes (wxGTK and Qt GUI^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -678,9 +679,11 @@ if %buildmkv%==1 (
     )
 if %buildmkv%==2 (
     set "mkv=n"
-    set "mingwpackages=%mingwpackages% qt5-static"
     )
-if %buildmkv% GTR 2 GOTO mkv
+if %buildmkv%==3 (
+    set "mkv=b"
+    )
+if %buildmkv% GTR 3 GOTO mkv
 if %writeMKV%==yes echo.mkv=^%buildmkv%>>%ini%
 
 :numCores

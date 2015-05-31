@@ -628,7 +628,7 @@ if do_checkForOptions "--enable-librtmp"; then
     fi
 fi
 
-if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
+if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
         echo -------------------------------------------------
         echo "libgnurx-2.5.1 is already compiled"
@@ -693,30 +693,6 @@ if [[ $mkv = "y" ]] || [[ $sox = "y" ]]; then
     fi
 fi
 
-if [[ $mkv = "y" ]]; then
-    if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
-        echo -------------------------------------------------
-        echo "wxWidgets is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile wxWidgets $bits\007"
-
-        do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
-
-        if [[ -f config.log ]]; then
-            make distclean
-        fi
-
-        CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-
-        make -j $cpuCount
-        make install
-
-        do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
-    fi
-fi
-
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile global tools $bits done..."
@@ -772,7 +748,7 @@ if do_checkForOptions "--enable-libilbc"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || [[ $flac = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "ogg = 1.3.2"; then
+if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
@@ -792,7 +768,7 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
@@ -854,7 +830,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $sox = "y" ]] || [[ $mkv = "y" ]] && do_pkgConfig "flac = 1.3.1"; then
+if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $sox = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
@@ -2144,7 +2120,68 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
     fi
 fi
 
-if [[ $mkv = "y" ]]; then
+if [[ $mkv != "n" ]]; then
+    if do_pkgConfig "Qt5Core = 5.4.1"; then
+        cd $LOCALBUILDDIR
+        do_wget_tar "http://download.qt.io/official_releases/qt/5.4/5.4.1/submodules/qtbase-opensource-src-5.4.1.tar.xz"
+
+        if [[ -d build ]]; then
+            rm -rf build/*
+        else
+            mkdir -p build
+        fi
+        if [[ -d $LOCALDESTDIR/include/QtCore ]]; then
+            rm -f $LOCALDESTDIR/lib/pkgconfig/Qt5*.pc $LOCALDESTDIR/lib/libQt5*.a $LOCALDESTDIR/lib/libqt*.a
+            rm -f $LOCALDESTDIR/lib/Qt5*.prl $LOCALDESTDIR/lib/qt*.prl
+            rm -rf $LOCALDESTDIR/include/Qt* $LOCALDESTDIR/{mkspecs,plugins}
+            rm -f $LOCALDESTDIR/bin-global/{qdoc,qmake,uic,qlalr,moc,rcc}.exe $LOCALDESTDIR/bin-global/syncqt.pl
+        fi
+
+        cd build
+        if [[ $bits = "32bit" ]]; then
+            nosse2="-no-sse2"
+        else
+            nosse2=""
+        fi
+        OPENSSL_LIBS="`pkg-config --libs-only-l openssl`" \
+        ../configure -opensource -confirm-license -platform win32-g++ \
+        -force-pkg-config -release -static -prefix $LOCALDESTDIR -bindir $LOCALDESTDIR/bin-global \
+        -no-icu -no-opengl -no-glib -nomake examples -nomake tests -no-sql-mysql -no-sql-sqlite \
+        -no-sql-odbc -no-sql-psql -no-sql-tds -no-cups -qt-pcre -no-fontconfig -qt-freetype \
+        -qt-zlib -qt-libjpeg -qt-harfbuzz -qt-libpng -openssl-linked -no-dbus $nosse2 -v
+
+        make -j $cpuCount QMAKE="$(pwd)/bin/qmake CONFIG-='debug debug_and_release'"
+        make install
+
+        cp -f ./lib/pkgconfig/*.pc $LOCALDESTDIR/lib/pkgconfig/
+
+        do_checkIfExist qtbase-opensource-src-5.4.1 libQt5Core.a
+    fi
+
+    if [[ $mkv = "b" ]]; then
+        if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
+            echo -------------------------------------------------
+            echo "wxWidgets is already compiled"
+            echo -------------------------------------------------
+        else
+            cd $LOCALBUILDDIR
+            echo -ne "\033]0;compile wxWidgets $bits\007"
+
+            do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
+
+            if [[ -f config.log ]]; then
+                make distclean
+            fi
+
+            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+
+            make -j $cpuCount
+            make install
+
+            do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
+        fi
+    fi
+
     cd $LOCALBUILDDIR
     do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix shallow master bin-video/mkvtoolnix/bin/mkvmerge.exe
     if [[ $compile = "true" ]]; then
@@ -2159,14 +2196,10 @@ if [[ $mkv = "y" ]]; then
 
         do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
 
-        qtbin=$MINGW_PREFIX/qt5-static/bin
-
-        PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$qtbin/../lib/pkgconfig" \
         CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static" \
         LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static" \
         ./configure --build=$targetBuild --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl \
-        --with-boost-libdir=$MINGW_PREFIX/lib --enable-static-qt --with-moc=${qtbin}/moc \
-        --with-uic=$qtbin/uic --with-rcc=$qtbin/rcc --enable-static
+        --with-boost-libdir=$MINGW_PREFIX/lib --enable-static-qt --enable-static
 
         sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/" build-config
         sed -i "s/@\(.*\)@//" build-config
@@ -2176,7 +2209,6 @@ if [[ $mkv = "y" ]]; then
         drake
         rake install
 
-        mkdir -p $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc
         mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/locale $LOCALDESTDIR/bin-video/mkvtoolnix/bin/locale
         cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
         unset DRAKETHREADS
