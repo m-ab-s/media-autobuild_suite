@@ -1912,6 +1912,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             arch='x86_64'
         fi
 
+        rm -f ffmpeg-use-pkg-config-for-more-external-libs.patch
         do_wget "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
         patch -N -i ffmpeg-use-pkg-config-for-more-external-libs.patch
 
