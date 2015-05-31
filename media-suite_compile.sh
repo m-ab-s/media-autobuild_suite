@@ -1246,7 +1246,7 @@ fi
 
 if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://git.chromium.org/git/webm/libvpx.git" vpx noDepth
+    do_git "https://github.com/webmproject/libvpx.git" vpx noDepth
     if [[ $compile = "true" ]]; then
         if [ -d $LOCALDESTDIR/include/vpx ]; then
             rm -rf $LOCALDESTDIR/include/vpx
