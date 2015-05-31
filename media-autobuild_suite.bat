@@ -41,6 +41,8 @@ if exist %ini% GOTO checkINI
     echo. 1 = 32 bit msys2
     echo. 2 = 64 bit msys2 [recommended]
     echo.
+    echo. Choose the same as your operating system.
+    echo.
     echo. If you make a mistake, delete the media-autobuild_suite.ini file
     echo. and re-run this file.
     echo.

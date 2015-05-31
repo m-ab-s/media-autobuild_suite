@@ -1,19 +1,19 @@
 media-autobuild_suite
 =========
 
-This tool is inspire by the very nice, linux cross compile, tool from Roger Pack(rdp):
+This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
 https://github.com/rdp/ffmpeg-windows-build-helpers
 
-It is based on msys2 and tested under Windows 7.
+It is based on msys2 and tested under Windows 7 and 8.1.
 http://sourceforge.net/projects/msys2/
 
-I use some jscipt parts from nu774:
+I use some jscript parts from nu774:
 https://github.com/nu774/fdkaac_autobuild
 
 Thanks to all of them!
 
 
-For Informations about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
+For information about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
 
 Download
 --------
@@ -26,99 +26,96 @@ Current release is **v3.5**
 Included Tools And Libraries
 --------
 
- - ffmpeg (shared or static) with that libraries:
+ - FFmpeg (shared or static) with these libraries (all optional, but compiled by default):
 	- decklink
-	- fdkaac
-	- faac
-	- fontconfig
-	- freetype
-	- frei0r
-	- gsm
-	- gnutls
-	- libass
-	- libbs2b
-	- libbluray
-	- libcaca
-	- libdcadec
-	- libilbc
+	- fontconfig (2.11.92)
+	- freetype (2.5.5)
+	- frei0r (1.4)
+	- fribidi (0.19.6)
+	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
+	- harfbuzz (git)
+	- libass (git)
+	- libbs2b (3.1.0)
+	- libbluray (git)
+	- libcaca (0.99.beta19)
+	- libdcadec (git)
+	- libfdk-aac (git)
+	- libgsm
+	- libilbc (git)
 	- libmodplug
-	- libpng
-	- libsoxr
-	- libtiff
-	- libtwolame
-	- libutvideo (only static)
-	- libzvbi
-	- mp3lame
-	- nvenc
-	- opencore-amr
-	- openjpeg
-	- ogg
-	- opus
-	- rtmp
-	- schroedinger
-	- sdl
-	- speex
-	- theora
-	- vidstab
-	- vpx
-	- vo-aacenc
-	- vo-amrwbenc
-	- vorbis
-	- wavpack
-	- x264
-	- x265
-	- xavs
-	- xvid
+	- libmp3lame
+	- libopencore-amrwb/nb (0.1.3)
+	- libopus (1.1)
+	- librtmp (git)
+	- libschroedinger
+	- libsoxr (0.1.1)
+	- libspeex (1.2rc2)
+	- libtheora (1.1.1)
+	- libtwolame (git)
+	- libutvideo (git/15.1.0)
+	- libvo-aacenc (0.1.3)
+	- libvo-amrwbenc (0.1.2)
+	- libvorbis (1.3.5)
+	- libvpx (git)
+	- libx264 (git)
+	- libx265 (hg)
+	- libxavs (svn snapshot)
+	- libxvid
+	- libzvbi (0.2.35)
+	- nvenc (5.0.1)
+	- openjpeg 1.5.2 (version 2 is incompatible with ffmbc)
+	- sdl (1.2.15)
+	- vidstab (git)
 	
  - other tools
-	- f265
-	- fdkaac
-	- faac
-	- ffmbc
-	- file
-	- flac
-	- gnutls
-	- kvazaar
-	- libsndfile
-	- mediainfo cli
-	- mp4box
-	- mpg123
-	- mplayer
-	- mkvtoolnix
-	- mpv
-	- opus-tools
-	- rtmp
-	- speex
-	- sox 
-	- vpx
-	- x264 (8 and 10 bit, with gpac[mp4 output])
-	- x265 (8 and 16 bit)
-	- xavs	
+	- f265 (git)
+	- fdkaac (git)
+	- ffmbc (0.7.4)
+	- file (5.22)
+	- flac (1.3.1)
+	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
+	- kvazaar (git)
+	- libsndfile (git) (libs only)
+	- mediainfo cli (snapshot)
+	- mp4box (git)
+	- mplayer (svn)
+	- mkvtoolnix (git)
+	- mpv (git)
+	- opus-tools (0.1.9)
+	- rtmpdump (git)
+	- speex (1.2rc2)
+	- sox (git)
+	- vpx (git)
+	- x264 (8 and 10 bit, with gpac[mp4 output]) (git)
+	- x265 (8 and 16 bit) (git)
+	- xavs (svn snapshot)
 
 
 --------
 
 
-This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
-After building the environment it get and compile all tools. All tools get static compiled, no external .dlls needed.
+This Windows Batchscript setups a MinGW/GCC compiler environment for building ffmpeg and other media tools under Windows.
+After building the environment it retrieves and compiles all tools. All tools get static compiled, no external .dlls needed (with some optional exceptions)
 
-For using it:
- - Download the file, and copy it in your target folder. In that folder all compiler and tools get installed. Please look that you use a folder without space characters. A good place is: c:\mingw
- - double click the media-autobuild_suite.bat file 
- - select if you want to compile for Windows 32 bit, 64 bit or both
- - select if you want to compile non free tools like "fdk aac"
- - select the numbers of CPU (cores) you want to use
- - Wait a little bit, and hopefully after a while you found all your "*.exe" Tools under local32\bin, or local64\bin
+How to use it:
+ - Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder without space characters. A good place is: c:\mingw
+ - Double click the media-autobuild_suite.bat file
+ - Select the toolchain you'll want (select the one your operating system is on, if you don't know it's probably 64-bit)
+ - Select if you want to compile for Windows 32-bit, 64-bit or both
+ - Select if you want to compile non-free tools like "fdk aac"
+ - Select the numbers of CPU (cores) you want to use
+ - Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-audio/global/video or local64\bin-audio/global/video
  
-The Script write a ini-file, so you only need to choose the first time what you want to build.
+The Script writes a ini-file, so you only need to make these choices the first time what you want to build.
 
 For all you need ~7 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Build all from the begin take around ~3 hours.
+Building everything from the beginning takes around ~3 hours.
 
-Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one. ffmpeg, x264, x265, libvpx, libbluray, sox and some other tools have automatic update from git, so by them you don't need to delete files or folders. 
+Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one under /local32/lib or /local64/lib. ffmpeg, x264, x265, libvpx, libbluray, sox and some other tools have frequent updates from git, so for them you probably don't need to delete files or folders to get updated versions. 
 
-For saving space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in build32 and build64. The selection in the batch file do this also for you.
+To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders itself.
+
 Have fun!
 
 
@@ -127,27 +124,36 @@ What The Individual Files Do
 --------
 
 media-autobuild_suite.bat
- - This file set up the msys2 system and the compiler environment. For a normal using you only have to start this file. Every time you start this batch file it runs truth the process, but after the first time it only check some variables and run a update and after that it only compile this tools what have a new git version.
+ - This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
 	
 media-autobuild_suite.ini
- - This file get generated after the first start and save the settings what you have selected. Before the next run you can edit it.
+ - This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
 	
 media-suite_compile.sh
- - This is the compiling script, it builds all the libs and tools what we want, like ffmpeg; mplayer; etc. You also can inspect it and see how to compile your own source codes. Normally you can copy the code and past them in the mintty shell (expect make -j $cpuCount, here you need to put your cpu count). You don't need to start this script, it get calls by the batch script.
+ - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it get called by the batch script.
 	
 media-suite_update.sh
- - This script runs every time you run the batch file to. It checks that there is new packets what needs to get installed. It check the compiler profiles that if they are up to date. And it makes a msys2 system update. This you also don't need to start manuell. 
+ - This script runs every time you run the batch file. It checks for updates to the MinGW environment.
+
+/build/ffmpeg_options.txt
+ - If you select the option to choose your own FFmpeg optional libraries, this file will contain options that get sent to FFmpeg's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg without features you don't need.
 	
-All scripts you can normally override with the newest Version and then rerun the batch process.
-	
+
+Troubleshooting
+--------
+
+If there's some error during compilation follow these steps:
+- 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
+- 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
+- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the contents of the compilation window, the contents of the .ini file and contents of ffmpeg_options.txt if you're using it;
+- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
+- 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 
 
 References
 --------
 
 http://ingar.satgnu.net/devenv/mingw32/base.html
-
-
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
 
 
