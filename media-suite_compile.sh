@@ -708,7 +708,7 @@ if [[ $mkv = "y" ]]; then
             make distclean
         fi
 
-        CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
 
         make -j $cpuCount
         make install
@@ -2159,12 +2159,17 @@ if [[ $mkv = "y" ]]; then
 
         do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl --with-boost-libdir=$MINGW_PREFIX/lib
+        qtbin=$MINGW_PREFIX/qt5-static/bin
 
-        sed -i "s/EXTRA_CFLAGS = *$/EXTRA_CFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
-        sed -i "s/EXTRA_LDFLAGS = *$/EXTRA_LDFLAGS = -static-libgcc -static-libstdc++ -static/g" build-config
-        sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/g" build-config
-		sed -i "s/@\(.*\)@//" build-config
+        PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$qtbin/../lib/pkgconfig" \
+        CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static" \
+        LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static" \
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl \
+        --with-boost-libdir=$MINGW_PREFIX/lib --enable-static-qt --with-moc=${qtbin}/moc \
+        --with-uic=$qtbin/uic --with-rcc=$qtbin/rcc --enable-static
+
+        sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/" build-config
+        sed -i "s/@\(.*\)@//" build-config
 
         export DRAKETHREADS=$cpuCount
 
@@ -2173,7 +2178,6 @@ if [[ $mkv = "y" ]]; then
 
         mkdir -p $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc
         mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/locale $LOCALDESTDIR/bin-video/mkvtoolnix/bin/locale
-        mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/doc/mkvtoolnix/guide $LOCALDESTDIR/bin-video/mkvtoolnix/bin/doc/guide
         cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
         unset DRAKETHREADS
 

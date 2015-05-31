@@ -678,6 +678,7 @@ if %buildmkv%==1 (
     )
 if %buildmkv%==2 (
     set "mkv=n"
+    set "mingwpackages=%mingwpackages% qt5-static"
     )
 if %buildmkv% GTR 2 GOTO mkv
 if %writeMKV%==yes echo.mkv=^%buildmkv%>>%ini%
