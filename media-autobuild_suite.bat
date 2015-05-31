@@ -1229,7 +1229,7 @@ if %build32%==yes (
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
             echo.
             echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
+            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.export PATH PS1
             echo.
             echo.# package build directory
@@ -1284,7 +1284,7 @@ if %build64%==yes (
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
             echo.
             echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\033[33m\w\033[0m\]$ '
+            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.export PATH PS1
             echo.
             echo.# package build directory
