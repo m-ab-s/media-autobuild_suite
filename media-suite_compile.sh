@@ -356,7 +356,10 @@ do_removeOption() {
 do_patch() {
     local patch=${1%% *}
     local strip=$2
-    curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
+    if [[ ! -z $strip ]]; then
+        strip="-p$strip"
+    fi
+    curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N $strip
 }
 
 buildProcess() {
