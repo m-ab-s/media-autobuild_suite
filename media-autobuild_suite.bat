@@ -675,6 +675,7 @@ if %writeMKV%==yes echo.mkv=^%buildmkv%>>%ini%
 
 :numCores
 set "writeCores=no"
+if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
 if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -682,7 +683,7 @@ if %coresINI%==0 (
     echo. Number of CPU Cores/Threads for compiling:
     echo. [it is non-recommended to use all cores/threads!]
     echo.
-    echo. Recommended: half of your total number of cores
+    echo. Recommended: %coreHalf%
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
