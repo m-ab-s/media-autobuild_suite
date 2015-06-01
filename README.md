@@ -42,6 +42,7 @@ Included Tools And Libraries
 	- libfdk-aac (git)
 	- libgsm
 	- libilbc (git)
+	- libmfx (git)
 	- libmodplug
 	- libmp3lame
 	- libopencore-amrwb/nb (0.1.3)
@@ -143,11 +144,11 @@ Troubleshooting
 --------
 
 If there's some error during compilation follow these steps:
-- 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
-- 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
-- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the contents of the compilation window, the contents of the .ini file and contents of ffmpeg_options.txt if you're using it;
-- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
-- 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
+ 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
+ 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
+ 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the contents of the compilation window, the contents of the .ini file and contents of ffmpeg_options.txt if you're using it;
+ 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
+ 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 
 
 References
