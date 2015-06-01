@@ -1,6 +1,6 @@
 diff -uprN ./include/opus_defines.h ./include/opus_defines.h
---- ./include/opus_defines.h   2013-11-29 15:17:15.000000000 -0500
-+++ ./include/opus_defines.h   2013-12-06 01:44:24.656150129 -0500
+--- a/include/opus_defines.h   2013-11-29 15:17:15.000000000 -0500
++++ b/include/opus_defines.h   2013-12-06 01:44:24.656150129 -0500
 @@ -65,11 +65,7 @@ extern "C" {
  
  #ifndef OPUS_EXPORT

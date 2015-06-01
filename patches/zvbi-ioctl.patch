@@ -1,6 +1,6 @@
 diff -ru zvbi.orig/contrib/ntsc-cc.c zvbi/contrib/ntsc-cc.c
---- contrib/ntsc-cc.c	2011-11-06 11:22:47.000000000 +0200
-+++ contrib/ntsc-cc.c	2011-11-06 11:29:04.000000000 +0200
+--- a/contrib/ntsc-cc.c	2011-11-06 11:22:47.000000000 +0200
++++ b/contrib/ntsc-cc.c	2011-11-06 11:29:04.000000000 +0200
 @@ -32,7 +32,6 @@
  #include <fcntl.h>
  #include <errno.h>

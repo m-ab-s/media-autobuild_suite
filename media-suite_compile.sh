@@ -356,9 +356,6 @@ do_removeOption() {
 do_patch() {
     local patch=${1%% *}
     local strip=$2
-    if [[ -z $strip ]]; then
-        strip="0"
-    fi
     curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
 }
 
@@ -1918,7 +1915,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             arch='x86_64'
         fi
 
-        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch" 1
+        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
 
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then

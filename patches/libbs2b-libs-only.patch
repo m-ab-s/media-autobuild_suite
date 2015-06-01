@@ -1,5 +1,5 @@
---- src/Makefile.in.orig	2009-06-04 19:17:13.000000000 +0100
-+++ src/Makefile.in	2015-06-01 15:26:07.771798900 +0100
+--- a/src/Makefile.in	2009-06-04 19:17:13.000000000 +0100
++++ b/src/Makefile.in	2015-06-01 15:26:07.771798900 +0100
 @@ -34,7 +34,7 @@
  POST_UNINSTALL = :
  build_triplet = @build@
