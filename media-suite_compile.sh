@@ -10,7 +10,7 @@ DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
---enable-libzvbi --enable-libdcadec --enable-libbs2b \
+--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 
@@ -1663,6 +1663,26 @@ if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
         fi
     
         do_checkIfExist nvenc_5.0.1_sdk "include/nvEncodeAPI.h"
+    fi
+fi
+
+if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg = "y" ]]; then
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f configure ]]; then
+            autoreconf -fiv
+        elif [[ -f Makefile ]]; then
+            make distclean
+        fi
+        if [[ -d $LOCALDESTDIR/include/mfx ]]; then
+            rm -rf $LOCALDESTDIR/include/mfx
+            rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
+        fi
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
+        make -j $cpuCount
+        make install
+        do_checkIfExist libmfx-git libmfx.a
     fi
 fi
 

@@ -556,7 +556,7 @@ if %buildffmpegChoice%==1 (
             echo.--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
             echo.--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
             echo.--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
-            echo.--enable-libzvbi --enable-libdcadec --enable-libbs2b \
+            echo.--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx \
             echo.--enable-decklink --enable-libutvideo --enable-libgme \
             echo.--enable-nonfree --enable-nvenc --enable-libfdk-aac
             )>>"%instdir%\build\ffmpeg_options.txt"
