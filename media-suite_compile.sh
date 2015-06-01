@@ -1117,7 +1117,8 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
         rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
     fi
 
-    sed -i 's/bs2bconvert$(EXEEXT) bs2bstream$(EXEEXT)//' src/Makefile.in
+    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-disable-sndfile.patch"
+    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-libs-only.patch"
     ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
 
     make -j $cpuCount

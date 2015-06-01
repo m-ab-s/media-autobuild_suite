@@ -1,0 +1,25 @@
+--- configure.orig	2009-06-04 19:17:12.000000000 +0100
++++ configure	2015-06-01 15:27:34.936577200 +0100
+@@ -20116,22 +20116,6 @@
+ 
+ fi
+ 
+-# Checks for libraries.
+-if test -n "$PKG_CONFIG" && \
+-    { ($as_echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"sndfile\"") >&5
+-  ($PKG_CONFIG --exists --print-errors "sndfile") 2>&5
+-  ac_status=$?
+-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+-  (exit $ac_status); }; then
+-  :
+-else
+-
+-    { { $as_echo "$as_me:$LINENO: error: Please install libsndfile." >&5
+-$as_echo "$as_me: error: Please install libsndfile." >&2;}
+-   { (exit 1); exit 1; }; }
+-
+-fi
+-
+ # Checks for header files.
+ 
+ 
