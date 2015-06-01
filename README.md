@@ -20,7 +20,7 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v3.5**
+Current release is **v3.6**
 
 
 Included Tools And Libraries
@@ -79,7 +79,7 @@ Included Tools And Libraries
 	- mediainfo cli (snapshot)
 	- mp4box (git)
 	- mplayer (svn)
-	- mkvtoolnix (git)
+	- mkvtoolnix (git) (with Qt GUI, wxGTK GUI optional)
 	- mpv (git)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
