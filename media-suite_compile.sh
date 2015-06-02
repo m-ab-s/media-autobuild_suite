@@ -1739,7 +1739,7 @@ if [[ ! $x264 = "n" ]]; then
     if [[ $compile = "true" ]]; then
         if [[ $x264 = "y" ]]; then
             cd $LOCALBUILDDIR
-            do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master lib/libavcodec.a
+            do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
                 rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
@@ -1922,7 +1922,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
     echo "-------------------------------------------------------------------------------"
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/FFmpeg/FFmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
+    do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
@@ -1948,7 +1948,8 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             arch='x86_64'
         fi
 
-        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-use-pkg-config-for-more-external-libs.patch"
+        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
+        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then

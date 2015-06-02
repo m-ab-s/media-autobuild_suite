@@ -1,25 +1,29 @@
+From 46529b51fb19ad3c1bfa38f8bed9eee179a09232 Mon Sep 17 00:00:00 2001
+From: Ricardo Constantino <wiiaboo@gmail.com>
+Date: Tue, 2 Jun 2015 21:18:36 +0100
+Subject: [PATCH 1/2] Use pkg-config for more external libs
+
+Original by lachs0r
+---
+ configure | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
 diff --git a/configure b/configure
-index aabcdc2..590d245 100755
+index f217eba..1ef5be8 100755
 --- a/configure
 +++ b/configure
-@@ -5102,14 +5102,14 @@ enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
- enabled libcaca           && require_pkg_config caca caca.h caca_create_canvas
- enabled libdcadec         && require_pkg_config dcadec libdcadec/dca_context.h dcadec_context_create
- enabled libfaac           && require2 libfaac "stdint.h faac.h" faacEncGetVersion -lfaac
--enabled libfdk_aac        && require libfdk_aac fdk-aac/aacenc_lib.h aacEncOpen -lfdk-aac
-+enabled libfdk_aac        && require_pkg_config fdk-aac fdk-aac/aacenc_lib.h aacEncOpen
- flite_libs="-lflite_cmu_time_awb -lflite_cmu_us_awb -lflite_cmu_us_kal -lflite_cmu_us_kal16 -lflite_cmu_us_rms -lflite_cmu_us_slt -lflite_usenglish -lflite_cmulex -lflite"
- enabled libflite          && require2 libflite "flite/flite.h" flite_init $flite_libs
- enabled fontconfig        && enable libfontconfig
+@@ -5120,7 +5120,9 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_libfreetype
  enabled libfribidi        && require_pkg_config fribidi fribidi.h fribidi_version_info
 -enabled libgme            && require  libgme gme/gme.h gme_new_emu -lgme -lstdc++
-+enabled libgme            && require_pkg_config libgme gme/gme.h gme_new_emu
++enabled libgme            && { use_pkg_config libgme gme/gme.h gme_new_emu ||
++                               { require libgme gme/gme.h gme_new_emu -lgme -lstdc++ &&
++                                 warn "using libgme without pkg-config"; } }
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
                                     check_lib "${gsm_hdr}" gsm_create -lgsm && break;
                                 done || die "ERROR: libgsm not found"; }
-@@ -5118,8 +5118,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
+@@ -5129,8 +5131,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
  enabled libmodplug        && require_pkg_config libmodplug libmodplug/modplug.h ModPlug_Load
  enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
  enabled libnut            && require libnut libnut.h nut_demuxer_init -lnut
@@ -30,14 +34,7 @@ index aabcdc2..590d245 100755
  enabled libopencv         && require_pkg_config opencv opencv/cxcore.h cvCreateImageHeader
  enabled libopenh264       && require_pkg_config openh264 wels/codec_api.h WelsGetCodecVersion
  enabled libopenjpeg       && { check_lib openjpeg.h opj_version -lopenmj2 -DOPJ_STATIC ||
-@@ -5134,14 +5134,14 @@ enabled libschroedinger   && require_pkg_config schroedinger-1.0 schroedinger/sc
- enabled libshine          && require_pkg_config shine shine/layer3.h shine_encode_buffer
- enabled libsmbclient      && { use_pkg_config smbclient libsmbclient.h smbc_init ||
-                                require smbclient libsmbclient.h smbc_init -lsmbclient; }
--enabled libsoxr           && require libsoxr soxr.h soxr_create -lsoxr
-+enabled libsoxr           && require libsoxr soxr.h soxr_create -lsoxr && LIBSOXR="-lsoxr"
- enabled libssh            && require_pkg_config libssh libssh/sftp.h sftp_init
- enabled libspeex          && require_pkg_config speex speex/speex.h speex_decoder_init -lspeex
+@@ -5151,8 +5153,8 @@ enabled libspeex          && require_pkg_config speex speex/speex.h speex_decode
  enabled libstagefright_h264 && require_cpp libstagefright_h264 "binder/ProcessState.h media/stagefright/MetaData.h
      media/stagefright/MediaBufferGroup.h media/stagefright/MediaDebug.h media/stagefright/MediaDefs.h
      media/stagefright/OMXClient.h media/stagefright/OMXCodec.h" android::OMXClient -lstagefright -lmedia -lutils -lbinder -lgnustl_static
@@ -48,7 +45,7 @@ index aabcdc2..590d245 100755
                               { check_lib twolame.h twolame_encode_buffer_float32_interleaved -ltwolame ||
                                 die "ERROR: libtwolame must be installed and version must be >= 0.3.10"; }
  enabled libutvideo        && require_cpp utvideo "stdint.h stdlib.h utvideo/utvideo.h utvideo/Codec.h" 'CCodec*' -lutvideo -lstdc++
-@@ -5149,7 +5149,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
+@@ -5160,7 +5162,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
  enabled libvidstab        && require_pkg_config "vidstab >= 0.98" vid.stab/libvidstab.h vsMotionDetectInit
  enabled libvo_aacenc      && require libvo_aacenc vo-aacenc/voAAC.h voGetAACEncAPI -lvo-aacenc
  enabled libvo_amrwbenc    && require libvo_amrwbenc vo-amrwbenc/enc_if.h E_IF_init -lvo-amrwbenc
@@ -57,9 +54,6 @@ index aabcdc2..590d245 100755
  enabled libvpx            && {
      enabled libvpx_vp8_decoder && { check_lib2 "vpx/vpx_decoder.h vpx/vp8dx.h" vpx_codec_dec_init_ver -lvpx ||
                                      die "ERROR: libvpx decoder version must be >=0.9.1"; }
-@@ -6099,4 +6099,4 @@ pkgconfig_generate libavfilter   "FFmpeg audio/video filtering library" "$LIBAVF
- pkgconfig_generate libpostproc   "FFmpeg postprocessing library"        "$LIBPOSTPROC_VERSION"   ""
- pkgconfig_generate libavresample "Libav audio resampling library"       "$LIBAVRESAMPLE_VERSION" "$LIBM"
- pkgconfig_generate libswscale    "FFmpeg image rescaling library"       "$LIBSWSCALE_VERSION"    "$LIBM"
--pkgconfig_generate libswresample "FFmpeg audio resampling library"      "$LIBSWRESAMPLE_VERSION" "$LIBM"
-+pkgconfig_generate libswresample "FFmpeg audio resampling library"      "$LIBSWRESAMPLE_VERSION" "$LIBM $LIBSOXR"
+-- 
+2.4.2
+
