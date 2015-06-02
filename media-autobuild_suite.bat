@@ -36,10 +36,18 @@ set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 au
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
 intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems
 
-set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc gettext glew gmp gsm ^
-headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng libtiff mpc nasm pcre ^
-schroedinger sqlite3 tools-git winpthreads-git winstorecompat-git xvidcore yasm
+set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
+gettext glew gmp gsm  headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng ^
+libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git winstorecompat-git xvidcore yasm
 
+set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
+--enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
+--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
+--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
+--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid ^
+--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx ^
+--enable-decklink --enable-libutvideo --enable-libgme ^
+--enable-nonfree --enable-nvenc --enable-libfdk-aac
 
 :selectmsys2Arch
 if exist %ini% GOTO checkINI
@@ -549,17 +557,7 @@ if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
     if not exist "%instdir%\build" ( mkdir "%instdir%/build" )
     if not exist "%instdir%\build\ffmpeg_options.txt" (
-        (
-            echo.--enable-librtmp --enable-gnutls --enable-frei0r \
-            echo.--enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-libass --enable-libgsm \
-            echo.--enable-libilbc --enable-libmodplug --enable-libmp3lame \
-            echo.--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
-            echo.--enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
-            echo.--enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
-            echo.--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx \
-            echo.--enable-decklink --enable-libutvideo --enable-libgme \
-            echo.--enable-nonfree --enable-nvenc --enable-libfdk-aac
-            )>>"%instdir%\build\ffmpeg_options.txt"
+        for %%i in (%ffmpeg_options%) do echo.%%i>>"%instdir%\build\ffmpeg_options.txt"
         echo -------------------------------------------------------------------------------
         echo. File with default options has been created in
         echo. %instdir%\build\ffmpeg_options.txt
