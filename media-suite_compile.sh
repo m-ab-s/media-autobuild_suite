@@ -4,13 +4,12 @@ compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_OPTS="--disable-debug --disable-doc --disable-w32threads --enable-gpl --enable-version3 --enable-avisynth"
-DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r \
---enable-libbluray --enable-libcaca --enable-libopenjpeg --enable-libass --enable-libgsm \
---enable-libilbc --enable-libmodplug --enable-libmp3lame \
+DEFAULT_FFMPEG_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
+--enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
---enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx \
+--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 
@@ -1666,7 +1665,7 @@ if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg = "y" ]]; then
+if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
@@ -1684,6 +1683,25 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg = "y" ]]; then
         make install
         do_checkIfExist libmfx-git libmfx.a
     fi
+fi
+
+if do_checkForOptions "--enable-libcdio"; then
+    cd $LOCALBUILDDIR
+    do_git "git://github.com/rocky/libcdio-paranoia.git" libcdio-paranoia
+    if [[ ! -f configure ]]; then
+        autoreconf -fiv
+    elif [[ -f config.h ]]; then
+        make distclean
+    fi
+    if [[ -d $LOCALDESTDIR/include/cdio ]]; then
+        rm -rf $LOCALDESTDIR/include/cdio
+        rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
+        rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
+    fi
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-example-progs --disable-cpp-progs --enable-silent-rules
+    make -j $cpuCount
+    make install
+    do_checkIfExist libcdio-paranoia-git libcdio_paranoia.a
 fi
 
 #------------------------------------------------
