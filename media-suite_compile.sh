@@ -1753,6 +1753,22 @@ if [[ ! $x264 = "n" ]]; then
 
             do_checkIfExist ffmpeg-git libavcodec.a
 
+            cd $LOCALBUILDDIR
+            do_git "https://github.com/l-smash/l-smash.git" lsmash
+            if [[ $compile = "true" ]]; then
+                if [[ -f "config.mak" ]]; then
+                    make distclean
+                fi
+                if [[ -f "$LOCALDESTDIR/lib/liblsmash.a" ]]; then
+                    rm -f $LOCALDESTDIR/include/lsmash.h $LOCALDESTDIR/lib/liblsmash.a
+                    rm -f $LOCALDESTDIR/lib/pkgconfig/liblsmash.pc
+                fi
+                ./configure --prefix=$LOCALDESTDIR
+                make -j $cpuCount lib
+                make install-lib
+                do_checkIfExist lsmash-git liblsmash.a
+            fi
+
             cd $LOCALBUILDDIR/x264-git
         fi
 
