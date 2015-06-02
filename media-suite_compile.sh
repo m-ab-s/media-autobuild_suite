@@ -2141,9 +2141,9 @@ if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
 fi
 
 if [[ $mkv != "n" ]]; then
-    if do_pkgConfig "Qt5Core = 5.4.1"; then
+    if do_pkgConfig "Qt5Core = 5.4.2"; then
         cd $LOCALBUILDDIR
-        do_wget_tar "http://download.qt.io/official_releases/qt/5.4/5.4.1/submodules/qtbase-opensource-src-5.4.1.tar.xz"
+        do_wget_tar "http://download.qt.io/official_releases/qt/5.4/5.4.2/submodules/qtbase-opensource-src-5.4.2.tar.xz"
 
         if [[ -d build ]]; then
             rm -rf build/*
@@ -2175,7 +2175,7 @@ if [[ $mkv != "n" ]]; then
 
         cp -f ./lib/pkgconfig/*.pc $LOCALDESTDIR/lib/pkgconfig/
 
-        do_checkIfExist qtbase-opensource-src-5.4.1 libQt5Core.a
+        do_checkIfExist qtbase-opensource-src-5.4.2 libQt5Core.a
     fi
 
     if [[ $mkv = "b" ]]; then
