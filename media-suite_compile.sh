@@ -1687,21 +1687,23 @@ fi
 
 if do_checkForOptions "--enable-libcdio"; then
     cd $LOCALBUILDDIR
-    do_git "git://github.com/rocky/libcdio-paranoia.git" libcdio-paranoia
-    if [[ ! -f configure ]]; then
-        autoreconf -fiv
-    elif [[ -f config.h ]]; then
-        make distclean
+    do_git "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f configure ]]; then
+            autoreconf -fiv
+        elif [[ -f config.h ]]; then
+            make distclean
+        fi
+        if [[ -d $LOCALDESTDIR/include/cdio ]]; then
+            rm -rf $LOCALDESTDIR/include/cdio
+            rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
+            rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
+        fi
+        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-example-progs --disable-cpp-progs --enable-silent-rules
+        make -j $cpuCount
+        make install
+        do_checkIfExist libcdio_paranoia-git libcdio_paranoia.a
     fi
-    if [[ -d $LOCALDESTDIR/include/cdio ]]; then
-        rm -rf $LOCALDESTDIR/include/cdio
-        rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
-        rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
-    fi
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-example-progs --disable-cpp-progs --enable-silent-rules
-    make -j $cpuCount
-    make install
-    do_checkIfExist libcdio-paranoia-git libcdio_paranoia.a
 fi
 
 #------------------------------------------------
