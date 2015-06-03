@@ -1949,7 +1949,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
         fi
 
         do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
-        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
+        #do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
