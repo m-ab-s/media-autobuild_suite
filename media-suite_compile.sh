@@ -251,7 +251,6 @@ do_checkIfExist() {
         if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
             touch $LOCALBUILDDIR/$packetName/build_successful$bits
         fi
-        cd $LOCALBUILDIR
     else
         if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
             rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
@@ -324,7 +323,7 @@ do_getFFmpegConfig() {
     fi
 
     # handle non-free libs
-    if [[ $nonfree = "y" && do_checkForOptions "--enable-libfdk-aac --enable-nvenc --enable-libfaac" ]]; then
+    if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc --enable-libfaac"; then
         do_addOption "--enable-nonfree"
     else
         do_removeOption "--enable-nonfree"
@@ -334,7 +333,7 @@ do_getFFmpegConfig() {
     fi
 
     # remove libs that don't work with shared
-    if [[ $ffmpeg = "s" ]]; then
+    if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
         do_removeOption "--enable-decklink" y
         do_removeOption "--enable-libutvideo" y
@@ -1641,7 +1640,7 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     do_addOption "--enable-filter=frei0r"
 fi
 
-if do_checkForOptions "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
+if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
 
     if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
@@ -1658,7 +1657,7 @@ if do_checkForOptions "--enable-decklink" && [[ $ffmpeg = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg = "y" ]]; then
+if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
 
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
@@ -1931,7 +1930,7 @@ fi
 
 
 
-if [[ $ffmpeg != "n" ]] then
+if [[ $ffmpeg != "n" ]]; then
 
     echo "-------------------------------------------------------------------------------"
     echo "compile ffmpeg $bits"
@@ -1958,7 +1957,8 @@ if [[ $ffmpeg != "n" ]] then
         do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
         # shared
-        if [[ $ffmpeg != "y" ]]; then
+        if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
+            echo -ne "\033]0;compiling shared FFmpeg $bits\007"
             [ -f config.mak ] && make distclean
             if [ -d "$LOCALDESTDIR/bin-video/ffmpegSHARED" ]; then
                 rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
@@ -1974,10 +1974,12 @@ if [[ $ffmpeg != "n" ]] then
             make -j $cpuCount
             make install
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
+            [ $ffmpeg = b ] && [ -f build_successful${bits} ] && mv build_successful${bits} build_successful${bits}_shared
         fi
 
         # static
-        if [[ $ffmpeg != "s" ]]
+        if [[ $ffmpeg != "s" ]]; then
+            echo -ne "\033]0;compiling static FFmpeg $bits\007"
             [ -f config.mak ] && make distclean
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --enable-static --disable-shared \
@@ -1994,7 +1996,7 @@ if [[ $ffmpeg != "n" ]] then
     fi
 fi
 
-if [[ $bits = "64bit" && $other265 = "y" && $ffmpeg = "y" ]]; then
+if [[ $bits = "64bit" && $other265 = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
     cd $LOCALBUILDDIR
     do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
@@ -2069,7 +2071,7 @@ fi
 
 
 
-if [[ $mpv = "y" && $ffmpeg = "y" ]]; then
+if [[ $mpv = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
     if [[ $compile = "true" ]]; then

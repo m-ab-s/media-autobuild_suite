@@ -481,6 +481,7 @@ if %ffmpegINI%==0 (
     echo. 1 = Yes [static] [recommended]
     echo. 2 = No
     echo. 3 = Shared
+    echo. 4 = Both static and shared [shared goes to an isolated directory]
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -499,7 +500,10 @@ if %buildffmpeg%==2 (
 if %buildffmpeg%==3 (
     set "ffmpeg=s"
     )
-if %buildffmpeg% GTR 3 GOTO ffmpeg
+if %buildffmpeg%==4 (
+    set "ffmpeg=b"
+    )
+if %buildffmpeg% GTR 4 GOTO ffmpeg
 if %writeFF%==yes echo.ffmpegB=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
