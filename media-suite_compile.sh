@@ -294,13 +294,6 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-libfaac"
     fi
 
-    # remove libs that don't work with shared
-    if [[ $ffmpeg = "s" ]]; then
-        do_removeOption "--enable-decklink"
-        do_removeOption "--enable-libutvideo"
-        do_removeOption "--enable-libgme"
-    fi
-
     # add options if ffmbc is being compiled
     if [[ $ffmbc = "y" ]]; then
         do_addOption "--enable-librtmp"
@@ -326,6 +319,14 @@ do_getFFmpegConfig() {
     if do_checkForOptions "--enable-libmodplug"; then
         do_addOption "--extra-cflags=-DMODPLUG_STATIC"
     fi
+
+    # remove libs that don't work with shared
+    if [[ $ffmpeg = "s" ]]; then
+        FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
+        do_removeOption "--enable-decklink" y
+        do_removeOption "--enable-libutvideo" y
+        do_removeOption "--enable-libgme" y
+    fi
 }
 
 do_checkForOptions() {
@@ -349,7 +350,12 @@ do_addOption() {
 
 do_removeOption() {
     local option=${1%% *}
-    FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
+    local shared=$2
+    if [[ -z $shared ]]; then
+        FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
+    else
+        FFMPEG_OPTS_SHARED=$(echo "$FFMPEG_OPTS_SHARED" | sed "s/ *$option//g")
+    fi
 }
 
 do_patch() {
@@ -1961,7 +1967,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             LDFLAGS="$LDFLAGS -static-libgcc" ./configure \
             --arch=$arch --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
             --disable-static --enable-shared \
-            $FFMPEG_OPTS \
+            $FFMPEG_OPTS_SHARED \
             $builtvpx $builtx264 $builtx265 \
             --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' \
             --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
