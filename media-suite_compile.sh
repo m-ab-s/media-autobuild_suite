@@ -1969,8 +1969,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --disable-static --enable-shared \
             $FFMPEG_OPTS_SHARED \
             $builtvpx $builtx264 $builtx265 \
-            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' \
-            --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'
 
             sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" config.h
         else
@@ -1979,15 +1978,14 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
             --enable-static --disable-shared \
             $FFMPEG_OPTS \
             $builtvpx $builtx264 $builtx265 \
-            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' \
-            --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'
+            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'
 
             newFfmpeg="yes"
 
             sed -i "s|--target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video ||g" config.h
         fi
 
-        sed -i "s/ --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags='-mconsole -Wl,--allow-multiple-definition'//g" config.h
+        sed -i "s/ --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'//g" config.h
 
         make -j $cpuCount
         make install
