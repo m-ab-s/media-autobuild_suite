@@ -1951,7 +1951,7 @@ if [[ $ffmpeg = "y" ]] || [[ $ffmpeg = "s" ]]; then
         fi
 
         do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
-        #do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
+        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
         if [[ $ffmpeg = "s" ]]; then
             if [ -f "$LOCALDESTDIR/bin-video/ffmpegSHARED/bin/ffmpeg.exe" ]; then
@@ -1999,11 +1999,8 @@ if [[ $bits = "64bit" && $other265 = "y" && $ffmpeg = "y" ]]; then
     do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -d "build" ] || [[ -f "$LOCALDESTDIR/bin-video/f265cli.exe" ]]; then
-            rm -rf build
-            rm -rf .sconf_temp
-            rm -f .sconsign.dblite
-            rm -f config.log
-            rm -f options.py
+            rm -rf build .sconf_temp
+            rm -f .sconsign.dblite config.log options.py
             rm -f $LOCALDESTDIR/bin-video/f265cli.exe
         fi
 
