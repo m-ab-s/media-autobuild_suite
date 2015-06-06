@@ -95,7 +95,7 @@ else
         touch recently_updated
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-            run32bitagain="yes"
+            new_updates="yes"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$gitCheck" && $pcExists = 1 ]] ||
@@ -141,7 +141,7 @@ else
         touch recently_updated
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-            run32bitagain="yes"
+            new_updates="yes"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$svnCheck" && $pcExists = 1 ]] ||
@@ -188,7 +188,7 @@ else
         touch recently_updated
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-            run32bitagain="yes"
+            new_updates="yes"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$hgCheck" && $pcExists = 1 ]] ||
@@ -2356,35 +2356,38 @@ run_builds() {
 
 run_builds
 
-if [[ $run32bitagain = "yes" ]]; then
+while [[ $new_updates = "yes" ]]; do
+    ret="no"
     echo "-------------------------------------------------------------------------------"
-    echo "There were new updates while compiling 64-bits."
-    echo "Would you like to run compilation again to get those updates in 32-bit? Default: no"
+    echo "There were new updates while compiling."
+    echo "Would you like to run compilation again to get those updates? Default: no"
     read -p "y/[n] " ret
     echo "-------------------------------------------------------------------------------"
+    new_updates="no"
     [[ $ret = "y" || $ret = "Y" ]] && run_builds
 fi
 
+echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
 find $LOCALBUILDDIR -maxdepth 2 -name build_successful* -delete
 
 if [[ $deleteSource = "y" ]]; then
-    echo -ne "\033]0;delete source folders\007"
+    echo -ne "\033]0;deleting source folders\007"
     echo
-    echo "delete source folders..."
+    echo "deleting source folders..."
     echo
     find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" -exec rm -rf {} \;
 fi
 
 echo -ne "\033]0;compiling done...\007"
 echo
-echo "Window close in 15"
+echo "Window closing in 15 seconds..."
 echo
 sleep 5
 echo
-echo "Window close in 10"
+echo "Window closing in 10 seconds..."
 echo
 sleep 5
 echo
-echo "Window close in 5"
+echo "Window closing in 5 seconds..."
 sleep 5
