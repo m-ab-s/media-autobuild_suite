@@ -856,7 +856,9 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] || [[ $sox = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "flac = 1.3.1"; then
+if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
+    [[ $sox = "y" ]] || [[ $mkv != "n" ]] &&
+    [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
@@ -1201,7 +1203,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://git.code.sf.net/p/sox/code" sox
+    do_git "git://git.code.sf.net/p/sox/code" sox shallow master bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 
