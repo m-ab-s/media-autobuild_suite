@@ -3,7 +3,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --disable-doc --enable-gpl --disable-w32threads --enable-avisynth --disable-d3d11va"
+FFMPEG_BASE_OPTS="--disable-debug --disable-doc --enable-gpl --disable-w32threads --enable-avisynth"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
