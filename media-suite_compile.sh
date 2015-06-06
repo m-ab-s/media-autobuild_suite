@@ -2352,7 +2352,12 @@ run_builds() {
 run_builds
 
 if [[ $run32bitagain = "yes" ]]; then
-    run_builds
+    echo "-------------------------------------------------------------------------------"
+    echo "There were new updates while compiling 64-bits."
+    echo "Would you like to run compilation again to get those updates in 32-bit? Default: no"
+    read -p "y/[n] " ret
+    echo "-------------------------------------------------------------------------------"
+    [[ $ret = "y" || $ret = "Y" ]] && run_builds
 fi
 
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
