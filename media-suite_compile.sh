@@ -80,9 +80,12 @@ else
     if [[ $gitDepth = "" && -f .git/shallow ]]; then
         local unshallow="--unshallow"
     fi
+    if ! git remote show origin | grep -q -e "$gitURL"; then
+        git remote set-url origin "$gitURL"
+    fi
     oldHead=$(git rev-parse HEAD)
     git reset --quiet --hard
-    git pull $unshallow origin "$gitBranch"
+    git pull --no-edit $unshallow origin "$gitBranch"
     newHead=$(git rev-parse HEAD)
 
     pkg-config --exists "$gitFolder"
@@ -631,7 +634,7 @@ fi
 
 if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
-    do_git "git://git.ffmpeg.org/rtmpdump" librtmp shallow master bin-video/rtmpdump.exe
+    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow master bin-video/rtmpdump.exe
     if [[ $compile = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
             rm -rf $LOCALDESTDIR/include/librtmp
