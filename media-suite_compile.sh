@@ -91,6 +91,9 @@ else
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful*
+        if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
+            run32bitagain="yes"
+        fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$gitCheck" && $pcExists = 1 ]] ||
          [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
@@ -134,6 +137,9 @@ else
     if [[ "$oldRevision" != "$newRevision" ]]; then
         touch recently_updated
         rm -f build_successful*
+        if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
+            run32bitagain="yes"
+        fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$svnCheck" && $pcExists = 1 ]] ||
          [[ ! -z "$svnCheck" && ! -f $LOCALDESTDIR/"$svnCheck" ]]; then
@@ -178,6 +184,9 @@ else
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful*
+        if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
+            run32bitagain="yes"
+        fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$hgCheck" && $pcExists = 1 ]] ||
          [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
@@ -2322,20 +2331,28 @@ echo
 echo "-------------------------------------------------------------------------------"
 }
 
-if [[ $build32 = "yes" ]]; then
-    source /local32/etc/profile.local
-    buildProcess
-    echo "-------------------------------------------------------------------------------"
-    echo "compile all tools 32bit done..."
-    echo "-------------------------------------------------------------------------------"
-fi
+run_builds() {
+    if [[ $build32 = "yes" ]]; then
+        source /local32/etc/profile.local
+        buildProcess
+        echo "-------------------------------------------------------------------------------"
+        echo "compile all tools 32bit done..."
+        echo "-------------------------------------------------------------------------------"
+    fi
 
-if [[ $build64 = "yes" ]]; then
-    source /local64/etc/profile.local
-    buildProcess
-    echo "-------------------------------------------------------------------------------"
-    echo "compile all tools 64bit done..."
-    echo "-------------------------------------------------------------------------------"
+    if [[ $build64 = "yes" ]]; then
+        source /local64/etc/profile.local
+        buildProcess
+        echo "-------------------------------------------------------------------------------"
+        echo "compile all tools 64bit done..."
+        echo "-------------------------------------------------------------------------------"
+    fi
+}
+
+run_builds
+
+if [[ $run32bitagain = "yes" ]]; then
+    run_builds
 fi
 
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
