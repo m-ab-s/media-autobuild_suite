@@ -320,10 +320,7 @@ do_getFFmpegConfig() {
         do_addOption "--enable-libbluray"
     fi
 
-    # add options for static caca and modplug
-    if do_checkForOptions "--enable-libcaca"; then
-        do_addOption "--extra-cflags=-DCACA_STATIC"
-    fi
+    # add options for static modplug
     if do_checkForOptions "--enable-libmodplug"; then
         do_addOption "--extra-cflags=-DMODPLUG_STATIC"
     fi
@@ -1156,8 +1153,8 @@ if [[ ! $vpx = "n" ]]; then
         if [ -f libvpx.a ]; then
             make distclean
         fi
-        extracommands="--prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc \
-        --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth --disable-examples"
+        extracommands="--prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs \
+        --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth --disable-examples"
         if [[ $bits = "64bit" ]]; then
             LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86_64-win64-gcc $extracommands
             sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
@@ -1248,7 +1245,8 @@ if do_checkForOptions "--enable-libbluray"; then
             rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
             make distclean
         fi
-        do_generic_confmakeinstall no --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot --without-libxml2
+        do_generic_confmakeinstall no --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
+        --disable-doxygen-dot --without-libxml2
         do_checkIfExist libbluray-git libbluray.a
     fi
 fi
@@ -1334,9 +1332,15 @@ if [ $mediainfo = "y" ]; then
         echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
 
         if [[ ! -d mediainfo ]]; then
-            a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
+            a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | \
+            sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | \
+            grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | \
+            sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
 
-            b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | grep "7z" | sed "s/ //g"`
+            b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | \
+            sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | \
+            grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | \
+            grep "7z" | sed "s/ //g"`
 
             do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
 
@@ -1384,7 +1388,8 @@ if [ $mediainfo = "y" ]; then
         fi
 
         ./autogen
-        ./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
+        ./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no \
+        LDFLAGS="$LDFLAGS -static-libgcc"
 
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
@@ -1438,6 +1443,7 @@ if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; t
     sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" figfont.c
     sed -i "s/__declspec(dllexport)//g" *.h
     sed -i "s/__declspec(dllimport)//g" *.h
+    sed -i "s/Cflags: -I\${includedir}/& -DCACA_STATIC/" caca.pc.in
     cd ..
 
     do_generic_conf --bindir=$LOCALDESTDIR/bin-global --disable-cxx --disable-csharp --disable-ncurses \
@@ -1445,6 +1451,8 @@ if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; t
     sed -i 's/ln -sf/$(LN_S)/' "doc/Makefile"
     do_makeinstall
     do_checkIfExist libcaca-0.99.beta19 libcaca.a
+elif ! pkg-config --cflags caca | grep -q -e "-DCACA_STATIC"; then
+    sed -i "s/Cflags: -I\${includedir}/& -DCACA_STATIC/" $LOCALDESTDIR/lib/pkgconfig/caca.pc
 fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
@@ -1767,7 +1775,13 @@ if [[ $ffmbc = "y" ]]; then
             fi
 
             cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
-            ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
+            ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
+            --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe \
+            --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib \
+            --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass \
+            --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora \
+            --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras \
+            --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
 
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
@@ -1960,7 +1974,8 @@ if [[ $mpv = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
         fi
 		
         make BUILDMODE=static amalg
-        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
+        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe \
+        INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
 
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
@@ -1997,7 +2012,8 @@ if [[ $mpv = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
             ./bootstrap.py
         fi
 
-        CFLAGS="$CFLAGS -DCACA_STATIC" ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
+        ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
+        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
