@@ -335,7 +335,8 @@ do_getFFmpegConfig() {
     fi
 
     # handle non-free libs
-    if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc --enable-libfaac"; then
+    if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc \
+        --enable-libfaac"; then
         do_addOption "--enable-nonfree"
     else
         do_removeOption "--enable-nonfree"
@@ -391,6 +392,49 @@ do_patch() {
     curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
 }
 
+do_cmake() {
+    local source=$1
+    shift 1
+    if [ -d "build" ]; then
+        rm -rf ./build/*
+    else
+        mkdir build
+    fi
+    cd build
+    cmake $source -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:bool=off \
+    -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DUNIX:bool=on "$@"
+}
+
+do_generic_confmakeinstall() {
+    local bindir=""
+    case "$1" in
+    global)
+        bindir="--bindir=$LOCALDESTDIR/bin-global"
+        ;;
+    audio)
+        bindir="--bindir=$LOCALDESTDIR/bin-audio"
+        ;;
+    video)
+        bindir="--bindir=$LOCALDESTDIR/bin-video"
+        ;;
+    no)
+        bindir=""
+        ;;
+    esac
+    shift 1
+    do_generic_conf $bindir "$@"
+    do_makeinstall
+}
+
+do_generic_conf() {
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared "$@"
+}
+
+do_makeinstall() {
+    make -j $cpuCount "$@"
+    make install
+}
+
 buildProcess() {
 cd $LOCALBUILDDIR
 echo "-------------------------------------------------------------------------------"
@@ -404,29 +448,21 @@ do_getFFmpegConfig
 if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
     do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
-    if [ -d "build" ]; then
-        cd build
-        if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
-            rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
-            rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
-            rm -rf $LOCALDESTDIR/lib/openjpeg-1.5
-        fi
-        make clean
-        rm -rf *
-    else
-        mkdir build
-        cd build
+    if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
+        rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
+        rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
+        rm -rf $LOCALDESTDIR/lib/openjpeg-1.5
     fi
-
-    cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:BOOL=off -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on -DBUILD_THIRDPARTY:BOOL=on -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC" -DUNIX:BOOL=on
-
-    make -j $cpuCount
-    make install
-
+    do_cmake .. -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on \
+    -DBUILD_THIRDPARTY:BOOL=on -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global \
+    -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
+    do_makeinstall
     do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
 fi
 
-if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" && do_pkgConfig "freetype2 = 17.4.11"; then
+if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" && \
+    do_pkgConfig "freetype2 = 17.4.11"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
@@ -437,16 +473,13 @@ if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" 
         rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
         rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype.pc
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-harfbuzz=no
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall global --with-harfbuzz=no
     do_checkIfExist freetype-2.5.5 libfreetype.a
     do_addOption "--enable-libfreetype"
 fi
 
-if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && do_pkgConfig "fontconfig = 2.11.92"; then
+if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && \
+    do_pkgConfig "fontconfig = 2.11.92"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
@@ -457,13 +490,7 @@ if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" &
         rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
         rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
     fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared
-    sed -i 's/-L${libdir} -lfontconfig[^l]*$/-L${libdir} -lfontconfig -lfreetype -lexpat/' fontconfig.pc
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall global
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
     do_addOption "--enable-fontconfig"
 fi
@@ -479,11 +506,7 @@ if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fri
         rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi*
         rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static --disable-shared --disable-deprecated --with-glib=no
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall global --enable-static --disable-deprecated --with-glib=no
     do_checkIfExist fribidi-0.19.6 libfribidi.a
     do_addOption "--enable-libfribidi"
 fi
@@ -505,11 +528,7 @@ if do_checkForOptions "--enable-libass"; then
         if [[ -f "$LOCALDESTDIR/bin-global/ragel.exe" ]]; then
             rm -rf $LOCALDESTDIR/bin-global/ragel.exe
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall global
         do_checkIfExist ragel-6.9 bin-global/ragel.exe
     fi
 
@@ -523,11 +542,8 @@ if do_checkForOptions "--enable-libass"; then
             rm -rf $LOCALDESTDIR/lib/libharfbuzz.{l,}a $LOCALDESTDIR/lib/pkgconfig/harfbuzz.pc
             make distclean
         fi
-
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-icu=no --with-glib=no --with-gobject=no LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
+        LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         do_checkIfExist harfbuzz-git libharfbuzz.a
     fi
 fi
@@ -543,14 +559,9 @@ if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 
         rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
         rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
     fi
-
-    CFLAGS="-DDECLSPEC=" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-shared=no
-    make -j $cpuCount
-    make install
-
+    CFLAGS="-DDECLSPEC=" do_generic_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
     sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-
     do_checkIfExist SDL-1.2.15 libSDL.a
 fi
 
@@ -563,29 +574,27 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
         echo -------------------------------------------------
         echo "libgcrypt-1.6.3 is already compiled"
         echo -------------------------------------------------
+    else
+        cd $LOCALBUILDDIR
+        echo -ne "\033]0;compile libgcrypt $bits\007"
+
+        do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
+
+        if [[ -f "src/.libs/libgcrypt.a" ]]; then
+            make distclean
+        fi
+        if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
+            rm -f $LOCALDESTDIR/include/libgcrypt.h
+            rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
+            rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+        fi
+        if [[ $bits = "64bit" ]]; then
+            extracommands="--disable-asm --disable-padlock-support"
         else
-            cd $LOCALBUILDDIR
-            echo -ne "\033]0;compile libgcrypt $bits\007"
-
-            do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
-
-            if [[ -f "src/.libs/libgcrypt.a" ]]; then
-                make distclean
-            fi
-            if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
-                rm -rf $LOCALDESTDIR/include/libgcrypt.h $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
-                rm -rf $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
-            fi
-
-            if [[ "$bits" = "32bit" ]]; then
-                ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX
-            else
-                ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --with-gpg-error-prefix=$MINGW_PREFIX --disable-asm --disable-padlock-support
-            fi
-            make -j $cpuCount
-            make install
-
-            do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
+            extracommands=""
+        fi
+        do_generic_confmakeinstall global --with-gpg-error-prefix=$MINGW_PREFIX $extracommands
+        do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
     fi
 
     if do_pkgConfig "nettle = 2.7.1"; then
@@ -599,12 +608,7 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
             rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/nettle-*.exe
             rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-documentation --disable-openssl --disable-shared
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall global --disable-documentation --disable-openssl
         do_checkIfExist nettle-2.7.1 libnettle.a
     fi
 
@@ -619,14 +623,11 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
             rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/bin-global/gnutls-*.exe
             rm -rf $LOCALDESTDIR/lib/libgnutls* $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-guile --enable-cxx --disable-doc --disable-tests --disable-shared --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc --disable-libdane --enable-local-libopts
-
-        make -j $cpuCount
-        make install
-
-        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-
+        do_generic_confmakeinstall global --disable-guile --enable-cxx --disable-doc \
+        --disable-tests --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc \
+        --disable-libdane --enable-local-libopts
+        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' \
+        $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
         do_checkIfExist gnutls-3.3.15 libgnutls.a
     fi
     do_addOption "--enable-gnutls"
@@ -638,20 +639,22 @@ if do_checkForOptions "--enable-librtmp"; then
     if [[ $compile = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
             rm -rf $LOCALDESTDIR/include/librtmp
-            rm $LOCALDESTDIR/lib/librtmp.a
-            rm $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-            rm $LOCALDESTDIR/man/man3/librtmp.3
-            rm $LOCALDESTDIR/bin-video/rtmpdump.exe $LOCALDESTDIR/bin-video/rtmpsuck.exe $LOCALDESTDIR/bin-video/rtmpsrv.exe $LOCALDESTDIR/bin-video/rtmpgw.exe
-            rm $LOCALDESTDIR/man/man1/rtmpdump.1
-            rm $LOCALDESTDIR/man/man8/rtmpgw.8
+            rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+            rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,w}.exe
         fi
         if [[ -f "librtmp/librtmp.a" ]]; then
             make clean
         fi
 
-        make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl"
+        make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR \
+        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= \
+        SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv \
+        -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls \
+        -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 \
+        -lintl"
 
-        sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+        sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' \
+        $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
 
         do_checkIfExist librtmp-git librtmp.a
     fi
@@ -686,12 +689,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
         aclocal
         autoconf
         automake --add-missing
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-static=yes --enable-shared=no
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
     fi
 
@@ -713,7 +711,9 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
+        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR \
+        --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no \
+        CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
 
         make CPPFLAGS='-D_REGEX_RE_COMP' -j $cpuCount
         make install
@@ -751,7 +751,6 @@ if do_checkForOptions "--enable-libdcadec"; then
 
         make CONFIG_WINDOWS=1 LDFLAGS=-lm lib
         make PREFIX=$LOCALDESTDIR PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install-lib
-
         do_checkIfExist dcadec-git libdcadec.a
     fi
 fi
@@ -767,17 +766,13 @@ if do_checkForOptions "--enable-libilbc"; then
             rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
             make distclean
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no
         do_checkIfExist libilbc-git libilbc.a
     fi
 fi
 
-if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
+if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || \
+    [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
@@ -788,16 +783,12 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
         rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
         rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || \
+    [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
@@ -806,14 +797,10 @@ if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]
     fi
     if [[ -d "$LOCALDESTDIR/include/vorbis" ]]; then
         rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
-        rm -rf $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
+        rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
     fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist libvorbis-1.3.5 libvorbis.a
 fi
 
@@ -830,12 +817,7 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
     fi
 
     do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-doc
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no --disable-doc
     do_checkIfExist opus-1.1 libopus.a
 fi
 
@@ -851,11 +833,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
         rm -rf $LOCALDESTDIR/lib/libspeex{,dsp}.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex{,dsp}.pc
     fi
 
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-oggtest
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall audio --disable-oggtest
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
@@ -872,12 +850,7 @@ if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
         rm -rf $LOCALDESTDIR/include/FLAC{,++} $LOCALDESTDIR/bin-audio/{meta,}flac.exe
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
     fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-xmms-plugin --disable-doxygen-docs --disable-shared
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
     do_checkIfExist flac-1.3.1 bin-audio/flac.exe
 fi
 
@@ -892,16 +865,12 @@ if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3
         rm -rf $LOCALDESTDIR/include/vo-aacenc
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
-if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 opencore-amrwb = 0.1.3"; then
+if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 \
+    opencore-amrwb = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
@@ -910,14 +879,10 @@ if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencor
     fi
     if [[ -d "$LOCALDESTDIR/include/opencore-amrnb" ]]; then
         rm -rf $LOCALDESTDIR/include/opencore-amr{nb,wb}
-        rm -rf $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
+        rm -r $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist opencore-amr-0.1.3 libopencore-amrnb.a
 fi
 
@@ -932,12 +897,7 @@ if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
     fi
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
@@ -952,12 +912,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
             make distclean
         fi
-
-        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --enable-shared=no
-
-        make -j $cpuCount
-        make install
-
+        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall no
         do_checkIfExist fdk-aac-git libfdk-aac.a
     fi
 
@@ -970,12 +925,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
             rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
             make distclean
         fi
-
-        CXXFLAGS+=" -O2" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio
-
-        make -j $cpuCount
-        make install
-
+        CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
         do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     fi
 fi
@@ -996,12 +946,7 @@ if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
             else            
                 sh bootstrap
             fi
-
-            ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --enable-shared=no --without-mp4v2
-
-            make -j $cpuCount
-            make install
-
+            do_generic_confmakeinstall audio --without-mp4v2
             do_checkIfExist faac-1.28 libfaac.a
     fi
 fi
@@ -1023,12 +968,7 @@ if do_checkForOptions "--enable-libopus"; then
         if [[ -d "$LOCALDESTDIR/bin-audio/opusenc.exe" ]]; then
             rm -rf $LOCALDESTDIR/bin-audio/opus*
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
     fi
 fi
@@ -1038,26 +978,14 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     do_wget_tar "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
-
-    if [ -d "build" ]; then
-        cd build
-        if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
-            rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
-            rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/soxr{,-lsr}.pc
-        fi
-        make clean
-        rm -rf *
-    else
-        mkdir build
-        cd build
+    if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
+        rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
+        rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/soxr{,-lsr}.pc
     fi
-
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_SHARED_LIBS:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on -DBUILD_TESTS:bool=off -DWITH_OPENMP:bool=off -DBUILD_LSR_TESTS:bool=off -DUNIX:bool=on
-
-    make -j $cpuCount
-    make install
-
+    do_cmake .. -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on \
+    -DBUILD_TESTS:bool=off -DWITH_OPENMP:bool=off -DBUILD_LSR_TESTS:bool=off
+    do_makeinstall
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
@@ -1065,25 +993,13 @@ if do_checkForOptions "--enable-libgme"; then
     cd $LOCALBUILDDIR
     do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
-        if [ -d "build" ]; then
-            cd build
-            if [[ -d $LOCALDESTDIR/include/gme ]]; then
-                rm -rf $LOCALDESTDIR/include/gme
-                rm -f $LOCALDESTDIR/lib/libgme.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
-            fi
-            make clean
-            rm -rf *
-        else
-            mkdir build
-            cd build
+        if [[ -d $LOCALDESTDIR/include/gme ]]; then
+            rm -rf $LOCALDESTDIR/include/gme
+            rm -f $LOCALDESTDIR/lib/libgme.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
-
-        cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS=OFF
-
-        make -j $cpuCount
-        make install
-
+        do_cmake ..
+        do_makeinstall
         do_checkIfExist libgme-git libgme.a
     fi
 fi
@@ -1102,12 +1018,9 @@ if do_checkForOptions "--enable-libtwolame"; then
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
+        do_generic_conf
         sed -i 's/frontend simplefrontend//' Makefile
-
-        make -j $cpuCount
-        make install
-
+        do_makeinstall
         do_checkIfExist twolame-git libtwolame.a
     fi
 fi
@@ -1126,11 +1039,7 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
 
     do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-disable-sndfile.patch"
     do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-libs-only.patch"
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no
     do_checkIfExist libbs2b-3.1.0 libbs2b.a
 fi
 
@@ -1147,15 +1056,9 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
             rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-        # don't compile programs
+        do_generic_conf
         sed -i 's/ examples regtest tests programs//g' Makefile
-
-        make -j $cpuCount
-        make install
-
+        do_makeinstall
         do_checkIfExist sndfile-git libsndfile.a
     fi
 
@@ -1177,11 +1080,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
         fi
 
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --enable-fpm=intel --disable-debugging
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no --enable-fpm=intel --disable-debugging
         do_checkIfExist libmad-0.15.1b libmad.a
     fi
 
@@ -1196,12 +1095,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
         fi
-
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared LIBS="$LIBS -lole32 -lgdi32"
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no LIBS="$LIBS -lole32 -lgdi32"
         do_checkIfExist opusfile-0.6 libopusfile.a
     fi
 
@@ -1217,12 +1111,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
             make distclean
         fi
-
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall audio CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
         do_checkIfExist sox-git bin-audio/sox.exe
     fi
 fi
@@ -1250,12 +1139,7 @@ if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; the
         rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
         rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
     fi
-
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared --disable-examples
-
-    make -j $cpuCount
-    make install
-
+    do_generic_confmakeinstall no --disable-examples
     do_checkIfExist libtheora-1.1.1 libtheora.a
 fi
 
@@ -1272,17 +1156,17 @@ if [[ ! $vpx = "n" ]]; then
         if [ -f libvpx.a ]; then
             make distclean
         fi
-
+        extracommands="--prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc \
+        --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth --disable-examples"
         if [[ $bits = "64bit" ]]; then
-            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86_64-win64-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
+            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86_64-win64-gcc $extracommands
             sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
         else
-            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --prefix=$LOCALDESTDIR --target=x86-win32-gcc --disable-shared --enable-static --disable-unit-tests --disable-docs --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth
+            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86-win32-gcc $extracommands
             sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
         fi
-
-        make -j $cpuCount
-        make install
+        do_makeinstall
+        extracommands=""
 
         if [[ $vpx = "y" ]]; then
             mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video
@@ -1331,12 +1215,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
         fi
-
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no
         do_checkIfExist dvdread-git libdvdread.a
     fi
 
@@ -1353,12 +1232,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
         fi
-
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no
         do_checkIfExist dvdnav-git libdvdnav.a
     fi
 fi
@@ -1374,12 +1248,7 @@ if do_checkForOptions "--enable-libbluray"; then
             rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
             make distclean
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --disable-shared --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot --without-libxml2
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc --disable-doxygen-dot --without-libxml2
         do_checkIfExist libbluray-git libbluray.a
     fi
 fi
@@ -1416,12 +1285,7 @@ if do_checkForOptions "--enable-libass"; then
             rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared
-
-        make -j $cpuCount
-        make install
-
+        do_generic_confmakeinstall no
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
     fi
@@ -1449,11 +1313,8 @@ if do_checkForOptions "--enable-libxavs"; then
             rm -rf $LOCALDESTDIR/include/xavs.h
             rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         fi
-
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video
-
+        do_generic_conf
         make -j $cpuCount libxavs.a
-
         install -m 644 xavs.h $LOCALDESTDIR/include
         install -m 644 libxavs.a $LOCALDESTDIR/lib
         install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
@@ -1541,23 +1402,13 @@ if do_checkForOptions "--enable-libvidstab"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
-        if [ -d "build" ]; then
-            cd build
+        if [[ -d $LOCALDESTDIR/include/vid.stab ]]; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
-            make clean
-            rm -rf *
-        else
-            mkdir build
-            cd build
         fi
-
-        cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBUILD_SHARED_LIBS:BOOL=off -DUSE_OMP:bool=off
+        do_cmake .. -DUSE_OMP:bool=off
         sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
-
-        make -j $cpuCount
-        make install
-
+        do_makeinstall
         do_checkIfExist vidstab-git libvidstab.a
         buildFFmpeg="true"
     fi
@@ -1589,13 +1440,10 @@ if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; t
     sed -i "s/__declspec(dllimport)//g" *.h
     cd ..
 
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --disable-shared --disable-cxx --disable-csharp --disable-ncurses --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
-
+    do_generic_conf --bindir=$LOCALDESTDIR/bin-global --disable-cxx --disable-csharp --disable-ncurses \
+    --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
     sed -i 's/ln -sf/$(LN_S)/' "doc/Makefile"
-
-    make -j $cpuCount
-    make install
-
+    do_makeinstall
     do_checkIfExist libcaca-0.99.beta19 libcaca.a
 fi
 
@@ -1610,19 +1458,13 @@ if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; th
         rm -rf $LOCALDESTDIR/include/libzvbi.h
         rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
     fi
-
     do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
     do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
-
-    ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --disable-shared --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
-
+    do_generic_conf --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen \
+    CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
     cd src
-
-    make -j $cpuCount
-    make install
-
+    do_makeinstall
     cp ../zvbi-0.2.pc $LOCALDESTDIR/lib/pkgconfig
-
     do_checkIfExist zvbi-0.2.35 libzvbi.a
 fi
 
@@ -1632,20 +1474,14 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
 
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
 
-    if [ -d "build" ]; then
-        cd build
-        if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
-            rm -rf $LOCALDESTDIR/include/frei0r.h
-            rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
-        fi
-        make clean
-        rm -rf *
-    else
-        mkdir build
-        cd build
+    [[ -d "build" ]] && rm -rf build/* || mkdir build
+    cd build
+    if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
+        rm -rf $LOCALDESTDIR/include/frei0r.h
+        rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
 
-    cmake -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR ..
+    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
 
     make -j $cpuCount
     make all install
@@ -1710,9 +1546,7 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
             rm -rf $LOCALDESTDIR/include/mfx
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
         fi
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared
-        make -j $cpuCount
-        make install
+        do_generic_confmakeinstall no
         do_checkIfExist libmfx-git libmfx.a
     fi
 fi
@@ -1731,9 +1565,7 @@ if do_checkForOptions "--enable-libcdio"; then
             rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
             rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
         fi
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-audio --disable-shared --disable-example-progs --disable-cpp-progs --enable-silent-rules
-        make -j $cpuCount
-        make install
+        do_generic_confmakeinstall audio --disable-example-progs --disable-cpp-progs --enable-silent-rules
         do_checkIfExist libcdio_paranoia-git libcdio_paranoia.a
     fi
 fi
@@ -1795,9 +1627,7 @@ if [[ ! $x264 = "n" ]]; then
             ./configure $FFMPEG_BASE_OPTS --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-shared \
             --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
 
-            make -j $cpuCount
-            make install
-
+            do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
 
             cd $LOCALBUILDDIR
@@ -1831,20 +1661,22 @@ if [[ ! $x264 = "n" ]]; then
         fi
 
         if [[ $x264 = "y" ]]; then
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --bit-depth=10 --enable-win32thread
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static \
+            --bit-depth=10 --enable-win32thread
             make -j $cpuCount
 
             cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
             make clean
 
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static --enable-win32thread
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static \
+            --bit-depth=8 --enable-win32thread
         else
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash --bit-depth=8 --disable-cli
+            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread \
+            --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash \
+            --bit-depth=8 --disable-cli
         fi
 
-        make -j $cpuCount
-        make install
-
+        do_makeinstall
         do_checkIfExist x264-git libx264.a
         buildFFmpeg="true"
     fi
@@ -1859,26 +1691,31 @@ if [[ ! $x265 = "n" ]]; then
     if [[ $compile = "true" ]]; then
         cd build/msys
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
-        rm -f $LOCALDESTDIR/include/x265.h
-        rm -f $LOCALDESTDIR/include/x265_config.h
-        rm -f $LOCALDESTDIR/lib/libx265.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/x265.pc
-        rm -f $LOCALDESTDIR/bin-video/libx265*.dll
-        rm -f $LOCALDESTDIR/bin-video/x265.exe
+        rm -f $LOCALDESTDIR/include/x265{,_config}.h
+        rm -f $LOCALDESTDIR/lib/libx265.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
+        rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
+
+        do_x265_cmake() {
+            cmake ../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
+            -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
+            -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
+            -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR \
+            -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=-static "$@"
+        }
 
         if [[ $bits = "32bit" ]]; then
             xpsupport="-DWINXP_SUPPORT:BOOL=TRUE"
-            assembly="-DENABLE_ASSEMBLY=OFF"
+            assembly="-DENABLE_ASSEMBLY=OFF -DHIGH_BIT_DEPTH=1"
         fi
-
         if [[ $x265 = "s" ]]; then
             # 16-bit static x265.exe
-            cmake -G "MSYS Makefiles" $xpsupport $assembly -DHIGH_BIT_DEPTH=1 -DENABLE_CLI:BOOLEAN=ON  ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            do_x265_cmake $assembly -DENABLE_CLI:BOOLEAN=ON  -DENABLE_SHARED:BOOLEAN=OFF
             make -j $cpuCount
             cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
         else
             # shared 16-bit libx265_main10.dll
-            cmake -G "MSYS Makefiles" $xpsupport $assembly -DHIGH_BIT_DEPTH=1 -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=ON -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+            do_x265_cmake $assembly -DENABLE_CLI:BOOLEAN=OFF -DENABLE_SHARED:BOOLEAN=ON
             make -j $cpuCount
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         fi
@@ -1887,15 +1724,13 @@ if [[ ! $x265 = "n" ]]; then
 
         if [[ $x265 = "y" ]]; then
             # 8-bit static x265.exe
-            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=ON  ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++" -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video -DCMAKE_CXX_FLAGS_RELEASE:STRING="-O3 -DNDEBUG $CXXFLAGS" -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="$LDFLAGS -static"
+            do_x265_cmake -DENABLE_CLI:BOOLEAN=ON  -DENABLE_SHARED:BOOLEAN=OFF
         else
             # 8-bit static libx265.a
-            cmake -G "MSYS Makefiles" $xpsupport -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR -DENABLE_CLI:BOOLEAN=OFF ../../source -DENABLE_SHARED:BOOLEAN=OFF -DHG_EXECUTABLE=/usr/bin/hg.bat -DCMAKE_CXX_FLAGS="-static-libgcc -static-libstdc++" -DCMAKE_C_FLAGS="-static-libgcc -static-libstdc++"
+            do_x265_cmake -DENABLE_CLI:BOOLEAN=OFF -DENABLE_SHARED:BOOLEAN=OFF
         fi
 
-        make -j $cpuCount
-        make install
-
+        do_makeinstall
         do_checkIfExist x265-hg libx265.a
         buildFFmpeg="true"
     fi
@@ -1985,8 +1820,7 @@ if [[ $ffmpeg != "n" ]]; then
 
             sed -i -e "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" \
                    -e "s|--extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags=-static-libgcc||g" config.h
-            make -j $cpuCount
-            make install
+            do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [ $ffmpeg = b ] && [ -f build_successful${bits} ] && mv build_successful${bits} build_successful${bits}_shared
         fi
@@ -2002,8 +1836,7 @@ if [[ $ffmpeg != "n" ]]; then
             --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'
             sed -i -e "s| --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video||g" \
                    -e "s| --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'||g" config.h
-            make -j $cpuCount
-            make install
+            do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
             newFfmpeg="yes"
         fi
@@ -2019,13 +1852,10 @@ if [[ $bits = "64bit" && $other265 = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b"
             rm -f .sconsign.dblite config.log options.py
             rm -f $LOCALDESTDIR/bin-video/f265cli.exe
         fi
-
         scons
-
         if [ -f build/f265cli.exe ]; then
             cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
         fi
-
         do_checkIfExist f265-git bin-video/f265cli.exe
     fi
 fi
@@ -2074,11 +1904,12 @@ if [[ $mplayer = "y" ]]; then
 
         sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 
-        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal --enable-bluray --disable-gif --enable-freetype --disable-cddb $faac
-
-        make -j $cpuCount
-        make install
-
+        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
+        --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
+        --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' \
+        --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal \
+        --enable-bluray --disable-gif --enable-freetype --disable-cddb $faac
+        do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
     fi
 fi
@@ -2220,8 +2051,7 @@ if [[ $mkv != "n" ]]; then
         -no-sql-odbc -no-sql-psql -no-sql-tds -no-cups -qt-pcre -no-fontconfig -qt-freetype \
         -qt-zlib -qt-libjpeg -qt-harfbuzz -qt-libpng -openssl-linked -no-dbus $nosse2 -v
 
-        make -j $cpuCount QMAKE="$(pwd)/bin/qmake CONFIG-='debug debug_and_release'"
-        make install
+        do_makeinstall QMAKE="$(pwd)/bin/qmake CONFIG-='debug debug_and_release'"
 
         cp -f ./lib/pkgconfig/*.pc $LOCALDESTDIR/lib/pkgconfig/
 
@@ -2243,11 +2073,10 @@ if [[ $mkv != "n" ]]; then
                 make distclean
             fi
 
-            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --with-msw --disable-mslu --disable-shared --enable-static --enable-iniconf --enable-iff --enable-permissive --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-
-            make -j $cpuCount
-            make install
-
+            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" do_generic_confmakeinstall global \
+            --with-msw --disable-mslu --enable-static --enable-iniconf --enable-iff --enable-permissive \
+            --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers \
+            LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
             do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
         fi
     fi
