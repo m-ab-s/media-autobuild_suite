@@ -1451,7 +1451,7 @@ if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; t
     sed -i 's/ln -sf/$(LN_S)/' "doc/Makefile"
     do_makeinstall
     do_checkIfExist libcaca-0.99.beta19 libcaca.a
-elif ! pkg-config --cflags caca | grep -q -e "-DCACA_STATIC"; then
+elif pkg-config --exists caca && ! pkg-config --cflags caca | grep -q -e "-DCACA_STATIC"; then
     sed -i "s/Cflags: -I\${includedir}/& -DCACA_STATIC/" $LOCALDESTDIR/lib/pkgconfig/caca.pc
 fi
 
