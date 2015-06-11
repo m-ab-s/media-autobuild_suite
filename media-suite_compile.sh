@@ -2210,7 +2210,7 @@ while [[ $new_updates = "yes" ]]; do
     echo "-------------------------------------------------------------------------------"
     new_updates="no"
     [[ $ret = "y" || $ret = "Y" ]] && run_builds
-fi
+done
 
 echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
