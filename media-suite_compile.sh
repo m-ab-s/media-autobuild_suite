@@ -1924,7 +1924,7 @@ fi
 
 
 
-if [[ $mpv = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
+if [[ $mpv = "y" ]] && do_pkgConfig "libavcodec libavutil libavformat libswscale"; then
     cd $LOCALBUILDDIR
     do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
     if [[ $compile = "true" ]]; then
