@@ -2126,48 +2126,6 @@ if [[ $mkv != "n" ]]; then
     fi
 fi
 
-if [[ $stripping = "y" ]]; then
-    cd $LOCALDESTDIR
-
-    echo -ne "\033]0;strip $bits binaries\007"
-    echo
-    echo "-------------------------------------------------------------------------------"
-    echo
-    FILES=`find ./bin* ./lib -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
-
-    for f in $FILES; do
-        strip --strip-all $f
-        echo "strip $f done..."
-    done
-
-fi
-
-if [[ $packing = "y" ]]; then
-    if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
-        echo -ne "\033]0;Download UPX\007"
-        cd $LOCALBUILDDIR
-        rm -rf upx391w
-        do_wget "http://upx.sourceforge.net/download/upx391w.zip"
-        unzip upx391w.zip
-        rm upx391w.zip
-    fi
-    echo -ne "\033]0;pack $bits binaries\007"
-    echo
-    echo "-------------------------------------------------------------------------------"
-    echo
-    cd $LOCALDESTDIR
-    FILES=`find ./bin-*  -regex ".*\.\(exe\|dll\|com\)" -mmin -600`
-
-    for f in $FILES; do
-        if [[ $stripping = "y" ]]; then
-            $LOCALBUILDDIR/upx391w/upx.exe -9 -q $f
-        else
-            $LOCALBUILDDIR/upx391w/upx.exe -9 -q --strip-relocs=0 $f
-        fi
-        echo "pack $f done..."
-    done
-fi
-
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile video tools $bits done..."
@@ -2193,6 +2151,44 @@ run_builds() {
     fi
 }
 
+strip_and_pack() {
+if [[ $stripping = "y" ]]; then
+    echo -ne "\033]0;Stripping $bits binaries\007"
+    echo
+    echo "-------------------------------------------------------------------------------"
+    echo
+    printf "Stripping binaries and libs... "
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -mmin -600 | xargs strip --strip-all
+    printf "done!\n"
+fi
+
+if [[ $packing = "y" ]]; then
+    if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
+        echo -ne "\033]0;Installing UPX\007"
+        cd $LOCALBUILDDIR
+        rm -rf upx391w
+        do_wget "http://upx.sourceforge.net/download/upx391w.zip"
+        unzip upx391w.zip
+        rm upx391w.zip
+    fi
+    echo -ne "\033]0;Packing $bits binaries\007"
+    echo
+    echo "-------------------------------------------------------------------------------"
+    echo
+    FILES=`find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
+
+    for f in $FILES; do
+        printf "Packing $f..."
+        if [[ $stripping = "y" ]]; then
+            $LOCALBUILDDIR/upx391w/upx.exe -9 -q $f
+        else
+            $LOCALBUILDDIR/upx391w/upx.exe -9 -q --strip-relocs=0 $f
+        fi
+        printf "done!\n"
+    done
+fi
+}
+
 run_builds
 
 while [[ $new_updates = "yes" ]]; do
@@ -2203,8 +2199,10 @@ while [[ $new_updates = "yes" ]]; do
     read -p "y/[n] " ret
     echo "-------------------------------------------------------------------------------"
     new_updates="no"
-    [[ $ret = "y" || $ret = "Y" ]] && run_builds
+    [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds
 done
+
+strip_and_pack
 
 echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
