@@ -386,6 +386,7 @@ do_patch() {
     if [[ -z $strip ]]; then
         strip="1"
     fi
+    patch="https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch"
     curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
 }
 
@@ -813,7 +814,7 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
     fi
 
-    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/opus11.patch"
+    do_patch "opus11.patch"
     do_generic_confmakeinstall no --disable-doc
     do_checkIfExist opus-1.1 libopus.a
 fi
@@ -1034,8 +1035,8 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
         rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
     fi
 
-    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-disable-sndfile.patch"
-    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/libbs2b-libs-only.patch"
+    do_patch "libbs2b-disable-sndfile.patch"
+    do_patch "libbs2b-libs-only.patch"
     do_generic_confmakeinstall no
     do_checkIfExist libbs2b-3.1.0 libbs2b.a
 fi
@@ -1466,8 +1467,8 @@ if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; th
         rm -rf $LOCALDESTDIR/include/libzvbi.h
         rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
     fi
-    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-win32.patch"
-    do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/zvbi-ioctl.patch"
+    do_patch "zvbi-win32.patch"
+    do_patch "zvbi-ioctl.patch"
     do_generic_conf --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen \
     CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
     cd src
@@ -1816,8 +1817,8 @@ if [[ $ffmpeg != "n" ]]; then
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
         fi
 
-        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
-        do_patch "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
+        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
+        do_patch "ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
@@ -2109,7 +2110,7 @@ if [[ $mkv != "n" ]]; then
             rm -rf $LOCALDESTDIR/bin-video/mkvtoolnix
         fi
 
-        do_patch "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/patches/mkvinfo.patch"
+        do_patch "mkvinfo.patch"
 
         CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static" \
         LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static" \
