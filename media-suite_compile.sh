@@ -1804,19 +1804,6 @@ if [[ $ffmpeg != "n" ]]; then
     do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
-        if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-            rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
-            rm -rf $LOCALDESTDIR/include/libpostproc
-            rm -rf $LOCALDESTDIR/include/libsw{scale,resample}
-            rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
-            rm -f $LOCALDESTDIR/lib/libsw{scale,resample}.a
-            rm -f $LOCALDESTDIR/lib/libpostproc.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libsw{scale,resample}.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
-            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
-        fi
-
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
         do_patch "ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
 
@@ -1843,6 +1830,12 @@ if [[ $ffmpeg != "n" ]]; then
         # static
         if [[ $ffmpeg != "s" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
+            if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
+                rm -rf $LOCALDESTDIR/include/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}
+                rm -f $LOCALDESTDIR/lib/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.pc
+                rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
+            fi
             [ -f config.mak ] && make distclean
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --enable-static --disable-shared \
