@@ -1692,8 +1692,6 @@ if [[ ! $x264 = "n" ]]; then
     builtx264="--enable-libx264"
 fi
 
-
-
 if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_hg "https://bitbucket.org/multicoreware/x265" x265
@@ -1746,9 +1744,8 @@ if [[ ! $x265 = "n" ]]; then
     builtx265="--enable-libx265"
 fi
 
-cd $LOCALBUILDDIR
-
 if [[ $ffmbc = "y" ]]; then
+    cd $LOCALBUILDDIR
     if $LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep -q -e "version 0.7.4"; then
         echo -------------------------------------------------
         echo "ffmbc-0.7.4 is already compiled"
@@ -1793,13 +1790,7 @@ if [[ $ffmbc = "y" ]]; then
 fi
 
 
-
 if [[ $ffmpeg != "n" ]]; then
-
-    echo "-------------------------------------------------------------------------------"
-    echo "compile ffmpeg $bits"
-    echo "-------------------------------------------------------------------------------"
-
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
@@ -1868,15 +1859,10 @@ if [[ $bits = "64bit" && $other265 = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b"
     fi
 fi
 
-cd $LOCALBUILDDIR
-
-if [[ $nonfree = "y" ]]; then
-    faac=""
-  elif [[ $nonfree = "n" ]]; then
-      faac="--disable-faac --disable-faac-lavc"
-fi
-
 if [[ $mplayer = "y" ]]; then
+    cd $LOCALBUILDDIR
+    [[ $nonfree = "n" ]] && faac="--disable-faac --disable-faac-lavc"
+
     do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer bin-video/mplayer.exe
 
     if [ -d "ffmpeg" ]; then
@@ -1922,9 +1908,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-
-
-if [[ $mpv = "y" ]] && do_pkgConfig "libavcodec libavutil libavformat libswscale"; then
+if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
     cd $LOCALBUILDDIR
     do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
     if [[ $compile = "true" ]]; then
