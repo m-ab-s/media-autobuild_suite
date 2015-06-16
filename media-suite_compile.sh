@@ -80,9 +80,7 @@ else
     if [[ $gitDepth = "" && -f .git/shallow ]]; then
         local unshallow="--unshallow"
     fi
-    if ! git remote show origin | grep -q -e "$gitURL"; then
-        git remote set-url origin "$gitURL"
-    fi
+    git remote set-url origin "$gitURL"
     oldHead=$(git rev-parse HEAD)
     git reset --quiet --hard
     git pull --no-edit $unshallow origin "$gitBranch"
@@ -1143,7 +1141,7 @@ fi
 
 if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/webmproject/libvpx.git" vpx noDepth
+    do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
     if [[ $compile = "true" ]]; then
         if [ -d $LOCALDESTDIR/include/vpx ]; then
             rm -rf $LOCALDESTDIR/include/vpx
