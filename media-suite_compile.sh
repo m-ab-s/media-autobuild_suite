@@ -1700,27 +1700,28 @@ if [[ ! $x265 = "n" ]]; then
         rm -f $LOCALDESTDIR/lib/libx265.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
         rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
 
+        if [[ $bits = "32bit" ]]; then
+            xpsupport="-DWINXP_SUPPORT=ON"
+            assembly="-DENABLE_ASSEMBLY=OFF"
+        fi
+
         do_x265_cmake() {
             cmake ../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
             -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
-            -DCMAKE_INSTALL_PREFIX:PATH=$LOCALDESTDIR \
-            -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING=-static "$@"
+            -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR \
+            -DCMAKE_EXE_LINKER_FLAGS_RELEASE=-static -DENABLE_SHARED=OFF -DENABLE_CLI=ON "$@"
         }
 
-        if [[ $bits = "32bit" ]]; then
-            xpsupport="-DWINXP_SUPPORT:BOOL=TRUE"
-            assembly="-DENABLE_ASSEMBLY=OFF -DHIGH_BIT_DEPTH=1"
-        fi
         if [[ $x265 = "s" ]]; then
             # 16-bit static x265.exe
-            do_x265_cmake $assembly -DENABLE_CLI:BOOLEAN=ON  -DENABLE_SHARED:BOOLEAN=OFF
+            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON
             make -j $cpuCount
             cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
         else
             # shared 16-bit libx265_main10.dll
-            do_x265_cmake $assembly -DENABLE_CLI:BOOLEAN=OFF -DENABLE_SHARED:BOOLEAN=ON
+            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=ON -DENABLE_CLI=OFF
             make -j $cpuCount
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         fi
@@ -1729,10 +1730,10 @@ if [[ ! $x265 = "n" ]]; then
 
         if [[ $x265 = "y" ]]; then
             # 8-bit static x265.exe
-            do_x265_cmake -DENABLE_CLI:BOOLEAN=ON  -DENABLE_SHARED:BOOLEAN=OFF
+            do_x265_cmake
         else
             # 8-bit static libx265.a
-            do_x265_cmake -DENABLE_CLI:BOOLEAN=OFF -DENABLE_SHARED:BOOLEAN=OFF
+            do_x265_cmake -DENABLE_CLI=OFF
         fi
 
         do_makeinstall
