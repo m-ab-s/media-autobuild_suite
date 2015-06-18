@@ -1709,9 +1709,8 @@ if [[ ! $x265 = "n" ]]; then
             cmake ../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
-            -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
-            -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR \
-            -DCMAKE_EXE_LINKER_FLAGS_RELEASE=-static -DENABLE_SHARED=OFF -DENABLE_CLI=ON "$@"
+            -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
+            -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DHIGH_BIT_DEPTH=OFF "$@"
         }
 
         if [[ $x265 = "s" ]]; then
@@ -1726,7 +1725,7 @@ if [[ ! $x265 = "n" ]]; then
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         fi
 
-        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
+        make clean
 
         if [[ $x265 = "y" ]]; then
             # 8-bit static x265.exe
