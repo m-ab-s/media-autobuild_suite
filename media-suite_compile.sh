@@ -386,6 +386,17 @@ do_patch() {
     fi
     patch="https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch"
     curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
+    if $? = 1; then
+        echo "Patch not found online. Trying local patch. Probably not up-to-date."
+        iPath=$(cygpath -w /)
+        if [ -f ./"$patch" ]; then
+            patch -N -p$strip -i "$patch"
+        elif [ -f "$iPath/../patches/$patch" ]
+            patch -N -p$strip -i "$iPath/../patches/$patch"
+        else
+            echo "No patch found. Moving on without patching."
+        fi
+    fi
 }
 
 do_cmake() {
