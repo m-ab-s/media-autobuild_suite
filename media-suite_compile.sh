@@ -391,7 +391,7 @@ do_patch() {
         iPath=$(cygpath -w /)
         if [ -f ./"$patch" ]; then
             patch -N -p$strip -i "$patch"
-        elif [ -f "$iPath/../patches/$patch" ]
+        elif [ -f "$iPath/../patches/$patch" ]; then
             patch -N -p$strip -i "$iPath/../patches/$patch"
         else
             echo "No patch found. Moving on without patching."
