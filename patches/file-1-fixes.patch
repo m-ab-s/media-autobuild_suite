@@ -1,0 +1,40 @@
+This file is part of MXE.
+See index.html for further information.
+
+Contains ad hoc patches for cross building.
+
+From afe77055b3e244d82cf4dedc82af15524b34d908 Mon Sep 17 00:00:00 2001
+From: MXE
+Date: Thu, 18 Jun 2015 22:19:17 -0400
+Subject: [PATCH] {gm,local}time_r: Fix function signature
+
+
+diff --git a/src/gmtime_r.c b/src/gmtime_r.c
+index 963dfee..7e27ed6 100644
+--- a/src/gmtime_r.c
++++ b/src/gmtime_r.c
+@@ -9,7 +9,7 @@ FILE_RCSID("@(#)$File: gmtime_r.c,v 1.1 2015/01/09 19:28:32 christos Exp $")
+ 
+ /* asctime_r is not thread-safe anyway */
+ struct tm *
+-gmtime_r(const time_t t, struct tm *tm)
++gmtime_r(const time_t *t, struct tm *tm)
+ {
+ 	struct tm *tmp = gmtime(t);
+ 	if (tmp == NULL)
+diff --git a/src/localtime_r.c b/src/localtime_r.c
+index 69d78d9..35c3b40 100644
+--- a/src/localtime_r.c
++++ b/src/localtime_r.c
+@@ -9,7 +9,7 @@ FILE_RCSID("@(#)$File: localtime_r.c,v 1.1 2015/01/09 19:28:32 christos Exp $")
+ 
+ /* asctime_r is not thread-safe anyway */
+ struct tm *
+-localtime_r(const time_t t, struct tm *tm)
++localtime_r(const time_t *t, struct tm *tm)
+ {
+ 	struct tm *tmp = localtime(t);
+ 	if (tmp == NULL)
+-- 
+1.9.1
+

@@ -1,0 +1,27 @@
+This file is part of MXE.
+See index.html for further information.
+
+diff -Nur mingw-libgnurx-2.5.1/Makefile.mxe mingw-libgnurx-2.5.1-mxe/Makefile.mxe
+--- mingw-libgnurx-2.5.1/Makefile.mxe	1970-01-01 01:00:00.000000000 +0100
++++ mingw-libgnurx-2.5.1-mxe/Makefile.mxe	2011-10-23 16:57:18.579312050 +0200
+@@ -0,0 +1,20 @@
++include Makefile
++
++libgnurx.a: $(OBJECTS)
++	rm -f $@
++	$(TARGET)-ar rcu $@ $(OBJECTS)
++	$(TARGET)-ranlib $@
++
++install-common:
++	mkdir -p ${includedir} ${libdir}
++	cp -p ${srcdir}/regex.h ${includedir}
++
++install-static: install-common libgnurx.a
++	cp -p ${srcdir}/libgnurx.a ${libdir}
++	ln -sf ${libdir}/libgnurx.a ${libdir}/libregex.a
++
++install-shared: install-common libgnurx-$(DLLVERSION).dll libgnurx.dll.a
++	cp -p ${srcdir}/libgnurx.dll.a ${libdir}
++	cp -p ${srcdir}/libgnurx-$(DLLVERSION).dll ${bindir}
++	ln -sf ${libdir}/libgnurx.dll.a ${libdir}/libregex.dll.a
++	ln -sf ${bindir}/libgnurx-$(DLLVERSION).dll ${bindir}/libregex-$(DLLVERSION).dll

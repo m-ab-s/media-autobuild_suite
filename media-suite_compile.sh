@@ -675,41 +675,28 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-
         do_wget_tar "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
-
-        if [[ -f ".libs/libgnurx.a" ]]; then
+        if [[ -f "libgnurx.a" ]]; then
             make distclean
         fi
         if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
-            rm -rf $LOCALDESTDIR/lib/libgnurx.{l,}a
+            rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a
+            rm -f $LOCALDESTDIR/include/regex.h
         fi
-
-        rm -f configure.ac Makefile.am
-
-        do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-Makefile.am" Makefile.am
-        do_wget "https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-libgnurx/mingw32-libgnurx-configure.ac" configure.ac
-
-        touch NEWS
-        touch AUTHORS
-        libtoolize --copy
-        aclocal
-        autoconf
-        automake --add-missing
-        do_generic_confmakeinstall no
+        do_patch "libgnurx-1-additional-makefile-rules.patch"
+        ./configure --prefix=$LOCALDESTDIR
+        do_makeinstall -f Makefile.mxe install-static
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
     fi
 
-    if file --version | grep -q -e "file.exe-5.22"; then
+    if $LOCALDESTDIR/bin-global/file --version | grep -q -e "file.exe-5.23"; then
         echo -------------------------------------------------
-        echo "file-5.22[libmagic] is already compiled"
+        echo "file-5.23[libmagic] is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
-
-        do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.22.tar.gz"
-
+        do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.23.tar.gz"
         if [[ -f "src/.libs/libmagic.a" ]]; then
             make distclean
         fi
@@ -717,14 +704,8 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
         fi
-
-        ./configure --build=$targetBuild --host=$targetHost --prefix=$LOCALDESTDIR \
-        --bindir=$LOCALDESTDIR/bin-global --enable-static=yes --enable-shared=no \
-        CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz'
-
-        make CPPFLAGS='-D_REGEX_RE_COMP' -j $cpuCount
-        make install
-
+        do_patch "file-1-fixes.patch"
+        do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
         do_checkIfExist file-5.22 libmagic.a
     fi
 fi
