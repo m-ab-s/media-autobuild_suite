@@ -393,7 +393,7 @@ do_patch() {
     fi
     patch="https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch"
     curl --retry 20 --retry-max-time 5 -L "$patch" | patch -N -p$strip
-    if $? = 1; then
+    if [ $? = 1 ]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
         iPath=$(cygpath -w /)
         if [ -f ./"$patch" ]; then
