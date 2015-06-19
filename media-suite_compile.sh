@@ -331,13 +331,20 @@ do_getFFmpegConfig() {
 
     # handle non-free libs
     if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc \
-        --enable-libfaac"; then
+        --enable-libfaac --enable-openssl"; then
         do_addOption "--enable-nonfree"
     else
         do_removeOption "--enable-nonfree"
         do_removeOption "--enable-libfdk-aac"
         do_removeOption "--enable-nvenc"
         do_removeOption "--enable-libfaac"
+        do_checkForOptions "--enable-openssl" && do_removeOption "--enable-openssl" && \
+            do_addOption "--enable-gnutls"
+    fi
+
+    # prefer openssl if in options
+    if do_checkForOptions "--enable-openssl"; then
+        do_removeOption "--enable-gnutls"
     fi
 
     # remove libs that don't work with shared
@@ -637,7 +644,6 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
         $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
         do_checkIfExist gnutls-3.3.15 libgnutls.a
     fi
-    do_addOption "--enable-gnutls"
 fi
 
 if do_checkForOptions "--enable-librtmp"; then
