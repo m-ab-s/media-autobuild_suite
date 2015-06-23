@@ -872,27 +872,13 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 	)
 
 :getMintty
+
 if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     echo -------------------------------------------------------------------------------
     echo.
-    echo.- set mintty shell shortcut and make a first run
+    echo.- make a first run
     echo.
     echo -------------------------------------------------------------------------------
-    del %instdir\mintty.lnk
-    (
-        echo.Set Shell = CreateObject^("WScript.Shell"^)
-        echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
-        echo.link.Arguments = "-i /msys2.ico /usr/bin/bash --login"
-        echo.link.Description = "msys2 shell console"
-        echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe"
-        echo.link.WindowStyle = ^1
-        echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
-        echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
-        echo.link.Save
-        )>>%instdir%\setlink.vbs
-
-    cscript /nologo %instdir%\setlink.vbs
-    del %instdir%\setlink.vbs
 
     echo.sleep ^4>>firstrun.sh
     echo.exit>>firstrun.sh
@@ -914,6 +900,21 @@ if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     del %instdir%\firstUpdate.sh
 
 :minttySettings
+if not exist %instdir%\mintty.lnk (
+    (
+        echo.Set Shell = CreateObject^("WScript.Shell"^)
+        echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
+        echo.link.Arguments = "-i /msys2.ico /usr/bin/bash --login"
+        echo.link.Description = "msys2 shell console"
+        echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe"
+        echo.link.WindowStyle = ^1
+        echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
+        echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
+        echo.link.Save
+        )>>%instdir%\setlink.vbs
+    cscript /nologo %instdir%\setlink.vbs
+    del %instdir%\setlink.vbs
+    )
 if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
 if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
     (
