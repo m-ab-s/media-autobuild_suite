@@ -1976,23 +1976,20 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_git "https://github.com/mpv-player/mpv.git" mpv shallow master bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
-        if [ ! -f waf ]; then
-            ./bootstrap.py
-        else
-            ./waf distclean
-            rm waf
-            rm -rf .waf-*
-            rm -rf $LOCALDESTDIR/bin-video/mpv.exe
-            ./bootstrap.py
+        if [ -f waf ]; then
+            $python waf distclean
+            rm -rf waf .waf-*
+            rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
+        $python bootstrap.py
 
-        ./waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
+        $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
         --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
-        ./waf build -j $cpuCount
-        ./waf install
+        $python waf build -j $cpuCount
+        $python waf install
 
         if [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
