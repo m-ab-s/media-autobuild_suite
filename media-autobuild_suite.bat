@@ -1228,7 +1228,7 @@ if %build32%==yes (
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
-            echo.export python=python2
+            echo.export python=/usr/bin/python
             echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man"
@@ -1283,7 +1283,7 @@ if %build64%==yes (
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
-            echo.export python=python2
+            echo.export python=/usr/bin/python
             echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man"
