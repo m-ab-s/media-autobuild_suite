@@ -2187,15 +2187,15 @@ if [[ $packing = "y" ]]; then
 fi
 
 echo "deleting status files..."
-find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
-find $LOCALBUILDDIR -maxdepth 2 -name build_successful* -delete
+find $LOCALBUILDDIR -maxdepth 2 -name recently_updated | xargs rm -f
+find $LOCALBUILDDIR -maxdepth 2 -regex "build_successful(32|64)bit" | xargs rm -f
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
     echo
     echo "deleting source folders..."
     echo
-    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" -exec rm -rf {} \;
+    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" | xargs rm -rf
 fi
 
 echo -ne "\033]0;compiling done...\007"
