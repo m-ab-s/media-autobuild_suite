@@ -94,6 +94,7 @@ else
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
+            new_updates_packages="$new_updates_packages [$gitFolder]"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$gitCheck" && $pcExists = 1 ]] ||
@@ -140,6 +141,7 @@ else
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
+            new_updates_packages="$new_updates_packages [$svnFolder]"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$svnCheck" && $pcExists = 1 ]] ||
@@ -187,6 +189,7 @@ else
         rm -f build_successful*
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
+            new_updates_packages="$new_updates_packages [$hgFolder]"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$hgCheck" && $pcExists = 1 ]] ||
@@ -2115,6 +2118,8 @@ echo "--------------------------------------------------------------------------
 }
 
 run_builds() {
+    new_updates="no"
+    new_updates_packages=""
     if [[ $build32 = "yes" ]]; then
         source /local32/etc/profile.local
         buildProcess
@@ -2132,7 +2137,19 @@ run_builds() {
     fi
 }
 
-strip_and_pack() {
+run_builds
+
+while [[ $new_updates = "yes" ]]; do
+    ret="no"
+    echo "-------------------------------------------------------------------------------"
+    echo "There were new updates while compiling."
+    echo "Updated:$new_updates_packages"
+    echo "Would you like to run compilation again to get those updates? Default: no"
+    read -p "y/[n] " ret
+    echo "-------------------------------------------------------------------------------"
+    [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds
+done
+
 if [[ $stripping = "y" ]]; then
     echo -ne "\033]0;Stripping $bits binaries\007"
     echo
@@ -2168,22 +2185,6 @@ if [[ $packing = "y" ]]; then
         printf "done!\n"
     done
 fi
-}
-
-run_builds
-
-while [[ $new_updates = "yes" ]]; do
-    ret="no"
-    echo "-------------------------------------------------------------------------------"
-    echo "There were new updates while compiling."
-    echo "Would you like to run compilation again to get those updates? Default: no"
-    read -p "y/[n] " ret
-    echo "-------------------------------------------------------------------------------"
-    new_updates="no"
-    [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds
-done
-
-strip_and_pack
 
 echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated -delete
