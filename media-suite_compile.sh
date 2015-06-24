@@ -690,7 +690,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
             rm -f $LOCALDESTDIR/include/regex.h
         fi
         do_patch "libgnurx-1-additional-makefile-rules.patch"
-        ./configure --prefix=$LOCALDESTDIR
+        ./configure --prefix=$LOCALDESTDIR --disable-shared
         do_makeinstall -f Makefile.mxe install-static
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
     fi
