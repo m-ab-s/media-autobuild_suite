@@ -1693,9 +1693,9 @@ if [[ ! $x265 = "n" ]]; then
     do_hg "https://bitbucket.org/multicoreware/x265" x265
     if [[ $compile = "true" ]]; then
         cd build/msys
-        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/*
+        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10}bit*
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
-        rm -f $LOCALDESTDIR/lib/libx265.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
+        rm -f $LOCALDESTDIR/lib/libx265{,_main10}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
         rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
 
         if [[ $bits = "32bit" ]]; then
@@ -1704,36 +1704,40 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         do_x265_cmake() {
-            cmake ../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            cmake ../../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
-            -DENABLE_SHARED=OFF -DENABLE_CLI=ON -DHIGH_BIT_DEPTH=OFF "$@"
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=OFF -DEXPORT_C_API=OFF "$@"
         }
+        mkdir -p 8bit 10bit
 
+        cd 10bit
         if [[ $x265 = "s" ]]; then
-            # 16-bit static x265.exe
-            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON
-            make -j $cpuCount
-            cp x265.exe $LOCALDESTDIR/bin-video/x265-16bit.exe
-        else
-            # shared 16-bit libx265_main10.dll
-            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=ON -DENABLE_CLI=OFF
+            # libx265_main10.dll
+            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON -DENABLE_SHARED=ON -DEXPORT_C_API=ON
             make -j $cpuCount
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
-        fi
-
-        make clean
-
-        if [[ $x265 = "y" ]]; then
-            # 8-bit static x265.exe
-            do_x265_cmake
         else
-            # 8-bit static libx265.a
-            do_x265_cmake -DENABLE_CLI=OFF
+            # multilib
+            do_x265_cmake $assembly -DHIGH_BIT_DEPTH=ON
+            make -j $cpuCount
+            cp libx265.a ../8bit/libx265_main10.a
         fi
 
+        cd ../8bit
+        if [[ $x265 = "s" ]]; then
+            # 8-bit static x265.exe
+            do_x265_cmake -DENABLE_CLI=ON -DEXPORT_C_API=ON
+        else
+            # multilib
+            [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
+            do_x265_cmake -DEXTRA_LIB=x265_main10.a -DEXTRA_LINK_FLAGS=-L. $cli
+            cp libx265_main10.a $LOCALDESTDIR/lib/
+        fi
         do_makeinstall
+        [[ $x265 != "s" ]] && sed -i "s/Libs: .*$/& -lx265_main10/" $LOCALDESTDIR/lib/pkgconfig/x265.pc
+
         do_checkIfExist x265-hg libx265.a
         buildFFmpeg="true"
     fi
@@ -1756,7 +1760,6 @@ if [[ $ffmbc = "y" ]]; then
             fi
 
             do_wget_tar "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
-
 
             if [[ $bits = "32bit" ]]; then
                 arch='x86'
@@ -1793,6 +1796,7 @@ if [[ $ffmpeg != "n" ]]; then
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
         do_patch "ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
+        sed -i "s/x265_encoder_encode/x265_api_get/" configure
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then

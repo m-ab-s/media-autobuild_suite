@@ -335,10 +335,10 @@ if %x265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build x265 [H.265 encoder]?
-    echo. 1 = Static x265.exe [8-bit] and libx265_main10.dll
-    echo. 2 = Static library [8-bit] and libx265_main10.dll
+    echo. 1 = Static x265.exe and library with Main and Main10 included
+    echo. 2 = Static library only
     echo. 3 = No
-    echo. 4 = Static x265.exe [8-bit] and x265-16bit.exe
+    echo. 4 = Static x265.exe [Main] and libx265_main10.dll
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
