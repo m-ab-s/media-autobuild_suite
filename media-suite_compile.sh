@@ -2188,7 +2188,7 @@ fi
 
 echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated | xargs rm -f
-find $LOCALBUILDDIR -maxdepth 2 -regex "build_successful(32|64)bit" | xargs rm -f
+find $LOCALBUILDDIR -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
