@@ -1804,7 +1804,6 @@ if [[ $ffmpeg != "n" ]]; then
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
-        do_patch "ffmpeg-0002-Add-lsoxr-to-libswresamples-libs.patch"
         sed -i "s/x265_encoder_encode/x265_api_get/" configure
 
         # shared
@@ -1851,21 +1850,24 @@ if [[ $ffmpeg != "n" ]]; then
     fi
 fi
 
-if [[ $bits = "64bit" && $other265 = "y" ]] && [[ $ffmpeg = "y" || $ffmpeg = "b" ]]; then
+if [[ $bits = "64bit" && $other265 = "y" ]] && [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
     cd $LOCALBUILDDIR
-    do_git "http://f265.org/repos/f265/" f265 noDepth master bin-video/f265cli.exe
-    if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
-        if [ -d "build" ] || [[ -f "$LOCALDESTDIR/bin-video/f265cli.exe" ]]; then
-            rm -rf build .sconf_temp
-            rm -f .sconsign.dblite config.log options.py
-            rm -f $LOCALDESTDIR/bin-video/f265cli.exe
-        fi
-        scons
-        if [ -f build/f265cli.exe ]; then
-            cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
-        fi
-        do_checkIfExist f265-git bin-video/f265cli.exe
+    pkgname="f265_development_snapshot"
+    do_wget "http://f265.org/f265/static/bin/$pkgname.zip"
+    unzip "$pkgname.zip" && rm -f "$pkgname.zip"
+    cd $pkgname
+    if [ -d "build" ]; then
+        rm -rf build .sconf_temp
+        rm -f .sconsign.dblite config.log options.py
     fi
+    scons libav=none
+    [ -f build/f265cli.exe ] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
+    fi
+    do_checkIfExist f265-git bin-video/f265cli.exe
+else
+    echo -------------------------------------------------
+    echo "f265 is already compiled"
+    echo -------------------------------------------------
 fi
 
 if [[ $mplayer = "y" ]]; then
