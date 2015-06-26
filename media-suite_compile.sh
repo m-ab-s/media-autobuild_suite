@@ -448,8 +448,8 @@ do_generic_confmakeinstall() {
     video)
         bindir="--bindir=$LOCALDESTDIR/bin-video"
         ;;
-    no)
-        bindir=""
+    *)
+        bindir="$1"
         ;;
     esac
     shift 1
@@ -777,7 +777,7 @@ if do_checkForOptions "--enable-libilbc"; then
             rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
             make distclean
         fi
-        do_generic_confmakeinstall no
+        do_generic_confmakeinstall
         do_checkIfExist libilbc-git libilbc.a
     fi
 fi
@@ -794,7 +794,7 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
         rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
         rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     fi
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
@@ -811,7 +811,7 @@ if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]
         rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
         rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
     fi
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist libvorbis-1.3.5 libvorbis.a
 fi
 
@@ -828,7 +828,7 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
     fi
 
     do_patch "opus11.patch"
-    do_generic_confmakeinstall no --disable-doc
+    do_generic_confmakeinstall --disable-doc
     do_checkIfExist opus-1.1 libopus.a
 fi
 
@@ -876,7 +876,7 @@ if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3
         rm -rf $LOCALDESTDIR/include/vo-aacenc
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
     fi
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
@@ -893,7 +893,7 @@ if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencor
         rm -r $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a
         rm -f $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
     fi
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist opencore-amr-0.1.3 libopencore-amrnb.a
 fi
 
@@ -908,7 +908,7 @@ if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
     fi
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
@@ -923,7 +923,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
             make distclean
         fi
-        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall no
+        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall
         do_checkIfExist fdk-aac-git libfdk-aac.a
     fi
 
@@ -1050,7 +1050,7 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
 
     do_patch "libbs2b-disable-sndfile.patch"
     do_patch "libbs2b-libs-only.patch"
-    do_generic_confmakeinstall no
+    do_generic_confmakeinstall
     do_checkIfExist libbs2b-3.1.0 libbs2b.a
 fi
 
@@ -1091,7 +1091,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
         fi
 
-        do_generic_confmakeinstall no --enable-fpm=intel --disable-debugging
+        do_generic_confmakeinstall --enable-fpm=intel --disable-debugging
         do_checkIfExist libmad-0.15.1b libmad.a
     fi
 
@@ -1106,7 +1106,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
         fi
-        do_generic_confmakeinstall no LIBS="$LIBS -lole32 -lgdi32"
+        do_generic_confmakeinstall LIBS="$LIBS -lole32 -lgdi32"
         do_checkIfExist opusfile-0.6 libopusfile.a
     fi
 
@@ -1150,7 +1150,7 @@ if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; the
         rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
         rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
     fi
-    do_generic_confmakeinstall no --disable-examples
+    do_generic_confmakeinstall --disable-examples
     do_checkIfExist libtheora-1.1.1 libtheora.a
 fi
 
@@ -1226,7 +1226,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
         fi
-        do_generic_confmakeinstall no
+        do_generic_confmakeinstall
         do_checkIfExist dvdread-git libdvdread.a
     fi
 
@@ -1243,7 +1243,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
         fi
-        do_generic_confmakeinstall no
+        do_generic_confmakeinstall
         do_checkIfExist dvdnav-git libdvdnav.a
     fi
 fi
@@ -1259,7 +1259,7 @@ if do_checkForOptions "--enable-libbluray"; then
             rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
             make distclean
         fi
-        do_generic_confmakeinstall no --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
+        do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
         --disable-doxygen-dot --without-libxml2
         do_checkIfExist libbluray-git libbluray.a
     fi
@@ -1297,7 +1297,7 @@ if do_checkForOptions "--enable-libass"; then
             rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
-        do_generic_confmakeinstall no
+        do_generic_confmakeinstall
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
     fi
@@ -1560,7 +1560,7 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
             rm -rf $LOCALDESTDIR/include/mfx
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
         fi
-        do_generic_confmakeinstall no
+        do_generic_confmakeinstall
         do_checkIfExist libmfx-git libmfx.a
     fi
 fi
@@ -1860,7 +1860,6 @@ if [[ $bits = "64bit" && $other265 = "y" ]] && [[ ! -f $LOCALDESTDIR/bin-video/f
     fi
     scons libav=none
     [ -f build/f265cli.exe ] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
-    fi
     do_checkIfExist f265 bin-video/f265cli.exe
 else
     echo -------------------------------------------------
