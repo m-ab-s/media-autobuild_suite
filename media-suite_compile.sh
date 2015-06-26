@@ -12,6 +12,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
+[[ ! -f "$LOCALBUILDDIR/last_run" ]] && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
 
 while true; do
   case $1 in
@@ -2156,7 +2157,7 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -mmin -600 | xargs strip --strip-all
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs strip --strip-all
     printf "done!\n"
 fi
 
@@ -2173,22 +2174,19 @@ if [[ $packing = "y" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo
-    FILES=`find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -mmin -600`
-
-    for f in $FILES; do
-        printf "Packing $f..."
-        if [[ $stripping = "y" ]]; then
-            $LOCALBUILDDIR/upx391w/upx.exe -9 -q $f
-        else
-            $LOCALBUILDDIR/upx391w/upx.exe -9 -q --strip-relocs=0 $f
-        fi
-        printf "done!\n"
-    done
+    echo "Packing binaries and shared libs... "
+    packcmd="$LOCALBUILDDIR/upx391w/upx.exe -9 -qq"
+    [[ $stripping = "y" ]] && packcmd="$packcmd --strip-relocs=0"
+    find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs $packcmd
 fi
 
+echo
+echo "-------------------------------------------------------------------------------"
+echo
 echo "deleting status files..."
 find $LOCALBUILDDIR -maxdepth 2 -name recently_updated | xargs rm -f
 find $LOCALBUILDDIR -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
+[[ -f $LOCALBUILDDIR/last_run ]] && mv $LOCALBUILDDIR/last_run $LOCALBUILDDIR/last_successful_run
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
