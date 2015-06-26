@@ -395,9 +395,10 @@ do_patch() {
     if [[ -z $strip ]]; then
         strip="1"
     fi
-    curl --retry 20 --retry-max-time 5 -L \
-        "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch" | patch -N -p$strip
-    if [ $? = 1 ]; then
+    local response_code="$(curl --retry 20 --retry-max-time 5 --location --fail --write-out "%{response_code}" \
+        --remote-name "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch")"
+
+    if [[ $response_code = "404" ]]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
         iPath=$(cygpath -w /)
         if [ -f ./"$patch" ]; then
@@ -405,8 +406,12 @@ do_patch() {
         elif [ -f "$iPath/../patches/$patch" ]; then
             patch -N -p$strip -i "$iPath/../patches/$patch"
         else
-            echo "No patch found. Moving on without patching."
+            echo "No local patch found. Moving on without patching."
         fi
+    elif [[ $response_code = "200" ]]; then
+        patch -N -p$strip -i "$patch"
+    else
+        echo "No patch found anywhere. Moving on without patching."
     fi
 }
 
