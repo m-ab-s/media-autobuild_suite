@@ -207,36 +207,44 @@ fi
 
 # get wget download
 do_wget() {
-local URL="$1"
-local archive="$2"
-
-if [[ -z $archive ]]; then
-    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL
-else
-    wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
-fi
-}
-
-do_wget_tar() {
-    local URL="$1"
-    # rename archive to what the directory should look like, not what wget outputs
+    local url="$1"
     local archive="$2"
+    local dirName="$3"
     if [[ -z $archive ]]; then
-        archive=`expr $URL : '.*/\(.*\.tar\.\(gz\|bz2\|xz\)\)'`
+        # remove arguments and filepath
+        archive=${url%%\?*}
+        archive=${archive##*/}
     fi
-    local dirName=`expr $archive : '\(.*\)\.tar\.\(gz\|bz2\|xz\)'`
-
-    # if dir exists and no builds were successful, better to redownload
-    if [[ -d $dirName ]] && [[ ! -f $dirName/build_successful32bit && ! -f $dirName/build_successful64bit ]]; then
+    # accepted: zip, 7z, tar.gz, tar.bz2 and tar.xz
+    local archive_type=$(expr $archive : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    [[ -z "$dirName" ]] && dirName=$(expr $archive : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    if [[ -d "$dirName" && $archive_type = tar* ]] &&
+        { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
+          [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
         rm -rf $dirName
     fi
-
-    if [[ ! -d $dirName ]]; then
-        wget --tries=20 --retry-connrefused --waitretry=2 --no-check-certificate -c $URL -O $archive
-        tar -xaf $archive
-        rm -f $archive
+    local response_code=$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" -o "$archive" "$url")
+    if [[ $response_code = "200" || $response_code = "226" ]]; then
+        case $archive_type in
+        zip)
+            unzip "$archive"
+            rm "$archive"
+            ;;
+        7z)
+            7z x -o"$dirName" "$archive"
+            rm "$archive"
+            ;;
+        tar*)
+            tar -xaf "$archive"
+            rm "$archive"
+            cd "$dirName"
+            ;;
+        esac
+    elif [[ $response_code -gt 400 ]]; then
+        echo "Error $response_code while downloading $URL"
+        echo "Try again later or <Enter> to continue"
+        read -p "if you're sure nothing depends on it."
     fi
-    cd $dirName
 }
 
 # check if compiled file exist
@@ -395,8 +403,8 @@ do_patch() {
     if [[ -z $strip ]]; then
         strip="1"
     fi
-    local response_code="$(curl --retry 20 --retry-max-time 5 --location --fail --write-out "%{response_code}" \
-        --remote-name "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch")"
+    local response_code="$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
+        -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch")"
 
     if [[ $response_code = "404" ]]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
@@ -469,7 +477,7 @@ echo "--------------------------------------------------------------------------
 do_getFFmpegConfig
 
 if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
-    do_wget_tar "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
+    do_wget "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
     if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
         rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
@@ -487,7 +495,7 @@ fi
 if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" && \
     do_pkgConfig "freetype2 = 17.4.11"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
+    do_wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
 
     if [[ -f "objs/.libs/libfreetype.a" ]]; then
         make distclean
@@ -504,7 +512,7 @@ fi
 if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && \
     do_pkgConfig "fontconfig = 2.11.92"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
+    do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
     if [[ -f "src/.libs/libfontconfig.a" ]]; then
         make distclean
@@ -520,7 +528,7 @@ fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
+    do_wget "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
 
     if [[ -f "lib/.libs/libfribidi.a" ]]; then
         make distclean
@@ -543,7 +551,7 @@ if do_checkForOptions "--enable-libass"; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile ragel $bits\007"
 
-        do_wget_tar "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
+        do_wget "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
 
         if [[ -f "ragel/ragel.exe" ]]; then
             make distclean
@@ -573,7 +581,7 @@ fi
 
 if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
+    do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
 
     if [[ -f "build/.libs/libSDL.a" ]]; then
         make distclean
@@ -601,7 +609,7 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgcrypt $bits\007"
 
-        do_wget_tar "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
+        do_wget "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
 
         if [[ -f "src/.libs/libgcrypt.a" ]]; then
             make distclean
@@ -622,7 +630,7 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
 
     if do_pkgConfig "nettle = 2.7.1"; then
         cd $LOCALBUILDDIR
-        do_wget_tar "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
+        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
 
         if [[ -f "libnettle.a" ]]; then
             make distclean
@@ -637,7 +645,7 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
 
     if do_pkgConfig "gnutls = 3.3.15"; then
         cd $LOCALBUILDDIR
-        do_wget_tar "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.15.tar.xz"
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.15.tar.xz"
 
         if [[ -f "lib/.libs/libgnutls.a" ]]; then
             make distclean
@@ -690,7 +698,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-        do_wget_tar "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
         if [[ -f "libgnurx.a" ]]; then
             make distclean
         fi
@@ -711,7 +719,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
-        do_wget_tar "ftp://ftp.astron.com/pub/file/file-5.23.tar.gz"
+        do_wget "ftp://ftp.astron.com/pub/file/file-5.23.tar.gz"
         if [[ -f "src/.libs/libmagic.a" ]]; then
             make distclean
         fi
@@ -777,7 +785,7 @@ fi
 if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || \
     [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
+    do_wget "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
     if [[ -f "./src/.libs/libogg.a" ]]; then
         make distclean
@@ -793,7 +801,7 @@ fi
 if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || \
     [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
+    do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
     if [[ -f "./lib/.libs/libvorbis.a" ]]; then
         make distclean
@@ -809,7 +817,7 @@ fi
 
 if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
+    do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
 
     if [[ -f ".libs/libopus.a" ]]; then
         make distclean
@@ -826,7 +834,7 @@ fi
 
 if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
+    do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
 
     if [[ -f "libspeex/.libs/libspeex.a" ]]; then
         make distclean
@@ -844,7 +852,7 @@ if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
     [[ $sox = "y" ]] || [[ $mkv != "n" ]] &&
     [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
+    do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
 
     if [[ -f "src/libFLAC/.libs/libFLAC.a" ]]; then
         make distclean
@@ -859,7 +867,7 @@ fi
 
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
+    do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
 
     if [[ -f ".libs/libvo-aacenc.a" ]]; then
         make distclean
@@ -875,7 +883,7 @@ fi
 if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 \
     opencore-amrwb = 0.1.3"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
+    do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
     if [[ -f "amrnb/.libs/libopencore-amrnb.a" ]]; then
         make distclean
@@ -891,7 +899,7 @@ fi
 
 if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+    do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
 
     if [[ -f ".libs/libvo-amrwbenc.a" ]]; then
         make distclean
@@ -942,7 +950,7 @@ if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
             cd $LOCALBUILDDIR
             echo -ne "\033]0;compile faac $bits\007"
 
-            do_wget_tar "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
+            do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
 
             if [[ -f configure ]]; then
                 make distclean
@@ -963,7 +971,7 @@ if do_checkForOptions "--enable-libopus"; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile opus-tools $bits\007"
 
-        do_wget_tar "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
+        do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
 
         if [[ -f "opusenc.exe" ]]; then
             make distclean
@@ -978,7 +986,7 @@ fi
 
 if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
+    do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
 
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
@@ -1030,7 +1038,7 @@ fi
 
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
+    do_wget "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
 
     if [[ -f "src/.libs/libbs2b.a" ]]; then
         make distclean
@@ -1073,7 +1081,7 @@ if [[ $sox = "y" ]]; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libmad $bits\007"
 
-        do_wget_tar "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
+        do_wget "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 
         if [[ -f ".libs/libmad.a" ]]; then
             make distclean
@@ -1089,7 +1097,7 @@ if [[ $sox = "y" ]]; then
 
     if do_pkgConfig "opusfile = 0.6"; then
         cd $LOCALBUILDDIR
-        do_wget_tar "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
+        do_wget "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
 
         if [[ -f ".libs/libopusfile.a" ]]; then
             make distclean
@@ -1133,7 +1141,7 @@ echo "--------------------------------------------------------------------------
 
 if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
+    do_wget "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
 
     if [[ -f "lib/.libs/libtheora.a" ]]; then
         make distclean
@@ -1349,12 +1357,7 @@ if [ $mediainfo = "y" ]; then
             grep "7z" | sed "s/ //g"`
 
             do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
-
-            mkdir mediainfo
-            7za x -omediainfo mediainfo.7z
-            rm mediainfo.7z
         fi
-
         cd mediainfo
 
         sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
@@ -1427,7 +1430,7 @@ fi
 
 if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
+    do_wget "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
 
     if [[ -f "caca/.libs/libcaca.a" ]]; then
         make distclean
@@ -1463,7 +1466,7 @@ fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
+    do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
 
     if [[ -f "src/.libs/libzvbi.a" ]]; then
         make distclean
@@ -1484,7 +1487,7 @@ fi
 
 if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     cd $LOCALBUILDDIR
-    do_wget_tar "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
+    do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
 
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
 
@@ -1530,10 +1533,7 @@ if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg != "n" ]]; then
         echo -------------------------------------------------
     else
         echo -ne "\033]0;install nvenc $bits\007"
-        rm -rf nvenc_5.0.1_sdk
-        do_wget http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip
-        unzip nvenc_5.0.1_sdk.zip
-        rm nvenc_5.0.1_sdk.zip
+        do_wget "http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip"
         
         if [[ $build32 = "yes" ]] && [[ ! -f /local32/include/nvEncodeAPI.h ]]; then
             cp nvenc_5.0.1_sdk/Samples/common/inc/* /local32/include
@@ -1768,7 +1768,7 @@ if [[ $ffmbc = "y" ]]; then
                 extras=""
             fi
 
-            do_wget_tar "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
+            do_wget "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
 
             if [[ $bits = "32bit" ]]; then
                 arch='x86'
@@ -1852,10 +1852,8 @@ fi
 
 if [[ $bits = "64bit" && $other265 = "y" ]] && [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
     cd $LOCALBUILDDIR
-    pkgname="f265_development_snapshot"
-    do_wget "http://f265.org/f265/static/bin/$pkgname.zip"
-    unzip "$pkgname.zip" && rm -f "$pkgname.zip"
-    cd $pkgname
+    do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
+    rm -rf f265 && mv f265_development_snapshot f265 && cd f265
     if [ -d "build" ]; then
         rm -rf build .sconf_temp
         rm -f .sconsign.dblite config.log options.py
@@ -1863,7 +1861,7 @@ if [[ $bits = "64bit" && $other265 = "y" ]] && [[ ! -f $LOCALDESTDIR/bin-video/f
     scons libav=none
     [ -f build/f265cli.exe ] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
     fi
-    do_checkIfExist f265-git bin-video/f265cli.exe
+    do_checkIfExist f265 bin-video/f265cli.exe
 else
     echo -------------------------------------------------
     echo "f265 is already compiled"
@@ -2009,14 +2007,12 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         if [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
             do_wget "http://srsfckn.biz/noto-mpv.7z"
-            7z x -ofonts noto-mpv.7z
-            rm -f noto-mpv.7z
         fi
 
         if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
-            cp -R fonts $LOCALDESTDIR/bin-video/
+            cp -R noto-mpv $LOCALDESTDIR/bin-video/fonts
         fi
 
         do_checkIfExist mpv-git bin-video/mpv.exe
@@ -2026,7 +2022,7 @@ fi
 if [[ $mkv != "n" ]]; then
     if do_pkgConfig "Qt5Core = 5.4.2"; then
         cd $LOCALBUILDDIR
-        do_wget_tar "http://download.qt.io/official_releases/qt/5.4/5.4.2/submodules/qtbase-opensource-src-5.4.2.tar.xz"
+        do_wget "http://download.qt.io/official_releases/qt/5.4/5.4.2/submodules/qtbase-opensource-src-5.4.2.tar.xz"
 
         if [[ -d build ]]; then
             rm -rf build/*
@@ -2069,7 +2065,7 @@ if [[ $mkv != "n" ]]; then
             cd $LOCALBUILDDIR
             echo -ne "\033]0;compile wxWidgets $bits\007"
 
-            do_wget_tar "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
+            do_wget "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
 
             if [[ -f config.log ]]; then
                 make distclean
@@ -2174,8 +2170,6 @@ if [[ $packing = "y" ]]; then
         cd $LOCALBUILDDIR
         rm -rf upx391w
         do_wget "http://upx.sourceforge.net/download/upx391w.zip"
-        unzip upx391w.zip
-        rm upx391w.zip
     fi
     echo -ne "\033]0;Packing $bits binaries\007"
     echo
