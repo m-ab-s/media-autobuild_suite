@@ -1982,7 +1982,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/mpv-player/mpv.git" mpv shallow master bin-video/mpv.exe
+    do_git "https://github.com/mpv-player/mpv.git" mpv noDepth master bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -f waf ]; then
             $python waf distclean
@@ -1990,7 +1990,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
         $python bootstrap.py
-
+        git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
         --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
 
