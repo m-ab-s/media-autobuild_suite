@@ -950,7 +950,7 @@ if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USE
         )>>%instdir%\%msys2%\home\%USERNAME%\.minttyrc
 
 :hgsettings
-if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO rebase
+if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO gitsettings
     (
         echo.[ui]
         echo.username = %USERNAME%
@@ -971,6 +971,27 @@ if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO rebase
         echo.status.unknown = blue bold
         echo.status.ignored = black bold
         )>>%instdir%\%msys2%\home\%USERNAME%\.hgrc
+
+:gitsettings
+if exist %instdir%\%msys2%\home\%USERNAME%\.gitconfig GOTO rebase
+    (
+        echo.[user]
+        echo.name = %USERNAME%
+        echo.email = %USERNAME%@%COMPUTERNAME%
+        echo.
+        echo.[color]
+        echo.ui = true
+        echo.
+        echo.[core]
+        echo.editor = vim
+        echo.autocrlf =
+        echo.
+        echo.[merge]
+        echo.tool = vimdiff
+        echo.
+        echo.[push]
+        echo.default = simple
+        )>>%instdir%\%msys2%\home\%USERNAME%\.gitconfig
 
 :rebase
 if %msys2%==msys32 (
