@@ -1804,7 +1804,6 @@ if [[ $ffmpeg != "n" ]]; then
 
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
-        sed -i "s/x265_encoder_encode/x265_api_get/" configure
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
