@@ -9,7 +9,8 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
---enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio \
+--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
+--enable-fontconfig --enable-libfribidi \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
@@ -506,7 +507,6 @@ if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" 
     fi
     do_generic_confmakeinstall global --with-harfbuzz=no
     do_checkIfExist freetype-2.5.5 libfreetype.a
-    do_addOption "--enable-libfreetype"
 fi
 
 if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && \
@@ -523,7 +523,6 @@ if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" &
     fi
     do_generic_confmakeinstall global
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
-    do_addOption "--enable-fontconfig"
 fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
@@ -539,7 +538,6 @@ if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fri
     fi
     do_generic_confmakeinstall global --enable-static --disable-deprecated --with-glib=no
     do_checkIfExist fribidi-0.19.6 libfribidi.a
-    do_addOption "--enable-libfribidi"
 fi
 
 if do_checkForOptions "--enable-libass"; then

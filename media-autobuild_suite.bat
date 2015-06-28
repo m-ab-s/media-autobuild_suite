@@ -45,7 +45,8 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid ^
---enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio ^
+--enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
+--enable-fontconfig --enable-libfribidi ^
 --enable-decklink --enable-libutvideo --enable-libgme ^
 --enable-nonfree --enable-nvenc --enable-libfdk-aac
 
