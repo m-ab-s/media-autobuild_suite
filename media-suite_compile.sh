@@ -1168,7 +1168,7 @@ if [[ ! $vpx = "n" ]]; then
             make distclean
         fi
         extracommands="--prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs \
-        --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth --disable-examples"
+        --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth"
         if [[ $bits = "64bit" ]]; then
             LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86_64-win64-gcc $extracommands
             sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
