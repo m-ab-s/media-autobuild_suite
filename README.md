@@ -22,6 +22,13 @@ Download
 
 Current release is **v3.6**
 
+Known Issues
+--------
+ - FFmpeg and FFmpeg-based (mplayer, mpv)
+	- if compiled with OpenSSL instead of GnuTLS, packing doesn't work in 64-bit
+ - mkvtoolnix
+	- mkvmerge CLI and GUIs crash on attaching font file
+		- upstream doesn't support Windows outside of the official builds so it won't ever be fixed, probably (use official builds if you're thinking of attaching fonts)
 
 Included Tools And Libraries
 --------
