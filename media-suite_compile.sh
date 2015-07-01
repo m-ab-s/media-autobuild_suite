@@ -2148,7 +2148,7 @@ while [[ $new_updates = "yes" ]]; do
     echo "Would you like to run compilation again to get those updates? Default: no"
     read -p "y/[n] " ret
     echo "-------------------------------------------------------------------------------"
-    [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds
+    [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds || break
 done
 
 if [[ $stripping = "y" ]]; then
