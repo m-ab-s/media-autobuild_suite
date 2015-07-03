@@ -1752,7 +1752,7 @@ if [[ ! $x265 = "n" ]]; then
         else
             # multilib
             [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
-            do_x265_cmake -DEXTRA_LIB="x265_main10.a x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli -DHIGH_BIT_DEPTH=OFF
+            do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli -DHIGH_BIT_DEPTH=OFF
             cp libx265_main{10,12}.a $LOCALDESTDIR/lib/
         fi
         do_makeinstall
