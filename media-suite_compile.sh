@@ -1708,6 +1708,9 @@ if [[ ! $x265 = "n" ]]; then
         if [[ $bits = "32bit" ]]; then
             xpsupport="-DWINXP_SUPPORT=ON"
             assembly="-DENABLE_ASSEMBLY=OFF"
+        else
+            xpsupport="-DWINXP_SUPPORT=OFF"
+            assembly="-DENABLE_ASSEMBLY=ON"
         fi
 
         do_x265_cmake() {
