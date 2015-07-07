@@ -691,7 +691,8 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" mingw-libgnurx-2.5.1.tar.gz
+        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
+            mingw-libgnurx-2.5.1.tar.gz
         if [[ -f "libgnurx.a" ]]; then
             make distclean
         fi
@@ -1569,7 +1570,8 @@ if do_checkForOptions "--enable-libcdio"; then
         fi
         if [[ -d $LOCALDESTDIR/include/cdio ]]; then
             rm -rf $LOCALDESTDIR/include/cdio
-            rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
+            rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
             rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
         fi
         do_generic_confmakeinstall audio --disable-example-progs --disable-cpp-progs --enable-silent-rules
@@ -1614,9 +1616,12 @@ if [[ ! $x264 = "n" ]]; then
             do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}
-                rm -f $LOCALDESTDIR/lib/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.pc
+                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
+                rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
+                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+                rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
                 rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
 
@@ -1822,19 +1827,24 @@ if [[ $ffmpeg != "n" ]]; then
             --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags=-static-libgcc
 
             sed -i -e "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" \
-                   -e "s|--extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags=-static-libgcc||g" config.h
+                   -e "s|--extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' ||g" \
+                   -e "s|--extra-ldflags=-static-libgcc||g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
-            [ $ffmpeg = b ] && [ -f build_successful${bits} ] && mv build_successful${bits} build_successful${bits}_shared
+            [ $ffmpeg = b ] && [ -f build_successful${bits} ] &&
+                mv build_successful${bits} build_successful${bits}_shared
         fi
 
         # static
         if [[ $ffmpeg != "s" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}
-                rm -f $LOCALDESTDIR/lib/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.pc
+                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
+                rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
+                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+                rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+                rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
                 rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
             [ -f config.mak ] && make distclean
@@ -1911,8 +1921,8 @@ if [[ $mplayer = "y" ]]; then
         ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
         --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' \
-        --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection --enable-ass-internal \
-        --enable-bluray --disable-gif --enable-freetype --disable-cddb $faac
+        --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
+        --enable-ass-internal --enable-bluray --disable-gif --enable-freetype --disable-cddb $faac
         do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
     fi
@@ -2162,7 +2172,8 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-all
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | \
+        xargs -r strip --strip-all
     find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
     printf "done!\n"
 fi
