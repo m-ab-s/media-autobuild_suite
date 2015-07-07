@@ -2171,8 +2171,8 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs strip --strip-all
-    find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs strip --strip-unneeded
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-all
+    find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
     printf "done!\n"
 fi
 
@@ -2190,7 +2190,7 @@ if [[ $packing = "y" ]]; then
     echo "Packing binaries and shared libs... "
     packcmd="$LOCALBUILDDIR/upx391w/upx.exe -9 -qq"
     [[ $stripping = "y" ]] && packcmd="$packcmd --strip-relocs=0"
-    find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs $packcmd
+    find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs -r $packcmd
 fi
 
 echo
