@@ -13,7 +13,8 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-fontconfig --enable-libfribidi \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
-[[ ! -f "$LOCALBUILDDIR/last_run" ]] && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
+[[ ! -f "$LOCALBUILDDIR/last_run" ]] \
+    && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
 
 while true; do
   case $1 in
@@ -1718,19 +1719,14 @@ if [[ ! $x265 = "n" ]]; then
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
-            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=OFF "$@"
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON "$@"
         }
         mkdir -p {8,10,12}bit
 
         cd 12bit
-        if [[ $x265 = "s" ]]; then
-            # libx265_main12.dll
-            do_x265_cmake $assembly -DMAIN12=ON -DENABLE_SHARED=ON -DEXPORT_C_API=ON
-            make -j $cpuCount
-            cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main12.dll
-        else
+        if [[ $x265 != "s" ]]; then
             # multilib
-            do_x265_cmake $assembly -DMAIN12=ON
+            do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
             make -j $cpuCount
             cp libx265.a ../8bit/libx265_main12.a
         fi
@@ -1738,12 +1734,12 @@ if [[ ! $x265 = "n" ]]; then
         cd ../10bit
         if [[ $x265 = "s" ]]; then
             # libx265_main10.dll
-            do_x265_cmake $assembly -DENABLE_SHARED=ON -DEXPORT_C_API=ON
+            do_x265_cmake $assembly -DENABLE_SHARED=ON
             make -j $cpuCount
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         else
             # multilib
-            do_x265_cmake $assembly
+            do_x265_cmake $assembly -DEXPORT_C_API=OFF
             make -j $cpuCount
             cp libx265.a ../8bit/libx265_main10.a
         fi
@@ -1751,11 +1747,12 @@ if [[ ! $x265 = "n" ]]; then
         cd ../8bit
         if [[ $x265 = "s" ]]; then
             # 8-bit static x265.exe
-            do_x265_cmake -DENABLE_CLI=ON -DEXPORT_C_API=ON -DHIGH_BIT_DEPTH=OFF
+            do_x265_cmake -DENABLE_CLI=ON -DHIGH_BIT_DEPTH=OFF
         else
             # multilib
             [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
-            do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli -DHIGH_BIT_DEPTH=OFF
+            do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
+                -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
             cp libx265_main{10,12}.a $LOCALDESTDIR/lib/
         fi
         do_makeinstall
@@ -1763,7 +1760,7 @@ if [[ ! $x265 = "n" ]]; then
 
         do_checkIfExist x265-hg libx265.a
         buildFFmpeg="true"
-        unset cli
+        unset xpsupport assembly cli
     fi
     builtx265="--enable-libx265"
 fi
@@ -2174,7 +2171,8 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs strip --strip-all
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs strip --strip-all
+    find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs strip --strip-unneeded
     printf "done!\n"
 fi
 
