@@ -781,7 +781,7 @@ if do_checkForOptions "--enable-libilbc"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" || \
+if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" ||
     [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
@@ -797,7 +797,7 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] || \
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] ||
     [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
@@ -1156,7 +1156,7 @@ fi
 if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
         if [ -d $LOCALDESTDIR/include/vpx ]; then
             rm -rf $LOCALDESTDIR/include/vpx
             rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
@@ -1614,22 +1614,15 @@ fi
 if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/x264.git" x264 noDepth
-
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" ]] || [[ $x264 = "y" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
         if [[ $x264 = "y" ]]; then
             cd $LOCALBUILDDIR
             do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
-                rm -rf $LOCALDESTDIR/include/libpostproc
-                rm -rf $LOCALDESTDIR/include/libsw{scale,resample}
-                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
-                rm -f $LOCALDESTDIR/lib/libsw{scale,resample}.a
-                rm -f $LOCALDESTDIR/lib/libpostproc.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libsw{scale,resample}.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libpostproc.pc
+                rm -rf $LOCALDESTDIR/include/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}
+                rm -f $LOCALDESTDIR/lib/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.a
+                rm -f $LOCALDESTDIR/lib/pkgconfig/{libav{codec,device,filter,format,util,resample},libsw{scale,resample},libpostproc}.pc
                 rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
 
@@ -1699,7 +1692,7 @@ fi
 if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_hg "https://bitbucket.org/multicoreware/x265" x265
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" ]] || [[ $x265 != "l" && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
         cd build/msys
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
@@ -1812,8 +1805,12 @@ fi
 
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
 
+    if [[ $ffmpeg != "s" ]]; then
+        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
+    else
+        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpegSHARED/ffmpeg.exe
+    fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
 
@@ -1903,7 +1900,7 @@ if [[ $mplayer = "y" ]]; then
         if ! test -e ffmpeg ; then
             if [ ! $ffmpeg = "n" ]; then
                 git clone --depth 1 $LOCALBUILDDIR/ffmpeg-git ffmpeg
-            elif ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg ; then
+            elif ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."

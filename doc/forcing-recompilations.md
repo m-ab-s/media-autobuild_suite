@@ -82,7 +82,8 @@ wx-config
 ```
 f265cli
 ffmbc
-ffmpeg
+ffmpeg (for static and both)
+ffmpegSHARED/ffmpeg (for shared only)
 kvazaar
 mediainfo
 mkvtoolnix/bin/mkvmerge
@@ -90,4 +91,7 @@ MP4Box
 mplayer
 mpv
 rtmpdump
+x264
+x265
+vpxenc
 ```
