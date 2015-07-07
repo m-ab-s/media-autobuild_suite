@@ -664,7 +664,7 @@ fi
 
 if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
-    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow master bin-video/rtmpdump.exe
+    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow master lib/pkgconfig/librtmp.pc
     if [[ $compile = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
             rm -rf $LOCALDESTDIR/include/librtmp
@@ -675,15 +675,9 @@ if do_checkForOptions "--enable-librtmp"; then
             make clean
         fi
 
-        make XCFLAGS=$MINGW_PREFIX/include LDFLAGS="$LDFLAGS" prefix=$LOCALDESTDIR \
-        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video CRYPTO=GNUTLS SHARED= \
-        SYS=mingw install LIBS="$LIBS -liconv -lrtmp -lgnutls -lhogweed -lnettle -lgmp -liconv \
-        -ltasn1 -lws2_32 -lwinmm -lgdi32 -lcrypt32 -lintl -lz -liconv" LIB_GNUTLS="-lgnutls \
-        -lhogweed -lnettle -lgmp -liconv -ltasn1" LIBS_mingw="-lws2_32 -lwinmm -lgdi32 -lcrypt32 \
-        -lintl"
-
-        sed -i 's/Libs:.*/Libs: -L${libdir} -lrtmp -lwinmm -lz -lgmp -lintl/' \
-        $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
+        SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --libs gnutls)" prefix=$LOCALDESTDIR \
+        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video install
 
         do_checkIfExist librtmp-git librtmp.a
     fi

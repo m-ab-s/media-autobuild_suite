@@ -24,6 +24,7 @@ libgme (game music emu)
 libilbc
 libmfx (intel quick sync hw accelerator)
 libopenjpeg1 (openjpeg)
+librtmp
 libutvideo
 luajit
 nettle
@@ -90,7 +91,6 @@ mkvtoolnix/bin/mkvmerge
 MP4Box
 mplayer
 mpv
-rtmpdump
 x264
 x265
 vpxenc
