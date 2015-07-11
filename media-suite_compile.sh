@@ -935,7 +935,7 @@ fi
     fi
 # fi
 
-if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
+if [[ $nonfree = "y" ]] && [[ $mplayer = "y" || $ffmbc = "y" ]] || do_checkForOptions "--enable-libfaac"; then
     if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
