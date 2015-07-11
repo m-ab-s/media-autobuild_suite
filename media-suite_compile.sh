@@ -906,7 +906,7 @@ if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
-if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
+# if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
@@ -933,7 +933,7 @@ if do_checkForOptions "--enable-libfdk-aac" && [[ $nonfree = "y" ]]; then
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
         do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     fi
-fi
+# fi
 
 if [[ $mplayer = "y" ]] || [[ $ffmbc = "y" ]] && [[ $nonfree = "y" ]]; then
     if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
