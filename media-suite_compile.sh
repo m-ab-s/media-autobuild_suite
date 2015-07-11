@@ -959,6 +959,30 @@ if [[ $nonfree = "y" ]] && [[ $mplayer = "y" || $ffmbc = "y" ]] || do_checkForOp
     fi
 fi
 
+if do_checkForOptions "--enable-libvorbis"; then
+    if oggenc.exe --version | grep -q "vorbis-tools 1.4.0"; then
+        echo -------------------------------------------------
+        echo "vorbis-tools-1.4.0 is already compiled"
+        echo -------------------------------------------------
+    else
+        cd $LOCALBUILDDIR
+        echo -ne "\033]0;compile vorbis-tools $bits\007"
+
+        do_wget "http://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.0.tar.gz"
+
+        if [[ -f "oggenc/oggenc.exe" ]]; then
+            make distclean
+        fi
+        if [[ -d "$LOCALDESTDIR/bin-audio/oggenc.exe" ]]; then
+            rm -r $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
+        fi
+        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo --disable-flac --disable-speex
+        make -j $cpuCount
+        [[ -f oggenc/oggenc.exe ]] && cp -f oggenc/oggenc.exe oggdec/oggdec.exe $LOCALDESTDIR/bin-audio/
+        do_checkIfExist vorbis-tools-1.4.0 bin-audio/oggenc.exe
+    fi
+fi
+
 if do_checkForOptions "--enable-libopus"; then
     if opusenc.exe --version | grep -q -e "opus-tools 0.1.9"; then
         echo -------------------------------------------------
