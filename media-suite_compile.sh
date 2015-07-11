@@ -835,10 +835,10 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     fi
     if [[ -d "$LOCALDESTDIR/include/speex" ]]; then
         rm -rf $LOCALDESTDIR/include/speex $LOCALDESTDIR/bin-audio/speex{enc,dec}.exe
-        rm -rf $LOCALDESTDIR/lib/libspeex{,dsp}.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex{,dsp}.pc
+        rm -rf $LOCALDESTDIR/lib/libspeex.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex.pc
     fi
-
-    do_generic_confmakeinstall audio --disable-oggtest
+    do_patch speex-mingw-winmm.patch
+    do_generic_confmakeinstall audio --enable-vorbis-psy --enable-binaries
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
