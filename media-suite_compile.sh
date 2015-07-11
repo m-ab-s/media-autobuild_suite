@@ -1862,7 +1862,8 @@ if [[ $ffmpeg != "n" ]]; then
     fi
 fi
 
-if [[ $bits = "64bit" && $other265 = "y" ]] && [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
+if [[ $bits = "64bit" && $other265 = "y" ]]; then
+if [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
     cd $LOCALBUILDDIR
     do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
     rm -rf f265 && mv f265_development_snapshot f265 && cd f265
@@ -1877,6 +1878,7 @@ else
     echo -------------------------------------------------
     echo "f265 is already compiled"
     echo -------------------------------------------------
+fi
 fi
 
 if [[ $mplayer = "y" ]]; then
