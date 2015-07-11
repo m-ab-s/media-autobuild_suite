@@ -1745,10 +1745,20 @@ if [[ ! $x265 = "n" ]]; then
             [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
             do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
                 -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-            cp libx265_main{10,12}.a $LOCALDESTDIR/lib/
+            # cp libx265_main{10,12}.a $LOCALDESTDIR/lib/
         fi
         do_makeinstall
-        [[ $x265 != "s" ]] && sed -i "s/Libs: .*$/& -lx265_main10 -lx265_main12/" $LOCALDESTDIR/lib/pkgconfig/x265.pc
+        if [[ $x265 != "s" ]]; then
+            # sed -i "s/Libs: .*$/& -lx265_main10 -lx265_main12/" $LOCALDESTDIR/lib/pkgconfig/x265.pc
+           ar -M <<EOF
+CREATE libx265.a
+ADDLIB libx265_main.a
+ADDLIB libx265_main10.a
+ADDLIB libx265_main12.a
+SAVE
+END
+EOF
+        fi
 
         do_checkIfExist x265-hg libx265.a
         buildFFmpeg="true"
