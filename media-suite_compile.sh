@@ -332,6 +332,16 @@ do_getFFmpegConfig() {
         do_addOption "--enable-libbluray"
     fi
 
+    # prefer openssl if in options
+    if do_checkForOptions "--enable-openssl" && [[ $nonfree = "y" ]]; then
+        do_removeOption "--enable-gnutls"
+    elif do_checkForOptions "--enable-openssl"; then
+        do_removeOption "--enable-openssl"
+        do_addOption "--enable-gnutls"
+    fi
+}
+
+do_changeFFmpegConfig() {
     # add options for static modplug
     if do_checkForOptions "--enable-libmodplug"; then
         do_addOption "--extra-cflags=-DMODPLUG_STATIC"
@@ -352,13 +362,6 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-libfdk-aac"
         do_removeOption "--enable-nvenc"
         do_removeOption "--enable-libfaac"
-        do_checkForOptions "--enable-openssl" && do_removeOption "--enable-openssl" && \
-            do_addOption "--enable-gnutls"
-    fi
-
-    # prefer openssl if in options
-    if do_checkForOptions "--enable-openssl"; then
-        do_removeOption "--enable-gnutls"
     fi
 
     # remove libs that don't work with shared
@@ -906,7 +909,7 @@ if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0
     do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
 fi
 
-# if do_checkForOptions "--enable-libfdk-aac"; then
+if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
@@ -933,7 +936,7 @@ fi
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
         do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     fi
-# fi
+fi
 
 if [[ $nonfree = "y" ]] && [[ $mplayer = "y" || $ffmbc = "y" ]] || do_checkForOptions "--enable-libfaac"; then
     if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
@@ -1814,7 +1817,7 @@ fi
 
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
-
+    do_changeFFmpegConfig
     if [[ $ffmpeg != "s" ]]; then
         do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
     else
