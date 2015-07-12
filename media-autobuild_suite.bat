@@ -41,7 +41,7 @@ gettext glew gmp gsm  headers-git jasper lame lcms2 libcddb libcdio libgpg-error
 libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git winstorecompat-git xvidcore yasm
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
---enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame^
+--enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid ^
