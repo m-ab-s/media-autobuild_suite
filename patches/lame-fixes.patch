@@ -1,0 +1,19 @@
+--- lame-3.99.5/configure.in.orig	2015-07-12 14:13:22.681416400 +0100
++++ lame-3.99.5/configure.in	2015-07-12 14:13:41.060911500 +0100
+@@ -96,7 +96,6 @@
+ 		 sys/soundcard.h \
+ 		 sys/time.h \
+ 		 unistd.h \
+-		 xmmintrin.h \
+ 		 linux/soundcard.h)
+ 
+ dnl Checks for typedefs, structures, and compiler characteristics.
+@@ -393,7 +392,7 @@
+ 
+ dnl configure use of features
+ 
+-AM_PATH_GTK(1.2.0, HAVE_GTK="yes", HAVE_GTK="no")
++AC_SUBST(GTK_CFLAGS,[])
+ 
+ dnl ElectricFence malloc debugging
+ AC_MSG_CHECKING(use of ElectricFence malloc debugging)

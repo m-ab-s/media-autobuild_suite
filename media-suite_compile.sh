@@ -1030,6 +1030,10 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         do_wget "http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz"
+        if grep "xmmintrin\.h" configure.in; then
+            do_patch lame-fixes.patch
+            autoreconf -fi
+        fi
         if [[ -f libmp3lame/.libs/libmp3lame.a ]]; then
             make distclean
         fi
