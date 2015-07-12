@@ -1029,6 +1029,7 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
+        echo -ne "\033]0;compiling lame $bits\007"
         do_wget "http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz"
         if grep "xmmintrin\.h" configure.in; then
             do_patch lame-fixes.patch
@@ -1802,7 +1803,8 @@ if [[ ! $x265 = "n" ]]; then
         do_makeinstall
         if [[ $x265 != "s" ]]; then
             # sed -i "s/Libs: .*$/& -lx265_main10 -lx265_main12/" $LOCALDESTDIR/lib/pkgconfig/x265.pc
-           ar -M <<EOF
+            mv libx265.a libx265_main.a
+            ar -M <<EOF
 CREATE libx265.a
 ADDLIB libx265_main.a
 ADDLIB libx265_main10.a
@@ -1810,6 +1812,7 @@ ADDLIB libx265_main12.a
 SAVE
 END
 EOF
+            cp libx265.a $LOCALDESTDIR/lib/libx265.a
         fi
 
         do_checkIfExist x265-hg libx265.a
