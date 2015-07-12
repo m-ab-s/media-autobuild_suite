@@ -325,12 +325,14 @@ do_getFFmpegConfig() {
         do_addOption "--enable-libvorbis"
         do_addOption "--enable-libxavs"
         do_addOption "--enable-libmp3lame"
+        do_addOption "--enable-libfaac"
     fi
 
     # add options for mplayer
     if [[ $mplayer = "y" ]]; then
         do_addOption "--enable-libfreetype"
         do_addOption "--enable-libbluray"
+        do_addOption "--enable-libfaac"
     fi
 
     # prefer openssl if in options
@@ -939,24 +941,24 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     fi
 fi
 
-if [[ $nonfree = "y" ]] && [[ $mplayer = "y" || $ffmbc = "y" ]] || do_checkForOptions "--enable-libfaac"; then
+if do_checkForOptions "--enable-libfaac"; then
     if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
+    else
+        cd $LOCALBUILDDIR
+        echo -ne "\033]0;compile faac $bits\007"
+
+        do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
+
+        if [[ -f configure ]]; then
+            make distclean
         else
-            cd $LOCALBUILDDIR
-            echo -ne "\033]0;compile faac $bits\007"
-
-            do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
-
-            if [[ -f configure ]]; then
-                make distclean
-            else            
-                sh bootstrap
-            fi
-            do_generic_confmakeinstall audio --without-mp4v2
-            do_checkIfExist faac-1.28 libfaac.a
+            sh bootstrap
+        fi
+        do_generic_confmakeinstall audio --without-mp4v2
+        do_checkIfExist faac-1.28 libfaac.a
     fi
 fi
 
