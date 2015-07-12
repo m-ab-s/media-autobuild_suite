@@ -1022,26 +1022,6 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
-if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
-    if $LOCALDESTDIR/bin-audio/lame.exe 2>&1 | grep -q "version 3.99.5"; then
-        echo -------------------------------------------------
-        echo "lame 3.99.5 is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        do_wget "http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz"
-        if [[ -f libmp3lame/.libs/libmp3lame.a ]]; then
-            make distclean
-        fi
-        if [[ -f $LOCALDESTDIR/include/lame/lame.h ]]; then
-            rm -rf $LOCALDESTDIR/include/lame
-            rm -f $LOCALDESTDIR/lib/libmp3lame.{l,}a $LOCALDESTDIR/bin-audio/lame.exe
-        fi
-        do_generic_confmakeinstall audio --disable-decoder
-        do_checkIfExist lame-3.99.5 libmp3lame.a
-    fi
-fi
-
 if do_checkForOptions "--enable-libgme"; then
     cd $LOCALBUILDDIR
     do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
