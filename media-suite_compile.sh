@@ -324,7 +324,6 @@ do_getFFmpegConfig() {
         do_addOption "--enable-libtheora"
         do_addOption "--enable-libvorbis"
         do_addOption "--enable-libxavs"
-        do_addOption "--enable-libmp3lame"
     fi
 
     # add options for mplayer
