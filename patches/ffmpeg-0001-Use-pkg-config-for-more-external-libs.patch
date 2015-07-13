@@ -1,4 +1,4 @@
-From cf676d7722adf8d6a820154e6d0d185812dca52e Mon Sep 17 00:00:00 2001
+From 56d5fdcbad71945bfe69978afc8290c212c7bd48 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Tue, 23 Jun 2015 16:14:50 +0100
 Subject: [PATCH] Use pkg-config for more external libs
@@ -8,10 +8,10 @@ Subject: [PATCH] Use pkg-config for more external libs
  1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/configure b/configure
-index 0620936..c8824da 100755
+index 88ee936..71cab0a 100755
 --- a/configure
 +++ b/configure
-@@ -5110,7 +5110,9 @@ enabled fontconfig        && enable libfontconfig
+@@ -5147,7 +5147,9 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_libfreetype
  enabled libfribidi        && require_pkg_config fribidi fribidi.h fribidi_version_info
@@ -22,7 +22,7 @@ index 0620936..c8824da 100755
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
                                     check_lib "${gsm_hdr}" gsm_create -lgsm && break;
                                 done || die "ERROR: libgsm not found"; }
-@@ -5119,8 +5121,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
+@@ -5156,8 +5158,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
  enabled libmodplug        && require_pkg_config libmodplug libmodplug/modplug.h ModPlug_Load
  enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
  enabled libnut            && require libnut libnut.h nut_demuxer_init -lnut
@@ -33,7 +33,7 @@ index 0620936..c8824da 100755
  enabled libopencv         && require_pkg_config opencv opencv/cxcore.h cvCreateImageHeader
  enabled libopenh264       && require_pkg_config openh264 wels/codec_api.h WelsGetCodecVersion
  enabled libopenjpeg       && { check_lib openjpeg.h opj_version -lopenmj2 -DOPJ_STATIC ||
-@@ -5142,8 +5144,8 @@ enabled libspeex          && require_pkg_config speex speex/speex.h speex_decode
+@@ -5179,8 +5181,8 @@ enabled libspeex          && require_pkg_config speex speex/speex.h speex_decode
  enabled libstagefright_h264 && require_cpp libstagefright_h264 "binder/ProcessState.h media/stagefright/MetaData.h
      media/stagefright/MediaBufferGroup.h media/stagefright/MediaDebug.h media/stagefright/MediaDefs.h
      media/stagefright/OMXClient.h media/stagefright/OMXCodec.h" android::OMXClient -lstagefright -lmedia -lutils -lbinder -lgnustl_static
@@ -44,7 +44,7 @@ index 0620936..c8824da 100755
                               { check_lib twolame.h twolame_encode_buffer_float32_interleaved -ltwolame ||
                                 die "ERROR: libtwolame must be installed and version must be >= 0.3.10"; }
  enabled libutvideo        && require_cpp utvideo "stdint.h stdlib.h utvideo/utvideo.h utvideo/Codec.h" 'CCodec*' -lutvideo -lstdc++
-@@ -5151,7 +5153,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
+@@ -5188,7 +5190,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
  enabled libvidstab        && require_pkg_config "vidstab >= 0.98" vid.stab/libvidstab.h vsMotionDetectInit
  enabled libvo_aacenc      && require libvo_aacenc vo-aacenc/voAAC.h voGetAACEncAPI -lvo-aacenc
  enabled libvo_amrwbenc    && require libvo_amrwbenc vo-amrwbenc/enc_if.h E_IF_init -lvo-amrwbenc
@@ -54,5 +54,5 @@ index 0620936..c8824da 100755
  enabled libvpx            && {
      enabled libvpx_vp8_decoder && {
 -- 
-1.9.5.msysgit.0
+2.4.5
 
