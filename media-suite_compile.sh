@@ -84,8 +84,9 @@ else
         local unshallow="--unshallow"
     fi
     git remote set-url origin "$gitURL"
+    git reset --quiet --hard @{u}
     oldHead=$(git rev-parse HEAD)
-    git reset --quiet --hard
+    [[ $(git rev-parse --abbrev-ref HEAD) != "$gitBranch" ]] && git checkout "$gitBranch"
     git pull --no-edit $unshallow origin "$gitBranch"
     newHead=$(git rev-parse HEAD)
 
