@@ -2075,10 +2075,13 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
         $python bootstrap.py
+
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
-        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
+        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
+            mpv_pthreads="--enable-win32-internal-pthreads"
+
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit
+        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit $mpv_pthreads
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
@@ -2089,13 +2092,12 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
             do_wget "http://srsfckn.biz/noto-mpv.7z"
         fi
-
         if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
             cp -R noto-mpv $LOCALDESTDIR/bin-video/fonts
         fi
-
+        unset mpv_ldflags mpv_pthreads
         do_checkIfExist mpv-git bin-video/mpv.exe
     fi
 fi
