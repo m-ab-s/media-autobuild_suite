@@ -53,11 +53,11 @@ local gitFolder="$2"
 local gitDepth="$3"
 local gitBranch="$4"
 local gitCheck="$5"
+local unshallow=""
 compile="true"
 
 if [[ $gitDepth = "noDepth" ]]; then
     gitDepth=""
-
 elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
     gitDepth="--depth 1"
 fi
@@ -80,10 +80,9 @@ if [ ! -d "$gitFolder"-git ]; then
     fi
 else
     cd "$gitFolder"-git
-    if [[ $gitDepth = "" && -f .git/shallow ]]; then
-        local unshallow="--unshallow"
-    fi
-    git remote set-url origin "$gitURL"
+    [[ "$gitDepth" = "" && -f .git/shallow ]] && unshallow="--unshallow"
+    [[ $(git remote -v | grep origin | head -1 | awk '{print $2}') != "$gitURL" ]] &&
+        git remote set-url origin "$gitURL"
     git reset --quiet --hard @{u}
     oldHead=$(git rev-parse HEAD)
     [[ $(git rev-parse --abbrev-ref HEAD) != "$gitBranch" ]] && git checkout "$gitBranch"
