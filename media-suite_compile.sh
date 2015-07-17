@@ -10,7 +10,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
---enable-fontconfig --enable-libfribidi \
+--enable-fontconfig --enable-libfribidi  --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
@@ -1203,7 +1203,7 @@ if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; the
     do_checkIfExist libtheora-1.1.1 libtheora.a
 fi
 
-if [[ ! $vpx = "n" ]]; then
+if [[ ! $vpx = "n" ]] || [[ $ffmbc = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
@@ -1226,7 +1226,6 @@ if [[ ! $vpx = "n" ]]; then
             sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
         fi
         do_makeinstall
-        extracommands=""
 
         if [[ $vpx = "y" ]]; then
             mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video
@@ -1236,8 +1235,10 @@ if [[ ! $vpx = "n" ]]; then
 
         do_checkIfExist vpx-git libvpx.a
         buildFFmpeg="true"
+        unset extracommands
     fi
-    builtvpx="--enable-libvpx"
+else
+    pkg-config --exists vpx || do_removeOption "--enable-libvpx"
 fi
 
 if [[ $other265 = "y" ]]; then
@@ -1662,7 +1663,7 @@ if [[ $mp4box = "y" ]]; then
     fi
 fi
 
-if [[ ! $x264 = "n" ]]; then
+if [[ ! $x264 = "n" ]] || [[ $ffmbc = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/x264.git" x264 noDepth
     if [[ $compile = "true" ]] || [[ $x264 = "y" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
@@ -1740,7 +1741,8 @@ if [[ ! $x264 = "n" ]]; then
         do_checkIfExist x264-git libx264.a
         buildFFmpeg="true"
     fi
-    builtx264="--enable-libx264"
+else
+    pkg-config --exists x264 ||  do_removeOption "--enable-libx264"
 fi
 
 if [[ ! $x265 = "n" ]]; then
@@ -1821,7 +1823,8 @@ EOF
         buildFFmpeg="true"
         unset xpsupport assembly cli
     fi
-    builtx265="--enable-libx265"
+else
+    pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
 
 if [[ $ffmbc = "y" ]]; then
@@ -1857,7 +1860,7 @@ if [[ $ffmbc = "y" ]]; then
             --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib \
             --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass \
             --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora \
-            --enable-libvorbis $builtvpx --enable-libxavs $builtx264 --enable-libxvid $extras \
+            --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras \
             --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
 
             make SRC_DIR=. -j $cpuCount
@@ -1890,7 +1893,6 @@ if [[ $ffmpeg != "n" ]]; then
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
             --disable-static --enable-shared \
             $FFMPEG_OPTS_SHARED \
-            $builtvpx $builtx264 $builtx265 \
             --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags=-static-libgcc
 
             sed -i -e "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" \
@@ -1918,7 +1920,6 @@ if [[ $ffmpeg != "n" ]]; then
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --enable-static --disable-shared \
             $FFMPEG_OPTS \
-            $builtvpx $builtx264 $builtx265 \
             --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'
             sed -i -e "s| --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video||g" \
                    -e "s| --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'||g" config.h
