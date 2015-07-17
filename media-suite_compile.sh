@@ -40,6 +40,7 @@ while true; do
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
+--xpcomp=* ) xpcomp="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1755,13 +1756,8 @@ if [[ ! $x265 = "n" ]]; then
         rm -f $LOCALDESTDIR/lib/libx265{,_main10,_main12}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
         rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
 
-        if [[ $bits = "32bit" ]]; then
-            xpsupport="-DWINXP_SUPPORT=ON"
-            assembly="-DENABLE_ASSEMBLY=OFF"
-        else
-            xpsupport="-DWINXP_SUPPORT=OFF"
-            assembly="-DENABLE_ASSEMBLY=ON"
-        fi
+        [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF" || assembly="-DENABLE_ASSEMBLY=ON"
+        [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
 
         do_x265_cmake() {
             cmake ../../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \

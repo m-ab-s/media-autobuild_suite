@@ -336,10 +336,12 @@ if %x265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build x265 [H.265 encoder]?
-    echo. 1 = Static x265.exe and library with Main and Main10 included
-    echo. 2 = Static library only
+    echo. 1 = Static x265.exe and library with Main, Main10 and Main12 included
+    echo. 2 = Static library only with Main, Main10 and Main12 included
     echo. 3 = No
     echo. 4 = Static x265.exe [Main] and libx265_main10.dll
+    echo. 5 = Same as 1 with XP compatibility
+    echo. 6 = Same as 2 with XP compatibility
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -361,7 +363,15 @@ if %buildx265%==3 (
 if %buildx265%==4 (
     set "x265=s"
     )
-if %buildx265% GTR 4 GOTO x265
+if %buildx265%==5 (
+    set "x265=y"
+    set "xpcomp=y"
+    )
+if %buildx265%==6 (
+    set "x265=l"
+    set "xpcomp=y"
+    )
+if %buildx265% GTR 6 GOTO x265
 if %writex265%==yes echo.x265=^%buildx265%>>%ini%
 
 :other265
@@ -1391,6 +1401,6 @@ start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile%
+--mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
 
 exit
