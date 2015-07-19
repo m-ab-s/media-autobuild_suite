@@ -1362,13 +1362,14 @@ if do_checkForOptions "--enable-libxavs"; then
         echo -------------------------------------------------
     else
         echo -ne "\033]0;compile xavs $bits\007"
-
-        if [[ ! -d xavs ]]; then
-            svn checkout --trust-server-cert --non-interactive https://svn.code.sf.net/p/xavs/code/trunk/ xavs
+        if [[ ! -d xavs ]] || [[ -d xavs ]] &&
+        { [[ $build32 = "yes" && ! -f xavs/build_successful32bit ]] ||
+          [[ $build64 = "yes" && ! -f xavs/build_successful64bit ]]; }; then
+            rm -f distrotech-xavs.zip
+            do_wget https://github.com/Distrotech/xavs/archive/distrotech-xavs.zip
+            mv xavs-distrotech-xavs xavs
         fi
-
         cd xavs
-
         if [[ -f "libxavs.a" ]]; then
             make distclean
         fi
