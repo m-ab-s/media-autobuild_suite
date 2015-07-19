@@ -1986,9 +1986,9 @@ if [[ $mplayer = "y" ]]; then
 
         ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
-        --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' \
+        --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
         --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
-        --enable-ass-internal --enable-bluray --disable-gif --enable-freetype --disable-cddb $faac
+        --enable-ass-internal --enable-bluray --enable-dvdread --disable-gif --enable-freetype --disable-cddb $faac
         do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
     fi
