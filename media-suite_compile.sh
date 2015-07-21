@@ -2079,7 +2079,8 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             mpv_pthreads="--enable-win32-internal-pthreads"
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit $mpv_pthreads
+        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit $mpv_pthreads \
+        --disable-libguess
 
         sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
 
