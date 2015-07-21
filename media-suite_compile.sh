@@ -509,7 +509,7 @@ if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5
     do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
 fi
 
-if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" && \
+if do_checkForOptions "--enable-libfreetype --enable-libass" && \
     do_pkgConfig "freetype2 = 17.4.11"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
@@ -525,7 +525,7 @@ if do_checkForOptions "--enable-libfreetype --enable-libbluray --enable-libass" 
     do_checkIfExist freetype-2.5.5 libfreetype.a
 fi
 
-if do_checkForOptions "--enable-fontconfig --enable-libbluray --enable-libass" && \
+if do_checkForOptions "--enable-fontconfig --enable-libass" && \
     do_pkgConfig "fontconfig = 2.11.92"; then
     cd $LOCALBUILDDIR
     do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
@@ -1317,7 +1317,7 @@ if do_checkForOptions "--enable-libbluray"; then
             make distclean
         fi
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
-        --disable-doxygen-dot --without-libxml2
+        --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype
         do_checkIfExist libbluray-git libbluray.a
     fi
 fi
