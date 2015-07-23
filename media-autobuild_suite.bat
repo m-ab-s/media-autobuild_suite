@@ -816,7 +816,7 @@ if %writePack%==yes echo.pack=^%packF%>>%ini%
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-if exist "%instdir%\%msys2%" GOTO getMintty
+if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
     echo -------------------------------------------------------------
     echo.
     echo - Download wget
