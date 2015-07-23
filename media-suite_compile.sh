@@ -707,7 +707,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-        do_wget "http://downloads.sourceforge.net/project/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
+        do_wget "http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz/download" \
             mingw-libgnurx-2.5.1.tar.gz
         if [[ -f "libgnurx.a" ]]; then
             make distclean
@@ -722,14 +722,14 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
         do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
     fi
 
-    if $LOCALDESTDIR/bin-global/file --version | grep -q -e "file.exe-5.23"; then
+    if $LOCALDESTDIR/bin-global/file --version | grep -q -e "file.exe-5.24"; then
         echo -------------------------------------------------
-        echo "file-5.23[libmagic] is already compiled"
+        echo "file-5.24[libmagic] is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
-        do_wget "ftp://ftp.astron.com/pub/file/file-5.23.tar.gz"
+        do_wget "https://fossies.org/linux/misc/file-5.24.tar.gz"
         if [[ -f "src/.libs/libmagic.a" ]]; then
             make distclean
         fi
@@ -739,7 +739,7 @@ if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
         fi
         do_patch "file-1-fixes.patch"
         do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
-        do_checkIfExist file-5.22 libmagic.a
+        do_checkIfExist file-5.24 libmagic.a
     fi
 fi
 
@@ -877,7 +877,7 @@ fi
 
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
-    do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
+    do_wget "http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download" vo-aacenc-0.1.3.tar.gz
 
     if [[ -f ".libs/libvo-aacenc.a" ]]; then
         make distclean
@@ -960,7 +960,7 @@ if do_checkForOptions "--enable-libfaac"; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile faac $bits\007"
 
-        do_wget "http://downloads.sourceforge.net/faac/faac-1.28.tar.gz"
+        do_wget "http://sourceforge.net/projects/faac/files/faac-src/faac-1.28/faac-1.28.tar.gz/download" faac-1.28.tar.gz
 
         if [[ -f configure ]]; then
             make distclean
@@ -1097,7 +1097,7 @@ fi
 
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
-    do_wget "http://downloads.sourceforge.net/project/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz"
+    do_wget "http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz/download" libbs2b-3.1.0.tar.gz
 
     if [[ -f "src/.libs/libbs2b.a" ]]; then
         make distclean
@@ -1165,7 +1165,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
         fi
-        do_generic_confmakeinstall LIBS="$LIBS -lole32 -lgdi32"
+        do_generic_confmakeinstall
         do_checkIfExist opusfile-0.6 libopusfile.a
     fi
 
@@ -1419,7 +1419,7 @@ if [ $mediainfo = "y" ]; then
 
             do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
         fi
-        cd mediainfo
+        cd mediainfo/mediainfo_AllInclusive
 
         sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
         cd ZenLib/Project/GNU/Library
@@ -1527,7 +1527,7 @@ fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
-    do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
+    do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download" zvbi-0.2.35.tar.bz2
 
     if [[ -f "src/.libs/libzvbi.a" ]]; then
         make distclean
