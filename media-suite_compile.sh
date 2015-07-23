@@ -15,6 +15,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
+printf "$(date +"%F %T %z")\n" >> newchangelog
 
 while true; do
   case $1 in
@@ -100,6 +101,10 @@ else
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$gitFolder]"
         fi
+        echo "$gitFolder" >> "$LOCALBUILDDIR"/newchangelog
+        git log --no-merges --pretty="%ci %h %s" \
+            --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
+        echo "" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$gitCheck" && $pcExists = 1 ]] ||
          [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
@@ -195,6 +200,10 @@ else
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$hgFolder]"
         fi
+        echo "$hgFolder" >> "$LOCALBUILDDIR"/newchangelog
+        hg log --template "{date|localdate|isodatesec} {node|short} {desc|firstline}\n" \
+            -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
+        echo "" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
          [[ -z "$hgCheck" && $pcExists = 1 ]] ||
          [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
@@ -2267,9 +2276,12 @@ echo
 echo "-------------------------------------------------------------------------------"
 echo
 echo "deleting status files..."
-find $LOCALBUILDDIR -maxdepth 2 -name recently_updated | xargs rm -f
-find $LOCALBUILDDIR -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
-[[ -f $LOCALBUILDDIR/last_run ]] && mv $LOCALBUILDDIR/last_run $LOCALBUILDDIR/last_successful_run
+cd $LOCALBUILDDIR
+find . -maxdepth 2 -name recently_updated | xargs rm -f
+find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
+[[ -f ./last_run ]] && mv ./last_run ./last_successful_run
+[[ -f ./CHANGELOG.txt ]] && cat ./CHANGELOG.txt >> ./newchangelog
+mv ./newchangelog ./CHANGELOG.txt
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
