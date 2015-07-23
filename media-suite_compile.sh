@@ -2082,8 +2082,6 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit $mpv_pthreads \
         --disable-libguess
 
-        sed -r -i "s/LIBPATH_lib(ass|av(|device|filter)) = \[.*local(32|64).*mingw(32|64).*\]/LIBPATH_lib\1 = ['\/local\3\/lib', '\/mingw\4\/lib']/g" ./build/c4che/_cache.py
-
         $python waf build -j $cpuCount
         $python waf install
 
