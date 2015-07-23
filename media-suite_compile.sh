@@ -2092,7 +2092,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
-            cp -R noto-mpv $LOCALDESTDIR/bin-video/fonts
+            cp -R fonts $LOCALDESTDIR/bin-video/fonts
         fi
         unset mpv_ldflags mpv_pthreads
         do_checkIfExist mpv-git bin-video/mpv.exe
