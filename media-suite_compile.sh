@@ -1399,10 +1399,11 @@ if [ $mediainfo = "y" ]; then
     cd $LOCALBUILDDIR
 
 	cd $LOCALBUILDDIR
-    do_git "https://github.com/MediaArea/ZenLib" ZenLib
-	cd Project/GNU/Library
-	
+    do_git "https://github.com/MediaArea/ZenLib" libzen
+		
     if [[ $compile = "true" ]]; then
+		cd Project/GNU/Library
+		
         if [[ ! -f "configure" ]]; then
             ./autogen.sh
         else
@@ -1426,10 +1427,11 @@ if [ $mediainfo = "y" ]; then
     fi
 	
 	cd $LOCALBUILDDIR
-	do_git "https://github.com/MediaArea/MediaInfoLib" MediaInfoLib
-	cd Project/GNU/Library
+	do_git "https://github.com/MediaArea/MediaInfoLib" libmediainfo
 
 	if [[ $compile = "true" ]]; then
+		cd Project/GNU/Library
+		
 		if [[ ! -f ".libs/libmediainfo.a" ]]; then
 			./autogen.sh
 		else
@@ -1438,7 +1440,7 @@ if [ $mediainfo = "y" ]; then
 
         if [[ -d $LOCALDESTDIR/include/MediaInfo ]]; then
             rm -rf $LOCALDESTDIR/include/MediaInfo $LOCALDESTDIR/include/MediaInfoDLL
-            rm -rf $LOCALDESTDIR/lib/libmediainfo.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
+            rm -rf $LOCALDESTDIR/lib/libmediainfo.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc $LOCALDESTDIR/bin-global/libmediainfo-config
         fi
 		
         ./configure --prefix=$LOCALDESTDIR --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
@@ -1458,9 +1460,10 @@ if [ $mediainfo = "y" ]; then
 	cd $LOCALBUILDDIR
 	
 	do_git "https://github.com/MediaArea/MediaInfo" MediaInfo
-	cd Project/GNU/CLI
 	
 	if [[ $compile = "true" ]]; then
+		cd Project/GNU/CLI
+		
 		if [[ ! -f "mediainfo.exe" ]]; then
 			./autogen.sh
 		else
