@@ -1424,7 +1424,7 @@ if [ $mediainfo = "y" ]; then
 		make install
 		
 		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libzen-config
-		sed -i "s/\/build\/libzen-git\/Project\/GNU/Library\/.libs\/libzen.a/\$LOCALDESTDIR\/lib\/libzen.a/g" $LOCALDESTDIR/bin-global/libzen-config
+		sed -i "s/\/build\/libzen-git\/Project\/GNU\/Library\/.libs/\$LOCALDESTDIR\/lib/g" $LOCALDESTDIR/bin-global/libzen-config
 		
         do_checkIfExist ZenLib-git libzen.a
     fi
@@ -1459,7 +1459,7 @@ if [ $mediainfo = "y" ]; then
 		
 		sed -i "s/-L\/build\/libmediainfo-git\/Project\/GNU\/Library -lmediainfo/-L\$LOCALDESTDIR\/lib -lmediainfo/g" $LOCALDESTDIR/bin-global/libmediainfo-config
 		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libmediainfo-config
-		sed -i "s/\/build\/libmediainfo-git\/Project\/GNU\/Library\/.libs\/libmediainfo.a/\$LOCALDESTDIR\/lib\/libmediainfo.a/g" $LOCALDESTDIR/bin-global/libmediainfo-config
+		sed -i "s/\/build\/libmediainfo-git\/Project\/GNU\/Library\/.libs/\$LOCALDESTDIR\/lib/g" $LOCALDESTDIR/bin-global/libmediainfo-config
 		
         do_checkIfExist MediaInfoLib-git libmediainfo.a
 	fi
