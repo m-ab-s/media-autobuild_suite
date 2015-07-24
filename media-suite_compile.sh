@@ -10,7 +10,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
---enable-fontconfig --enable-libfribidi  --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
+--enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
@@ -36,7 +36,6 @@ while true; do
 --ffmpegChoice=* ) ffmpegChoice="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --mpv=* ) mpv="${1#*=}"; shift ;;
---mkv=* ) mkv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --nonfree=* ) nonfree="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
@@ -699,7 +698,7 @@ if do_checkForOptions "--enable-librtmp"; then
     fi
 fi
 
-if [[ $mkv != "n" ]] || [[ $sox = "y" ]]; then
+if [[ $sox = "y" ]]; then
     if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
         echo -------------------------------------------------
         echo "libgnurx-2.5.1 is already compiled"
@@ -793,7 +792,7 @@ if do_checkForOptions "--enable-libilbc"; then
 fi
 
 if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" ||
-    [[ $flac = "y" ]] || [[ $mkv != "n" ]] && do_pkgConfig "ogg = 1.3.2"; then
+    [[ $flac = "y" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
 
@@ -809,7 +808,7 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
 fi
 
 if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] ||
-    [[ $mkv != "n" ]] && do_pkgConfig "vorbis = 1.3.5"; then
+    do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
 
@@ -859,7 +858,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
 fi
 
 if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
-    [[ $sox = "y" ]] || [[ $mkv != "n" ]] &&
+    [[ $sox = "y" ]] &&
     [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
@@ -1399,77 +1398,90 @@ fi
 if [ $mediainfo = "y" ]; then
     cd $LOCALBUILDDIR
 
-    if [ -f "$LOCALDESTDIR/bin-video/mediainfo.exe" ]; then
-        echo -------------------------------------------------
-        echo "MediaInfo_CLI is already compiled"
-        echo -------------------------------------------------
-    else
-        echo -ne "\033]0;compile MediaInfo_CLI $bits\007"
-
-        if [[ ! -d mediainfo ]]; then
-            a=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/" | \
-            sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | \
-            grep "tr.*title.*class.*folder" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | \
-            sed "q1" | sed "s/%%20//g" | sed "s/ //g"`
-
-            b=`wget -qO- "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/" | \
-            sed "s/<tbody>/\n<tbody>\n/g;s/<\/tbody>/\n<\/tbody>\n/g" | awk "/<tbody>/,/<\/tbody>/" | \
-            grep "tr.*title.*class.*file" | sed "s/<tr.\.*title=\d034//g;s/\d034 class.*$//g" | \
-            grep "7z" | sed "s/ //g"`
-
-            do_wget "http://sourceforge.net/projects/mediainfo/files/source/mediainfo/$a/$b/download" mediainfo.7z
-        fi
-        cd mediainfo/mediainfo_AllInclusive
-
-        sed -i '/#include <windows.h>/ a\#include <time.h>' ZenLib/Source/ZenLib/Ztring.cpp
-        cd ZenLib/Project/GNU/Library
-
-        if [[ -f ".libs/libzen.a" ]]; then
+	cd $LOCALBUILDDIR
+    do_git "https://github.com/MediaArea/ZenLib" ZenLib
+	cd Project/GNU/Library
+	
+    if [[ $compile = "true" ]]; then
+        if [[ ! -f "configure" ]]; then
+            ./autogen.sh
+        else
             make distclean
         fi
 
-        ./autogen
-        ./configure --build=$targetBuild --host=$targetHost
+        if [[ -d $LOCALDESTDIR/include/ZenLib ]]; then
+            rm -rf $LOCALDESTDIR/include/ZenLib
+            rm -rf $LOCALDESTDIR/lib/libzen.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
+        fi
+		
+		./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --build=$targetBuild --host=$targetHost
 
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         fi
         make -j $cpuCount
+		make install
+ 
+        do_checkIfExist ZenLib-git libzen.a
+    fi
+	
+	cd $LOCALBUILDDIR
+	do_git "https://github.com/MediaArea/MediaInfoLib" MediaInfoLib
+	cd Project/GNU/Library
 
-        cd ../../../../MediaInfoLib/Project/GNU/Library
+	if [[ $compile = "true" ]]; then
+		if [[ ! -f ".libs/libmediainfo.a" ]]; then
+			./autogen.sh
+		else
+			make distclean
+		fi
 
-        if [[ -f ".libs/libmediainfo.a" ]]; then
-            make distclean
+        if [[ -d $LOCALDESTDIR/include/MediaInfo ]]; then
+            rm -rf $LOCALDESTDIR/include/MediaInfo $LOCALDESTDIR/include/MediaInfoDLL
+            rm -rf $LOCALDESTDIR/lib/libmediainfo.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
         fi
-
-        ./autogen
-        ./configure --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
-
-        if [[ $bits = "64bit" ]]; then
-            sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
-        fi
-
-        make -j $cpuCount
-
-        cd ../../../../MediaInfo/Project/GNU/CLI
-
-        if [[ -f "mediainfo.exe" ]]; then
-            make distclean
-        fi
-
-        ./autogen
-        ./configure --build=$targetBuild --host=$targetHost --enable-staticlibs --enable-shared=no \
-        LDFLAGS="$LDFLAGS -static-libgcc"
+		
+        ./configure --prefix=$LOCALDESTDIR --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
 
         if [[ $bits = "64bit" ]]; then
             sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         fi
 
         make -j $cpuCount
+		make install
+		cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
+		cp libmediainfo-config $LOCALDESTDIR/bin-global/
+		
+        do_checkIfExist MediaInfoLib-git libmediainfo.a
+	fi
+	
+	cd $LOCALBUILDDIR
+	
+	do_git "https://github.com/MediaArea/MediaInfo" MediaInfo
+	cd Project/GNU/CLI
+	
+	if [[ $compile = "true" ]]; then
+		if [[ ! -f "mediainfo.exe" ]]; then
+			./autogen.sh
+		else
+			make distclean
+		fi
+		
+		 if [[ -d $LOCALDESTDIR/bin-video/mediainfo.exe ]]; then
+            rm -rf $LOCALDESTDIR/bin-video/mediainfo.exe
+        fi
 
-        cp mediainfo.exe $LOCALDESTDIR/bin-video/mediainfo.exe
+        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --build=$targetBuild --host=$targetHost \
+		--enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
 
-        do_checkIfExist mediainfo bin-video/mediainfo.exe
+        if [[ $bits = "64bit" ]]; then
+            sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        fi
+
+        make -j $cpuCount
+		make install
+
+        do_checkIfExist mediainfo-git bin-video/mediainfo.exe
     fi
 fi
 
@@ -2105,101 +2117,6 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         fi
         unset mpv_ldflags mpv_pthreads
         do_checkIfExist mpv-git bin-video/mpv.exe
-    fi
-fi
-
-if [[ $mkv != "n" ]]; then
-    if do_pkgConfig "Qt5Core = 5.4.2"; then
-        cd $LOCALBUILDDIR
-        do_wget "http://download.qt.io/official_releases/qt/5.4/5.4.2/submodules/qtbase-opensource-src-5.4.2.tar.xz"
-
-        if [[ -d build ]]; then
-            rm -rf build/*
-        else
-            mkdir -p build
-        fi
-        if [[ -d $LOCALDESTDIR/include/QtCore ]]; then
-            rm -f $LOCALDESTDIR/lib/pkgconfig/Qt5*.pc $LOCALDESTDIR/lib/libQt5*.a $LOCALDESTDIR/lib/libqt*.a
-            rm -f $LOCALDESTDIR/lib/Qt5*.prl $LOCALDESTDIR/lib/qt*.prl
-            rm -rf $LOCALDESTDIR/include/Qt* $LOCALDESTDIR/{mkspecs,plugins}
-            rm -f $LOCALDESTDIR/bin-global/{qdoc,qmake,uic,qlalr,moc,rcc}.exe $LOCALDESTDIR/bin-global/syncqt.pl
-        fi
-
-        cd build
-        if [[ $bits = "32bit" ]]; then
-            nosse2="-no-sse2"
-        else
-            nosse2=""
-        fi
-        OPENSSL_LIBS="`pkg-config --libs-only-l openssl`" \
-        ../configure -opensource -confirm-license -platform win32-g++ \
-        -force-pkg-config -release -static -prefix $LOCALDESTDIR -bindir $LOCALDESTDIR/bin-global \
-        -no-icu -no-opengl -no-glib -nomake examples -nomake tests -no-sql-mysql -no-sql-sqlite \
-        -no-sql-odbc -no-sql-psql -no-sql-tds -no-cups -qt-pcre -no-fontconfig -qt-freetype \
-        -qt-zlib -qt-libjpeg -qt-harfbuzz -qt-libpng -openssl-linked -no-dbus $nosse2 -v
-
-        do_makeinstall QMAKE="$(pwd)/bin/qmake CONFIG-='debug debug_and_release'"
-
-        cp -f ./lib/pkgconfig/*.pc $LOCALDESTDIR/lib/pkgconfig/
-
-        do_checkIfExist qtbase-opensource-src-5.4.2 libQt5Core.a
-    fi
-
-    if [[ $mkv = "b" ]]; then
-        if [[ `$LOCALDESTDIR/bin-global/wx-config --version` = "3.0.2" ]]; then
-            echo -------------------------------------------------
-            echo "wxWidgets is already compiled"
-            echo -------------------------------------------------
-        else
-            cd $LOCALBUILDDIR
-            echo -ne "\033]0;compile wxWidgets $bits\007"
-
-            do_wget "https://sourceforge.net/projects/wxwindows/files/3.0.2/wxWidgets-3.0.2.tar.bz2"
-
-            if [[ -f config.log ]]; then
-                make distclean
-            fi
-
-            CPPFLAGS+=" -fno-devirtualize" CFLAGS+=" -fno-devirtualize" do_generic_confmakeinstall global \
-            --with-msw --disable-mslu --enable-static --enable-iniconf --enable-iff --enable-permissive \
-            --disable-monolithic --enable-unicode --enable-accessibility --disable-precomp-headers \
-            LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-            do_checkIfExist wxWidgets-3.0.2 libwx_baseu-3.0.a
-        fi
-    fi
-
-    cd $LOCALBUILDDIR
-    do_git "https://github.com/mbunkus/mkvtoolnix.git" mkvtoolnix shallow master bin-video/mkvtoolnix/bin/mkvmerge.exe
-    if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            ./autogen.sh
-            git submodule init
-            git submodule update
-        else
-            rake clean
-            rm -rf $LOCALDESTDIR/bin-video/mkvtoolnix
-        fi
-
-        do_patch "mkvinfo.patch"
-
-        CFLAGS="$CFLAGS -static-libgcc -static-libstdc++ -static" \
-        LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++ -static" \
-        ./configure --build=$targetBuild --prefix=$LOCALDESTDIR/bin-video/mkvtoolnix --without-curl \
-        --with-boost-libdir=$MINGW_PREFIX/lib --enable-static-qt --enable-static
-
-        sed -i "s/LIBINTL_LIBS = -lintl*$/LIBINTL_LIBS = -lintl -liconv/" build-config
-        sed -i "s/@\(.*\)@//" build-config
-
-        export DRAKETHREADS=$cpuCount
-
-        drake
-        rake install
-
-        mv $LOCALDESTDIR/bin-video/mkvtoolnix/share/locale $LOCALDESTDIR/bin-video/mkvtoolnix/bin/locale
-        cp -r examples $LOCALDESTDIR/bin-video/mkvtoolnix/bin/examples
-        unset DRAKETHREADS
-
-        do_checkIfExist mkvtoolnix-git bin-video/mkvtoolnix/bin/mkvmerge.exe
     fi
 fi
 

@@ -37,8 +37,8 @@ automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffs
 intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems
 
 set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
-gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng ^
-libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm
+gettext glew gmp gsm  headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng ^
+libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git winstorecompat-git xvidcore yasm
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug ^
@@ -91,7 +91,6 @@ if exist %ini% GOTO checkINI
     set mp4boxINI=0
     set mplayerINI=0
     set mpvINI=0
-    set mkvINI=0
     set coresINI=0
     set deleteSourceINI=0
     set stripINI=0
@@ -134,8 +133,6 @@ findstr /i "mplayer" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "mpv" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "mkv" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "cores" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "deleteSource" %ini% > nul
@@ -163,7 +160,6 @@ for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegChoice" %ini%') do set ffm
 for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
 for /F "tokens=2 delims==" %%e in ('findstr /i "mplayer" %ini%') do set mplayerINI=%%e
 for /F "tokens=2 delims==" %%l in ('findstr /i "mpv" %ini%') do set mpvINI=%%l
-for /F "tokens=2 delims==" %%m in ('findstr /i "mkv" %ini%') do set mkvINI=%%m
 for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%%h
 for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
@@ -668,37 +664,6 @@ if %buildmpv%==2 (
 if %buildmpv% GTR 2 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
 
-:mkv
-set "writeMKV=no"
-if %mkvINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build static mkvtoolnix binaries?
-    echo. 1 = Yes (Qt GUI^)
-    echo. 2 = No
-    echo. 3 = Yes (wxGTK and Qt GUI^)
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildmkv="Build mkvtoolnix: "
-    set "writeMKV=yes"
-    ) else (
-        set buildmkv=%mkvINI%
-        )
-
-if %buildmkv%==1 (
-    set "mkv=y"
-    )
-if %buildmkv%==2 (
-    set "mkv=n"
-    )
-if %buildmkv%==3 (
-    set "mkv=b"
-    )
-if %buildmkv% GTR 3 GOTO mkv
-if %writeMKV%==yes echo.mkv=^%buildmkv%>>%ini%
-
 :numCores
 set "writeCores=no"
 if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
@@ -816,7 +781,7 @@ if %writePack%==yes echo.pack=^%packF%>>%ini%
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
+if exist "%instdir%\%msys2%" GOTO getMintty
     echo -------------------------------------------------------------
     echo.
     echo - Download wget
@@ -1401,6 +1366,6 @@ start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --mkv=%mkv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
+--mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
 
 exit
