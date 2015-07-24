@@ -1258,13 +1258,13 @@ if [[ $other265 = "y" ]]; then
         if [[ -f intra.o ]]; then
             make clean
         fi
-
+        cp Makefile Makefile.ab
+        sed -i 's/-fpic //gi' Makefile.ab
         if [[ "$bits" = "32bit" ]]; then
-            make ARCH=i686 -j $cpuCount
+            make ARCH=i686 -j $cpuCount -f Makefile.ab
         else
-            make ARCH=x86_64 -j $cpuCount
+            make ARCH=x86_64 -j $cpuCount -f Makefile.ab
         fi
-
         cp kvazaar.exe $LOCALDESTDIR/bin-video
         do_checkIfExist kvazaar-git bin-video/kvazaar.exe
     fi
