@@ -1412,7 +1412,7 @@ if [ $mediainfo = "y" ]; then
 
         if [[ -d $LOCALDESTDIR/include/ZenLib ]]; then
             rm -rf $LOCALDESTDIR/include/ZenLib
-            rm -rf $LOCALDESTDIR/lib/libzen.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
+            rm -rf $LOCALDESTDIR/lib/libzen.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc $LOCALDESTDIR/bin-global/libzen-config
         fi
 		
 		./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --build=$targetBuild --host=$targetHost
@@ -1422,7 +1422,10 @@ if [ $mediainfo = "y" ]; then
         fi
         make -j $cpuCount
 		make install
- 
+		
+		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libzen-config
+		sed -i "s/\/build\/libzen-git\/Project\/GNU/Library\/.libs\/libzen.a/\$LOCALDESTDIR\/lib\/libzen.a/g" $LOCALDESTDIR/bin-global/libzen-config
+		
         do_checkIfExist ZenLib-git libzen.a
     fi
 	
@@ -1454,12 +1457,16 @@ if [ $mediainfo = "y" ]; then
 		cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
 		cp libmediainfo-config $LOCALDESTDIR/bin-global/
 		
+		sed -i "s/-L\/build\/libmediainfo-git\/Project\/GNU\/Library -lmediainfo/-L\$LOCALDESTDIR\/lib -lmediainfo/g" $LOCALDESTDIR/bin-global/libmediainfo-config
+		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libmediainfo-config
+		sed -i "s/\/build\/libmediainfo-git\/Project\/GNU\/Library\/.libs\/libmediainfo.a/\$LOCALDESTDIR\/lib\/libmediainfo.a/g" $LOCALDESTDIR/bin-global/libmediainfo-config
+		
         do_checkIfExist MediaInfoLib-git libmediainfo.a
 	fi
 	
 	cd $LOCALBUILDDIR
 	
-	do_git "https://github.com/MediaArea/MediaInfo" MediaInfo
+	do_git "https://github.com/MediaArea/MediaInfo" mediainfo
 	
 	if [[ $compile = "true" ]]; then
 		cd Project/GNU/CLI
