@@ -807,7 +807,7 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     do_checkIfExist libogg-1.3.2 libogg.a
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] ||
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] &&
     do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
