@@ -557,7 +557,8 @@ if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fri
 fi
 
 if do_checkForOptions "--enable-libass"; then
-    if $LOCALDESTDIR/bin-global/ragel --version | grep -q -e "version 6.9"; then
+    if [[ -f $LOCALDESTDIR/bin-global/ragel.exe ]] && \
+        $LOCALDESTDIR/bin-global/ragel --version | grep -q -e "version 6.9"; then
         echo -------------------------------------------------
         echo "ragel-6.9 is already compiled"
         echo -------------------------------------------------
@@ -615,7 +616,8 @@ fi
 #----------------------
 
 if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
-    if [[ `libgcrypt-config --version` = "1.6.3" ]]; then
+    if [[ -f $LOCALDESTDIR/bin-global/libgcrypt-config ]] &&
+        [[ $(libgcrypt-config --version) = "1.6.3" ]]; then
         echo -------------------------------------------------
         echo "libgcrypt-1.6.3 is already compiled"
         echo -------------------------------------------------
@@ -635,11 +637,10 @@ if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
         fi
         if [[ $bits = "64bit" ]]; then
             extracommands="--disable-asm --disable-padlock-support"
-        else
-            extracommands=""
         fi
         do_generic_confmakeinstall global --with-gpg-error-prefix=$MINGW_PREFIX $extracommands
         do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
+        unset extracommands
     fi
 
     if do_pkgConfig "nettle = 2.7.1"; then
