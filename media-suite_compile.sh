@@ -543,11 +543,9 @@ fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
     cd $LOCALBUILDDIR
-    do_wget "http://fribidi.org/download/fribidi-0.19.6.tar.bz2"
-
-    if [[ -f "lib/.libs/libfribidi.a" ]]; then
-        make distclean
-    fi
+    do_wget "https://github.com/behdad/fribidi/archive/0.19.6.tar.gz" fribidi-0.19.6.tar.gz
+    [[ ! -f configure ]] && ./bootstrap
+    [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/fribidi" ]]; then
         rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi*
         rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
@@ -579,7 +577,7 @@ if do_checkForOptions "--enable-libass"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://anongit.freedesktop.org/harfbuzz" harfbuzz
+    do_git "https://github.com/behdad/harfbuzz.git" harfbuzz
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             ./autogen.sh -V
