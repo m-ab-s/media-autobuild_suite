@@ -15,7 +15,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-nonfree --enable-nvenc --enable-libfdk-aac"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
-printf "$(date +"%F %T %z")\n" >> newchangelog
+printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
   case $1 in
