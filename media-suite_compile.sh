@@ -1589,18 +1589,18 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
 fi
 
 if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
-    cd $LOCALBUILDDIR
-
-    if [ -f "$LOCALDESTDIR/include/DeckLinkAPI.h" ]; then
+    if [ -f "$LOCALDESTDIR/include/DeckLinkAPIVersion.h" ] &&
+        grep -q -E "API_VERSION_STRING\W+\"10\.4\.1\"" DeckLinkAPIVersion.h; then
         echo -------------------------------------------------
         echo "DeckLinkAPI is already downloaded"
         echo -------------------------------------------------
     else
         echo -ne "\033]0;download DeckLinkAPI $bits\007"
         cd $LOCALDESTDIR/include
-        do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI.h"
-        do_wget "https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/includes/DeckLinkAPI_i.c"
-
+        rm -f DeckLinkAPI{,Version}.h DeckLinkAPI_i.c
+        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPI.h"
+        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPI_i.c"
+        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPIVersion.h"
         do_checkIfExist DeckLinkAPI "include/DeckLinkAPI.h"
     fi
 fi
