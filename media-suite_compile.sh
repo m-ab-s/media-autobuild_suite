@@ -1464,7 +1464,7 @@ if [ $mediainfo = "y" ]; then
 	
 	cd $LOCALBUILDDIR
 	
-	do_git "https://github.com/MediaArea/MediaInfo" mediainfo bin-video/mediainfo.exe
+	do_git "https://github.com/MediaArea/MediaInfo" mediainfo shallow master bin-video/mediainfo.exe
 	
 	if [[ $compile = "true" ]]; then
 		cd Project/GNU/CLI
