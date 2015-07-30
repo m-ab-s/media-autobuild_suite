@@ -1904,7 +1904,7 @@ if [[ $ffmpeg != "n" ]]; then
     else
         do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpegSHARED/ffmpeg.exe
     fi
-    if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" ]]; then
+    if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
 
         # shared
