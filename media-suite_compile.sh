@@ -1345,18 +1345,20 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libass/libass.git" libass
+    do_git "https://github.com/libass/libass.git" libass noDepth fonts
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
         else
             rm -rf $LOCALDESTDIR/include/ass
-            rm -rf $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
+            rm -f $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
-        do_generic_confmakeinstall
+        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
+        do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
+        unset disable_fc
     fi
 fi
 
@@ -2112,15 +2114,16 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         $python waf build -j $cpuCount
         $python waf install
 
-        if [[ ! -f fonts.conf ]]; then
+        if [[ $bits = "32bit" ]] && [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
-            do_wget "http://srsfckn.biz/noto-mpv.7z"
-        fi
-        if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
-            cp -R fonts $LOCALDESTDIR/bin-video/fonts
+            if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
+                do_wget "http://srsfckn.biz/noto-mpv.7z" noto-mpv.7z fonts
+                mv fonts $LOCALDESTDIR/bin-video/
+            fi
         fi
+
         unset mpv_ldflags mpv_pthreads
         do_checkIfExist mpv-git bin-video/mpv.exe
     fi
