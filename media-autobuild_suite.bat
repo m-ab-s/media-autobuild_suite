@@ -37,7 +37,7 @@ automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffs
 intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems ^
 man-db
 
-set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
+set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
 gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng ^
 libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm
 
