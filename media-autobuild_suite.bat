@@ -34,7 +34,8 @@ set "ini=media-autobuild_suite.ini"
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
-intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems
+intltool libtool patch pkg-config python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems ^
+man-db
 
 set mingwpackages=boost cloog cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
 gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg libmodplug libpng ^

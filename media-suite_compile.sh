@@ -3,7 +3,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --disable-doc --enable-gpl --disable-w32threads --enable-avisynth"
+FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -691,7 +691,8 @@ if do_checkForOptions "--enable-librtmp"; then
 
         make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
         SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --libs gnutls)" prefix=$LOCALDESTDIR \
-        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video install
+        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
+        mandir=$LOCALDESTDIR/share/man install
 
         do_checkIfExist librtmp-git librtmp.a
     fi
@@ -2108,7 +2109,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             mpv_pthreads="--enable-win32-internal-pthreads"
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-        --disable-debug-build --enable-static-build --disable-manpage-build --disable-pdf-build --lua=luajit $mpv_pthreads \
+        --disable-debug-build --enable-static-build --disable-pdf-build --lua=luajit $mpv_pthreads \
         --disable-libguess
 
         $python waf build -j $cpuCount
