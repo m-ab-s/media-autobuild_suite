@@ -1828,11 +1828,9 @@ if [[ ! $x265 = "n" ]]; then
             [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
             do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
                 -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-            # cp libx265_main{10,12}.a $LOCALDESTDIR/lib/
         fi
         do_makeinstall
         if [[ $x265 != "s" ]]; then
-            # sed -i "s/Libs: .*$/& -lx265_main10 -lx265_main12/" $LOCALDESTDIR/lib/pkgconfig/x265.pc
             mv libx265.a libx265_main.a
             ar -M <<EOF
 CREATE libx265.a
@@ -1853,7 +1851,7 @@ else
     pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
 
-if [[ $ffmbc = "y" ]]; then
+if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
     cd $LOCALBUILDDIR
     if $LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep -q -e "version 0.7.4"; then
         echo -------------------------------------------------
@@ -1883,7 +1881,7 @@ if [[ $ffmbc = "y" ]]; then
             cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe \
-            --disable-w32threads --enable-gpl --enable-runtime-cpudetect --enable-bzlib --enable-zlib \
+            --disable-w32threads --enable-gpl --enable-runtime-cpudetect \
             --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass \
             --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora \
             --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras \
