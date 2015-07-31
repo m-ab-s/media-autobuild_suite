@@ -1355,7 +1355,7 @@ if do_checkForOptions "--enable-libass"; then
             rm -f $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
-        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
+        [[ $bits = "64bit" ]] && ! do_checkForOptions "--enable-fontconfig" && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
