@@ -103,7 +103,7 @@ if [[ $build32 = "yes" ]]; then
 
         oldProfiles32=`sed -n "/# \/local32\/etc\/profile.local/,/cross='i686-w64-mingw32-'/p" /local32/etc/profile.local`
 
-        if ! cmp -s <(echo $newProfiles32) <(echo $oldProfiles32); then
+        if ! diff -q <(echo $newProfiles32) <(echo $oldProfiles32) &> /dev/null; then
             echo
             echo "-------------------------------------------------------------------------------"
             echo "delete old 32 bit profile..."
@@ -120,7 +120,7 @@ if [[ $build64 = "yes" ]]; then
 
         oldProfiles64=`sed -n "/# \/local64\/etc\/profile.local/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
 
-        if ! cmp -s <(echo $newProfiles64) <(echo $oldProfiles64); then
+        if ! diff -q <(echo $newProfiles64) <(echo $oldProfiles64) &> /dev/null; then
             echo
             echo "-------------------------------------------------------------------------------"
             echo "delete old 64 bit profile..."
