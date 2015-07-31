@@ -1252,7 +1252,8 @@ if %build32%==yes (
             echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
-            echo.export PATH PS1 HOME
+            echo.GIT_GUI_LIB_DIR=$(cygpath -w /usr/share/git-gui/lib)
+            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.
             echo.# package build directory
             echo.LOCALBUILDDIR=/build
@@ -1308,7 +1309,8 @@ if %build64%==yes (
             echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
-            echo.export PATH PS1 HOME
+            echo.GIT_GUI_LIB_DIR=$(cygpath -w /usr/share/git-gui/lib)
+            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.
             echo.# package build directory
             echo.LOCALBUILDDIR=/build
