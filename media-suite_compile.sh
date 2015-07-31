@@ -1346,7 +1346,12 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libass/libass.git" libass noDepth fonts
+    if ! do_checkForOptions "--enable-fontconfig" && [[ $mpv = "y" ]]; then
+        do_git "https://github.com/libass/libass.git" libass noDepth fonts
+        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
+    else
+        do_git "https://github.com/libass/libass.git" libass
+    fi
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1355,7 +1360,6 @@ if do_checkForOptions "--enable-libass"; then
             rm -f $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
-        [[ $bits = "64bit" ]] && ! do_checkForOptions "--enable-fontconfig" && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
