@@ -1389,6 +1389,7 @@ if do_checkForOptions "--enable-libxavs"; then
             rm -rf $LOCALDESTDIR/include/xavs.h
             rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         fi
+        sed -i 's,"NUL","/dev/null",g' configure
         ./configure --host=$targetHost --prefix=$LOCALDESTDIR
         make -j $cpuCount libxavs.a
         install -m 644 xavs.h $LOCALDESTDIR/include
