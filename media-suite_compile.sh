@@ -951,7 +951,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
 fi
 
 if do_checkForOptions "--enable-libfaac"; then
-    if $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
+    if [[ -f $LOCALDESTDIR/bin-audio/faac.exe ]] && $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
