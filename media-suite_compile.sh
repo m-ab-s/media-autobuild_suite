@@ -1258,7 +1258,6 @@ if [[ $other265 = "y" ]]; then
         if [[ -f intra.o ]]; then
             make clean
         fi
-        sed -i 's/-fpic //gi' Makefile
         if [[ "$bits" = "32bit" ]]; then
             make ARCH=i686 -j $cpuCount
         else
