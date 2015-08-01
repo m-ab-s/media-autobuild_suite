@@ -491,20 +491,59 @@ echo "--------------------------------------------------------------------------
 
 do_getFFmpegConfig
 
-if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5.2"; then
+if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "y" ]] &&
+    do_pkgConfig "libopenjpeg1 = 1.5.2"; then
     do_wget "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
 
-    if [[ -d $LOCALDESTDIR/lib/openjpeg-1.5 ]]; then
-        rm -rf $LOCALDESTDIR/include/openjpeg-1.5 $LOCALDESTDIR/include/openjpeg.h
+    if pkg-config --exists libopenjpeg1; then
+        rm -rf $LOCALDESTDIR/include/openjpeg-{1.5,.h} $LOCALDESTDIR/lib/openjpeg-1.5
         rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
-        rm -rf $LOCALDESTDIR/lib/openjpeg-1.5
+        rm -f $LOCALDESTDIR/bin-global/{opj_dec_server1,test_index}.exe
+        find $LOCALDESTDIR/bin-global -name *j2k*.exe -o -iname *jp2*.exe -o \
+        -name *mj2*.exe | xargs rm -f
     fi
     do_cmake -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on \
     -DBUILD_THIRDPARTY:BOOL=on -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global \
     -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
     do_makeinstall
     do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
+fi
+
+if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
+    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo shallow master lib/libjpeg.a
+    if [[ $compile = "true" ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libjpeg.a ]]; then
+            rm -f $LOCALDESTDIR/include/j{config,error,morecfg,peglib}.h
+            rm -f $LOCALDESTDIR/lib/libjpeg.{l,}a $LOCALDESTDIR/bin-global/{c,d}jpeg.exe
+            rm -f $LOCALDESTDIR/bin-global/jpegtran.exe $LOCALDESTDIR/bin-global/{rd,wr}jpgcom.exe
+        fi
+        [[ -f configure ]] || autoreconf -fiv
+        [[ -f Makefile ]] && make distclean
+        do_generic_confmakeinstall global --without-turbojpeg
+        do_checkIfExist libjpegturbo libjpeg.a
+    fi
+
+    do_git "https://github.com/uclouvain/openjpeg.git" libopenjp2
+    if [[ $compile = "true" ]]; then
+        if pkg-config --exists libopenjp2; then
+            rm -rf $LOCALDESTDIR/include/openjpeg{-2.1,.h} $LOCALDESTDIR/lib/openjpeg-2.1
+            rm -f $LOCALDESTDIR/lib/libopenjp{2,wl}.a $LOCALDESTDIR/lib/libopenmj2.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
+            rm -f $LOCALDESTDIR/bin-global/opj_*.exe
+        fi
+        do_cmake -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DBUILD_MJ2=on \
+            -DBUILD_JPWL=on -DBUILD_THIRDPARTY=on -DCMAKE_C_FLAGS="$CFLAGS -DOPJ_STATIC" \
+            -DBUILD_PKGCONFIG_FILES=on
+        do_makeinstall
+        # fix wrong values in pkg-config files
+        sed -i -e "s,prefix=.*,prefix=$LOCALDESTDIR," \
+               -e 's,bindir=.*,bindir=${prefix}/bin-global,' \
+               $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
+        # ffmpeg needs this specific openjpeg.h
+        cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
+        do_checkIfExist libopenjp2 libopenjp2.a
+    fi
 fi
 
 if do_checkForOptions "--enable-libfreetype --enable-libass" && \
@@ -1884,7 +1923,7 @@ if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
             if [ -f "config.log" ]; then
                 make distclean
             fi
-
+            mv $LOCALDESTDIR/include/openjpeg.h $LOCALDESTDIR/include/openjpeg-2.1.h
             cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe \
@@ -1899,6 +1938,7 @@ if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
 
             do_checkIfExist FFmbc-0.7.4 bin-video/ffmbc.exe
             rm $LOCALDESTDIR/include/openjpeg.h
+            mv $LOCALDESTDIR/include/openjpeg-2.1.h $LOCALDESTDIR/include/openjpeg.h
     fi
 fi
 
