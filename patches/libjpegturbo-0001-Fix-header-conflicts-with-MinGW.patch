@@ -1,0 +1,29 @@
+From 61989d5f45db5f1d51f819cc0083fdce8d9ec3d8 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Sun, 2 Aug 2015 00:51:12 +0100
+Subject: [PATCH] Fix header conflicts with MinGW
+
+---
+ jmorecfg.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/jmorecfg.h b/jmorecfg.h
+index e86ccc6..8dcdd80 100644
+--- a/jmorecfg.h
++++ b/jmorecfg.h
+@@ -25,6 +25,12 @@
+ 
+ #define MAX_COMPONENTS  10      /* maximum number of image components */
+ 
++/* prevents conflicts */
++#if defined(__MINGW32__)
++#include <shlwapi.h> /* typedefs INT16 and INT32 */
++
++#define HAVE_BOOLEAN
++#endif
+ 
+ /*
+  * Basic data types.
+-- 
+2.5.0
+

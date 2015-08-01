@@ -511,6 +511,7 @@ if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "y" ]] &&
 fi
 
 if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
+    cd $LOCALBUILDDIR
     do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo shallow master lib/libjpeg.a
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/lib/libjpeg.a ]]; then
@@ -520,10 +521,12 @@ if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
         fi
         [[ -f configure ]] || autoreconf -fiv
         [[ -f Makefile ]] && make distclean
+        do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch"
         do_generic_confmakeinstall global --without-turbojpeg
         do_checkIfExist libjpegturbo libjpeg.a
     fi
 
+    cd $LOCALBUILDDIR
     do_git "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
         if pkg-config --exists libopenjp2; then
