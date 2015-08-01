@@ -441,15 +441,13 @@ do_patch() {
 }
 
 do_cmake() {
-    local source=$1
-    shift 1
     if [ -d "build" ]; then
         rm -rf ./build/*
     else
         mkdir build
     fi
     cd build
-    cmake $source -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:bool=off \
+    cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:bool=off \
     -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DUNIX:bool=on "$@"
 }
 
@@ -502,7 +500,7 @@ if do_checkForOptions "--enable-libopenjpeg" && do_pkgConfig "libopenjpeg1 = 1.5
         rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
         rm -rf $LOCALDESTDIR/lib/openjpeg-1.5
     fi
-    do_cmake .. -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on \
+    do_cmake -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on \
     -DBUILD_THIRDPARTY:BOOL=on -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global \
     -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
     do_makeinstall
@@ -1027,7 +1025,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
         rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/soxr{,-lsr}.pc
     fi
-    do_cmake .. -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on \
+    do_cmake -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on \
     -DBUILD_TESTS:bool=off -DWITH_OPENMP:bool=off -DBUILD_LSR_TESTS:bool=off
     do_makeinstall
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
@@ -1067,7 +1065,7 @@ if do_checkForOptions "--enable-libgme"; then
             rm -f $LOCALDESTDIR/lib/libgme.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
-        do_cmake ..
+        do_cmake
         do_makeinstall
         do_checkIfExist libgme-git libgme.a
     fi
@@ -1508,7 +1506,7 @@ if do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
-        do_cmake .. -DUSE_OMP:bool=off
+        do_cmake -DUSE_OMP:bool=off
         sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
         do_makeinstall
         do_checkIfExist vidstab-git libvidstab.a
