@@ -23,7 +23,8 @@ libcdio_paranoia
 libgme (game music emu)
 libilbc
 libmfx (intel quick sync hw accelerator)
-libopenjpeg1 (openjpeg)
+libopenjpeg1 (openjpeg 1)
+libopenjp2 (openjpeg 2)
 librtmp
 libutvideo
 luajit
@@ -53,6 +54,7 @@ zvbi-0.2 (libzvbi)
 ## Libraries not using pkg-config
 To recompile these libs, delete `<libname>.a` with the same name in `/local32/lib` or `/local64/lib`:
 ```
+libjpeg (libjpeg-turbo)
 libgnurx
 libmad
 libwaio

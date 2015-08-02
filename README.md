@@ -35,7 +35,7 @@ Included Tools And Libraries
 --------
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default):
-	- decklink
+	- decklink 10.4.1
 	- fontconfig (2.11.92)
 	- freetype (2.5.5)
 	- frei0r (1.4)
@@ -50,10 +50,12 @@ Included Tools And Libraries
 	- libfdk-aac (git)
 	- libgsm
 	- libilbc (git)
+	- libjpeg-turbo (git)
 	- libmfx (git)
 	- libmodplug
 	- libmp3lame
 	- libopencore-amrwb/nb (0.1.3)
+	- libopenjpeg 2.1 (git) (version 1.5.2 used with ffmbc)
 	- libopus (1.1)
 	- librtmp (git)
 	- libschroedinger
@@ -72,7 +74,6 @@ Included Tools And Libraries
 	- libxvid
 	- libzvbi (0.2.35)
 	- nvenc (5.0.1)
-	- openjpeg 1.5.2 (version 2 is incompatible with ffmbc)
 	- sdl (1.2.15)
 	- vidstab (git)
 	
@@ -85,7 +86,7 @@ Included Tools And Libraries
 	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
 	- kvazaar (git)
 	- libsndfile (git) (libs only)
-	- mediainfo cli (snapshot)
+	- mediainfo cli (git)
 	- mp4box (git)
 	- mplayer (svn)
 	- mkvtoolnix (git) (with Qt GUI, wxGTK GUI optional)
