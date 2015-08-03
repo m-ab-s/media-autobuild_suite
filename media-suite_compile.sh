@@ -2159,10 +2159,9 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         --disable-debug-build --enable-static-build --disable-pdf-build --lua=luajit $mpv_pthreads \
         --disable-libguess
 
-        $python waf build -j $cpuCount
-        $python waf install
+        $python waf install -j $cpuCount
 
-        if [[ $bits = "32bit" ]] && [[ ! -f fonts.conf ]]; then
+        if do_checkForOption "--enable-fontconfig" && [[ ! -f fonts.conf ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
