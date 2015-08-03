@@ -512,7 +512,7 @@ fi
 
 if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo shallow master lib/libjpeg.a
+    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo noDepth master lib/libjpeg.a
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/lib/libjpeg.a ]]; then
             rm -f $LOCALDESTDIR/include/j{config,error,morecfg,peglib}.h
