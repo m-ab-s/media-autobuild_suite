@@ -2142,6 +2142,27 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
+    do_git "https://github.com/BYVoid/uchardet.git" uchardet
+    if [[ $compile = "true" ]]; then
+        if pkg-config --exists uchardet; then
+            rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc
+        fi
+        do_cmake
+        make libuchardet_static
+        sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
+               -e "s,^libdir=.*,libdir=$LOCALDESTDIR/lib," \
+               -e "s,^includedir=.*,includedir=$LOCALDESTDIR/include," uchardet.pc
+        if [[ -f src/libuchardet.a ]]; then
+            mkdir -p $LOCALDESTDIR/include/uchardet
+            cp ../src/uchardet.h $LOCALDESTDIR/include/uchardet/
+            cp src/libuchardet.a $LOCALDESTDIR/lib/
+            cp uchardet.pc $LOCALDESTDIR/lib/pkgconfig/
+        fi
+        do_checkIfExist uchardet-git libuchardet.a
+    fi
+
+    cd $LOCALBUILDDIR
     do_git "https://github.com/mpv-player/mpv.git" mpv noDepth master bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -f waf ]; then

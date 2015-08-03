@@ -43,11 +43,11 @@ Included Tools And Libraries
 	- libbs2b (3.1.0)
 	- libbluray (git)
 	- libcaca (0.99.beta19)
+	- libcdio-paranoia (git)
 	- libdcadec (git)
 	- libfdk-aac (git)
 	- libgsm
 	- libilbc (git)
-	- libjpeg-turbo (git)
 	- libmfx (git)
 	- libmodplug
 	- libmp3lame
@@ -82,20 +82,24 @@ Included Tools And Libraries
 	- flac (1.3.1)
 	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
 	- kvazaar (git)
-	- libsndfile (git) (libs only)
+	- libsndfile (git)
 	- mediainfo cli (git)
 	- mp4box (git)
 	- mplayer (svn)
-	- mkvtoolnix (git) (with Qt GUI, wxGTK GUI optional)
-	- mpv (git)
+	- mpv (git) including in addition to ffmpeg libs:
+		- libjpeg-turbo (git)
+		- librubberband (git)
+		- libuchardet (git)
+		- libwaio (git)
+		- luajit (git)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
 	- speex (1.2rc2)
 	- sox (git)
-	- vpx (git)
-	- x264 (8 and 10 bit, with gpac[mp4 output]) (git)
-	- x265 (8 and 16 bit) (git)
-	- xavs (svn snapshot)
+	- vpx (VP8 and VP9 8, 10 and 12 bit) (git)
+	- x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
+	- x265 (8, 10 and 12 bit) (git)
+	- xavs (git snapshot)
 
 
 --------

@@ -42,6 +42,7 @@ soxr (sox resampling library only)
 speex
 theora
 twolame
+uchardet
 vidstab
 vo-aacenc
 vo-amrwbenc
