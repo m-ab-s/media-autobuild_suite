@@ -523,7 +523,7 @@ if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
         [[ -f Makefile ]] && make distclean
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch"
         do_generic_confmakeinstall global --without-turbojpeg --with-jpeg8
-        do_checkIfExist libjpegturbo libjpeg.a
+        do_checkIfExist libjpegturbo-git libjpeg.a
     fi
 
     cd $LOCALBUILDDIR
