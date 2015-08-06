@@ -2088,34 +2088,21 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit*.exe $LOCALDESTDIR/lib/lua
             rm -rf $LOCALDESTDIR/lib/libluajit-5.1.a $LOCALDESTDIR/lib/pkgconfig/luajit.pc
         fi
-        
-        if [[ -f "src/luajit.exe" ]]; then
-            make clean
-        fi
-		
+        [[ -f "src/luajit.exe" ]] && make clean
         make BUILDMODE=static amalg
         make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe \
         INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
-
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
-
         do_checkIfExist luajit-git libluajit-5.1.a
     fi
 
     cd $LOCALBUILDDIR
     do_git "https://github.com/lachs0r/rubberband.git" rubberband
     if [[ $compile = "true" ]]; then
-        if [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]]; then
-            make PREFIX=$LOCALDESTDIR uninstall
-        fi
-		
-		if [[ -f "lib/librubberband.a" ]]; then
-            make clean
-        fi
-
+        [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]] && make PREFIX=$LOCALDESTDIR uninstall
+        [[ -f "lib/librubberband.a" ]] && make clean
         make PREFIX=$LOCALDESTDIR install-static
-
         do_checkIfExist rubberband-git librubberband.a
     fi
 
