@@ -581,17 +581,16 @@ if do_checkForOptions "--enable-fontconfig --enable-libass" && \
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
 fi
 
-if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.6"; then
+if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.7"; then
     cd $LOCALBUILDDIR
-    do_wget "https://github.com/behdad/fribidi/archive/0.19.6.tar.gz" fribidi-0.19.6.tar.gz
-    [[ ! -f configure ]] && ./bootstrap
+    do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
     [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/fribidi" ]]; then
-        rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi*
+        rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
         rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
     fi
-    do_generic_confmakeinstall global --enable-static --disable-deprecated --with-glib=no
-    do_checkIfExist fribidi-0.19.6 libfribidi.a
+    do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
+    do_checkIfExist fribidi-0.19.7 libfribidi.a
 fi
 
 if do_checkForOptions "--enable-libass"; then
