@@ -1835,24 +1835,9 @@ if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
         echo -------------------------------------------------
         else
             echo -ne "\033]0;compile ffmbc $bits\007"
-
-            if [[ $nonfree = "y" ]]; then
-                extras="--enable-nonfree --enable-libfaac"
-            else
-                extras=""
-            fi
-
+            [[ $nonfree = "y" ]] && extras="--enable-nonfree --enable-libfaac"
             do_wget "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
-
-            if [[ $bits = "32bit" ]]; then
-                arch='x86'
-            else
-                arch='x86_64'
-            fi
-
-            if [ -f "config.log" ]; then
-                make distclean
-            fi
+            [ -f "config.log" ] && make distclean
             mv $LOCALDESTDIR/include/openjpeg.h $LOCALDESTDIR/include/openjpeg-2.1.h
             cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
@@ -1862,10 +1847,8 @@ if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
             --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora \
             --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras \
             --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
-
             make SRC_DIR=. -j $cpuCount
             make SRC_DIR=. install-progs
-
             do_checkIfExist FFmbc-0.7.4 bin-video/ffmbc.exe
             rm $LOCALDESTDIR/include/openjpeg.h
             mv $LOCALDESTDIR/include/openjpeg-2.1.h $LOCALDESTDIR/include/openjpeg.h
