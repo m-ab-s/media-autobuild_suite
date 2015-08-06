@@ -78,7 +78,6 @@ if exist %ini% GOTO checkINI
     set msys2ArchINI=%msys2Arch%
     set archINI=0
     set freeINI=0
-    set ffmbcINI=0
     set vpxINI=0
     set x264INI=0
     set x265INI=0
@@ -105,8 +104,6 @@ findstr /i "msys2Arch" %ini% > nul
 findstr /i "arch" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "free" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmbc" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "vpx" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
@@ -147,7 +144,6 @@ findstr /i "pack" %ini% > nul
 for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
 for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
 for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
-for /F "tokens=2 delims==" %%f in ('findstr /i "ffmbc" %ini%') do set ffmbcINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "vpx" %ini%') do set vpxINI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
 for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
@@ -236,33 +232,6 @@ if %nonfree%==2 (
     )
 if %nonfree% GTR 2 GOTO selectNonFree
 if %writeFree%==yes echo.free=^%nonfree%>>%ini%
-
-:ffmbc
-set "writeBC=no"
-if %ffmbcINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build FFMedia Broadcast binary?
-    echo. 1 = Yes [static]
-    echo. 2 = No
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildffmbc="Build ffmbc: "
-    set "writeBC=yes"
-    ) else (
-        set buildffmbc=%ffmbcINI%
-        )
-
-if %buildffmbc%==1 (
-    set "ffmbc=y"
-    )
-if %buildffmbc%==2 (
-    set "ffmbc=n"
-    )
-if %buildffmbc% GTR 2 GOTO ffmbc
-if %writeBC%==yes echo.ffmbc=^%buildffmbc%>>%ini%
 
 :vpx
 set "writevpx=no"
@@ -1367,7 +1336,7 @@ IF ERRORLEVEL == 1 (
 
 start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
---ffmbc=%ffmbc% --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
+--vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
 

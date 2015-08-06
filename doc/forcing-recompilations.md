@@ -23,7 +23,6 @@ libcdio_paranoia
 libgme (game music emu)
 libilbc
 libmfx (intel quick sync hw accelerator)
-libopenjpeg1 (openjpeg 1)
 libopenjp2 (openjpeg 2)
 librtmp
 libutvideo
@@ -85,7 +84,6 @@ wx-config
 #### /bin-video
 ```
 f265cli
-ffmbc
 ffmpeg (for static and both)
 ffmpegSHARED/ffmpeg (for shared only)
 kvazaar

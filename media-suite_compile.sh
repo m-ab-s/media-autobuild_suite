@@ -23,7 +23,6 @@ while true; do
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
---ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --vpx=* ) vpx="${1#*=}"; shift ;;
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
@@ -323,20 +322,6 @@ do_getFFmpegConfig() {
     fi
     export arch
 
-    # add options if ffmbc is being compiled
-    if [[ $ffmbc = "y" ]]; then
-        do_addOption "--enable-librtmp"
-        do_addOption "--enable-frei0r"
-        do_addOption "--enable-libopenjpeg"
-        do_addOption "--enable-libass"
-        do_addOption "--enable-libspeex"
-        do_addOption "--enable-libtheora"
-        do_addOption "--enable-libvorbis"
-        do_addOption "--enable-libxavs"
-        do_addOption "--enable-libmp3lame"
-        do_addOption "--enable-libfaac"
-    fi
-
     # add options for mplayer
     if [[ $mplayer = "y" ]]; then
         do_addOption "--enable-libfreetype"
@@ -491,26 +476,7 @@ echo "--------------------------------------------------------------------------
 
 do_getFFmpegConfig
 
-if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "y" ]] &&
-    do_pkgConfig "libopenjpeg1 = 1.5.2"; then
-    do_wget "http://downloads.sourceforge.net/project/openjpeg.mirror/1.5.2/openjpeg-1.5.2.tar.gz"
-
-    if pkg-config --exists libopenjpeg1; then
-        rm -rf $LOCALDESTDIR/include/openjpeg-{1.5,.h} $LOCALDESTDIR/lib/openjpeg-1.5
-        rm -f $LOCALDESTDIR/lib/libopenj{peg{,_JPWL},pip_local}.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjpeg1.pc
-        rm -f $LOCALDESTDIR/bin-global/{opj_dec_server1,test_index}.exe
-        find $LOCALDESTDIR/bin-global -name *j2k*.exe -o -iname *jp2*.exe -o \
-        -name *mj2*.exe | xargs rm -f
-    fi
-    do_cmake -DBUILD_MJ2:BOOL=on -DBUILD_JPWL:BOOL=on -DBUILD_JPIP:BOOL=on \
-    -DBUILD_THIRDPARTY:BOOL=on -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global \
-    -DCMAKE_C_FLAGS="-mms-bitfields -mthreads -mtune=generic -pipe -DOPJ_STATIC"
-    do_makeinstall
-    do_checkIfExist openjpeg-1.5.2 libopenjpeg.a
-fi
-
-if do_checkForOptions "--enable-libopenjpeg" && [[ $ffmbc = "n" ]]; then
+if do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo noDepth master lib/libjpeg.a
     if [[ $compile = "true" ]]; then
@@ -1230,7 +1196,7 @@ if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; the
     do_checkIfExist libtheora-1.1.1 libtheora.a
 fi
 
-if [[ ! $vpx = "n" ]] || [[ $ffmbc = "y" ]]; then
+if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
@@ -1670,7 +1636,7 @@ if [[ $mp4box = "y" ]]; then
     fi
 fi
 
-if [[ ! $x264 = "n" ]] || [[ $ffmbc = "y" ]]; then
+if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/x264.git" x264 noDepth
     if [[ $compile = "true" ]] || [[ $x264 = "y" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
@@ -1826,35 +1792,6 @@ EOF
 else
     pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
-
-if [[ $bits = "32bit" && $ffmbc = "y" ]]; then
-    cd $LOCALBUILDDIR
-    if $LOCALDESTDIR/bin-video/ffmbc.exe 2>&1 | grep -q -e "version 0.7.4"; then
-        echo -------------------------------------------------
-        echo "ffmbc-0.7.4 is already compiled"
-        echo -------------------------------------------------
-        else
-            echo -ne "\033]0;compile ffmbc $bits\007"
-            [[ $nonfree = "y" ]] && extras="--enable-nonfree --enable-libfaac"
-            do_wget "https://drive.google.com/uc?id=0B0jxxycBojSwZTNqOUg0bzEta00&export=download" FFmbc-0.7.4.tar.bz2
-            [ -f "config.log" ] && make distclean
-            mv $LOCALDESTDIR/include/openjpeg.h $LOCALDESTDIR/include/openjpeg-2.1.h
-            cp $LOCALDESTDIR/include/openjpeg-1.5/openjpeg.h $LOCALDESTDIR/include
-            ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-            --disable-debug --disable-shared --disable-doc --disable-avdevice --disable-dxva2 --disable-ffprobe \
-            --disable-w32threads --enable-gpl --enable-runtime-cpudetect \
-            --enable-librtmp --enable-avisynth --enable-frei0r --enable-libopenjpeg --enable-libass \
-            --enable-libmp3lame --enable-libschroedinger --enable-libspeex --enable-libtheora \
-            --enable-libvorbis --enable-libvpx --enable-libxavs --enable-libx264 --enable-libxvid $extras \
-            --extra-cflags='-DPTW32_STATIC_LIB' --extra-libs='-ltasn1 -ldl -liconv -lpng -lorc-0.4'
-            make SRC_DIR=. -j $cpuCount
-            make SRC_DIR=. install-progs
-            do_checkIfExist FFmbc-0.7.4 bin-video/ffmbc.exe
-            rm $LOCALDESTDIR/include/openjpeg.h
-            mv $LOCALDESTDIR/include/openjpeg-2.1.h $LOCALDESTDIR/include/openjpeg.h
-    fi
-fi
-
 
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR

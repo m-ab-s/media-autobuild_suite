@@ -52,7 +52,7 @@ Included Tools And Libraries
 	- libmodplug
 	- libmp3lame
 	- libopencore-amrwb/nb (0.1.3)
-	- libopenjpeg 2.1 (git) (version 1.5.2 used with ffmbc)
+	- libopenjpeg 2.1 (git)
 	- libopus (1.1)
 	- librtmp (git)
 	- libschroedinger
@@ -77,7 +77,6 @@ Included Tools And Libraries
  - other tools
 	- f265 (git)
 	- fdkaac (git)
-	- ffmbc (0.7.4)
 	- file (5.22)
 	- flac (1.3.1)
 	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
