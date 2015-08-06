@@ -594,27 +594,6 @@ if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fri
 fi
 
 if do_checkForOptions "--enable-libass"; then
-    if [[ -f $LOCALDESTDIR/bin-global/ragel.exe ]] && \
-        $LOCALDESTDIR/bin-global/ragel --version | grep -q -e "version 6.9"; then
-        echo -------------------------------------------------
-        echo "ragel-6.9 is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile ragel $bits\007"
-
-        do_wget "http://www.colm.net/files/ragel/ragel-6.9.tar.gz"
-
-        if [[ -f "ragel/ragel.exe" ]]; then
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/bin-global/ragel.exe" ]]; then
-            rm -rf $LOCALDESTDIR/bin-global/ragel.exe
-        fi
-        do_generic_confmakeinstall global
-        do_checkIfExist ragel-6.9 bin-global/ragel.exe
-    fi
-
     cd $LOCALBUILDDIR
     do_git "https://github.com/behdad/harfbuzz.git" harfbuzz
     if [[ $compile = "true" ]]; then
