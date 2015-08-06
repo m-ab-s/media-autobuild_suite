@@ -1420,100 +1420,49 @@ fi
 
 if [ $mediainfo = "y" ]; then
     cd $LOCALBUILDDIR
-
-	cd $LOCALBUILDDIR
     do_git "https://github.com/MediaArea/ZenLib" libzen
-		
     if [[ $compile = "true" ]]; then
-		cd Project/GNU/Library
-		
-        if [[ ! -f "configure" ]]; then
-            ./autogen.sh
-        else
-            make distclean
-        fi
-
+        cd Project/GNU/Library
+        [[ ! -f "configure" ]] && ./autogen.sh || make distclean
         if [[ -d $LOCALDESTDIR/include/ZenLib ]]; then
-            rm -rf $LOCALDESTDIR/include/ZenLib
-            rm -rf $LOCALDESTDIR/lib/libzen.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc $LOCALDESTDIR/bin-global/libzen-config
+            rm -rf $LOCALDESTDIR/include/ZenLib $LOCALDESTDIR/bin-global/libzen-config
+            rm -f $LOCALDESTDIR/lib/libzen.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
         fi
-		
-		./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-global --build=$targetBuild --host=$targetHost
-
-        if [[ $bits = "64bit" ]]; then
-            sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
-        fi
-        make -j $cpuCount
-		make install
-		
-		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libzen-config
-		sed -i "s/\/build\/libzen-git\/Project\/GNU\/Library\/.libs/\$LOCALDESTDIR\/lib/g" $LOCALDESTDIR/bin-global/libzen-config
-		
-        do_checkIfExist ZenLib-git libzen.a
+        do_generic_conf
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        do_makeinstall
+        [[ -f "$LOCALDESTDIR/bin/libzen-config" ]] && rm $LOCALDESTDIR/bin/libzen-config
+        do_checkIfExist libzen-git libzen.a
+        buildMediaInfo="true"
     fi
-	
-	cd $LOCALBUILDDIR
-	do_git "https://github.com/MediaArea/MediaInfoLib" libmediainfo
 
-	if [[ $compile = "true" ]]; then
-		cd Project/GNU/Library
-		
-		if [[ ! -f ".libs/libmediainfo.a" ]]; then
-			./autogen.sh
-		else
-			make distclean
-		fi
-
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/MediaArea/MediaInfoLib" libmediainfo
+    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
+        cd Project/GNU/Library
+        [[ ! -f "configure" ]] && ./autogen.sh || make distclean
         if [[ -d $LOCALDESTDIR/include/MediaInfo ]]; then
-            rm -rf $LOCALDESTDIR/include/MediaInfo $LOCALDESTDIR/include/MediaInfoDLL
-            rm -rf $LOCALDESTDIR/lib/libmediainfo.a.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc $LOCALDESTDIR/bin-global/libmediainfo-config
+            rm -rf $LOCALDESTDIR/include/MediaInfo{,DLL}
+            rm -f $LOCALDESTDIR/lib/libmediainfo.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
+            rm -f $LOCALDESTDIR/bin-global/libmediainfo-config
         fi
-		
-        ./configure --prefix=$LOCALDESTDIR --build=$targetBuild --host=$targetHost LDFLAGS="$LDFLAGS -static-libgcc"
+        do_generic_conf LDFLAGS="$LDFLAGS -static-libgcc"
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        do_makeinstall
+        cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
+        do_checkIfExist libmediainfo-git libmediainfo.a
+        buildMediaInfo="true"
+    fi
 
-        if [[ $bits = "64bit" ]]; then
-            sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
-        fi
-
-        make -j $cpuCount
-		make install
-		cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
-		cp libmediainfo-config $LOCALDESTDIR/bin-global/
-		
-		sed -i "s/-L\/build\/libmediainfo-git\/Project\/GNU\/Library -lmediainfo/-L\$LOCALDESTDIR\/lib -lmediainfo/g" $LOCALDESTDIR/bin-global/libmediainfo-config
-		sed -i "s/-L\/build\/libzen-git\/Project\/GNU\/Library -lzen/-L\$LOCALDESTDIR\/lib -lzen/g" $LOCALDESTDIR/bin-global/libmediainfo-config
-		sed -i "s/\/build\/libmediainfo-git\/Project\/GNU\/Library\/.libs/\$LOCALDESTDIR\/lib/g" $LOCALDESTDIR/bin-global/libmediainfo-config
-		
-        do_checkIfExist MediaInfoLib-git libmediainfo.a
-	fi
-	
-	cd $LOCALBUILDDIR
-	
-	do_git "https://github.com/MediaArea/MediaInfo" mediainfo shallow master bin-video/mediainfo.exe
-	
-	if [[ $compile = "true" ]]; then
-		cd Project/GNU/CLI
-		
-		if [[ ! -f "mediainfo.exe" ]]; then
-			./autogen.sh
-		else
-			make distclean
-		fi
-		
-		 if [[ -d $LOCALDESTDIR/bin-video/mediainfo.exe ]]; then
-            rm -rf $LOCALDESTDIR/bin-video/mediainfo.exe
-        fi
-
-        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --build=$targetBuild --host=$targetHost \
-		--enable-staticlibs --enable-shared=no LDFLAGS="$LDFLAGS -static-libgcc"
-
-        if [[ $bits = "64bit" ]]; then
-            sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
-        fi
-
-        make -j $cpuCount
-		make install
-
+    cd $LOCALBUILDDIR
+    do_git "https://github.com/MediaArea/MediaInfo" mediainfo shallow master bin-video/mediainfo.exe
+    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
+        cd Project/GNU/CLI
+        [[ ! -f "configure" ]] && ./autogen.sh || make distclean
+        [[ -d $LOCALDESTDIR/bin-video/mediainfo.exe ]] && rm -rf $LOCALDESTDIR/bin-video/mediainfo.exe
+        do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        do_makeinstall
         do_checkIfExist mediainfo-git bin-video/mediainfo.exe
     fi
 fi
