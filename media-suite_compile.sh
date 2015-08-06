@@ -451,7 +451,7 @@ do_cmake() {
     -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DUNIX:bool=on "$@"
 }
 
-do_generic_confmakeinstall() {
+do_generic_conf() {
     local bindir=""
     case "$1" in
     global)
@@ -468,17 +468,17 @@ do_generic_confmakeinstall() {
         ;;
     esac
     shift 1
-    do_generic_conf $bindir "$@"
-    do_makeinstall
-}
-
-do_generic_conf() {
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared "$@"
+    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
 }
 
 do_makeinstall() {
     make -j $cpuCount "$@"
     make install
+}
+
+do_generic_confmakeinstall() {
+    do_generic_conf "$@"
+    do_makeinstall
 }
 
 buildProcess() {
