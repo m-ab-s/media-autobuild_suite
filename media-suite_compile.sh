@@ -1399,11 +1399,10 @@ if do_checkForOptions "--enable-libxavs"; then
         if [[ ! -d xavs ]] || [[ -d xavs ]] &&
         { [[ $build32 = "yes" && ! -f xavs/build_successful32bit ]] ||
           [[ $build64 = "yes" && ! -f xavs/build_successful64bit ]]; }; then
-            rm -f distrotech-xavs.zip
+            rm -rf distrotech-xavs.zip xavs-distrotech-xavs
             do_wget https://github.com/Distrotech/xavs/archive/distrotech-xavs.zip
-            mv xavs-distrotech-xavs xavs
         fi
-        cd xavs
+        cd xavs-distrotech-xavs
         if [[ -f "libxavs.a" ]]; then
             make distclean
         fi
@@ -1418,7 +1417,7 @@ if do_checkForOptions "--enable-libxavs"; then
         install -m 644 libxavs.a $LOCALDESTDIR/lib
         install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
 
-        do_checkIfExist xavs libxavs.a
+        do_checkIfExist xavs-distrotech-xavs libxavs.a
     fi
 fi
 
