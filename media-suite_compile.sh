@@ -333,6 +333,7 @@ do_getFFmpegConfig() {
     # prefer openssl if both are in options and nonfree
     if do_checkForOptions "--enable-openssl" && [[ $nonfree = "y" ]]; then
         do_removeOption "--enable-gnutls"
+        do_removeOption "--enable-libutvideo"
     # prefer gnutls if both are in options and free
     elif do_checkForOptions "--enable-openssl"; then
         do_removeOption "--enable-openssl"
@@ -341,6 +342,7 @@ do_getFFmpegConfig() {
     elif ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
          do_checkForOptions "--enable-librtmp" && [[ $nonfree = "y" ]]; then
         do_addOption "--enable-openssl"
+        do_removeOption "--enable-libutvideo"
     # add gnutls if free
     else
         do_addOption "--enable-gnutls"
