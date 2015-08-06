@@ -2053,7 +2053,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
 
         $python waf install -j $cpuCount
 
-        if do_checkForOptions "--enable-fontconfig" && [[ ! -f fonts.conf ]]; then
+        if do_checkForOptions "--enable-fontconfig" && [[ ! -f fonts.conf || -d fonts ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
             mkdir -p $LOCALDESTDIR/bin-video/mpv
             cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
