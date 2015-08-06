@@ -12,7 +12,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-decklink --enable-libutvideo --enable-libgme \
---enable-nonfree --enable-nvenc --enable-libfdk-aac"
+--enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
@@ -329,11 +329,19 @@ do_getFFmpegConfig() {
         do_addOption "--enable-libfaac"
     fi
 
-    # prefer openssl if in options
+    # prefer openssl if both are in options and nonfree
     if do_checkForOptions "--enable-openssl" && [[ $nonfree = "y" ]]; then
         do_removeOption "--enable-gnutls"
+    # prefer gnutls if both are in options and free
     elif do_checkForOptions "--enable-openssl"; then
         do_removeOption "--enable-openssl"
+        do_addOption "--enable-gnutls"
+    # add openssl if neither are in options and librtmp is and nonfree
+    elif ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
+         do_checkForOptions "--enable-librtmp" && [[ $nonfree = "y" ]]; then
+        do_addOption "--enable-openssl"
+    # add gnutls if free
+    else
         do_addOption "--enable-gnutls"
     fi
 }
@@ -597,7 +605,7 @@ fi
 # crypto engine
 #----------------------
 
-if do_checkForOptions "--enable-gnutls --enable-librtmp" ; then
+if do_checkForOptions "--enable-gnutls" ; then
     if [[ -f $LOCALDESTDIR/bin-global/libgcrypt-config ]] &&
         [[ $(libgcrypt-config --version) = "1.6.3" ]]; then
         echo -------------------------------------------------
@@ -672,11 +680,17 @@ if do_checkForOptions "--enable-librtmp"; then
         if [[ -f "librtmp/librtmp.a" ]]; then
             make clean
         fi
-
-        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
-        SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --libs gnutls)" prefix=$LOCALDESTDIR \
-        bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
-        mandir=$LOCALDESTDIR/share/man install
+        if do_checkForOptions "--enable-gnutls"; then
+            make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
+            SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --libs gnutls)" prefix=$LOCALDESTDIR \
+            bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
+            mandir=$LOCALDESTDIR/share/man install
+        else
+            make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
+            SYS=mingw LIB_OPENSSL="$(pkg-config --libs openssl)" XLIBS=-lz \
+            prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
+            mandir=$LOCALDESTDIR/share/man install
+        fi
 
         do_checkIfExist librtmp-git librtmp.a
     fi

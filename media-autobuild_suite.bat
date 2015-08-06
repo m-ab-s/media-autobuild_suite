@@ -49,7 +49,7 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-decklink --enable-libutvideo --enable-libgme ^
---enable-nonfree --enable-nvenc --enable-libfdk-aac
+--enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 :selectmsys2Arch
 if exist %ini% GOTO checkINI
