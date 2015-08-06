@@ -11,6 +11,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
+--enable-libwebp \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
@@ -738,6 +739,22 @@ if [[ $sox = "y" ]]; then
         do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
         do_checkIfExist file-5.24 libmagic.a
     fi
+fi
+
+if do_checkForOptions "--enable-libwebp" && do_pkgConfig "libwebp = 0.4.3"; then
+    cd $LOCALBUILDDIR
+    do_wget "http://downloads.webmproject.org/releases/webp/libwebp-0.4.3.tar.gz"
+    [[ -f Makefile ]] && make distclean
+    if pkg-config --exists libwebp; then
+        rm -rf $LOCALDESTDIR/include/webp
+        rm -f $LOCALDESTDIR/lib/libwebp{,demux,mux,decoder}.{,l}a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
+        rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
+    fi
+    do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
+        --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
+        --disable-tiff LIBS=-lz LIBPNG_CONFIG="pkg-config"
+    do_checkIfExist libwebp-0.4.3 libwebp.a
 fi
 
 echo "-------------------------------------------------------------------------------"
