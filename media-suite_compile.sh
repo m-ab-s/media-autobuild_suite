@@ -76,7 +76,7 @@ if [ ! -d "$gitFolder"-git ]; then
     else
         echo "$gitFolder git seems to be down"
         echo "Try again later or <Enter> to continue"
-        read -p "if you're sure nothing depends on it."
+        do_prompt "if you're sure nothing depends on it."
         compile="false"
     fi
 else
@@ -132,7 +132,7 @@ if [ ! -d "$svnFolder"-svn ]; then
     else
         echo "$svnFolder svn seems to be down"
         echo "Try again later or <Enter> to continue"
-        read -p "if you're sure nothing depends on it."
+        do_prompt "if you're sure nothing depends on it."
         compile="false"
     fi
 else
@@ -179,7 +179,7 @@ if [ ! -d "$hgFolder"-hg ]; then
     else
         echo "$hgFolder hg seems to be down"
         echo "Try again later or <Enter> to continue"
-        read -p "if you're sure nothing depends on it."
+        do_prompt "if you're sure nothing depends on it."
         compile="false"
     fi
 else
@@ -254,7 +254,7 @@ do_wget() {
     elif [[ $response_code -gt 400 ]]; then
         echo "Error $response_code while downloading $URL"
         echo "Try again later or <Enter> to continue"
-        read -p "if you're sure nothing depends on it."
+        do_prompt "if you're sure nothing depends on it."
     fi
 }
 
@@ -292,7 +292,7 @@ do_checkIfExist() {
         echo "Build of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
         echo "If you're sure there are no dependencies <Enter> to continue building."
-        read -p "Close this window if you wish to stop building."
+        do_prompt "Close this window if you wish to stop building."
     fi
 }
 
@@ -475,6 +475,12 @@ do_makeinstall() {
 do_generic_confmakeinstall() {
     do_generic_conf "$@"
     do_makeinstall
+}
+
+do_prompt() {
+    # from http://superuser.com/a/608509
+    while read -s -e -t 0.1; do : ; done
+    read -p "$1" ret
 }
 
 buildProcess() {
@@ -2103,7 +2109,7 @@ while [[ $new_updates = "yes" ]]; do
     echo "There were new updates while compiling."
     echo "Updated:$new_updates_packages"
     echo "Would you like to run compilation again to get those updates? Default: no"
-    read -p "y/[n] " ret
+    do_prompt "y/[n] "
     echo "-------------------------------------------------------------------------------"
     [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]] && run_builds || break
 done
