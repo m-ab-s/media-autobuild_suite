@@ -831,20 +831,34 @@ if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     echo.exit>>firstrun.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstrun.sh
     del firstrun.sh
-
+    pause
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
     if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
     (
         echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm -Syu --force --ignoregroup base
-        echo.pacman --noconfirm -Su --force
+        echo.pacman --noconfirm --force -Sy bash pacman pacman-mirrors msys2-runtime
+        echo.read -p ""
         echo.exit
         )>>%instdir%\firstUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
     cls
     del %instdir%\firstUpdate.sh
+
+    echo.-------------------------------------------------------------------------------
+    echo.second update
+    echo.-------------------------------------------------------------------------------
+    if exist %instdir%\secondUpdate.sh del %instdir%\secondUpdate.sh
+    (
+        echo.echo -ne "\033]0;second msys2 update\007"
+        echo.pacman --noconfirm -Syu --force --ignoregroup base
+        echo.pacman --noconfirm -Su --force
+        echo.exit
+        )>>%instdir%\secondUpdate.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\secondUpdate.sh
+    cls
+    del %instdir%\secondUpdate.sh
 
 :minttySettings
 if not exist %instdir%\mintty.lnk (
