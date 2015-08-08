@@ -820,7 +820,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 
 :getMintty
 
-if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
+if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.
     echo.- make a first run
@@ -831,15 +831,15 @@ if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     echo.exit>>firstrun.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstrun.sh
     del firstrun.sh
-    pause
+
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
     if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
     (
         echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm --force -Sy bash pacman pacman-mirrors msys2-runtime
-        echo.read -p ""
+        echo.pacman --noconfirm --force -Sy pacman-mirrors
+        echo.sleep ^4
         echo.exit
         )>>%instdir%\firstUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
@@ -860,8 +860,6 @@ if exist %instdir%\%msys2%\usr\bin\mintty.exe GOTO minttySettings
     cls
     del %instdir%\secondUpdate.sh
 
-:minttySettings
-if not exist %instdir%\mintty.lnk (
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
         echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
@@ -875,40 +873,40 @@ if not exist %instdir%\mintty.lnk (
         )>>%instdir%\setlink.vbs
     cscript /nologo %instdir%\setlink.vbs
     del %instdir%\setlink.vbs
-    )
-if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
-if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
-    (
-        echo.BoldAsFont=no
-        echo.BackgroundColour=57,57,57
-        echo.ForegroundColour=221,221,221
-        echo.Transparency=medium
-        echo.FontHeight=^9
-        echo.FontSmoothing=full
-        echo.AllowBlinking=yes
-        echo.Font=DejaVu Sans Mono
-        echo.Columns=120
-        echo.Rows=30
-        echo.Term=xterm-256color
-        echo.CursorType=block
-        echo.ClicksPlaceCursor=yes
-        echo.Black=38,39,41
-        echo.Red=249,38,113
-        echo.Green=166,226,46
-        echo.Yellow=253,151,31
-        echo.Blue=102,217,239
-        echo.Magenta=158,111,254
-        echo.Cyan=94,113,117
-        echo.White=248,248,242
-        echo.BoldBlack=85,68,68
-        echo.BoldRed=249,38,113
-        echo.BoldGreen=166,226,46
-        echo.BoldYellow=253,151,31
-        echo.BoldBlue=102,217,239
-        echo.BoldMagenta=158,111,254
-        echo.BoldCyan=163,186,191
-        echo.BoldWhite=248,248,242
-        )>>%instdir%\%msys2%\home\%USERNAME%\.minttyrc
+        )
+    if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
+    if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
+        (
+            echo.BoldAsFont=no
+            echo.BackgroundColour=57,57,57
+            echo.ForegroundColour=221,221,221
+            echo.Transparency=medium
+            echo.FontHeight=^9
+            echo.FontSmoothing=full
+            echo.AllowBlinking=yes
+            echo.Font=DejaVu Sans Mono
+            echo.Columns=120
+            echo.Rows=30
+            echo.Term=xterm-256color
+            echo.CursorType=block
+            echo.ClicksPlaceCursor=yes
+            echo.Black=38,39,41
+            echo.Red=249,38,113
+            echo.Green=166,226,46
+            echo.Yellow=253,151,31
+            echo.Blue=102,217,239
+            echo.Magenta=158,111,254
+            echo.Cyan=94,113,117
+            echo.White=248,248,242
+            echo.BoldBlack=85,68,68
+            echo.BoldRed=249,38,113
+            echo.BoldGreen=166,226,46
+            echo.BoldYellow=253,151,31
+            echo.BoldBlue=102,217,239
+            echo.BoldMagenta=158,111,254
+            echo.BoldCyan=163,186,191
+            echo.BoldWhite=248,248,242
+            )>>%instdir%\%msys2%\home\%USERNAME%\.minttyrc
 
 :hgsettings
 if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO gitsettings
