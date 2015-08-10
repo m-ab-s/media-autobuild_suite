@@ -512,7 +512,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
-        if pkg-config --exists libopenjp2; then
+        if [[ -d $LOCALDESTDIR/include/openjpeg-2.1 ]]; then
             rm -rf $LOCALDESTDIR/include/openjpeg{-2.1,.h} $LOCALDESTDIR/lib/openjpeg-2.1
             rm -f $LOCALDESTDIR/lib/libopenjp{2,wl}.a $LOCALDESTDIR/lib/libopenmj2.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
@@ -750,20 +750,27 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions "--enable-libwebp" && do_pkgConfig "libwebp = 0.4.3"; then
+if do_checkForOptions "--enable-libwebp"; then
     cd $LOCALBUILDDIR
-    do_wget "http://downloads.webmproject.org/releases/webp/libwebp-0.4.3.tar.gz"
-    [[ -f Makefile ]] && make distclean
-    if pkg-config --exists libwebp; then
-        rm -rf $LOCALDESTDIR/include/webp
-        rm -f $LOCALDESTDIR/lib/libwebp{,demux,mux,decoder}.{,l}a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
-        rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
+    do_git "https://chromium.googlesource.com/webm/libwebp" libwebp
+    if [[ $compile = "true" ]]; then
+        [[ -f configure ]] || ./autogen.sh
+        [[ -f Makefile ]] && make distclean
+        if [[ -d $LOCALDESTDIR/include/webp ]]; then
+            rm -rf $LOCALDESTDIR/include/webp
+            rm -f $LOCALDESTDIR/lib/libwebp{,demux,mux,decoder}.{,l}a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
+            rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
+        fi
+        do_patch libwebp-gcc5.1.patch
+        do_generic_conf global --enable-swap-16bit-csp --enable-experimental \
+            --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
+            LIBS="$(pkg-config --libs libtiff-4)" LIBPNG_CONFIG="pkg-config" \
+            LDFLAGS="$LDFLAGS -static -static-libgcc"
+        make
+        make install
+        do_checkIfExist libwebp-git libwebp.a
     fi
-    do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
-        --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
-        --disable-tiff LIBS=-lz LIBPNG_CONFIG="pkg-config"
-    do_checkIfExist libwebp-0.4.3 libwebp.a
 fi
 
 echo "-------------------------------------------------------------------------------"
@@ -2021,7 +2028,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_git "https://github.com/BYVoid/uchardet.git" uchardet
     if [[ $compile = "true" ]]; then
-        if pkg-config --exists uchardet; then
+        if [[ -f $LOCALDESTDIR/include/uchardet.h ]]; then
             rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc
         fi

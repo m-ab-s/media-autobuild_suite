@@ -1,0 +1,49 @@
+From 4a74e98ac6d8c5653f4667eae7185c51063a68ee Mon Sep 17 00:00:00 2001
+From: Lubosz Sarnecki <lubosz.sarnecki@collabora.co.uk>
+Date: Thu, 2 Jul 2015 17:11:13 +0200
+Subject: [PATCH 1/2] fix gcc 5.1 error, where c++14 string literals are
+ detected
+
+http://sourceforge.net/p/freeimage/discussion/36110/thread/605ef8e4/
+---
+ src/dsp/upsampling_mips_dsp_r2.c | 6 +++---
+ src/dsp/yuv_mips_dsp_r2.c        | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/dsp/upsampling_mips_dsp_r2.c b/src/dsp/upsampling_mips_dsp_r2.c
+index 9c9665f..c587b1e 100644
+--- a/src/dsp/upsampling_mips_dsp_r2.c
++++ b/src/dsp/upsampling_mips_dsp_r2.c
+@@ -34,13 +34,13 @@
+     G = G - t2 + kGCst;                                                        \
+     B = B + kBCst;                                                             \
+     __asm__ volatile (                                                         \
+-      "shll_s.w         %["#R"],      %["#R"],        9              \n\t"     \
++      "shll_s.w         %[" #R "],      %[" #R "],        9              \n\t"     \
+       "shll_s.w         %["#G"],      %["#G"],        9              \n\t"     \
+       "shll_s.w         %["#B"],      %["#B"],        9              \n\t"     \
+-      "precrqu_s.qb.ph  %["#R"],      %["#R"],        $zero          \n\t"     \
++      "precrqu_s.qb.ph  %[" #R "],      %[" #R "],        $zero          \n\t"     \
+       "precrqu_s.qb.ph  %["#G"],      %["#G"],        $zero          \n\t"     \
+       "precrqu_s.qb.ph  %["#B"],      %["#B"],        $zero          \n\t"     \
+-      "srl              %["#R"],      %["#R"],        24             \n\t"     \
++      "srl              %[" #R "],      %[" #R "],        24             \n\t"     \
+       "srl              %["#G"],      %["#G"],        24             \n\t"     \
+       "srl              %["#B"],      %["#B"],        24             \n\t"     \
+       : [R]"+r"(R), [G]"+r"(G), [B]"+r"(B)                                     \
+diff --git a/src/dsp/yuv_mips_dsp_r2.c b/src/dsp/yuv_mips_dsp_r2.c
+index 43f02cc..3b9a907 100644
+--- a/src/dsp/yuv_mips_dsp_r2.c
++++ b/src/dsp/yuv_mips_dsp_r2.c
+@@ -54,7 +54,7 @@
+   "srl              %[temp5],   %[temp5],       24              \n\t"          \
+   "srl              %[temp6],   %[temp6],       24              \n\t"          \
+   "srl              %[temp7],   %[temp7],       24              \n\t"          \
+-  "sb               %[temp5],   "#R"(%[dst])                    \n\t"          \
++  "sb               %[temp5],   " #R "(%[dst])                    \n\t"          \
+   "sb               %[temp6],   "#G"(%[dst])                    \n\t"          \
+   "sb               %[temp7],   "#B"(%[dst])                    \n\t"          \
+ 
+-- 
+2.4.5
+
