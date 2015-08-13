@@ -550,9 +550,9 @@ if do_checkForOptions "--enable-libfreetype --enable-libass" && \
 fi
 
 if do_checkForOptions "--enable-fontconfig --enable-libass" && \
-    do_pkgConfig "fontconfig = 2.11.92" || [[ "$newFreetype" = "y" ]] ; then
+    do_pkgConfig "fontconfig = 2.11.94" || [[ "$newFreetype" = "y" ]] ; then
     cd $LOCALBUILDDIR
-    do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
+    do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
 
     if [[ -f "src/.libs/libfontconfig.a" ]]; then
         make distclean
@@ -562,8 +562,9 @@ if do_checkForOptions "--enable-fontconfig --enable-libass" && \
         rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
     fi
     do_generic_confmakeinstall global
-    do_checkIfExist fontconfig-2.11.92 libfontconfig.a
+    do_checkIfExist fontconfig-2.11.94 libfontconfig.a
     unset newFreetype
+    newFontconfig="y"
 fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.7"; then
