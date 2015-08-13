@@ -546,11 +546,11 @@ if do_checkForOptions "--enable-libfreetype --enable-libass" && \
     fi
     do_generic_confmakeinstall global --with-harfbuzz=no
     do_checkIfExist freetype-2.6 libfreetype.a
-    newFreetype="y"
+    buildLibass="y"
 fi
 
 if do_checkForOptions "--enable-fontconfig --enable-libass" && \
-    do_pkgConfig "fontconfig = 2.11.94" || [[ "$newFreetype" = "y" ]] ; then
+    do_pkgConfig "fontconfig = 2.11.94" || [[ "$buildLibass" = "y" ]] ; then
     cd $LOCALBUILDDIR
     do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
 
@@ -563,8 +563,7 @@ if do_checkForOptions "--enable-fontconfig --enable-libass" && \
     fi
     do_generic_confmakeinstall global
     do_checkIfExist fontconfig-2.11.94 libfontconfig.a
-    unset newFreetype
-    newFontconfig="y"
+    buildLibass="y"
 fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.7"; then
@@ -582,7 +581,7 @@ fi
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/behdad/harfbuzz.git" harfbuzz
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" || "$buildLibass" = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             ./autogen.sh -V
         else
@@ -593,6 +592,7 @@ if do_checkForOptions "--enable-libass"; then
         do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
         LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         do_checkIfExist harfbuzz-git libharfbuzz.a
+        buildLibass="y"
     fi
 fi
 
@@ -1307,16 +1307,10 @@ if [[ $other265 = "y" ]]; then
 fi
 
 if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
-
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
-        if [[ ! -f "configure" ]]; then
-            autoreconf -fiv
-        else
-            make distclean
-        fi
-
+        [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/dvdread ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
@@ -1328,12 +1322,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
-        if [[ ! -f "configure" ]]; then
-            autoreconf -fiv
-        else
-            make distclean
-        fi
-
+        [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/dvdnav ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
@@ -1369,15 +1358,10 @@ if do_checkForOptions "--enable-libutvideo"; then
             rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
             make distclean
         fi
-
         ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-
         make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
         make install RANLIBX="${RANLIB-ranlib}"
-
         do_checkIfExist libutvideo-git libutvideo.a
-
-        buildFFmpeg="true"
     fi
 fi
 
@@ -1389,7 +1373,7 @@ if do_checkForOptions "--enable-libass"; then
     else
         do_git "https://github.com/libass/libass.git" libass
     fi
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" || $buildLibass = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
         else
@@ -1400,7 +1384,7 @@ if do_checkForOptions "--enable-libass"; then
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
-        unset disable_fc
+        unset disable_fc buildLibass
     fi
 fi
 
@@ -1673,18 +1657,11 @@ if [[ $mp4box = "y" ]]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
         fi
-
-        if [[ -f config.mak ]]; then
-            make distclean
-        fi
-
+        [[ -f config.mak ]] && make distclean
         ./configure --prefix=$LOCALDESTDIR --static-mp4box --extra-libs="-lz"
-
         make -j $cpuCount
         make install-lib
-
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
-
         do_checkIfExist gpac-git bin-video/MP4Box.exe
     fi
 fi
@@ -1707,9 +1684,7 @@ if [[ ! $x264 = "n" ]]; then
                 rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
 
-            if [ -f "config.mak" ]; then
-                make distclean
-            fi
+            [ -f "config.mak" ] && make distclean
 
             ./configure $FFMPEG_BASE_OPTS --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-shared \
             --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
@@ -1720,9 +1695,7 @@ if [[ ! $x264 = "n" ]]; then
             cd $LOCALBUILDDIR
             do_git "https://github.com/l-smash/l-smash.git" lsmash
             if [[ $compile = "true" ]]; then
-                if [[ -f "config.mak" ]]; then
-                    make distclean
-                fi
+                [[ -f "config.mak" ]] && make distclean
                 if [[ -f "$LOCALDESTDIR/lib/liblsmash.a" ]]; then
                     rm -f $LOCALDESTDIR/include/lsmash.h $LOCALDESTDIR/lib/liblsmash.a
                     rm -f $LOCALDESTDIR/lib/pkgconfig/liblsmash.pc
