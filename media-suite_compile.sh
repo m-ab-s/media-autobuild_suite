@@ -533,9 +533,9 @@ if do_checkForOptions "--enable-libopenjpeg"; then
 fi
 
 if do_checkForOptions "--enable-libfreetype --enable-libass" && \
-    do_pkgConfig "freetype2 = 17.4.11"; then
+    do_pkgConfig "freetype2 = 18.0.12"; then
     cd $LOCALBUILDDIR
-    do_wget "http://downloads.sourceforge.net/project/freetype/freetype2/2.5.5/freetype-2.5.5.tar.bz2"
+    do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
 
     if [[ -f "objs/.libs/libfreetype.a" ]]; then
         make distclean
@@ -545,11 +545,12 @@ if do_checkForOptions "--enable-libfreetype --enable-libass" && \
         rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype.pc
     fi
     do_generic_confmakeinstall global --with-harfbuzz=no
-    do_checkIfExist freetype-2.5.5 libfreetype.a
+    do_checkIfExist freetype-2.6 libfreetype.a
+    newFreetype="y"
 fi
 
 if do_checkForOptions "--enable-fontconfig --enable-libass" && \
-    do_pkgConfig "fontconfig = 2.11.92"; then
+    do_pkgConfig "fontconfig = 2.11.92" || [[ "$newFreetype" = "y" ]] ; then
     cd $LOCALBUILDDIR
     do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.92.tar.gz"
 
@@ -562,6 +563,7 @@ if do_checkForOptions "--enable-fontconfig --enable-libass" && \
     fi
     do_generic_confmakeinstall global
     do_checkIfExist fontconfig-2.11.92 libfontconfig.a
+    unset newFreetype
 fi
 
 if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.7"; then
