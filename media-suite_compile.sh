@@ -927,8 +927,7 @@ if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
-if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3 \
-    opencore-amrwb = 0.1.3"; then
+if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
 
