@@ -532,7 +532,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
                $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
-        do_checkIfExist libopenjp2 libopenjp2.a
+        do_checkIfExist libopenjp2-git libopenjp2.a
     fi
 fi
 
