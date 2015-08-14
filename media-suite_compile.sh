@@ -2025,8 +2025,9 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
         --disable-debug-build --enable-static-build --disable-pdf-build --lua=luajit $mpv_pthreads \
         --disable-libguess
-
+        [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         $python waf install -j $cpuCount
+        [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
 
         if do_checkForOptions "--enable-fontconfig" && [[ ! -f fonts.conf || -d fonts ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
