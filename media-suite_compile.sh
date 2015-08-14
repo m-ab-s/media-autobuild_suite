@@ -1609,8 +1609,9 @@ fi
 
 if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx
+    do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx noDepth
     if [[ $compile = "true" ]]; then
+        git checkout 152907739b824613baf39ce4beff4d35eaef98be
         if [[ ! -f configure ]]; then
             autoreconf -fiv
         elif [[ -f Makefile ]]; then
@@ -1622,6 +1623,7 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
         fi
         do_generic_confmakeinstall
         do_checkIfExist libmfx-git libmfx.a
+        git checkout master
     fi
 fi
 
