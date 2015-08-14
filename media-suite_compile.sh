@@ -1069,6 +1069,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     fi
     do_cmake -DHAVE_WORDS_BIGENDIAN_EXITCODE:bool=off -DBUILD_EXAMPLES:bool=off -DWITH_SIMD:bool=on \
     -DBUILD_TESTS:bool=off -DWITH_OPENMP:bool=off -DBUILD_LSR_TESTS:bool=off
+    sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
     do_makeinstall
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
