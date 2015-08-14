@@ -372,6 +372,10 @@ do_changeFFmpegConfig() {
         do_removeOption "--enable-libfaac"
     fi
 
+    if do_checkForOptions "--enable-frei0r"; then
+        do_addOption "--enable-filter=frei0r"
+    fi
+
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
@@ -1546,23 +1550,19 @@ fi
 if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     cd $LOCALBUILDDIR
     do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
-
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
-
-    [[ -d "build" ]] && rm -rf build/* || mkdir build
-    cd build
     if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
         rm -rf $LOCALDESTDIR/include/frei0r.h
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
-
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR
-
+    do_cmake -DCMAKE_BUILD_TYPE=Release
     make -j $cpuCount
+    sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
+           -e 's,^exec_prefix=.*,exec_prefix=${prefix},' \
+           -e 's,^libdir=.*,libdir=${prefix}/lib,' \
+           -e 's,^includedir=.*,includedir=${prefix}/include,' frei0r.pc
     make all install
-
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
-    do_addOption "--enable-filter=frei0r"
 fi
 
 if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
