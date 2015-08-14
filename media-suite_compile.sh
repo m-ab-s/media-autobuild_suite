@@ -1949,7 +1949,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
     if [[ $compile = "true" ]]; then
-        [[ $bits = "32bit" ]] && _bits="32" && _bits="64"
+        [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
         if [[ -f lib${_bits}/libwaio.a ]]; then
             ./build-mingw-nt${_bits} clean
             rm -rf $LOCALDESTDIR/include/waio
