@@ -42,7 +42,7 @@ gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error 
 libtiff mpc nasm pcre ragel schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm python2-lxml
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
---enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame^
+--enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid ^
