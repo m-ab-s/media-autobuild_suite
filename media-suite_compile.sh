@@ -300,7 +300,7 @@ do_pkgConfig() {
     local pkg=${1%% *}
     echo -ne "\033]0;compiling $pkg $bits\007"
 
-    if [ $(pkg-config --variable=prefix --silence-errors "$1") = "$LOCALDESTDIR" ]; then
+    if [[ $(pkg-config --variable=prefix --silence-errors "$1") = "$LOCALDESTDIR" ]]; then
         echo -------------------------------------------------
         echo "$pkg is already compiled"
         echo -------------------------------------------------
