@@ -1477,8 +1477,7 @@ if do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
-        do_cmake -DUSE_OMP:bool=off
-        sed -i 's/ -fPIC//g' CMakeFiles/vidstab.dir/flags.make
+        do_cmake
         do_makeinstall
         do_checkIfExist vidstab-git libvidstab.a
         buildFFmpeg="true"
