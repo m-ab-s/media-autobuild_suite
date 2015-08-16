@@ -1,0 +1,55 @@
+From 143a2491ca34b9bc57d6c81d5a2cedca6c558763 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Sun, 16 Aug 2015 18:47:07 +0100
+Subject: [PATCH] Only compile libraries
+
+---
+ CMakeLists.txt | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index df874e9..6461bab 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -295,7 +295,7 @@ else()
+   set(DJPEG_BMP_SOURCES wrbmp.c wrtarga.c)
+ endif()
+ 
+-if(ENABLE_STATIC)
++if(FALSE)
+   add_executable(cjpeg-static cjpeg.c cdjpeg.c rdgif.c rdppm.c rdswitch.c
+     ${CJPEG_BMP_SOURCES})
+   set_property(TARGET cjpeg-static PROPERTY COMPILE_FLAGS ${COMPILE_FLAGS})
+@@ -311,9 +311,9 @@ if(ENABLE_STATIC)
+   set_property(TARGET jpegtran-static PROPERTY COMPILE_FLAGS "-DUSE_SETMODE")
+ endif()
+ 
+-add_executable(rdjpgcom rdjpgcom.c)
++#add_executable(rdjpgcom rdjpgcom.c)
+ 
+-add_executable(wrjpgcom wrjpgcom.c)
++#add_executable(wrjpgcom wrjpgcom.c)
+ 
+ 
+ #
+@@ -932,7 +932,7 @@ endif()
+ 
+ if(ENABLE_STATIC)
+   install(TARGETS jpeg-static ARCHIVE DESTINATION lib)
+-  if(NOT ENABLE_SHARED)
++  if(FALSE)
+     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/cjpeg-static.exe
+       DESTINATION bin RENAME cjpeg.exe)
+     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/djpeg-static.exe
+@@ -942,7 +942,7 @@ if(ENABLE_STATIC)
+   endif()
+ endif()
+ 
+-install(TARGETS rdjpgcom wrjpgcom RUNTIME DESTINATION bin)
++#install(TARGETS rdjpgcom wrjpgcom RUNTIME DESTINATION bin)
+ 
+ install(FILES ${CMAKE_SOURCE_DIR}/README ${CMAKE_SOURCE_DIR}/README-turbo.txt
+   ${CMAKE_SOURCE_DIR}/example.c ${CMAKE_SOURCE_DIR}/libjpeg.txt
+-- 
+2.5.0
+

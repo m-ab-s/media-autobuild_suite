@@ -505,10 +505,10 @@ if do_checkForOptions "--enable-libopenjpeg"; then
             rm -f $LOCALDESTDIR/lib/libjpeg.{l,}a $LOCALDESTDIR/bin-global/{c,d}jpeg.exe
             rm -f $LOCALDESTDIR/bin-global/jpegtran.exe $LOCALDESTDIR/bin-global/{rd,wr}jpgcom.exe
         fi
-        [[ -f configure ]] || autoreconf -fiv
-        [[ -f Makefile ]] && make distclean
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch"
-        do_generic_confmakeinstall global --without-turbojpeg --with-jpeg8
+        do_patch "libjpegturbo-0002-Only-compile-libraries.patch"
+        do_cmake -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
+        ninja install
         do_checkIfExist libjpegturbo-git libjpeg.a
     fi
 
