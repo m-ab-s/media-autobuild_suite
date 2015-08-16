@@ -447,8 +447,7 @@ do_cmake() {
         mkdir build
     fi
     cd build
-    cmake .. -G "MSYS Makefiles" -DBUILD_SHARED_LIBS:bool=off \
-    -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DUNIX:bool=on "$@"
+    cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
 }
 
 do_generic_conf() {
@@ -524,8 +523,8 @@ if do_checkForOptions "--enable-libopenjpeg"; then
         fi
         do_patch "openjpeg-0001-Only-compile-libraries.patch"
         do_cmake -DBUILD_MJ2=on
-        do_makeinstall
         sed -i "s,prefix=.*,prefix=$LOCALDESTDIR," libopenjp2.pc
+        ninja install
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
         do_checkIfExist libopenjp2-git libopenmj2.a
@@ -1065,7 +1064,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     fi
     do_cmake -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
     sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
-    do_makeinstall
+    ninja install
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
@@ -1105,7 +1104,7 @@ if do_checkForOptions "--enable-libgme"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
         do_cmake
-        do_makeinstall
+        ninja install
         do_checkIfExist libgme-git libgme.a
     fi
 fi
@@ -1478,7 +1477,7 @@ if do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
         do_cmake
-        do_makeinstall
+        ninja install
         do_checkIfExist vidstab-git libvidstab.a
         buildFFmpeg="true"
     fi
@@ -1550,12 +1549,11 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
     do_cmake -DCMAKE_BUILD_TYPE=Release
-    make -j $cpuCount
     sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
            -e 's,^exec_prefix=.*,exec_prefix=${prefix},' \
            -e 's,^libdir=.*,libdir=${prefix}/lib,' \
            -e 's,^includedir=.*,includedir=${prefix}/include,' frei0r.pc
-    make all install
+    ninja install
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
 
@@ -1989,10 +1987,10 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc
         fi
         do_cmake
-        make libuchardet_static
+        ninja libuchardet_static
         sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
-               -e "s,^libdir=.*,libdir=$LOCALDESTDIR/lib," \
-               -e "s,^includedir=.*,includedir=$LOCALDESTDIR/include," uchardet.pc
+               -e 's,^libdir=.*,libdir=${prefix}/lib,' \
+               -e 's,^includedir=.*,includedir=${prefix}/include,' uchardet.pc
         if [[ -f src/libuchardet.a ]]; then
             mkdir -p $LOCALDESTDIR/include/uchardet
             cp ../src/uchardet.h $LOCALDESTDIR/include/uchardet/
