@@ -1750,7 +1750,7 @@ if [[ ! $x265 = "n" ]]; then
         [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
 
         do_x265_cmake() {
-            cmake ../../../source -G "MSYS Makefiles" $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
@@ -1762,7 +1762,7 @@ if [[ ! $x265 = "n" ]]; then
         if [[ $x265 != "s" ]]; then
             # multilib
             do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
-            make -j $cpuCount
+            ninja
             cp libx265.a ../8bit/libx265_main12.a
         fi
 
@@ -1770,12 +1770,12 @@ if [[ ! $x265 = "n" ]]; then
         if [[ $x265 = "s" ]]; then
             # libx265_main10.dll
             do_x265_cmake $assembly -DENABLE_SHARED=ON
-            make -j $cpuCount
+            ninja
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         else
             # multilib
             do_x265_cmake $assembly -DEXPORT_C_API=OFF
-            make -j $cpuCount
+            ninja
             cp libx265.a ../8bit/libx265_main10.a
         fi
 
@@ -1789,7 +1789,7 @@ if [[ ! $x265 = "n" ]]; then
             do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
                 -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
         fi
-        do_makeinstall
+        ninja
         if [[ $x265 != "s" ]]; then
             mv libx265.a libx265_main.a
             ar -M <<EOF
@@ -1800,7 +1800,7 @@ ADDLIB libx265_main12.a
 SAVE
 END
 EOF
-            cp libx265.a $LOCALDESTDIR/lib/libx265.a
+            ninja install
         fi
 
         do_checkIfExist x265-hg libx265.a
