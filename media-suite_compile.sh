@@ -522,17 +522,13 @@ if do_checkForOptions "--enable-libopenjpeg"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
             rm -f $LOCALDESTDIR/bin-global/opj_*.exe
         fi
-        do_cmake -DOPENJPEG_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global -DBUILD_MJ2=on \
-            -DBUILD_JPWL=on -DBUILD_THIRDPARTY=on -DCMAKE_C_FLAGS="$CFLAGS -DOPJ_STATIC" \
-            -DBUILD_PKGCONFIG_FILES=on
+        do_patch "openjpeg-0001-Only-compile-libraries.patch"
+        do_cmake -DBUILD_MJ2=on
         do_makeinstall
-        # fix wrong values in pkg-config files
-        sed -i -e "s,prefix=.*,prefix=$LOCALDESTDIR," \
-               -e 's,bindir=.*,bindir=${prefix}/bin-global,' \
-               $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
+        sed -i "s,prefix=.*,prefix=$LOCALDESTDIR," libopenjp2.pc
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
-        do_checkIfExist libopenjp2-git libopenjp2.a
+        do_checkIfExist libopenjp2-git libopenmj2.a
     fi
 fi
 
