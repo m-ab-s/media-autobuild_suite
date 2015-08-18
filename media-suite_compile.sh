@@ -1603,19 +1603,13 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx noDepth
     if [[ $compile = "true" ]]; then
-        git checkout 152907739b824613baf39ce4beff4d35eaef98be
-        if [[ ! -f configure ]]; then
-            autoreconf -fiv
-        elif [[ -f Makefile ]]; then
-            make distclean
-        fi
+        [[ ! -f configure ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/mfx ]]; then
             rm -rf $LOCALDESTDIR/include/mfx
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
         fi
         do_generic_confmakeinstall
         do_checkIfExist libmfx-git libmfx.a
-        git checkout master
     fi
 fi
 
@@ -1623,14 +1617,9 @@ if do_checkForOptions "--enable-libcdio"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
     if [[ $compile = "true" ]]; then
-        if [[ ! -f configure ]]; then
-            autoreconf -fiv
-        elif [[ -f config.h ]]; then
-            make distclean
-        fi
+        [[ ! -f configure ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/cdio ]]; then
-            rm -rf $LOCALDESTDIR/include/cdio
-            rm -f $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
+            rm -rf $LOCALDESTDIR/include/cdio $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
             rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
         fi
