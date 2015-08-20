@@ -508,7 +508,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch"
         do_patch "libjpegturbo-0002-Only-compile-libraries.patch"
         do_cmake -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
-        ninja install
+        ninja -j $cpuCount install
         do_checkIfExist libjpegturbo-git libjpeg.a
     fi
 
@@ -524,7 +524,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
         do_patch "openjpeg-0001-Only-compile-libraries.patch"
         do_cmake -DBUILD_MJ2=on
         sed -i "s,prefix=.*,prefix=$LOCALDESTDIR," libopenjp2.pc
-        ninja install
+        ninja -j $cpuCount install
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
         do_checkIfExist libopenjp2-git libopenmj2.a
@@ -1064,7 +1064,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     fi
     do_cmake -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
     sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
-    ninja install
+    ninja -j $cpuCount install
     do_checkIfExist soxr-0.1.1-Source libsoxr.a
 fi
 
@@ -1104,7 +1104,7 @@ if do_checkForOptions "--enable-libgme"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
         do_cmake
-        ninja install
+        ninja -j $cpuCount install
         do_checkIfExist libgme-git libgme.a
     fi
 fi
@@ -1477,7 +1477,7 @@ if do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
         do_cmake
-        ninja install
+        ninja -j $cpuCount install
         do_checkIfExist vidstab-git libvidstab.a
         buildFFmpeg="true"
     fi
@@ -1553,7 +1553,7 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
            -e 's,^exec_prefix=.*,exec_prefix=${prefix},' \
            -e 's,^libdir=.*,libdir=${prefix}/lib,' \
            -e 's,^includedir=.*,includedir=${prefix}/include,' frei0r.pc
-    ninja install
+    ninja -j $cpuCount install
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
 
@@ -1789,7 +1789,7 @@ ADDLIB libx265_main12.a
 SAVE
 END
 EOF
-            ninja install
+            ninja -j $cpuCount install
         fi
 
         do_checkIfExist x265-hg libx265.a
@@ -1976,7 +1976,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc
         fi
         do_cmake
-        ninja libuchardet_static
+        ninja -j $cpuCount libuchardet_static
         sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
                -e 's,^libdir=.*,libdir=${prefix}/lib,' \
                -e 's,^includedir=.*,includedir=${prefix}/include,' uchardet.pc
