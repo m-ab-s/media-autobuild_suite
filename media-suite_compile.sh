@@ -3,7 +3,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth"
+FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth --pkg-config-flags=--static"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -693,12 +693,12 @@ if do_checkForOptions "--enable-librtmp"; then
         fi
         if do_checkForOptions "--enable-gnutls"; then
             make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
-            SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --libs gnutls)" prefix=$LOCALDESTDIR \
+            SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --static --libs gnutls)" prefix=$LOCALDESTDIR \
             bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
             mandir=$LOCALDESTDIR/share/man install
         else
             make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
-            SYS=mingw LIB_OPENSSL="$(pkg-config --libs openssl)" XLIBS=-lz \
+            SYS=mingw LIB_OPENSSL="$(pkg-config --static --libs openssl)" XLIBS=-lz \
             prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
             mandir=$LOCALDESTDIR/share/man install
         fi
@@ -767,7 +767,7 @@ if do_checkForOptions "--enable-libwebp"; then
         do_patch libwebp-gcc5.1.patch
         do_generic_conf global --enable-swap-16bit-csp --enable-experimental \
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
-            LIBS="$(pkg-config --libs libtiff-4)" LIBPNG_CONFIG="pkg-config" \
+            LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
             LDFLAGS="$LDFLAGS -static -static-libgcc"
         make
         make install
