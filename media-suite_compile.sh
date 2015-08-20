@@ -1293,17 +1293,24 @@ if [[ $other265 = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/ultravideo/kvazaar.git" kvazaar shallow master bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
+        if [[ -f "$LOCALDESTDIR/lib/libkvazaar.a" ]]; then
+            rm -f "$LOCALDESTDIR/include/kvazaar.h"
+            rm -f "$LOCALDESTDIR/include/kvazaar_version.h"
+            rm -f "$LOCALDESTDIR/lib/libkvazaar.a"
+            rm -f "$LOCALDESTDIR/lib/pkgconfig/kvazaar.pc"
+            rm -f "$LOCALDESTDIR/bin-video/kvazaar.exe"
+        fi
         cd src
         if [[ -f intra.o ]]; then
             make clean
         fi
         if [[ "$bits" = "32bit" ]]; then
-            make ARCH=i686 -j $cpuCount
+            make all lib-static ARCH=i686 -j $cpuCount
         else
-            make ARCH=x86_64 -j $cpuCount
+            make all lib-static ARCH=x86_64 -j $cpuCount
         fi
-        cp kvazaar.exe $LOCALDESTDIR/bin-video
-        do_checkIfExist kvazaar-git bin-video/kvazaar.exe
+        make install-{pc,prog,static} PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-video
+        do_checkIfExist kvazaar-git libkvazaar.a
     fi
 fi
 
