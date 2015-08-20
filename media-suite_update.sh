@@ -57,7 +57,7 @@ if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -
         echo "-------------------------------------------------------------------------------"
         echo
         while true; do
-            read -p "install packs: $installBasePacks $installMingw32Packs $installMingw64Packs:" yn
+            read -p "install packs: $installBasePacks $installMingw32Packs $installMingw64Packs [y/n]: " yn
             case $yn in
                 [Yy]* ) pacman --noconfirm -S $installBasePacks $installMingw32Packs $installMingw64Packs; break;;
                 [Nn]* ) exit;;
@@ -74,7 +74,7 @@ if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -
         echo "-------------------------------------------------------------------------------"
         echo
         while true; do
-            read -p "remove packs: $removeBasePacks $removeMingw32Packs $removeMingw64Packs:" yn
+            read -p "remove packs: $removeBasePacks $removeMingw32Packs $removeMingw64Packs [y/n]: " yn
             case $yn in
                 [Yy]* ) pacman --noconfirm -R $removeBasePacks $removeMingw32Packs $removeMingw64Packs; break;;
                 [Nn]* ) exit;;
