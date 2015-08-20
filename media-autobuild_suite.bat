@@ -839,7 +839,7 @@ if not exist %instdir%\mintty.lnk (
     if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
     (
         echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm --force -Sy pacman-mirrors
+        echo.pacman --noconfirm --force -Sy --asdeps pacman-mirrors
         echo.sleep ^4
         echo.exit
         )>>%instdir%\firstUpdate.sh
@@ -852,8 +852,8 @@ if not exist %instdir%\mintty.lnk (
     if exist %instdir%\secondUpdate.sh del %instdir%\secondUpdate.sh
     (
         echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --force --ignoregroup base
-        echo.pacman --noconfirm -Su --force
+        echo.pacman --noconfirm -Syu --force --asdeps --ignoregroup base
+        echo.pacman --noconfirm -Su --force --asdeps
         echo.exit
         )>>%instdir%\secondUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\secondUpdate.sh

@@ -15,6 +15,8 @@ done
 # packet update system
 # --------------------------------------------------
 
+pacman -Qqe | grep -q bash && pacman -Qqg base | pacman -D --asdeps - > /dev/null
+
 if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -f "/etc/pac-mingw64-old.pk" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
