@@ -4,6 +4,7 @@ while true; do
   case $1 in
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
+--remove=* ) remove="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -49,27 +50,27 @@ if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -
         rm -f /etc/pac-mingw64-old.pk
     fi
 
-    if [[ ! "$installBasePacks" == "" ]] || [[ ! "$installMingw32Packs" == "" ]] || [[ ! "$installMingw64Packs" == "" ]]; then
+    if [[ "$installBasePacks" != "" || "$installMingw32Packs" != "" || "$installMingw64Packs" != "" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
-        echo "You don't have the all the packs installed what the actual script need."
+        echo "You're missing some packages!"
         echo "Do you want to install them?"
         echo "-------------------------------------------------------------------------------"
         echo
         while true; do
             read -p "install packs: $installBasePacks $installMingw32Packs $installMingw64Packs [y/n]: " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm -S $installBasePacks $installMingw32Packs $installMingw64Packs; break;;
+                [Yy]* ) pacman --noconfirm --needed -S $installBasePacks $installMingw32Packs $installMingw64Packs; break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no";;
             esac
         done
     fi
 
-    if [[ ! "$removeBasePacks" == "" ]] || [[ ! "$removeMingw32Packs" == "" ]] || [[ ! "$removeMingw64Packs" == "" ]]; then
+    if [[ "$remove" = "y" ]] && [[ "$removeBasePacks" != "" || "$removeMingw32Packs" != "" || "$removeMingw64Packs" != "" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
-        echo "You have more base packs installed then the actual compiler script need."
+        echo "You have more packages than needed!"
         echo "Do you want to remove them?"
         echo "-------------------------------------------------------------------------------"
         echo

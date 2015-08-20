@@ -34,7 +34,7 @@ set "ini=media-autobuild_suite.ini"
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
-intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial rubygems ^
+intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial ruby ^
 man-db
 
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
@@ -844,7 +844,6 @@ if not exist %instdir%\mintty.lnk (
         echo.exit
         )>>%instdir%\firstUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
-    cls
     del %instdir%\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
@@ -1056,7 +1055,8 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh --build32=%build32% --build64=%build64%
+%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh ^
+--build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
 
 :rebase2
