@@ -17,74 +17,57 @@ done
 
 pacman -Qqe | grep -q bash && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 
-if [[ -f "/etc/pac-base-old.pk" ]] && [[ -f "/etc/pac-mingw32-old.pk" ]] || [[ -f "/etc/pac-mingw64-old.pk" ]]; then
+if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/pac-mingw64.pk" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo "check pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
+    old=$(pacman -Qqe | sort)
+    new=$(cat /etc/pac-base.pk)
+    [[ "$build32" = "yes" ]] && new=$(printf "$new\n$(cat /etc/pac-mingw32.pk)")
+    [[ "$build64" = "yes" ]] && new=$(printf "$new\n$(cat /etc/pac-mingw64.pk)")
+    diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort) | grep '^[<>]')
+    install=$(echo "$diff" | grep '>' | sed 's/[<>] //g')
+    uninstall=$(echo "$diff" | grep '<' | sed 's/[<>] //g')
 
-    sed -i 's/ /\n/g' /etc/pac-base-old.pk
-    sed -i 's/ /\n/g' /etc/pac-base-new.pk
-    oldBase=/etc/pac-base-old.pk
-    newBase=/etc/pac-base-new.pk
-    installBasePacks=`diff $oldBase $newBase | grep ">" | sed "s/> //g" | tr '\n' ' '`
-    removeBasePacks=`diff $oldBase $newBase | grep "<" | sed "s/< //g" | tr '\n' ' '`
-    rm -f /etc/pac-base-old.pk
-
-    if [[ $build32 = "yes" ]]; then
-        sed -i 's/ /\n/g' /etc/pac-mingw32-old.pk
-        sed -i 's/ /\n/g' /etc/pac-mingw32-new.pk
-        oldMingw32=/etc/pac-mingw32-old.pk
-        newMingw32=/etc/pac-mingw32-new.pk
-        installMingw32Packs=`diff $oldMingw32 $newMingw32 | grep ">" | sed "s/> //g" | tr '\n' ' '`
-        removeMingw32Packs=`diff $oldMingw32 $newMingw32 | grep "<" | sed "s/< //g" | tr '\n' ' '`
-        rm -f /etc/pac-mingw32-old.pk
-    fi
-
-    if [[ $build64 = "yes" ]]; then
-        sed -i 's/ /\n/g' /etc/pac-mingw64-old.pk
-        sed -i 's/ /\n/g' /etc/pac-mingw64-new.pk
-        oldMingw64=/etc/pac-mingw64-old.pk
-        newMingw64=/etc/pac-mingw64-new.pk
-        installMingw64Packs=`diff $oldMingw64 $newMingw64 | grep ">" | sed "s/> //g" | tr '\n' ' '`
-        removeMingw64Packs=`diff $oldMingw64 $newMingw64 | grep "<" | sed "s/< //g" | tr '\n' ' '`
-        rm -f /etc/pac-mingw64-old.pk
-    fi
-
-    if [[ "$installBasePacks" != "" || "$installMingw32Packs" != "" || "$installMingw64Packs" != "" ]]; then
+    if [[ "$install" != "" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You're missing some packages!"
         echo "Do you want to install them?"
         echo "-------------------------------------------------------------------------------"
         echo
+        echo "Install:"
+        echo "$install"
         while true; do
-            read -p "install packs: $installBasePacks $installMingw32Packs $installMingw64Packs [y/n]: " yn
+            read -p "install packs [y/n]? " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm --needed -S $installBasePacks $installMingw32Packs $installMingw64Packs; break;;
+                [Yy]* ) pacman --noconfirm --needed -S $install; break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no";;
             esac
         done
     fi
-
-    if [[ "$remove" = "y" ]] && [[ "$removeBasePacks" != "" || "$removeMingw32Packs" != "" || "$removeMingw64Packs" != "" ]]; then
+    if [[ "$remove" = "y" ]] && [[ "$uninstall" != "" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You have more packages than needed!"
         echo "Do you want to remove them?"
         echo "-------------------------------------------------------------------------------"
         echo
+        echo "Remove:"
+        echo "$remove"
         while true; do
-            read -p "remove packs: $removeBasePacks $removeMingw32Packs $removeMingw64Packs [y/n]: " yn
+            read -p "remove packs [y/n]? " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm -R $removeBasePacks $removeMingw32Packs $removeMingw64Packs; break;;
-                [Nn]* ) exit;;
+                [Yy]* ) pacman --noconfirm -R $uninstall; break;;
+                [Nn]* ) break;;
                 * ) echo "Please answer yes or no";;
             esac
         done
     fi
+    rm -f /etc/pac-{base,mingw32,mingw64}.pk
 fi
 
 # --------------------------------------------------
@@ -141,10 +124,10 @@ fi
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 system..."
 echo "-------------------------------------------------------------------------------"
-pacman --noconfirm -Syu --force --ignoregroup base
-pacman --noconfirm -Su --force
+pacman --noconfirm -Syu --force --asdeps --ignoregroup base
+pacman --noconfirm -Su --force --asdeps
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
-    pacman --noconfirm -S ca-certificates
+    pacman --noconfirm -S --asdeps ca-certificates
 fi
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 done..."

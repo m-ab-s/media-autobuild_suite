@@ -960,10 +960,8 @@ if %msys2%==msys32 (
     )
 
 :installbase
-if exist "%instdir%\%msys2%\etc\pac-base-old.pk" del "%instdir%\%msys2%\etc\pac-base-old.pk"
-if exist "%instdir%\%msys2%\etc\pac-base-new.pk" ren "%instdir%\%msys2%\etc\pac-base-new.pk" pac-base-old.pk
-
-for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base-new.pk
+if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
+for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base.pk
 
 if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
@@ -972,7 +970,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     if exist %instdir%\pacman.sh del %instdir%\pacman.sh
     (
     echo.echo -ne "\033]0;install base system\007"
-    echo.pacman --noconfirm -S $(cat /etc/pac-base-new.pk ^| sed -e 's#\\##'^)
+    echo.pacman --noconfirm -S $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
     echo.sleep ^3
     echo.exit
         )>>%instdir%\pacman.sh
@@ -1007,10 +1005,8 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
 
 :getmingw32
 if %build32%==yes (
-if exist "%instdir%\%msys2%\etc\pac-mingw32-old.pk" del "%instdir%\%msys2%\etc\pac-mingw32-old.pk"
-if exist "%instdir%\%msys2%\etc\pac-mingw32-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw32-new.pk" pac-mingw32-old.pk
-
-for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32-new.pk
+if exist "%instdir%\%msys2%\etc\pac-mingw32.pk" del "%instdir%\%msys2%\etc\pac-mingw32.pk"
+for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32.pk
 
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
@@ -1019,7 +1015,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.pacman --noconfirm -S $(cat /etc/pac-mingw32-new.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S $(cat /etc/pac-mingw32.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw32.sh
@@ -1029,10 +1025,8 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
 
 :getmingw64
 if %build64%==yes (
-if exist "%instdir%\%msys2%\etc\pac-mingw64-old.pk" del "%instdir%\%msys2%\etc\pac-mingw64-old.pk"
-if exist "%instdir%\%msys2%\etc\pac-mingw64-new.pk" ren "%instdir%\%msys2%\etc\pac-mingw64-new.pk" pac-mingw64-old.pk
-
-for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64-new.pk
+if exist "%instdir%\%msys2%\etc\pac-mingw64.pk" del "%instdir%\%msys2%\etc\pac-mingw64.pk"
+for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64.pk
 
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
@@ -1041,7 +1035,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.pacman --noconfirm -S $(cat /etc/pac-mingw64-new.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw64.sh
