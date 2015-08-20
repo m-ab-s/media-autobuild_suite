@@ -34,13 +34,12 @@ set "ini=media-autobuild_suite.ini"
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
-intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial ruby ^
-man-db
+intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial ruby man-db ^
+pkgconf gperf winpty-git
 
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
 gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg-turbo libmodplug ^
-libpng libtiff mpc nasm pcre ragel schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm python2-lxml ninja ^
-pkg-config
+libpng libtiff mpc nasm pcre ragel schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm python2-lxml ninja
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
