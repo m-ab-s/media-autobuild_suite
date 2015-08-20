@@ -48,6 +48,7 @@ Included Tools And Libraries
 	- libfdk-aac (git)
 	- libgsm
 	- libilbc (git)
+	- libkvazaar (git)
 	- libmfx (git)
 	- libmodplug
 	- libmp3lame

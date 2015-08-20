@@ -11,6 +11,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
+--enable-libkvazaar \
 --enable-libwebp \
 --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
@@ -353,6 +354,11 @@ do_changeFFmpegConfig() {
     # add options for static modplug
     if do_checkForOptions "--enable-libmodplug"; then
         do_addOption "--extra-cflags=-DMODPLUG_STATIC"
+    fi
+
+    # add options for static kvazaar
+    if do_checkForOptions "--enable-libkvazaar"; then
+        do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
     fi
 
     # handle gplv3 libs
@@ -1312,6 +1318,8 @@ if [[ $other265 = "y" ]]; then
         make install-{pc,prog,static} PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-video
         do_checkIfExist kvazaar-git libkvazaar.a
     fi
+else
+    pkg-config --exists kvazaar || do_removeOption "--enable-libkvazaar"
 fi
 
 if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
