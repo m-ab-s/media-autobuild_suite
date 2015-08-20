@@ -57,7 +57,7 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
         echo "-------------------------------------------------------------------------------"
         echo
         echo "Remove:"
-        echo "$remove"
+        echo "$uninstall"
         while true; do
             read -p "remove packs [y/n]? " yn
             case $yn in
