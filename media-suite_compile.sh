@@ -416,10 +416,12 @@ do_removeOption() {
 
 do_patch() {
     local patch=${1%% *}
-    local strip=$2
+    local am=$2     # "am" to apply patch with "git am"
+    local strip=$3  # value of "patch" -p i.e. leading directories to strip
     if [[ -z $strip ]]; then
         strip="1"
     fi
+    local patchpath=""
     local response_code="$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch")"
 
@@ -427,14 +429,15 @@ do_patch() {
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
         iPath=$(cygpath -w /)
         if [ -f ./"$patch" ]; then
-            patch -N -p$strip -i "$patch"
+            patchpath="$patch"
         elif [ -f "$iPath/../patches/$patch" ]; then
-            patch -N -p$strip -i "$iPath/../patches/$patch"
-        else
-            echo "No local patch found. Moving on without patching."
+            patchpath="$iPath/../patches/$patch"
         fi
     elif [[ $response_code = "200" ]]; then
-        patch -N -p$strip -i "$patch"
+        patchpath="$patch"
+    fi
+    if [[ "$patchpath" != "" ]]; then
+        [[ "$am" = "am" ]] && git am "$patchpath" || patch -N -p$strip -i "$patchpath"
     else
         echo "No patch found anywhere. Moving on without patching."
     fi
@@ -505,8 +508,8 @@ if do_checkForOptions "--enable-libopenjpeg"; then
             rm -f $LOCALDESTDIR/lib/libjpeg.{l,}a $LOCALDESTDIR/bin-global/{c,d}jpeg.exe
             rm -f $LOCALDESTDIR/bin-global/jpegtran.exe $LOCALDESTDIR/bin-global/{rd,wr}jpgcom.exe
         fi
-        do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch"
-        do_patch "libjpegturbo-0002-Only-compile-libraries.patch"
+        do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
+        do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
         do_cmake -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
         ninja -j $cpuCount install
         do_checkIfExist libjpegturbo-git libjpeg.a
@@ -521,7 +524,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
             rm -f $LOCALDESTDIR/bin-global/opj_*.exe
         fi
-        do_patch "openjpeg-0001-Only-compile-libraries.patch"
+        do_patch "openjpeg-0001-Only-compile-libraries.patch" am
         do_cmake -DBUILD_MJ2=on
         sed -i "s,prefix=.*,prefix=$LOCALDESTDIR," libopenjp2.pc
         ninja -j $cpuCount install
@@ -764,7 +767,7 @@ if do_checkForOptions "--enable-libwebp"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
             rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
         fi
-        do_patch libwebp-gcc5.1.patch
+        do_patch libwebp-gcc5.1.patch am
         do_generic_conf global --enable-swap-16bit-csp --enable-experimental \
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
             LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
@@ -1809,7 +1812,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpegSHARED/ffmpeg.exe
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
-        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch"
+        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
