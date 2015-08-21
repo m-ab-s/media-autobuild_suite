@@ -85,9 +85,8 @@ cd $iPath/..
 
 if [[ $build32 = "yes" ]]; then
     if [ -f "/local32/etc/profile.local" ]; then
-        newProfiles32=`sed -n "/echo.# \/local32\/etc\/profile.local/,/echo.cross='i686-w64-mingw32-'/p" media-autobuild_suite.bat | sed "s/echo.//g"`
-
-        oldProfiles32=`sed -n "/# \/local32\/etc\/profile.local/,/cross='i686-w64-mingw32-'/p" /local32/etc/profile.local`
+        newProfiles32=$(sed -n "/echo.# \/local32\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" media-autobuild_suite.bat | sed "s/echo.//g")
+        oldProfiles32=$(sed -n "/# \/local32\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" /local32/etc/profile.local)
 
         if ! diff -q <(echo $newProfiles32) <(echo $oldProfiles32) &> /dev/null; then
             echo
@@ -102,9 +101,8 @@ fi
 
 if [[ $build64 = "yes" ]]; then
         if [ -f "/local64/etc/profile.local" ]; then
-        newProfiles64=`sed -n "/echo.# \/local64\/etc\/profile.local/,/echo.cross='x86_64-w64-mingw32-'/p" media-autobuild_suite.bat | sed "s/echo.//g"`
-
-        oldProfiles64=`sed -n "/# \/local64\/etc\/profile.local/,/cross='x86_64-w64-mingw32-'/p" /local64/etc/profile.local`
+        newProfiles64=$(sed -n "/echo.# \/local64\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" media-autobuild_suite.bat | sed "s/echo.//g")
+        oldProfiles64=$(sed -n "/# \/local64\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" /local64/etc/profile.local)
 
         if ! diff -q <(echo $newProfiles64) <(echo $oldProfiles64) &> /dev/null; then
             echo

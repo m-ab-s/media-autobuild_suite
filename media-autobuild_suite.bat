@@ -1201,36 +1201,7 @@ if %build32%==yes (
             echo.# /local32/etc/profile.local
             echo.#
             echo.
-            echo.alias dir='ls -la --color=auto'
-            echo.alias ls='ls --color=auto'
-            echo.export CC=gcc
-            echo.export python=/usr/bin/python
-            echo.
-            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="/usr/share/man:/mingw32/share/man:/local32/man:/local32/share/man"
-            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw32/share/info"
-            echo.MINGW_PREFIX="/mingw32"
-            echo.MINGW_CHOST="i686-w64-mingw32"
-            echo.
             echo.MSYSTEM=MINGW32
-            echo.
-            echo.DXSDK_DIR="/mingw32/i686-w64-mingw32"
-            echo.ACLOCAL_PATH="/mingw32/share/aclocal:/usr/share/aclocal"
-            echo.PKG_CONFIG_PATH="/local32/lib/pkgconfig:/mingw32/lib/pkgconfig"
-            echo.CPPFLAGS="-I/local32/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe"
-            echo.CXXFLAGS="-I/local32/include -mms-bitfields -mthreads -mtune=generic -pipe"
-            echo.LDFLAGS="-L/local32/lib -mthreads -pipe"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
-            echo.
-            echo.PYTHONHOME=/usr
-            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
-            echo.
-            echo.PATH=".:/local32/bin-audio:/local32/bin-global:/local32/bin-video:/local32/bin:/mingw32/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-            echo.HOME="/home/${USERNAME}"
-            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.
             echo.# package build directory
             echo.LOCALBUILDDIR=/build
@@ -1239,9 +1210,39 @@ if %build32%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='32bit'
-            echo.targetBuild='i686-w64-mingw32'
-            echo.targetHost='i686-w64-mingw32'
-            echo.cross='i686-w64-mingw32-'
+            echo.MINGW_PREFIX="/mingw32"
+            echo.MINGW_CHOST="i686-w64-mingw32"
+            echo.
+            echo.# rest is the same in both profiles
+            echo.targetBuild="${MINGW_CHOST}"
+            echo.targetHost="${MINGW_CHOST}"
+            echo.cross="${MINGW_CHOST}-"
+            echo.alias dir='ls -la --color=auto'
+            echo.alias ls='ls --color=auto'
+            echo.export CC=gcc
+            echo.export python=/usr/bin/python
+            echo.
+            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+            echo.MANPATH="/usr/share/man:${MINGW_PREFIX}/share/man:${LOCALDESTDIR}/man:${LOCALDESTDIR}/share/man"
+            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:${MINGW_PREFIX}/share/info"
+            echo.
+            echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
+            echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
+            echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+            echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
+            echo.CXXFLAGS="${CFLAGS}"
+            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
+            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+            echo.
+            echo.PYTHONHOME=/usr
+            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
+            echo.
+            echo.PATH=".:${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
+            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
+            echo.HOME="/home/${USERNAME}"
+            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
+            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             )>>%instdir%\local32\etc\profile.local
         )
 
@@ -1258,36 +1259,7 @@ if %build64%==yes (
             echo.# /local64/etc/profile.local
             echo.#
             echo.
-            echo.alias dir='ls -la --color=auto'
-            echo.alias ls='ls --color=auto'
-            echo.export CC=gcc
-            echo.export python=/usr/bin/python
-            echo.
-            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="/usr/share/man:/mingw64/share/man:/local64/man:/local64/share/man"
-            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:/mingw64/share/info"
-            echo.MINGW_PREFIX="/mingw64"
-            echo.MINGW_CHOST="x86_64-w64-mingw32"
-            echo.
             echo.MSYSTEM=MINGW64
-            echo.
-            echo.DXSDK_DIR="/mingw64/x86_64-w64-mingw32"
-            echo.ACLOCAL_PATH="/mingw64/share/aclocal:/usr/share/aclocal"
-            echo.PKG_CONFIG_PATH="/local64/lib/pkgconfig:/mingw64/lib/pkgconfig"
-            echo.CPPFLAGS="-I/local64/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe"
-            echo.CXXFLAGS="-I/local64/include -mms-bitfields -mthreads -mtune=generic -pipe"
-            echo.LDFLAGS="-L/local64/lib -pipe"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
-            echo.
-            echo.PYTHONHOME=/usr
-            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
-            echo.
-            echo.PATH=".:/local64/bin-audio:/local64/bin-global:/local64/bin-video:/local64/bin:/mingw64/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-            echo.HOME="/home/${USERNAME}"
-            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.
             echo.# package build directory
             echo.LOCALBUILDDIR=/build
@@ -1296,9 +1268,39 @@ if %build64%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='64bit'
-            echo.targetBuild='x86_64-w64-mingw32'
-            echo.targetHost='x86_64-w64-mingw32'
-            echo.cross='x86_64-w64-mingw32-'
+            echo.MINGW_PREFIX="/mingw64"
+            echo.MINGW_CHOST="x86_64-w64-mingw32"
+            echo.
+            echo.# rest is the same in both profiles
+            echo.targetBuild="${MINGW_CHOST}"
+            echo.targetHost="${MINGW_CHOST}"
+            echo.cross="${MINGW_CHOST}-"
+            echo.alias dir='ls -la --color=auto'
+            echo.alias ls='ls --color=auto'
+            echo.export CC=gcc
+            echo.export python=/usr/bin/python
+            echo.
+            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+            echo.MANPATH="/usr/share/man:${MINGW_PREFIX}/share/man:${LOCALDESTDIR}/man:${LOCALDESTDIR}/share/man"
+            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:${MINGW_PREFIX}/share/info"
+            echo.
+            echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
+            echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
+            echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+            echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
+            echo.CXXFLAGS="${CFLAGS}"
+            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
+            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+            echo.
+            echo.PYTHONHOME=/usr
+            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
+            echo.
+            echo.PATH=".:${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
+            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
+            echo.HOME="/home/${USERNAME}"
+            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
+            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
             )>>%instdir%\local64\etc\profile.local
         )
 
