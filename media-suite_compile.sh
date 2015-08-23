@@ -298,8 +298,8 @@ do_checkIfExist() {
 do_pkgConfig() {
     local pkg=${1%% *}
     echo -ne "\033]0;compiling $pkg $bits\007"
-
-    if [[ $(pkg-config --variable=prefix --silence-errors "$1") = "$LOCALDESTDIR" ]]; then
+    local prefix=$(pkg-config --variable=prefix --silence-errors "$1")
+    if [[ $(cygpath -u "$prefix") = "$LOCALDESTDIR" ]]; then
         echo -------------------------------------------------
         echo "$pkg is already compiled"
         echo -------------------------------------------------
@@ -530,7 +530,6 @@ if do_checkForOptions "--enable-libopenjpeg"; then
         fi
         do_patch "openjpeg-0001-Only-compile-libraries.patch" am
         do_cmake -DBUILD_MJ2=on
-        sed -i "s,prefix=.*,prefix=$LOCALDESTDIR," libopenjp2.pc
         ninja -j $cpuCount install
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
@@ -1565,10 +1564,6 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
     do_cmake -DCMAKE_BUILD_TYPE=Release
-    sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
-           -e 's,^exec_prefix=.*,exec_prefix=${prefix},' \
-           -e 's,^libdir=.*,libdir=${prefix}/lib,' \
-           -e 's,^includedir=.*,includedir=${prefix}/include,' frei0r.pc
     ninja -j $cpuCount install
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
@@ -1996,9 +1991,6 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         fi
         do_cmake
         ninja -j $cpuCount libuchardet_static
-        sed -i -e "s,^prefix=.*,prefix=$LOCALDESTDIR," \
-               -e 's,^libdir=.*,libdir=${prefix}/lib,' \
-               -e 's,^includedir=.*,includedir=${prefix}/include,' uchardet.pc
         if [[ -f src/libuchardet.a ]]; then
             mkdir -p $LOCALDESTDIR/include/uchardet
             cp ../src/uchardet.h $LOCALDESTDIR/include/uchardet/
