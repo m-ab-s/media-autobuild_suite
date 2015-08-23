@@ -1896,10 +1896,10 @@ if [[ $mplayer = "y" ]]; then
 
     if [ -d "ffmpeg" ]; then
         cd ffmpeg
-        git checkout -f --no-track -B ab-suite origin/HEAD
+        git checkout -f --no-track -B master origin/HEAD
         git fetch
         oldHead=$(git rev-parse HEAD)
-        git checkout -f --no-track -B ab-suite origin/HEAD
+        git checkout -f --no-track -B master origin/HEAD
         newHead=$(git rev-parse HEAD)
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         cd ..
@@ -1915,7 +1915,7 @@ if [[ $mplayer = "y" ]]; then
 
         if ! test -e ffmpeg ; then
             if [ ! $ffmpeg = "n" ]; then
-                git clone --depth 1 $LOCALBUILDDIR/ffmpeg-git ffmpeg
+                git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
             elif ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
