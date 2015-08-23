@@ -61,16 +61,15 @@ compile="true"
 if [[ $gitDepth = "noDepth" ]]; then
     gitDepth=""
 elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
-    gitDepth="--depth 1"
+    gitDepth="--depth=1"
 fi
 
-if [ -z "$gitBranch" ]; then
-    gitBranch="master"
-fi
+local ref="origin/HEAD"
+[[ -n "$gitBranch" ]] && ref="$gitBranch"
 
 echo -ne "\033]0;compiling $gitFolder $bits\007"
 if [ ! -d "$gitFolder"-git ]; then
-    git clone $gitDepth -b "$gitBranch" "$gitURL" "$gitFolder"-git
+    git clone $gitDepth "$gitURL" "$gitFolder"-git
     if [[ -d "$gitFolder"-git ]]; then
         cd "$gitFolder"-git
         touch recently_updated
@@ -79,42 +78,41 @@ if [ ! -d "$gitFolder"-git ]; then
         echo "Try again later or <Enter> to continue"
         do_prompt "if you're sure nothing depends on it."
         compile="false"
+        return
     fi
 else
     cd "$gitFolder"-git
-    [[ "$gitDepth" = "" && -f .git/shallow ]] && unshallow="--unshallow"
-    [[ $(git remote -v | grep origin | head -1 | awk '{print $2}') != "$gitURL" ]] &&
+    [[ -z "$gitDepth" && -f .git/shallow ]] && unshallow="--unshallow"
+    [[ "$gitURL" != "$(git config --get remote.origin.url)" ]] &&
         git remote set-url origin "$gitURL"
-    git reset --quiet --hard @{u}
-    oldHead=$(git rev-parse HEAD)
-    [[ $(git rev-parse --abbrev-ref HEAD) != "$gitBranch" ]] && git checkout "$gitBranch"
-    git pull --no-edit $unshallow origin "$gitBranch"
-    newHead=$(git rev-parse HEAD)
+fi
+[[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
+git checkout -q -f --no-track -B ab-suite "$ref"
+git fetch ${gitDepth}
+oldHead=$(git rev-parse HEAD)
+git checkout -q -f --no-track -B ab-suite "$ref"
+newHead=$(git rev-parse HEAD)
 
-    pkg-config --exists "$gitFolder"
-    local pcExists=$?
-
-    if [[ "$oldHead" != "$newHead" ]]; then
-        touch recently_updated
-        rm -f build_successful*
-        if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-            new_updates="yes"
-            new_updates_packages="$new_updates_packages [$gitFolder]"
-        fi
-        echo "$gitFolder" >> "$LOCALBUILDDIR"/newchangelog
-        git log --no-merges --pretty="%ci %h %s" \
-            --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
-        echo "" >> "$LOCALBUILDDIR"/newchangelog
-    elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$gitCheck" && $pcExists = 1 ]] ||
-         [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
-        compile="true"
-    else
-        echo -------------------------------------------------
-        echo "$gitFolder is already up to date"
-        echo -------------------------------------------------
-        compile="false"
+if [[ "$oldHead" != "$newHead" ]]; then
+    touch recently_updated
+    rm -f build_successful*
+    if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
+        new_updates="yes"
+        new_updates_packages="$new_updates_packages [$gitFolder]"
     fi
+    echo "$gitFolder" >> "$LOCALBUILDDIR"/newchangelog
+    git log --no-merges --pretty="%ci %h %s" \
+        --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
+    echo "" >> "$LOCALBUILDDIR"/newchangelog
+elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
+     [[ -z "$gitCheck" && -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder" ]] ||
+     [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
+    compile="true"
+else
+    echo -------------------------------------------------
+    echo "$gitFolder is already up to date"
+    echo -------------------------------------------------
+    compile="false"
 fi
 }
 
@@ -507,7 +505,7 @@ do_getFFmpegConfig
 
 if do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo noDepth master lib/libjpeg.a
+    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo noDepth "" lib/libjpeg.a
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/lib/libjpeg.a ]]; then
             rm -f $LOCALDESTDIR/include/j{config,error,morecfg,peglib}.h
@@ -690,7 +688,7 @@ fi
 
 if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
-    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow master lib/pkgconfig/librtmp.pc
+    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow "" lib/pkgconfig/librtmp.pc
     if [[ $compile = "true" ]]; then
         if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
             rm -rf $LOCALDESTDIR/include/librtmp
@@ -978,7 +976,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/nu774/fdkaac" bin-fdk-aac shallow master bin-audio/fdkaac.exe
+    do_git "https://github.com/nu774/fdkaac" bin-fdk-aac "" "" bin-audio/fdkaac.exe
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             autoreconf -i
@@ -1120,7 +1118,7 @@ fi
 
 if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/qyot27/twolame.git" twolame shallow mingw-static
+    do_git "https://github.com/qyot27/twolame.git" twolame "" origin/mingw-static
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             ./autogen.sh -V
@@ -1214,7 +1212,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://git.code.sf.net/p/sox/code" sox shallow master bin-audio/sox.exe
+    do_git "git://git.code.sf.net/p/sox/code" sox "" "" bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 
@@ -1297,7 +1295,7 @@ fi
 
 if [[ $other265 = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar shallow master bin-video/kvazaar.exe
+    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar "" "" bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/libkvazaar.a" ]]; then
             rm -f "$LOCALDESTDIR/include/kvazaar.h"
@@ -1367,7 +1365,7 @@ fi
 
 if do_checkForOptions "--enable-libutvideo"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/qyot27/libutvideo.git" libutvideo shallow 15.1.0
+    do_git "https://github.com/qyot27/libutvideo.git" libutvideo "" origin/15.1.0
     if [[ $compile = "true" ]]; then
         if [ -f utv_core/libutvideo.a ]; then
             rm -rf $LOCALDESTDIR/include/utvideo
@@ -1384,7 +1382,7 @@ fi
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
     if ! do_checkForOptions "--enable-fontconfig" && [[ $mpv = "y" ]]; then
-        do_git "https://github.com/libass/libass.git" libass noDepth fonts
+        do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
     else
         do_git "https://github.com/libass/libass.git" libass
@@ -1474,7 +1472,7 @@ if [ $mediainfo = "y" ]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/MediaArea/MediaInfo" mediainfo shallow master bin-video/mediainfo.exe
+    do_git "https://github.com/MediaArea/MediaInfo" mediainfo "" "" bin-video/mediainfo.exe
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
@@ -1652,7 +1650,7 @@ fi
 
 if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/gpac/gpac.git" gpac noDepth master bin-video/MP4Box.exe
+    do_git "https://github.com/gpac/gpac.git" gpac noDepth "" bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
@@ -1673,7 +1671,7 @@ if [[ ! $x264 = "n" ]]; then
     if [[ $compile = "true" ]] || [[ $x264 = "y" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
         if [[ $x264 = "y" ]]; then
             cd $LOCALBUILDDIR
-            do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master lib/libavcodec.a
+            do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" lib/libavcodec.a
 
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
                 rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
@@ -1822,9 +1820,9 @@ if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
     if [[ $ffmpeg != "s" ]]; then
-        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpeg.exe
+        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" bin-video/ffmpeg.exe
     else
-        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth master bin-video/ffmpegSHARED/ffmpeg.exe
+        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" bin-video/ffmpegSHARED/ffmpeg.exe
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
@@ -1903,9 +1901,12 @@ if [[ $mplayer = "y" ]]; then
 
     if [ -d "ffmpeg" ]; then
         cd ffmpeg
-        oldHead=`git rev-parse HEAD`
-        git pull origin master
-        newHead=`git rev-parse HEAD`
+        git checkout -f --no-track -B ab-suite origin/HEAD
+        git fetch
+        oldHead=$(git rev-parse HEAD)
+        git checkout -f --no-track -B ab-suite origin/HEAD
+        newHead=$(git rev-parse HEAD)
+        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         cd ..
     fi
 
@@ -1946,7 +1947,7 @@ fi
 
 if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
     cd $LOCALBUILDDIR
-    do_git "git://midipix.org/waio" waio shallow master lib/libwaio.a
+    do_git "git://midipix.org/waio" waio "" "" lib/libwaio.a
     if [[ $compile = "true" ]]; then
         [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
         if [[ -f lib${_bits}/libwaio.a ]]; then
@@ -2008,7 +2009,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/mpv-player/mpv.git" mpv noDepth master bin-video/mpv.exe
+    do_git "https://github.com/mpv-player/mpv.git" mpv noDepth "" bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -f waf ]; then
             $python waf distclean
