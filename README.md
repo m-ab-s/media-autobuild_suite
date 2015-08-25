@@ -33,11 +33,11 @@ Included Tools And Libraries
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default):
 	- decklink 10.4.1
-	- fontconfig (2.11.92)
-	- freetype (2.5.5)
+	- fontconfig (2.11.94)
+	- freetype (2.6)
 	- frei0r (1.4)
 	- fribidi (0.19.6)
-	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
+	- gnutls (3.3.16) (3.4 doesn't work well with ffmpeg)
 	- harfbuzz (git)
 	- libass (git)
 	- libbs2b (3.1.0)
@@ -51,7 +51,7 @@ Included Tools And Libraries
 	- libkvazaar (git)
 	- libmfx (git)
 	- libmodplug
-	- libmp3lame
+	- libmp3lame (3.99.5)
 	- libopencore-amrwb/nb (0.1.3)
 	- libopenjpeg 2.1 (git)
 	- libopus (1.1)
@@ -66,6 +66,7 @@ Included Tools And Libraries
 	- libvo-amrwbenc (0.1.2)
 	- libvorbis (1.3.5)
 	- libvpx (git)
+	- libwebp (git) (needed for webp encoding)
 	- libx264 (git)
 	- libx265 (hg)
 	- libxavs (svn snapshot)
@@ -76,12 +77,17 @@ Included Tools And Libraries
 	- vidstab (git)
 	
  - other tools
+ 	- cd-paranoia (git)
 	- f265 (git)
-	- fdkaac (git)
+    - faac (1.28)
+	- fdk-aac (git)
 	- file (5.22)
 	- flac (1.3.1)
-	- gnutls (3.3.15) (3.4 doesn't work well with ffmpeg)
+	- fontconfig tools (2.11.94)
+	- gnutls (3.3.16) (3.4 doesn't work well with ffmpeg)
+	- jpeg-turbo tools (git)
 	- kvazaar (git)
+	- lame (3.99.5)
 	- libsndfile (git)
 	- mediainfo cli (git)
 	- mp4box (git)
@@ -89,14 +95,17 @@ Included Tools And Libraries
 	- mpv (git) including in addition to ffmpeg libs:
 		- libjpeg-turbo (git)
 		- librubberband (git)
-		- libuchardet (git)
+		- uchardet (git)
 		- libwaio (git)
 		- luajit (git)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
 	- speex (1.2rc2)
 	- sox (git)
+	- uchardet
+	- vorbis-tools (1.4.0)
 	- vpx (VP8 and VP9 8, 10 and 12 bit) (git)
+	- webp tools (git)
 	- x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
 	- x265 (8, 10 and 12 bit) (git)
 	- xavs (git snapshot)
