@@ -1900,7 +1900,6 @@ if [[ $mplayer = "y" ]]; then
         oldHead=$(git rev-parse HEAD)
         git checkout -f --no-track -B master origin/HEAD
         newHead=$(git rev-parse HEAD)
-        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         cd ..
     fi
 
@@ -1915,16 +1914,16 @@ if [[ $mplayer = "y" ]]; then
         if ! test -e ffmpeg ; then
             if [ ! $ffmpeg = "n" ]; then
                 git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
+                git checkout -f --no-track -B master origin/HEAD
             elif ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
                 echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
                 echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-                echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg; touch ffmpeg/mp_auto_pull"
+                echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg"
                 exit 1
             fi
-            touch ffmpeg/mp_auto_pull
         fi
 
         sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
