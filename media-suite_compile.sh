@@ -1291,7 +1291,7 @@ else
     pkg-config --exists vpx || do_removeOption "--enable-libvpx"
 fi
 
-if [[ $other265 = "y" ]]; then
+if [[ $other265 = "y" ]] || do_checkForOptions "--enable-libkvazaar"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/ultravideo/kvazaar.git" kvazaar "" "" bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
