@@ -808,8 +808,7 @@ if do_checkForOptions "--enable-libdcadec"; then
             make clean
         fi
 
-        make CONFIG_WINDOWS=1 LDFLAGS=-lm lib
-        make PREFIX=$LOCALDESTDIR PKG_CONFIG_PATH=$LOCALDESTDIR/lib/pkgconfig install-lib
+        make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
         do_checkIfExist dcadec-git libdcadec.a
     fi
 fi
