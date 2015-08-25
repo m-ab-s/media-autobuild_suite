@@ -1985,16 +1985,12 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/include/uchardet.h ]]; then
             rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc $LOCALDESTDIR/bin/uchardet.exe
         fi
-        do_cmake
-        ninja -j $cpuCount libuchardet_static
-        if [[ -f src/libuchardet.a ]]; then
-            mkdir -p $LOCALDESTDIR/include/uchardet
-            cp ../src/uchardet.h $LOCALDESTDIR/include/uchardet/
-            cp src/libuchardet.a $LOCALDESTDIR/lib/
-            cp uchardet.pc $LOCALDESTDIR/lib/pkgconfig/
-        fi
+        do_patch "uchardet-0001-hack-compile-bin-statically.patch"
+        LDFLAGS+=" -static-ligcc" do_cmake -DUCHARDET_INSTALL_BIN_DIR=$LOCALDESTDIR/bin-global
+        ninja -j $cpuCount
+        [[ -f src/libuchardet.a ]] && ninja install
         do_checkIfExist uchardet-git libuchardet.a
     fi
 
