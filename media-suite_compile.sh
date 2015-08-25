@@ -1383,7 +1383,7 @@ if do_checkForOptions "--enable-libass"; then
         do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
     else
-        do_git "https://github.com/libass/libass.git" libass
+        do_git "https://github.com/libass/libass.git" libass noDepth
     fi
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
         if [[ ! -f "configure" ]]; then
