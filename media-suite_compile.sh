@@ -1748,11 +1748,11 @@ if [[ ! $x265 = "n" ]]; then
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
         rm -f $LOCALDESTDIR/lib/libx265{,_main10,_main12}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
         rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
+        [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF" || assembly="-DENABLE_ASSEMBLY=ON"
+        [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
 
         build_x265() {
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
-        [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF" || assembly="-DENABLE_ASSEMBLY=ON"
-        [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
 
         do_x265_cmake() {
             cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
