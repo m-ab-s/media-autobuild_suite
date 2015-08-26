@@ -43,7 +43,7 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
         while true; do
             read -p "install packs [y/n]? " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm --needed -S $install; break;;
+                [Yy]* ) pacman --noconfirm --asexplicit --force -S $install; break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no";;
             esac
@@ -62,7 +62,7 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
             read -p "remove packs [y/n]? " yn
             case $yn in
                 [Yy]* ) pacman --noconfirm -R $uninstall; break;;
-                [Nn]* ) break;;
+                [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
                 * ) echo "Please answer yes or no";;
             esac
         done
