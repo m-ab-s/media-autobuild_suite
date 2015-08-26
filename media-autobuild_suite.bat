@@ -974,7 +974,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.sleep ^3
     echo.exit
         )>>%instdir%\pacman.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\base.log -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
     del %instdir%\pacman.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
@@ -1020,7 +1020,7 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw32.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw32.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
     del %instdir%\mingw32.sh
     )
     
@@ -1055,7 +1055,7 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
         echo.sleep ^3
         echo.exit
         )>>%instdir%\mingw64.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw64.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
     del %instdir%\mingw64.sh
     )
 
@@ -1078,7 +1078,7 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh ^
+%instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\update.log -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
 
@@ -1373,7 +1373,7 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh ^
+start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\compile.log -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
