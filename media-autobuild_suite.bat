@@ -310,6 +310,7 @@ if %x265INI%==0 (
     echo. 4 = Static x265.exe [Main] and libx265_main10.dll
     echo. 5 = Same as 1 with XP compatibility
     echo. 6 = Same as 2 with XP compatibility
+    echo. 7 = Same as 5 with addition of non-XP compatible x265-numa.exe
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -339,7 +340,11 @@ if %buildx265%==6 (
     set "x265=l"
     set "xpcomp=y"
     )
-if %buildx265% GTR 6 GOTO x265
+if %buildx265%==7 (
+    set "x265=d"
+    set "xpcomp=y"
+    )
+if %buildx265% GTR 7 GOTO x265
 if %writex265%==yes echo.x265=^%buildx265%>>%ini%
 
 :other265

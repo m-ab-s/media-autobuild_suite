@@ -1745,11 +1745,12 @@ if [[ ! $x265 = "n" ]]; then
     do_hg "https://bitbucket.org/multicoreware/x265" x265
     if [[ $compile = "true" ]] || [[ $x265 != "l" && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
         cd build/msys
-        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
         rm -f $LOCALDESTDIR/lib/libx265{,_main10,_main12}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
         rm -f $LOCALDESTDIR/bin-video/libx265*.dll $LOCALDESTDIR/bin-video/x265.exe
 
+        build_x265() {
+        rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
         [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF" || assembly="-DENABLE_ASSEMBLY=ON"
         [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
 
@@ -1804,9 +1805,17 @@ ADDLIB libx265_main12.a
 SAVE
 END
 EOF
-            ninja -j $cpuCount install
         fi
-
+        }
+        build_x265
+        ninja -j $cpuCount install
+        if [[ $x265 = "d" ]]; then
+            cd ..
+            rm -f $LOCALDESTDIR/bin-video/x265-numa.exe
+            xpsupport="-DWINXP_SUPPORT=OFF"
+            build_x265
+            cp -f x265.exe $LOCALDESTDIR/bin-video/x265-numa.exe
+        fi
         do_checkIfExist x265-hg libx265.a
         buildFFmpeg="true"
         unset xpsupport assembly cli
