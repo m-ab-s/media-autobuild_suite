@@ -1005,11 +1005,11 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
 
 :getmingw32
 if %build32%==yes (
-if exist "%instdir%\%msys2%\etc\pac-mingw32.pk" del "%instdir%\%msys2%\etc\pac-mingw32.pk"
-for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32.pk
+    if exist "%instdir%\%msys2%\etc\pac-mingw32.pk" del "%instdir%\%msys2%\etc\pac-mingw32.pk"
+    for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32.pk
 
 :tryagain32
-if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
+    if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
     echo.-------------------------------------------------------------------------------
@@ -1022,29 +1022,29 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
         )>>%instdir%\mingw32.sh
     %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw32.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
     del %instdir%\mingw32.sh
-    )
     
-if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.mingw32 where not install, maybe the download has not work
-    echo.do you want to try it again?
-    echo.
-    echo -------------------------------------------------------------------------------
-    set /P try32="try again [y/n]: "
+    if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.mingw32 is not installed, maybe the download didn't work.
+        echo.Do you want to try it again?
+        echo.
+        echo -------------------------------------------------------------------------------
+        set /P try32="try again [y/n]: "
 
-    if %packF%==y (
-        GOTO tryagain32
-        ) else exit
+        if %packF%==y (
+            GOTO tryagain32
+            ) else exit
+        )
     )
     
 :getmingw64
 if %build64%==yes (
-if exist "%instdir%\%msys2%\etc\pac-mingw64.pk" del "%instdir%\%msys2%\etc\pac-mingw64.pk"
-for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64.pk
+    if exist "%instdir%\%msys2%\etc\pac-mingw64.pk" del "%instdir%\%msys2%\etc\pac-mingw64.pk"
+    for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64.pk
 
 :tryagain64
-if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
+    if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
     echo.-------------------------------------------------------------------------------
@@ -1054,25 +1054,25 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
         echo.pacman --noconfirm -S $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
-        )>>%instdir%\mingw64.sh
+            )>>%instdir%\mingw64.sh
     %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw64.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
     del %instdir%\mingw64.sh
+
+    if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.mingw64 where not install, maybe the download has not work
+        echo.do you want to try it again?
+        echo.
+        echo -------------------------------------------------------------------------------
+        set /P try64="try again [y/n]: "
+
+        if %packF%==y (
+            GOTO tryagain64
+            ) else exit
+        )
     )
 
-if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.mingw64 where not install, maybe the download has not work
-    echo.do you want to try it again?
-    echo.
-    echo -------------------------------------------------------------------------------
-    set /P try64="try again [y/n]: "
-
-    if %packF%==y (
-        GOTO tryagain64
-        ) else exit
-    )
-    
 :updatebase
 echo.-------------------------------------------------------------------------------
 echo.update autobuild suite
