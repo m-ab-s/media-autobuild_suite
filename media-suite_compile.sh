@@ -380,6 +380,11 @@ do_changeFFmpegConfig() {
         do_addOption "--enable-filter=frei0r"
     fi
 
+    # remove libmfx if compiling with xp compatibility
+    if [[ $xpcomp = "y" ]]; then
+        do_removeOption "--enable-libmfx"
+    fi
+
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
