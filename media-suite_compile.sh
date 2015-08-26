@@ -1116,7 +1116,7 @@ fi
 
 if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/qyot27/twolame.git" twolame "" origin/mingw-static
+    do_git "https://github.com/qyot27/twolame.git" twolame noDepth origin/mingw-static
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             ./autogen.sh -V
