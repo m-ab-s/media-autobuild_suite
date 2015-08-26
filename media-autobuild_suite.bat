@@ -760,16 +760,16 @@ if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
     echo.
     echo -------------------------------------------------------------
     if exist "%instdir%\build\install-wget.js" del "%instdir%\build\install-wget.js"
-	if not exist build mkdir build
-	cd build
-	if exist "%instdir%\build\msys2-base.tar.xz" GOTO unpack
-	
+    if not exist build mkdir build
+    cd build
+    if exist "%instdir%\build\msys2-base.tar.xz" GOTO unpack
+    
     echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
 
     cscript install-wget.js
     del install-wget.js
     del wget.zip
-	del 7zip-license.txt
+    del 7zip-license.txt
     del COPYING.txt
 
 :checkmsys2
@@ -794,33 +794,32 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 
     for /F %%b in ( '%instdir%\build\wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^| %instdir%\build\grep -o -P "(?<=tr title=).*(?<=class=)" ^| %instdir%\build\grep -m 1 -o "msys2-base-x86_64-*.*tar.xz"' ) do %instdir%\build\wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
     )
-	
+    
 :unpack
 if exist "%instdir%\build\msys2-base.tar.xz" (
-	%instdir%\build\7za.exe x msys2-base.tar.xz -so | %instdir%\build\7za.exe x -aoa -si -ttar -o..
-	del %instdir%\build\msys2-base.tar.xz
-	del %instdir%\build\grep.exe
-	del %instdir%\build\wget.exe
-	del %instdir%\build\7za.exe
-	)
-	
+    %instdir%\build\7za.exe x msys2-base.tar.xz -so | %instdir%\build\7za.exe x -aoa -si -ttar -o..
+    del %instdir%\build\msys2-base.tar.xz
+    del %instdir%\build\grep.exe
+    del %instdir%\build\wget.exe
+    del %instdir%\build\7za.exe
+    )
+    
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-	echo -------------------------------------------------------------------------------
-	echo.
-	echo.- Download msys2 basic system failed,
-	echo.- please download it manuel from:
-	echo.- http://downloads.sourceforge.net/project/msys2
-	echo.- and copy the uncompressed folder to:
-	echo.- %instdir%\build
-	echo.- and start the batch script again!
-	echo.
-	echo -------------------------------------------------------------------------------
-	pause
-	GOTO unpack
-	)
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.- Download msys2 basic system failed,
+    echo.- please download it manuel from:
+    echo.- http://downloads.sourceforge.net/project/msys2
+    echo.- and copy the uncompressed folder to:
+    echo.- %instdir%\build
+    echo.- and start the batch script again!
+    echo.
+    echo -------------------------------------------------------------------------------
+    pause
+    GOTO unpack
+    )
 
 :getMintty
-
 if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.
@@ -1009,6 +1008,7 @@ if %build32%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw32.pk" del "%instdir%\%msys2%\etc\pac-mingw32.pk"
 for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32.pk
 
+:tryagain32
 if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
@@ -1023,12 +1023,27 @@ if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
     del %instdir%\mingw32.sh
     )
+    
+if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.mingw32 where not install, maybe the download has not work
+    echo.do you want to try it again?
+    echo.
+    echo -------------------------------------------------------------------------------
+    set /P try32="try again [y/n]: "
 
+    if %packF%==y (
+        GOTO tryagain32
+        ) else exit
+    )
+    
 :getmingw64
 if %build64%==yes (
 if exist "%instdir%\%msys2%\etc\pac-mingw64.pk" del "%instdir%\%msys2%\etc\pac-mingw64.pk"
 for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64.pk
 
+:tryagain64
 if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
@@ -1044,6 +1059,20 @@ if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     del %instdir%\mingw64.sh
     )
 
+if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.mingw64 where not install, maybe the download has not work
+    echo.do you want to try it again?
+    echo.
+    echo -------------------------------------------------------------------------------
+    set /P try64="try again [y/n]: "
+
+    if %packF%==y (
+        GOTO tryagain64
+        ) else exit
+    )
+    
 :updatebase
 echo.-------------------------------------------------------------------------------
 echo.update autobuild suite
