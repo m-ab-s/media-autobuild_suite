@@ -11,9 +11,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
---enable-libkvazaar \
---enable-libwebp \
---enable-decklink --enable-libutvideo --enable-libgme \
+--enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"

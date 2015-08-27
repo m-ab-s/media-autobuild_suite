@@ -48,9 +48,7 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid ^
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
---enable-libkvazaar ^
---enable-libwebp ^
---enable-decklink --enable-libutvideo --enable-libgme ^
+--enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme ^
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 :selectmsys2Arch
@@ -832,37 +830,37 @@ if not exist %instdir%\mintty.lnk (
     echo.
     echo -------------------------------------------------------------------------------
 
-    echo.sleep ^4>>firstrun.sh
-    echo.exit>>firstrun.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstrun.sh
-    del firstrun.sh
+    echo.sleep ^4>>%instdir%\build\firstrun.sh
+    echo.exit>>%instdir%\build\firstrun.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\firstrun.sh
+    del %instdir%\build\firstrun.sh
 
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\firstUpdate.sh del %instdir%\firstUpdate.sh
+    if exist %instdir%\build\firstUpdate.sh del %instdir%\build\firstUpdate.sh
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm --force -Sy --asdeps pacman-mirrors
         echo.sleep ^4
         echo.exit
-        )>>%instdir%\firstUpdate.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\firstUpdate.sh
-    del %instdir%\firstUpdate.sh
+        )>>%instdir%\build\firstUpdate.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\firstUpdate.sh
+    del %instdir%\build\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
     echo.second update
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\secondUpdate.sh del %instdir%\secondUpdate.sh
+    if exist %instdir%\build\secondUpdate.sh del %instdir%\build\secondUpdate.sh
     (
         echo.echo -ne "\033]0;second msys2 update\007"
         echo.pacman --noconfirm -Syu --force --asdeps --ignoregroup base
         echo.pacman --noconfirm -Su --force --asdeps
         echo.exit
-        )>>%instdir%\secondUpdate.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\secondUpdate.sh
+        )>>%instdir%\build\secondUpdate.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\secondUpdate.sh
     cls
-    del %instdir%\secondUpdate.sh
+    del %instdir%\build\secondUpdate.sh
 
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
@@ -874,9 +872,9 @@ if not exist %instdir%\mintty.lnk (
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
         echo.link.Save
-        )>>%instdir%\setlink.vbs
-    cscript /nologo %instdir%\setlink.vbs
-    del %instdir%\setlink.vbs
+        )>>%instdir%\build\setlink.vbs
+    cscript /nologo %instdir%\build\setlink.vbs
+    del %instdir%\build\setlink.vbs
         )
     if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
     if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
@@ -972,23 +970,23 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
     echo.install msys2 base system
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\pacman.sh del %instdir%\pacman.sh
+    if exist %instdir%\build\pacman.sh del %instdir%\build\pacman.sh
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.pacman --noconfirm -S $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
     echo.sleep ^3
     echo.exit
-        )>>%instdir%\pacman.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\base.log -i /msys2.ico /usr/bin/bash --login %instdir%\pacman.sh
-    del %instdir%\pacman.sh
+        )>>%instdir%\build\pacman.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\base.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\pacman.sh
+    del %instdir%\build\pacman.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
-            echo.update-ca-trust>>cert.sh
-            echo.sleep ^3>>cert.sh
-            echo.exit>>cert.sh
-            %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\cert.sh
-            del cert.sh
+            echo.update-ca-trust>>%instdir%\build\cert.sh
+            echo.sleep ^3>>%instdir%\build\cert.sh
+            echo.exit>>%instdir%\build\cert.sh
+            %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\cert.sh
+            del %instdir%\build\cert.sh
             )
         )
 
@@ -1018,15 +1016,15 @@ if %build32%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\mingw32.sh del %instdir%\mingw32.sh
+    if exist %instdir%\build\mingw32.sh del %instdir%\build\mingw32.sh
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
         echo.pacman --noconfirm -S $(cat /etc/pac-mingw32.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
-        )>>%instdir%\mingw32.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw32.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw32.sh
-    del %instdir%\mingw32.sh
+        )>>%instdir%\build\mingw32.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw32.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\mingw32.sh
+    del %instdir%\build\mingw32.sh
     
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
@@ -1053,15 +1051,15 @@ if %build64%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\mingw64.sh del %instdir%\mingw64.sh
+    if exist %instdir%\build\mingw64.sh del %instdir%\build\mingw64.sh
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.pacman --noconfirm -S $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
-            )>>%instdir%\mingw64.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw64.log -i /msys2.ico /usr/bin/bash --login %instdir%\mingw64.sh
-    del %instdir%\mingw64.sh
+            )>>%instdir%\build\mingw64.sh
+    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw64.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\mingw64.sh
+    del %instdir%\build\mingw64.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
