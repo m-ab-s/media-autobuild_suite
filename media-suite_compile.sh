@@ -1175,28 +1175,6 @@ if [[ $sox = "y" ]]; then
         do_checkIfExist sndfile-git libsndfile.a
     fi
 
-    if [ -f "$LOCALDESTDIR/lib/libmad.a" ]; then
-        echo -------------------------------------------------
-        echo "libmad-0.15.1b is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile libmad $bits\007"
-
-        do_wget "ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
-
-        if [[ -f ".libs/libmad.a" ]]; then
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/lib/libmad.a" ]]; then
-            rm -rf $LOCALDESTDIR/include/mad.h
-            rm -rf $LOCALDESTDIR/lib/libmad.{l,}a
-        fi
-
-        do_generic_confmakeinstall --enable-fpm=intel --disable-debugging
-        do_checkIfExist libmad-0.15.1b libmad.a
-    fi
-
     if do_pkgConfig "opusfile = 0.6"; then
         cd $LOCALBUILDDIR
         do_wget "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
