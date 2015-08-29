@@ -634,57 +634,49 @@ if do_checkForOptions "--enable-gnutls" ; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgcrypt $bits\007"
-
         do_wget "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
-
-        if [[ -f "src/.libs/libgcrypt.a" ]]; then
-            make distclean
-        fi
+        [[ -f "src/.libs/libgcrypt.a" ]] && make distclean
         if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
             rm -f $LOCALDESTDIR/include/libgcrypt.h
             rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
             rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
         fi
-        if [[ $bits = "64bit" ]]; then
-            extracommands="--disable-asm --disable-padlock-support"
-        fi
+        [[ $bits = "64bit" ]] && extracommands="--disable-asm --disable-padlock-support"
         do_generic_confmakeinstall global --with-gpg-error-prefix=$MINGW_PREFIX $extracommands
         do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
         unset extracommands
     fi
 
-    if do_pkgConfig "nettle = 2.7.1"; then
+    if do_pkgConfig "nettle = 3.1"; then
         cd $LOCALBUILDDIR
-        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-2.7.1.tar.gz"
-
-        if [[ -f "libnettle.a" ]]; then
-            make distclean
-        fi
+        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-3.1.tar.gz"
+        [[ -f "libnettle.a" ]] && make distclean
         if [[ -d "$LOCALDESTDIR/include/nettle" ]]; then
-            rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/nettle-*.exe
+            rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
             rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
         fi
-        do_generic_confmakeinstall global --disable-documentation --disable-openssl
-        do_checkIfExist nettle-2.7.1 libnettle.a
+        do_generic_conf --disable-documentation --disable-openssl
+        make -j $cpuCount install-{headers,pkgconfig,static}
+        do_checkIfExist nettle-3.1 libnettle.a
     fi
 
-    if do_pkgConfig "gnutls = 3.3.16"; then
+    if do_pkgConfig "gnutls = 3.4.4"; then
         cd $LOCALBUILDDIR
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.3/gnutls-3.3.16.tar.xz"
-
-        if [[ -f "lib/.libs/libgnutls.a" ]]; then
-            make distclean
-        fi
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.4.1.tar.xz"
+        [[ -d build ]] && rm -rf build
+        mkdir build && cd build
         if [[ -d "$LOCALDESTDIR/include/gnutls" ]]; then
-            rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/bin-global/gnutls-*.exe
-            rm -rf $LOCALDESTDIR/lib/libgnutls* $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+            rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/lib/libgnutls*
+            rm -f $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+            rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
         fi
-        do_generic_confmakeinstall global --disable-guile --enable-cxx --disable-doc \
-        --disable-tests --with-zlib --without-p11-kit --disable-rpath --disable-gtk-doc \
-        --disable-libdane --enable-local-libopts
+        ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
+            --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
+            --disable-libdane --without-idn --without-tpm --enable-local-libopts
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' \
-        $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-        do_checkIfExist gnutls-3.3.16 libgnutls.a
+        lib/gnutls.pc
+        do_makeinstall
+        do_checkIfExist gnutls-3.4.4.1 libgnutls.a
     fi
 fi
 

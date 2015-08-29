@@ -56,7 +56,6 @@ To recompile these libs, delete `<libname>.a` with the same name in `/local32/li
 ```
 libjpeg (libjpeg-turbo)
 libgnurx
-libmad
 libwaio
 libxavs
 ```
