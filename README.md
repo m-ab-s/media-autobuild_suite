@@ -4,7 +4,7 @@ media-autobuild_suite
 This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
 https://github.com/rdp/ffmpeg-windows-build-helpers
 
-It is based on msys2 and tested under Windows 7 and 8.1.
+It is based on msys2 and tested under Windows 7, 8.1. and 10.
 http://sourceforge.net/projects/msys2/
 
 I use some jscript parts from nu774:
