@@ -1985,6 +1985,8 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
         $python bootstrap.py
+		
+		do_patch "mpv-win32-path.patch"
 
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
