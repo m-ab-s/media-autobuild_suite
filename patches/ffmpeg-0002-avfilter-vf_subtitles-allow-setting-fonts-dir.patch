@@ -1,0 +1,43 @@
+From db5f246fa64da001f86b102907b6ab93e606a1b7 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Sun, 30 Aug 2015 19:32:42 +0100
+Subject: [PATCH] avfilter/vf_subtitles: allow setting fonts dir
+
+---
+ libavfilter/vf_subtitles.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/libavfilter/vf_subtitles.c b/libavfilter/vf_subtitles.c
+index 5e1324c..3879de6 100644
+--- a/libavfilter/vf_subtitles.c
++++ b/libavfilter/vf_subtitles.c
+@@ -50,6 +50,7 @@ typedef struct {
+     ASS_Renderer *renderer;
+     ASS_Track    *track;
+     char *filename;
++    char *fontsdir;
+     char *charenc;
+     char *force_style;
+     int stream_index;
+@@ -67,6 +68,7 @@ typedef struct {
+     {"filename",       "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
+     {"f",              "set the filename of file to read",                         OFFSET(filename),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
+     {"original_size",  "set the size of the original video (used to scale fonts)", OFFSET(original_w), AV_OPT_TYPE_IMAGE_SIZE, {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
++    {"fontsdir",       "set the directory containing the fonts to read",           OFFSET(fontsdir),   AV_OPT_TYPE_STRING,     {.str = NULL},  CHAR_MIN, CHAR_MAX, FLAGS }, \
+ 
+ /* libass supports a log level ranging from 0 to 7 */
+ static const int ass_libavfilter_log_level_map[] = {
+@@ -106,6 +108,10 @@ static av_cold int init(AVFilterContext *ctx)
+     }
+     ass_set_message_cb(ass->library, ass_log, ctx);
+ 
++    if (ass->fontsdir) {
++        ass_set_fonts_dir(ass->library, ass->fontsdir);
++    }
++
+     ass->renderer = ass_renderer_init(ass->library);
+     if (!ass->renderer) {
+         av_log(ctx, AV_LOG_ERROR, "Could not initialize libass renderer.\n");
+-- 
+2.5.0
+

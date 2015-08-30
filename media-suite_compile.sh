@@ -1355,7 +1355,7 @@ if do_checkForOptions "--enable-libass"; then
     if ! do_checkForOptions "--enable-fontconfig" && [[ $mpv = "y" ]]; then
         do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
-    else
+    elif do_checkForOptions "--enable-fontconfig"; then
         do_git "https://github.com/libass/libass.git" libass noDepth
     fi
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
@@ -1802,6 +1802,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
+        do_patch "ffmpeg-0002-avfilter-vf_subtitles-allow-setting-fonts-dir.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
