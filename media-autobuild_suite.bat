@@ -1210,7 +1210,7 @@ if "%searchRes%"=="local64" GOTO writeProfile32
     if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
     (
         echo.
-		echo.%instdir%\ /trunk
+        echo.%instdir%\ /trunk
         echo.%instdir%\local32\ /local32
         echo.%instdir%\build\ /build
         echo.%instdir%\%msys2%\mingw32\ /mingw32
@@ -1339,7 +1339,7 @@ if %build64%==yes (
         )
 
 :loginProfile
-if %build32%==no GOTO loginProfile64
+if %build64%==yes GOTO loginProfile64
     %instdir%\%msys2%\usr\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
         echo -------------------------------------------------------------------------------
         echo.
