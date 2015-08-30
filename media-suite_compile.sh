@@ -86,7 +86,7 @@ else
 fi
 [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
 git checkout -q -f --no-track -B ab-suite "$ref"
-git fetch ${gitDepth}
+git fetch -q ${gitDepth}
 oldHead=$(git rev-parse HEAD)
 git checkout -q -f --no-track -B ab-suite "$ref"
 newHead=$(git rev-parse HEAD)
@@ -2098,7 +2098,7 @@ find . -maxdepth 2 -name recently_updated | xargs rm -f
 find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
 [[ -f ./last_run ]] && mv ./last_run ./last_successful_run
 [[ -f ./CHANGELOG.txt ]] && cat ./CHANGELOG.txt >> ./newchangelog
-mv ./newchangelog ./CHANGELOG.txt
+unix2dos -n newchangelog CHANGELOG.txt && rm -f newchangelog
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
