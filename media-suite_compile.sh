@@ -1981,13 +1981,12 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -f waf ]; then
             $python waf distclean
-            rm -rf waf .waf-*
+            rm -rf waf .waf-* VERSION
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
         $python bootstrap.py
-		
-		do_patch "mpv-win32-path.patch"
 
+        # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
             mpv_pthreads="--enable-win32-internal-pthreads"
@@ -2001,6 +2000,8 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
+        # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
+        # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         $python waf install -j $cpuCount
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
