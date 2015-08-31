@@ -1,14 +1,34 @@
-From db5f246fa64da001f86b102907b6ab93e606a1b7 Mon Sep 17 00:00:00 2001
-From: RiCON <RiCON@nowhere>
-Date: Sun, 30 Aug 2015 19:32:42 +0100
-Subject: [PATCH] avfilter/vf_subtitles: allow setting fonts dir
+From 6ec0579691a4cad820c384effbc65f47499f046b Mon Sep 17 00:00:00 2001
+From: Ricardo Constantino <wiiaboo@gmail.com>
+Date: Sun, 30 Aug 2015 23:52:10 +0100
+Subject: [PATCH] avfilter/vf_subtitles: allow setting fonts directory
 
+This is mostly useful if libass was compiled with a font provider
+other than fontconfig, but is still useful in that case.
+
+Signed-off-by: Ricardo Constantino <wiiaboo@gmail.com>
 ---
- libavfilter/vf_subtitles.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ doc/filters.texi           | 4 ++++
+ libavfilter/vf_subtitles.c | 4 ++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/doc/filters.texi b/doc/filters.texi
+index b78cf90..d2c8842 100644
+--- a/doc/filters.texi
++++ b/doc/filters.texi
+@@ -9939,6 +9939,10 @@ was composed. For the syntax of this option, check the
+ Due to a misdesign in ASS aspect ratio arithmetic, this is necessary to
+ correctly scale the fonts if the aspect ratio has been changed.
+ 
++@item fontsdir
++Set a directory path containing fonts that can be used by the filter.
++These fonts will be used in addition to whatever the font provider uses.
++
+ @item charenc
+ Set subtitles input character encoding. @code{subtitles} filter only. Only
+ useful if not UTF-8.
 diff --git a/libavfilter/vf_subtitles.c b/libavfilter/vf_subtitles.c
-index 5e1324c..3879de6 100644
+index 5e1324c..b0d016c 100644
 --- a/libavfilter/vf_subtitles.c
 +++ b/libavfilter/vf_subtitles.c
 @@ -50,6 +50,7 @@ typedef struct {
@@ -27,13 +47,11 @@ index 5e1324c..3879de6 100644
  
  /* libass supports a log level ranging from 0 to 7 */
  static const int ass_libavfilter_log_level_map[] = {
-@@ -106,6 +108,10 @@ static av_cold int init(AVFilterContext *ctx)
+@@ -106,6 +108,8 @@ static av_cold int init(AVFilterContext *ctx)
      }
      ass_set_message_cb(ass->library, ass_log, ctx);
  
-+    if (ass->fontsdir) {
-+        ass_set_fonts_dir(ass->library, ass->fontsdir);
-+    }
++    ass_set_fonts_dir(ass->library, ass->fontsdir);
 +
      ass->renderer = ass_renderer_init(ass->library);
      if (!ass->renderer) {
