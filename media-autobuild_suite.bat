@@ -1175,22 +1175,29 @@ if %build64%==yes (
         )
     )
 
-if %build32%==yes (
-    set searchStr=local32
-    ) else (
-        set searchStr=local64
-        )
-
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
 
 for /f "tokens=2 delims=/" %%b in ('findstr /i build32 %instdir%\%msys2%\etc\fstab.') do set searchRes=oldbuild
+if "%searchRes%"=="oldbuild" set removefstab=yes
 
-if "%searchRes%"=="oldbuild" (
+for /f "tokens=2 delims=/" %%a in ('findstr /i local32 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if not "%searchRes%"=="local32" (
+    set removefstab=yes
+    ) else (
+    if not %build32%==yes set removefstab=yes
+    )
+
+for /f "tokens=2 delims=/" %%a in ('findstr /i local64 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if not "%searchRes%"=="local64" (
+    set removefstab=yes
+    ) else (
+    if not %build64%==yes set removefstab=yes
+    )
+
+if %removefstab%==yes (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab
     )
-
-for /f "tokens=2 delims=/" %%a in ('findstr /i %searchStr% %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
 
 if "%searchRes%"=="local32" GOTO writeProfile32
 if "%searchRes%"=="local64" GOTO writeProfile32
@@ -1211,12 +1218,12 @@ if "%searchRes%"=="local64" GOTO writeProfile32
     (
         echo.
         echo.%instdir%\ /trunk
-        echo.%instdir%\local32\ /local32
         echo.%instdir%\build\ /build
         echo.%instdir%\%msys2%\mingw32\ /mingw32
-        echo.%instdir%\local64\ /local64
         echo.%instdir%\%msys2%\mingw64\ /mingw64
         )>>%instdir%\%msys2%\etc\fstab.
+    if exist %instdir%\local32 echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
+    if exist %instdir%\local64 echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 ::------------------------------------------------------------------
 :: write config profiles:

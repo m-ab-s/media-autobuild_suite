@@ -2088,7 +2088,7 @@ if [[ $packing = "y" ]]; then
     echo "Packing binaries and shared libs... "
     packcmd="$LOCALBUILDDIR/upx391w/upx.exe -9 -qq"
     [[ $stripping = "y" ]] && packcmd="$packcmd --strip-relocs=0"
-    find /local*/bin-*  -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs -r $packcmd
+    find /local*/bin-* -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs -r $packcmd
 fi
 
 echo
@@ -2098,9 +2098,9 @@ echo "deleting status files..."
 cd $LOCALBUILDDIR
 find . -maxdepth 2 -name recently_updated | xargs rm -f
 find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
-[[ -f ./last_run ]] && mv ./last_run ./last_successful_run
-[[ -f ./CHANGELOG.txt ]] && cat ./CHANGELOG.txt >> ./newchangelog
-unix2dos -n newchangelog CHANGELOG.txt && rm -f newchangelog
+[[ -f last_run ]] && mv last_run last_successful_run
+[[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
+unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
