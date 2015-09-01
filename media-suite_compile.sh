@@ -1352,12 +1352,7 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    if ! do_checkForOptions "--enable-fontconfig" && [[ $mpv = "y" ]]; then
-        do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
-        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
-    elif do_checkForOptions "--enable-fontconfig"; then
-        do_git "https://github.com/libass/libass.git" libass noDepth
-    fi
+    do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1366,6 +1361,7 @@ if do_checkForOptions "--enable-libass"; then
             rm -f $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
+        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
@@ -1802,7 +1798,6 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
-        do_patch "ffmpeg-0002-avfilter-vf_subtitles-allow-setting-fonts-dir.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
