@@ -1305,7 +1305,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/libdvdnav.git" dvdnav
+    do_git "git://git.videolan.org/libdvdnav.git" dvdnav "" "a452748"
     if [[ $compile = "true" ]]; then
         [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/dvdnav ]]; then
