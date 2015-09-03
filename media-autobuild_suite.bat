@@ -1176,7 +1176,7 @@ if %build64%==yes (
     )
 
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
-removefstab=no
+set removefstab=no
 
 for /f "tokens=2 delims=/" %%b in ('findstr /i build32 %instdir%\%msys2%\etc\fstab.') do set searchRes=oldbuild
 if "%searchRes%"=="oldbuild" set removefstab=yes
