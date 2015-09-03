@@ -15,6 +15,7 @@ done
 # packet update system
 # --------------------------------------------------
 
+pacman -Sy
 pacman -Qqe | grep -q bash && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 
 if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/pac-mingw64.pk" ]]; then
@@ -122,7 +123,7 @@ fi
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 system..."
 echo "-------------------------------------------------------------------------------"
-pacman --noconfirm -Syu --force --asdeps --ignoregroup base
+pacman --noconfirm -Su --force --asdeps --ignoregroup base
 pacman --noconfirm -Su --force --asdeps
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
