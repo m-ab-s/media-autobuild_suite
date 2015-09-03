@@ -8,7 +8,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
---enable-libvo-aacenc --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
+--enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
@@ -911,10 +911,7 @@ fi
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download" vo-aacenc-0.1.3.tar.gz
-
-    if [[ -f ".libs/libvo-aacenc.a" ]]; then
-        make distclean
-    fi
+    [[ -f ".libs/libvo-aacenc.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/vo-aacenc" ]]; then
         rm -rf $LOCALDESTDIR/include/vo-aacenc
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
