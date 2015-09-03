@@ -86,7 +86,7 @@ else
 fi
 [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
 git checkout -q -f --no-track -B ab-suite "$ref"
-git fetch -q ${gitDepth}
+git fetch -qt ${gitDepth}
 oldHead=$(git rev-parse HEAD)
 git checkout -q -f --no-track -B ab-suite "$ref"
 newHead=$(git rev-parse HEAD)
