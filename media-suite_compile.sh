@@ -1228,35 +1228,26 @@ if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
-        if [ -d $LOCALDESTDIR/include/vpx ]; then
-            rm -rf $LOCALDESTDIR/include/vpx
-            rm -f $LOCALDESTDIR/lib/pkgconfig/vpx.pc
-            rm -f $LOCALDESTDIR/lib/libvpx.a
+        if [[ -d $LOCALDESTDIR/include/vpx ]]; then
+            rm -rf $LOCALDESTDIR/include/vpx $LOCALDESTDIR/bin-video/vpx{enc,dec}.exe
+            rm -f $LOCALDESTDIR/lib/libvpx.a $LOCALDESTDIR/lib/pkgconfig/vpx.pc
         fi
-
-        if [ -f libvpx.a ]; then
-            make distclean
-        fi
-        extracommands="--prefix=$LOCALDESTDIR --disable-shared --enable-static --disable-unit-tests --disable-docs \
-        --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect --enable-vp9-highbitdepth"
-        if [[ $bits = "64bit" ]]; then
-            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86_64-win64-gcc $extracommands
-            sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86_64-win64-gcc.mk
-        else
-            LDFLAGS="$LDFLAGS -static-libgcc -static" ./configure --target=x86-win32-gcc $extracommands
-            sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' libs-x86-win32-gcc.mk
-        fi
+        [[ -f libvpx.a ]] && make distclean
+        [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
+        LDFLAGS+=" -static-libgcc -static" ./configure --target="${target}-gcc" \
+            --disable-shared --enable-static --disable-unit-tests --disable-docs \
+            --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
+            --enable-vp9-highbitdepth --disable-examples \
+            #--enable-vp10
+        sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
-
-        if [[ $vpx = "y" ]]; then
-            mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video
-        else
+        [[ $vpx = "y"  && -f $LOCALDESTDIR/bin/vpxenc.exe ]] &&
+            mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video/ ||
             rm -f $LOCALDESTDIR/bin/vpx{enc,dec}.exe
-        fi
 
         do_checkIfExist vpx-git libvpx.a
         buildFFmpeg="true"
-        unset extracommands
+        unset target
     fi
 else
     pkg-config --exists vpx || do_removeOption "--enable-libvpx"
