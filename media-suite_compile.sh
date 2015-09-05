@@ -86,7 +86,7 @@ else
 fi
 [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
 git checkout -q -f --no-track -B ab-suite "$ref"
-git fetch -qt ${gitDepth}
+git fetch -qt --all ${gitDepth}
 oldHead=$(git rev-parse HEAD)
 git checkout -q -f --no-track -B ab-suite "$ref"
 newHead=$(git rev-parse HEAD)
@@ -1239,7 +1239,7 @@ if [[ ! $vpx = "n" ]]; then
         LDFLAGS+=" -static-libgcc -static" ./configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
-            --enable-vp9-highbitdepth --disable-examples \
+            --enable-vp9-highbitdepth --disable-examples --prefix=$LOCALDESTDIR \
             #--enable-vp10
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
