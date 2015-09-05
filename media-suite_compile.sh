@@ -14,7 +14,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" && -d "/trunk" ]] \
-    && echo "bash /trunk/media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
+    && echo "bash /trunk/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
@@ -1573,11 +1573,11 @@ fi
 if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_git "git://git.videolan.org/x264.git" x264 noDepth
-    if [[ $compile = "true" ]] || [[ $x264 = "y" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
-        if [[ $x264 = "y" ]]; then
+    if [[ $compile = "true" ]] || [[ $x264 != "l" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
+        extracommands="--host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
+        if [[ $x264 = "f" ]]; then
             cd $LOCALBUILDDIR
             do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" lib/libavcodec.a
-
             if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
                 rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
                 rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
@@ -1587,15 +1587,17 @@ if [[ ! $x264 = "n" ]]; then
                 rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
                 rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             fi
-
-            [ -f "config.mak" ] && make distclean
-
+            [[ -f "config.mak" ]] && make distclean
             ./configure $FFMPEG_BASE_OPTS --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-shared \
             --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
 
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
+        else
+            extracommands+=" --disable-lavf --disable-swscale --disable-ffms"
+        fi
 
+        if [[ $x264 != "l" ]]; then
             cd $LOCALBUILDDIR
             do_git "https://github.com/l-smash/l-smash.git" lsmash
             if [[ $compile = "true" ]]; then
@@ -1609,35 +1611,30 @@ if [[ ! $x264 = "n" ]]; then
                 make install-lib
                 do_checkIfExist lsmash-git liblsmash.a
             fi
-
             cd $LOCALBUILDDIR/x264-git
+            # x264 prefers and only uses lsmash if available
+            extracommands+=" --disable-gpac"
+        else
+            extracommands+=" --disable-lsmash"
         fi
 
         echo -ne "\033]0;compile x264-git $bits\007"
-
         if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
-            rm -f $LOCALDESTDIR/include/x264.h $LOCALDESTDIR/include/x264_config.h $LOCALDESTDIR/lib/libx264.a
-            rm -f $LOCALDESTDIR/bin/x264.exe $LOCALDESTDIR/bin/x264-10bit.exe $LOCALDESTDIR/lib/pkgconfig/x264.pc
+            rm -f $LOCALDESTDIR/include/x264{,_config}.h $LOCALDESTDIR/bin/x264{,-10bit}.exe
+            rm -f $LOCALDESTDIR/lib/libx264.a $LOCALDESTDIR/lib/pkgconfig/x264.pc
         fi
+        [[ -f "libx264.a" ]] && make distclean
 
-        [ -f "libx264.a" ] && make distclean
-
-        if [[ $x264 = "y" ]]; then
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static \
-            --bit-depth=10 --enable-win32thread
+        if [[ $x264 != "l" ]]; then
+            extracommands+=" --bindir=$LOCALDESTDIR/bin-video"
+            ./configure --bit-depth=10 $extracommands
             make -j $cpuCount
-
             cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
             make clean
-
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static \
-            --bit-depth=8 --enable-win32thread
         else
-            ./configure --host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread \
-            --disable-interlaced --disable-swscale --disable-lavf --disable-ffms --disable-gpac --disable-lsmash \
-            --bit-depth=8 --disable-cli
+            extracommands+=" --disable-interlaced --disable-gpac --disable-cli"
         fi
-
+        ./configure --bit-depth=8 $extracommands
         do_makeinstall
         do_checkIfExist x264-git libx264.a
         buildFFmpeg="true"

@@ -271,10 +271,11 @@ if %x264INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build x264 [H.264 encoder] binary?
-    echo. 1 = Yes [static]
+    echo. Build x264 [H.264 encoder]?
+    echo. 1 = 8 and 10-bit binaries and 8-bit library [static]
     echo. 2 = Build library only
     echo. 3 = No
+    echo. 4 = 8 and 10-bit binaries with libavformat and library [static]
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -293,7 +294,10 @@ if %buildx264%==2 (
 if %buildx264%==3 (
     set "x264=n"
     )
-if %buildx264% GTR 3 GOTO x264
+if %buildx264%==4 (
+    set "x264=f"
+    )
+if %buildx264% GTR 4 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
 :x265
