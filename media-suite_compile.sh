@@ -459,8 +459,6 @@ do_cmake() {
         mkdir build
     fi
     cd build
-    # http://sourceforge.net/p/msys2/wiki/Porting/
-    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
 }
 
@@ -1667,7 +1665,6 @@ if [[ ! $x265 = "n" ]]; then
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
 
         do_x265_cmake() {
-            MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=;-DBIN_INSTALL_DIR=" \
             cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
