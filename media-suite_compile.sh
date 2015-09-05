@@ -291,7 +291,7 @@ do_pkgConfig() {
     local pkg=${1%% *}
     echo -ne "\033]0;compiling $pkg $bits\007"
     local prefix=$(pkg-config --variable=prefix --silence-errors "$1")
-    prefix="$(cygpath -u "$prefix")"
+    [[ ! -z "$prefix" ]] && prefix="$(cygpath -u "$prefix")"
     if [[ "$prefix" = "$LOCALDESTDIR" || "$prefix" = "/trunk${LOCALDESTDIR}" ]]; then
         echo -------------------------------------------------
         echo "$pkg is already compiled"
