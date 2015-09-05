@@ -864,15 +864,11 @@ fi
 if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-
-    if [[ -f ".libs/libopus.a" ]]; then
-        make distclean
-    fi
+    [[ -f ".libs/libopus.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
         rm -rf $LOCALDESTDIR/include/opus
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
     fi
-
     do_patch "opus11.patch"
     do_generic_confmakeinstall --disable-doc
     do_checkIfExist opus-1.1 libopus.a
@@ -881,10 +877,7 @@ fi
 if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
-
-    if [[ -f "libspeex/.libs/libspeex.a" ]]; then
-        make distclean
-    fi
+    [[ -f "libspeex/.libs/libspeex.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/speex" ]]; then
         rm -rf $LOCALDESTDIR/include/speex $LOCALDESTDIR/bin-audio/speex{enc,dec}.exe
         rm -rf $LOCALDESTDIR/lib/libspeex.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex.pc
@@ -899,10 +892,7 @@ if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
     [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
-
-    if [[ -f "src/libFLAC/.libs/libFLAC.a" ]]; then
-        make distclean
-    fi
+    [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/FLAC" ]]; then
         rm -rf $LOCALDESTDIR/include/FLAC{,++} $LOCALDESTDIR/bin-audio/{meta,}flac.exe
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
@@ -942,10 +932,7 @@ fi
 if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
-
-    if [[ -f ".libs/libvo-amrwbenc.a" ]]; then
-        make distclean
-    fi
+    [[ -f ".libs/libvo-amrwbenc.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/vo-amrwbenc" ]]; then
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
@@ -992,14 +979,8 @@ if do_checkForOptions "--enable-libfaac"; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile faac $bits\007"
-
         do_wget "http://sourceforge.net/projects/faac/files/faac-src/faac-1.28/faac-1.28.tar.gz/download" faac-1.28.tar.gz
-
-        if [[ -f configure ]]; then
-            make distclean
-        else
-            sh bootstrap
-        fi
+        [[ -f configure ]] && make distclean || sh bootstrap
         do_generic_confmakeinstall audio --without-mp4v2
         do_checkIfExist faac-1.28 libfaac.a
     fi
@@ -1014,16 +995,12 @@ if do_checkForOptions "--enable-libvorbis"; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile vorbis-tools $bits\007"
-
         do_wget "http://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.0.tar.gz"
-
-        if [[ -f "oggenc/oggenc.exe" ]]; then
-            make distclean
-        fi
-        if [[ -d "$LOCALDESTDIR/bin-audio/oggenc.exe" ]]; then
+        [[ -f "oggenc/oggenc.exe" ]] && make distclean
+        [[ -f "$LOCALDESTDIR/bin-audio/oggenc.exe" ]] &&
             rm -r $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
-        fi
-        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo --disable-flac --disable-speex
+        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut \
+            --disable-ogginfo --disable-flac --disable-speex
         make -j $cpuCount
         [[ -f oggenc/oggenc.exe ]] && cp -f oggenc/oggenc.exe oggdec/oggdec.exe $LOCALDESTDIR/bin-audio/
         do_checkIfExist vorbis-tools-1.4.0 bin-audio/oggenc.exe
@@ -1039,15 +1016,10 @@ if do_checkForOptions "--enable-libopus"; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile opus-tools $bits\007"
-
         do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
-
-        if [[ -f "opusenc.exe" ]]; then
-            make distclean
-        fi
-        if [[ -d "$LOCALDESTDIR/bin-audio/opusenc.exe" ]]; then
-            rm -rf $LOCALDESTDIR/bin-audio/opus*
-        fi
+        [[ -f "opusenc.exe" ]] && make distclean
+        [[ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]] &&
+            rm -rf $LOCALDESTDIR/bin-audio/opus{dec,enc,info}.exe
         do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
     fi
@@ -1056,7 +1028,6 @@ fi
 if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
-
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
         rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
@@ -1083,9 +1054,7 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
             do_patch lame-fixes.patch
             autoreconf -fi
         fi
-        if [[ -f libmp3lame/.libs/libmp3lame.a ]]; then
-            make distclean
-        fi
+        [[ -f libmp3lame/.libs/libmp3lame.a ]] && make distclean
         if [[ -f $LOCALDESTDIR/include/lame/lame.h ]]; then
             rm -rf $LOCALDESTDIR/include/lame
             rm -f $LOCALDESTDIR/lib/libmp3lame.{l,}a $LOCALDESTDIR/bin-audio/lame.exe
@@ -1114,16 +1083,11 @@ if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/qyot27/twolame.git" twolame noDepth origin/mingw-static
     if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            ./autogen.sh -V
-        else
-            make distclean
-        fi
+        [[ ! -f ./configure ]] && ./autogen.sh -V || make distclean
         if [[ -f "$LOCALDESTDIR/include/twolame.h" ]]; then
             rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
-
         do_generic_conf
         sed -i 's/frontend simplefrontend//' Makefile
         do_makeinstall
@@ -1134,15 +1098,11 @@ fi
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz/download" libbs2b-3.1.0.tar.gz
-
-    if [[ -f "src/.libs/libbs2b.a" ]]; then
-        make distclean
-    fi
+    [[ -f "src/.libs/libbs2b.a" ]] && make distclean
     if [[ -d "$LOCALDESTDIR/include/bs2b" ]]; then
         rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
         rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
     fi
-
     do_patch "libbs2b-disable-sndfile.patch"
     do_patch "libbs2b-libs-only.patch"
     do_generic_confmakeinstall
@@ -1153,11 +1113,7 @@ if [[ $sox = "y" ]]; then
     cd $LOCALBUILDDIR
     do_git "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            ./autogen.sh
-        else
-            make distclean
-        fi
+        [[ ! -f ./configure ]] && ./autogen.sh || make distclean
         if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
             rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
             rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
