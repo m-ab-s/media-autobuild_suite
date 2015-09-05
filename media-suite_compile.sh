@@ -668,7 +668,7 @@ if do_checkForOptions "--enable-gnutls" ; then
         fi
         ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
             --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
-            --disable-libdane --without-idn --without-tpm --enable-local-libopts
+            --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' \
         lib/gnutls.pc
         do_makeinstall
