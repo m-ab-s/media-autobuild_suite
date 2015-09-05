@@ -103,7 +103,7 @@ if [[ "$oldHead" != "$newHead" ]]; then
         --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
     echo "" >> "$LOCALBUILDDIR"/newchangelog
 elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-     [[ -z "$gitCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder" ]] ||
+     [[ -z "$gitCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder.pc" ]] ||
      [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
     compile="true"
 else
@@ -146,7 +146,7 @@ else
             new_updates_packages="$new_updates_packages [$svnFolder]"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$svnCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$svnFolder" ]] ||
+         [[ -z "$svnCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$svnFolder.pc" ]] ||
          [[ ! -z "$svnCheck" && ! -f $LOCALDESTDIR/"$svnCheck" ]]; then
         compile="true"
     else
@@ -195,7 +195,7 @@ else
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
         echo "" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$hgCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$hgFolder" ]] ||
+         [[ -z "$hgCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$hgFolder.pc" ]] ||
          [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
          compile="true"
     else
