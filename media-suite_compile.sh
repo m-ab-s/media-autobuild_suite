@@ -13,8 +13,8 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
-[[ ! -f "$LOCALBUILDDIR/last_run" ]] \
-    && echo "bash $(cygpath -u $(cygpath -m /)../media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
+[[ ! -f "$LOCALBUILDDIR/last_run" && -d "/trunk" ]] \
+    && echo "bash /trunk/media-suite_compile.sh) $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
@@ -435,11 +435,12 @@ do_patch() {
 
     if [[ $response_code = "404" ]]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
-        iPath=$(cygpath -w /)
+        local trunk="/trunk"
+        [[ -d "$trunk" ]] || trunk="$(cygpath -w /).."
         if [ -f ./"$patch" ]; then
             patchpath="$patch"
-        elif [ -f "$iPath/../patches/$patch" ]; then
-            patchpath="$iPath/../patches/$patch"
+        elif [ -f "${trunk}/patches/${patch}" ]; then
+            patchpath="${trunk}/patches/${patch}"
         fi
     elif [[ $response_code = "200" ]]; then
         patchpath="$patch"

@@ -1194,6 +1194,9 @@ if not "%searchRes%"=="local64" (
     if not %build64%==yes set removefstab=yes
     )
 
+for /f "tokens=2 delims=/" %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if not "%searchRes%"=="trunk" set removefstab=yes
+
 if %removefstab%==yes (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab

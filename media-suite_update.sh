@@ -80,9 +80,7 @@ echo "check profiles..."
 echo "-------------------------------------------------------------------------------"
 echo
 
-iPath=`cygpath -w /`
-
-cd $iPath/..
+[[ -d "/trunk" ]] && cd "/trunk" || cd "$(cygpath -w /).."
 
 if [[ $build32 = "yes" ]]; then
     if [ -f "/local32/etc/profile.local" ]; then
