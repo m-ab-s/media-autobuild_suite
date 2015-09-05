@@ -1480,7 +1480,7 @@ fi
 
 if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
     if [ -f "$LOCALDESTDIR/include/DeckLinkAPIVersion.h" ] &&
-        grep -q -E "API_VERSION_STRING\W+\"10\.4\.1\"" "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
+        grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
         echo -------------------------------------------------
         echo "DeckLinkAPI is already downloaded"
         echo -------------------------------------------------
