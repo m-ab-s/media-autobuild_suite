@@ -842,7 +842,7 @@ if not exist %instdir%\mintty.lnk (
     if exist %instdir%\build\firstUpdate.sh del %instdir%\build\firstUpdate.sh
     (
         echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm --force -Sy --asdeps pacman-mirrors
+        echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
         echo.sleep ^4
         echo.exit
         )>>%instdir%\build\firstUpdate.sh
@@ -856,8 +856,7 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.echo -ne "\033]0;second msys2 update\007"
         echo.pacman --noconfirm -Syu --force --asdeps --ignoregroup base
-        echo.pacman --noconfirm -Su --force --asdeps
-        echo.exit
+        echo.pacman --noconfirm -Su --force --asdeps ^&^& exit
         )>>%instdir%\build\secondUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\secondUpdate.sh
     cls
@@ -974,7 +973,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     if exist %instdir%\build\pacman.sh del %instdir%\build\pacman.sh
     (
     echo.echo -ne "\033]0;install base system\007"
-    echo.pacman --noconfirm -S $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
+    echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
     echo.sleep ^3
     echo.exit
         )>>%instdir%\build\pacman.sh
@@ -1020,7 +1019,7 @@ if %build32%==yes (
     if exist %instdir%\build\mingw32.sh del %instdir%\build\mingw32.sh
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.pacman --noconfirm -S $(cat /etc/pac-mingw32.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw32.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\build\mingw32.sh
@@ -1030,7 +1029,7 @@ if %build32%==yes (
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
         echo.
-        echo.mingw32 is not installed, maybe the download didn't work.
+        echo.MinGW32 GCC compiler isn't installed; maybe the download didn't work
         echo.Do you want to try it again?
         echo.
         echo -------------------------------------------------------------------------------
@@ -1055,7 +1054,7 @@ if %build64%==yes (
     if exist %instdir%\build\mingw64.sh del %instdir%\build\mingw64.sh
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.pacman --noconfirm -S $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
         echo.sleep ^3
         echo.exit
             )>>%instdir%\build\mingw64.sh
@@ -1065,8 +1064,8 @@ if %build64%==yes (
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
         echo.
-        echo.mingw64 where not install, maybe the download has not work
-        echo.do you want to try it again?
+        echo.MinGW64 GCC compiler isn't installed; maybe the download didn't work
+        echo.Do you want to try it again?
         echo.
         echo -------------------------------------------------------------------------------
         set /P try64="try again [y/n]: "
