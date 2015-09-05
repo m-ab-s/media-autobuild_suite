@@ -103,7 +103,7 @@ if [[ "$oldHead" != "$newHead" ]]; then
         --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
     echo "" >> "$LOCALBUILDDIR"/newchangelog
 elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-     [[ -z "$gitCheck" && -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder" ]] ||
+     [[ -z "$gitCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder" ]] ||
      [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
     compile="true"
 else
@@ -138,9 +138,6 @@ else
     svn update
     newRevision=$(svnversion)
 
-    pkg-config --exists "$svnFolder"
-    local pcExists=$?
-
     if [[ "$oldRevision" != "$newRevision" ]]; then
         touch recently_updated
         rm -f build_successful*
@@ -149,7 +146,7 @@ else
             new_updates_packages="$new_updates_packages [$svnFolder]"
         fi
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$svnCheck" && $pcExists = 1 ]] ||
+         [[ -z "$svnCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$svnFolder" ]] ||
          [[ ! -z "$svnCheck" && ! -f $LOCALDESTDIR/"$svnCheck" ]]; then
         compile="true"
     else
@@ -186,9 +183,6 @@ else
     hg update
     newHead=$(hg id --id)
 
-    pkg-config --exists "$hgFolder"
-    local pcExists=$?
-
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful*
@@ -201,7 +195,7 @@ else
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
         echo "" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$hgCheck" && $pcExists = 1 ]] ||
+         [[ -z "$hgCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$hgFolder" ]] ||
          [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
          compile="true"
     else
