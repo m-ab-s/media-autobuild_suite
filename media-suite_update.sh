@@ -50,7 +50,7 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
             esac
         done
     fi
-    if [[ "$remove" = "y" ]] && [[ "$uninstall" != "" ]]; then
+    if [[ ! -z "$uninstall" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You have more packages than needed!"
