@@ -40,7 +40,7 @@ pkg-config gperf winpty-git
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
 gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg-turbo libmad libmodplug ^
 libpng libtiff mpc nasm pcre ragel schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm python2-lxml ninja ^
-libarchive
+libarchive rtmpdump-git
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
