@@ -1188,7 +1188,7 @@ if [[ ! $vpx = "n" ]]; then
         LDFLAGS+=" -static-libgcc -static" ./configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
-            --enable-vp9-highbitdepth --disable-examples --prefix=$LOCALDESTDIR \
+            --enable-vp9-highbitdepth --prefix=$LOCALDESTDIR \
             #--enable-vp10
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
