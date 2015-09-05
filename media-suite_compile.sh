@@ -85,6 +85,8 @@ else
         git remote set-url origin "$gitURL"
 fi
 [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
+[[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
+    git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 git checkout -q -f --no-track -B ab-suite "$ref"
 git fetch -qt --all ${gitDepth}
 oldHead=$(git rev-parse HEAD)
