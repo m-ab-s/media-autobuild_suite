@@ -1479,43 +1479,43 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
 fi
 
 if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
-    if [ -f "$LOCALDESTDIR/include/DeckLinkAPIVersion.h" ] &&
+    cd $LOCALBUILDDIR
+    missing="n"
+    for file in DeckLinkAPI{{,Version}.h,_i.c}; do
+        [[ ! -f "$LOCALDESTDIR/include/$file" ]] && missing="y"
+    done
+    if [[ "$missing" = "n" ]] &&
         grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
         echo -------------------------------------------------
-        echo "DeckLinkAPI is already downloaded"
+        echo "DeckLinkAPI is already installed"
         echo -------------------------------------------------
     else
-        echo -ne "\033]0;download DeckLinkAPI $bits\007"
-        cd $LOCALDESTDIR/include
-        rm -f DeckLinkAPI{,Version}.h DeckLinkAPI_i.c
-        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPI.h"
-        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPI_i.c"
-        do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/DeckLinkAPIVersion.h"
+        echo -ne "\033]0;installing DeckLinkAPI $bits\007"
+        mkdir -p DeckLinkAPI && cd DeckLinkAPI
+        [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
+        for file in DeckLinkAPI{{,Version}.h,_i.c}; do
+            [[ ! -f "$file" ]] &&
+                do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/$file" &&
+                touch recently_updated
+            cp -f "$file" "$LOCALDESTDIR/include/$file"
+        done
         do_checkIfExist DeckLinkAPI "include/DeckLinkAPI.h"
     fi
+    unset missing
 fi
 
 if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
-
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
         echo -------------------------------------------------
         echo "nvenc is already installed"
         echo -------------------------------------------------
     else
         echo -ne "\033]0;install nvenc $bits\007"
-        if [[ ! -d nvenc_5.0.1_sdk ]]; then
+        if [[ ! -d nvenc_5.0.1_sdk ]] &&
             do_wget "http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip"
-        fi
-
-        if [[ $build32 = "yes" ]] && [[ ! -f /local32/include/nvEncodeAPI.h ]]; then
-            cp nvenc_5.0.1_sdk/Samples/common/inc/* /local32/include
-        fi
-        
-        if [[ $build64 = "yes" ]] && [[ ! -f /local64/include/nvEncodeAPI.h ]]; then
-            cp nvenc_5.0.1_sdk/Samples/common/inc/* /local64/include
-        fi
-    
+        [[ ! -f "$LOCALDESTDIR/include/nvEncodeAPI.h" ]] &&
+            cp nvenc_5.0.1_sdk/Samples/common/inc/* "$LOCALDESTDIR/include/"
         do_checkIfExist nvenc_5.0.1_sdk "include/nvEncodeAPI.h"
     fi
 fi
