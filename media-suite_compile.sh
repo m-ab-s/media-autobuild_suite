@@ -1512,7 +1512,7 @@ if do_checkForOptions "--enable-nvenc" && [[ $ffmpeg != "n" ]]; then
         echo -------------------------------------------------
     else
         echo -ne "\033]0;install nvenc $bits\007"
-        if [[ ! -d nvenc_5.0.1_sdk ]] &&
+        [[ ! -d nvenc_5.0.1_sdk ]] &&
             do_wget "http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip"
         [[ ! -f "$LOCALDESTDIR/include/nvEncodeAPI.h" ]] &&
             cp nvenc_5.0.1_sdk/Samples/common/inc/* "$LOCALDESTDIR/include/"
