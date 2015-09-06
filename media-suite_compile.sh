@@ -1624,7 +1624,7 @@ if [[ ! $x264 = "n" ]]; then
             rm -f $LOCALDESTDIR/lib/libx264.a $LOCALDESTDIR/lib/pkgconfig/x264.pc
         fi
         [[ -f "libx264.a" ]] && make distclean
-
+        do_patch "x264-0001-Fix-compilation-with-ffmpeg-git.patch" am
         if [[ $x264 != "l" ]]; then
             extracommands+=" --bindir=$LOCALDESTDIR/bin-video"
             ./configure --bit-depth=10 $extracommands
