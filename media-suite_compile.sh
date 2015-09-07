@@ -1294,7 +1294,7 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libass/libass.git" libass noDepth origin/fonts
+    do_git "https://github.com/libass/libass.git" libass noDepth
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
