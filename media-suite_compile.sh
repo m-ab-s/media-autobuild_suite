@@ -1578,15 +1578,13 @@ if [[ ! $x264 = "n" ]]; then
         if [[ $x264 = "f" ]]; then
             cd $LOCALBUILDDIR
             do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" lib/libavcodec.a
-            if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
-                rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
-                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
-                rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
-                rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
-            fi
+            rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
+            rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
+            rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+            rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
+            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f "config.mak" ]] && make distclean
             ./configure $FFMPEG_BASE_OPTS --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-shared \
             --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
@@ -1742,9 +1740,7 @@ if [[ $ffmpeg != "n" ]]; then
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             echo -ne "\033]0;compiling shared FFmpeg $bits\007"
             [ -f config.mak ] && make distclean
-            if [ -d "$LOCALDESTDIR/bin-video/ffmpegSHARED" ]; then
-                rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-            fi
+            rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
             --disable-static --enable-shared \
             $FFMPEG_OPTS_SHARED \
@@ -1762,15 +1758,13 @@ if [[ $ffmpeg != "n" ]]; then
         # static
         if [[ $ffmpeg != "s" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
-            if [ -f "$LOCALDESTDIR/lib/libavcodec.a" ]; then
-                rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
-                rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
-                rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
-                rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
-                rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
-                rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
-                rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
-            fi
+            rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
+            rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
+            rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+            rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
+            rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+            rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
+            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [ -f config.mak ] && make distclean
             ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
             --enable-static --disable-shared \
