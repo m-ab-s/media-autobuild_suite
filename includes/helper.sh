@@ -391,7 +391,7 @@ do_generic_confmakeinstall() {
 do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
-    local files=$(pacman -Qql $packages | grep .dll.a)
+    local files=$(pacman -Qql $packages 2>/dev/null | grep .dll.a)
 
     for file in "$files"; do
         if [[ -f "$file" && -f "${file%*.dll.a}.a" ]]; then
@@ -409,9 +409,16 @@ do_unhide_pacman_sharedlibs() {
 do_pacman_install() {
     local packages="$1"
     echo "Installing dependencies as needed:"
-    pacman -S --noconfirm --needed $packages 2>/dev/null &&
-        do_hide_pacman_sharedlibs "$packages"
-    pacman -D --asexplicit $packages
+    local sed=""
+    [[ $build32 = "yes" ]] && sed+="mingw-w64-i686-&"
+    [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
+    local newpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
+    pacman -S --noconfirm --needed $newpackages 2>/dev/null
+    do_hide_pacman_sharedlibs "$newpackages"
+    pacman -D --asexplicit $newpackages >/dev/null
+    for pkg in $packages; do
+        grep -q "$pkg" /etc/pac-mingw-extra.pk || echo "$pkg" >> /etc/pac-mingw-extra.pk
+    done
 }
 
 do_pacman_remove() {
@@ -419,4 +426,7 @@ do_pacman_remove() {
     echo "Removing packages:"
     do_unhide_pacman_sharedlibs "$packages"
     pacman -Rs --noconfirm $packages 2>/dev/null
+    for pkg in $packages; do
+        grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
+    done
 }

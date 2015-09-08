@@ -11,6 +11,22 @@ while true; do
   esac
 done
 
+[[ -d "/trunk" ]] && cd "/trunk" || cd "$(cygpath -w /).."
+
+do_prompt() {
+    # from http://superuser.com/a/608509
+    while read -s -e -t 0.1; do : ; done
+    read -p "$1" ret
+}
+
+if [[ ! -f includes/helper.sh ]] &&
+    ! curl --retry 20 --retry-max-time 5 -Lkf -o includes/helper.sh \
+        "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/includes/helper.sh"; then
+    do_prompt "Failed getting helper script. Try again later."
+    exit 1
+fi
+source includes/helper.sh
+
 # --------------------------------------------------
 # packet update system
 # --------------------------------------------------
@@ -18,7 +34,7 @@ done
 pacman -Sy
 pacman -Qqe | grep -q bash && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 
-if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/pac-mingw64.pk" ]]; then
+if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo "check pacman packages..."
@@ -26,11 +42,13 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
     echo
     old=$(pacman -Qqe | sort)
     new=$(cat /etc/pac-base.pk)
-    [[ "$build32" = "yes" ]] && new=$(printf "$new\n$(cat /etc/pac-mingw32.pk)")
-    [[ "$build64" = "yes" ]] && new=$(printf "$new\n$(cat /etc/pac-mingw64.pk)")
-    diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort) | grep '^[<>]')
-    install=$(echo "$diff" | grep '>' | sed 's/[<>] //g')
-    uninstall=$(echo "$diff" | grep '<' | sed 's/[<>] //g')
+    newmingw=$(cat /etc/pac-mingw.pk)
+    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n$(cat /etc/pac-mingw-extra.pk)")
+    [[ "$build32" = "yes" ]] && new+=$(printf "\n$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
+    [[ "$build64" = "yes" ]] && new+=$(printf "\n$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
+    diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
+    install=$(echo "$diff" | sed -nr 's/> (.*)/\1/p')
+    uninstall=$(echo "$diff" | sed -nr 's/< (.*)/\1/p')
 
     if [[ "$install" != "" ]]; then
         echo
@@ -44,7 +62,11 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
         while true; do
             read -p "install packs [y/n]? " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm --asexplicit --force -S $install; break;;
+                [Yy]* )
+                    pacman -S --noconfirm --needed $install
+                    do_hide_pacman_sharedlibs "$install"
+                    pacman -D --asexplicit $install
+                    break;;
                 [Nn]* ) exit;;
                 * ) echo "Please answer yes or no";;
             esac
@@ -62,13 +84,16 @@ if [[ -f "/etc/pac-base.pk" ]] && [[ -f "/etc/pac-mingw32.pk" ]] || [[ -f "/etc/
         while true; do
             read -p "remove packs [y/n]? " yn
             case $yn in
-                [Yy]* ) pacman --noconfirm -R $uninstall; break;;
+                [Yy]* )
+                    pacman -R --noconfirm $uninstall
+                    do_pacman_remove "$uninstall"
+                    break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
                 * ) echo "Please answer yes or no";;
             esac
         done
     fi
-    rm -f /etc/pac-{base,mingw32,mingw64}.pk
+    rm -f /etc/pac-{base,mingw}.pk
 fi
 
 # --------------------------------------------------

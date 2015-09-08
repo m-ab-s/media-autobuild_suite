@@ -1018,10 +1018,10 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
     )>>%instdir%\%msys2%\usr\bin\hg.bat
 
 :getmingw32
-if %build32%==yes (
-    if exist "%instdir%\%msys2%\etc\pac-mingw32.pk" del "%instdir%\%msys2%\etc\pac-mingw32.pk"
-    for %%i in (%mingwpackages%) do echo.mingw-w64-i686-%%i>>%instdir%\%msys2%\etc\pac-mingw32.pk
+if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
+for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 
+if %build32%==yes (
 :tryagain32
     if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
@@ -1030,7 +1030,7 @@ if %build32%==yes (
     if exist %instdir%\build\mingw32.sh del %instdir%\build\mingw32.sh
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw32.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-i686-^&#g'^)
         echo.sleep ^3
         echo.exit
         )>>%instdir%\build\mingw32.sh
@@ -1054,9 +1054,6 @@ if %build32%==yes (
     
 :getmingw64
 if %build64%==yes (
-    if exist "%instdir%\%msys2%\etc\pac-mingw64.pk" del "%instdir%\%msys2%\etc\pac-mingw64.pk"
-    for %%i in (%mingwpackages%) do echo.mingw-w64-x86_64-%%i>>%instdir%\%msys2%\etc\pac-mingw64.pk
-
 :tryagain64
     if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
@@ -1065,7 +1062,7 @@ if %build64%==yes (
     if exist %instdir%\build\mingw64.sh del %instdir%\build\mingw64.sh
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw64.pk ^| sed -e 's#\\##'^)
+        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-x86_64-^&#g'^)
         echo.sleep ^3
         echo.exit
             )>>%instdir%\build\mingw64.sh
