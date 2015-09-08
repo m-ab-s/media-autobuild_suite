@@ -1941,14 +1941,12 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         $python waf install -j $cpuCount
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
 
-        if do_checkForOptions "--enable-fontconfig" && [[ ! -f fonts.conf || -d fonts ]]; then
+        if [[ $bits = "32bit" ]] && [[ ! -d $LOCALDESTDIR/bin-video/fonts ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
             mkdir -p $LOCALDESTDIR/bin-video/mpv
-            cp fonts.conf $LOCALDESTDIR/bin-video/mpv/
-            if [ ! -d $LOCALDESTDIR/bin-video/fonts ]; then
-                do_wget "http://srsfckn.biz/noto-mpv.7z" noto-mpv.7z fonts
-                mv fonts $LOCALDESTDIR/bin-video/
-            fi
+            mv -f fonts.conf $LOCALDESTDIR/bin-video/mpv/
+            do_wget "http://srsfckn.biz/noto-mpv.7z" noto-mpv.7z fonts
+            mv fonts $LOCALDESTDIR/bin-video/
         fi
 
         unset mpv_ldflags mpv_pthreads replace
