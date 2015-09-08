@@ -387,3 +387,36 @@ do_generic_confmakeinstall() {
     do_generic_conf "$@"
     do_makeinstall
 }
+
+do_hide_pacman_sharedlibs() {
+    local packages="$1"
+    local revert="$2"
+    local files=$(pacman -Qql $packages | grep .dll.a)
+
+    for file in "$files"; do
+        if [[ -f "$file" && -f "${file%*.dll.a}.a" ]]; then
+            mv -f "${file}" "${file}.dyn"
+        elif [[ -n "$revert" && -f "${file}.dyn" ]]; then
+            mv -f "${file}.dyn" "${file}"
+        fi
+    done
+}
+
+do_unhide_pacman_sharedlibs() {
+    do_hide_pacman_sharedlibs "$1" revert
+}
+
+do_pacman_install() {
+    local packages="$1"
+    echo "Installing dependencies as needed:"
+    pacman -S --noconfirm --needed $packages 2>/dev/null &&
+        do_hide_pacman_sharedlibs "$packages"
+    pacman -D --asexplicit $packages
+}
+
+do_pacman_remove() {
+    local packages="$1"
+    echo "Removing packages:"
+    do_unhide_pacman_sharedlibs "$packages"
+    pacman -Rs --noconfirm $packages 2>/dev/null
+}
