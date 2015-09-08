@@ -47,167 +47,118 @@ while true; do
   esac
 done
 
-# get git clone, or update
-do_git() {
-local gitURL="$1"
-local gitFolder="$2"
-local gitDepth="$3"
-local gitBranch="$4"
-local gitCheck="$5"
-local unshallow=""
-compile="true"
-
-if [[ $gitDepth = "noDepth" ]]; then
-    gitDepth=""
-elif [[ $gitDepth = "shallow" ]] || [[ -z "$gitDepth" ]]; then
-    gitDepth="--depth=1"
-fi
-
-local ref="origin/HEAD"
-[[ -n "$gitBranch" ]] && ref="$gitBranch"
-
-echo -ne "\033]0;compiling $gitFolder $bits\007"
-if [ ! -d "$gitFolder"-git ]; then
-    git clone $gitDepth "$gitURL" "$gitFolder"-git
-    if [[ -d "$gitFolder"-git ]]; then
-        cd "$gitFolder"-git
-        touch recently_updated
+vcs_clone() {
+    if [[ "$vcsType" = "svn" ]]; then
+        svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
-        echo "$gitFolder git seems to be down"
-        echo "Try again later or <Enter> to continue"
-        do_prompt "if you're sure nothing depends on it."
-        compile="false"
-        return
+        "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
     fi
-else
-    cd "$gitFolder"-git
-    [[ -z "$gitDepth" && -f .git/shallow ]] && unshallow="--unshallow"
-    [[ "$gitURL" != "$(git config --get remote.origin.url)" ]] &&
-        git remote set-url origin "$gitURL"
-fi
-[[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
-[[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
-    git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-git checkout -q -f --no-track -B ab-suite "$ref"
-git fetch -qt --all ${gitDepth}
-oldHead=$(git rev-parse HEAD)
-git checkout -q -f --no-track -B ab-suite "$ref"
-newHead=$(git rev-parse HEAD)
-
-if [[ "$oldHead" != "$newHead" ]]; then
-    touch recently_updated
-    rm -f build_successful*
-    if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-        new_updates="yes"
-        new_updates_packages="$new_updates_packages [$gitFolder]"
-    fi
-    echo "$gitFolder" >> "$LOCALBUILDDIR"/newchangelog
-    git log --no-merges --pretty="%ci %h %s" \
-        --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
-    echo "" >> "$LOCALBUILDDIR"/newchangelog
-elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-     [[ -z "$gitCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$gitFolder.pc" ]] ||
-     [[ ! -z "$gitCheck" && ! -f $LOCALDESTDIR/"$gitCheck" ]]; then
-    compile="true"
-else
-    echo -------------------------------------------------
-    echo "$gitFolder is already up to date"
-    echo -------------------------------------------------
-    compile="false"
-fi
 }
 
-# get svn checkout, or update
-do_svn() {
-local svnURL="$1"
-local svnFolder="$2"
-local svnCheck="$3"
-compile="true"
-echo -ne "\033]0;compiling $svnFolder $bits\007"
-if [ ! -d "$svnFolder"-svn ]; then
-    svn checkout "$svnURL" "$svnFolder"-svn
-    if [[ -d "$svnFolder"-svn ]]; then
-        cd "$svnFolder"-svn
-        touch recently_updated
-    else
-        echo "$svnFolder svn seems to be down"
-        echo "Try again later or <Enter> to continue"
-        do_prompt "if you're sure nothing depends on it."
-        compile="false"
+vcs_update() {
+    if [[ "$vcsType" = "svn" ]]; then
+        oldHead=$(svnversion)
+        svn update -r "$ref"
+        newHead=$(svnversion)
+    elif [[ "$vcsType" = "hg" ]]; then
+        oldHead=$(hg id --id)
+        hg pull
+        hg update -C -r "$ref"
+        newHead=$(hg id --id)
+    elif [[ "$vcsType" = "git" ]]; then
+        local unshallow=""
+        [[ -f .git/shallow ]] && unshallow="--unshallow"
+        [[ "$vcsURL" != "$(git config --get remote.origin.url)" ]] &&
+            git remote set-url origin "$vcsURL"
+        [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
+        [[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
+            git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+        git checkout -qf --no-track -B ab-suite "$ref"
+        git fetch -qt $unshallow origin
+        oldHead=$(git rev-parse HEAD)
+        git checkout -qf --no-track -B ab-suite "$ref"
+        newHead=$(git rev-parse HEAD)
     fi
-else
-    cd "$svnFolder"-svn
-    oldRevision=$(svnversion)
-    svn update
-    newRevision=$(svnversion)
+}
 
-    if [[ "$oldRevision" != "$newRevision" ]]; then
+vcs_log() {
+    if [[ "$vcsType" = "git" ]]; then
+        git log --no-merges --pretty="%ci %h %s" \
+            --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
+    elif [[ "$vcsType" = "hg" ]]; then
+        hg log --template "{date|localdate|isodatesec} {node|short} {desc|firstline}\n" \
+            -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
+    fi
+}
+
+# get source from VCS
+# example:
+#   do_vcs "url#branch|revision|tag|commit=NAME" "folder" "lib/libname.a"
+do_vcs() {
+    local vcsType="${1%::*}"
+    local vcsURL="${1#*::}"
+    local vcsBranch="${1#*#}"
+    [[ "$vcsType" = "$vcsURL" ]] && vcsType="git"
+    [[ "$vcsBranch" = "$vcsURL" ]] && vcsBranch=""
+    local vcsFolder="$2"
+    local vcsCheck="$3"
+    local ref=""
+    if [[ -n "$vcsBranch" ]]; then
+        case ${vcsBranch%%=*} in
+            commit|tag|revision)
+                ref=${vcsBranch##*=}
+                ;;
+            branch)
+                ref=origin/${vcsBranch##*=}
+                ;;
+        esac
+    else
+        if [[ "$vcsType" = "git" ]]; then
+            ref="origin/HEAD"
+        elif [[ "$vcsType" = "hg" ]]; then
+            ref="tip"
+        elif [[ "$vcsType" = "svn" ]]; then
+            ref="HEAD"
+        fi
+    fi
+    compile="false"
+
+    echo -ne "\033]0;compiling $vcsFolder $bits\007"
+    if [ ! -d "$vcsFolder-$vcsType" ]; then
+        vcs_clone
+        if [[ -d "$vcsFolder-$vcsType" ]]; then
+            cd "$vcsFolder-$vcsType"
+            touch recently_updated
+        else
+            echo "$vcsFolder $vcsType seems to be down"
+            echo "Try again later or <Enter> to continue"
+            do_prompt "if you're sure nothing depends on it."
+            return
+        fi
+    else
+        cd "$vcsFolder-$vcsType"
+    fi
+    vcs_update
+    if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
-        rm -f build_successful*
+        rm -f build_successful{32,64}bit
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
-            new_updates_packages="$new_updates_packages [$svnFolder]"
+            new_updates_packages="$new_updates_packages [$vcsFolder]"
         fi
-    elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$svnCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$svnFolder.pc" ]] ||
-         [[ ! -z "$svnCheck" && ! -f $LOCALDESTDIR/"$svnCheck" ]]; then
+        echo "$vcsFolder" >> "$LOCALBUILDDIR"/newchangelog
+        vcs_log
+        echo "" >> "$LOCALBUILDDIR"/newchangelog
+        compile="true"
+    elif [[ -f recently_updated && ! -f "build_successful$bits" ]] ||
+         [[ -z "$vcsCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$vcsFolder.pc" ]] ||
+         [[ ! -z "$vcsCheck" && ! -f "$LOCALDESTDIR/$vcsCheck" ]]; then
         compile="true"
     else
         echo -------------------------------------------------
-        echo "$svnFolder is already up to date"
+        echo "$vcsFolder is already up to date"
         echo -------------------------------------------------
-        compile="false"
     fi
-fi
-}
-
-# get hg clone, or update
-do_hg() {
-local hgURL="$1"
-local hgFolder="$2"
-local hgCheck="$3"
-compile="true"
-echo -ne "\033]0;compiling $hgFolder $bits\007"
-if [ ! -d "$hgFolder"-hg ]; then
-    hg clone "$hgURL" "$hgFolder"-hg
-    if [[ -d "$hgFolder"-hg ]]; then
-        cd "$hgFolder"-hg
-        touch recently_updated
-    else
-        echo "$hgFolder hg seems to be down"
-        echo "Try again later or <Enter> to continue"
-        do_prompt "if you're sure nothing depends on it."
-        compile="false"
-    fi
-else
-    cd "$hgFolder"-hg
-    oldHead=$(hg id --id)
-    hg pull
-    hg update
-    newHead=$(hg id --id)
-
-    if [[ "$oldHead" != "$newHead" ]]; then
-        touch recently_updated
-        rm -f build_successful*
-        if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
-            new_updates="yes"
-            new_updates_packages="$new_updates_packages [$hgFolder]"
-        fi
-        echo "$hgFolder" >> "$LOCALBUILDDIR"/newchangelog
-        hg log --template "{date|localdate|isodatesec} {node|short} {desc|firstline}\n" \
-            -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
-        echo "" >> "$LOCALBUILDDIR"/newchangelog
-    elif [[ -f recently_updated && ! -f build_successful$bits ]] ||
-         [[ -z "$hgCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$hgFolder.pc" ]] ||
-         [[ ! -z "$hgCheck" && ! -f $LOCALDESTDIR/"$hgCheck" ]]; then
-         compile="true"
-    else
-        echo -------------------------------------------------
-        echo "$hgFolder is already up to date"
-        echo -------------------------------------------------
-        compile="false"
-    fi
-fi
 }
 
 # get wget download
@@ -501,7 +452,7 @@ do_getFFmpegConfig
 
 if do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo noDepth "" lib/libjpeg.a
+    do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/lib/libjpeg.a ]]; then
             rm -f $LOCALDESTDIR/include/j{config,error,morecfg,peglib}.h
@@ -516,7 +467,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/uclouvain/openjpeg.git" libopenjp2
+    do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
         if [[ -d $LOCALDESTDIR/include/openjpeg-2.1 ]]; then
             rm -rf $LOCALDESTDIR/include/openjpeg{-2.1,.h} $LOCALDESTDIR/lib/openjpeg-2.1
@@ -581,7 +532,7 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/behdad/harfbuzz.git" harfbuzz
+    do_vcs "https://github.com/behdad/harfbuzz.git" harfbuzz
     if [[ $compile = "true" || "$buildLibass" = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             ./autogen.sh -V
@@ -675,7 +626,7 @@ fi
 
 if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
-    do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow "" lib/pkgconfig/librtmp.pc
+    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp lib/pkgconfig/librtmp.pc
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
             rm -rf $LOCALDESTDIR/include/librtmp
@@ -748,7 +699,7 @@ fi
 
 if do_checkForOptions "--enable-libwebp"; then
     cd $LOCALBUILDDIR
-    do_git "https://chromium.googlesource.com/webm/libwebp" libwebp
+    do_vcs "https://chromium.googlesource.com/webm/libwebp" libwebp
     if [[ $compile = "true" ]]; then
         [[ -f configure ]] || ./autogen.sh
         [[ -f Makefile ]] && make distclean
@@ -783,7 +734,7 @@ echo "--------------------------------------------------------------------------
 
 if do_checkForOptions "--enable-libdcadec"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/foo86/dcadec.git" dcadec
+    do_vcs "https://github.com/foo86/dcadec.git" dcadec
     if [[ $compile = "true" ]]; then
         if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
             rm -rf $LOCALDESTDIR/include/libdcadec
@@ -803,7 +754,7 @@ fi
 
 if do_checkForOptions "--enable-libilbc"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/TimothyGu/libilbc.git" libilbc
+    do_vcs "https://github.com/TimothyGu/libilbc.git" libilbc
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -932,7 +883,7 @@ fi
 
 if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/mstorsjo/fdk-aac" fdk-aac
+    do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             ./autogen.sh
@@ -946,7 +897,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/nu774/fdkaac" bin-fdk-aac "" "" bin-audio/fdkaac.exe
+    do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac bin-audio/fdkaac.exe
     if [[ $compile = "true" ]]; then
         if [[ ! -f ./configure ]]; then
             autoreconf -i
@@ -1055,7 +1006,7 @@ fi
 
 if do_checkForOptions "--enable-libgme"; then
     cd $LOCALBUILDDIR
-    do_git "https://bitbucket.org/mpyne/game-music-emu.git" libgme
+    do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
         if [[ -d $LOCALDESTDIR/include/gme ]]; then
             rm -rf $LOCALDESTDIR/include/gme
@@ -1070,7 +1021,7 @@ fi
 
 if do_checkForOptions "--enable-libtwolame"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/qyot27/twolame.git" twolame noDepth origin/mingw-static
+    do_vcs "https://github.com/qyot27/twolame.git#branch=mingw-static" twolame
     if [[ $compile = "true" ]]; then
         [[ ! -f ./configure ]] && ./autogen.sh -V || make distclean
         if [[ -f "$LOCALDESTDIR/include/twolame.h" ]]; then
@@ -1100,7 +1051,7 @@ fi
 
 if [[ $sox = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/erikd/libsndfile.git" sndfile
+    do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         [[ ! -f ./configure ]] && ./autogen.sh || make distclean
         if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
@@ -1129,7 +1080,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://git.code.sf.net/p/sox/code" sox "" "" bin-audio/sox.exe
+    do_vcs "git://git.code.sf.net/p/sox/code" sox bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
 
@@ -1174,7 +1125,7 @@ fi
 
 if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://chromium.googlesource.com/webm/libvpx.git" vpx noDepth
+    do_vcs "https://chromium.googlesource.com/webm/libvpx.git" vpx
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
         if [[ -d $LOCALDESTDIR/include/vpx ]]; then
             rm -rf $LOCALDESTDIR/include/vpx $LOCALDESTDIR/bin-video/vpx{enc,dec}.exe
@@ -1203,7 +1154,7 @@ fi
 
 if [[ $other265 = "y" ]] || do_checkForOptions "--enable-libkvazaar"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/ultravideo/kvazaar.git" kvazaar "" "" bin-video/kvazaar.exe
+    do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/libkvazaar.a" ]]; then
             rm -f "$LOCALDESTDIR/include/kvazaar.h"
@@ -1230,7 +1181,7 @@ fi
 
 if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/libdvdread.git" dvdread
+    do_vcs "git://git.videolan.org/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/dvdread ]]; then
@@ -1242,7 +1193,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/libdvdnav.git" dvdnav
+    do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/dvdnav ]]; then
@@ -1256,7 +1207,7 @@ fi
 
 if do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/libbluray.git" libbluray
+    do_vcs "git://git.videolan.org/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1273,7 +1224,7 @@ fi
 
 if do_checkForOptions "--enable-libutvideo"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/qyot27/libutvideo.git" libutvideo "" origin/15.1.0
+    do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0" libutvideo
     if [[ $compile = "true" ]]; then
         if [ -f utv_core/libutvideo.a ]; then
             rm -rf $LOCALDESTDIR/include/utvideo
@@ -1289,7 +1240,7 @@ fi
 
 if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/libass/libass.git" libass noDepth
+    do_vcs "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
         if [[ ! -f "configure" ]]; then
             autoreconf -fiv
@@ -1341,7 +1292,7 @@ fi
 
 if [ $mediainfo = "y" ]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/MediaArea/ZenLib" libzen
+    do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
         cd Project/GNU/Library
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
@@ -1358,7 +1309,7 @@ if [ $mediainfo = "y" ]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/MediaArea/MediaInfoLib" libmediainfo
+    do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
@@ -1376,7 +1327,7 @@ if [ $mediainfo = "y" ]; then
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/MediaArea/MediaInfo" mediainfo "" "" bin-video/mediainfo.exe
+    do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo bin-video/mediainfo.exe
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
@@ -1390,7 +1341,7 @@ fi
 
 if do_checkForOptions "--enable-libvidstab"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/georgmartius/vid.stab.git" vidstab
+    do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
         if [[ -d $LOCALDESTDIR/include/vid.stab ]]; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
@@ -1517,7 +1468,7 @@ fi
 
 if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/lu-zero/mfx_dispatch.git" libmfx noDepth
+    do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
         [[ ! -f configure ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/mfx ]]; then
@@ -1531,7 +1482,7 @@ fi
 
 if do_checkForOptions "--enable-libcdio"; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
+    do_vcs "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
     if [[ $compile = "true" ]]; then
         [[ ! -f configure ]] && autoreconf -fiv || make distclean
         if [[ -d $LOCALDESTDIR/include/cdio ]]; then
@@ -1550,7 +1501,7 @@ fi
 
 if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/gpac/gpac.git#commit=236c5f81" gpac bin-video/MP4Box.exe
+    do_vcs "https://github.com/gpac/gpac.git#commit=236c5f81" gpac bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
@@ -1567,12 +1518,12 @@ fi
 
 if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_git "git://git.videolan.org/x264.git" x264 noDepth
+    do_vcs "git://git.videolan.org/x264.git" x264
     if [[ $compile = "true" ]] || [[ $x264 != "l" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
         extracommands="--host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
         if [[ $x264 = "f" ]]; then
             cd $LOCALBUILDDIR
-            do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" lib/libavcodec.a
+            do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg lib/libavcodec.a
             rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
             rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
             rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
@@ -1592,7 +1543,7 @@ if [[ ! $x264 = "n" ]]; then
 
         if [[ $x264 != "l" ]]; then
             cd $LOCALBUILDDIR
-            do_git "https://github.com/l-smash/l-smash.git" lsmash
+            do_vcs "https://github.com/l-smash/l-smash.git" lsmash
             if [[ $compile = "true" ]]; then
                 [[ -f "config.mak" ]] && make distclean
                 if [[ -f "$LOCALDESTDIR/lib/liblsmash.a" ]]; then
@@ -1638,7 +1589,7 @@ fi
 
 if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_hg "https://bitbucket.org/multicoreware/x265" x265
+    do_vcs "hg::https://bitbucket.org/multicoreware/x265" x265
     if [[ $compile = "true" ]] || [[ $x265 != "l" && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
         cd build/msys
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
@@ -1724,9 +1675,9 @@ if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
     if [[ $ffmpeg != "s" ]]; then
-        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" bin-video/ffmpeg.exe
+        do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
     else
-        do_git "git://git.videolan.org/ffmpeg.git" ffmpeg noDepth "" bin-video/ffmpegSHARED/ffmpeg.exe
+        do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpegSHARED/ffmpeg.exe
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
@@ -1793,7 +1744,7 @@ if [[ $mplayer = "y" ]]; then
     cd $LOCALBUILDDIR
     [[ $nonfree = "n" ]] && faac="--disable-faac --disable-faac-lavc"
 
-    do_svn "svn://svn.mplayerhq.hu/mplayer/trunk" mplayer bin-video/mplayer.exe
+    do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer bin-video/mplayer.exe
 
     if [ -d "ffmpeg" ]; then
         cd ffmpeg
@@ -1843,7 +1794,7 @@ fi
 
 if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
     cd $LOCALBUILDDIR
-    do_git "git://midipix.org/waio" waio "" "" lib/libwaio.a
+    do_vcs "git://midipix.org/waio" waio lib/libwaio.a
     if [[ $compile = "true" ]]; then
         [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
         if [[ -f lib${_bits}/libwaio.a ]]; then
@@ -1859,7 +1810,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "http://luajit.org/git/luajit-2.0.git" luajit noDepth
+    do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
             rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit*.exe $LOCALDESTDIR/lib/lua
@@ -1875,7 +1826,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/lachs0r/rubberband.git" rubberband
+    do_vcs "https://github.com/lachs0r/rubberband.git" rubberband
     if [[ $compile = "true" ]]; then
         [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]] && make PREFIX=$LOCALDESTDIR uninstall
         [[ -f "lib/librubberband.a" ]] && make clean
@@ -1884,7 +1835,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/BYVoid/uchardet.git" uchardet
+    do_vcs "https://github.com/BYVoid/uchardet.git" uchardet
     if [[ $compile = "true" ]]; then
         if [[ -f $LOCALDESTDIR/include/uchardet.h ]]; then
             rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
@@ -1898,7 +1849,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     fi
 
     cd $LOCALBUILDDIR
-    do_git "https://github.com/mpv-player/mpv.git" mpv noDepth "" bin-video/mpv.exe
+    do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         if [ -f waf ]; then
             $python waf distclean
