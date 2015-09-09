@@ -318,13 +318,6 @@ do_getFFmpegConfig() {
     fi
     export arch
 
-    # add options for mplayer
-    if [[ $mplayer = "y" ]]; then
-        do_addOption "--enable-libfreetype"
-        do_addOption "--enable-libbluray"
-        do_addOption "--enable-libfaac"
-    fi
-
     # prefer openssl if both are in options and nonfree
     if do_checkForOptions "--enable-openssl" && [[ $nonfree = "y" ]]; then
         do_removeOption "--enable-gnutls"
@@ -1841,7 +1834,8 @@ if [[ $mplayer = "y" ]]; then
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
         --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
         --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
-        --enable-ass-internal --enable-bluray --enable-dvdread --disable-gif --enable-freetype --disable-cddb $faac
+        --disable-gif --disable-cddb $faac
+
         do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
     fi
