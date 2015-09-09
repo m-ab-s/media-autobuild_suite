@@ -4,7 +4,7 @@ compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_BASE_OPTS="--target-os=mingw32 --disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
---pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-liconv -lpng -lpthread -lwsock32'"
+--pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -1744,7 +1744,8 @@ if [[ $ffmpeg != "n" ]]; then
             [[ -f config.mak ]] && make distclean
             rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
-                --disable-static --enable-shared $FFMPEG_OPTS_SHARED
+                --disable-static --enable-shared $FFMPEG_OPTS_SHARED \
+                --extra-libs='-liconv -lpng -lpthread -lwsock32'
             # cosmetics
             sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+') ?//g" config.h
             do_makeinstall
@@ -1765,7 +1766,8 @@ if [[ $ffmpeg != "n" ]]; then
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f config.mak ]] && make distclean
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-                --enable-static --disable-shared $FFMPEG_OPTS
+                --enable-static --disable-shared $FFMPEG_OPTS \
+                --extra-libs='-liconv -lpng -lpthread -lwsock32'
             # cosmetics
             sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+') ?//g" config.h
             do_makeinstall
