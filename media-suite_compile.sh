@@ -684,27 +684,27 @@ if do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
     do_git "git://repo.or.cz/rtmpdump.git" librtmp shallow "" lib/pkgconfig/librtmp.pc
     if [[ $compile = "true" ]]; then
-        if [ -f "$LOCALDESTDIR/lib/librtmp.a" ]; then
+        if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
             rm -rf $LOCALDESTDIR/include/librtmp
             rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-            rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,w}.exe
+            rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,gw}.exe
         fi
-        if [[ -f "librtmp/librtmp.a" ]]; then
-            make clean
-        fi
+        [[ -f "librtmp/librtmp.a" ]] && make clean
+        extracommands=""
         if do_checkForOptions "--enable-gnutls"; then
-            make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" CRYPTO=GNUTLS \
-            SHARED= SYS=mingw LIB_GNUTLS="$(pkg-config --static --libs gnutls)" prefix=$LOCALDESTDIR \
-            bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
-            mandir=$LOCALDESTDIR/share/man install
+            crypto=GNUTLS
+            cryptolibs="$(pkg-config --static --libs gnutls)"
         else
-            make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
-            SYS=mingw LIB_OPENSSL="$(pkg-config --static --libs openssl)" XLIBS=-lz \
-            prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video sbindir=$LOCALDESTDIR/bin-video \
-            mandir=$LOCALDESTDIR/share/man install
+            crypto=OPENSSL
+            cryptolibs="$(pkg-config --static --libs openssl)"
+            extracommands+="XLIBS=-lz"
         fi
-
+        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
+            SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
+            sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
+            CRYPTO=$crypto LIB_${crypto}="${cryptolibs}" $extracommands install
         do_checkIfExist librtmp-git librtmp.a
+        unset crypto cryptolibs extracommands
     fi
 fi
 
