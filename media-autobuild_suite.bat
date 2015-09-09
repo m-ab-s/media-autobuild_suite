@@ -38,8 +38,8 @@ intltool libtool patch python scons xmlto make tar zip unzip git subversion wget
 pkg-config gperf winpty-git
 
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
-gettext glew gmp gsm headers-git jasper lame lcms2 libcddb libcdio libgpg-error libiconv libjpeg-turbo libmad libmodplug ^
-libpng libtiff mpc nasm pcre ragel schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm python2-lxml ninja ^
+gettext glew gmp gsm headers-git jasper lcms2 libcddb libcdio libgpg-error libiconv libjpeg-turbo libmad libmodplug ^
+libpng libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm ninja ^
 libarchive rtmpdump-git
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^

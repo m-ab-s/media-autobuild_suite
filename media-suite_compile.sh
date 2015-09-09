@@ -105,62 +105,19 @@ if do_checkForOptions "--enable-libopenjpeg"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libfreetype --enable-libass" && \
-    do_pkgConfig "freetype2 = 18.0.12"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
-    [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libfreetype.a ]]; then
-        rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
-        rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype.pc
-    fi
-    do_generic_confmakeinstall global --with-harfbuzz=no
-    do_checkIfExist freetype-2.6 libfreetype.a
-    buildLibass="y"
-fi
+if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig --enable-libfribidi"; then
+    rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
+    rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype2.pc
 
-if do_checkForOptions "--enable-fontconfig --enable-libass" && \
-    do_pkgConfig "fontconfig = 2.11.94" || [[ "$buildLibass" = "y" ]] ; then
-    cd $LOCALBUILDDIR
-    do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
-    [[ -f "src/.libs/libfontconfig.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libfontconfig.a ]]; then
-        rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
-        rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
-    fi
-    do_generic_confmakeinstall global
-    do_checkIfExist fontconfig-2.11.94 libfontconfig.a
-    buildLibass="y"
-fi
+    rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
+    rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
 
-if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fribidi = 0.19.7"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-    [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libfribidi.a ]]; then
-        rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
-        rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
-    fi
-    do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
-    do_checkIfExist fribidi-0.19.7 libfribidi.a
-fi
+    rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
+    rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
 
-if do_checkForOptions "--enable-libass"; then
-    cd $LOCALBUILDDIR
-    do_vcs "https://github.com/behdad/harfbuzz.git" harfbuzz
-    if [[ $compile = "true" || "$buildLibass" = "y" ]]; then
-        if [[ ! -f "configure" ]]; then
-            ./autogen.sh -V
-        else
-            rm -rf $LOCALDESTDIR/include/harfbuzz $LOCALDESTDIR/bin-global/hb-fc-list.exe
-            rm -rf $LOCALDESTDIR/lib/libharfbuzz.{l,}a $LOCALDESTDIR/lib/pkgconfig/harfbuzz.pc
-            make distclean
-        fi
-        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
-        LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-        do_checkIfExist harfbuzz-git libharfbuzz.a
-        buildLibass="y"
-    fi
+    rm -rf $LOCALDESTDIR/include/harfbuzz
+    rm -rf $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
+    do_pacman_install "freetype fontconfig fribidi harfbuzz ragel python2-lxml"
 fi
 
 if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
@@ -265,7 +222,7 @@ if do_checkForOptions "--enable-librtmp"; then
 fi
 
 if [[ $sox = "y" ]]; then
-    if [ -f "$LOCALDESTDIR/lib/libgnurx.a" ]; then
+    if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
         echo -------------------------------------------------
         echo "libgnurx-2.5.1 is already compiled"
         echo -------------------------------------------------
@@ -274,13 +231,9 @@ if [[ $sox = "y" ]]; then
         echo -ne "\033]0;compile libgnurx $bits\007"
         do_wget "http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz/download" \
             mingw-libgnurx-2.5.1.tar.gz
-        if [[ -f "libgnurx.a" ]]; then
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
-            rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a
-            rm -f $LOCALDESTDIR/include/regex.h
-        fi
+        [[ -f "libgnurx.a" ]] && make distclean
+        [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]] &&
+            rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a $LOCALDESTDIR/include/regex.h
         do_patch "libgnurx-1-additional-makefile-rules.patch"
         ./configure --prefix=$LOCALDESTDIR --disable-shared
         do_makeinstall -f Makefile.mxe install-static
@@ -296,9 +249,7 @@ if [[ $sox = "y" ]]; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
         do_wget "https://fossies.org/linux/misc/file-5.24.tar.gz"
-        if [[ -f "src/.libs/libmagic.a" ]]; then
-            make distclean
-        fi
+        [[ -f "src/.libs/libmagic.a" ]] && make distclean
         if [[ -f "$LOCALDESTDIR/lib/libmagic.a" ]]; then
             rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
