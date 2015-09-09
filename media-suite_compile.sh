@@ -90,7 +90,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
-        if [[ -d $LOCALDESTDIR/include/openjpeg-2.1 ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libopenmj2.a ]]; then
             rm -rf $LOCALDESTDIR/include/openjpeg{-2.1,.h} $LOCALDESTDIR/lib/openjpeg-2.1
             rm -f $LOCALDESTDIR/lib/libopenjp{2,wl}.a $LOCALDESTDIR/lib/libopenmj2.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
@@ -109,11 +109,8 @@ if do_checkForOptions "--enable-libfreetype --enable-libass" && \
     do_pkgConfig "freetype2 = 18.0.12"; then
     cd $LOCALBUILDDIR
     do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
-
-    if [[ -f "objs/.libs/libfreetype.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/freetype2" ]]; then
+    [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libfreetype.a ]]; then
         rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
         rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype.pc
     fi
@@ -126,11 +123,8 @@ if do_checkForOptions "--enable-fontconfig --enable-libass" && \
     do_pkgConfig "fontconfig = 2.11.94" || [[ "$buildLibass" = "y" ]] ; then
     cd $LOCALBUILDDIR
     do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
-
-    if [[ -f "src/.libs/libfontconfig.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/fontconfig" ]]; then
+    [[ -f "src/.libs/libfontconfig.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libfontconfig.a ]]; then
         rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
         rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
     fi
@@ -143,7 +137,7 @@ if do_checkForOptions "--enable-libfribidi --enable-libass" && do_pkgConfig "fri
     cd $LOCALBUILDDIR
     do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
     [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/fribidi" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libfribidi.a ]]; then
         rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
         rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
     fi
@@ -172,11 +166,8 @@ fi
 if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
     cd $LOCALBUILDDIR
     do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
-
-    if [[ -f "build/.libs/libSDL.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/SDL" ]]; then
+    [[ -f "build/.libs/libSDL.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libSDL.a ]]; then
         rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
         rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
     fi
@@ -216,7 +207,7 @@ if do_checkForOptions "--enable-gnutls" ; then
         cd $LOCALBUILDDIR
         do_wget "https://ftp.gnu.org/gnu/nettle/nettle-3.1.tar.gz"
         [[ -f "libnettle.a" ]] && make distclean
-        if [[ -d "$LOCALDESTDIR/include/nettle" ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libnettle.a ]]; then
             rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
             rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
         fi
@@ -230,7 +221,7 @@ if do_checkForOptions "--enable-gnutls" ; then
         do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.4.1.tar.xz"
         [[ -d build ]] && rm -rf build
         mkdir build && cd build
-        if [[ -d "$LOCALDESTDIR/include/gnutls" ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
             rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/lib/libgnutls*
             rm -f $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
             rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
@@ -324,7 +315,7 @@ if do_checkForOptions "--enable-libwebp"; then
     if [[ $compile = "true" ]]; then
         [[ -f configure ]] || ./autogen.sh
         [[ -f Makefile ]] && make distclean
-        if [[ -d $LOCALDESTDIR/include/webp ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libwebp.a ]]; then
             rm -rf $LOCALDESTDIR/include/webp
             rm -f $LOCALDESTDIR/lib/libwebp{,demux,mux,decoder}.{,l}a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
@@ -357,17 +348,13 @@ if do_checkForOptions "--enable-libdcadec"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/foo86/dcadec.git" dcadec
     if [[ $compile = "true" ]]; then
-        if [[ -d $LOCALDESTDIR/include/libdcadec ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libdcadec.a ]]; then
             rm -rf $LOCALDESTDIR/include/libdcadec
             rm -f $LOCALDESTDIR/lib/libdcadec.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
             rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
         fi
-
-        if [[ -f libdcadec/libdcadec.a ]]; then
-            make clean
-        fi
-
+        [[ -f libdcadec/libdcadec.a ]] && make clean
         make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
         do_checkIfExist dcadec-git libdcadec.a
     fi
@@ -393,11 +380,8 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     [[ $flac = "y" ]] && do_pkgConfig "ogg = 1.3.2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
-
-    if [[ -f "./src/.libs/libogg.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/ogg" ]]; then
+    [[ -f "./src/.libs/libogg.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libogg.a ]]; then
         rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
         rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     fi
@@ -409,11 +393,8 @@ if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]
     do_pkgConfig "vorbis = 1.3.5"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
-
-    if [[ -f "./lib/.libs/libvorbis.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/vorbis" ]]; then
+    [[ -f "./lib/.libs/libvorbis.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libvorbis.a ]]; then
         rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
         rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
         rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
@@ -426,7 +407,7 @@ if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "op
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
     [[ -f ".libs/libopus.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libopus.a ]]; then
         rm -rf $LOCALDESTDIR/include/opus
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
     fi
@@ -439,7 +420,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     [[ -f "libspeex/.libs/libspeex.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/speex" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libspeex.a ]]; then
         rm -rf $LOCALDESTDIR/include/speex $LOCALDESTDIR/bin-audio/speex{enc,dec}.exe
         rm -rf $LOCALDESTDIR/lib/libspeex.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex.pc
     fi
@@ -454,19 +435,19 @@ if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/FLAC" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libFLAC.a ]]; then
         rm -rf $LOCALDESTDIR/include/FLAC{,++} $LOCALDESTDIR/bin-audio/{meta,}flac.exe
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
     fi
     do_generic_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
-    do_checkIfExist flac-1.3.1 bin-audio/flac.exe
+    do_checkIfExist flac-1.3.1 libFLAC.a
 fi
 
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download" vo-aacenc-0.1.3.tar.gz
     [[ -f ".libs/libvo-aacenc.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/vo-aacenc" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libvo-aacenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-aacenc
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
     fi
@@ -477,11 +458,8 @@ fi
 if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
-
-    if [[ -f "amrnb/.libs/libopencore-amrnb.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/opencore-amrnb" ]]; then
+    [[ -f "amrnb/.libs/libopencore-amrnb.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libopencore-amrnb.a ]]; then
         rm -rf $LOCALDESTDIR/include/opencore-amr{nb,wb}
         rm -r $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a
         rm -f $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
@@ -494,7 +472,7 @@ if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0
     cd $LOCALBUILDDIR
     do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
     [[ -f ".libs/libvo-amrwbenc.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/vo-amrwbenc" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libvo-amrwbenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
     fi
@@ -510,7 +488,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
             ./autogen.sh
         else
             rm -rf $LOCALDESTDIR/include/fdk-aac
-            rm -rf $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
+            rm -f $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
             make distclean
         fi
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall
@@ -590,10 +568,10 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
-    if [[ -f $LOCALDESTDIR/include/soxr.h ]]; then
-        rm -rf $LOCALDESTDIR/include/soxr{,-lsr}.h
-        rm -f $LOCALDESTDIR/lib/soxr{,-lsr}.a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/soxr{,-lsr}.pc
+    if [[ -f $LOCALDESTDIR/lib/libsoxr.a ]]; then
+        rm -rf $LOCALDESTDIR/include/soxr.h
+        rm -f $LOCALDESTDIR/lib/libsoxr.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/soxr.pc
     fi
     do_cmake -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
     sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
@@ -616,7 +594,7 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
             autoreconf -fi
         fi
         [[ -f libmp3lame/.libs/libmp3lame.a ]] && make distclean
-        if [[ -f $LOCALDESTDIR/include/lame/lame.h ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libmp3lame.a ]]; then
             rm -rf $LOCALDESTDIR/include/lame
             rm -f $LOCALDESTDIR/lib/libmp3lame.{l,}a $LOCALDESTDIR/bin-audio/lame.exe
         fi
@@ -629,7 +607,7 @@ if do_checkForOptions "--enable-libgme"; then
     cd $LOCALBUILDDIR
     do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
-        if [[ -d $LOCALDESTDIR/include/gme ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libgme.a ]]; then
             rm -rf $LOCALDESTDIR/include/gme
             rm -f $LOCALDESTDIR/lib/libgme.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
@@ -645,7 +623,7 @@ if do_checkForOptions "--enable-libtwolame"; then
     do_vcs "https://github.com/qyot27/twolame.git#branch=mingw-static" twolame
     if [[ $compile = "true" ]]; then
         [[ ! -f ./configure ]] && ./autogen.sh -V || make distclean
-        if [[ -f "$LOCALDESTDIR/include/twolame.h" ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libtwolame.a ]]; then
             rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
             rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
         fi
@@ -660,7 +638,7 @@ if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz/download" libbs2b-3.1.0.tar.gz
     [[ -f "src/.libs/libbs2b.a" ]] && make distclean
-    if [[ -d "$LOCALDESTDIR/include/bs2b" ]]; then
+    if [[ -f "$LOCALDESTDIR/lib/libbs2b.a" ]]; then
         rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
         rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
     fi
@@ -675,7 +653,7 @@ if [[ $sox = "y" ]]; then
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         [[ ! -f ./configure ]] && ./autogen.sh || make distclean
-        if [[ -f "$LOCALDESTDIR/include/sndfile.h" ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libsndfile.a ]]; then
             rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
             rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
         fi
@@ -688,11 +666,8 @@ if [[ $sox = "y" ]]; then
     if do_pkgConfig "opusfile = 0.6"; then
         cd $LOCALBUILDDIR
         do_wget "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
-
-        if [[ -f ".libs/libopusfile.a" ]]; then
-            make distclean
-        fi
-        if [[ -d "$LOCALDESTDIR/include/opus" ]]; then
+        [[ -f ".libs/libopusfile.a" ]] && make distclean
+        if [[ -f $LOCALDESTDIR/lib/libopusfile.a ]]; then
             rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
         fi
@@ -704,7 +679,6 @@ if [[ $sox = "y" ]]; then
     do_vcs "git://git.code.sf.net/p/sox/code" sox bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
-
         if [[ ! -f ./configure ]]; then
             autoreconf -i
         else
@@ -732,11 +706,8 @@ echo "--------------------------------------------------------------------------
 if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-
-    if [[ -f "lib/.libs/libtheora.a" ]]; then
-        make distclean
-    fi
-    if [[ -d "$LOCALDESTDIR/include/theora" ]]; then
+    [[ -f "lib/.libs/libtheora.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libtheora.a ]]; then
         rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
         rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
     fi
@@ -748,7 +719,7 @@ if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://chromium.googlesource.com/webm/libvpx.git" vpx
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
-        if [[ -d $LOCALDESTDIR/include/vpx ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libvpx.a ]]; then
             rm -rf $LOCALDESTDIR/include/vpx $LOCALDESTDIR/bin-video/vpx{enc,dec}.exe
             rm -f $LOCALDESTDIR/lib/libvpx.a $LOCALDESTDIR/lib/pkgconfig/vpx.pc
         fi
@@ -764,7 +735,6 @@ if [[ ! $vpx = "n" ]]; then
         [[ $vpx = "y"  && -f $LOCALDESTDIR/bin/vpxenc.exe ]] &&
             mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video/ ||
             rm -f $LOCALDESTDIR/bin/vpx{enc,dec}.exe
-
         do_checkIfExist vpx-git libvpx.a
         buildFFmpeg="true"
         unset target
@@ -805,7 +775,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     do_vcs "git://git.videolan.org/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
-        if [[ -d $LOCALDESTDIR/include/dvdread ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libdvdread.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
         fi
@@ -817,7 +787,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
-        if [[ -d $LOCALDESTDIR/include/dvdnav ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libdvdnav.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
         fi
@@ -893,10 +863,8 @@ if do_checkForOptions "--enable-libxavs"; then
             do_wget https://github.com/Distrotech/xavs/archive/distrotech-xavs.zip
         fi
         cd xavs-distrotech-xavs
-        if [[ -f "libxavs.a" ]]; then
-            make distclean
-        fi
-        if [[ -f "$LOCALDESTDIR/include/xavs.h" ]]; then
+        [[ -f "libxavs.a" ]] && make distclean
+        if [[ -f $LOCALDESTDIR/lib/libxavs.a ]]; then
             rm -rf $LOCALDESTDIR/include/xavs.h
             rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         fi
@@ -906,7 +874,6 @@ if do_checkForOptions "--enable-libxavs"; then
         install -m 644 xavs.h $LOCALDESTDIR/include
         install -m 644 libxavs.a $LOCALDESTDIR/lib
         install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
-
         do_checkIfExist xavs-distrotech-xavs libxavs.a
     fi
 fi
@@ -917,7 +884,7 @@ if [ $mediainfo = "y" ]; then
     if [[ $compile = "true" ]]; then
         cd Project/GNU/Library
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
-        if [[ -d $LOCALDESTDIR/include/ZenLib ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libzen.a ]]; then
             rm -rf $LOCALDESTDIR/include/ZenLib $LOCALDESTDIR/bin-global/libzen-config
             rm -f $LOCALDESTDIR/lib/libzen.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
         fi
@@ -934,7 +901,7 @@ if [ $mediainfo = "y" ]; then
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
-        if [[ -d $LOCALDESTDIR/include/MediaInfo ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libmediainfo.a ]]; then
             rm -rf $LOCALDESTDIR/include/MediaInfo{,DLL}
             rm -f $LOCALDESTDIR/lib/libmediainfo.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
             rm -f $LOCALDESTDIR/bin-global/libmediainfo-config
@@ -952,7 +919,7 @@ if [ $mediainfo = "y" ]; then
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
         [[ ! -f "configure" ]] && ./autogen.sh || make distclean
-        [[ -d $LOCALDESTDIR/bin-video/mediainfo.exe ]] && rm -rf $LOCALDESTDIR/bin-video/mediainfo.exe
+        [[ -f $LOCALDESTDIR/bin-video/mediainfo.exe ]] && rm -rf $LOCALDESTDIR/bin-video/mediainfo.exe
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
         [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
@@ -964,7 +931,7 @@ if do_checkForOptions "--enable-libvidstab"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
-        if [[ -d $LOCALDESTDIR/include/vid.stab ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libvidstab.a ]]; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
@@ -985,7 +952,7 @@ if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; t
         sed -i -e 's/src //g' -e 's/examples //g' -e 's/doc //g' Makefile.am
         autoreconf -fiv
     fi
-    if [[ -f "$LOCALDESTDIR/include/caca.h" ]]; then
+    if [[ -f $LOCALDESTDIR/lib/libcaca.a ]]; then
         rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
         rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
     fi
@@ -1014,11 +981,8 @@ fi
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
     do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download" zvbi-0.2.35.tar.bz2
-
-    if [[ -f "src/.libs/libzvbi.a" ]]; then
-        make distclean
-    fi
-    if [[ -f "$LOCALDESTDIR/include/libzvbi.h" ]]; then
+    [[ -f "src/.libs/libzvbi.a" ]] && make distclean
+    if [[ -f $LOCALDESTDIR/lib/libzvbi.a ]]; then
         rm -rf $LOCALDESTDIR/include/libzvbi.h
         rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
     fi
@@ -1036,7 +1000,7 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
     cd $LOCALBUILDDIR
     do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
-    if [[ -f $LOCALDESTDIR/include/frei0r.h ]]; then
+    if [[ -f $LOCALDESTDIR/lib/frei0r-1/xfade0r.dll ]]; then
         rm -rf $LOCALDESTDIR/include/frei0r.h
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
@@ -1092,7 +1056,7 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
         [[ ! -f configure ]] && autoreconf -fiv || make distclean
-        if [[ -d $LOCALDESTDIR/include/mfx ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libmfx.a ]]; then
             rm -rf $LOCALDESTDIR/include/mfx
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
         fi
@@ -1106,7 +1070,7 @@ if do_checkForOptions "--enable-libcdio"; then
     do_vcs "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
     if [[ $compile = "true" ]]; then
         [[ ! -f configure ]] && autoreconf -fiv || make distclean
-        if [[ -d $LOCALDESTDIR/include/cdio ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libcdio_paranoia.a ]]; then
             rm -rf $LOCALDESTDIR/include/cdio $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
             rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
@@ -1124,7 +1088,7 @@ if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/gpac/gpac.git#commit=236c5f81" gpac bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
-        if [ -d "$LOCALDESTDIR/include/gpac" ]; then
+        if [ -f $LOCALDESTDIR/lib/libgpac_static.a ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
         fi
@@ -1151,7 +1115,6 @@ if [[ ! $x264 = "n" ]]; then
             rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
             rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
-            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f "config.mak" ]] && make distclean
             ./configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-shared --disable-programs \
             --disable-devices --disable-filters --disable-encoders --disable-muxers
@@ -1167,7 +1130,7 @@ if [[ ! $x264 = "n" ]]; then
             do_vcs "https://github.com/l-smash/l-smash.git" lsmash
             if [[ $compile = "true" ]]; then
                 [[ -f "config.mak" ]] && make distclean
-                if [[ -f "$LOCALDESTDIR/lib/liblsmash.a" ]]; then
+                if [[ -f $LOCALDESTDIR/lib/liblsmash.a ]]; then
                     rm -f $LOCALDESTDIR/include/lsmash.h $LOCALDESTDIR/lib/liblsmash.a
                     rm -f $LOCALDESTDIR/lib/pkgconfig/liblsmash.pc
                 fi
@@ -1184,7 +1147,7 @@ if [[ ! $x264 = "n" ]]; then
         fi
 
         echo -ne "\033]0;compile x264-git $bits\007"
-        if [ -f "$LOCALDESTDIR/lib/libx264.a" ]; then
+        if [ -f $LOCALDESTDIR/lib/libx264.a ]; then
             rm -f $LOCALDESTDIR/include/x264{,_config}.h $LOCALDESTDIR/bin/x264{,-10bit}.exe
             rm -f $LOCALDESTDIR/lib/libx264.a $LOCALDESTDIR/lib/pkgconfig/x264.pc
         fi
@@ -1352,7 +1315,7 @@ if [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
         rm -f .sconsign.dblite config.log options.py
     fi
     scons libav=none
-    [ -f build/f265cli.exe ] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
+    [[ -f build/f265cli.exe ]] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
     do_checkIfExist f265 bin-video/f265cli.exe
 else
     echo -------------------------------------------------
@@ -1378,13 +1341,9 @@ if [[ $mplayer = "y" ]]; then
     fi
 
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
-        if [ -f $LOCALDESTDIR/bin-video/mplayer.exe ]; then
+        [[ -f $LOCALDESTDIR/bin-video/mplayer.exe ]] &&
             rm -f $LOCALDESTDIR/bin-video/{mplayer,mencoder}.exe
-        fi
-        if [ -f config.mak ]; then
-            make distclean
-        fi
-
+        [[ -f config.mak ]] && make distclean
         if ! test -e ffmpeg ; then
             if [ ! $ffmpeg = "n" ]; then
                 git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
@@ -1449,7 +1408,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/lachs0r/rubberband.git" rubberband
     if [[ $compile = "true" ]]; then
-        [[ -f "$LOCALDESTDIR/lib/librubberband.a" ]] && make PREFIX=$LOCALDESTDIR uninstall
+        [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
         [[ -f "lib/librubberband.a" ]] && make clean
         make PREFIX=$LOCALDESTDIR install-static
         do_checkIfExist rubberband-git librubberband.a
@@ -1458,7 +1417,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/BYVoid/uchardet.git" uchardet
     if [[ $compile = "true" ]]; then
-        if [[ -f $LOCALDESTDIR/include/uchardet.h ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libuchardet.a ]]; then
             rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc $LOCALDESTDIR/bin/uchardet.exe
         fi
@@ -1472,7 +1431,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
-        if [ -f waf ]; then
+        if [[ -f waf ]]; then
             $python waf distclean
             rm -rf waf .waf-* VERSION
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
