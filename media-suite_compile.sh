@@ -3,7 +3,8 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth --pkg-config-flags=--static"
+FFMPEG_BASE_OPTS="--target-os=mingw32 --disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
+--pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-liconv -lpng -lpthread -lwsock32'"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -386,6 +387,7 @@ do_changeFFmpegConfig() {
         do_removeOption "--enable-decklink" y
         do_removeOption "--enable-libutvideo" y
         do_removeOption "--enable-libgme" y
+        do_addOption    "--extra-ldflags=-static-libgcc" y
     fi
 }
 
@@ -1305,8 +1307,6 @@ if do_checkForOptions "--enable-libass"; then
         fi
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
-        grep -q liconv "$LOCALDESTDIR"/lib/pkgconfig/libass.pc ||
-            sed -i 's|Libs: .*|& -liconv|' "$LOCALDESTDIR"/lib/pkgconfig/libass.pc
         do_checkIfExist libass-git libass.a
         buildFFmpeg="true"
         unset disable_fc buildLibass
@@ -1741,19 +1741,15 @@ if [[ $ffmpeg != "n" ]]; then
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             echo -ne "\033]0;compiling shared FFmpeg $bits\007"
-            [ -f config.mak ] && make distclean
+            [[ -f config.mak ]] && make distclean
             rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-            ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
-            --disable-static --enable-shared \
-            $FFMPEG_OPTS_SHARED \
-            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' --extra-ldflags=-static-libgcc
-
-            sed -i -e "s|--target-os=mingw32 --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED ||g" \
-                   -e "s|--extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32' ||g" \
-                   -e "s|--extra-ldflags=-static-libgcc||g" config.h
+            ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
+                --disable-static --enable-shared $FFMPEG_OPTS_SHARED
+            # cosmetics
+            sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+') ?//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
-            [ $ffmpeg = b ] && [ -f build_successful${bits} ] &&
+            [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
                 mv build_successful${bits} build_successful${bits}_shared
         fi
 
@@ -1767,13 +1763,11 @@ if [[ $ffmpeg != "n" ]]; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
             rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
-            [ -f config.mak ] && make distclean
-            ./configure --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-            --enable-static --disable-shared \
-            $FFMPEG_OPTS \
-            --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'
-            sed -i -e "s| --target-os=mingw32 --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video||g" \
-                   -e "s| --extra-cflags=-DPTW32_STATIC_LIB --extra-libs='-lpng -lpthread -lwsock32'||g" config.h
+            [[ -f config.mak ]] && make distclean
+            ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
+                --enable-static --disable-shared $FFMPEG_OPTS
+            # cosmetics
+            sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+') ?//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
             newFfmpeg="yes"
