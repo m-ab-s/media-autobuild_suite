@@ -1144,6 +1144,13 @@ else
     pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
 
+do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
+if do_checkForOptions "--enable-libxvid"; then
+    do_pacman_install "xvidcore"
+    [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
+fi
+
+
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
