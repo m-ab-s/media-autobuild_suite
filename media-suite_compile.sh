@@ -589,16 +589,10 @@ if [[ $sox = "y" ]]; then
         do_checkIfExist sndfile-git libsndfile.a
     fi
 
-    if do_pkgConfig "opusfile = 0.6"; then
-        cd $LOCALBUILDDIR
-        do_wget "http://downloads.xiph.org/releases/opus/opusfile-0.6.tar.gz"
-        [[ -f ".libs/libopusfile.a" ]] && make distclean
-        if [[ -f $LOCALDESTDIR/lib/libopusfile.a ]]; then
-            rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
-            rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
-        fi
-        do_generic_confmakeinstall
-        do_checkIfExist opusfile-0.6 libopusfile.a
+    if do_checkForOptions "--enable-libopus"; then
+        do_pacman_install "opusfile"
+        rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
+        rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
     fi
 
     cd $LOCALBUILDDIR
