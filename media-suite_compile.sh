@@ -661,16 +661,10 @@ echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
 
-if do_checkForOptions "--enable-libtheora" && do_pkgConfig "theora = 1.1.1"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.bz2"
-    [[ -f "lib/.libs/libtheora.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libtheora.a ]]; then
-        rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
-        rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
-    fi
-    do_generic_confmakeinstall --disable-examples
-    do_checkIfExist libtheora-1.1.1 libtheora.a
+if do_checkForOptions "--enable-libtheora"; then
+    rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
+    rm -rf $LOCALDESTDIR/lib/pkgconfig/theora{,enc,dec}.pc
+    do_pacman_install "libtheora"
 fi
 
 if [[ ! $vpx = "n" ]]; then
