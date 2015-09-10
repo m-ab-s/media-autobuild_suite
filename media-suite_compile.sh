@@ -642,6 +642,11 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
+if do_checkForOptions "--enable-libmodplug"; then
+    do_pacman_install "libmodplug"
+    do_addOption "--extra-cflags=-DMODPLUG_STATIC"
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo
 echo "compile audio tools $bits done..."

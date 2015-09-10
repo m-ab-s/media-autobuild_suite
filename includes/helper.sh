@@ -243,11 +243,6 @@ do_getFFmpegConfig() {
 }
 
 do_changeFFmpegConfig() {
-    # add options for static modplug
-    if do_checkForOptions "--enable-libmodplug"; then
-        do_addOption "--extra-cflags=-DMODPLUG_STATIC"
-    fi
-
     # add options for static kvazaar
     if do_checkForOptions "--enable-libkvazaar"; then
         do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
