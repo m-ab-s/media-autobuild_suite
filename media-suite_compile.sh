@@ -1145,11 +1145,11 @@ else
 fi
 
 do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
+do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
 if do_checkForOptions "--enable-libxvid"; then
     do_pacman_install "xvidcore"
     [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
 fi
-
 
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
