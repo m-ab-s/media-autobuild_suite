@@ -868,40 +868,10 @@ if do_checkForOptions "--enable-libvidstab"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libcaca" && do_pkgConfig "caca = 0.99.beta19"; then
-    cd $LOCALBUILDDIR
-    do_wget "https://fossies.org/linux/privat/libcaca-0.99.beta19.tar.gz"
-
-    if [[ -f "caca/.libs/libcaca.a" ]]; then
-        make distclean
-    else
-        sed -i -e 's/src //g' -e 's/examples //g' -e 's/doc //g' Makefile.am
-        autoreconf -fiv
-    fi
-    if [[ -f $LOCALDESTDIR/lib/libcaca.a ]]; then
-        rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
-        rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
-    fi
-
-    cd caca
-    sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" string.c
-    sed -i "s/#if defined(HAVE_VSNPRINTF_S)//g" string.c
-    sed -i "s/vsnprintf_s(buf, bufsize, _TRUNCATE, format, args);//g" string.c
-    sed -i "s/#elif defined(HAVE_VSNPRINTF)/#if defined(HAVE_VSNPRINTF)/g" string.c
-    sed -i "s/#define HAVE_VSNPRINTF_S 1/#define HAVE_VSNPRINTF 1/g" ../win32/config.h
-    sed -i "s/#if defined _WIN32 && defined __GNUC__ && __GNUC__ >= 3/#if defined __MINGW__/g" figfont.c
-    sed -i "s/__declspec(dllexport)//g" *.h
-    sed -i "s/__declspec(dllimport)//g" *.h
-    sed -i "s/Cflags: -I\${includedir}/& -DCACA_STATIC/" caca.pc.in
-    cd ..
-
-    do_generic_conf --bindir=$LOCALDESTDIR/bin-global --disable-cxx --disable-csharp --disable-ncurses \
-    --disable-java --disable-python --disable-ruby --disable-imlib2 --disable-doc
-    sed -i 's/ln -sf/$(LN_S)/' "doc/Makefile"
-    do_makeinstall
-    do_checkIfExist libcaca-0.99.beta19 libcaca.a
-elif pkg-config --exists caca && ! pkg-config --cflags caca | grep -q -e "-DCACA_STATIC"; then
-    sed -i "s/Cflags: -I\${includedir}/& -DCACA_STATIC/" $LOCALDESTDIR/lib/pkgconfig/caca.pc
+if do_checkForOptions "--enable-libcaca"; then
+    rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
+    rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
+    do_pacman_install "libcaca"
 fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
@@ -1087,7 +1057,7 @@ if [[ ! $x264 = "n" ]]; then
         buildFFmpeg="true"
     fi
 else
-    pkg-config --exists x264 ||  do_removeOption "--enable-libx264"
+    pkg-config --exists x264 || do_removeOption "--enable-libx264"
 fi
 
 if [[ ! $x265 = "n" ]]; then
