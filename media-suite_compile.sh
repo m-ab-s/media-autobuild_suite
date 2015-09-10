@@ -297,19 +297,12 @@ echo
 echo "-------------------------------------------------------------------------------"
 
 if do_checkForOptions "--enable-libdcadec"; then
-    cd $LOCALBUILDDIR
-    do_vcs "https://github.com/foo86/dcadec.git" dcadec
-    if [[ $compile = "true" ]]; then
-        if [[ -f $LOCALDESTDIR/lib/libdcadec.a ]]; then
-            rm -rf $LOCALDESTDIR/include/libdcadec
-            rm -f $LOCALDESTDIR/lib/libdcadec.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
-            rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
-        fi
-        [[ -f libdcadec/libdcadec.a ]] && make clean
-        make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
-        do_checkIfExist dcadec-git libdcadec.a
-    fi
+    rm -rf $LOCALBUILDDIR/dcadec-git
+    rm -rf $LOCALDESTDIR/include/libdcadec
+    rm -f $LOCALDESTDIR/lib/libdcadec.a
+    rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
+    rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+    do_pacman_install "dcadec-git"
 fi
 
 if do_checkForOptions "--enable-libilbc"; then
