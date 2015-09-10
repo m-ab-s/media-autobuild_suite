@@ -328,18 +328,11 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     do_pacman_install "libogg"
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] &&
-    do_pkgConfig "vorbis = 1.3.5"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://downloads.xiph.org/releases/vorbis/libvorbis-1.3.5.tar.gz"
-    [[ -f "./lib/.libs/libvorbis.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libvorbis.a ]]; then
-        rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
-        rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
-    fi
-    do_generic_confmakeinstall
-    do_checkIfExist libvorbis-1.3.5 libvorbis.a
+if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]]; then
+    rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
+    rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
+    rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
+    do_pacman_install "libvorbis"
 fi
 
 if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
