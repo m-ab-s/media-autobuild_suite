@@ -1022,18 +1022,11 @@ if do_checkForOptions "--enable-libmfx" && [[ $ffmpeg != "n" ]]; then
 fi
 
 if do_checkForOptions "--enable-libcdio"; then
-    cd $LOCALBUILDDIR
-    do_vcs "https://github.com/rocky/libcdio-paranoia.git" libcdio_paranoia
-    if [[ $compile = "true" ]]; then
-        [[ ! -f configure ]] && autoreconf -fiv || make distclean
-        if [[ -f $LOCALDESTDIR/lib/libcdio_paranoia.a ]]; then
-            rm -rf $LOCALDESTDIR/include/cdio $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
-            rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
-        fi
-        do_generic_confmakeinstall audio --disable-example-progs --disable-cpp-progs --enable-silent-rules
-        do_checkIfExist libcdio_paranoia-git libcdio_paranoia.a
-    fi
+    rm -rf $LOCALBUILDDIR/libcdio_paranoia-git
+    rm -rf $LOCALDESTDIR/include/cdio $LOCALDESTDIR/lib/libcdio_{cdda,paranoia}.{l,}a
+    rm -f $LOCALDESTDIR/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
+    rm -f $LOCALDESTDIR/bin-audio/cd-paranoia.exe
+    do_pacman_install "libcddb libcdio libcdio-paranoia"
 fi
 
 #------------------------------------------------
