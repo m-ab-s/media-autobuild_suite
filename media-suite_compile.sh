@@ -387,17 +387,11 @@ if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3
     do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
 fi
 
-if do_checkForOptions "--enable-libopencore-amr(wb|nb)" && do_pkgConfig "opencore-amrnb = 0.1.3"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/opencore-amr-0.1.3.tar.gz"
-    [[ -f "amrnb/.libs/libopencore-amrnb.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libopencore-amrnb.a ]]; then
-        rm -rf $LOCALDESTDIR/include/opencore-amr{nb,wb}
-        rm -r $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a
-        rm -f $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
-    fi
-    do_generic_confmakeinstall
-    do_checkIfExist opencore-amr-0.1.3 libopencore-amrnb.a
+if do_checkForOptions "--enable-libopencore-amr(wb|nb)"; then
+    rm -rf $LOCALDESTDIR/include/opencore-amr{nb,wb}
+    rm -f $LOCALDESTDIR/lib/libopencore-amr{nb,wb}.{l,}a
+    rm -f $LOCALDESTDIR/lib/pkgconfig/opencore-amr{nb,wb}.pc
+    do_pacman_install "opencore-amr"
 fi
 
 if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
@@ -469,7 +463,7 @@ if do_checkForOptions "--enable-libvorbis"; then
         do_wget "http://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.0.tar.gz"
         [[ -f "oggenc/oggenc.exe" ]] && make distclean
         [[ -f "$LOCALDESTDIR/bin-audio/oggenc.exe" ]] &&
-            rm -r $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
+            rm -f $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
         do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut \
             --disable-ogginfo --disable-flac --disable-speex
         make -j $cpuCount
