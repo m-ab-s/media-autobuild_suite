@@ -38,7 +38,7 @@ intltool libtool patch python scons xmlto make tar zip unzip git subversion wget
 pkg-config gperf winpty-git
 
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
-gettext glew gmp gsm headers-git jasper lcms2 libgpg-error libiconv libjpeg-turbo libmad ^
+gettext glew gmp gsm headers-git jasper lcms2 libgpg-error libiconv libjpeg-turbo ^
 libpng libtiff mpc nasm pcre schroedinger sqlite3 tools-git winpthreads-git xvidcore yasm ninja ^
 libarchive rtmpdump-git
 

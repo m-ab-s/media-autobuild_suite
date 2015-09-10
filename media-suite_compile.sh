@@ -115,6 +115,7 @@ if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig 
     rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
     rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
 
+    rm -rf $LOCALBUILDDIR/harfbuzz-git
     rm -rf $LOCALDESTDIR/include/harfbuzz
     rm -rf $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
     do_pacman_install "freetype fontconfig fribidi harfbuzz ragel python2-lxml"
@@ -627,6 +628,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     cd $LOCALBUILDDIR
+    do_pacman_install "libmad"
     do_vcs "git://git.code.sf.net/p/sox/code" sox bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
