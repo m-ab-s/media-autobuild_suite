@@ -322,16 +322,10 @@ if do_checkForOptions "--enable-libilbc"; then
 fi
 
 if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" ||
-    [[ $flac = "y" ]] && do_pkgConfig "ogg = 1.3.2"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz"
-    [[ -f "./src/.libs/libogg.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libogg.a ]]; then
-        rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
-        rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
-    fi
-    do_generic_confmakeinstall
-    do_checkIfExist libogg-1.3.2 libogg.a
+    [[ $flac = "y" ]]; then
+    rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
+    rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
+    do_pacman_install "libogg"
 fi
 
 if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]] &&
