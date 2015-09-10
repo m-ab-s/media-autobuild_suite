@@ -1102,47 +1102,6 @@ if %msys2%==msys32 (
     )
 
 :checkdyn
-echo.-------------------------------------------------------------------------------
-echo.check for dynamic libs
-echo.-------------------------------------------------------------------------------
-
-Setlocal EnableDelayedExpansion
-
-if %build32%==yes (
-if exist %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a (
-    del %instdir%\%msys2%\mingw32\bin\xvidcore.dll
-    %instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.a %instdir%\%msys2%\mingw32\lib\libxvidcore.a
-    %instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a %instdir%\%msys2%\mingw32\lib\xvidcore.dll.a.dyn
-    )
-
-    FOR /R "%instdir%\%msys2%\mingw32" %%C IN (*.dll.a) DO (
-        set file=%%C
-        set name=!file:~0,-6!
-        if exist %%C.dyn del %%C.dyn
-        if exist !name!.a (
-            %instdir%\%msys2%\usr\bin\mv %%C %%C.dyn
-            )
-        )
-    )
-
-if %build64%==yes (
-if exist %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a (
-    del %instdir%\%msys2%\mingw64\bin\xvidcore.dll
-    %instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.a %instdir%\%msys2%\mingw64\lib\libxvidcore.a
-    %instdir%\%msys2%\usr\bin\mv %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a %instdir%\%msys2%\mingw64\lib\xvidcore.dll.a.dyn
-    )
-
-    FOR /R "%instdir%\%msys2%\mingw64" %%C IN (*.dll.a) DO (
-        set file=%%C
-        set name=!file:~0,-6!
-        if exist %%C.dyn del %%C.dyn
-        if exist !name!.a (
-            %instdir%\%msys2%\usr\bin\mv %%C %%C.dyn
-            )
-        )
-    )
-
-Setlocal DisableDelayedExpansion
 
 if %build32%==yes (
     if not exist %instdir%\build mkdir %instdir%\build

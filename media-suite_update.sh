@@ -151,6 +151,12 @@ pacman --noconfirm -Su --force --asdeps
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
 fi
+
+sharedlibs=$(find /mingw{32,64} -name *.dll.a)
+for lib in $sharedlibs; do
+    [[ -f "$lib" && -f "${lib%*.dll.a}.a" ]] && mv -f "$lib" "${lib}.dyn"
+done
+
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 done..."
 echo "-------------------------------------------------------------------------------"
