@@ -848,7 +848,11 @@ if not exist %instdir%\mintty.lnk (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
         echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
+        echo.clear
+        echo.echo ""
+        echo.echo ----------------------------------------------------------------
         echo.echo "You probably will need to manually close this window."
+        echo.echo ----------------------------------------------------------------
         echo.sleep ^4
         echo.exit
         )>>%instdir%\build\firstUpdate.sh
