@@ -140,26 +140,10 @@ fi
 #----------------------
 
 if do_checkForOptions "--enable-gnutls" ; then
-    if [[ -f $LOCALDESTDIR/bin-global/libgcrypt-config ]] &&
-        [[ $(libgcrypt-config --version) = "1.6.3" ]]; then
-        echo -------------------------------------------------
-        echo "libgcrypt-1.6.3 is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile libgcrypt $bits\007"
-        do_wget "ftp://ftp.gnupg.org/gcrypt/libgcrypt/libgcrypt-1.6.3.tar.bz2"
-        [[ -f "src/.libs/libgcrypt.a" ]] && make distclean
-        if [[ -f "$LOCALDESTDIR/include/libgcrypt.h" ]]; then
-            rm -f $LOCALDESTDIR/include/libgcrypt.h
-            rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
-            rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
-        fi
-        [[ $bits = "64bit" ]] && extracommands="--disable-asm --disable-padlock-support"
-        do_generic_confmakeinstall global --with-gpg-error-prefix=$MINGW_PREFIX $extracommands
-        do_checkIfExist libgcrypt-1.6.3 libgcrypt.a
-        unset extracommands
-    fi
+    rm -f $LOCALDESTDIR/include/libgcrypt.h
+    rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
+    rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+    do_pacman_install "libgcrypt"
 
     if do_pkgConfig "nettle = 3.1"; then
         cd $LOCALBUILDDIR
