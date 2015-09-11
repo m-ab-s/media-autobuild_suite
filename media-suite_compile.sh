@@ -1550,7 +1550,7 @@ fi
 
 if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_git "https://github.com/gpac/gpac.git" gpac noDepth "" bin-video/MP4Box.exe
+    do_git "https://github.com/gpac/gpac.git#commit=236c5f81" gpac bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -d "$LOCALDESTDIR/include/gpac" ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
