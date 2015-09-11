@@ -14,8 +14,8 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
-[[ ! -f "$LOCALBUILDDIR/last_run" && -d "/trunk" ]] \
-    && echo "bash /trunk/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
+[[ ! -f "$LOCALBUILDDIR/last_run" ]] \
+    && echo "bash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
@@ -47,19 +47,7 @@ while true; do
   esac
 done
 
-do_prompt() {
-    # from http://superuser.com/a/608509
-    while read -s -e -t 0.1; do : ; done
-    read -p "$1" ret
-}
-
-if [[ ! -f /trunk/includes/helper.sh ]] &&
-    ! curl --retry 20 --retry-max-time 5 -Lkf -o /trunk/includes/helper.sh \
-        "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/includes/helper.sh"; then
-    do_prompt "Failed getting helper script. Try again later."
-    exit 1
-fi
-source /trunk/includes/helper.sh
+[[ -f $LOCALBUILDDIR/media-suite_helper.sh ]] && source $LOCALBUILDDIR/media-suite_helper.sh
 
 buildProcess() {
 cd $LOCALBUILDDIR
@@ -900,7 +888,7 @@ if do_checkForOptions "--enable-decklink" && [[ $ffmpeg != "n" ]]; then
         [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
         for file in DeckLinkAPI{{,Version}.h,_i.c}; do
             [[ ! -f "$file" ]] &&
-                do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/includes/$file" &&
+                do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$file" &&
                 touch recently_updated
             cp -f "$file" "$LOCALDESTDIR/include/$file"
         done
@@ -1420,7 +1408,7 @@ if [[ $deleteSource = "y" ]]; then
     echo
     echo "deleting source folders..."
     echo
-    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\)\$" | xargs rm -rf
+    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" | xargs rm -rf
 fi
 
 echo -ne "\033]0;compiling done...\007"

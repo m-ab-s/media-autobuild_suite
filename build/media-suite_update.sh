@@ -11,21 +11,8 @@ while true; do
   esac
 done
 
-[[ -d "/trunk" ]] && cd "/trunk" || cd "$(cygpath -w /).."
-
-do_prompt() {
-    # from http://superuser.com/a/608509
-    while read -s -e -t 0.1; do : ; done
-    read -p "$1" ret
-}
-
-if [[ ! -f includes/helper.sh ]] &&
-    ! curl --retry 20 --retry-max-time 5 -Lkf -o includes/helper.sh \
-        "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/includes/helper.sh"; then
-    do_prompt "Failed getting helper script. Try again later."
-    exit 1
-fi
-source includes/helper.sh
+[[ -d "/build" ]] && cd "/build" || cd "$(cygpath -w /)build"
+[[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 
 # --------------------------------------------------
 # packet update system

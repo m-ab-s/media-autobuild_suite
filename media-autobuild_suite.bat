@@ -30,7 +30,7 @@ color 80
 title media-autobuild_suite
 
 set instdir=%CD%
-set "ini=media-autobuild_suite.ini"
+set "ini=build\media-autobuild_suite.ini"
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
@@ -1089,7 +1089,7 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\update.log -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_update.sh ^
+%instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\update.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
 
@@ -1355,7 +1355,7 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\compile.log -i /msys2.ico /usr/bin/bash --login %instdir%\media-suite_compile.sh ^
+start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\compile.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^

@@ -322,16 +322,14 @@ do_patch() {
     fi
     local patchpath=""
     local response_code="$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
-        -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master/patches/$patch")"
+        -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code = "404" ]]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
-        local trunk="/trunk"
-        [[ -d "$trunk" ]] || trunk="$(cygpath -w /).."
-        if [ -f ./"$patch" ]; then
+        if [[ -f ./"$patch" ]]; then
             patchpath="$patch"
-        elif [ -f "${trunk}/patches/${patch}" ]; then
-            patchpath="${trunk}/patches/${patch}"
+        elif [[ -f "$LOCALBUILDDIR/patches/${patch}" ]]; then
+            patchpath="$LOCALBUILDDIR/patches/${patch}"
         fi
     elif [[ $response_code = "200" ]]; then
         patchpath="$patch"
@@ -424,4 +422,10 @@ do_pacman_remove() {
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
     done
+}
+
+do_prompt() {
+    # from http://superuser.com/a/608509
+    while read -s -e -t 0.1; do : ; done
+    read -p "$1" ret
 }
