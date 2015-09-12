@@ -9,7 +9,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
---enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
+--enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
@@ -1112,6 +1112,7 @@ fi
 
 do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
 do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
+do_checkForOptions "--enable-libtesseract" && do_pacman_install "tesseract-ocr"
 if do_checkForOptions "--enable-libxvid"; then
     do_pacman_install "xvidcore"
     [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
