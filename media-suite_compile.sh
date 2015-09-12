@@ -3,7 +3,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--target-os=mingw32 --disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
+FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
 --pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB"
 FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
@@ -1581,8 +1581,8 @@ if [[ ! $x264 = "n" ]]; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f "config.mak" ]] && make distclean
-            ./configure $FFMPEG_BASE_OPTS --target-os=mingw32 --prefix=$LOCALDESTDIR --disable-shared \
-            --disable-programs --disable-devices --disable-filters --disable-encoders --disable-muxers
+            ./configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-shared --disable-programs \
+            --disable-devices --disable-filters --disable-encoders --disable-muxers
 
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
@@ -1740,7 +1740,7 @@ if [[ $ffmpeg != "n" ]]; then
                 --disable-static --enable-shared $FFMPEG_OPTS_SHARED \
                 --extra-libs='-liconv -lpng -lpthread -lwsock32'
             # cosmetics
-            sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
@@ -1762,7 +1762,7 @@ if [[ $ffmpeg != "n" ]]; then
                 --enable-static --disable-shared $FFMPEG_OPTS \
                 --extra-libs='-liconv -lpng -lpthread -lwsock32'
             # cosmetics
-            sed -ri "s/ ?--(target-os|prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+') ?//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
             newFfmpeg="yes"
