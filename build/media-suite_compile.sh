@@ -107,6 +107,10 @@ if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig 
     rm -rf $LOCALDESTDIR/include/harfbuzz
     rm -rf $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
     do_pacman_install "freetype fontconfig fribidi harfbuzz ragel python2-lxml"
+
+    # fix iconv problems with harfbuzz/libass due to missing lib in mingw's glib pkgconfig
+    grep -q "liconv" "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc ||
+        sed -i 's/-lintl/& -liconv/g' "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc
 fi
 
 if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
@@ -159,7 +163,7 @@ if do_checkForOptions "--enable-gnutls" ; then
         ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
             --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
             --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
-        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -liconv -lcrypt32 -lws2_32 -lz -lgmp -lintl/' \
+        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
         lib/gnutls.pc
         do_makeinstall
         do_checkIfExist gnutls-3.4.4.1 libgnutls.a
@@ -1136,7 +1140,7 @@ if [[ $ffmpeg != "n" ]]; then
             rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
                 --disable-static --enable-shared $FFMPEG_OPTS_SHARED \
-                --extra-libs='-liconv -lpng -lpthread -lwsock32'
+                --extra-libs='-lpng -lpthread -lwsock32'
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
             do_makeinstall
@@ -1158,7 +1162,7 @@ if [[ $ffmpeg != "n" ]]; then
             [[ -f config.mak ]] && make distclean
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
                 --enable-static --disable-shared $FFMPEG_OPTS \
-                --extra-libs='-liconv -lpng -lpthread -lwsock32'
+                --extra-libs='-lpng -lpthread -lwsock32'
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
             do_makeinstall
