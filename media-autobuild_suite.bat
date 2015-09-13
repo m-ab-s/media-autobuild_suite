@@ -1094,6 +1094,30 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
+if not exist "%instdir%\build\media-suite_compile.sh" (
+	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
+	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_compile.sh
+	) else (
+		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
+		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_compile.sh
+		)
+		
+if not exist "%instdir%\build\media-suite_helper.sh" (
+	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
+	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_helper.sh
+	) else (
+		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
+		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_helper.sh
+		)
+
+if not exist "%instdir%\build\media-suite_update.sh" (
+	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
+	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_update.sh
+	) else (
+		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
+		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_update.sh
+		)
+
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
@@ -1109,7 +1133,6 @@ if %msys2%==msys32 (
 :checkdyn
 
 if %build32%==yes (
-    if not exist %instdir%\build mkdir %instdir%\build
     if not exist %instdir%\local32\share (
         echo.-------------------------------------------------------------------------------
         echo.create local32 folders
@@ -1128,7 +1151,6 @@ if %build32%==yes (
     )
 
 if %build64%==yes (
-    if not exist %instdir%\build mkdir %instdir%\build
     if not exist %instdir%\local64\share (
         echo.-------------------------------------------------------------------------------
         echo.create local64 folders
