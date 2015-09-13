@@ -1094,29 +1094,13 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-if not exist "%instdir%\build\media-suite_compile.sh" (
-	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
-	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_compile.sh
-	) else (
-		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
-		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_compile.sh
-		)
-		
-if not exist "%instdir%\build\media-suite_helper.sh" (
-	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
-	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_helper.sh
-	) else (
-		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
-		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_helper.sh
-		)
-
-if not exist "%instdir%\build\media-suite_update.sh" (
-	%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c ^
-	https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_update.sh
-	) else (
-		%instdir%\%msys2%\usr\bin\wget.exe --tries=20 --retry-connrefused --waitretry=2 -c -N ^
-		https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master/build/media-suite_update.sh
-		)
+set scripts=compile helper update
+for %%s in (%scripts%) do (
+    if not exist "%instdir%\build\media-suite_%%s.sh" (
+        %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
+        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
+        )
+    )
 
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
