@@ -51,7 +51,6 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             case $yn in
                 [Yy]* )
                     pacman -S --noconfirm --needed $install
-                    do_hide_pacman_sharedlibs "$install"
                     pacman -D --asexplicit $install
                     break;;
                 [Nn]* ) exit;;
@@ -139,10 +138,7 @@ if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
 fi
 
-sharedlibs=$(find /mingw{32,64} -name *.dll.a)
-for lib in $sharedlibs; do
-    [[ -f "$lib" && -f "${lib%*.dll.a}.a" ]] && mv -f "$lib" "${lib}.dyn"
-done
+do_hide_all_sharedlibs
 
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 done..."

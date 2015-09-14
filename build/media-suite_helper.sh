@@ -395,8 +395,12 @@ do_hide_pacman_sharedlibs() {
     done
 }
 
-do_unhide_pacman_sharedlibs() {
-    do_hide_pacman_sharedlibs "$1" revert
+do_hide_all_sharedlibs() {
+    local files=$(find /mingw{32,64} -name *.dll.a)
+    for file in "$files"; do
+        [[ -f "$file" && -f "${file%*.dll.a}.a" ]] &&
+            mv -f "${file}" "${file}.dyn"
+    done
 }
 
 do_pacman_install() {
@@ -407,7 +411,7 @@ do_pacman_install() {
     [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
     local newpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
     pacman -S --noconfirm --needed $newpackages 2>/dev/null
-    do_hide_pacman_sharedlibs "$newpackages"
+    do_hide_all_sharedlibs
     pacman -D --asexplicit $newpackages >/dev/null
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk || echo "$pkg" >> /etc/pac-mingw-extra.pk
@@ -417,7 +421,7 @@ do_pacman_install() {
 do_pacman_remove() {
     local packages="$1"
     echo "Removing packages:"
-    do_unhide_pacman_sharedlibs "$packages"
+    do_hide_pacman_sharedlibs "$packages" revert
     pacman -Rs --noconfirm $packages 2>/dev/null
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
