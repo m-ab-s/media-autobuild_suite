@@ -7,14 +7,57 @@ while true; do
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
 --remove=* ) remove="${1#*=}"; shift ;;
+--update=* ) update="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
   esac
 done
 
-[[ -d "/build" ]] && cd "/build" || cd "$(cygpath -w /)../build"
+[[ -d "/trunk/build" ]] && cd "/trunk/build" || cd "$(cygpath -w /)../build"
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
+
+# --------------------------------------------------
+# update suite
+# --------------------------------------------------
+if [[ "$update" = "yes" ]]; then
+    echo
+    echo "-------------------------------------------------------------------------------"
+    echo "checking if suite has been updated..."
+    echo "-------------------------------------------------------------------------------"
+    echo
+
+    if [[ ! -d ../.git ]] && which git; then
+        if ! git clone "https://github.com/jb-alvarado/media-autobuild_suite.git" ab-git; then
+            git -C ab-git fetch
+        fi
+        cp -fr ab-git/.git ..
+    fi
+    cd ..
+    if [[ -d .git ]]; then
+        if [[ -n $(git status -s) ]]; then
+            diffname="$(date +%F-%H.%M.%S)"
+            git diff >> build/user-changes-${diffname}.diff
+            echo "Your changes have been exported to build/user-changes-${diffname}.diff."
+            git reset --hard origin/master
+        fi
+        oldHead=$(git rev-parse HEAD)
+        git checkout -qfB master "origin/HEAD"
+        newHead=$(git rev-parse HEAD)
+        if [[ $oldHead != $newHead ]]; then
+            if git apply build/user-changes-${diffname}.diff; then
+                rm build/user-changes-${diffname}.diff
+                echo "Your changes have been successfully applied!"
+            elif [[ -f build/user-changes-${diffname}.diff ]]; then
+                echo "Your changes couldn't be applied. Script will run without them."
+            fi
+            touch build/suite_updated
+            echo "Script will now restart to use the new changes."
+            sleep 5
+            exit
+        fi
+    fi
+fi
 
 # --------------------------------------------------
 # packet update system

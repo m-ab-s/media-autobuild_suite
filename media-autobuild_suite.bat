@@ -110,6 +110,7 @@ if exist %ini% GOTO checkINI
     set deleteSourceINI=0
     set stripINI=0
     set packINI=0
+    set suiteUpdateINI=0
 
     GOTO systemVars
 
@@ -154,6 +155,8 @@ findstr /i "strip" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "pack" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+findstr /i "suiteUpdate" %ini% > nul
+    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 
 :readINI
 for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
@@ -176,6 +179,7 @@ for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%
 for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
 for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
 for /F "tokens=2 delims==" %%g in ('findstr /i "pack" %ini%') do set packINI=%%g
+for /F "tokens=2 delims==" %%g in ('findstr /i "suiteUpdate" %ini%') do set suiteUpdateINI=%%g
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
@@ -771,6 +775,33 @@ if %packF%==2 (
 if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
+:suiteUpdate
+set "writeSuiteUpdate=no"
+if %suiteUpdateINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Update suite automatically using git?
+    echo. 1 = Yes [recommended]
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P updateF="Update suite: "
+    set "writeSuiteUpdate=yes"
+    ) else (
+        set updateF=%suiteUpdateINI%
+    )
+
+if %updateF%==1 (
+    set "suiteUpdate=yes"
+    )
+if %updateF%==2 (
+    set "suiteUpdate=no"
+    )
+if %updateF% GTR 2 GOTO suiteUpdate
+if %writeSuiteUpdate%==yes echo.suiteUpdate=^%updateF%>>%ini%
+
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -1103,7 +1134,12 @@ for %%s in (%scripts%) do (
     )
 
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
---build32=%build32% --build64=%build64% --remove=%deleteSource%
+--build32=%build32% --build64=%build64% --remove=%deleteSource% --update=%suiteUpdate%
+if exist %instdir%\build\suite_updated (
+    del %instdir%\build\suite_updated
+    start %instdir%\media-autobuild_suite.bat
+    exit
+    )
 cls
 
 :rebase2
