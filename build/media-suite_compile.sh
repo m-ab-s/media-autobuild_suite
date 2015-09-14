@@ -945,7 +945,7 @@ fi
 
 if [[ $mp4box = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/gpac/gpac.git#commit=236c5f81" gpac bin-video/MP4Box.exe
+    do_vcs "https://github.com/gpac/gpac.git" gpac bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -f $LOCALDESTDIR/lib/libgpac_static.a ]; then
             rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
