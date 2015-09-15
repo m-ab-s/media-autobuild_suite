@@ -11,7 +11,7 @@ while true; do
   esac
 done
 
-[[ -d "/build" ]] && cd "/build" || cd "$(cygpath -w /)build"
+[[ -d "/build" ]] && cd "/build" || cd "$(cygpath -w /)../build"
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 
 # --------------------------------------------------
@@ -19,7 +19,7 @@ done
 # --------------------------------------------------
 
 pacman -Sy
-pacman -Qqe | grep -q bash && pacman -Qqg base | pacman -D --asdeps - > /dev/null
+pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
