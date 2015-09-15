@@ -396,10 +396,11 @@ do_hide_pacman_sharedlibs() {
 }
 
 do_hide_all_sharedlibs() {
+    [[ x"$1" = "xdry" ]] && local dryrun="y"
     local files=$(find /mingw{32,64} -name *.dll.a)
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] &&
-            mv -f "${file}" "${file}.dyn"
+            { [[ $dryrun != "y" ]] && mv -f "${file}" "${file}.dyn" || echo "${file}"; }
     done
 }
 

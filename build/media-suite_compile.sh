@@ -1122,6 +1122,7 @@ if do_checkForOptions "--enable-libxvid"; then
     [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f $MINGW_PREFIX/lib/xvidcore.dll.a{,.dyn}
     [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f $MINGW_PREFIX/bin/xvidcore.dll{,.disabled}
 fi
+do_hide_all_sharedlibs
 
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
