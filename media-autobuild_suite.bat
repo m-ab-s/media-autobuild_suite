@@ -781,27 +781,20 @@ if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
     del COPYING.txt
 
 :checkmsys2
-if %msys2%==msys32 (
 if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download and install msys2 basic system
     echo.
     echo -------------------------------------------------------------------------------
-
-    for /F %%b in ( '%instdir%\build\wget -qO- http://sourceforge.net/projects/msys2/files/Base/i686/ ^| %instdir%\build\grep -o -P "(?<=tr title=).*(?<=class=)" ^| %instdir%\build\grep -m 1 -o "msys2-base-i686-*.*tar.xz"' ) do %instdir%\build\wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/i686/%%b/download
-    )
-
-if %msys2%==msys64 (
-if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.- Download and install msys2 basic system
-    echo.
-    echo -------------------------------------------------------------------------------
-
-    for /F %%b in ( '%instdir%\build\wget -qO- http://sourceforge.net/projects/msys2/files/Base/x86_64/ ^| %instdir%\build\grep -o -P "(?<=tr title=).*(?<=class=)" ^| %instdir%\build\grep -m 1 -o "msys2-base-x86_64-*.*tar.xz"' ) do %instdir%\build\wget --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz http://sourceforge.net/projects/msys2/files/Base/x86_64/%%b/download
-    )
+    if %msys2%==msys32 (set "msysprefix=i686" ) else (set "msysprefix=x86_64")
+    set "msysbase=https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/m/ms/msys2/Base/%msysprefix%"
+    for /F %%b in (
+        '%instdir%\build\wget --no-check-certificate -qO- "%msysbase%/?C=M;O=D" ^| ^
+        %instdir%\build\grep -oPm 1 "(?<=href=.)msys2-base-%msysprefix%-\d{8}.tar.xz"'
+        ) do (
+        %instdir%\build\wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz %msysbase%/%%b
+        )
     
 :unpack
 if exist "%instdir%\build\msys2-base.tar.xz" (
@@ -816,7 +809,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download msys2 basic system failed,
-    echo.- please download it manuel from:
+    echo.- please download it manually from:
     echo.- http://downloads.sourceforge.net/project/msys2
     echo.- and copy the uncompressed folder to:
     echo.- %instdir%\build
