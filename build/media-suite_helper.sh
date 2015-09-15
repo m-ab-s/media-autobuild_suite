@@ -138,15 +138,15 @@ do_wget() {
         case $archive_type in
         zip)
             unzip "$archive"
-            rm "$archive"
+            [[ $deleteSource = "y" ]] && rm "$archive"
             ;;
         7z)
             7z x -o"$dirName" "$archive"
-            rm "$archive"
+            [[ $deleteSource = "y" ]] && rm "$archive"
             ;;
         tar*)
             tar -xaf "$archive"
-            rm "$archive"
+            [[ $deleteSource = "y" ]] && rm "$archive"
             cd "$dirName"
             ;;
         esac
