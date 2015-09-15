@@ -840,12 +840,12 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
-        echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.clear
         echo.echo ""
-        echo.echo ----------------------------------------------------------------
-        echo.echo "You probably will need to manually close this window."
-        echo.echo ----------------------------------------------------------------
+        echo.echo -------------------------------------------------------------------------------
+        echo.echo "You probably will need to manually close this window after this."
+        echo.echo -------------------------------------------------------------------------------
+        echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.sleep ^4
         echo.exit
         )>>%instdir%\build\firstUpdate.sh
@@ -858,8 +858,7 @@ if not exist %instdir%\mintty.lnk (
     if exist %instdir%\build\secondUpdate.sh del %instdir%\build\secondUpdate.sh
     (
         echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --force --asdeps --ignoregroup base
-        echo.pacman --noconfirm -Su --force --asdeps
+        echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
         )>>%instdir%\build\secondUpdate.sh
     %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\secondUpdate.sh
