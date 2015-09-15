@@ -386,7 +386,7 @@ do_hide_pacman_sharedlibs() {
     local revert="$2"
     local files=$(pacman -Qql $packages 2>/dev/null | grep .dll.a)
 
-    for file in "$files"; do
+    for file in $files; do
         if [[ -f "$file" && -f "${file%*.dll.a}.a" ]]; then
             mv -f "${file}" "${file}.dyn"
         elif [[ -n "$revert" && -f "${file}.dyn" ]]; then
@@ -397,8 +397,8 @@ do_hide_pacman_sharedlibs() {
 
 do_hide_all_sharedlibs() {
     local files=$(find /mingw{32,64} -name *.dll.a)
-    for file in "$files"; do
-        [[ -f "$file" && -f "${file%*.dll.a}.a" ]] &&
+    for file in $files; do
+        [[ -f "${file%*.dll.a}.a" ]] &&
             mv -f "${file}" "${file}.dyn"
     done
 }
