@@ -93,7 +93,8 @@ if do_checkForOptions "--enable-libopenjpeg"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig --enable-libfribidi"; then
+if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig --enable-libfribidi" ||
+    [[ "$mpv" = "y" || "$mplayer" = "y" ]]; then
     rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
     rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype2.pc
 
@@ -1228,13 +1229,14 @@ if [[ $mplayer = "y" ]]; then
             fi
         fi
 
-        sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
+        grep -q "windows" libmpcodecs/ad_spdif.c ||
+            sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 
         ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
         --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
         --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
-        --disable-gif --disable-cddb $faac
+        --enable-dvdread --enable-freetype --enable-ass-internal --disable-gif --disable-cddb $faac
 
         do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
