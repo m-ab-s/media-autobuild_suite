@@ -771,7 +771,7 @@ if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
     if not exist build mkdir build
     cd build
     if exist "%instdir%\build\msys2-base.tar.xz" GOTO unpack
-    
+    if exist "%instdir%\build\wget.exe" GOTO checkmsys2
     echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
 
     cscript install-wget.js
@@ -800,9 +800,6 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
 if exist "%instdir%\build\msys2-base.tar.xz" (
     %instdir%\build\7za.exe x msys2-base.tar.xz -so | %instdir%\build\7za.exe x -aoa -si -ttar -o..
     del %instdir%\build\msys2-base.tar.xz
-    del %instdir%\build\grep.exe
-    del %instdir%\build\wget.exe
-    del %instdir%\build\7za.exe
     )
     
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
@@ -818,6 +815,12 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo -------------------------------------------------------------------------------
     pause
     GOTO unpack
+    )
+
+if exist %instdir%\build\wget.exe (
+    del %instdir%\build\grep.exe
+    del %instdir%\build\wget.exe
+    del %instdir%\build\7za.exe
     )
 
 :getMintty
