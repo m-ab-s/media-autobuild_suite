@@ -32,6 +32,19 @@ title media-autobuild_suite
 set instdir=%CD%
 set "ini=build\media-autobuild_suite.ini"
 
+if not exist %instdir% (
+    echo -------------------------------------------------------------------------------
+    echo. You have probably run the script in a path with spaces.
+    echo. This is not supported.
+    echo. Please move the script to use a path without spaces. Ex.:
+    echo. Incorrect: C:\build suite\
+    echo. Correct:   C:\build_suite\
+    pause
+    exit
+    )
+
+if not exist %instdir%\build mkdir %instdir%\build
+
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
 intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial ruby man-db ^
