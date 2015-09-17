@@ -830,7 +830,7 @@ if not exist %instdir%\mintty.lnk (
 
     echo.sleep ^4>>%instdir%\build\firstrun.sh
     echo.exit>>%instdir%\build\firstrun.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\firstrun.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\firstrun.sh
     del %instdir%\build\firstrun.sh
 
     echo.-------------------------------------------------------------------------------
@@ -849,7 +849,7 @@ if not exist %instdir%\mintty.lnk (
         echo.sleep ^4
         echo.exit
         )>>%instdir%\build\firstUpdate.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\firstUpdate.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\firstUpdate.sh
     del %instdir%\build\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
@@ -861,7 +861,7 @@ if not exist %instdir%\mintty.lnk (
         echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
         )>>%instdir%\build\secondUpdate.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\secondUpdate.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\secondUpdate.sh
     cls
     del %instdir%\build\secondUpdate.sh
 
@@ -980,7 +980,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.sleep ^3
     echo.exit
         )>>%instdir%\build\pacman.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\base.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\pacman.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\pacman.sh
     del %instdir%\build\pacman.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
@@ -988,7 +988,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
             echo.update-ca-trust>>%instdir%\build\cert.sh
             echo.sleep ^3>>%instdir%\build\cert.sh
             echo.exit>>%instdir%\build\cert.sh
-            %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico /usr/bin/bash --login %instdir%\build\cert.sh
+            %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\cert.sh
             del %instdir%\build\cert.sh
             )
         )
@@ -1014,7 +1014,6 @@ if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-min
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 
 if %build32%==yes (
-:tryagain32
     if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
@@ -1026,7 +1025,7 @@ if %build32%==yes (
         echo.sleep ^3
         echo.exit
         )>>%instdir%\build\mingw32.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw32.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\mingw32.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\mingw32.sh
     del %instdir%\build\mingw32.sh
     
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
@@ -1039,14 +1038,13 @@ if %build32%==yes (
         set /P try32="try again [y/n]: "
 
         if %packF%==y (
-            GOTO tryagain32
+            GOTO getmingw32
             ) else exit
         )
     )
     
 :getmingw64
 if %build64%==yes (
-:tryagain64
     if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
@@ -1058,7 +1056,7 @@ if %build64%==yes (
         echo.sleep ^3
         echo.exit
             )>>%instdir%\build\mingw64.sh
-    %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\mingw64.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\mingw64.sh
+    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\mingw64.sh
     del %instdir%\build\mingw64.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
@@ -1071,7 +1069,7 @@ if %build64%==yes (
         set /P try64="try again [y/n]: "
 
         if %packF%==y (
-            GOTO tryagain64
+            GOTO getmingw64
             ) else exit
         )
     )
@@ -1081,7 +1079,7 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\update.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\media-suite_update.sh ^
+%instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
 
