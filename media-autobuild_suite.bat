@@ -45,7 +45,6 @@ if not exist %instdir% (
 
 set build=%instdir%\build
 if not exist %build% mkdir %build%
-set scriptname=%build%\temp
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
@@ -844,18 +843,16 @@ if not exist %instdir%\mintty.lnk (
     echo.- make a first run
     echo.
     echo -------------------------------------------------------------------------------
-    set scriptname=%build%\firstrun
     (
         echo.sleep ^4
         echo.exit
-        )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+        )>%build%\firstrun.sh
+    %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login %build%\firstrun.sh
+    del %build%\firstrun.sh
 
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
-    set scriptname=%build%\firstUpdate
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
@@ -867,21 +864,20 @@ if not exist %instdir%\mintty.lnk (
         echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.sleep ^4
         echo.exit
-        )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+        )>%build%\firstUpdate.sh
+    %mintty% --log 2>&1 %build%\firstUpdate.log /usr/bin/bash --login %build%\firstUpdate.sh
+    del %build%\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
     echo.second update
     echo.-------------------------------------------------------------------------------
-    set scriptname=%build%\secondUpdate
     (
         echo.echo -ne "\033]0;second msys2 update\007"
         echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
-        )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+        )>%build%\secondUpdate.sh
+    %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
+    del %build%\secondUpdate.sh
     cls
 
     (
@@ -993,26 +989,24 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
     echo.install msys2 base system
     echo.-------------------------------------------------------------------------------
-    set scriptname=%build%\pacman
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
     echo.sleep ^3
     echo.exit
-        )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+        )>%build%\pacman.sh
+    %mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
+    del %build%\pacman.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
-            set scriptname=%build%\cert
             (
                 echo.update-ca-trust
                 echo.sleep ^3
                 echo.exit
-                )>%scriptname%.sh
-            %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-            del %scriptname%.sh
+                )>%build%\cert.sh
+            %mintty% --log 2>&1 %build%\cert.log /usr/bin/bash --login %build%\cert.sh
+            del %build%\cert.sh
             )
         )
 
@@ -1041,15 +1035,14 @@ if %build32%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
     echo.-------------------------------------------------------------------------------
-    set scriptname=%build%\mingw32
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
         echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-i686-^&#g'^)
         echo.sleep ^3
         echo.exit
-        )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+        )>%build%\mingw32.sh
+    %mintty% --log 2>&1 %build%\mingw32.log /usr/bin/bash --login %build%\mingw32.sh
+    del %build%\mingw32.sh
     
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
@@ -1072,15 +1065,14 @@ if %build64%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
     echo.-------------------------------------------------------------------------------
-    set scriptname=%build%\mingw64
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-x86_64-^&#g'^)
         echo.sleep ^3
         echo.exit
-            )>%scriptname%.sh
-    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
-    del %scriptname%.sh
+            )>%build%\mingw64.sh
+    %mintty% --log 2>&1 %build%\mingw64.log /usr/bin/bash --login %build%\mingw64.sh
+    del %build%\mingw64.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
