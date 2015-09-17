@@ -1,4 +1,5 @@
-# set CPU count global. This can be overwrite from the compiler script (media-autobuild_suite.bat)
+#!/bin/bash
+
 cpuCount=1
 compile="false"
 buildFFmpeg="false"
@@ -15,7 +16,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
-    && echo "bash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
+    && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do

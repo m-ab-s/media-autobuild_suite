@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo -ne "\033]0;update autobuild suite\007"
 
 while true; do

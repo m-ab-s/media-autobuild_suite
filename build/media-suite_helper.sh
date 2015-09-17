@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
