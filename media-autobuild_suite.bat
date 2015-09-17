@@ -43,7 +43,9 @@ if not exist %instdir% (
     exit
     )
 
-if not exist %instdir%\build mkdir %instdir%\build
+set build=%instdir%\build
+if not exist %build% mkdir %build%
+set scriptname=%build%\temp
 
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
@@ -559,12 +561,11 @@ if %ffmpegChoiceINI%==0 (
 
 if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
-    if not exist "%instdir%\build" ( mkdir "%instdir%/build" )
-    if not exist "%instdir%\build\ffmpeg_options.txt" (
-        for %%i in (%ffmpeg_options%) do echo.%%i>>"%instdir%\build\ffmpeg_options.txt"
+    if not exist %build%\ffmpeg_options.txt (
+        for %%i in (%ffmpeg_options%) do echo.%%i>>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default options has been created in
-        echo. %instdir%\build\ffmpeg_options.txt
+        echo. %build%\ffmpeg_options.txt
         echo.
         echo. Edit it now or leave it unedited to compile according to defaults.
         echo -------------------------------------------------------------------------------
@@ -780,11 +781,10 @@ if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
     echo - Download wget
     echo.
     echo -------------------------------------------------------------
-    if exist "%instdir%\build\install-wget.js" del "%instdir%\build\install-wget.js"
-    if not exist build mkdir build
+    if exist %build%\install-wget.js del %build%\install-wget.js
     cd build
-    if exist "%instdir%\build\msys2-base.tar.xz" GOTO unpack
-    if exist "%instdir%\build\wget.exe" GOTO checkmsys2
+    if exist %build%\msys2-base.tar.xz GOTO unpack
+    if exist %build%\wget.exe GOTO checkmsys2
     echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
 
     cscript install-wget.js
@@ -803,16 +803,16 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     if %msys2%==msys32 (set "msysprefix=i686" ) else (set "msysprefix=x86_64")
     set "msysbase=https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/m/ms/msys2/Base/%msysprefix%"
     for /F %%b in (
-        '%instdir%\build\wget --no-check-certificate -qO- "%msysbase%/?C=M;O=D" ^| ^
-        %instdir%\build\grep -oPm 1 "(?<=href=.)msys2-base-%msysprefix%-\d{8}.tar.xz"'
+        '%build%\wget --no-check-certificate -qO- "%msysbase%/?C=M;O=D" ^| ^
+        %build%\grep -oPm 1 "(?<=href=.)msys2-base-%msysprefix%-\d{8}.tar.xz"'
         ) do (
-        %instdir%\build\wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz %msysbase%/%%b
+        %build%\wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz %msysbase%/%%b
         )
     
 :unpack
-if exist "%instdir%\build\msys2-base.tar.xz" (
-    %instdir%\build\7za.exe x msys2-base.tar.xz -so | %instdir%\build\7za.exe x -aoa -si -ttar -o..
-    del %instdir%\build\msys2-base.tar.xz
+if exist %build%\msys2-base.tar.xz (
+    %build%\7za.exe x msys2-base.tar.xz -so | %build%\7za.exe x -aoa -si -ttar -o..
+    del %build%\msys2-base.tar.xz
     )
     
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
@@ -822,7 +822,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo.- please download it manually from:
     echo.- http://downloads.sourceforge.net/project/msys2
     echo.- and copy the uncompressed folder to:
-    echo.- %instdir%\build
+    echo.- %build%
     echo.- and start the batch script again!
     echo.
     echo -------------------------------------------------------------------------------
@@ -830,29 +830,32 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     GOTO unpack
     )
 
-if exist %instdir%\build\wget.exe (
-    del %instdir%\build\grep.exe
-    del %instdir%\build\wget.exe
-    del %instdir%\build\7za.exe
+if exist %build%\wget.exe (
+    del %build%\grep.exe
+    del %build%\wget.exe
+    del %build%\7za.exe
     )
 
 :getMintty
+set "mintty=%instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.
     echo.- make a first run
     echo.
     echo -------------------------------------------------------------------------------
-
-    echo.sleep ^4>>%instdir%\build\firstrun.sh
-    echo.exit>>%instdir%\build\firstrun.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\firstrun.sh
-    del %instdir%\build\firstrun.sh
+    set scriptname=%build%\firstrun
+    (
+        echo.sleep ^4
+        echo.exit
+        )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
 
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\build\firstUpdate.sh del %instdir%\build\firstUpdate.sh
+    set scriptname=%build%\firstUpdate
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
@@ -864,22 +867,22 @@ if not exist %instdir%\mintty.lnk (
         echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.sleep ^4
         echo.exit
-        )>>%instdir%\build\firstUpdate.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\firstUpdate.sh
-    del %instdir%\build\firstUpdate.sh
+        )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
 
     echo.-------------------------------------------------------------------------------
     echo.second update
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\build\secondUpdate.sh del %instdir%\build\secondUpdate.sh
+    set scriptname=%build%\secondUpdate
     (
         echo.echo -ne "\033]0;second msys2 update\007"
         echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
-        )>>%instdir%\build\secondUpdate.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\secondUpdate.sh
+        )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
     cls
-    del %instdir%\build\secondUpdate.sh
 
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
@@ -891,10 +894,11 @@ if not exist %instdir%\mintty.lnk (
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
         echo.link.Save
-        )>>%instdir%\build\setlink.vbs
-    cscript /nologo %instdir%\build\setlink.vbs
-    del %instdir%\build\setlink.vbs
-        )
+        )>%build%\setlink.vbs
+    cscript /nologo %build%\setlink.vbs
+    del %build%\setlink.vbs
+    )
+
     if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
     if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
         (
@@ -989,23 +993,26 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
     echo.install msys2 base system
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\build\pacman.sh del %instdir%\build\pacman.sh
+    set scriptname=%build%\pacman
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
     echo.sleep ^3
     echo.exit
-        )>>%instdir%\build\pacman.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\pacman.sh
-    del %instdir%\build\pacman.sh
+        )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
-            echo.update-ca-trust>>%instdir%\build\cert.sh
-            echo.sleep ^3>>%instdir%\build\cert.sh
-            echo.exit>>%instdir%\build\cert.sh
-            %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\cert.sh
-            del %instdir%\build\cert.sh
+            set scriptname=%build%\cert
+            (
+                echo.update-ca-trust
+                echo.sleep ^3
+                echo.exit
+                )>%scriptname%.sh
+            %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+            del %scriptname%.sh
             )
         )
 
@@ -1034,15 +1041,15 @@ if %build32%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 32 bit compiler
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\build\mingw32.sh del %instdir%\build\mingw32.sh
+    set scriptname=%build%\mingw32
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
         echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-i686-^&#g'^)
         echo.sleep ^3
         echo.exit
-        )>>%instdir%\build\mingw32.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\mingw32.sh
-    del %instdir%\build\mingw32.sh
+        )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
     
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
@@ -1065,15 +1072,15 @@ if %build64%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
     echo.-------------------------------------------------------------------------------
-    if exist %instdir%\build\mingw64.sh del %instdir%\build\mingw64.sh
+    set scriptname=%build%\mingw64
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-x86_64-^&#g'^)
         echo.sleep ^3
         echo.exit
-            )>>%instdir%\build\mingw64.sh
-    %instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\mingw64.sh
-    del %instdir%\build\mingw64.sh
+            )>%scriptname%.sh
+    %mintty% --log 2>&1 %scriptname%.log /usr/bin/bash --login %scriptname%.sh
+    del %scriptname%.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
@@ -1095,7 +1102,7 @@ echo.---------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
-%instdir%\%msys2%\usr\bin\bash.exe --login %instdir%\build\media-suite_update.sh ^
+%mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 cls
 
@@ -1361,7 +1368,7 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %instdir%\build\compile.log -i /msys2.ico /usr/bin/bash --login %instdir%\build\media-suite_compile.sh ^
+start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login %build%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
