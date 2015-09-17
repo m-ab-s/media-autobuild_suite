@@ -1412,6 +1412,7 @@ find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xarg
 [[ -f last_run ]] && mv last_run last_successful_run
 [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
 unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
+rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
 
 if [[ $deleteSource = "y" ]]; then
     echo -ne "\033]0;deleting source folders\007"
