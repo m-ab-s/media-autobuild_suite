@@ -10,7 +10,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libopenjpeg --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
---enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid \
+--enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libutvideo --enable-libgme \
@@ -252,13 +252,52 @@ if do_checkForOptions "--enable-libwebp"; then
             rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
         fi
         do_patch libwebp-gcc5.1.patch am
-        do_generic_conf global --enable-swap-16bit-csp --enable-experimental \
+        do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
             LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
             LDFLAGS="$LDFLAGS -static -static-libgcc"
-        make
-        make install
         do_checkIfExist libwebp-git libwebp.a
+    fi
+fi
+
+if do_checkForOptions "--enable-libtesseract"; then
+    do_pacman_remove "tesseract-ocr"
+    cd $LOCALBUILDDIR
+    if do_pkgConfig "lept = 1.72"; then
+        do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
+        [[ -f Makefile ]] && make distclean
+        if [[ -f $LOCALDESTDIR/lib/liblept.a ]]; then
+            rm -rf $LOCALDESTDIR/include/leptonica
+            rm -f $LOCALDESTDIR/lib/liblept.{,l}a $LOCALDESTDIR/lib/pkgconfig/lept.pc
+        fi
+        do_generic_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
+        do_checkIfExist leptonica-1.72 liblept.a
+    fi
+
+    cd $LOCALBUILDDIR
+    do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
+    if [[ $compile = "true" ]]; then
+        [[ -f configure ]] || ./autogen.sh
+        [[ -f config.log ]] && make distclean
+        if [[ -f $LOCALDESTDIR/lib/libtesseract.a ]]; then
+            rm -rf $LOCALDESTDIR/include/tesseract
+            rm -f $LOCALDESTDIR/lib/libtesseract.{,l}a $LOCALDESTDIR/lib/pkgconfig/tesseract.pc
+            rm -f $LOCALDESTDIR/bin-global/tesseract.exe
+        fi
+        sed -i 's# @OPENCL_LIB@# -lstdc++#' tesseract.pc.in
+        do_generic_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
+            LIBLEPT_HEADERSDIR=$LOCALDESTDIR/include LDFLAGS="$LDFLAGS -static -static-libgcc" \
+            LIBS="$(pkg-config --static --libs lept)" --datadir=$LOCALDESTDIR/bin-global
+        if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
+            mkdir -p $LOCALDESTDIR/bin-global/tessdata
+            pushd $LOCALDESTDIR/bin-global/tessdata > /dev/null
+            do_wget "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
+            printf "You can get more language data here:\n"\
+                   "https://github.com/tesseract-ocr/tessdata/blob/master/\n"\
+                   "Just download <lang you want>.traineddata and copy it to this directory." > need_more_languages.txt
+            popd > /dev/null
+        fi
+        do_checkIfExist tesseract-git libtesseract.a
     fi
 fi
 
