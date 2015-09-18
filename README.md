@@ -20,8 +20,6 @@ Download
 
 ### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
 
-Current release is **v3.6**
-
 Known Issues
 --------
  - FFmpeg and FFmpeg-based (mplayer, mpv)
@@ -31,40 +29,47 @@ Known Issues
 Included Tools And Libraries
 --------
 
- - FFmpeg (shared or static) with these libraries (all optional, but compiled by default):
-	- decklink 10.4.1
-	- fontconfig (2.11.94)
-	- freetype (2.6)
+ - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
+	- decklink 10.5
+	- fontconfig
+	- freetype
 	- frei0r (1.4)
-	- fribidi (0.19.6)
-	- gnutls (3.4.4)
-	- harfbuzz (git)
-	- libass (git)
+	- fribidi
+	- gnutls (3.4.4) or openssl
+		- if `--enable-openssl` and `--enable-nonfree` are present openssl is preferred
+	- harfbuzz
+	- libass (git) (with directwrite backend) (with fontconfig too if 32-bit)
 	- libbs2b (3.1.0)
 	- libbluray (git)
-	- libcaca (0.99.beta19)
-	- libcdio-paranoia (git)
-	- libdcadec (git)
+	- libcaca
+	- libcdio-paranoia
+	- libdcadec
+	- libfaac (1.28)
+		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
+		- Not compiled by default, add `--enable-libfaac` to ffmpeg_options.txt
 	- libfdk-aac (git)
+		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
 	- libgsm
 	- libilbc (git)
 	- libkvazaar (git)
 	- libmfx (git)
 	- libmodplug
 	- libmp3lame (3.99.5)
-	- libopencore-amrwb/nb (0.1.3)
+	- libopencore-amrwb/nb
 	- libopenjpeg 2.1 (git)
 	- libopus (1.1)
 	- librtmp (git)
 	- libschroedinger
 	- libsoxr (0.1.1)
 	- libspeex (1.2rc2)
-	- libtheora (1.1.1)
+	- libtesseract (git)
+	- libtheora
 	- libtwolame (git)
 	- libutvideo (git/15.1.0)
 	- libvo-aacenc (0.1.3)
+		- Not compiled by default, add `--enable-libvo-aacenc` to ffmpeg_options.txt
 	- libvo-amrwbenc (0.1.2)
-	- libvorbis (1.3.5)
+	- libvorbis
 	- libvpx (git)
 	- libwebp (git) (needed for webp encoding)
 	- libx264 (git)
@@ -73,21 +78,19 @@ Included Tools And Libraries
 	- libxvid
 	- libzvbi (0.2.35)
 	- nvenc (5.0.1)
+		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
 	- sdl (1.2.15)
 	- vidstab (git)
 	
  - other tools
- 	- cd-paranoia (git)
 	- f265 (git)
     - faac (1.28)
 	- fdk-aac (git)
 	- file (5.22)
 	- flac (1.3.1)
-	- fontconfig tools (2.11.94)
 	- jpeg-turbo tools (git)
 	- kvazaar (git)
 	- lame (3.99.5)
-	- libgcrypt tools (1.6.3)
 	- libsndfile (git)
 	- mediainfo cli (git)
 	- mp4box (git)
@@ -95,14 +98,14 @@ Included Tools And Libraries
 	- mpv (git) including in addition to ffmpeg libs:
 		- libjpeg-turbo (git)
 		- librubberband (git)
-		- uchardet (git)
+		- uchardet
 		- libwaio (git)
 		- luajit (git)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
 	- speex (1.2rc2)
 	- sox (git)
-	- uchardet (git)
+	- tesseract (git)
 	- vorbis-tools (1.4.0)
 	- vpx (VP8 and VP9 8, 10 and 12 bit) (git)
 	- webp tools (git)
@@ -124,7 +127,7 @@ How to use it:
  - Select if you want to compile for Windows 32-bit, 64-bit or both
  - Select if you want to compile non-free tools like "fdk aac"
  - Select the numbers of CPU (cores) you want to use
- - Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-audio/global/video or local64\bin-audio/global/video
+ - Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-(audio/global/video) or local64\bin-(audio/global/video)
  
 The Script writes a ini-file, so you only need to make these choices the first time what you want to build.
 
@@ -146,17 +149,20 @@ What The Individual Files Do
 media-autobuild_suite.bat
  - This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
 	
-media-autobuild_suite.ini
+/build/media-autobuild_suite.ini
  - This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
 	
-media-suite_compile.sh
- - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it get called by the batch script.
+/build/media-suite_compile.sh
+ - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
 	
-media-suite_update.sh
+/build/media-suite_update.sh
  - This script runs every time you run the batch file. It checks for updates to the MinGW environment.
 
+/build/media-suite_helper.sh
+ - This script contains helper functions used by compile and update that can also be `source`'d by the user if desired.
+
 /build/ffmpeg_options.txt
- - If you select the option to choose your own FFmpeg optional libraries, this file will contain options that get sent to FFmpeg's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg without features you don't need.
+ - If you select the option to choose your own FFmpeg optional libraries, this file will contain options that get sent to FFmpeg's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg without features you don't need or with additional features not compiled by default, if supported.
 	
 
 Troubleshooting
