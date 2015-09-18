@@ -410,10 +410,10 @@ do_pacman_install() {
     local sed=""
     [[ $build32 = "yes" ]] && sed+="mingw-w64-i686-&"
     [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
-    local newpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
-    pacman -S --noconfirm --needed $newpackages 2>/dev/null
+    local mingwpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
+    pacman -S --noconfirm --needed $mingwpackages 2>/dev/null
     do_hide_all_sharedlibs
-    pacman -D --asexplicit $newpackages >/dev/null
+    pacman -D --asexplicit $mingwpackages >/dev/null
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk || echo "$pkg" >> /etc/pac-mingw-extra.pk
     done
@@ -421,11 +421,13 @@ do_pacman_install() {
 
 do_pacman_remove() {
     local packages="$1"
-    echo "Removing packages:"
-    do_hide_pacman_sharedlibs "$packages" revert
-    pacman -Rs --noconfirm $packages 2>/dev/null
+    [[ $build32 = "yes" ]] && sed+="mingw-w64-i686-&"
+    [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
+    local mingwpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
+    do_hide_pacman_sharedlibs "$mingwpackages" revert
+    pacman -Rs --noconfirm $mingwpackages 2>/dev/null
     for pkg in $packages; do
-        grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
+        grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/${pkg}/d" /etc/pac-mingw-extra.pk
     done
 }
 
