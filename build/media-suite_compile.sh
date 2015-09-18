@@ -108,7 +108,8 @@ if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig 
     rm -rf $LOCALBUILDDIR/harfbuzz-git
     rm -rf $LOCALDESTDIR/include/harfbuzz
     rm -rf $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
-    do_pacman_install "freetype fontconfig fribidi harfbuzz ragel python2-lxml"
+    do_pacman_install "freetype fontconfig fribidi harfbuzz python2-lxml"
+    do_pacman_remove "ragel"
 
     # fix iconv problems with harfbuzz/libass due to missing lib in mingw's glib pkgconfig
     grep -q "liconv" "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc ||
