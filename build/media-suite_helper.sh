@@ -324,14 +324,14 @@ do_patch() {
     local response_code="$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
-    if [[ $response_code = "404" ]]; then
+    if [[ $response_code != "200" ]]; then
         echo "Patch not found online. Trying local patch. Probably not up-to-date."
         if [[ -f ./"$patch" ]]; then
             patchpath="$patch"
         elif [[ -f "$LOCALBUILDDIR/patches/${patch}" ]]; then
             patchpath="$LOCALBUILDDIR/patches/${patch}"
         fi
-    elif [[ $response_code = "200" ]]; then
+    else
         patchpath="$patch"
     fi
     if [[ "$patchpath" != "" ]]; then

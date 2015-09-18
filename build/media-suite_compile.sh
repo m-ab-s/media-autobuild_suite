@@ -1333,12 +1333,11 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
-        if [[ -f waf ]]; then
+        [[ ! -f waf ]] && $python bootstrap.py
+        if [[ -d build ]]; then
             $python waf distclean
-            rm -rf waf .waf-* VERSION
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
         fi
-        $python bootstrap.py
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
