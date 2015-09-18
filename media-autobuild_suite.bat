@@ -66,6 +66,11 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme ^
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
+set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
+mp4box mplayer mpv cores deleteSource strip pack
+
+set previousOptions=0
+
 :selectmsys2Arch
 if exist %ini% GOTO checkINI
     echo -------------------------------------------------------------------------------
@@ -91,95 +96,22 @@ if exist %ini% GOTO checkINI
     echo.msys2Arch=^%msys2Arch%>>%ini%
 
     set msys2ArchINI=%msys2Arch%
-    set archINI=0
-    set freeINI=0
-    set vpxINI=0
-    set x264INI=0
-    set x265INI=0
-    set other265INI=0
-    set flacINI=0
-    set mediainfoINI=0
-    set soxINI=0
-    set ffmpegINI=0
-    set ffmpegUpdateINI=0
-    set ffmpegChoiceINI=0
-    set mp4boxINI=0
-    set mplayerINI=0
-    set mpvINI=0
-    set coresINI=0
-    set deleteSourceINI=0
-    set stripINI=0
-    set packINI=0
-    set suiteUpdateINI=2
+    if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
 
     GOTO systemVars
 
 :checkINI
-findstr /i "msys2Arch" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "arch" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "free" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "vpx" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "x264" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "x265" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "other265" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "flac" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "mediainfo" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "soxB" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmpegB" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmpegUpdate" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "ffmpegChoice" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "mp4box" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "mplayer" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "mpv" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "cores" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "deleteSource" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "strip" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "pack" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-:: findstr /i "suiteUpdate" %ini% > nul
-::     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-
-:readINI
-for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
-for /F "tokens=2 delims==" %%j in ('findstr /i "arch" %ini%') do set archINI=%%j
-for /F "tokens=2 delims==" %%b in ('findstr /i "free" %ini%') do set freeINI=%%b
-for /F "tokens=2 delims==" %%f in ('findstr /i "vpx" %ini%') do set vpxINI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "x264" %ini%') do set x264INI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "x265" %ini%') do set x265INI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "other265" %ini%') do set other265INI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "flac" %ini%') do set flacINI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "mediainfo" %ini%') do set mediainfoINI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "soxB" %ini%') do set soxINI=%%f
-for /F "tokens=2 delims==" %%f in ('findstr /i "ffmpegB" %ini%') do set ffmpegINI=%%f
-for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegUpdate" %ini%') do set ffmpegUpdateINI=%%c
-for /F "tokens=2 delims==" %%c in ('findstr /i "ffmpegChoice" %ini%') do set ffmpegChoiceINI=%%c
-for /F "tokens=2 delims==" %%d in ('findstr /i "mp4box" %ini%') do set mp4boxINI=%%d
-for /F "tokens=2 delims==" %%e in ('findstr /i "mplayer" %ini%') do set mplayerINI=%%e
-for /F "tokens=2 delims==" %%l in ('findstr /i "mpv" %ini%') do set mpvINI=%%l
-for /F "tokens=2 delims==" %%h in ('findstr /i "cores" %ini%') do set coresINI=%%h
-for /F "tokens=2 delims==" %%i in ('findstr /i "deleteSource" %ini%') do set deleteSourceINI=%%i
-for /F "tokens=2 delims==" %%k in ('findstr /i "strip" %ini%') do set stripINI=%%k
-for /F "tokens=2 delims==" %%g in ('findstr /i "pack" %ini%') do set packINI=%%g
-for /F "tokens=2 delims==" %%g in ('findstr /i "suiteUpdate" %ini%') do set suiteUpdateINI=%%g
+set deleteIni=0
+for %%a in (%iniOptions%) do (
+    findstr %%a %ini% > nul
+    if errorlevel 1 set deleteIni=1 && set %%aINI=0
+    if errorlevel 0 for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+    )
+if %deleteINI%==1 (
+    del %ini%
+    set previousOptions=1
+    GOTO selectmsys2Arch
+    )
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
@@ -451,7 +383,7 @@ if %writemediainfo%==yes echo.mediainfo=^%buildmediainfo%>>%ini%
 
 :sox
 set "writesox=no"
-if %soxINI%==0 (
+if %soxBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -464,7 +396,7 @@ if %soxINI%==0 (
     set /P buildsox="Build sox: "
     set "writesox=yes"
     ) else (
-        set buildsox=%soxINI%
+        set buildsox=%soxBINI%
         )
 
 if %buildsox%==1 (
@@ -478,7 +410,7 @@ if %writesox%==yes echo.soxB=^%buildsox%>>%ini%
 
 :ffmpeg
 set "writeFF=no"
-if %ffmpegINI%==0 (
+if %ffmpegBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -493,7 +425,7 @@ if %ffmpegINI%==0 (
     set /P buildffmpeg="Build FFmpeg: "
     set "writeFF=yes"
     ) else (
-        set buildffmpeg=%ffmpegINI%
+        set buildffmpeg=%ffmpegBINI%
         )
 
 if %buildffmpeg%==1 (
@@ -776,6 +708,7 @@ if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
 :suiteUpdate
+set suiteUpdateINI=2
 set "writeSuiteUpdate=no"
 if %suiteUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
