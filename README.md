@@ -57,6 +57,7 @@ Included Tools And Libraries
 	- libmp3lame (3.99.5)
 	- libopencore-amrwb/nb
 	- libopenjpeg 2.1 (git)
+		- Not compiled by default, add `--enable-libopenjpeg` to ffmpeg_options.txt
 	- libopus (1.1)
 	- librtmp (git)
 	- libschroedinger
@@ -66,6 +67,8 @@ Included Tools And Libraries
 	- libtheora
 	- libtwolame (git)
 	- libutvideo (git/15.1.0)
+		- If using `--enable-openssl`, this lib is disabled
+		- Not compiled by default, add `--enable-libutvideo` to ffmpeg_options.txt
 	- libvo-aacenc (0.1.3)
 		- Not compiled by default, add `--enable-libvo-aacenc` to ffmpeg_options.txt
 	- libvo-amrwbenc (0.1.2)
