@@ -110,7 +110,7 @@ if exist %ini% GOTO checkINI
     set deleteSourceINI=0
     set stripINI=0
     set packINI=0
-    set suiteUpdateINI=0
+    set suiteUpdateINI=2
 
     GOTO systemVars
 
@@ -155,8 +155,8 @@ findstr /i "strip" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 findstr /i "pack" %ini% > nul
     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
-findstr /i "suiteUpdate" %ini% > nul
-    if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
+:: findstr /i "suiteUpdate" %ini% > nul
+::     if ERRORLEVEL 1 del %ini% && GOTO selectmsys2Arch
 
 :readINI
 for /F "tokens=2 delims==" %%a in ('findstr /i "msys2Arch" %ini%') do set msys2ArchINI=%%a
