@@ -29,6 +29,7 @@
 color 80
 title media-autobuild_suite
 
+setlocal
 set instdir=%CD%
 set "ini=build\media-autobuild_suite.ini"
 
@@ -1223,4 +1224,5 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
 
-exit
+endlocal
+goto:eof
