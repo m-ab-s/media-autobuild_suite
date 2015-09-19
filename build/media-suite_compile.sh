@@ -236,7 +236,6 @@ if do_checkForOptions "--enable-libwebp"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libwebp{,decoder,demux,mux}.pc
             rm -f $LOCALDESTDIR/bin-global/{{c,d}webp,gif2webp,webpmux}.exe
         fi
-        do_patch libwebp-gcc5.1.patch am
         do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
             LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
