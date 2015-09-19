@@ -70,10 +70,12 @@ set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ff
 mp4box mplayer mpv cores deleteSource strip pack
 
 set previousOptions=0
+set msys2ArchINI=0
 
-:selectmsys2Arch
 if exist %ini% GOTO checkINI
+:selectmsys2Arch
     set deleteIni=1
+    if %msys2ArchINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -90,7 +92,7 @@ if exist %ini% GOTO checkINI
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P msys2Arch="msys2 system: "
+    set /P msys2Arch="msys2 system: " ) else set msys2Arch=%msys2ArchINI%
     if %msys2Arch% GTR 2 GOTO selectmsys2Arch
 
     echo.[compiler list]>%ini%
@@ -119,12 +121,8 @@ if %deleteINI%==1 (
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
-if %msys2Arch%==1 (
-    set "msys2=msys32"
-    )
-if %msys2Arch%==2 (
-    set "msys2=msys64"
-    )
+if %msys2Arch%==1 set "msys2=msys32"
+if %msys2Arch%==2 set "msys2=msys64"
 
 :selectSystem
 set "writeArch=no"
@@ -140,9 +138,7 @@ if %archINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildEnv="Build System: "
-    ) else (
-        set buildEnv=%archINI%
-        )
+    ) else set buildEnv=%archINI%
 if %deleteINI%==1 set "writeArch=yes"
 
 if %buildEnv%==1 (
@@ -174,9 +170,7 @@ if %freeINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P nonfree="Non-free binaries: "
-    ) else (
-        set nonfree=%freeINI%
-        )
+    ) else set nonfree=%freeINI%
 if %deleteINI%==1 set "writeFree=yes"
 
 if %nonfree%==1 set "binary=y"
@@ -224,9 +218,7 @@ if %x264INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx264="Build x264: "
-    ) else (
-        set buildx264=%x264INI%
-        )
+    ) else set buildx264=%x264INI%
 if %deleteINI%==1 set "writex264=yes"
 
 if %buildx264%==1 set "x264=y"
@@ -254,9 +246,7 @@ if %x265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
-    ) else (
-        set buildx265=%x265INI%
-        )
+    ) else set buildx265=%x265INI%
 if %deleteINI%==1 set "writex265=yes"
 
 if %buildx265%==1 set "x265=y"
@@ -291,9 +281,7 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildother265="Build other265: "
-    ) else (
-        set buildother265=%other265INI%
-        )
+    ) else set buildother265=%other265INI%
 if %deleteINI%==1 set "writeother265=yes"
 
 if %buildother265%==1 set "other265=y"
@@ -314,9 +302,7 @@ if %flacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildflac="Build flac: "
-    ) else (
-        set buildflac=%flacINI%
-        )
+    ) else set buildflac=%flacINI%
 if %deleteINI%==1 set "writeflac=yes"
 
 if %buildflac%==1 set "flac=y"
@@ -337,9 +323,7 @@ if %mediainfoINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmediainfo="Build mediainfo: "
-    ) else (
-        set buildmediainfo=%mediainfoINI%
-        )
+    ) else set buildmediainfo=%mediainfoINI%
 if %deleteINI%==1 set "writemediainfo=yes"
 
 if %buildmediainfo%==1 set "mediainfo=y"
@@ -360,9 +344,7 @@ if %soxBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsox="Build sox: "
-    ) else (
-        set buildsox=%soxBINI%
-        )
+    ) else set buildsox=%soxBINI%
 if %deleteINI%==1 set "writesox=yes"
 
 if %buildsox%==1 set "sox=y"
@@ -385,9 +367,7 @@ if %ffmpegBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpeg="Build FFmpeg: "
-    ) else (
-        set buildffmpeg=%ffmpegBINI%
-        )
+    ) else set buildffmpeg=%ffmpegBINI%
 if %deleteINI%==1 set "writeFF=yes"
 
 if %buildffmpeg%==1 set "ffmpeg=y"
