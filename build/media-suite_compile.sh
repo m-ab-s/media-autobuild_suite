@@ -337,17 +337,10 @@ if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]
     do_pacman_install "libvorbis"
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]] && do_pkgConfig "opus = 1.1"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
-    [[ -f ".libs/libopus.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libopus.a ]]; then
-        rm -rf $LOCALDESTDIR/include/opus
-        rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
-    fi
-    do_patch "opus11.patch"
-    do_generic_confmakeinstall --disable-doc
-    do_checkIfExist opus-1.1 libopus.a
+if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]]; then
+    rm -rf $LOCALDESTDIR/include/opus
+    rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
+    do_pacman_install "opus"
 fi
 
 if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
