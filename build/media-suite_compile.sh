@@ -852,6 +852,7 @@ if do_checkForOptions "--enable-libcaca"; then
     rm -rf $LOCALDESTDIR/include/caca* $LOCALDESTDIR/bin-video/caca*
     rm -rf $LOCALDESTDIR/lib/libcaca.{l,}a $LOCALDESTDIR/lib/pkgconfig/caca.pc
     do_pacman_install "libcaca"
+    do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
