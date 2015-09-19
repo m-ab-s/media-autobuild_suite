@@ -276,8 +276,8 @@ if do_checkForOptions "--enable-libtesseract"; then
             mkdir -p $LOCALDESTDIR/bin-global/tessdata
             pushd $LOCALDESTDIR/bin-global/tessdata > /dev/null
             do_wget "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
-            printf "You can get more language data here:\n"\
-                   "https://github.com/tesseract-ocr/tessdata/blob/master/\n"\
+            printf "%s\n" "You can get more language data here:"\
+                   "https://github.com/tesseract-ocr/tessdata/blob/master/"\
                    "Just download <lang you want>.traineddata and copy it to this directory." > need_more_languages.txt
             popd > /dev/null
         fi
