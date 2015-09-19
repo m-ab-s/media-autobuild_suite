@@ -25,6 +25,11 @@ Known Issues
  - FFmpeg and FFmpeg-based (mplayer, mpv)
 	- if compiled with OpenSSL instead of GnuTLS, packing doesn't work in 64-bit
 	- [libmfx is not WinXP-friendly][1], so don't use it as option if you're compiling for XP
+ - mintty
+	- Recent mintty changes force use of a flag that didn't exist in previous versions. If a window shows up while running the .bat file complaining with something about mintty, fix with:
+		1. run mintty using the shortcut
+		2. enter and run `pacman -Sy --noconfirm --force mintty`
+		3. close mintty and re-run the .bat as normal
 
 Included Tools And Libraries
 --------
