@@ -540,19 +540,10 @@ if do_checkForOptions "--enable-libgme"; then
 fi
 
 if do_checkForOptions "--enable-libtwolame"; then
-    cd $LOCALBUILDDIR
-    do_vcs "https://github.com/qyot27/twolame.git#branch=mingw-static" twolame
-    if [[ $compile = "true" ]]; then
-        [[ ! -f ./configure ]] && ./autogen.sh -V || make distclean
-        if [[ -f $LOCALDESTDIR/lib/libtwolame.a ]]; then
-            rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
-            rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
-        fi
-        do_generic_conf
-        sed -i 's/frontend simplefrontend//' Makefile
-        do_makeinstall
-        do_checkIfExist twolame-git libtwolame.a
-    fi
+    rm -rf $LOCALDESTDIR/include/twolame.h $LOCALDESTDIR/bin-audio/twolame.exe
+    rm -rf $LOCALDESTDIR/lib/libtwolame.{l,}a $LOCALDESTDIR/lib/pkgconfig/twolame.pc
+    do_pacman_install "twolame"
+    do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
 fi
 
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
