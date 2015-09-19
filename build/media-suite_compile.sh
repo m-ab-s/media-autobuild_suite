@@ -116,18 +116,11 @@ if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig 
         sed -i 's/-lintl/& -liconv/g' "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc
 fi
 
-if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
-    cd $LOCALBUILDDIR
-    do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
-    [[ -f "build/.libs/libSDL.a" ]] && make distclean
-    if [[ -f $LOCALDESTDIR/lib/libSDL.a ]]; then
-        rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
-        rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
-    fi
-    CFLAGS="-DDECLSPEC=" do_generic_confmakeinstall global
-    sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
-    sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-    do_checkIfExist SDL-1.2.15 libSDL.a
+if ! do_checkForOptions "--disable-sdl --disable-ffplay"; then
+    rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
+    rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
+    do_pacman_install "SDL"
+    sed -i "s/-mwindows//" "$MINGW_PREFIX/bin/sdl-config"
 fi
 
 #----------------------
