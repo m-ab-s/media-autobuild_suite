@@ -73,6 +73,7 @@ set previousOptions=0
 
 :selectmsys2Arch
 if exist %ini% GOTO checkINI
+    set deleteIni=1
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -105,7 +106,10 @@ set deleteIni=0
 for %%a in (%iniOptions%) do (
     findstr %%a %ini% > nul
     if errorlevel 1 set deleteIni=1 && set %%aINI=0
-    if errorlevel 0 for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+    if errorlevel 0 for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do (
+        set %%aINI=%%b
+        if %%b==0 set deleteIni=1
+        )
     )
 if %deleteINI%==1 (
     del %ini%
@@ -136,10 +140,10 @@ if %archINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildEnv="Build System: "
-    set "writeArch=yes"
     ) else (
         set buildEnv=%archINI%
         )
+if %deleteINI%==1 set "writeArch=yes"
 
 if %buildEnv%==1 (
     set "build32=yes"
@@ -170,17 +174,13 @@ if %freeINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P nonfree="Non-free binaries: "
-    set "writeFree=yes"
     ) else (
         set nonfree=%freeINI%
         )
+if %deleteINI%==1 set "writeFree=yes"
 
-if %nonfree%==1 (
-    set "binary=y"
-    )
-if %nonfree%==2 (
-    set "binary=n"
-    )
+if %nonfree%==1 set "binary=y"
+if %nonfree%==2 set "binary=n"
 if %nonfree% GTR 2 GOTO selectNonFree
 if %writeFree%==yes echo.free=^%nonfree%>>%ini%
 
@@ -198,20 +198,14 @@ if %vpxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvpx="Build vpx: "
-    set "writevpx=yes"
     ) else (
         set buildvpx=%vpxINI%
         )
+if %deleteINI%==1 set "writevpx=yes"
 
-if %buildvpx%==1 (
-    set "vpx=y"
-    )
-if %buildvpx%==2 (
-    set "vpx=l"
-    )
-if %buildvpx%==3 (
-    set "vpx=n"
-    )
+if %buildvpx%==1 set "vpx=y"
+if %buildvpx%==2 set "vpx=l"
+if %buildvpx%==3 set "vpx=n"
 if %buildvpx% GTR 3 GOTO vpx
 if %writevpx%==yes echo.vpx=^%buildvpx%>>%ini%
 
@@ -230,23 +224,15 @@ if %x264INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx264="Build x264: "
-    set "writex264=yes"
     ) else (
         set buildx264=%x264INI%
         )
+if %deleteINI%==1 set "writex264=yes"
 
-if %buildx264%==1 (
-    set "x264=y"
-    )
-if %buildx264%==2 (
-    set "x264=l"
-    )
-if %buildx264%==3 (
-    set "x264=n"
-    )
-if %buildx264%==4 (
-    set "x264=f"
-    )
+if %buildx264%==1 set "x264=y"
+if %buildx264%==2 set "x264=l"
+if %buildx264%==3 set "x264=n"
+if %buildx264%==4 set "x264=f"
 if %buildx264% GTR 4 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
@@ -268,23 +254,15 @@ if %x265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
-    set "writex265=yes"
     ) else (
         set buildx265=%x265INI%
         )
+if %deleteINI%==1 set "writex265=yes"
 
-if %buildx265%==1 (
-    set "x265=y"
-    )
-if %buildx265%==2 (
-    set "x265=l"
-    )
-if %buildx265%==3 (
-    set "x265=n"
-    )
-if %buildx265%==4 (
-    set "x265=s"
-    )
+if %buildx265%==1 set "x265=y"
+if %buildx265%==2 set "x265=l"
+if %buildx265%==3 set "x265=n"
+if %buildx265%==4 set "x265=s"
 if %buildx265%==5 (
     set "x265=y"
     set "xpcomp=y"
@@ -313,17 +291,13 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildother265="Build other265: "
-    set "writeother265=yes"
     ) else (
         set buildother265=%other265INI%
         )
+if %deleteINI%==1 set "writeother265=yes"
 
-if %buildother265%==1 (
-    set "other265=y"
-    )
-if %buildother265%==2 (
-    set "other265=n"
-    )
+if %buildother265%==1 set "other265=y"
+if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
 
@@ -340,17 +314,13 @@ if %flacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildflac="Build flac: "
-    set "writeflac=yes"
     ) else (
         set buildflac=%flacINI%
         )
+if %deleteINI%==1 set "writeflac=yes"
 
-if %buildflac%==1 (
-    set "flac=y"
-    )
-if %buildflac%==2 (
-    set "flac=n"
-    )
+if %buildflac%==1 set "flac=y"
+if %buildflac%==2 set "flac=n"
 if %buildflac% GTR 2 GOTO flac
 if %writeflac%==yes echo.flac=^%buildflac%>>%ini%
 
@@ -367,17 +337,13 @@ if %mediainfoINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmediainfo="Build mediainfo: "
-    set "writemediainfo=yes"
     ) else (
         set buildmediainfo=%mediainfoINI%
         )
+if %deleteINI%==1 set "writemediainfo=yes"
 
-if %buildmediainfo%==1 (
-    set "mediainfo=y"
-    )
-if %buildmediainfo%==2 (
-    set "mediainfo=n"
-    )
+if %buildmediainfo%==1 set "mediainfo=y"
+if %buildmediainfo%==2 set "mediainfo=n"
 if %buildmediainfo% GTR 2 GOTO mediainfo
 if %writemediainfo%==yes echo.mediainfo=^%buildmediainfo%>>%ini%
 
@@ -394,17 +360,13 @@ if %soxBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsox="Build sox: "
-    set "writesox=yes"
     ) else (
         set buildsox=%soxBINI%
         )
+if %deleteINI%==1 set "writesox=yes"
 
-if %buildsox%==1 (
-    set "sox=y"
-    )
-if %buildsox%==2 (
-    set "sox=n"
-    )
+if %buildsox%==1 set "sox=y"
+if %buildsox%==2 set "sox=n"
 if %buildsox% GTR 2 GOTO sox
 if %writesox%==yes echo.soxB=^%buildsox%>>%ini%
 
@@ -423,23 +385,15 @@ if %ffmpegBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpeg="Build FFmpeg: "
-    set "writeFF=yes"
     ) else (
         set buildffmpeg=%ffmpegBINI%
         )
+if %deleteINI%==1 set "writeFF=yes"
 
-if %buildffmpeg%==1 (
-    set "ffmpeg=y"
-    )
-if %buildffmpeg%==2 (
-    set "ffmpeg=n"
-    )
-if %buildffmpeg%==3 (
-    set "ffmpeg=s"
-    )
-if %buildffmpeg%==4 (
-    set "ffmpeg=b"
-    )
+if %buildffmpeg%==1 set "ffmpeg=y"
+if %buildffmpeg%==2 set "ffmpeg=n"
+if %buildffmpeg%==3 set "ffmpeg=s"
+if %buildffmpeg%==4 set "ffmpeg=b"
 if %buildffmpeg% GTR 4 GOTO ffmpeg
 if %writeFF%==yes echo.ffmpegB=^%buildffmpeg%>>%ini%
 
@@ -459,17 +413,11 @@ if %ffmpegUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpegUp="Build ffmpeg if lib is new: "
-    set "writeFFU=yes"
-    ) else (
-        set buildffmpegUp=%ffmpegUpdateINI%
-        )
+    ) else set buildffmpegUp=%ffmpegUpdateINI%
+if %deleteINI%==1 set "writeFFU=yes"
 
-if %buildffmpegUp%==1 (
-    set "ffmpegUpdate=y"
-    )
-if %buildffmpegUp%==2 (
-    set "ffmpegUpdate=n"
-    )
+if %buildffmpegUp%==1 set "ffmpegUpdate=y"
+if %buildffmpegUp%==2 set "ffmpegUpdate=n"
 if %buildffmpegUp% GTR 2 GOTO ffmpegUp
 if %writeFFU%==yes echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
@@ -489,10 +437,8 @@ if %ffmpegChoiceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpegChoice="Choose ffmpeg optional libs: "
-    set "writeFFC=yes"
-    ) else (
-        set buildffmpegChoice=%ffmpegChoiceINI%
-        )
+    ) else set buildffmpegChoice=%ffmpegChoiceINI%
+if %deleteINI%==1 set "writeFFC=yes"
 
 if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
@@ -507,9 +453,7 @@ if %buildffmpegChoice%==1 (
         pause
         )
     )
-if %buildffmpegChoice%==2 (
-    set "ffmpegChoice=n"
-    )
+if %buildffmpegChoice%==2 set "ffmpegChoice=n"
 if %writeFFC%==yes echo.ffmpegChoice=^%buildffmpegChoice%>>%ini%
 
 :mp4boxStatic
@@ -525,17 +469,11 @@ if %mp4boxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildMp4box="Build mp4box: "
-    set "writeMP4Box=yes"
-    ) else (
-        set buildMp4box=%mp4boxINI%
-        )
+    ) else set buildMp4box=%mp4boxINI%
+if %deleteINI%==1 set "writeMP4Box=yes"
 
-if %buildMp4box%==1 (
-    set "mp4box=y"
-    )
-if %buildMp4box%==2 (
-    set "mp4box=n"
-    )
+if %buildMp4box%==1 set "mp4box=y"
+if %buildMp4box%==2 set "mp4box=n"
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 if %writeMP4Box%==yes echo.mp4box=^%buildMp4box%>>%ini%
 
@@ -552,17 +490,11 @@ if %mplayerINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmplayer="Build mplayer: "
-    set "writeMPlayer=yes"
-    ) else (
-        set buildmplayer=%mplayerINI%
-        )
+    ) else set buildmplayer=%mplayerINI%
+if %deleteINI%==1 set "writeMPlayer=yes"
 
-if %buildmplayer%==1 (
-    set "mplayer=y"
-    )
-if %buildmplayer%==2 (
-    set "mplayer=n"
-    )
+if %buildmplayer%==1 set "mplayer=y"
+if %buildmplayer%==2 set "mplayer=n"
 if %buildmplayer% GTR 2 GOTO mplayer
 if %writeMPlayer%==yes echo.mplayer=^%buildmplayer%>>%ini%
 
@@ -579,17 +511,11 @@ if %mpvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
-    set "writeMPV=yes"
-    ) else (
-        set buildmpv=%mpvINI%
-        )
+    ) else set buildmpv=%mpvINI%
+if %deleteINI%==1 set "writeMPV=yes"
 
-if %buildmpv%==1 (
-    set "mpv=y"
-    )
-if %buildmpv%==2 (
-    set "mpv=n"
-    )
+if %buildmpv%==1 set "mpv=y"
+if %buildmpv%==2 set "mpv=n"
 if %buildmpv% GTR 2 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
 
@@ -608,13 +534,14 @@ if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P cpuCores="Core/Thread Count: "
-    set "writeCores=yes"
     ) else (
         set cpuCores=%coresINI%
         )
     for /l %%a in (1,1,%cpuCores%) do (
         set cpuCount=%%a
         )
+if %deleteINI%==1 set "writeCores=yes"
+
 if "%cpuCount%"=="" GOTO :numCores
 if %writeCores%==yes echo.cores=^%cpuCount%>>%ini%
 
@@ -633,17 +560,11 @@ if %deleteSourceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P deleteS="Delete source: "
-    set "writeDel=yes"
-    ) else (
-        set deleteS=%deleteSourceINI%
-    )
+    ) else set deleteS=%deleteSourceINI%
+if %deleteINI%==1 set "writeDel=yes"
 
-if %deleteS%==1 (
-    set "deleteSource=y"
-    )
-if %deleteS%==2 (
-    set "deleteSource=n"
-    )
+if %deleteS%==1 set "deleteSource=y"
+if %deleteS%==2 set "deleteSource=n"
 if %deleteS% GTR 2 GOTO delete
 if %writeDel%==yes echo.deleteSource=^%deleteS%>>%ini%
 
@@ -662,18 +583,11 @@ if %stripINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P stripF="Strip files: "
-    set "writeStrip=yes"
-    ) else (
-        set stripF=%stripINI%
-    )
+    ) else set stripF=%stripINI%
+if %deleteINI%==1 set "writeStrip=yes"
 
-if %stripF%==1 (
-    set "stripFile=y"
-    )
-if %stripF%==2 (
-    set "stripFile=n"
-    )
-
+if %stripF%==1 set "stripFile=y"
+if %stripF%==2 set "stripFile=n"
 if %stripF% GTR 2 GOTO stripEXE
 if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
 
@@ -693,17 +607,11 @@ if %packINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P packF="Pack files: "
-    set "writePack=yes"
-    ) else (
-        set packF=%packINI%
-    )
+    ) else set packF=%packINI%
+if %deleteINI%==1 set "writePack=yes"
 
-if %packF%==1 (
-    set "packFile=y"
-    )
-if %packF%==2 (
-    set "packFile=n"
-    )
+if %packF%==1 set "packFile=y"
+if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
@@ -721,17 +629,11 @@ if %suiteUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P updateF="Update suite: "
-    set "writeSuiteUpdate=yes"
-    ) else (
-        set updateF=%suiteUpdateINI%
-    )
+    ) else set updateF=%suiteUpdateINI%
+if %deleteINI%==1 set "writeSuiteUpdate=yes"
 
-if %updateF%==1 (
-    set "suiteUpdate=yes"
-    )
-if %updateF%==2 (
-    set "suiteUpdate=no"
-    )
+if %updateF%==1 set "suiteUpdate=yes"
+if %updateF%==2 set "suiteUpdate=no"
 if %updateF% GTR 2 GOTO suiteUpdate
 if %writeSuiteUpdate%==yes echo.suiteUpdate=^%updateF%>>%ini%
 
