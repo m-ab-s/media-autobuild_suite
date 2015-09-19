@@ -131,20 +131,11 @@ if do_checkForOptions "--enable-gnutls" ; then
     rm -f $LOCALDESTDIR/include/libgcrypt.h
     rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
     rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
-    do_pacman_install "libgcrypt"
 
-    if do_pkgConfig "nettle = 3.1"; then
-        cd $LOCALBUILDDIR
-        do_wget "https://ftp.gnu.org/gnu/nettle/nettle-3.1.tar.gz"
-        [[ -f "libnettle.a" ]] && make distclean
-        if [[ -f $LOCALDESTDIR/lib/libnettle.a ]]; then
-            rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
-            rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
-        fi
-        do_generic_conf --disable-documentation --disable-openssl
-        make -j $cpuCount install-{headers,pkgconfig,static}
-        do_checkIfExist nettle-3.1 libnettle.a
-    fi
+    rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
+    rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
+
+    do_pacman_install "libgcrypt nettle"
 
     if do_pkgConfig "gnutls = 3.4.4"; then
         cd $LOCALBUILDDIR
