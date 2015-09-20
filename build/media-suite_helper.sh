@@ -427,10 +427,10 @@ do_pacman_remove() {
     do_hide_pacman_sharedlibs "$mingwpackages" revert
     local deps=""
     for mingwpkg in $mingwpackages; do
-        pacman -Rs --noconfirm $mingwpkg >/dev/null
-        pacman -Qs $mingwpkg > /dev/null && deps+=" $mingwpkg"
+        pacman -Qs $mingwpkg >/dev/null && pacman -Rs --noconfirm $mingwpkg >/dev/null
+        pacman -Qs $mingwpkg >/dev/null && deps+=" $mingwpkg"
     done
-    pacman -D --noconfirm --asdeps $deps
+    [[ -n "$deps" ]] && pacman -D --noconfirm --asdeps $deps >/dev/null
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/${pkg}/d" /etc/pac-mingw-extra.pk
     done
