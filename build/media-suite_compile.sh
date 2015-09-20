@@ -193,8 +193,9 @@ if [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-        do_wget "http://sourceforge.net/projects/mingw/files/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz/download" \
-            mingw-libgnurx-2.5.1.tar.gz
+        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
+            "pub/sourceforge/m/mi/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/" \
+            "mingw-libgnurx-2.5.1-src.tar.gz")" mingw-libgnurx-2.5.1.tar.gz
         [[ -f "libgnurx.a" ]] && make distclean
         [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]] &&
             rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a $LOCALDESTDIR/include/regex.h
@@ -278,7 +279,8 @@ if do_checkForOptions "--enable-libtesseract"; then
             do_wget "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
             printf "%s\n" "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata/blob/master/"\
-                   "Just download <lang you want>.traineddata and copy it to this directory." > need_more_languages.txt
+                   "Just download <lang you want>.traineddata and copy it to this directory."\
+                    > need_more_languages.txt
             popd > /dev/null
         fi
         do_checkIfExist tesseract-git libtesseract.a
@@ -371,7 +373,8 @@ fi
 
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
-    do_wget "http://sourceforge.net/projects/opencore-amr/files/vo-aacenc/vo-aacenc-0.1.3.tar.gz/download" vo-aacenc-0.1.3.tar.gz
+    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
+        "sourceforge/o/op/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz")"
     [[ -f ".libs/libvo-aacenc.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-aacenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-aacenc
@@ -390,7 +393,8 @@ fi
 
 if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
-    do_wget "http://downloads.sourceforge.net/project/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
+        "sourceforge/o/op/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz")"
     [[ -f ".libs/libvo-amrwbenc.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-amrwbenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
@@ -438,7 +442,8 @@ if do_checkForOptions "--enable-libfaac"; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile faac $bits\007"
-        do_wget "http://sourceforge.net/projects/faac/files/faac-src/faac-1.28/faac-1.28.tar.gz/download" faac-1.28.tar.gz
+        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
+            "pub/sourceforge/f/fa/faac/faac-src/faac-1.28/faac-1.28.tar.bz2")"
         [[ -f configure ]] && make distclean || sh bootstrap
         do_generic_confmakeinstall audio --without-mp4v2
         do_checkIfExist faac-1.28 libfaac.a
@@ -486,7 +491,8 @@ fi
 
 if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     cd $LOCALBUILDDIR
-    do_wget "http://sourceforge.net/projects/soxr/files/soxr-0.1.1-Source.tar.xz"
+    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
+        "sourceforge/s/so/soxr/soxr-0.1.1-Source.tar.xz")"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     if [[ -f $LOCALDESTDIR/lib/libsoxr.a ]]; then
         rm -rf $LOCALDESTDIR/include/soxr.h
@@ -508,7 +514,8 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compiling lame $bits\007"
-        do_wget "http://sourceforge.net/projects/lame/files/lame/3.99/lame-3.99.5.tar.gz"
+        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
+            "sourceforge/l/la/lame/lame/3.99/lame-3.99.5.tar.gz")"
         if grep "xmmintrin\.h" configure.in; then
             do_patch lame-fixes.patch
             autoreconf -fi
@@ -547,7 +554,8 @@ fi
 
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
-    do_wget "http://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.gz/download" libbs2b-3.1.0.tar.gz
+    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
+        "pub/sourceforge/b/bs/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2")"
     [[ -f "src/.libs/libbs2b.a" ]] && make distclean
     if [[ -f "$LOCALDESTDIR/lib/libbs2b.a" ]]; then
         rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
@@ -856,7 +864,8 @@ fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
-    do_wget "http://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2/download" zvbi-0.2.35.tar.bz2
+    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
+        "pub/sourceforge/z/za/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2")"
     [[ -f "src/.libs/libzvbi.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libzvbi.a ]]; then
         rm -rf $LOCALDESTDIR/include/libzvbi.h
@@ -1312,9 +1321,9 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
             mpv_pthreads="--enable-win32-internal-pthreads"
 
-        LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-        --disable-debug-build --enable-static-build --disable-pdf-build --lua=luajit $mpv_pthreads \
-        --disable-libguess --enable-libarchive
+        LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
+        --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build \
+        --disable-pdf-build --lua=luajit $mpv_pthreads --disable-libguess --enable-libarchive
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
@@ -1397,7 +1406,8 @@ if [[ $packing = "y" ]]; then
         echo -ne "\033]0;Installing UPX\007"
         cd $LOCALBUILDDIR
         rm -rf upx391w
-        do_wget "http://upx.sourceforge.net/download/upx391w.zip"
+        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
+            "sourceforge/u/up/upx/upx/3.91/upx391w.zip")"
     fi
     echo -ne "\033]0;Packing $bits binaries\007"
     echo
@@ -1426,7 +1436,8 @@ if [[ $deleteSource = "y" ]]; then
     echo
     echo "deleting source folders..."
     echo
-    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" | xargs rm -rf
+    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d \
+        ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" | xargs rm -rf
 fi
 
 echo -ne "\033]0;compiling done...\007"
