@@ -13,7 +13,7 @@ FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-l
 --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract \
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
---enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme \
+--enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
@@ -283,6 +283,17 @@ if do_checkForOptions "--enable-libtesseract"; then
             popd > /dev/null
         fi
         do_checkIfExist tesseract-git libtesseract.a
+    fi
+fi
+
+if do_checkForOptions "--enable-librubberband"; then
+    cd $LOCALBUILDDIR
+    do_vcs "https://github.com/lachs0r/rubberband.git" rubberband
+    if [[ $compile = "true" ]]; then
+        [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
+        [[ -f "lib/librubberband.a" ]] && make clean
+        make PREFIX=$LOCALDESTDIR install-static
+        do_checkIfExist rubberband-git librubberband.a
     fi
 fi
 
@@ -1290,15 +1301,6 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
         do_checkIfExist luajit-git libluajit-5.1.a
-    fi
-
-    cd $LOCALBUILDDIR
-    do_vcs "https://github.com/lachs0r/rubberband.git" rubberband
-    if [[ $compile = "true" ]]; then
-        [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
-        [[ -f "lib/librubberband.a" ]] && make clean
-        make PREFIX=$LOCALDESTDIR install-static
-        do_checkIfExist rubberband-git librubberband.a
     fi
 
     rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
