@@ -42,6 +42,7 @@ if [[ "$update" = "yes" ]]; then
             git reset --hard origin/master
         fi
         oldHead=$(git rev-parse HEAD)
+        git fetch -qt origin
         git checkout -qfB master "origin/HEAD"
         newHead=$(git rev-parse HEAD)
         if git apply build/user-changes-${diffname}.diff; then
