@@ -68,7 +68,7 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
-mp4box mplayer mpv cores deleteSource strip pack
+mp4box mplayer mpv cores deleteSource strip pack suiteUpdate
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -597,7 +597,6 @@ if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
 :suiteUpdate
-set suiteUpdateINI=2
 set "writeSuiteUpdate=no"
 if %suiteUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
