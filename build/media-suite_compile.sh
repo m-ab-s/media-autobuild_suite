@@ -331,14 +331,14 @@ if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" 
     do_pacman_install "libogg"
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora" || [[ $sox = "y" ]]; then
+if do_checkForOptions "--enable-libvorbis --enable-libtheora"; then
     rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
     rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
     rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
     do_pacman_install "libvorbis"
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $sox = "y" ]]; then
+if do_checkForOptions "--enable-libopus"; then
     rm -rf $LOCALDESTDIR/include/opus
     rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
     do_pacman_install "opus"
@@ -357,9 +357,8 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
-if do_checkForOptions "--enable-libopus" || [[ $flac = "y" ]] ||
-    [[ $sox = "y" ]] &&
-    [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; then
+if [[ $flac = "y" ]] &&
+    { [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; } then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && make distclean
