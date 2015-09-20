@@ -68,7 +68,7 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
-mp4box mplayer mpv cores deleteSource strip pack suiteUpdate
+mp4box mplayer mpv cores deleteSource strip pack
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -596,27 +596,6 @@ if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
-:suiteUpdate
-set "writeSuiteUpdate=no"
-if %suiteUpdateINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Update suite automatically using git?
-    echo. 1 = Yes [recommended]
-    echo. 2 = No
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P updateF="Update suite: "
-    ) else set updateF=%suiteUpdateINI%
-if %deleteINI%==1 set "writeSuiteUpdate=yes"
-
-if %updateF%==1 set "suiteUpdate=yes"
-if %updateF%==2 set "suiteUpdate=no"
-if %updateF% GTR 2 GOTO suiteUpdate
-if %writeSuiteUpdate%==yes echo.suiteUpdate=^%updateF%>>%ini%
-
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -950,12 +929,8 @@ for %%s in (%scripts%) do (
     )
 
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
---build32=%build32% --build64=%build64% --remove=%deleteSource% --update=%suiteUpdate%
-if exist %build%\suite_updated (
-    del %build%\suite_updated
-    start %instdir%\media-autobuild_suite.bat
-    exit
-    )
+--build32=%build32% --build64=%build64% --remove=%deleteSource%
+
 cls
 
 :rebase2
