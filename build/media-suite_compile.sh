@@ -472,8 +472,9 @@ if do_checkForOptions "--enable-libvorbis"; then
         [[ -f "oggenc/oggenc.exe" ]] && make distclean
         [[ -f "$LOCALDESTDIR/bin-audio/oggenc.exe" ]] &&
             rm -f $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
-        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut \
-            --disable-ogginfo --disable-flac --disable-speex
+        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
+            $(do_checkForOptions "--enable-libspeex" || echo "--disable-speex") \
+            $([[ $flac = "y" ]] || echo "--disable-flac")
         make -j $cpuCount
         [[ -f oggenc/oggenc.exe ]] && cp -f oggenc/oggenc.exe oggdec/oggdec.exe $LOCALDESTDIR/bin-audio/
         do_checkIfExist vorbis-tools-1.4.0 bin-audio/oggenc.exe
@@ -493,7 +494,8 @@ if do_checkForOptions "--enable-libopus"; then
         [[ -f "opusenc.exe" ]] && make distclean
         [[ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]] &&
             rm -rf $LOCALDESTDIR/bin-audio/opus{dec,enc,info}.exe
-        do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
+            $([[ $flac = "y" ]] || echo "--without-flac")
         do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
     fi
 fi
