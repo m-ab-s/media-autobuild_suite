@@ -425,7 +425,12 @@ do_pacman_remove() {
     [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
     local mingwpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
     do_hide_pacman_sharedlibs "$mingwpackages" revert
-    pacman -Rs --noconfirm $mingwpackages 2>/dev/null
+    local deps=""
+    for mingwpkg in $mingwpackages; do
+        pacman -Rs --noconfirm $mingwpkg >/dev/null
+        pacman -Qs $mingwpkg > /dev/null && deps+=" $mingwpkg"
+    done
+    pacman -D --noconfirm --asdeps $deps
     for pkg in $packages; do
         grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/${pkg}/d" /etc/pac-mingw-extra.pk
     done

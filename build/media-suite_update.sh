@@ -116,8 +116,10 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             read -p "remove packs [y/n]? " yn
             case $yn in
                 [Yy]* )
-                    pacman -R --noconfirm $uninstall
-                    do_pacman_remove "$uninstall"
+                    for pkg in $uninstall; do
+                        pacman -Rs --noconfirm $pkg
+                        pacman -Qs $pkg > /dev/null && pacman -D --noconfirm --asdeps $pkg
+                    done
                     break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
                 * ) echo "Please answer yes or no";;
