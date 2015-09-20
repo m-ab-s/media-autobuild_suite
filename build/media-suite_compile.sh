@@ -170,18 +170,17 @@ if do_checkForOptions "--enable-librtmp"; then
         extracommands=""
         if do_checkForOptions "--enable-gnutls"; then
             crypto=GNUTLS
-            cryptolibs="$(pkg-config --static --libs gnutls)"
         else
             crypto=OPENSSL
-            cryptolibs="$(pkg-config --static --libs openssl)"
             extracommands+="XLIBS=-lz"
         fi
         make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
             sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
-            CRYPTO=$crypto LIB_${crypto}="${cryptolibs}" $extracommands install
+            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs ${crypto,,})" \
+            $extracommands install
         do_checkIfExist librtmp-git librtmp.a
-        unset crypto cryptolibs extracommands
+        unset crypto extracommands
     fi
 fi
 
