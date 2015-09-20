@@ -489,10 +489,10 @@ if do_checkForOptions "--enable-libopus"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
+if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.2"; then
     cd $LOCALBUILDDIR
     do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-        "sourceforge/s/so/soxr/soxr-0.1.1-Source.tar.xz")"
+        "sourceforge/s/so/soxr/soxr-0.1.2-Source.tar.xz")"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     if [[ -f $LOCALDESTDIR/lib/libsoxr.a ]]; then
         rm -rf $LOCALDESTDIR/include/soxr.h
@@ -502,7 +502,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.1"; then
     do_cmake -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
     sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
     ninja -j $cpuCount install
-    do_checkIfExist soxr-0.1.1-Source libsoxr.a
+    do_checkIfExist soxr-0.1.2-Source libsoxr.a
 fi
 
 if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
