@@ -34,6 +34,8 @@ Known Issues
 Included Tools And Libraries
 --------
 
+### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/FFmpeg-external-libraries)
+
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
 	- decklink 10.5
 	- fontconfig
@@ -50,10 +52,8 @@ Included Tools And Libraries
 	- libcdio-paranoia
 	- libdcadec
 	- libfaac (1.28)
-		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
-		- Not compiled by default, add `--enable-libfaac` to ffmpeg_options.txt
+		- Not compiled by default
 	- libfdk-aac (git)
-		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
 	- libgsm
 	- libilbc (git)
 	- libkvazaar (git)
@@ -62,9 +62,10 @@ Included Tools And Libraries
 	- libmp3lame (3.99.5)
 	- libopencore-amrwb/nb
 	- libopenjpeg 2.1 (git)
-		- Not compiled by default, add `--enable-libopenjpeg` to ffmpeg_options.txt
+		- Not compiled by default
 	- libopus (1.1)
 	- librtmp (git)
+	- librubberband (git)
 	- libschroedinger
 	- libsoxr (0.1.1)
 	- libspeex (1.2rc2)
@@ -73,9 +74,9 @@ Included Tools And Libraries
 	- libtwolame (git)
 	- libutvideo (git/15.1.0)
 		- If using `--enable-openssl`, this lib is disabled
-		- Not compiled by default, add `--enable-libutvideo` to ffmpeg_options.txt
+		- Not compiled by default
 	- libvo-aacenc (0.1.3)
-		- Not compiled by default, add `--enable-libvo-aacenc` to ffmpeg_options.txt
+		- Not compiled by default
 	- libvo-amrwbenc (0.1.2)
 	- libvorbis
 	- libvpx (git)
@@ -86,7 +87,6 @@ Included Tools And Libraries
 	- libxvid
 	- libzvbi (0.2.35)
 	- nvenc (5.0.1)
-		- Needs `--enable-nonfree`, rendering ffmpeg unredistributable
 	- sdl (1.2.15)
 	- vidstab (git)
 	
@@ -96,16 +96,13 @@ Included Tools And Libraries
 	- fdk-aac (git)
 	- file (5.22)
 	- flac (1.3.1)
-	- jpeg-turbo tools (git)
 	- kvazaar (git)
 	- lame (3.99.5)
-	- libsndfile (git)
 	- mediainfo cli (git)
 	- mp4box (git)
 	- mplayer (svn)
 	- mpv (git) including in addition to ffmpeg libs:
 		- libjpeg-turbo (git)
-		- librubberband (git)
 		- uchardet
 		- libwaio (git)
 		- luajit (git)
@@ -119,7 +116,6 @@ Included Tools And Libraries
 	- webp tools (git)
 	- x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
 	- x265 (8, 10 and 12 bit) (git)
-	- xavs (git snapshot)
 
 
 --------
