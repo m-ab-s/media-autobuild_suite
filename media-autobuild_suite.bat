@@ -621,8 +621,8 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     echo.
     echo -------------------------------------------------------------------------------
     if %msys2%==msys32 (
-	set "msysprefix=i686"
-	) else set "msysprefix=x86_64"
+    set "msysprefix=i686"
+    ) else set "msysprefix=x86_64"
     set "msysbase=https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/m/ms/msys2/Base/%msysprefix%"
     for /F %%b in (
         '%build%\wget --no-check-certificate -qO- "%msysbase%/?C=M;O=D" ^| ^
