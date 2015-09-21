@@ -978,35 +978,37 @@ if %build64%==yes (
     )
 
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
-set removefstab=no
+set "removefstab=no"
 
 for /f "tokens=2 delims=/" %%b in ('findstr /i build32 %instdir%\%msys2%\etc\fstab.') do set searchRes=oldbuild
-if "%searchRes%"=="oldbuild" set removefstab=yes
+if "%searchRes%"=="oldbuild" set "removefstab=yes"
+
+for /f "tokens=2 delims=/" %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if not "%searchRes%"=="trunk" set "removefstab=yes"
 
 for /f "tokens=2 delims=/" %%a in ('findstr /i local32 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="local32" (
-    set removefstab=yes
+if "%searchRes%"=="local32" (
+    if "%build32%"=="no" set "removefstab=yes"
     ) else (
-    if not %build32%==yes set removefstab=yes
+    if "%build32%"=="yes" set "removefstab=yes"
     )
 
 for /f "tokens=2 delims=/" %%a in ('findstr /i local64 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="local64" (
-    set removefstab=yes
+if "%searchRes%"=="local64" (
+    if "%build64%"=="no" set "removefstab=yes"
     ) else (
-    if not %build64%==yes set removefstab=yes
+    if "%build64%"=="yes" set "removefstab=yes"
     )
 
-for /f "tokens=2 delims=/" %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="trunk" set removefstab=yes
-
-if %removefstab%==yes (
+if "%removefstab%"=="yes" (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab
     )
 
 if "%searchRes%"=="local32" GOTO writeProfile32
-if "%searchRes%"=="local64" GOTO writeProfile32
+if "%searchRes%"=="local64" (
+    GOTO writeProfile32
+    ) else del %instdir%\%msys2%\etc\fstab.
 
     :writeFstab
     echo -------------------------------------------------------------------------------
