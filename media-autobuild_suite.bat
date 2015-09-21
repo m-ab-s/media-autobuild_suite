@@ -193,9 +193,7 @@ if %vpxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvpx="Build vpx: "
-    ) else (
-        set buildvpx=%vpxINI%
-        )
+    ) else set buildvpx=%vpxINI%
 if %deleteINI%==1 set "writevpx=yes"
 
 if %buildvpx%==1 set "vpx=y"
@@ -515,9 +513,7 @@ if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P cpuCores="Core/Thread Count: "
-    ) else (
-        set cpuCores=%coresINI%
-        )
+    ) else set cpuCores=%coresINI%
     for /l %%a in (1,1,%cpuCores%) do (
         set cpuCount=%%a
         )
