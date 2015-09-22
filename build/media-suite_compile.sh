@@ -192,9 +192,8 @@ if [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile libgnurx $bits\007"
-        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
-            "pub/sourceforge/m/mi/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/" \
-            "mingw-libgnurx-2.5.1-src.tar.gz")" mingw-libgnurx-2.5.1.tar.gz
+        do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
+            mingw-libgnurx-2.5.1.tar.gz
         [[ -f "libgnurx.a" ]] && make distclean
         [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]] &&
             rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a $LOCALDESTDIR/include/regex.h
@@ -382,8 +381,7 @@ fi
 
 if do_checkForOptions "--enable-libvo-aacenc" && do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
-    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-        "sourceforge/o/op/opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz")"
+    do_wget_sf "opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
     [[ -f ".libs/libvo-aacenc.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-aacenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-aacenc
@@ -402,8 +400,7 @@ fi
 
 if do_checkForOptions "--enable-libvo-amrwbenc" && do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
-    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-        "sourceforge/o/op/opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz")"
+    do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
     [[ -f ".libs/libvo-amrwbenc.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-amrwbenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
@@ -451,8 +448,7 @@ if do_checkForOptions "--enable-libfaac"; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile faac $bits\007"
-        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
-            "pub/sourceforge/f/fa/faac/faac-src/faac-1.28/faac-1.28.tar.bz2")"
+        do_wget_sf "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
         [[ -f configure ]] && make distclean || sh bootstrap
         do_generic_confmakeinstall audio --without-mp4v2
         do_checkIfExist faac-1.28 libfaac.a
@@ -502,8 +498,7 @@ fi
 
 if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.2"; then
     cd $LOCALBUILDDIR
-    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-        "sourceforge/s/so/soxr/soxr-0.1.2-Source.tar.xz")"
+    do_wget_sf "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     if [[ -f $LOCALDESTDIR/lib/libsoxr.a ]]; then
         rm -rf $LOCALDESTDIR/include/soxr.h
@@ -525,8 +520,7 @@ if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compiling lame $bits\007"
-        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-            "sourceforge/l/la/lame/lame/3.99/lame-3.99.5.tar.gz")"
+        do_wget_sf "lame/lame/3.99/lame-3.99.5.tar.gz"
         if grep "xmmintrin\.h" configure.in; then
             do_patch lame-fixes.patch
             autoreconf -fi
@@ -565,8 +559,7 @@ fi
 
 if do_checkForOptions "--enable-libbs2b" && do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
-    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
-        "pub/sourceforge/b/bs/bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2")"
+    do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     [[ -f "src/.libs/libbs2b.a" ]] && make distclean
     if [[ -f "$LOCALDESTDIR/lib/libbs2b.a" ]]; then
         rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
@@ -875,8 +868,7 @@ fi
 
 if do_checkForOptions "--enable-libzvbi" && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
-    do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/" \
-        "pub/sourceforge/z/za/zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2")"
+    do_wget_sf "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     [[ -f "src/.libs/libzvbi.a" ]] && make distclean
     if [[ -f $LOCALDESTDIR/lib/libzvbi.a ]]; then
         rm -rf $LOCALDESTDIR/include/libzvbi.h
@@ -1409,8 +1401,7 @@ if [[ $packing = "y" ]]; then
         echo -ne "\033]0;Installing UPX\007"
         cd $LOCALBUILDDIR
         rm -rf upx391w
-        do_wget "$(printf "%s" "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/" \
-            "sourceforge/u/up/upx/upx/3.91/upx391w.zip")"
+        do_wget_sf "upx/upx/3.91/upx391w.zip"
     fi
     echo -ne "\033]0;Packing $bits binaries\007"
     echo

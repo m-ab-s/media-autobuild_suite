@@ -157,6 +157,13 @@ do_wget() {
     fi
 }
 
+do_wget_sf() {
+    local url="$1"
+    shift 1
+    local dir="${url:0:1}/${url:0:2}"
+    do_wget "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/${dir}/${url}" $@
+}
+
 # check if compiled file exist
 do_checkIfExist() {
     local packetName="$1"
