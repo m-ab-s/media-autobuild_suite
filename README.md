@@ -1,6 +1,8 @@
 media-autobuild_suite
 =========
 
+[![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
 https://github.com/rdp/ffmpeg-windows-build-helpers
 
