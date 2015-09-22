@@ -1164,6 +1164,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
+        do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
