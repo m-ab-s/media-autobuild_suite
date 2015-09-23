@@ -691,7 +691,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
-        [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
+        [[ -f configure ]] && make distclean || autoreconf -fiv
         if [[ -f $LOCALDESTDIR/lib/libdvdread.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
@@ -703,7 +703,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
-        [[ ! -f "configure" ]] && autoreconf -fiv || make distclean
+        [[ -f configure ]] && make distclean || autoreconf -fiv
         if [[ -f $LOCALDESTDIR/lib/libdvdnav.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
@@ -717,12 +717,10 @@ if do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
-        if [[ ! -f "configure" ]]; then
-            autoreconf -fiv
-        else
+        [[ -f configure ]] && make distclean || autoreconf -fiv
+        if [[ -f $LOCALDESTDIR/lib/libbluray.a ]]; then
             rm -rf $LOCALDESTDIR/include/bluray
             rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
-            make distclean
         fi
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
         --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype
@@ -734,7 +732,7 @@ if do_checkForOptions "--enable-libutvideo"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0" libutvideo
     if [[ $compile = "true" ]]; then
-        if [ -f utv_core/libutvideo.a ]; then
+        if [[ -f utv_core/libutvideo.a ]]; then
             rm -rf $LOCALDESTDIR/include/utvideo
             rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
             make distclean
@@ -750,12 +748,10 @@ if do_checkForOptions "--enable-libass"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
-        if [[ ! -f "configure" ]]; then
-            autoreconf -fiv
-        else
+        [[ -f configure ]] && make distclean || autoreconf -fiv
+        if [[ -f $LOCALDESTDIR/lib/libass.a ]]; then
             rm -rf $LOCALDESTDIR/include/ass
             rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
-            make distclean
         fi
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
@@ -767,7 +763,7 @@ fi
 
 if do_checkForOptions "--enable-libxavs"; then
     cd $LOCALBUILDDIR
-    if [ -f "$LOCALDESTDIR/lib/libxavs.a" ]; then
+    if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
         echo -------------------------------------------------
         echo "xavs is already compiled"
         echo -------------------------------------------------
