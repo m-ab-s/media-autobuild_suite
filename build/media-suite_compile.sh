@@ -754,7 +754,7 @@ if do_checkForOptions "--enable-libass"; then
             autoreconf -fiv
         else
             rm -rf $LOCALDESTDIR/include/ass
-            rm -f $LOCALDESTDIR/lib/libass.a $LOCALDESTDIR/lib/pkgconfig/libass.pc
+            rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
             make distclean
         fi
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
@@ -1138,6 +1138,8 @@ fi
 
 do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
 do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
+do_checkForOptions "--enable-libwavpack" && do_pacman_install "wavpack"
+do_checkForOptions "--enable-libsnappy" && do_pacman_install "snappy"
 if do_checkForOptions "--enable-libxvid"; then
     do_pacman_install "xvidcore"
     [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
