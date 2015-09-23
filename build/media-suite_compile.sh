@@ -646,7 +646,7 @@ if [[ ! $vpx = "n" ]]; then
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix=$LOCALDESTDIR \
-            #--enable-vp10
+            --enable-vp10
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
         [[ $vpx = "y"  && -f $LOCALDESTDIR/bin/vpxenc.exe ]] &&
