@@ -434,8 +434,8 @@ do_pacman_remove() {
     do_hide_pacman_sharedlibs "$mingwpackages" revert
     local deps=""
     for mingwpkg in $mingwpackages; do
-        pacman -Qs $mingwpkg >/dev/null && pacman -Rs --noconfirm $mingwpkg >/dev/null
-        pacman -Qs $mingwpkg >/dev/null && deps+=" $mingwpkg"
+        pacman -Qs "^${mingwpkg}$" >/dev/null && pacman -Rs --noconfirm $mingwpkg >/dev/null
+        pacman -Qs "^${mingwpkg}$" >/dev/null && deps+=" $mingwpkg"
     done
     [[ -n "$deps" ]] && pacman -D --noconfirm --asdeps $deps >/dev/null
     for pkg in $packages; do
