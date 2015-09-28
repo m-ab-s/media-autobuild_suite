@@ -334,7 +334,7 @@ if do_checkForOptions "--enable-libilbc"; then
 fi
 
 if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" ||
-    [[ $flac = "y" ]]; then
+    [[ $flac = "y" || $sox = "y" ]]; then
     rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
     rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     do_pacman_install "libogg"
