@@ -50,12 +50,12 @@ if not exist %build% mkdir %build%
 set msyspackages=asciidoc autoconf autoconf2.13 automake-wrapper automake1.10 automake1.11 automake1.12 automake1.13 ^
 automake1.14 automake1.6 automake1.7 automake1.8 automake1.9 autogen bison diffstat diffutils dos2unix help2man ^
 intltool libtool patch python scons xmlto make tar zip unzip git subversion wget p7zip mercurial ruby man-db ^
-pkg-config gperf winpty-git
+gperf winpty-git
 
 set mingwpackages=boost cmake crt-git dlfcn doxygen gcc gcc-ada gcc-fortran gcc-libgfortran gcc-libs gcc-objc ^
 gettext glew gmp headers-git jasper lcms2 libgpg-error libiconv libjpeg-turbo ^
 libpng libtiff mpc nasm pcre sqlite3 tools-git winpthreads-git yasm ninja ^
-libarchive rtmpdump-git
+libarchive rtmpdump-git pkg-config
 
 set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
