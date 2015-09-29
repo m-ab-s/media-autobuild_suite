@@ -333,14 +333,14 @@ if do_checkForOptions "--enable-libilbc"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex" ||
-    [[ $flac = "y" || $sox = "y" ]]; then
+if [[ $flac = "y" || $sox = "y" ]] ||
+    do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex"; then
     rm -rf $LOCALDESTDIR/include/ogg $LOCALDESTDIR/share/aclocal/ogg.m4
     rm -rf $LOCALDESTDIR/lib/libogg.{l,}a $LOCALDESTDIR/lib/pkgconfig/ogg.pc
     do_pacman_install "libogg"
 fi
 
-if do_checkForOptions "--enable-libvorbis --enable-libtheora"; then
+if [[ $sox = "y" ]] || do_checkForOptions "--enable-libvorbis --enable-libtheora"; then
     rm -rf $LOCALDESTDIR/include/vorbis $LOCALDESTDIR/share/aclocal/vorbis.m4
     rm -f $LOCALDESTDIR/lib/libvorbis{,enc,file}.{l,}a
     rm -f $LOCALDESTDIR/lib/pkgconfig/vorbis{,enc,file}.pc
@@ -353,7 +353,7 @@ if do_checkForOptions "--enable-libopus"; then
     do_pacman_install "opus"
 fi
 
-if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
+if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } && do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     [[ -f "libspeex/.libs/libspeex.a" ]] && make distclean
@@ -366,7 +366,7 @@ if do_checkForOptions "--enable-libspeex" && do_pkgConfig "speex = 1.2rc2"; then
     do_checkIfExist speex-1.2rc2 libspeex.a
 fi
 
-if [[ $flac = "y" ]] &&
+if [[ $flac = "y" || $sox = "y" ]] &&
     { [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; } then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
@@ -511,7 +511,7 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.2"; then
     do_checkIfExist soxr-0.1.2-Source libsoxr.a
 fi
 
-if do_checkForOptions "--enable-libmp3lame" || [[ $sox = "y" ]]; then
+if do_checkForOptions "--enable-libmp3lame"; then
     if [[ -f $LOCALDESTDIR/bin-audio/lame.exe ]] &&
         $LOCALDESTDIR/bin-audio/lame.exe 2>&1 | grep -q "version 3.99.5"; then
         echo -------------------------------------------------
