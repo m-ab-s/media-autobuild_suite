@@ -70,7 +70,7 @@ pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
-    echo "check pacman packages..."
+    echo "checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
     old=$(pacman -Qqe | sort)
@@ -135,42 +135,31 @@ fi
 # --------------------------------------------------
 
 echo "-------------------------------------------------------------------------------"
-echo "check profiles..."
+echo "checking profiles..."
 echo "-------------------------------------------------------------------------------"
 echo
 
 [[ -d "/trunk" ]] && cd "/trunk" || cd "$(cygpath -w /).."
 
-if [[ $build32 = "yes" ]]; then
-    if [ -f "/local32/etc/profile.local" ]; then
-        newProfiles32=$(sed -n "/echo.# \/local32\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" media-autobuild_suite.bat | sed "s/echo.//g")
-        oldProfiles32=$(sed -n "/# \/local32\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" /local32/etc/profile.local)
-
-        if ! diff -q <(echo $newProfiles32) <(echo $oldProfiles32) &> /dev/null; then
-            echo
-            echo "-------------------------------------------------------------------------------"
-            echo "delete old 32 bit profile..."
-            echo "-------------------------------------------------------------------------------"
-            echo
-            rm -f /local32/etc/profile.local
+check_profiles() {
+    local profilebits="$1"
+    local newProfile=""
+    if [[ -f "/${profilebits}/etc/profile.local" ]]; then
+        newProfile=$(sed -n "/# .${profilebits}.etc.profile.local$/,/${profilebits}.etc.profile.local$/p" \
+            media-autobuild_suite.bat | head -n -1 | sed "s/\s*echo.//g")
+        if ! diff <(echo "$newProfile") <(tail -n +2 "/${profilebits}/etc/profile.local") &> /dev/null; then
+            echo "Updating profiles..."
+            printf "#\n%s" "$newProfile" > "/${profilebits}/etc/profile.local"
         fi
     fi
+}
+
+if [[ $build32 = "yes" ]]; then
+    check_profiles "local32"
 fi
 
 if [[ $build64 = "yes" ]]; then
-        if [ -f "/local64/etc/profile.local" ]; then
-        newProfiles64=$(sed -n "/echo.# \/local64\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" media-autobuild_suite.bat | sed "s/echo.//g")
-        oldProfiles64=$(sed -n "/# \/local64\/etc\/profile.local/,/export PATH PS1 HOME GIT_GUI_LIB_DIR/p" /local64/etc/profile.local)
-
-        if ! diff -q <(echo $newProfiles64) <(echo $oldProfiles64) &> /dev/null; then
-            echo
-            echo "-------------------------------------------------------------------------------"
-            echo "delete old 64 bit profile..."
-            echo "-------------------------------------------------------------------------------"
-            echo
-            rm -f /local64/etc/profile.local
-        fi
-    fi
+    check_profiles "local64"
 fi
 
 # --------------------------------------------------
