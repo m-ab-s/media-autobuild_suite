@@ -347,10 +347,13 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libvorbis --enable-libtheora
     do_pacman_install "libvorbis"
 fi
 
-if do_checkForOptions "--enable-libopus"; then
+if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
     rm -rf $LOCALDESTDIR/include/opus
     rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
-    do_pacman_install "opus"
+
+    rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
+    rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
+    do_pacman_install "opus opusfile"
 fi
 
 if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } && do_pkgConfig "speex = 1.2rc2"; then
@@ -584,12 +587,6 @@ if [[ $sox = "y" ]]; then
         sed -i 's/ examples regtest tests programs//g' Makefile
         do_makeinstall
         do_checkIfExist sndfile-git libsndfile.a
-    fi
-
-    if do_checkForOptions "--enable-libopus"; then
-        do_pacman_install "opusfile"
-        rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
-        rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
     fi
 
     cd $LOCALBUILDDIR
