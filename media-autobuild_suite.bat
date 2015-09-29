@@ -1088,11 +1088,12 @@ if %build32%==yes (
             echo.PYTHONHOME=/usr
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
             echo.
+            echo.LANG=en_US.UTF-8
             echo.PATH=".:${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
+            echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
             )>>%instdir%\local32\etc\profile.local
         )
 
@@ -1147,11 +1148,12 @@ if %build64%==yes (
             echo.PYTHONHOME=/usr
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
             echo.
+            echo.LANG=en_US.UTF-8
             echo.PATH=".:${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export PATH PS1 HOME GIT_GUI_LIB_DIR
+            echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
             )>>%instdir%\local64\etc\profile.local
         )
 
