@@ -413,34 +413,48 @@ do_hide_all_sharedlibs() {
 
 do_pacman_install() {
     local packages="$1"
-    echo "Installing dependencies as needed:"
-    local sed=""
-    [[ $build32 = "yes" ]] && sed+="mingw-w64-i686-&"
-    [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
-    local mingwpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
-    pacman -S --noconfirm --needed $mingwpackages 2>/dev/null
-    do_hide_all_sharedlibs
-    pacman -D --asexplicit $mingwpackages >/dev/null
+    local mingw=""
+    [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
+    [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
+    local install=()
+    local installed="$(pacman -Qqe | grep "^${mingw}-")"
     for pkg in $packages; do
-        grep -q "$pkg" /etc/pac-mingw-extra.pk || echo "$pkg" >> /etc/pac-mingw-extra.pk
+        if [[ "$pkg" = "${mingw}-"* ]]; then
+            grep -q "^${pkg}$" <(echo "$installed") || install+=("$pkg")
+        else
+            grep -q "^${mingw}-${pkg}$" <(echo "$installed") || install+=("${mingw}-${pkg}")
+        fi
+        grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
+    if [[ -n "$install" ]]; then
+        pacman -S --noconfirm --needed ${install[*]} >/dev/null
+        pacman -D --asexplicit ${install[*]} >/dev/null
+    fi
+    do_hide_all_sharedlibs
 }
 
 do_pacman_remove() {
     local packages="$1"
-    [[ $build32 = "yes" ]] && sed+="mingw-w64-i686-&"
-    [[ $build64 = "yes" ]] && sed+=" mingw-w64-x86_64-&"
-    local mingwpackages="$(echo $packages | sed -r "s/\S+/$sed/g")"
-    do_hide_pacman_sharedlibs "$mingwpackages" revert
-    local deps=""
-    for mingwpkg in $mingwpackages; do
-        pacman -Qs "^${mingwpkg}$" >/dev/null && pacman -Rs --noconfirm $mingwpkg >/dev/null
-        pacman -Qs "^${mingwpkg}$" >/dev/null && deps+=" $mingwpkg"
-    done
-    [[ -n "$deps" ]] && pacman -D --noconfirm --asdeps $deps >/dev/null
+    local mingw=""
+    [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
+    [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
+    local uninstall=""
+    local installed="$(pacman -Qqe | grep "^${mingw}-")"
     for pkg in $packages; do
-        grep -q "$pkg" /etc/pac-mingw-extra.pk && sed -i "/${pkg}/d" /etc/pac-mingw-extra.pk
+        if [[ "$pkg" = "${mingw}-"* ]]; then
+            grep -q "^${pkg}$" <(echo "$installed") && uninstall="$pkg"
+        else
+            grep -q "^${mingw}-${pkg}$" <(echo "$installed") && uninstall="${mingw}-${pkg}"
+        fi
+        sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
+        if [[ -n "$uninstall" ]]; then
+            do_hide_pacman_sharedlibs "$uninstall" revert
+            if ! pacman -Rs --noconfirm "$uninstall" 2&>/dev/null; then
+                pacman -D --asdeps "$uninstall" >/dev/null
+            fi
+        fi
     done
+    do_hide_all_sharedlibs
 }
 
 do_prompt() {
