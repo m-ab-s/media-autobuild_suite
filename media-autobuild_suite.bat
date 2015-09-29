@@ -1077,12 +1077,13 @@ if %build32%==yes (
             echo.
             echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
             echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
             echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
             echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.PYTHONHOME=/usr
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
@@ -1135,12 +1136,13 @@ if %build64%==yes (
             echo.
             echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
             echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
             echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
             echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.PYTHONHOME=/usr
             echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"

@@ -204,7 +204,7 @@ if [[ $sox = "y" ]]; then
     fi
 
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
-        $LOCALDESTDIR/bin-global/file.exe --version | grep -q -e "file.exe-5.24"; then
+        [[ $(file.exe --version) = *"file.exe-5.24"* ]]; then
         echo -------------------------------------------------
         echo "file-5.24[libmagic] is already compiled"
         echo -------------------------------------------------
@@ -441,7 +441,7 @@ fi
 
 if do_checkForOptions "--enable-libfaac"; then
     if [[ -f $LOCALDESTDIR/bin-audio/faac.exe ]] &&
-        $LOCALDESTDIR/bin-audio/faac.exe | grep -q -e "FAAC 1.28"; then
+        [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
         echo -------------------------------------------------
         echo "faac-1.28 is already compiled"
         echo -------------------------------------------------
@@ -457,7 +457,7 @@ fi
 
 if do_checkForOptions "--enable-libvorbis"; then
     if [[ -f $LOCALDESTDIR/bin-audio/oggenc.exe ]] &&
-        oggenc.exe --version | grep -q "vorbis-tools 1.4.0"; then
+        [[ $(oggenc.exe --version) = *"vorbis-tools 1.4.0"* ]]; then
         echo -------------------------------------------------
         echo "vorbis-tools-1.4.0 is already compiled"
         echo -------------------------------------------------
@@ -479,7 +479,7 @@ fi
 
 if do_checkForOptions "--enable-libopus"; then
     if [[ -f $LOCALDESTDIR/bin-audio/opusenc.exe ]] &&
-        opusenc.exe --version | grep -q -e "opus-tools 0.1.9"; then
+        [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
         echo -------------------------------------------------
         echo "opus-tools-0.1.9 is already compiled"
         echo -------------------------------------------------
@@ -513,7 +513,7 @@ fi
 
 if do_checkForOptions "--enable-libmp3lame"; then
     if [[ -f $LOCALDESTDIR/bin-audio/lame.exe ]] &&
-        $LOCALDESTDIR/bin-audio/lame.exe 2>&1 | grep -q "version 3.99.5"; then
+        [[ $(lame.exe 2>&1) = *"3.99.5"* ]]; then
         echo -------------------------------------------------
         echo "lame 3.99.5 is already compiled"
         echo -------------------------------------------------
