@@ -1366,7 +1366,13 @@ run_builds() {
     fi
 }
 
-run_builds
+cd $LOCALBUILDDIR
+if [[ "$(pwd)" = "$LOCALBUILDDIR" ]]; then
+    run_builds
+else
+    read -p "Something serious has failed. Let us know before running this script again."
+    exit 1
+fi
 
 while [[ $new_updates = "yes" ]]; do
     ret="no"
