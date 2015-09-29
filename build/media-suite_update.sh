@@ -118,8 +118,8 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             case $yn in
                 [Yy]* )
                     for pkg in $uninstall; do
-                        pacman -Rs --noconfirm $pkg
-                        pacman -Qs "^${pkg}$" > /dev/null && pacman -D --noconfirm --asdeps $pkg
+                        pacman -Rs --noconfirm $pkg 2>/dev/null
+                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --asdeps $pkg >/dev/null
                     done
                     break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
