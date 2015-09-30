@@ -1253,7 +1253,8 @@ if [[ $mplayer = "y" ]]; then
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
         --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
         --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
-        --enable-dvdread --enable-freetype --enable-ass-internal --disable-gif --disable-cddb $faac
+        --disable-gif --disable-cddb $faac --with-dvdread-config="$PKG_CONFIG dvdread" \
+        --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav"\
 
         do_makeinstall
         do_checkIfExist mplayer-svn bin-video/mplayer.exe
