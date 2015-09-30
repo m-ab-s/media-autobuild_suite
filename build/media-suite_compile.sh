@@ -71,8 +71,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
         fi
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
         do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
-        do_cmake -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
-        ninja -j $cpuCount install
+        do_cmakeinstall -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
         do_checkIfExist libjpegturbo-git libjpeg.a
     fi
 
@@ -86,8 +85,7 @@ if do_checkForOptions "--enable-libopenjpeg"; then
             rm -f $LOCALDESTDIR/bin-global/opj_*.exe
         fi
         do_patch "openjpeg-0001-Only-compile-libraries.patch" am
-        do_cmake -DBUILD_MJ2=on
-        ninja -j $cpuCount install
+        do_cmakeinstall -DBUILD_MJ2=on
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
         do_checkIfExist libopenjp2-git libopenmj2.a
@@ -508,9 +506,8 @@ if do_checkForOptions "--enable-libsoxr" && do_pkgConfig "soxr = 0.1.2"; then
         rm -f $LOCALDESTDIR/lib/libsoxr.a
         rm -f $LOCALDESTDIR/lib/pkgconfig/soxr.pc
     fi
-    do_cmake -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
-    sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" src/soxr.pc
-    ninja -j $cpuCount install
+    do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
+    sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" $LOCALDESTDIR/lib/pkgconfig/soxr.pc
     do_checkIfExist soxr-0.1.2-Source libsoxr.a
 fi
 
@@ -547,8 +544,7 @@ if do_checkForOptions "--enable-libgme"; then
             rm -f $LOCALDESTDIR/lib/libgme.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
-        do_cmake
-        ninja -j $cpuCount install
+        do_cmakeinstall
         do_checkIfExist libgme-git libgme.a
     fi
 fi
@@ -847,8 +843,7 @@ if do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/include/vid.stab $LOCALDESTDIR/lib/libvidstab.a
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
-        do_cmake
-        ninja -j $cpuCount install
+        do_cmakeinstall
         do_checkIfExist vidstab-git libvidstab.a
         buildFFmpeg="true"
     fi
@@ -887,8 +882,7 @@ if do_checkForOptions "--enable-frei0r" && do_pkgConfig "frei0r = 1.3.0"; then
         rm -rf $LOCALDESTDIR/include/frei0r.h
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
-    do_cmake -DCMAKE_BUILD_TYPE=Release
-    ninja -j $cpuCount install
+    do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
     do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
 fi
 
@@ -1067,6 +1061,7 @@ if [[ ! $x265 = "n" ]]; then
             -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
             -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON "$@"
+            ninja -j $cpuCount
         }
         mkdir -p {8,10,12}bit
 
@@ -1074,7 +1069,6 @@ if [[ ! $x265 = "n" ]]; then
         if [[ $x265 != "s" ]]; then
             # multilib
             do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
-            ninja
             cp libx265.a ../8bit/libx265_main12.a
         fi
 
@@ -1082,12 +1076,10 @@ if [[ ! $x265 = "n" ]]; then
         if [[ $x265 = "s" ]]; then
             # libx265_main10.dll
             do_x265_cmake $assembly -DENABLE_SHARED=ON
-            ninja
             cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
         else
             # multilib
             do_x265_cmake $assembly -DEXPORT_C_API=OFF
-            ninja
             cp libx265.a ../8bit/libx265_main10.a
         fi
 
@@ -1101,7 +1093,6 @@ if [[ ! $x265 = "n" ]]; then
             do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
                 -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
         fi
-        ninja
         if [[ $x265 != "s" ]]; then
             mv libx265.a libx265_main.a
             ar -M <<EOF

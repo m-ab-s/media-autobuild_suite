@@ -359,7 +359,7 @@ do_patch() {
     fi
 }
 
-do_cmake() {
+do_cmakeinstall() {
     if [ -d "build" ]; then
         rm -rf ./build/*
     else
@@ -367,6 +367,7 @@ do_cmake() {
     fi
     cd build
     cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
+    ninja $([[ -n "$cpuCount" ]] && echo "-j $cpuCount") install
 }
 
 do_generic_conf() {
