@@ -341,10 +341,21 @@ do_patch() {
     else
         patchpath="$patch"
     fi
-    if [[ "$patchpath" != "" ]]; then
-        [[ "$am" = "am" ]] && git am "$patchpath" || patch -N -p$strip -i "$patchpath"
+    if [[ -n "$patchpath" ]]; then
+        if [[ "$am" = "am" ]]; then
+            if ! git am "$patchpath"; then
+                git am --abort
+                echo "Patch couldn't be applied with 'git am'. Continuing without patching."
+            fi
+        else
+            if patch --dry-run -N -p$strip -i "$patchpath"; then
+                patch -N -p$strip -i "$patchpath"
+            else
+                echo "Patch couldn't be applied with 'patch'. Continuing without patching."
+            fi
+        fi
     else
-        echo "No patch found anywhere. Moving on without patching."
+        echo "No patch found anywhere. Continuing without patching."
     fi
 }
 
