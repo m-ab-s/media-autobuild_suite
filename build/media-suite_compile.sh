@@ -696,6 +696,8 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
         do_generic_confmakeinstall
         do_checkIfExist dvdread-git libdvdread.a
     fi
+    grep -q 'ldl' $LOCALDESTDIR/lib/pkgconfig/dvdread.pc ||
+        sed -i "/Libs:.*/ a\Libs.private: -ldl" $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
 
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
