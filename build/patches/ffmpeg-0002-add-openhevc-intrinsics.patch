@@ -1,4 +1,4 @@
-From be1149007e08c94717d818d514668c584160b12b Mon Sep 17 00:00:00 2001
+From 2219c15ff2b9e22bbb54d2fd2cd2069d4a3de888 Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 17 Aug 2014 13:26:23 +0200
 Subject: [PATCH 2/2] add openhevc intrinsics
@@ -50,15 +50,15 @@ index eb17663..57e233d 100644
  
  #endif /* AVCODEC_HEVCPRED_H */
 diff --git a/libavcodec/x86/Makefile b/libavcodec/x86/Makefile
-index b3cfb0b..cb1a071 100644
+index febaccd..a5ca9ec 100644
 --- a/libavcodec/x86/Makefile
 +++ b/libavcodec/x86/Makefile
-@@ -140,7 +140,9 @@ YASM-OBJS-$(CONFIG_HEVC_DECODER)       += x86/hevc_mc.o                 \
-                                           x86/hevc_deblock.o            \
+@@ -141,7 +141,9 @@ YASM-OBJS-$(CONFIG_HEVC_DECODER)       += x86/hevc_mc.o                 \
                                            x86/hevc_idct.o               \
                                            x86/hevc_res_add.o            \
--                                          x86/hevc_sao.o
-+                                          x86/hevc_sao.o                \
+                                           x86/hevc_sao.o                \
+-                                          x86/hevc_sao_10bit.o
++                                          x86/hevc_sao_10bit.o          \
 +                                          x86/hevc_idct_intrinsic.o     \
 +                                          x86/hevc_intra_intrinsic.o
  YASM-OBJS-$(CONFIG_JPEG2000_DECODER)   += x86/jpeg2000dsp.o
