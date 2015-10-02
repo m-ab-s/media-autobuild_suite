@@ -326,12 +326,10 @@ if do_checkForOptions "--enable-libilbc"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/TimothyGu/libilbc.git" libilbc
     if [[ $compile = "true" ]]; then
-        if [[ ! -f "configure" ]]; then
-            autoreconf -fiv
-        else
+        [[ -f configure ]] && make distclean || autoreconf -fiv
+        if [[ -f $LOCALDESTDIR/lib/libilbc.a ]]; then
             rm -rf $LOCALDESTDIR/include/ilbc.h
             rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
-            make distclean
         fi
         do_generic_confmakeinstall
         do_checkIfExist libilbc-git libilbc.a
@@ -422,12 +420,10 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            ./autogen.sh
-        else
+        [[ -f configure ]] && make distclean || ./autogen.sh
+        if [[ -f $LOCALDESTDIR/lib/libfdk-aac.a ]]; then
             rm -rf $LOCALDESTDIR/include/fdk-aac
             rm -f $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
-            make distclean
         fi
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall
         do_checkIfExist fdk-aac-git libfdk-aac.a
@@ -436,12 +432,8 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac bin-audio/fdkaac.exe
     if [[ $compile = "true" ]]; then
-        if [[ ! -f ./configure ]]; then
-            autoreconf -i
-        else
-            rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
-            make distclean
-        fi
+        [[ -f configure ]] && make distclean || autoreconf -fiv
+        rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
         do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
     fi
@@ -458,6 +450,10 @@ if do_checkForOptions "--enable-libfaac"; then
         echo -ne "\033]0;compile faac $bits\007"
         do_wget_sf "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
         [[ -f configure ]] && make distclean || sh bootstrap
+        if [[ -f $LOCALDESTDIR/lib/libfaac.a ]]; then
+            rm -f $LOCALDESTDIR/include/faac{,cfg}.h
+            rm -f $LOCALDESTDIR/lib/libfaac.a $LOCALDESTDIR/bin-audio/faac.exe
+        fi
         do_generic_confmakeinstall audio --without-mp4v2
         do_checkIfExist faac-1.28 libfaac.a
     fi
@@ -583,8 +579,8 @@ if [[ $sox = "y" ]]; then
     if [[ $compile = "true" ]]; then
         [[ ! -f ./configure ]] && ./autogen.sh || make distclean
         if [[ -f $LOCALDESTDIR/lib/libsndfile.a ]]; then
-            rm -rf $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
-            rm -rf $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
+            rm -f $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
+            rm -f $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
         fi
         do_generic_conf
         sed -i 's/ examples regtest tests programs//g' Makefile
@@ -597,12 +593,10 @@ if [[ $sox = "y" ]]; then
     do_vcs "git://git.code.sf.net/p/sox/code" sox bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
-        if [[ ! -f ./configure ]]; then
-            autoreconf -i
-        else
-            rm -rf $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
-            rm -rf $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
-            make distclean
+        [[ -f configure ]] && make distclean || autoreconf -fiv
+        if [[ -f $LOCALDESTDIR/bin-audio/sox.exe ]]; then
+            rm -f $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
+            rm -f $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
         fi
         do_generic_confmakeinstall audio CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
         do_checkIfExist sox-git bin-audio/sox.exe
@@ -966,7 +960,7 @@ if [[ $mp4box = "y" ]]; then
     do_vcs "https://github.com/gpac/gpac.git" gpac bin-video/MP4Box.exe
     if [[ $compile = "true" ]]; then
         if [ -f $LOCALDESTDIR/lib/libgpac_static.a ]; then
-            rm -rf $LOCALDESTDIR/bin-video/gpac $LOCALDESTDIR/lib/libgpac*
+            rm -f $LOCALDESTDIR/bin-video/MP4Box.exe $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
         fi
         [[ -f config.mak ]] && make distclean
