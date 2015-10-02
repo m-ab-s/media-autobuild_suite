@@ -1026,14 +1026,14 @@ if [[ ! $x264 = "n" ]]; then
         do_patch "x264-0001-Fix-compilation-with-ffmpeg-git.patch" am
         if [[ $x264 != "l" ]]; then
             extracommands+=" --bindir=$LOCALDESTDIR/bin-video"
-            ./configure --bit-depth=10 $extracommands
+            CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" ./configure --bit-depth=10 $extracommands
             make -j $cpuCount
             cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
             make clean
         else
             extracommands+=" --disable-interlaced --disable-gpac --disable-cli"
         fi
-        ./configure --bit-depth=8 $extracommands
+        CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" ./configure --bit-depth=8 $extracommands
         do_makeinstall
         do_checkIfExist x264-git libx264.a
         buildFFmpeg="true"
