@@ -146,7 +146,7 @@ check_profiles() {
     local newProfile=""
     if [[ -f "/${profilebits}/etc/profile.local" ]]; then
         newProfile=$(sed -n "/# .${profilebits}.etc.profile.local$/,/${profilebits}.etc.profile.local$/p" \
-            media-autobuild_suite.bat | head -n -1 | sed "s/\s*echo.//g")
+            media-autobuild_suite.bat | head -n -1 | sed "s/^\s*echo\.//")
         if ! diff <(echo "$newProfile") <(tail -n +2 "/${profilebits}/etc/profile.local") &> /dev/null; then
             echo "Updating profile in /${profilebits}..."
             printf "#\n%s\n" "$newProfile" > "/${profilebits}/etc/profile.local"
