@@ -57,7 +57,7 @@ gettext glew gmp headers-git jasper lcms2 libgpg-error libiconv libjpeg-turbo ^
 libpng libtiff mpc nasm pcre sqlite3 tools-git winpthreads-git yasm ninja ^
 libarchive rtmpdump-git pkg-config
 
-set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
+set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
@@ -68,7 +68,7 @@ set ffmpeg_options=--enable-librtmp --enable-gnutls --enable-frei0r --enable-lib
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
-mp4box mplayer mpv cores deleteSource strip pack
+mp4box rtmpdump mplayer mpv cores deleteSource strip pack
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -357,11 +357,13 @@ if %ffmpegBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build FFmpeg binary:
+    echo. Build FFmpeg binaries and libraries:
     echo. 1 = Yes [static] [recommended]
     echo. 2 = No
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
+    echo.
+    echo. Note: mpv needs FFmpeg static libraries.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -455,6 +457,27 @@ if %buildMp4box%==1 set "mp4box=y"
 if %buildMp4box%==2 set "mp4box=n"
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
 if %writeMP4Box%==yes echo.mp4box=^%buildMp4box%>>%ini%
+
+:rtmpdump
+set "writertmpdump=no"
+if %rtmpdumpINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build static rtmpdump binaries [rtmp tools]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildrtmpdump="Build rtmpdump: "
+    ) else set buildrtmpdump=%rtmpdumpINI%
+if %deleteINI%==1 set "writertmpdump=yes"
+
+if %buildrtmpdump%==1 set "rtmpdump=y"
+if %buildrtmpdump%==2 set "rtmpdump=n"
+if %buildrtmpdump% GTR 2 GOTO rtmpdump
+if %writertmpdump%==yes echo.rtmpdump=^%buildrtmpdump%>>%ini%
 
 :mplayer
 set "writeMPlayer=no"

@@ -6,7 +6,7 @@ buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
 --pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB"
-FFMPEG_DEFAULT_OPTS="--enable-librtmp --enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
+FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
@@ -25,6 +25,7 @@ while true; do
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
 --mp4box=* ) mp4box="${1#*=}"; shift ;;
+--rtmpdump=* ) rtmpdump="${1#*=}"; shift ;;
 --vpx=* ) vpx="${1#*=}"; shift ;;
 --x264=* ) x264="${1#*=}"; shift ;;
 --x265=* ) x265="${1#*=}"; shift ;;
@@ -155,31 +156,37 @@ if do_checkForOptions "--enable-gnutls" ; then
     fi
 fi
 
-if do_checkForOptions "--enable-librtmp"; then
+if [[ $rtmpdump = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp lib/pkgconfig/librtmp.pc
-    if [[ $compile = "true" ]]; then
+    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp
+    extracommands=""
+    installed=""
+    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && installed=$(pkg-config --print-requires librtmp)
+    if do_checkForOptions "--enable-gnutls"; then
+        crypto=GNUTLS
+        pc=gnutls
+    else
+        crypto=OPENSSL
+        pc=libssl
+        extracommands="XLIBS=-lz"
+    fi
+    if [[ $compile = "true" ]] || [[ $installed != *$pc* ]]; then
         if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
             rm -rf $LOCALDESTDIR/include/librtmp
             rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
             rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,gw}.exe
         fi
         [[ -f "librtmp/librtmp.a" ]] && make clean
-        extracommands=""
-        if do_checkForOptions "--enable-gnutls"; then
-            crypto=GNUTLS
-        else
-            crypto=OPENSSL
-            extracommands+="XLIBS=-lz"
-        fi
         make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
             sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
-            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs ${crypto,,})" \
+            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs ${pc})" \
             $extracommands install
         do_checkIfExist librtmp-git librtmp.a
-        unset crypto extracommands
+        unset crypto extracommands pc installed
     fi
+else
+    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] || do_removeOption "--enable-librtmp"
 fi
 
 if [[ $sox = "y" ]]; then
@@ -1294,6 +1301,10 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
+        # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
+        # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
+        do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
+
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
             $python waf distclean
@@ -1314,11 +1325,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
-        # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
-        # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
-        [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         $python waf install -j $cpuCount
-        [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
 
         if [[ $bits = "32bit" ]] && [[ ! -d $LOCALDESTDIR/bin-video/fonts ]]; then
             do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
@@ -1330,6 +1337,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
 
         unset mpv_ldflags mpv_pthreads replace
         do_checkIfExist mpv-git bin-video/mpv.exe
+        [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
     fi
 fi
 

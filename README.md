@@ -67,6 +67,7 @@ Included Tools And Libraries
 		- Not compiled by default
 	- libopus (1.1)
 	- librtmp (git)
+		- Not compiled by default
 	- librubberband (git)
 	- libschroedinger
 	- libsoxr (0.1.1)
