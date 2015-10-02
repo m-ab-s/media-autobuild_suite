@@ -156,7 +156,7 @@ if do_checkForOptions "--enable-gnutls" ; then
     fi
 fi
 
-if [[ $rtmpdump = "y" ]]; then
+if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp
     extracommands=""
