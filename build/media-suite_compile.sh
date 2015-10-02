@@ -52,6 +52,9 @@ done
 [[ -f $LOCALBUILDDIR/media-suite_helper.sh ]] && source $LOCALBUILDDIR/media-suite_helper.sh
 
 buildProcess() {
+[[ -f "$HOME"/custom_build_options ]] &&
+    echo "importing custom build options (unsupported)" && source "$HOME"/custom_build_options
+
 cd $LOCALBUILDDIR
 echo "-------------------------------------------------------------------------------"
 echo
