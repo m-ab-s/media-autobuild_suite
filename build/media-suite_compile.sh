@@ -161,7 +161,7 @@ fi
 
 if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
-    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp
+    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
     extracommands=""
     installed=""
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && installed=$(pkg-config --print-requires librtmp)
