@@ -1,0 +1,717 @@
+From 33271e6db717a3bf80e524da7d1c82b23174f416 Mon Sep 17 00:00:00 2001
+From: Hendrik Leppkes <h.leppkes@gmail.com>
+Date: Sun, 4 Oct 2015 14:48:49 +0200
+Subject: [PATCH] avformat: implement SChannel SSP TLS protocol
+
+not implemented:
+- listen support
+- loading of CA or Cert files
+---
+ configure                  |  20 +-
+ libavformat/Makefile       |   1 +
+ libavformat/allformats.c   |   1 +
+ libavformat/tls.h          |   2 +-
+ libavformat/tls_schannel.c | 601 +++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 621 insertions(+), 4 deletions(-)
+ create mode 100644 libavformat/tls_schannel.c
+
+diff --git a/configure b/configure
+index 3ee1ed2..94ce85b 100755
+--- a/configure
++++ b/configure
+@@ -279,6 +279,8 @@ External library support:
+   --enable-opengl          enable OpenGL rendering [no]
+   --enable-openssl         enable openssl, needed for https support
+                            if gnutls is not used [no]
++  --disable-schannel       disable SChannel SSP, needed for TLS support on
++                           Windows if openssl and gnutls are not used [autodetect]
+   --disable-sdl            disable sdl [autodetect]
+   --disable-securetransport disable Secure Transport, needed for TLS support
+                            on OSX if openssl and gnutls are not used [autodetect]
+@@ -1444,6 +1446,7 @@ EXTERNAL_LIBRARY_LIST="
+     opencl
+     opengl
+     openssl
++    schannel
+     sdl
+     securetransport
+     x11grab
+@@ -2730,13 +2733,15 @@ sctp_protocol_deps="struct_sctp_event_subscribe"
+ sctp_protocol_select="network"
+ srtp_protocol_select="rtp_protocol"
+ tcp_protocol_select="network"
+-tls_gnutls_protocol_deps="gnutls !tls_securetransport_protocol"
++tls_gnutls_protocol_deps="gnutls !tls_schannel_protocol !tls_securetransport_protocol"
+ tls_gnutls_protocol_select="tcp_protocol"
+-tls_openssl_protocol_deps="openssl !tls_securetransport_protocol !tls_gnutls_protocol"
++tls_openssl_protocol_deps="openssl !tls_schannel_protocol !tls_securetransport_protocol !tls_gnutls_protocol"
+ tls_openssl_protocol_select="tcp_protocol"
++tls_schannel_protocol_deps="schannel"
++tls_schannel_protocol_select="tcp_protocol"
+ tls_securetransport_protocol_deps="securetransport"
+ tls_securetransport_protocol_select="tcp_protocol"
+-tls_protocol_deps_any="tls_securetransport_protocol tls_gnutls_protocol tls_openssl_protocol"
++tls_protocol_deps_any="tls_schannel_protocol tls_securetransport_protocol tls_gnutls_protocol tls_openssl_protocol"
+ udp_protocol_select="network"
+ udplite_protocol_select="network"
+ unix_protocol_deps="sys_un_h"
+@@ -5447,6 +5452,15 @@ disabled securetransport || { check_func SecIdentityCreate "-Wl,-framework,CoreF
+     check_lib2 "Security/SecureTransport.h Security/Security.h" "SSLCreateContext SecItemImport" "-Wl,-framework,CoreFoundation -Wl,-framework,Security" &&
+     enable securetransport; }
+ 
++if ! disabled schannel; then
++check_cc <<EOF && enable schannel && add_extralibs -lSecur32
++#define SECURITY_WIN32
++#include <windows.h>
++#include <Security.h>
++int main(void) { InitializeSecurityContext(NULL, NULL, NULL, 0, 0, 0, NULL, 0, NULL, NULL, NULL, NULL); return 0; }
++EOF
++fi
++
+ makeinfo --version > /dev/null 2>&1 && enable makeinfo  || disable makeinfo
+ enabled makeinfo \
+     && [ 0$(makeinfo --version | grep "texinfo" | sed 's/.*texinfo[^0-9]*\([0-9]*\)\..*/\1/') -ge 5 ] \
+diff --git a/libavformat/Makefile b/libavformat/Makefile
+index 466da51..3867058 100644
+--- a/libavformat/Makefile
++++ b/libavformat/Makefile
+@@ -531,6 +531,7 @@ OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
+ OBJS-$(CONFIG_TCP_PROTOCOL)              += tcp.o
+ OBJS-$(CONFIG_TLS_GNUTLS_PROTOCOL)       += tls_gnutls.o tls.o
+ OBJS-$(CONFIG_TLS_OPENSSL_PROTOCOL)      += tls_openssl.o tls.o
++OBJS-$(CONFIG_TLS_SCHANNEL_PROTOCOL)     += tls_schannel.o tls.o
+ OBJS-$(CONFIG_TLS_SECURETRANSPORT_PROTOCOL) += tls_securetransport.o tls.o
+ OBJS-$(CONFIG_UDP_PROTOCOL)              += udp.o
+ OBJS-$(CONFIG_UDPLITE_PROTOCOL)          += udp.o
+diff --git a/libavformat/allformats.c b/libavformat/allformats.c
+index 0a24ac7..108a25c 100644
+--- a/libavformat/allformats.c
++++ b/libavformat/allformats.c
+@@ -383,6 +383,7 @@ void av_register_all(void)
+     REGISTER_PROTOCOL(SRTP,             srtp);
+     REGISTER_PROTOCOL(SUBFILE,          subfile);
+     REGISTER_PROTOCOL(TCP,              tcp);
++    REGISTER_PROTOCOL(TLS_SCHANNEL,     tls_schannel);
+     REGISTER_PROTOCOL(TLS_SECURETRANSPORT, tls_securetransport);
+     REGISTER_PROTOCOL(TLS_GNUTLS,       tls_gnutls);
+     REGISTER_PROTOCOL(TLS_OPENSSL,      tls_openssl);
+diff --git a/libavformat/tls.h b/libavformat/tls.h
+index 2a36f34..0326ef7 100644
+--- a/libavformat/tls.h
++++ b/libavformat/tls.h
+@@ -26,7 +26,7 @@
+ #include "url.h"
+ #include "libavutil/opt.h"
+ 
+-#define CONFIG_TLS_PROTOCOL (CONFIG_TLS_GNUTLS_PROTOCOL | CONFIG_TLS_OPENSSL_PROTOCOL | CONFIG_TLS_SECURETRANSPORT_PROTOCOL)
++#define CONFIG_TLS_PROTOCOL (CONFIG_TLS_GNUTLS_PROTOCOL | CONFIG_TLS_OPENSSL_PROTOCOL | CONFIG_TLS_SECURETRANSPORT_PROTOCOL | CONFIG_TLS_SCHANNEL_PROTOCOL)
+ 
+ typedef struct TLSShared {
+     char *ca_file;
+diff --git a/libavformat/tls_schannel.c b/libavformat/tls_schannel.c
+new file mode 100644
+index 0000000..0f4ae25
+--- /dev/null
++++ b/libavformat/tls_schannel.c
+@@ -0,0 +1,601 @@
++/*
++ * Copyright (c) 2015 Hendrik Leppkes
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++/** Based on the CURL SChannel module */
++
++#include "avformat.h"
++#include "internal.h"
++#include "network.h"
++#include "os_support.h"
++#include "url.h"
++#include "tls.h"
++
++#define SECURITY_WIN32
++#include <security.h>
++#include <schnlsp.h>
++
++#define SCHANNEL_INITIAL_BUFFER_SIZE   4096
++#define SCHANNEL_FREE_BUFFER_SIZE      1024
++
++#ifndef SECBUFFER_ALERT
++#define SECBUFFER_ALERT                17
++#endif
++
++typedef struct TLSContext {
++    const AVClass *class;
++    TLSShared tls_shared;
++
++    CredHandle cred_handle;
++    TimeStamp cred_timestamp;
++
++    CtxtHandle ctxt_handle;
++    TimeStamp ctxt_timestamp;
++
++    ULONG request_flags;
++    ULONG context_flags;
++
++    uint8_t *enc_buf;
++    int enc_buf_size;
++    int enc_buf_offset;
++
++    uint8_t *dec_buf;
++    int dec_buf_size;
++    int dec_buf_offset;
++
++    SecPkgContext_StreamSizes Sizes;
++
++    int connected;
++    int connection_closed;
++    int sspi_close_notify;
++} TLSContext;
++
++static void InitSecBuffer(SecBuffer *buffer, unsigned long BufType,
++                          void *BufDataPtr, unsigned long BufByteSize)
++{
++    buffer->cbBuffer   = BufByteSize;
++    buffer->BufferType = BufType;
++    buffer->pvBuffer   = BufDataPtr;
++}
++
++static void InitSecBufferDesc(SecBufferDesc *desc, SecBuffer *BufArr,
++                              unsigned long NumArrElem)
++{
++    desc->ulVersion = SECBUFFER_VERSION;
++    desc->pBuffers = BufArr;
++    desc->cBuffers = NumArrElem;
++}
++
++static int tls_client_handshake_loop(URLContext *h, int initial)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    SECURITY_STATUS sspi_ret = SEC_I_CONTINUE_NEEDED;
++    SecBuffer outbuf[3];
++    SecBufferDesc outbuf_desc;
++    SecBuffer inbuf[2];
++    SecBufferDesc inbuf_desc;
++    int i, ret = 0, read_data = initial;
++
++    if (c->enc_buf == NULL) {
++        c->enc_buf_offset = 0;
++        c->enc_buf_size = SCHANNEL_INITIAL_BUFFER_SIZE;
++        ret = av_reallocp(&c->enc_buf, c->enc_buf_size);
++        if (ret < 0)
++            goto fail;
++    }
++
++    if (c->dec_buf == NULL) {
++        c->dec_buf_offset = 0;
++        c->dec_buf_size = SCHANNEL_INITIAL_BUFFER_SIZE;
++        ret = av_reallocp(&c->dec_buf, c->dec_buf_size);
++        if (ret < 0)
++            goto fail;
++    }
++
++    while (1)
++    {
++        if (c->enc_buf_size - c->enc_buf_offset < SCHANNEL_FREE_BUFFER_SIZE) {
++            c->enc_buf_size = c->enc_buf_offset + SCHANNEL_FREE_BUFFER_SIZE;
++            ret = av_reallocp(&c->enc_buf, c->enc_buf_size);
++            if (ret < 0)
++                goto fail;
++        }
++
++        if (read_data) {
++            ret = ffurl_read(c->tls_shared.tcp, c->enc_buf + c->enc_buf_offset,
++                             c->enc_buf_size - c->enc_buf_offset);
++            if (ret < 0) {
++                av_log(h, AV_LOG_ERROR, "Failed to read handshake response\n");
++                goto fail;
++            }
++            c->enc_buf_offset += ret;
++        }
++
++        /* input buffers */
++        InitSecBuffer(&inbuf[0], SECBUFFER_TOKEN, av_malloc(c->enc_buf_offset), c->enc_buf_offset);
++        InitSecBuffer(&inbuf[1], SECBUFFER_EMPTY, NULL, 0);
++        InitSecBufferDesc(&inbuf_desc, inbuf, 2);
++
++        if (inbuf[0].pvBuffer == NULL) {
++            av_log(h, AV_LOG_ERROR, "Failed to allocate input buffer\n");
++            ret = AVERROR(ENOMEM);
++            goto fail;
++        }
++
++        memcpy(inbuf[0].pvBuffer, c->enc_buf, c->enc_buf_offset);
++
++        /* output buffers */
++        InitSecBuffer(&outbuf[0], SECBUFFER_TOKEN, NULL, 0);
++        InitSecBuffer(&outbuf[1], SECBUFFER_ALERT, NULL, 0);
++        InitSecBuffer(&outbuf[2], SECBUFFER_EMPTY, NULL, 0);
++        InitSecBufferDesc(&outbuf_desc, outbuf, 3);
++
++        sspi_ret = InitializeSecurityContext(&c->cred_handle, &c->ctxt_handle, s->host, c->request_flags,
++                                             0, 0, &inbuf_desc, 0, NULL, &outbuf_desc, &c->context_flags,
++                                             &c->ctxt_timestamp);
++        av_freep(&inbuf[0].pvBuffer);
++
++        if (sspi_ret == SEC_E_INCOMPLETE_MESSAGE) {
++            av_log(h, AV_LOG_DEBUG, "Received incomplete handshake, need more data\n");
++            read_data = 1;
++            continue;
++        }
++
++        /* remote requests a client certificate - attempt to continue without one anyway */
++        if (sspi_ret == SEC_I_INCOMPLETE_CREDENTIALS &&
++            !(c->request_flags & ISC_REQ_USE_SUPPLIED_CREDS)) {
++            av_log(h, AV_LOG_VERBOSE, "Client certificate has been requested, ignoring\n");
++            c->request_flags |= ISC_REQ_USE_SUPPLIED_CREDS;
++            read_data = 0;
++            continue;
++        }
++
++        /* continue handshake */
++        if (sspi_ret == SEC_I_CONTINUE_NEEDED || sspi_ret == SEC_E_OK) {
++            for(i = 0; i < 3; i++) {
++                if (outbuf[i].BufferType == SECBUFFER_TOKEN && outbuf[i].cbBuffer > 0) {
++                    ret = ffurl_write(c->tls_shared.tcp, outbuf[i].pvBuffer, outbuf[i].cbBuffer);
++                    if (ret < 0 || ret != outbuf[i].cbBuffer) {
++                        av_log(h, AV_LOG_VERBOSE, "Failed to send handshake data\n");
++                        ret = AVERROR(EIO);
++                        goto fail;
++                    }
++                }
++
++                if (outbuf[i].pvBuffer != NULL) {
++                    FreeContextBuffer(outbuf[i].pvBuffer);
++                    outbuf[i].pvBuffer = NULL;
++                }
++            }
++        } else {
++            if (sspi_ret == SEC_E_WRONG_PRINCIPAL)
++                av_log(h, AV_LOG_ERROR, "SNI or certificate check failed\n");
++            else
++                av_log(h, AV_LOG_ERROR, "Creating security context failed (%ld)\n", sspi_ret);
++            ret = AVERROR_UNKNOWN;
++            goto fail;
++        }
++
++        if (inbuf[1].BufferType == SECBUFFER_EXTRA && inbuf[1].cbBuffer > 0) {
++            if (c->enc_buf_offset > inbuf[1].cbBuffer) {
++                memmove(c->enc_buf, (c->enc_buf + c->enc_buf_offset) - inbuf[1].cbBuffer,
++                        inbuf[1].cbBuffer);
++                c->enc_buf_offset = inbuf[1].cbBuffer;
++                if (sspi_ret == SEC_I_CONTINUE_NEEDED) {
++                    read_data = 0;
++                    continue;
++                }
++            }
++        } else {
++            c->enc_buf_offset  = 0;
++        }
++
++        if (sspi_ret == SEC_I_CONTINUE_NEEDED) {
++            read_data = 1;
++            continue;
++        }
++
++        break;
++    }
++
++    return 0;
++
++fail:
++    /* free any remaining output data */
++    for(i = 0; i < 3; i++) {
++        if (outbuf[i].pvBuffer != NULL) {
++            FreeContextBuffer(outbuf[i].pvBuffer);
++            outbuf[i].pvBuffer = NULL;
++        }
++    }
++
++    return ret;
++}
++
++static int tls_client_handshake(URLContext *h)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    SecBuffer outbuf;
++    SecBufferDesc outbuf_desc;
++    SECURITY_STATUS sspi_ret;
++    int ret;
++
++    InitSecBuffer(&outbuf, SECBUFFER_EMPTY, NULL, 0);
++    InitSecBufferDesc(&outbuf_desc, &outbuf, 1);
++
++    c->request_flags = ISC_REQ_SEQUENCE_DETECT | ISC_REQ_REPLAY_DETECT |
++                       ISC_REQ_CONFIDENTIALITY | ISC_REQ_ALLOCATE_MEMORY |
++                       ISC_REQ_STREAM;
++
++    sspi_ret = InitializeSecurityContext(&c->cred_handle, NULL, s->host, c->request_flags, 0, 0,
++                                         NULL, 0, &c->ctxt_handle, &outbuf_desc, &c->context_flags,
++                                         &c->ctxt_timestamp);
++    if(sspi_ret != SEC_I_CONTINUE_NEEDED) {
++        av_log(h, AV_LOG_ERROR, "Unable to create initial security context (%ld)\n", sspi_ret);
++        ret = AVERROR_UNKNOWN;
++        goto fail;
++    }
++
++    ret = ffurl_write(s->tcp, outbuf.pvBuffer, outbuf.cbBuffer);
++    FreeContextBuffer(outbuf.pvBuffer);
++    if (ret < 0 || ret != outbuf.cbBuffer) {
++        av_log(h, AV_LOG_ERROR, "Failed to send initial handshake data\n");
++        ret = AVERROR(EIO);
++        goto fail;
++    }
++
++    return tls_client_handshake_loop(h, 1);
++
++fail:
++    DeleteSecurityContext(&c->ctxt_handle);
++    return ret;
++}
++
++static int tls_open(URLContext *h, const char *uri, int flags, AVDictionary **options)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    SECURITY_STATUS sspi_ret;
++    SCHANNEL_CRED schannel_cred;
++    int ret;
++
++    if ((ret = ff_tls_open_underlying(s, h, uri, options)) < 0)
++        goto fail;
++
++    if (s->listen) {
++        av_log(h, AV_LOG_ERROR, "TLS Listen Sockets are not supported\n");
++        ret = -1;
++        goto fail;
++    }
++
++    /* SChannel Options */
++    memset(&schannel_cred, 0, sizeof(schannel_cred));
++    schannel_cred.dwVersion = SCHANNEL_CRED_VERSION;
++
++    if (s->verify)
++        schannel_cred.dwFlags = SCH_CRED_AUTO_CRED_VALIDATION |
++                                SCH_CRED_REVOCATION_CHECK_CHAIN;
++    else
++        schannel_cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION |
++                                SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
++                                SCH_CRED_IGNORE_REVOCATION_OFFLINE;
++
++    /* Get credential handle */
++    sspi_ret = AcquireCredentialsHandle(NULL, (TCHAR *)UNISP_NAME, SECPKG_CRED_OUTBOUND,
++                                        NULL,  &schannel_cred, NULL, NULL, &c->cred_handle,
++                                        &c->cred_timestamp);
++    if (sspi_ret != SEC_E_OK) {
++        av_log(h, AV_LOG_ERROR, "Unable to acquire security credentials (%ld)\n", sspi_ret);
++        ret = AVERROR_UNKNOWN;
++        goto fail;
++    }
++
++    ret = tls_client_handshake(h);
++    if (ret < 0)
++        goto fail;
++
++    c->connected = 1;
++
++    return 0;
++
++fail:
++    FreeCredentialsHandle(&c->cred_handle);
++    return ret;
++}
++
++static int tls_shutdown_client(URLContext *h)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    int ret;
++
++    if (c->connected) {
++        SecBufferDesc BuffDesc;
++        SecBuffer Buffer;
++        SECURITY_STATUS sspi_ret;
++        SecBuffer outbuf;
++        SecBufferDesc outbuf_desc;
++
++        DWORD dwshut = SCHANNEL_SHUTDOWN;
++        InitSecBuffer(&Buffer, SECBUFFER_TOKEN, &dwshut, sizeof(dwshut));
++        InitSecBufferDesc(&BuffDesc, &Buffer, 1);
++
++        sspi_ret = ApplyControlToken(&c->ctxt_handle, &BuffDesc);
++        if (sspi_ret != SEC_E_OK)
++            av_log(h, AV_LOG_ERROR, "ApplyControlToken failed\n");
++
++        InitSecBuffer(&outbuf, SECBUFFER_EMPTY, NULL, 0);
++        InitSecBufferDesc(&outbuf_desc, &outbuf, 1);
++
++        sspi_ret = InitializeSecurityContext(&c->cred_handle, &c->ctxt_handle, s->host,
++                                             c->request_flags, 0, 0, NULL, 0, &c->ctxt_handle,
++                                             &outbuf_desc, &c->context_flags, &c->ctxt_timestamp);
++        if (sspi_ret == SEC_E_OK || sspi_ret == SEC_I_CONTEXT_EXPIRED) {
++            ret = ffurl_write(s->tcp, outbuf.pvBuffer, outbuf.cbBuffer);
++            FreeContextBuffer(outbuf.pvBuffer);
++            if (ret < 0 || ret != outbuf.cbBuffer)
++                av_log(h, AV_LOG_ERROR, "Failed to send close message\n");
++        }
++
++        c->connected = 0;
++    }
++    return 0;
++}
++
++static int tls_close(URLContext *h)
++{
++    TLSContext *c = h->priv_data;
++
++    tls_shutdown_client(h);
++
++    DeleteSecurityContext(&c->ctxt_handle);
++    FreeCredentialsHandle(&c->cred_handle);
++
++    av_freep(&c->enc_buf);
++    av_freep(&c->dec_buf);
++
++    if (c->tls_shared.tcp)
++        ffurl_close(c->tls_shared.tcp);
++    return 0;
++}
++
++static int tls_read(URLContext *h, uint8_t *buf, int len)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    SECURITY_STATUS sspi_ret = SEC_E_OK;
++    SecBuffer inbuf[4];
++    SecBufferDesc inbuf_desc;
++    int size, ret;
++    int min_enc_buf_size = len + SCHANNEL_FREE_BUFFER_SIZE;
++
++    if (len && len <= c->dec_buf_offset)
++        goto cleanup;
++
++    if (c->sspi_close_notify)
++        goto cleanup;
++
++    if (!c->connection_closed) {
++        size = c->enc_buf_size - c->enc_buf_offset;
++        if (size < SCHANNEL_FREE_BUFFER_SIZE || c->enc_buf_size < min_enc_buf_size) {
++            c->enc_buf_size = c->enc_buf_offset + SCHANNEL_FREE_BUFFER_SIZE;
++            if (c->enc_buf_size < min_enc_buf_size)
++                c->enc_buf_size = min_enc_buf_size;
++            ret = av_reallocp(&c->enc_buf, c->enc_buf_size);
++            if (ret < 0)
++                goto fail;
++        }
++
++        ret = ffurl_read(s->tcp, c->enc_buf + c->enc_buf_offset,
++                         c->enc_buf_size - c->enc_buf_offset);
++        if (ret < 0) {
++            av_log(h, AV_LOG_ERROR, "Unable to read from socket\n");
++            goto fail;
++        } else if (ret == 0)
++            c->connection_closed = 1;
++
++        c->enc_buf_offset += ret;
++    }
++
++    while (c->enc_buf_offset > 0 && sspi_ret == SEC_E_OK &&
++            (!len || c->dec_buf_offset < len || c->connection_closed)) {
++        /*  input buffer */
++        InitSecBuffer(&inbuf[0], SECBUFFER_DATA, c->enc_buf, c->enc_buf_offset);
++
++        /* additional buffers for possible output */
++        InitSecBuffer(&inbuf[1], SECBUFFER_EMPTY, NULL, 0);
++        InitSecBuffer(&inbuf[2], SECBUFFER_EMPTY, NULL, 0);
++        InitSecBuffer(&inbuf[3], SECBUFFER_EMPTY, NULL, 0);
++        InitSecBufferDesc(&inbuf_desc, inbuf, 4);
++
++        sspi_ret = DecryptMessage(&c->ctxt_handle, &inbuf_desc, 0, NULL);
++        if (sspi_ret == SEC_E_OK || sspi_ret == SEC_I_RENEGOTIATE ||
++            sspi_ret == SEC_I_CONTEXT_EXPIRED) {
++            /* handle decrypted data */
++            if (inbuf[1].BufferType == SECBUFFER_DATA) {
++                /* grow buffer if needed */
++                size = inbuf[1].cbBuffer > SCHANNEL_FREE_BUFFER_SIZE ?
++                       inbuf[1].cbBuffer : SCHANNEL_FREE_BUFFER_SIZE;
++                if (c->dec_buf_size - c->dec_buf_offset < size || c->dec_buf_size < len)  {
++                    c->dec_buf_size = c->dec_buf_offset + size;
++                    if (c->dec_buf_size < len)
++                        c->dec_buf_size = len;
++                    ret = av_reallocp(&c->dec_buf, c->dec_buf_size);
++                    if (ret < 0)
++                        goto fail;
++                }
++
++                /* copy decrypted data to buffer */
++                size = inbuf[1].cbBuffer;
++                if (size) {
++                    memcpy(c->dec_buf + c->dec_buf_offset, inbuf[1].pvBuffer, size);
++                    c->dec_buf_offset += size;
++                }
++            }
++            if (inbuf[3].BufferType == SECBUFFER_EXTRA && inbuf[3].cbBuffer > 0) {
++                if (c->enc_buf_offset > inbuf[3].cbBuffer) {
++                    memmove(c->enc_buf, (c->enc_buf + c->enc_buf_offset) - inbuf[3].cbBuffer,
++                    inbuf[3].cbBuffer);
++                    c->enc_buf_offset = inbuf[3].cbBuffer;
++                }
++            } else
++                c->enc_buf_offset = 0;
++
++            if (sspi_ret == SEC_I_RENEGOTIATE) {
++                if (c->enc_buf_offset) {
++                    av_log(h, AV_LOG_ERROR, "Cannot renegotiate, encrypted data buffer not empty\n");
++                    ret = AVERROR_UNKNOWN;
++                    goto cleanup;
++                }
++
++                av_log(h, AV_LOG_VERBOSE, "Re-negotiating security context\n");
++                ret = tls_client_handshake_loop(h, 0);
++                if (ret < 0) {
++                    goto cleanup;
++                }
++                sspi_ret = SEC_E_OK;
++                continue;
++            } else if (sspi_ret == SEC_I_CONTEXT_EXPIRED) {
++                c->sspi_close_notify = 1;
++                if (!c->connection_closed) {
++                    c->connection_closed = 1;
++                    av_log(h, AV_LOG_VERBOSE, "Server closed the connection\n");
++                }
++                ret = 0;
++                goto cleanup;
++            }
++        } else if (sspi_ret == SEC_E_INCOMPLETE_MESSAGE) {
++            ret = AVERROR(EAGAIN);
++            goto cleanup;
++        } else {
++            av_log(h, AV_LOG_ERROR, "Unable to decrypt message\n");
++            ret = AVERROR(EIO);
++            goto cleanup;
++        }
++    }
++
++    ret = 0;
++
++cleanup:
++    size = len < c->dec_buf_offset ? len : c->dec_buf_offset;
++    if (size) {
++        memcpy(buf, c->dec_buf, size);
++        memmove(c->dec_buf, c->dec_buf + size, c->dec_buf_offset - size);
++        c->dec_buf_offset -= size;
++
++        return size;
++    }
++
++    if (ret == 0 && !c->connection_closed)
++        ret = AVERROR(EAGAIN);
++
++    return ret < 0 ? ret : 0;
++
++fail:
++    return ret;
++}
++
++static int tls_write(URLContext *h, const uint8_t *buf, int len)
++{
++    TLSContext *c = h->priv_data;
++    TLSShared *s = &c->tls_shared;
++    SECURITY_STATUS sspi_ret;
++    int ret, data_size;
++    uint8_t *data = NULL;
++    SecBuffer outbuf[4];
++    SecBufferDesc outbuf_desc;
++
++    if (c->Sizes.cbMaximumMessage == 0) {
++        sspi_ret = QueryContextAttributes(&c->ctxt_handle, SECPKG_ATTR_STREAM_SIZES, &c->Sizes);
++        if (sspi_ret != SEC_E_OK)
++            return AVERROR_UNKNOWN;
++    }
++
++    if (len > c->Sizes.cbMaximumMessage) {
++        av_log(h, AV_LOG_ERROR, "Message exceeds max message size\n");
++        return AVERROR(EIO);
++    }
++
++    data_size = c->Sizes.cbHeader + len + c->Sizes.cbTrailer;
++    data = av_malloc(data_size);
++    if (data == NULL)
++        return AVERROR(ENOMEM);
++
++    InitSecBuffer(&outbuf[0], SECBUFFER_STREAM_HEADER,
++                  data, c->Sizes.cbHeader);
++    InitSecBuffer(&outbuf[1], SECBUFFER_DATA,
++                  data + c->Sizes.cbHeader, len);
++    InitSecBuffer(&outbuf[2], SECBUFFER_STREAM_TRAILER,
++                  data + c->Sizes.cbHeader + len,
++                  c->Sizes.cbTrailer);
++    InitSecBuffer(&outbuf[3], SECBUFFER_EMPTY, NULL, 0);
++    InitSecBufferDesc(&outbuf_desc, outbuf, 4);
++
++    memcpy(outbuf[1].pvBuffer, buf, len);
++
++    sspi_ret = EncryptMessage(&c->ctxt_handle, 0, &outbuf_desc, 0);
++    if (sspi_ret == SEC_E_OK)  {
++        len = outbuf[0].cbBuffer + outbuf[1].cbBuffer + outbuf[2].cbBuffer;
++        ret = ffurl_write(s->tcp, data, len);
++        if (ret < 0 || ret != len) {
++            ret = AVERROR(EIO);
++            av_log(h, AV_LOG_ERROR, "Writing encrypted data to socket failed\n");
++            goto fail;
++        }
++    } else {
++        av_log(h, AV_LOG_ERROR, "Encrypting data failed\n");
++        if (sspi_ret == SEC_E_INSUFFICIENT_MEMORY)
++            ret = AVERROR(ENOMEM);
++        else
++            ret = AVERROR(EIO);
++        goto fail;
++    }
++
++    av_freep(&data);
++    return outbuf[1].cbBuffer;
++
++fail:
++    av_freep(&data);
++    return ret;
++}
++
++static const AVOption options[] = {
++    TLS_COMMON_OPTIONS(TLSContext, tls_shared),
++    { NULL }
++};
++
++static const AVClass tls_class = {
++    .class_name = "tls",
++    .item_name  = av_default_item_name,
++    .option     = options,
++    .version    = LIBAVUTIL_VERSION_INT,
++};
++
++URLProtocol ff_tls_schannel_protocol = {
++    .name           = "tls",
++    .url_open2      = tls_open,
++    .url_read       = tls_read,
++    .url_write      = tls_write,
++    .url_close      = tls_close,
++    .priv_data_size = sizeof(TLSContext),
++    .flags          = URL_PROTOCOL_FLAG_NETWORK,
++    .priv_data_class = &tls_class,
++};

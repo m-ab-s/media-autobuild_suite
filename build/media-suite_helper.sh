@@ -243,9 +243,6 @@ do_getFFmpegConfig() {
          do_checkForOptions "--enable-librtmp" && [[ $nonfree = "y" ]]; then
         do_addOption "--enable-openssl"
         do_removeOption "--enable-libutvideo"
-    # add gnutls if free
-    else
-        do_addOption "--enable-gnutls"
     fi
 }
 

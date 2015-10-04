@@ -129,7 +129,7 @@ fi
 # crypto engine
 #----------------------
 
-if do_checkForOptions "--enable-gnutls" ; then
+if do_checkForOptions "--enable-gnutls"; then
     rm -f $LOCALDESTDIR/include/libgcrypt.h
     rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
     rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
@@ -163,17 +163,16 @@ if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
     cd $LOCALBUILDDIR
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
     extracommands=""
-    installed=""
-    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && installed=$(pkg-config --print-requires librtmp)
+    req=""
+    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
     if do_checkForOptions "--enable-gnutls"; then
         crypto=GNUTLS
         pc=gnutls
     else
         crypto=OPENSSL
         pc=libssl
-        extracommands="XLIBS=-lz"
     fi
-    if [[ $compile = "true" ]] || [[ $installed != *$pc* ]]; then
+    if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
         if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
             rm -rf $LOCALDESTDIR/include/librtmp
             rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
@@ -183,10 +182,9 @@ if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
         make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
             sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
-            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs ${pc})" \
-            $extracommands install
+            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" install
         do_checkIfExist librtmp-git librtmp.a
-        unset crypto extracommands pc installed
+        unset crypto pc req
     fi
 else
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] || do_removeOption "--enable-librtmp"
@@ -1149,6 +1147,8 @@ if [[ $ffmpeg != "n" ]]; then
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
+        do_checkForOptions "--enable-openssl --enable-gnutls" ||
+            do_patch "ffmpeg-0003-add-schannel.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
@@ -1300,7 +1300,8 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
-        do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
+        do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
+            mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
 
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
