@@ -4,8 +4,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --disable-w32threads --enable-avisynth \
---pkg-config-flags=--static --extra-cflags=-DPTW32_STATIC_LIB"
+FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --enable-avisynth --pkg-config-flags=--static"
 FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -14,6 +13,7 @@ FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
+--disable-w32threads \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"

@@ -247,6 +247,14 @@ do_getFFmpegConfig() {
 }
 
 do_changeFFmpegConfig() {
+    # if w32threads is disabled, pthreads is used and needs this cflag
+    # decklink depends on pthreads
+    if do_checkForOptions "--disable-w32threads --enable-pthreads --enable-decklink"; then
+        do_addOption "--disable-w32threads"
+        do_removeOption "--enable-w32threads"
+        do_addOption "--extra-cflags=-DPTW32_STATIC_LIB"
+    fi
+
     # add options for static kvazaar
     if do_checkForOptions "--enable-libkvazaar"; then
         do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
