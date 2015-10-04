@@ -1315,7 +1315,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build \
-        --disable-pdf-build --lua=luajit $mpv_pthreads --disable-libguess --enable-libarchive
+        --lua=luajit $mpv_pthreads --disable-libguess --enable-libarchive
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
