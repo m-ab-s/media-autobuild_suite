@@ -1148,7 +1148,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions "--enable-openssl --enable-gnutls" ||
-            do_patch "ffmpeg-0003-add-schannel.patch" am
+            do_patch "ffmpeg-0003-avformat-implement-SChannel.patch" am
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then

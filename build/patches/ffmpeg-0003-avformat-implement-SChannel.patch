@@ -1,4 +1,4 @@
-From 33271e6db717a3bf80e524da7d1c82b23174f416 Mon Sep 17 00:00:00 2001
+From 1ad3b5b79e37b3356cd3f99704eca13fafec76d7 Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 4 Oct 2015 14:48:49 +0200
 Subject: [PATCH] avformat: implement SChannel SSP TLS protocol
@@ -7,19 +7,19 @@ not implemented:
 - listen support
 - loading of CA or Cert files
 ---
- configure                  |  20 +-
+ configure                  |  22 +-
  libavformat/Makefile       |   1 +
  libavformat/allformats.c   |   1 +
  libavformat/tls.h          |   2 +-
  libavformat/tls_schannel.c | 601 +++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 621 insertions(+), 4 deletions(-)
+ 5 files changed, 622 insertions(+), 5 deletions(-)
  create mode 100644 libavformat/tls_schannel.c
 
 diff --git a/configure b/configure
-index 3ee1ed2..94ce85b 100755
+index eeb2936..6191b59 100755
 --- a/configure
 +++ b/configure
-@@ -279,6 +279,8 @@ External library support:
+@@ -280,6 +280,8 @@ External library support:
    --enable-opengl          enable OpenGL rendering [no]
    --enable-openssl         enable openssl, needed for https support
                             if gnutls is not used [no]
@@ -28,7 +28,7 @@ index 3ee1ed2..94ce85b 100755
    --disable-sdl            disable sdl [autodetect]
    --disable-securetransport disable Secure Transport, needed for TLS support
                             on OSX if openssl and gnutls are not used [autodetect]
-@@ -1444,6 +1446,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1446,6 +1448,7 @@ EXTERNAL_LIBRARY_LIST="
      opencl
      opengl
      openssl
@@ -36,7 +36,7 @@ index 3ee1ed2..94ce85b 100755
      sdl
      securetransport
      x11grab
-@@ -2730,13 +2733,15 @@ sctp_protocol_deps="struct_sctp_event_subscribe"
+@@ -2733,13 +2736,15 @@ sctp_protocol_deps="struct_sctp_event_subscribe"
  sctp_protocol_select="network"
  srtp_protocol_select="rtp_protocol"
  tcp_protocol_select="network"
@@ -55,7 +55,16 @@ index 3ee1ed2..94ce85b 100755
  udp_protocol_select="network"
  udplite_protocol_select="network"
  unix_protocol_deps="sys_un_h"
-@@ -5447,6 +5452,15 @@ disabled securetransport || { check_func SecIdentityCreate "-Wl,-framework,CoreF
+@@ -5405,7 +5410,7 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
+ enabled openssl           && require_pkg_config openssl openssl/ssl.h SSL_library_init
+ enabled qtkit_indev      && { check_header_oc QTKit/QTKit.h || disable qtkit_indev; }
+ 
+-if enabled gnutls; then
++if ! enabled openssl; then
+     { check_lib2 gmp.h mpz_export -lgmp && enable gmp; } ||
+     { check_lib gcrypt.h gcry_mpi_new -lgcrypt && enable gcrypt; }
+ fi
+@@ -5448,6 +5453,15 @@ disabled securetransport || { check_func SecIdentityCreate "-Wl,-framework,CoreF
      check_lib2 "Security/SecureTransport.h Security/Security.h" "SSLCreateContext SecItemImport" "-Wl,-framework,CoreFoundation -Wl,-framework,Security" &&
      enable securetransport; }
  
@@ -72,10 +81,10 @@ index 3ee1ed2..94ce85b 100755
  enabled makeinfo \
      && [ 0$(makeinfo --version | grep "texinfo" | sed 's/.*texinfo[^0-9]*\([0-9]*\)\..*/\1/') -ge 5 ] \
 diff --git a/libavformat/Makefile b/libavformat/Makefile
-index 466da51..3867058 100644
+index 2971912..bc2aabf 100644
 --- a/libavformat/Makefile
 +++ b/libavformat/Makefile
-@@ -531,6 +531,7 @@ OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
+@@ -532,6 +532,7 @@ OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
  OBJS-$(CONFIG_TCP_PROTOCOL)              += tcp.o
  OBJS-$(CONFIG_TLS_GNUTLS_PROTOCOL)       += tls_gnutls.o tls.o
  OBJS-$(CONFIG_TLS_OPENSSL_PROTOCOL)      += tls_openssl.o tls.o
@@ -84,7 +93,7 @@ index 466da51..3867058 100644
  OBJS-$(CONFIG_UDP_PROTOCOL)              += udp.o
  OBJS-$(CONFIG_UDPLITE_PROTOCOL)          += udp.o
 diff --git a/libavformat/allformats.c b/libavformat/allformats.c
-index 0a24ac7..108a25c 100644
+index 0ccde9d..7180db3 100644
 --- a/libavformat/allformats.c
 +++ b/libavformat/allformats.c
 @@ -383,6 +383,7 @@ void av_register_all(void)
@@ -715,3 +724,6 @@ index 0000000..0f4ae25
 +    .flags          = URL_PROTOCOL_FLAG_NETWORK,
 +    .priv_data_class = &tls_class,
 +};
+-- 
+2.5.2
+
