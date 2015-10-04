@@ -217,7 +217,7 @@ do_pkgConfig() {
 
 do_getFFmpegConfig() {
     configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
-    if [[ -f "$configfile" ]] && [[ $ffmpegChoice = "y" ]]; then
+    if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
         FFMPEG_OPTS="$FFMPEG_BASE_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
     else
         FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"

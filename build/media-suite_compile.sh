@@ -1159,7 +1159,7 @@ if [[ $ffmpeg != "n" ]]; then
                 --disable-static --enable-shared $FFMPEG_OPTS_SHARED \
                 --extra-libs='-lpng -lpthread -lwsock32'
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
