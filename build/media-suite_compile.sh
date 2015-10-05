@@ -291,15 +291,19 @@ if do_checkForOptions "--enable-libtesseract"; then
     fi
 fi
 
-if do_checkForOptions "--enable-librubberband"; then
+if do_checkForOptions "--enable-librubberband" && do_pkgConfig "rubberband = 1.8.1"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/lachs0r/rubberband.git" rubberband
-    if [[ $compile = "true" ]]; then
-        [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
-        [[ -f "lib/librubberband.a" ]] && make clean
-        make PREFIX=$LOCALDESTDIR install-static
-        do_checkIfExist rubberband-git librubberband.a
+    if [[ ! -d rubberband-master ]] || [[ -d rubberband-master ]] &&
+    { [[ $build32 = "yes" && ! -f rubberband-master/build_successful32bit ]] ||
+      [[ $build64 = "yes" && ! -f rubberband-master/build_successful64bit ]]; }; then
+        rm -rf rubberband-master{,.zip} rubberband-git
+        do_wget "https://github.com/lachs0r/rubberband/archive/master.zip" rubberband-master.zip
     fi
+    cd rubberband-master
+    [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
+    [[ -f "lib/librubberband.a" ]] && make clean
+    make PREFIX=$LOCALDESTDIR install-static
+    do_checkIfExist rubberband-master librubberband.a
 fi
 
 echo "-------------------------------------------------------------------------------"
