@@ -1050,7 +1050,7 @@ fi
 if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "hg::https://bitbucket.org/multicoreware/x265" x265
-    if [[ $compile = "true" ]] || [[ $x265 != "l" && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
+    if [[ $compile = "true" ]] || [[ $x265 != "l"* && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
         cd build/msys
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
         rm -f $LOCALDESTDIR/lib/libx265{,_main10,_main12}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
@@ -1071,35 +1071,37 @@ if [[ ! $x265 = "n" ]]; then
         }
         mkdir -p {8,10,12}bit
 
-        cd 12bit
-        if [[ $x265 != "s" ]]; then
-            # multilib
-            do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
-            cp libx265.a ../8bit/libx265_main12.a
+        if [[ $x265 != *8 ]]; then
+            cd 12bit
+            if [[ $x265 != "s" ]]; then
+                # multilib
+                do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
+                cp libx265.a ../8bit/libx265_main12.a
+            fi
+
+            cd ../10bit
+            if [[ $x265 = "s" ]]; then
+                # libx265_main10.dll
+                do_x265_cmake $assembly -DENABLE_SHARED=ON
+                cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
+            else
+                # multilib
+                do_x265_cmake $assembly -DEXPORT_C_API=OFF
+                cp libx265.a ../8bit/libx265_main10.a
+            fi
+            cd ..
         fi
 
-        cd ../10bit
-        if [[ $x265 = "s" ]]; then
-            # libx265_main10.dll
-            do_x265_cmake $assembly -DENABLE_SHARED=ON
-            cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main10.dll
-        else
-            # multilib
-            do_x265_cmake $assembly -DEXPORT_C_API=OFF
-            cp libx265.a ../8bit/libx265_main10.a
-        fi
-
-        cd ../8bit
-        if [[ $x265 = "s" ]]; then
-            # 8-bit static x265.exe
-            do_x265_cmake -DENABLE_CLI=ON -DHIGH_BIT_DEPTH=OFF
+        cd 8bit
+        if [[ $x265 = "s" || $x265 = *8 ]]; then
+            # 8-bit static x265.exe/library
+            [[ $x265 != "l8" ]] && cli="-DENABLE_CLI=ON"
+            do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
         else
             # multilib
             [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
             do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
                 -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-        fi
-        if [[ $x265 != "s" ]]; then
             mv libx265.a libx265_main.a
             ar -M <<EOF
 CREATE libx265.a

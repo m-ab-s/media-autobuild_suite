@@ -69,7 +69,7 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
 set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
-mp4box rtmpdump mplayer mpv cores deleteSource strip pack
+mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -228,6 +228,29 @@ if %buildx264%==4 set "x264=f"
 if %buildx264% GTR 4 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
 
+:xpcomp
+set "writexpcomp=no"
+if %xpcompINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build libraries/binaries compatible with Windows XP when possible?
+    echo. 1 = Yes
+    echo. 2 = No [recommended]
+    echo.
+    echo. Examples: x265, disabled QuickSync, etc.
+    echo. This usually causes worse performance in all systems.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildxpcomp="Build with XP compatibilty: "
+    ) else set buildxpcomp=%xpcompINI%
+if %deleteINI%==1 set "writexpcomp=yes"
+
+if %buildxpcomp%==1 set "xpcomp=y"
+if %buildxpcomp%==2 set "xpcomp=n"
+if %buildxpcomp% GTR 2 GOTO xpcomp
+if %writexpcomp%==yes echo.xpcomp=^%buildxpcomp%>>%ini%
+
 :x265
 set "writex265=no"
 if %x265INI%==0 (
@@ -238,10 +261,10 @@ if %x265INI%==0 (
     echo. 1 = Static x265.exe and library with Main, Main10 and Main12 included
     echo. 2 = Static library only with Main, Main10 and Main12 included
     echo. 3 = No
-    echo. 4 = Static x265.exe [Main] and libx265_main10.dll
-    echo. 5 = Same as 1 with XP compatibility
-    echo. 6 = Same as 2 with XP compatibility
-    echo. 7 = Same as 5 with addition of non-XP compatible x265-numa.exe
+    echo. 4 = Static x265.exe and library [Main] and libx265_main10.dll
+    echo. 5 = Static x265.exe and library [Main]
+    echo. 6 = Static library only [Main]
+    echo. 7 = Same as 1 with addition of non-XP compatible x265-numa.exe
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -253,18 +276,9 @@ if %buildx265%==1 set "x265=y"
 if %buildx265%==2 set "x265=l"
 if %buildx265%==3 set "x265=n"
 if %buildx265%==4 set "x265=s"
-if %buildx265%==5 (
-    set "x265=y"
-    set "xpcomp=y"
-    )
-if %buildx265%==6 (
-    set "x265=l"
-    set "xpcomp=y"
-    )
-if %buildx265%==7 (
-    set "x265=d"
-    set "xpcomp=y"
-    )
+if %buildx265%==5 set "x265=y8"
+if %buildx265%==6 set "x265=l8"
+if %buildx265%==7 set "x265=d"
 if %buildx265% GTR 7 GOTO x265
 if %writex265%==yes echo.x265=^%buildx265%>>%ini%
 
@@ -275,9 +289,10 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build H.265 encoders other than x265?
-    echo. 1 = Yes [static]
+    echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Included: kvazaar and f265
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildother265="Build other265: "
@@ -1225,7 +1240,7 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp%
+--mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
 
 endlocal
 goto:eof
