@@ -139,9 +139,9 @@ if do_checkForOptions "--enable-gnutls"; then
 
     do_pacman_install "libgcrypt nettle"
 
-    if do_pkgConfig "gnutls = 3.4.4"; then
+    if do_pkgConfig "gnutls = 3.4.5"; then
         cd $LOCALBUILDDIR
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.4.1.tar.xz"
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.5.tar.xz"
         [[ -d build ]] && rm -rf build
         mkdir build && cd build
         if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
@@ -155,7 +155,7 @@ if do_checkForOptions "--enable-gnutls"; then
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
         lib/gnutls.pc
         do_makeinstall
-        do_checkIfExist gnutls-3.4.4.1 libgnutls.a
+        do_checkIfExist gnutls-3.4.5 libgnutls.a
     fi
 fi
 
@@ -210,14 +210,14 @@ if [[ $sox = "y" ]]; then
     fi
 
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
-        [[ $(file.exe --version) = *"file.exe-5.24"* ]]; then
+        [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
         echo -------------------------------------------------
         echo "file-5.24[libmagic] is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile file $bits\007"
-        do_wget "https://fossies.org/linux/misc/file-5.24.tar.gz"
+        do_wget "https://fossies.org/linux/misc/file-5.25.tar.gz"
         [[ -f "src/.libs/libmagic.a" ]] && make distclean
         if [[ -f "$LOCALDESTDIR/lib/libmagic.a" ]]; then
             rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
@@ -225,7 +225,7 @@ if [[ $sox = "y" ]]; then
         fi
         do_patch "file-1-fixes.patch"
         do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
-        do_checkIfExist file-5.24 libmagic.a
+        do_checkIfExist file-5.25 libmagic.a
     fi
 fi
 
@@ -781,14 +781,14 @@ if do_checkForOptions "--enable-libxavs"; then
         sed -i 's,"NUL","/dev/null",g' configure
         ./configure --host=$targetHost --prefix=$LOCALDESTDIR
         make -j $cpuCount libxavs.a
-        install -m 644 xavs.h $LOCALDESTDIR/include
-        install -m 644 libxavs.a $LOCALDESTDIR/lib
-        install -m 644 xavs.pc $LOCALDESTDIR/lib/pkgconfig
+        cp -f xavs.h $LOCALDESTDIR/include
+        cp -f libxavs.a $LOCALDESTDIR/lib
+        cp -f xavs.pc $LOCALDESTDIR/lib/pkgconfig
         do_checkIfExist xavs-distrotech-xavs libxavs.a
     fi
 fi
 
-if [ $mediainfo = "y" ]; then
+if [[ $mediainfo = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
