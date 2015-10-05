@@ -1143,12 +1143,9 @@ do_hide_all_sharedlibs
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
-    if [[ $ffmpeg != "s" ]]; then
-        do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
-    else
-        do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpegSHARED/ffmpeg.exe
-    fi
-    if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
+    do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
+    if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]] ||
+        [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions "--enable-openssl --enable-gnutls" ||
