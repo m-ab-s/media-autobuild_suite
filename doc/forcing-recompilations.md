@@ -4,48 +4,33 @@ How to force compilation of libs/apps
 ## Libraries using pkg-config
 Most libs use pkg-config files to check if they exist, so for most libs in this list all you have to do is delete the corresponding `<libname>.pc` file in `/local32/lib/pkgconfig/` or `/local64/lib/pkgconfig`:
 ```
-caca
-dcadec
 dvdnav
 dvdread
 fdk-aac (fdk-aac library only)
-fontconfig
-freetype2
 frei0r
-fribidi
 gnutls
-harfbuzz
-l-smash
+lept (leptonica)
 libass
 libbluray
 libbs2b
-libcdio_paranoia
 libgme (game music emu)
 libilbc
+libmediainfo
 libmfx (intel quick sync hw accelerator)
 libopenjp2 (openjpeg 2)
-librtmp
 libutvideo
+libwebp
+libzen
+lsmash
 luajit
-nettle
-ogg
-opencore-amrnb
-opencore-amrwb
-opus
-opusfile
-Qt5Core
 rubberband
-sdl
 sndfile
 soxr (sox resampling library only)
 speex
-theora
-twolame
-uchardet
+tesseract
 vidstab
 vo-aacenc
 vo-amrwbenc
-vorbis
 vpx
 x264
 x265
@@ -68,6 +53,8 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
 faac
 fdkaac (fdk-aac encoder)
 flac
+lame (MP3 encoder)
+oggenc (Vorbis encoder)
 opusenc (Opus encoder)
 sox
 ```
@@ -75,9 +62,6 @@ sox
 #### /bin-global
 ```
 file
-libgcrypt-config
-ragel
-wx-config
 ```
 
 #### /bin-video
@@ -87,10 +71,10 @@ ffmpeg (for static and both)
 ffmpegSHARED/ffmpeg (for shared only)
 kvazaar
 mediainfo
-mkvtoolnix/bin/mkvmerge
 MP4Box
 mplayer
 mpv
+rtmpdump
 x264
 x265
 vpxenc
