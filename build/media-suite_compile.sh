@@ -1073,7 +1073,11 @@ if [[ ! $x265 = "n" ]]; then
 
         if [[ $x265 != *8 ]]; then
             cd 12bit
-            if [[ $x265 != "s" ]]; then
+            if [[ $x265 = "s" ]]; then
+                # libx265_main12.dll
+                do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
+                cp libx265.dll $LOCALDESTDIR/bin-video/libx265_main12.dll
+            else
                 # multilib
                 do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
                 cp libx265.a ../8bit/libx265_main12.a

@@ -261,7 +261,7 @@ if %x265INI%==0 (
     echo. 1 = Static x265.exe and library with Main, Main10 and Main12 included
     echo. 2 = Static library only with Main, Main10 and Main12 included
     echo. 3 = No
-    echo. 4 = Static x265.exe and library [Main] and libx265_main10.dll
+    echo. 4 = Static x265.exe and library [Main] with shared high bit-depth libraries
     echo. 5 = Static x265.exe and library [Main]
     echo. 6 = Static library only [Main]
     echo. 7 = Same as 1 with addition of non-XP compatible x265-numa.exe
