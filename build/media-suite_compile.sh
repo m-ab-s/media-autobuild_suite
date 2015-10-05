@@ -1441,13 +1441,6 @@ fi
 
 echo -ne "\033]0;compiling done...\007"
 echo
-echo "Window closing in 15 seconds..."
-echo
-sleep 5
-echo
-echo "Window closing in 10 seconds..."
-echo
-sleep 5
-echo
-echo "Window closing in 5 seconds..."
+echo "Compilation successful."
+echo "This window will close automatically in 5 seconds."
 sleep 5
