@@ -13,7 +13,7 @@ FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
---disable-w32threads \
+--disable-w32threads --enable-opencl \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
@@ -249,6 +249,22 @@ if do_checkForOptions "--enable-libwebp"; then
     fi
 fi
 
+if do_checkForOptions "--enable-libtesseract --enable-opencl"; then
+    cd $LOCALBUILDDIR
+    do_pacman_install "opencl-headers"
+    if [[ ! -f $LOCALDESTDIR/lib/libOpenCL.a ]]; then
+        [[ -d opencl ]] && rm -rf opencl
+        mkdir opencl && cd opencl
+        syspath=$(cygpath -S)
+        [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
+        [[ -f "$syspath/OpenCL.dll" ]] && gendef "$syspath/OpenCL.dll"
+        [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
+        [[ -f libOpenCL.a ]] && mv -f libOpenCL.a $LOCALDESTDIR/lib/
+        do_checkIfExist opencl libOpenCL.a
+        unset syspath
+    fi
+fi
+
 if do_checkForOptions "--enable-libtesseract"; then
     do_pacman_remove "tesseract-ocr"
     cd $LOCALBUILDDIR
@@ -273,10 +289,10 @@ if do_checkForOptions "--enable-libtesseract"; then
             rm -f $LOCALDESTDIR/lib/libtesseract.{,l}a $LOCALDESTDIR/lib/pkgconfig/tesseract.pc
             rm -f $LOCALDESTDIR/bin-global/tesseract.exe
         fi
-        sed -i 's# @OPENCL_LIB@# -lstdc++#' tesseract.pc.in
+        sed -i 's# @OPENCL_LIB@# -lOpenCL -lstdc++#' tesseract.pc.in
         do_generic_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
             LIBLEPT_HEADERSDIR=$LOCALDESTDIR/include LDFLAGS="$LDFLAGS -static -static-libgcc" \
-            LIBS="$(pkg-config --static --libs lept)" --datadir=$LOCALDESTDIR/bin-global
+            LIBS="$(pkg-config --static --libs lept libtiff-4)" --datadir=$LOCALDESTDIR/bin-global
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p $LOCALDESTDIR/bin-global/tessdata
             pushd $LOCALDESTDIR/bin-global/tessdata > /dev/null
