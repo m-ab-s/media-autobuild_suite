@@ -600,10 +600,11 @@ if [[ $sox = "y" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
         [[ -f configure ]] && make distclean || autoreconf -fiv
         if [[ -f $LOCALDESTDIR/bin-audio/sox.exe ]]; then
-            rm -f $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/sox.exe
+            rm -f $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/{sox{,i},play,rec}.exe
             rm -f $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
         fi
-        do_generic_confmakeinstall audio CPPFLAGS='-DPCRE_STATIC' LIBS='-lpcre -lshlwapi -lz -lgnurx'
+        do_generic_confmakeinstall audio --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
+            LIBS='-lpcre -lshlwapi -lz -lgnurx'
         do_checkIfExist sox-git bin-audio/sox.exe
     fi
 fi
