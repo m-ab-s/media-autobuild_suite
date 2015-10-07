@@ -678,7 +678,7 @@ fi
 
 if [[ $other265 = "y" ]] || do_checkForOptions "--enable-libkvazaar"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/ultravideo/kvazaar.git#commit=9051fbf" kvazaar bin-video/kvazaar.exe
+    do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
         if [[ -f "$LOCALDESTDIR/lib/libkvazaar.a" ]]; then
             rm -f "$LOCALDESTDIR/include/kvazaar.h"
