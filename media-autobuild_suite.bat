@@ -757,8 +757,8 @@ if not exist %instdir%\mintty.lnk (
     del %build%\setlink.vbs
     )
 
-    if exist %instdir%\%msys2%\home\%USERNAME%\.minttyrc GOTO hgsettings
-    if not exist %instdir%\%msys2%\home\%USERNAME% mkdir %instdir%\%msys2%\home\%USERNAME%
+    if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
+    if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
         (
             echo.BoldAsFont=no
             echo.BackgroundColour=57,57,57
@@ -789,10 +789,10 @@ if not exist %instdir%\mintty.lnk (
             echo.BoldMagenta=158,111,254
             echo.BoldCyan=163,186,191
             echo.BoldWhite=248,248,242
-            )>>%instdir%\%msys2%\home\%USERNAME%\.minttyrc
+            )>>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 
 :hgsettings
-if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO gitsettings
+if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
     (
         echo.[ui]
         echo.username = %USERNAME%
@@ -812,10 +812,10 @@ if exist %instdir%\%msys2%\home\%USERNAME%\.hgrc GOTO gitsettings
         echo.status.deleted = cyan bold
         echo.status.unknown = blue bold
         echo.status.ignored = black bold
-        )>>%instdir%\%msys2%\home\%USERNAME%\.hgrc
+        )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
 
 :gitsettings
-if exist %instdir%\%msys2%\home\%USERNAME%\.gitconfig GOTO rebase
+if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO rebase
     (
         echo.[user]
         echo.name = %USERNAME%
@@ -833,7 +833,7 @@ if exist %instdir%\%msys2%\home\%USERNAME%\.gitconfig GOTO rebase
         echo.
         echo.[push]
         echo.default = simple
-        )>>%instdir%\%msys2%\home\%USERNAME%\.gitconfig
+        )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
 
 :rebase
 if %msys2%==msys32 (
