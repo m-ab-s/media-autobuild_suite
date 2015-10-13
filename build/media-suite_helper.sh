@@ -268,7 +268,7 @@ do_changeFFmpegConfig() {
 
     # handle non-free libs
     if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc \
-        --enable-libfaac --enable-openssl"; then
+        --enable-libfaac"; then
         do_addOption "--enable-nonfree"
     else
         do_removeOption "--enable-nonfree"
@@ -466,7 +466,7 @@ do_pacman_remove() {
         sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
         if [[ -n "$uninstall" ]]; then
             do_hide_pacman_sharedlibs "$uninstall" revert
-            if ! pacman -Rs --noconfirm "$uninstall" 2&>/dev/null; then
+            if ! pacman -Rs --noconfirm "$uninstall"; then
                 pacman -D --asdeps "$uninstall" >/dev/null
             fi
         fi
