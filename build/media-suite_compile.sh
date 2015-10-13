@@ -98,24 +98,52 @@ fi
 
 if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig --enable-libfribidi" ||
     [[ "$mpv" = "y" || "$mplayer" = "y" ]]; then
-    rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
-    rm -rf $LOCALDESTDIR/lib/libfreetype.{l,}a $LOCALDESTDIR/lib/pkgconfig/freetype2.pc
+    do_pacman_remove "freetype fontconfig harfbuzz fribidi"
+    if do_pkgConfig "freetype2 = 18.0.12"; then
+        cd $LOCALBUILDDIR
+        do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
+        [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
+        rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
+        rm -f $LOCALDESTDIR/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
+        do_generic_confmakeinstall global --with-harfbuzz=no
+        do_checkIfExist freetype-2.6 libfreetype.a
+        buildLibass="y"
+    fi
 
-    rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
-    rm -rf $LOCALDESTDIR/lib/libfontconfig.{l,}a $LOCALDESTDIR/lib/pkgconfig/fontconfig.pc
+    if do_pkgConfig "fontconfig = 2.11.94" || [[ "$buildLibass" = "y" ]]; then
+        do_pacman_install "python2-lxml"
+        cd $LOCALBUILDDIR
+        do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
+        [[ -f "src/.libs/libfontconfig.a" ]] && make distclean
+        rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
+        rm -f $LOCALDESTDIR/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
+        do_generic_confmakeinstall global
+        do_checkIfExist fontconfig-2.11.94 libfontconfig.a
+        buildLibass="y"
+    fi
 
-    rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
-    rm -rf $LOCALDESTDIR/lib/libfribidi.{l,}a $LOCALDESTDIR/lib/pkgconfig/fribidi.pc
+    if do_pkgConfig "harfbuzz = 1.0.5" || [[ "$buildLibass" = "y" ]]; then
+        do_pacman_install "ragel"
+        cd $LOCALBUILDDIR
+        do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.0.5.tar.bz2"
+        [[ -f "src/.libs/libharfbuzz.a" ]] && make distclean
+        rm -rf $LOCALDESTDIR/include/harfbuzz
+        rm -f $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
+        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
+            LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        do_checkIfExist harfbuzz-1.0.5 libharfbuzz.a
+        buildLibass="y"
+    fi
 
-    rm -rf $LOCALBUILDDIR/harfbuzz-git
-    rm -rf $LOCALDESTDIR/include/harfbuzz
-    rm -rf $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
-    do_pacman_install "freetype fontconfig fribidi harfbuzz python2-lxml"
-    do_pacman_remove "ragel"
-
-    # fix iconv problems with harfbuzz/libass due to missing lib in mingw's glib pkgconfig
-    grep -q "liconv" "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc ||
-        sed -i 's/-lintl/& -liconv/g' "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc
+    if do_pkgConfig "fribidi = 0.19.7"; then
+        cd $LOCALBUILDDIR
+        do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
+        [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
+        rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
+        rm -f $LOCALDESTDIR/lib/{libfribidi.{l,}a,pkgconfig/fribidi.pc}
+        do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
+        do_checkIfExist fribidi-0.19.7 libfribidi.a
+    fi
 fi
 
 if ! do_checkForOptions "--disable-sdl --disable-ffplay"; then
@@ -767,13 +795,12 @@ if do_checkForOptions "--enable-libass"; then
     do_vcs "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
         [[ -f configure ]] && make distclean || autoreconf -fiv
-        if [[ -f $LOCALDESTDIR/lib/libass.a ]]; then
-            rm -rf $LOCALDESTDIR/include/ass
-            rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
-        fi
+        rm -rf $LOCALDESTDIR/include/ass
+        rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
+        sed -i 's,-lass -lm,& -liconv,' $LOCALDESTDIR/lib/pkgconfig/libass.pc
         buildFFmpeg="true"
         unset disable_fc buildLibass
     fi
