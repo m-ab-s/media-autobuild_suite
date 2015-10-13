@@ -1173,6 +1173,13 @@ if [[ $ffmpeg != "n" ]]; then
         do_checkForOptions "--enable-openssl --enable-gnutls" ||
             do_patch "ffmpeg-0003-avformat-implement-SChannel.patch" am
 
+        rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
+        rm -rf $LOCALDESTDIR/include/lib{sw{scale,resample},postproc}
+        rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
+        rm -f $LOCALDESTDIR/lib/lib{sw{scale,resample},postproc}.a
+        rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
+        rm -f $LOCALDESTDIR/lib/pkgconfig/lib{sw{scale,resample},postproc}.pc
+
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             echo -ne "\033]0;compiling shared FFmpeg $bits\007"
@@ -1191,12 +1198,6 @@ if [[ $ffmpeg != "n" ]]; then
         # static
         if [[ $ffmpeg != "s" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
-            rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
-            rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
-            rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
-            rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
-            rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
-            rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f config.mak ]] && make distclean
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
