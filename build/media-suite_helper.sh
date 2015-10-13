@@ -294,7 +294,7 @@ do_changeFFmpegConfig() {
         do_removeOption "--enable-decklink" y
         do_removeOption "--enable-libutvideo" y
         do_removeOption "--enable-libgme" y
-        do_addOption    "--extra-ldflags=-static-libgcc" y
+        FFMPEG_OPTS_SHARED="$FFMPEG_OPTS_SHARED --extra-ldflags=-static-libgcc"
     fi
 }
 
