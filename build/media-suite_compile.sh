@@ -400,8 +400,19 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libvorbis --enable-libtheora
 fi
 
 if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
-    rm -rf $LOCALDESTDIR/include/opus
-    rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
+    if do_pkgConfig "opus = 1.1"; then
+        cd $LOCALBUILDDIR
+        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
+        [[ -f ".libs/libopus.a" ]] && make distclean
+        rm -rf $LOCALDESTDIR/include/opus
+        rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
+
+        # needed to allow building shared FFmpeg with libopus
+        sed -i 's, __declspec(dllexport),,' include/opus_defines.h
+
+        do_generic_confmakeinstall --disable-doc
+        do_checkIfExist opus-1.1 libopus.a
+    fi
 
     rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
     rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
