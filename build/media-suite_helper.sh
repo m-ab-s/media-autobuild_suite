@@ -253,6 +253,8 @@ do_changeFFmpegConfig() {
         do_addOption "--disable-w32threads"
         do_removeOption "--enable-w32threads"
         do_addOption "--extra-cflags=-DPTW32_STATIC_LIB"
+        do_addOption "--extra-libs=-lpthread"
+        do_addOption "--extra-libs=-lwsock32"
     fi
 
     # add options for static kvazaar

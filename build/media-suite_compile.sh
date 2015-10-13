@@ -1179,8 +1179,7 @@ if [[ $ffmpeg != "n" ]]; then
             [[ -f config.mak ]] && make distclean
             rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
             ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
-                --disable-static --enable-shared $FFMPEG_OPTS_SHARED \
-                --extra-libs='-lpng -lpthread -lwsock32'
+                --disable-static --enable-shared $FFMPEG_OPTS_SHARED
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
             do_makeinstall
@@ -1201,10 +1200,9 @@ if [[ $ffmpeg != "n" ]]; then
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f config.mak ]] && make distclean
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-                --enable-static --disable-shared $FFMPEG_OPTS \
-                --extra-libs='-lpng -lpthread -lwsock32'
+                --enable-static --disable-shared $FFMPEG_OPTS
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs))=(\S+|'[^']+')//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
             newFfmpeg="yes"
