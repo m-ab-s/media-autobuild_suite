@@ -1366,6 +1366,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
         do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
             mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
+        [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
 
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
@@ -1400,6 +1401,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         unset mpv_ldflags mpv_pthreads replace
         do_checkIfExist mpv-git bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
+        [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
     fi
 fi
 
