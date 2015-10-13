@@ -369,10 +369,8 @@ echo
 echo "-------------------------------------------------------------------------------"
 
 if do_checkForOptions "--enable-libdcadec"; then
-    rm -rf $LOCALBUILDDIR/dcadec-git
-    rm -rf $LOCALDESTDIR/include/libdcadec
-    rm -f $LOCALDESTDIR/lib/libdcadec.a
-    rm -f $LOCALDESTDIR/lib/pkgconfig/dcadec.pc
+    rm -rf $LOCALBUILDDIR/dcadec-git $LOCALDESTDIR/include/libdcadec
+    rm -f $LOCALDESTDIR/lib/{libdcadec.a,pkgconfig/dcadec.pc}
     rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
     do_pacman_install "dcadec-git"
 fi
@@ -422,7 +420,7 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
 
     rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
     rm -rf $LOCALDESTDIR/lib/pkgconfig/opus{file,url}.pc
-    do_pacman_install "opus opusfile"
+    do_pacman_install "opusfile"
 fi
 
 if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } && do_pkgConfig "speex = 1.2rc2"; then
