@@ -151,6 +151,7 @@ if ! do_checkForOptions "--disable-sdl --disable-ffplay"; then
     rm -rf $LOCALDESTDIR/lib/libSDL{,main}.{l,}a $LOCALDESTDIR/lib/pkgconfig/sdl.pc
     do_pacman_install "SDL"
     sed -i "s/-mwindows//" "$MINGW_PREFIX/bin/sdl-config"
+    do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
 fi
 
 #----------------------
@@ -1226,7 +1227,7 @@ if [[ $ffmpeg != "n" ]]; then
             ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
                 --disable-static --enable-shared $FFMPEG_OPTS_SHARED
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
@@ -1241,7 +1242,7 @@ if [[ $ffmpeg != "n" ]]; then
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
                 --enable-static --disable-shared $FFMPEG_OPTS
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
+            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist ffmpeg-git libavcodec.a
             newFfmpeg="yes"
