@@ -815,7 +815,6 @@ if do_checkForOptions "--enable-libass"; then
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass-git libass.a
-        sed -i 's,-lass -lm,& -liconv,' $LOCALDESTDIR/lib/pkgconfig/libass.pc
         buildFFmpeg="true"
         unset disable_fc buildLibass
     fi
