@@ -34,6 +34,7 @@ vo-amrwbenc
 vpx
 x264
 x265
+zimg
 zvbi-0.2 (libzvbi)
 ```
 ## Libraries not using pkg-config

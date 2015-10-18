@@ -88,6 +88,7 @@ Included Tools And Libraries
 	- libx265 (hg)
 	- libxavs (svn snapshot)
 	- libxvid
+	- libzimg (git)
 	- libzvbi (0.2.35)
 	- nvenc (5.0.1)
 	- sdl (1.2.15)
