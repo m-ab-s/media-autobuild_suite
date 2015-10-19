@@ -100,8 +100,8 @@ if exist %ini% GOTO checkINI
     echo.[compiler list]>%ini%
     echo.msys2Arch=^%msys2Arch%>>%ini%
 
-    set msys2ArchINI=%msys2Arch%
     if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
+    set msys2ArchINI=%msys2Arch%
 
     GOTO systemVars
 
