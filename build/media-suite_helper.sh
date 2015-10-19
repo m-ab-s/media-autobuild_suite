@@ -216,6 +216,7 @@ do_pkgConfig() {
 }
 
 do_getFFmpegConfig() {
+    [[ -z "$license" && -n "$1" ]] && local license="$1"
     configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
         FFMPEG_OPTS="$FFMPEG_BASE_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
@@ -231,7 +232,7 @@ do_getFFmpegConfig() {
     export arch
 
     # prefer openssl if both are in options and nonfree
-    if do_checkForOptions "--enable-openssl" && [[ $nonfree = "y" ]]; then
+    if do_checkForOptions "--enable-openssl" && [[ $license = "nonfree" ]]; then
         do_removeOption "--enable-gnutls"
         do_removeOption "--enable-libutvideo"
     # prefer gnutls if both are in options and free
@@ -240,13 +241,14 @@ do_getFFmpegConfig() {
         do_addOption "--enable-gnutls"
     # add openssl if neither are in options and librtmp is and nonfree
     elif ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
-         do_checkForOptions "--enable-librtmp" && [[ $nonfree = "y" ]]; then
+         do_checkForOptions "--enable-librtmp" && [[ $license = "nonfree" ]]; then
         do_addOption "--enable-openssl"
         do_removeOption "--enable-libutvideo"
     fi
 }
 
 do_changeFFmpegConfig() {
+    [[ -z "$license" && -n "$1" ]] && local license="$1"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
     if do_checkForOptions "--disable-w32threads --enable-pthreads --enable-decklink"; then
@@ -262,28 +264,37 @@ do_changeFFmpegConfig() {
         do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
     fi
 
-    # handle gplv3 libs
+    # handle gpl libs
+    local gpl="--enable-frei0r --enable-cdio --enable-librubberband \
+        --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265 \
+        --enable-libxavs --enable-libxvid --enable-libzvbi"
+    if [[ $license != "lgpl" ]] && do_checkForOptions "$gpl"; then
+        do_addOption "--enable-gpl"
+    else
+        do_removeOptions "$gpl --enable-gpl"
+    fi
+
+    # handle (l)gplv3 libs
     if do_checkForOptions "--enable-libopencore-amrwb --enable-libopencore-amrnb \
         --enable-libvo-aacenc --enable-libvo-amrwbenc"; then
         do_addOption "--enable-version3"
+    else
+        do_removeOption "--enable-version3"
     fi
 
     # handle non-free libs
-    if [[ $nonfree = "y" ]] && do_checkForOptions "--enable-libfdk-aac --enable-nvenc \
-        --enable-libfaac"; then
+    local nonfree="--enable-libfdk-aac --enable-nvenc --enable-libfaac --enable-openssl"
+    if [[ $license = "nonfree" ]] && do_checkForOptions "$nonfree"; then
         do_addOption "--enable-nonfree"
     else
-        do_removeOption "--enable-nonfree"
-        do_removeOption "--enable-libfdk-aac"
-        do_removeOption "--enable-nvenc"
-        do_removeOption "--enable-libfaac"
+        do_removeOptions "$nonfree --enable-nonfree"
     fi
 
     if do_checkForOptions "--enable-frei0r"; then
         do_addOption "--enable-filter=frei0r"
     fi
 
-    # remove libmfx if compiling with xp compatibility
+    # handle WinXP-incompatible libs
     if [[ $xpcomp = "y" ]]; then
         do_removeOption "--enable-libmfx"
     fi
@@ -325,6 +336,12 @@ do_removeOption() {
     else
         FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
     fi
+}
+
+do_removeOptions() {
+    for option in $1; do
+        do_removeOption "$option"
+    done
 }
 
 do_patch() {

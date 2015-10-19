@@ -68,7 +68,7 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --disable-w32threads --enable-opencl --enable-libzimg ^
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
-set iniOptions=msys2Arch arch free vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
+set iniOptions=msys2Arch arch license vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
 mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
 
 set previousOptions=0
@@ -158,27 +158,36 @@ if %buildEnv%==3 (
 if %buildEnv% GTR 3 GOTO selectSystem
 if %writeArch%==yes echo.arch=^%buildEnv%>>%ini%
 
-:selectNonFree
-set "writeFree=no"
-if %freeINI%==0 (
+:ffmpeglicense
+set "writeLicense=no"
+if %licenseINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Include non-free libraries [like fdkaac and faac]?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo. [you will not be able to redistribute binaries including these]
+    echo. Build FFmpeg with which license?
+    echo. 1 = Non-free [unredistributable, but can include anything]
+    echo. 2 = GPL^(v3^) [disables OpenSSL and FDK-AAC]
+    echo. 3 = LGPL^(v3^) [also disables x264, x265, XviD, a lot of filters, etc.]
+    echo.
+    echo. If building for yourself, it's OK to choose non-free.
+    echo. If building to redistribute online, choose GPL or LGPL.
+    echo. If you want to use FFmpeg together with closed source software, choose LGPL
+    echo. and follow instructions in https://www.ffmpeg.org/legal.html
+    echo.
+    echo. ^(L^)GPL is automatically upgraded to version 3 if using any library that
+    echo. needs it, otherwise non-version 3 versions are used.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P nonfree="Non-free binaries: "
-    ) else set nonfree=%freeINI%
-if %deleteINI%==1 set "writeFree=yes"
+    set /P ffmpegLicense="FFmpeg license: "
+    ) else set ffmpegLicense=%licenseINI%
+if %deleteINI%==1 set "writeLicense=yes"
 
-if %nonfree%==1 set "binary=y"
-if %nonfree%==2 set "binary=n"
-if %nonfree% GTR 2 GOTO selectNonFree
-if %writeFree%==yes echo.free=^%nonfree%>>%ini%
+if %ffmpegLicense%==1 set "license=nonfree"
+if %ffmpegLicense%==2 set "license=gpl"
+if %ffmpegLicense%==3 set "license=lgpl"
+if %ffmpegLicense% GTR 3 GOTO ffmpeglicense
+if %writeLicense%==yes echo.license=^%ffmpegLicense%>>%ini%
 
 :vpx
 set "writevpx=no"
@@ -1240,7 +1249,7 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --nonfree=%binary%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
+--mpv=%mpv% --license=%license%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
 
 endlocal
 goto:eof

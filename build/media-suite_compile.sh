@@ -4,7 +4,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --enable-gpl --enable-avisynth --pkg-config-flags=--static"
+FFMPEG_BASE_OPTS="--disable-debug --enable-avisynth --pkg-config-flags=--static"
 FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -39,7 +39,7 @@ while true; do
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --mpv=* ) mpv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
---nonfree=* ) nonfree="${1#*=}"; shift ;;
+--license=* ) license="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
@@ -1287,7 +1287,7 @@ fi
 
 if [[ $mplayer = "y" ]]; then
     cd $LOCALBUILDDIR
-    [[ $nonfree = "n" ]] && faac="--disable-faac --disable-faac-lavc"
+    [[ $license != "nonfree" ]] && faac="--disable-faac --disable-faac-lavc"
 
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer bin-video/mplayer.exe
 
