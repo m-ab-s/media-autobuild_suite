@@ -3,25 +3,6 @@ media-autobuild_suite
 
 [![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
-https://github.com/rdp/ffmpeg-windows-build-helpers
-
-It is based on msys2 and tested under Windows 7, 8.1. and 10.
-http://sourceforge.net/projects/msys2/
-
-I use some jscript parts from nu774:
-https://github.com/nu774/fdkaac_autobuild
-
-Thanks to all of them!
-
-
-For information about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
-
-Download
---------
-
-### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
-
 Known Issues
 --------
  - FFmpeg and FFmpeg-based (mplayer, mpv)
@@ -32,6 +13,14 @@ Known Issues
 		1. run mintty using the shortcut
 		2. enter and run `pacman -Sy --noconfirm --force mintty`
 		3. close mintty and re-run the .bat as normal
+
+Download
+--------
+
+#### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
+
+For information about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
+
 
 Included Tools And Libraries
 --------
@@ -123,7 +112,19 @@ Included Tools And Libraries
 
 
 --------
+ Information
+--------
 
+This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
+https://github.com/rdp/ffmpeg-windows-build-helpers
+
+It is based on msys2 and tested under Windows 7, 8.1. and 10.
+http://sourceforge.net/projects/msys2/
+
+I use some jscript parts from nu774:
+https://github.com/nu774/fdkaac_autobuild
+
+Thanks to all of them!
 
 This Windows Batchscript setups a MinGW/GCC compiler environment for building ffmpeg and other media tools under Windows.
 After building the environment it retrieves and compiles all tools. All tools get static compiled, no external .dlls needed (with some optional exceptions)
@@ -150,6 +151,16 @@ To save a bit of space you can delete, after compiling, all source folders (exce
 Have fun!
 
 
+Troubleshooting
+--------
+
+If there's some error during compilation follow these steps:
+ 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
+ 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
+ 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste compile.log to some place like [Sprunge.us](http://sprunge.us) or [Gist](https://gist.github.com/), the contents of the .ini file and contents of ffmpeg_options.txt to the post itself if you're using it (these are small, so no need to use other sites);
+ 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
+ 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
+
 
 What The Individual Files Do
 --------
@@ -171,17 +182,6 @@ media-autobuild_suite.bat
 
 /build/ffmpeg_options.txt
  - If you select the option to choose your own FFmpeg optional libraries, this file will contain options that get sent to FFmpeg's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg without features you don't need or with additional features not compiled by default, if supported.
-	
-
-Troubleshooting
---------
-
-If there's some error during compilation follow these steps:
- 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
- 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste compile.log to some place like [Sprunge.us](http://sprunge.us) or [Gist](https://gist.github.com/), the contents of the .ini file and contents of ffmpeg_options.txt to the post itself if you're using it (these are small, so no need to use other sites);
- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
- 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 
 
 References
