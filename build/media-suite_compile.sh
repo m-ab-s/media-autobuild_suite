@@ -173,9 +173,9 @@ if do_checkForOptions "--enable-gnutls"; then
 
     do_pacman_install "libgcrypt nettle"
 
-    if do_pkgConfig "gnutls = 3.4.5"; then
+    if do_pkgConfig "gnutls = 3.4.6"; then
         cd $LOCALBUILDDIR
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.5.tar.xz"
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
         [[ -d build ]] && rm -rf build
         mkdir build && cd build
         if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
@@ -189,7 +189,7 @@ if do_checkForOptions "--enable-gnutls"; then
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
         lib/gnutls.pc
         do_makeinstall
-        do_checkIfExist gnutls-3.4.5 libgnutls.a
+        do_checkIfExist gnutls-3.4.6 libgnutls.a
     fi
 fi
 
