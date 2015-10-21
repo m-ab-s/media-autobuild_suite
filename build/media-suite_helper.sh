@@ -244,9 +244,6 @@ do_getFFmpegConfig() {
         # add openssl if neither are in options and librtmp is and nonfree
         do_addOption "--enable-openssl"
         do_removeOption "--enable-libutvideo"
-    else
-        # add gcrypt if using schannel
-        do_addOption "--enable-gcrypt"
     fi
 
     # handle WinXP-incompatible libs
@@ -301,6 +298,10 @@ do_changeFFmpegConfig() {
 
     if do_checkForOptions "--enable-frei0r"; then
         do_addOption "--enable-filter=frei0r"
+    fi
+
+    if do_checkForOptions "--enable-gnutls --enable-openssl"; then
+        do_removeOptions "--enable-gcrypt --enable-gmp"
     fi
 
     # remove libs that don't work with shared
