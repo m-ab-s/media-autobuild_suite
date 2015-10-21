@@ -1,25 +1,31 @@
-From 1ad3b5b79e37b3356cd3f99704eca13fafec76d7 Mon Sep 17 00:00:00 2001
+From e309b37003a17e6a55750e7a0cf009e55fa9b7aa Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 4 Oct 2015 14:48:49 +0200
 Subject: [PATCH] avformat: implement SChannel SSP TLS protocol
 
-not implemented:
-- listen support
-- loading of CA or Cert files
+This implementation does not support TLS listen sockets and loading
+CA/Certs from files.
+
+The Windows API does not support loading PEM certs, and would either
+require a manual loader or instead be limited to loading Windows PFX
+certificates
+
+TLS listen sockets would have to be implemented quite separately, as many
+of the APIs are different for server-mode (as opposed to client mode).
 ---
- configure                  |  22 +-
+ configure                  |  20 +-
  libavformat/Makefile       |   1 +
  libavformat/allformats.c   |   1 +
  libavformat/tls.h          |   2 +-
  libavformat/tls_schannel.c | 601 +++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 622 insertions(+), 5 deletions(-)
+ 5 files changed, 621 insertions(+), 4 deletions(-)
  create mode 100644 libavformat/tls_schannel.c
 
 diff --git a/configure b/configure
-index eeb2936..6191b59 100755
+index 1bbaf7f..b9ac04d 100755
 --- a/configure
 +++ b/configure
-@@ -280,6 +280,8 @@ External library support:
+@@ -281,6 +281,8 @@ External library support:
    --enable-opengl          enable OpenGL rendering [no]
    --enable-openssl         enable openssl, needed for https support
                             if gnutls is not used [no]
@@ -28,7 +34,7 @@ index eeb2936..6191b59 100755
    --disable-sdl            disable sdl [autodetect]
    --disable-securetransport disable Secure Transport, needed for TLS support
                             on OSX if openssl and gnutls are not used [autodetect]
-@@ -1446,6 +1448,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1467,6 +1469,7 @@ EXTERNAL_LIBRARY_LIST="
      opencl
      opengl
      openssl
@@ -36,7 +42,7 @@ index eeb2936..6191b59 100755
      sdl
      securetransport
      x11grab
-@@ -2733,13 +2736,15 @@ sctp_protocol_deps="struct_sctp_event_subscribe"
+@@ -2756,13 +2759,15 @@ sctp_protocol_deps="struct_sctp_event_subscribe"
  sctp_protocol_select="network"
  srtp_protocol_select="rtp_protocol"
  tcp_protocol_select="network"
@@ -55,16 +61,7 @@ index eeb2936..6191b59 100755
  udp_protocol_select="network"
  udplite_protocol_select="network"
  unix_protocol_deps="sys_un_h"
-@@ -5405,7 +5410,7 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
- enabled openssl           && require_pkg_config openssl openssl/ssl.h SSL_library_init
- enabled qtkit_indev      && { check_header_oc QTKit/QTKit.h || disable qtkit_indev; }
- 
--if enabled gnutls; then
-+if ! enabled openssl; then
-     { check_lib2 gmp.h mpz_export -lgmp && enable gmp; } ||
-     { check_lib gcrypt.h gcry_mpi_new -lgcrypt && enable gcrypt; }
- fi
-@@ -5448,6 +5453,15 @@ disabled securetransport || { check_func SecIdentityCreate "-Wl,-framework,CoreF
+@@ -5506,6 +5511,15 @@ disabled securetransport || { check_func SecIdentityCreate "-Wl,-framework,CoreF
      check_lib2 "Security/SecureTransport.h Security/Security.h" "SSLCreateContext SecItemImport" "-Wl,-framework,CoreFoundation -Wl,-framework,Security" &&
      enable securetransport; }
  
@@ -81,10 +78,10 @@ index eeb2936..6191b59 100755
  enabled makeinfo \
      && [ 0$(makeinfo --version | grep "texinfo" | sed 's/.*texinfo[^0-9]*\([0-9]*\)\..*/\1/') -ge 5 ] \
 diff --git a/libavformat/Makefile b/libavformat/Makefile
-index 2971912..bc2aabf 100644
+index 42b1e19..dc772ae 100644
 --- a/libavformat/Makefile
 +++ b/libavformat/Makefile
-@@ -532,6 +532,7 @@ OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
+@@ -538,6 +538,7 @@ OBJS-$(CONFIG_SUBFILE_PROTOCOL)          += subfile.o
  OBJS-$(CONFIG_TCP_PROTOCOL)              += tcp.o
  OBJS-$(CONFIG_TLS_GNUTLS_PROTOCOL)       += tls_gnutls.o tls.o
  OBJS-$(CONFIG_TLS_OPENSSL_PROTOCOL)      += tls_openssl.o tls.o
@@ -93,10 +90,10 @@ index 2971912..bc2aabf 100644
  OBJS-$(CONFIG_UDP_PROTOCOL)              += udp.o
  OBJS-$(CONFIG_UDPLITE_PROTOCOL)          += udp.o
 diff --git a/libavformat/allformats.c b/libavformat/allformats.c
-index 0ccde9d..7180db3 100644
+index 5f691ef..443f4a1 100644
 --- a/libavformat/allformats.c
 +++ b/libavformat/allformats.c
-@@ -383,6 +383,7 @@ void av_register_all(void)
+@@ -389,6 +389,7 @@ void av_register_all(void)
      REGISTER_PROTOCOL(SRTP,             srtp);
      REGISTER_PROTOCOL(SUBFILE,          subfile);
      REGISTER_PROTOCOL(TCP,              tcp);
@@ -119,7 +116,7 @@ index 2a36f34..0326ef7 100644
      char *ca_file;
 diff --git a/libavformat/tls_schannel.c b/libavformat/tls_schannel.c
 new file mode 100644
-index 0000000..0f4ae25
+index 0000000..d8a35bc
 --- /dev/null
 +++ b/libavformat/tls_schannel.c
 @@ -0,0 +1,601 @@
@@ -313,7 +310,7 @@ index 0000000..0f4ae25
 +            if (sspi_ret == SEC_E_WRONG_PRINCIPAL)
 +                av_log(h, AV_LOG_ERROR, "SNI or certificate check failed\n");
 +            else
-+                av_log(h, AV_LOG_ERROR, "Creating security context failed (%ld)\n", sspi_ret);
++                av_log(h, AV_LOG_ERROR, "Creating security context failed (0x%lx)\n", sspi_ret);
 +            ret = AVERROR_UNKNOWN;
 +            goto fail;
 +        }
@@ -374,7 +371,7 @@ index 0000000..0f4ae25
 +                                         NULL, 0, &c->ctxt_handle, &outbuf_desc, &c->context_flags,
 +                                         &c->ctxt_timestamp);
 +    if(sspi_ret != SEC_I_CONTINUE_NEEDED) {
-+        av_log(h, AV_LOG_ERROR, "Unable to create initial security context (%ld)\n", sspi_ret);
++        av_log(h, AV_LOG_ERROR, "Unable to create initial security context (0x%lx)\n", sspi_ret);
 +        ret = AVERROR_UNKNOWN;
 +        goto fail;
 +    }
@@ -406,8 +403,8 @@ index 0000000..0f4ae25
 +        goto fail;
 +
 +    if (s->listen) {
-+        av_log(h, AV_LOG_ERROR, "TLS Listen Sockets are not supported\n");
-+        ret = -1;
++        av_log(h, AV_LOG_ERROR, "TLS Listen Sockets with SChannel is not implemented.\n");
++        ret = AVERROR(EINVAL);
 +        goto fail;
 +    }
 +
@@ -428,7 +425,7 @@ index 0000000..0f4ae25
 +                                        NULL,  &schannel_cred, NULL, NULL, &c->cred_handle,
 +                                        &c->cred_timestamp);
 +    if (sspi_ret != SEC_E_OK) {
-+        av_log(h, AV_LOG_ERROR, "Unable to acquire security credentials (%ld)\n", sspi_ret);
++        av_log(h, AV_LOG_ERROR, "Unable to acquire security credentials (0x%lx)\n", sspi_ret);
 +        ret = AVERROR_UNKNOWN;
 +        goto fail;
 +    }
@@ -724,6 +721,3 @@ index 0000000..0f4ae25
 +    .flags          = URL_PROTOCOL_FLAG_NETWORK,
 +    .priv_data_class = &tls_class,
 +};
--- 
-2.5.2
-

@@ -163,7 +163,7 @@ fi
 # crypto engine
 #----------------------
 
-if do_checkForOptions "--enable-gnutls"; then
+if do_checkForOptions "--enable-gcrypt --enable-gnutls"; then
     rm -f $LOCALDESTDIR/include/libgcrypt.h
     rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
     rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
@@ -172,25 +172,25 @@ if do_checkForOptions "--enable-gnutls"; then
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
 
     do_pacman_install "libgcrypt nettle"
+fi
 
-    if do_pkgConfig "gnutls = 3.4.6"; then
-        cd $LOCALBUILDDIR
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
-        [[ -d build ]] && rm -rf build
-        mkdir build && cd build
-        if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
-            rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/lib/libgnutls*
-            rm -f $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-            rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
-        fi
-        ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
-            --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
-            --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
-        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
-        lib/gnutls.pc
-        do_makeinstall
-        do_checkIfExist gnutls-3.4.6 libgnutls.a
+if do_checkForOptions "--enable-gnutls" && do_pkgConfig "gnutls = 3.4.6"; then
+    cd $LOCALBUILDDIR
+    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
+    [[ -d build ]] && rm -rf build
+    mkdir build && cd build
+    if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
+        rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/lib/libgnutls*
+        rm -f $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
+        rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
     fi
+    ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
+        --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
+        --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
+    sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
+    lib/gnutls.pc
+    do_makeinstall
+    do_checkIfExist gnutls-3.4.6 libgnutls.a
 fi
 
 if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
@@ -1226,7 +1226,8 @@ if [[ $ffmpeg != "n" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions "--enable-openssl --enable-gnutls" ||
-            do_patch "ffmpeg-0003-avformat-implement-SChannel.patch" am
+            { do_patch "ffmpeg-0003-avformat-implement-SChannel.patch" am &&
+              do_patch "ffmpeg-0004-configure-Add-options-to-use-gmp-or-gcrypt.patch" am; }
 
         rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
         rm -rf $LOCALDESTDIR/include/lib{sw{scale,resample},postproc}

@@ -231,19 +231,22 @@ do_getFFmpegConfig() {
     fi
     export arch
 
-    # prefer openssl if both are in options and nonfree
     if do_checkForOptions "--enable-openssl" && [[ $license = "nonfree" ]]; then
+        # prefer openssl if both are in options and nonfree
         do_removeOption "--enable-gnutls"
         do_removeOption "--enable-libutvideo"
-    # prefer gnutls if both are in options and free
     elif do_checkForOptions "--enable-openssl"; then
+        # prefer gnutls if both are in options and free
         do_removeOption "--enable-openssl"
         do_addOption "--enable-gnutls"
-    # add openssl if neither are in options and librtmp is and nonfree
     elif ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
          do_checkForOptions "--enable-librtmp" && [[ $license = "nonfree" ]]; then
+        # add openssl if neither are in options and librtmp is and nonfree
         do_addOption "--enable-openssl"
         do_removeOption "--enable-libutvideo"
+    else
+        # add gcrypt if using schannel
+        do_addOption "--enable-gcrypt"
     fi
 
     # handle WinXP-incompatible libs
@@ -282,7 +285,7 @@ do_changeFFmpegConfig() {
 
     # handle (l)gplv3 libs
     if do_checkForOptions "--enable-libopencore-amrwb --enable-libopencore-amrnb \
-        --enable-libvo-aacenc --enable-libvo-amrwbenc"; then
+        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp"; then
         do_addOption "--enable-version3"
     else
         do_removeOption "--enable-version3"
