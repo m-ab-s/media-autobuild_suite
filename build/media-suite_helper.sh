@@ -245,6 +245,12 @@ do_getFFmpegConfig() {
         do_addOption "--enable-openssl"
         do_removeOption "--enable-libutvideo"
     fi
+
+    # handle WinXP-incompatible libs
+    if [[ $xpcomp = "y" ]]; then
+        do_removeOptions "--enable-libmfx --enable-decklink --enable-tesseract \
+            --enable-opencl --enable-libcaca"
+    fi
 }
 
 do_changeFFmpegConfig() {
@@ -292,11 +298,6 @@ do_changeFFmpegConfig() {
 
     if do_checkForOptions "--enable-frei0r"; then
         do_addOption "--enable-filter=frei0r"
-    fi
-
-    # handle WinXP-incompatible libs
-    if [[ $xpcomp = "y" ]]; then
-        do_removeOption "--enable-libmfx"
     fi
 
     # remove libs that don't work with shared
