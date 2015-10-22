@@ -1227,7 +1227,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions "--enable-openssl --enable-gnutls" ||
             { do_patch "ffmpeg-0003-avformat-implement-SChannel.patch" am &&
-              do_patch "ffmpeg-0004-configure-Add-options-to-use-gmp-or-gcrypt.patch" am; }
+              do_patch "ffmpeg-0004-configure-Add-options-to-use-gmp.patch" am; }
 
         rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
         rm -rf $LOCALDESTDIR/include/lib{sw{scale,resample},postproc}
