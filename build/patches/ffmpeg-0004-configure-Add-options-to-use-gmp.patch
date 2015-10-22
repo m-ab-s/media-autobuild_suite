@@ -1,51 +1,54 @@
-From a130d12e4678c679dd2699abda888b62801c14fc Mon Sep 17 00:00:00 2001
+From 148dac060a0b3fee3044e0378810871276a29816 Mon Sep 17 00:00:00 2001
 From: Ricardo Constantino <wiiaboo@gmail.com>
 Date: Wed, 21 Oct 2015 17:02:27 +0100
-Subject: [PATCH] configure: Add options to use gmp or gcrypt
+Subject: [PATCH] configure: Add option to use gmp
 
 Enables RTMP(T)E support with SChannel
 ---
- configure | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ configure | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 40853ea..c5a79c6 100755
+index 961ba10..f9f2ce3 100755
 --- a/configure
 +++ b/configure
-@@ -199,6 +199,10 @@ External library support:
+@@ -199,6 +199,8 @@ External library support:
    --enable-chromaprint     enable audio fingerprinting with chromaprint [no]
    --enable-fontconfig      enable fontconfig, useful for drawtext filter [no]
    --enable-frei0r          enable frei0r video filtering [no]
-+  --enable-gcrypt          enable gcrypt, needed for rtmp(t)e support
-+                           with SChannel if gmp is not used [no]
 +  --enable-gmp             enable gmp, needed for rtmp(t)e support
-+                           with SChannel if gcrypt is not used [no]
++                           with SChannel [no]
    --enable-gnutls          enable gnutls, needed for https support
                             if openssl is not used [no]
    --disable-iconv          disable iconv [autodetect]
-@@ -1394,6 +1398,8 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1394,6 +1396,7 @@ EXTERNAL_LIBRARY_LIST="
      crystalhd
      decklink
      frei0r
-+    gcrypt
 +    gmp
      gnutls
      iconv
      ladspa
-@@ -1944,8 +1950,6 @@ CONFIG_EXTRA="
-     fmtconvert
+@@ -1945,7 +1948,6 @@ CONFIG_EXTRA="
      frame_thread_encoder
      g722dsp
--    gcrypt
+     gcrypt
 -    gmp
      golomb
      gplv3
      h263dsp
-@@ -5320,6 +5324,8 @@ enabled avisynth          && { { check_lib2 "windows.h" LoadLibrary; } ||
+@@ -4756,6 +4758,7 @@ die_license_disabled nonfree nvenc
+ enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
+ enabled gpl && die_license_disabled_gpl nonfree openssl
+ 
++die_license_disabled version3 gmp
+ die_license_disabled version3 libopencore_amrnb
+ die_license_disabled version3 libopencore_amrwb
+ die_license_disabled version3 libsmbclient
+@@ -5323,6 +5326,7 @@ enabled avisynth          && { { check_lib2 "windows.h" LoadLibrary; } ||
  enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_version -lchromaprint
  enabled decklink          && { check_header DeckLinkAPI.h || die "ERROR: DeckLinkAPI.h header not found"; }
  enabled frei0r            && { check_header frei0r.h || die "ERROR: frei0r.h header not found"; }
-+enabled gcrypt            && require gcrypt gcrypt.h gcry_mpi_new -lgcrypt -lgpg-error
 +enabled gmp               && require2 gmp gmp.h mpz_export -lgmp
  enabled gnutls            && require_pkg_config gnutls gnutls/gnutls.h gnutls_global_init
  enabled ladspa            && { check_header ladspa.h || die "ERROR: ladspa.h header not found"; }
