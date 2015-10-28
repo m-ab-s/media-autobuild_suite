@@ -1369,9 +1369,11 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         do_checkIfExist luajit-git libluajit-5.1.a
     fi
 
-    rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/lib/libuchardet.a
-    rm -f $LOCALDESTDIR/lib/pkgconfig/uchardet.pc $LOCALDESTDIR/bin/uchardet.exe
-    do_pacman_install "uchardet-git"
+    rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
+    rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
+    do_pacman_install "uchardet-git libarchive"
+    grep -q "Libs.private" "$MINGW_PREFIX"/lib/pkgconfig/uchardet.pc ||
+        sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" "$MINGW_PREFIX"/lib/pkgconfig/uchardet.pc
 
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
