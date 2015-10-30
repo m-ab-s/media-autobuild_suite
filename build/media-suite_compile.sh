@@ -4,7 +4,7 @@ cpuCount=1
 compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
-FFMPEG_BASE_OPTS="--disable-debug --enable-avisynth --pkg-config-flags=--static"
+FFMPEG_BASE_OPTS="--enable-avisynth --pkg-config-flags=--static"
 FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
@@ -1396,7 +1396,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
             mpv_pthreads="--enable-win32-internal-pthreads"
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
-        --bindir=$LOCALDESTDIR/bin-video --disable-debug-build --enable-static-build \
+        --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit $mpv_pthreads --disable-libguess --enable-libarchive
 
         # Windows(?) has a lower argument limit than *nix so
