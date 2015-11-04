@@ -314,7 +314,7 @@ if do_checkForOptions "--enable-libtesseract"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
+    do_vcs "https://github.com/tesseract-ocr/tesseract.git#commit=d69965c" tesseract
     if [[ $compile = "true" ]]; then
         [[ -f configure ]] || ./autogen.sh
         [[ -f config.log ]] && make distclean
