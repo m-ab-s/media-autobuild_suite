@@ -231,6 +231,16 @@ do_getFFmpegConfig() {
     fi
     export arch
 
+    # OK to use OpenSSL for rtmpdump if nonfree
+    if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
+        do_checkForOptions "--enable-librtmp"; then
+        if [[ "$license" = "nonfree" ]]; then
+            do_addOption "--enable-openssl"
+        else
+            do_addOption "--enable-gnutls"
+        fi
+    fi
+
     if do_checkForOptions "--enable-openssl" && [[ $license = "nonfree" ]]; then
         # prefer openssl if both are in options and nonfree
         do_removeOption "--enable-gnutls"
@@ -239,11 +249,6 @@ do_getFFmpegConfig() {
         # prefer gnutls if both are in options and free
         do_removeOption "--enable-openssl"
         do_addOption "--enable-gnutls"
-    elif ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
-         do_checkForOptions "--enable-librtmp" && [[ $license = "nonfree" ]]; then
-        # add openssl if neither are in options and librtmp is and nonfree
-        do_addOption "--enable-openssl"
-        do_removeOption "--enable-libutvideo"
     fi
 
     # handle WinXP-incompatible libs

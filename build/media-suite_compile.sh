@@ -163,7 +163,8 @@ fi
 # crypto engine
 #----------------------
 
-if do_checkForOptions "--enable-gcrypt --enable-gnutls"; then
+if do_checkForOptions "--enable-gcrypt --enable-gnutls" ||
+    [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; then
     rm -f $LOCALDESTDIR/include/libgcrypt.h
     rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
     rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
@@ -174,7 +175,8 @@ if do_checkForOptions "--enable-gcrypt --enable-gnutls"; then
     do_pacman_install "libgcrypt nettle"
 fi
 
-if do_checkForOptions "--enable-gnutls" && do_pkgConfig "gnutls = 3.4.6"; then
+if { do_checkForOptions "--enable-gnutls" || [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; } &&
+    do_pkgConfig "gnutls = 3.4.6"; then
     cd $LOCALBUILDDIR
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
     [[ -d build ]] && rm -rf build
@@ -199,7 +201,7 @@ if [[ $rtmpdump = "y" ]] || do_checkForOptions "--enable-librtmp"; then
     extracommands=""
     req=""
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
-    if do_checkForOptions "--enable-gnutls"; then
+    if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
     else
