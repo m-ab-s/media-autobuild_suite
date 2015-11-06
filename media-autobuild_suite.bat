@@ -732,7 +732,7 @@ if not exist %instdir%\mintty.lnk (
         echo.echo -------------------------------------------------------------------------------
         echo.echo "You probably will need to manually close this window after this."
         echo.echo -------------------------------------------------------------------------------
-        echo.pacman --noconfirm -S --needed --asdeps bash pacman --ignore msys2-runtime
+        echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.sleep ^4
         echo.exit
         )>%build%\firstUpdate.sh
@@ -744,7 +744,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     (
         echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --force --asdeps --ignore msys2-runtime
+        echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
         )>%build%\secondUpdate.sh
     %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
