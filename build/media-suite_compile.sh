@@ -146,7 +146,8 @@ if do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig 
     fi
 fi
 
-if ! do_checkForOptions "--disable-sdl --disable-ffplay" && do_pkgConfig "sdl = 1.2.15"; then
+if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffplay"; } &&
+    do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove "SDL"
     cd $LOCALBUILDDIR
     do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
