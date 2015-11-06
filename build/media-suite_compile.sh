@@ -160,24 +160,14 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffpla
     do_checkIfExist SDL-1.2.15 libSDL.a
 fi
 
-#----------------------
-# crypto engine
-#----------------------
-
-if do_checkForOptions "--enable-gcrypt --enable-gnutls" ||
-    [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; then
-    rm -f $LOCALDESTDIR/include/libgcrypt.h
-    rm -f $LOCALDESTDIR/bin-global/{dumpsexp,hmac256,mpicalc}.exe
-    rm -f $LOCALDESTDIR/lib/libgcrypt.{l,}a $LOCALDESTDIR/bin-global/libgcrypt-config
+if { do_checkForOptions "--enable-gnutls" || [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; } &&
+    do_pkgConfig "gnutls = 3.4.6"; then
 
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
+    do_pacman_install nettle
+    do_pacman_remove libgcrypt
 
-    do_pacman_install "libgcrypt nettle"
-fi
-
-if { do_checkForOptions "--enable-gnutls" || [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; } &&
-    do_pkgConfig "gnutls = 3.4.6"; then
     cd $LOCALBUILDDIR
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
     [[ -d build ]] && rm -rf build
