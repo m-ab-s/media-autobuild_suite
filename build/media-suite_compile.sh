@@ -96,8 +96,9 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype --enable-fontconfig --enable-libfribidi"; } ||
-    [[ "$mpv" = "y" || "$mplayer" = "y" ]]; then
+if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
+    --enable-fontconfig --enable-libfribidi"; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
     if do_pkgConfig "freetype2 = 18.0.12"; then
         cd $LOCALBUILDDIR
