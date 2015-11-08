@@ -241,7 +241,7 @@ if [[ $sox = "y" ]]; then
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
         [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
         echo -------------------------------------------------
-        echo "file-5.24[libmagic] is already compiled"
+        echo "file-5.25[libmagic] is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
@@ -252,7 +252,6 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
         fi
-        do_patch "file-1-fixes.patch"
         do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
         do_checkIfExist file-5.25 libmagic.a
     fi
