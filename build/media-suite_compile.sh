@@ -535,26 +535,15 @@ if do_checkForOptions "--enable-libfaac"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libvorbis"; then
-    if [[ -f $LOCALDESTDIR/bin-audio/oggenc.exe ]] &&
-        [[ $(oggenc.exe --version) = *"vorbis-tools 1.4.0"* ]]; then
-        echo -------------------------------------------------
-        echo "vorbis-tools-1.4.0 is already compiled"
-        echo -------------------------------------------------
-    else
-        cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile vorbis-tools $bits\007"
-        do_wget "http://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.0.tar.gz"
-        [[ -f "oggenc/oggenc.exe" ]] && make distclean
-        [[ -f "$LOCALDESTDIR/bin-audio/oggenc.exe" ]] &&
-            rm -f $LOCALDESTDIR/bin-audio/ogg{enc,dec}.exe
-        do_generic_conf --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
-            $(do_checkForOptions "--enable-libspeex" || echo "--disable-speex") \
-            $([[ $flac = "y" ]] || echo "--disable-flac")
-        make -j $cpuCount
-        [[ -f oggenc/oggenc.exe ]] && cp -f oggenc/oggenc.exe oggdec/oggdec.exe $LOCALDESTDIR/bin-audio/
-        do_checkIfExist vorbis-tools-1.4.0 bin-audio/oggenc.exe
-    fi
+if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/oggenc.exe ]]; then
+    cd $LOCALBUILDDIR
+    do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools bin-audio/oggenc.exe
+    [[ -f Makefile ]] && make distclean || ./autogen.sh
+    rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
+    do_generic_confmakeinstall --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
+        $(do_checkForOptions "--enable-libspeex" || echo "--without-speex") \
+        $([[ $flac = "y" ]] || echo "--without-flac")
+    do_checkIfExist vorbis-tools-git bin-audio/oggenc.exe
 fi
 
 if do_checkForOptions "--enable-libopus"; then
