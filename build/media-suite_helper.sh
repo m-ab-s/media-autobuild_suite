@@ -231,12 +231,11 @@ do_getFFmpegConfig() {
     fi
     export arch
 
-    # OK to use OpenSSL for rtmpdump if nonfree
+    # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
+    # If nonfree will use SChannel if neither openssl or gnutls are in the options
     if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
         do_checkForOptions "--enable-librtmp"; then
-        if [[ "$license" = "nonfree" ]]; then
-            do_addOption "--enable-openssl"
-        else
+        if [[ "$license" != "nonfree" ]]; then
             do_addOption "--enable-gnutls"
         fi
     fi
