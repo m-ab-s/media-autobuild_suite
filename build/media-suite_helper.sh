@@ -294,11 +294,22 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    local nonfree="--enable-libfdk-aac --enable-nvenc --enable-libfaac --enable-openssl"
+    local nonfree="--enable-nvenc --enable-libfaac"
     if [[ $license = "nonfree" ]] && do_checkForOptions "$nonfree"; then
         do_addOption "--enable-nonfree"
     else
         do_removeOptions "$nonfree --enable-nonfree"
+    fi
+
+    # handle gpl-incompatible libs
+    local nonfreegpl="--enable-libfdk-aac --enable-openssl"
+    if do_checkForOptions "$nonfreegpl"; then
+        if [[ $license = "nonfree" ]]; then
+            do_addOption "--enable-nonfree"
+        elif [[ $license = "gpl" ]]; then
+            do_removeOptions "$nonfreegpl"
+        fi
+        # no lgpl here because they are accepted with it
     fi
 
     if do_checkForOptions "--enable-frei0r"; then
