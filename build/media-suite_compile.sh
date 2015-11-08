@@ -446,7 +446,7 @@ if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } &&
 fi
 
 if [[ $flac = "y" || $sox = "y" ]] &&
-    { [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]] || do_pkgConfig "flac = 1.3.1"; } then
+    { do_pkgConfig "flac = 1.3.1" || [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]]; } then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && make distclean
