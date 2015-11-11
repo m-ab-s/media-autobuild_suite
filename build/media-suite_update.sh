@@ -166,11 +166,13 @@ fi
 # packet msys2 system
 # --------------------------------------------------
 
-echo "-------------------------------------------------------------------------------"
-echo "updating msys2 system..."
-echo "-------------------------------------------------------------------------------"
-pacman --noconfirm -Su --force --ignoregroup base
-pacman --noconfirm -Su --force
+if [[ -n "$(pacman -Qu)" ]]; then
+    echo "-------------------------------------------------------------------------------"
+    echo "updating msys2 system..."
+    echo "-------------------------------------------------------------------------------"
+    pacman --noconfirm -Su --force --ignoregroup base
+    pacman --noconfirm -Su --force
+fi
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
 fi
