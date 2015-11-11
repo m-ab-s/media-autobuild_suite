@@ -169,8 +169,8 @@ fi
 echo "-------------------------------------------------------------------------------"
 echo "updating msys2 system..."
 echo "-------------------------------------------------------------------------------"
-pacman --noconfirm -Su --force --asdeps --ignoregroup base
-pacman --noconfirm -Su --force --asdeps
+pacman --noconfirm -Su --force --ignoregroup base
+pacman --noconfirm -Su --force
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
 fi
