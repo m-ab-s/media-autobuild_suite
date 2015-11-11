@@ -170,6 +170,7 @@ if [[ -n "$(pacman -Qu)" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "updating msys2 system..."
     echo "-------------------------------------------------------------------------------"
+    do_unhide_all_sharedlibs
     pacman --noconfirm -Su --force --ignoregroup base
     pacman --noconfirm -Su --force
 fi

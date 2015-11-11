@@ -450,10 +450,14 @@ do_hide_pacman_sharedlibs() {
     local files=$(pacman -Qql $packages 2>/dev/null | grep .dll.a)
 
     for file in $files; do
-        if [[ -f "$file" && -f "${file%*.dll.a}.a" ]]; then
-            mv -f "${file}" "${file}.dyn"
-        elif [[ -n "$revert" && -f "${file}.dyn" ]]; then
-            mv -f "${file}.dyn" "${file}"
+        if [[ -f "${file%*.dll.a}.a" ]]; then
+            if [[ -z "$revert" ]]; then
+                mv -f "${file}" "${file}.dyn"
+            elif [[ -n "$revert" && -f "${file}.dyn" && ! -f "${file}" ]]; then
+                mv -f "${file}.dyn" "${file}"
+            elif [[ -n "$revert" && -f "${file}.dyn" ]]; then
+                rm -f "${file}.dyn"
+            fi
         fi
     done
 }
@@ -464,6 +468,19 @@ do_hide_all_sharedlibs() {
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] &&
             { [[ $dryrun != "y" ]] && mv -f "${file}" "${file}.dyn" || echo "${file}"; }
+    done
+}
+
+do_unhide_all_sharedlibs() {
+    [[ x"$1" = "xdry" ]] && local dryrun="y"
+    local files=$(find /mingw{32,64} -name *.dll.a.dyn)
+
+    for file in $files; do
+        if [[ -f "${file%*.dyn}" ]]; then
+            [[ $dryrun != "y" ]] && rm -f "${file}" || echo "rm ${file}"
+        else
+            [[ $dryrun != "y" ]] && mv -f "${file}" "${file%*.dyn}" || echo "${file}"
+        fi
     done
 }
 
