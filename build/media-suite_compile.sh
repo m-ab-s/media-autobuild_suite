@@ -1366,7 +1366,11 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" "$MINGW_PREFIX"/lib/pkgconfig/uchardet.pc
 
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
+    if [[ $xpcomp = "y" ]]; then
+        do_vcs "https://github.com/mpv-player/mpv.git#commit=8f7b12d9" mpv bin-video/mpv.exe
+    else
+        do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
+    fi
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
