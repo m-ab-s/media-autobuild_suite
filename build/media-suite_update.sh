@@ -64,13 +64,19 @@ fi
 # packet update system
 # --------------------------------------------------
 
+echo
+echo "-------------------------------------------------------------------------------"
+echo "Updating pacman database..."
+echo "-------------------------------------------------------------------------------"
+echo
+
 pacman -Sy
 pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - > /dev/null
 
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
-    echo "checking pacman packages..."
+    echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
     old=$(pacman -Qqe | sort)
@@ -135,7 +141,7 @@ fi
 # --------------------------------------------------
 
 echo "-------------------------------------------------------------------------------"
-echo "checking profiles..."
+echo "Checking profiles..."
 echo "-------------------------------------------------------------------------------"
 echo
 
@@ -168,7 +174,7 @@ fi
 
 if [[ -n "$(pacman -Qu)" ]]; then
     echo "-------------------------------------------------------------------------------"
-    echo "updating msys2 system..."
+    echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
     do_unhide_all_sharedlibs
     pacman --noconfirm -Su --force --ignoregroup base
@@ -181,7 +187,7 @@ fi
 do_hide_all_sharedlibs
 
 echo "-------------------------------------------------------------------------------"
-echo "updating msys2 done..."
+echo "Updates finished."
 echo "-------------------------------------------------------------------------------"
 
 sleep 2
