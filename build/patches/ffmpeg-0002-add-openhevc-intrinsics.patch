@@ -1,7 +1,7 @@
-From 2219c15ff2b9e22bbb54d2fd2cd2069d4a3de888 Mon Sep 17 00:00:00 2001
+From 5a4353cc1fef62a3a24de44ca9f3a4ebd90a9c30 Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 17 Aug 2014 13:26:23 +0200
-Subject: [PATCH 2/2] add openhevc intrinsics
+Subject: [PATCH 2/5] add openhevc intrinsics
 
 All patches from http://git.1f0.de/gitweb?p=ffmpeg.git;a=summary;js=1
 hevc: port intrinsic SSE2 IDCT from OpenHEVC
@@ -50,10 +50,10 @@ index eb17663..57e233d 100644
  
  #endif /* AVCODEC_HEVCPRED_H */
 diff --git a/libavcodec/x86/Makefile b/libavcodec/x86/Makefile
-index febaccd..a5ca9ec 100644
+index 0d09fe6..9cbfaeb 100644
 --- a/libavcodec/x86/Makefile
 +++ b/libavcodec/x86/Makefile
-@@ -141,7 +141,9 @@ YASM-OBJS-$(CONFIG_HEVC_DECODER)       += x86/hevc_mc.o                 \
+@@ -145,7 +145,9 @@ YASM-OBJS-$(CONFIG_HEVC_DECODER)       += x86/hevc_mc.o                 \
                                            x86/hevc_idct.o               \
                                            x86/hevc_res_add.o            \
                                            x86/hevc_sao.o                \
@@ -1793,10 +1793,10 @@ index ad8168f..74184f6 100644
 +
  #endif // AVCODEC_X86_HEVCDSP_H
 diff --git a/libavcodec/x86/hevcdsp_init.c b/libavcodec/x86/hevcdsp_init.c
-index ddc876d..0386cea 100644
+index 2181f6d..8ae8268 100644
 --- a/libavcodec/x86/hevcdsp_init.c
 +++ b/libavcodec/x86/hevcdsp_init.c
-@@ -724,6 +724,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -719,6 +719,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
              c->transform_add[1]    = ff_hevc_transform_add8_8_sse2;
              c->transform_add[2]    = ff_hevc_transform_add16_8_sse2;
              c->transform_add[3]    = ff_hevc_transform_add32_8_sse2;
@@ -1809,7 +1809,7 @@ index ddc876d..0386cea 100644
          }
          if (EXTERNAL_SSSE3(cpu_flags)) {
              if(ARCH_X86_64) {
-@@ -876,6 +882,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -871,6 +877,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
              c->transform_add[1]    = ff_hevc_transform_add8_10_sse2;
              c->transform_add[2]    = ff_hevc_transform_add16_10_sse2;
              c->transform_add[3]    = ff_hevc_transform_add32_10_sse2;
@@ -1822,7 +1822,7 @@ index ddc876d..0386cea 100644
          }
          if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
              c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_10_ssse3;
-@@ -1076,6 +1088,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -1071,6 +1083,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
              c->idct_dc[1] = ff_hevc_idct8x8_dc_12_sse2;
              c->idct_dc[2] = ff_hevc_idct16x16_dc_12_sse2;
              c->idct_dc[3] = ff_hevc_idct32x32_dc_12_sse2;
@@ -1835,7 +1835,7 @@ index ddc876d..0386cea 100644
          }
          if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
              c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_12_ssse3;
-@@ -1112,3 +1130,35 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -1107,3 +1125,35 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
          }
      }
  }
@@ -1903,5 +1903,5 @@ index 0000000..d26e5bf
 +#endif // AVCODEC_X86_HEVCPRED_H
 \ No newline at end of file
 -- 
-2.5.2
+2.6.3
 

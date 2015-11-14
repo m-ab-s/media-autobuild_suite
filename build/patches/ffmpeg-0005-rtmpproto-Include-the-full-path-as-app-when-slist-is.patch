@@ -1,7 +1,7 @@
-From d77119e3f61ab5725185b2559ed2c012f31d22ad Mon Sep 17 00:00:00 2001
+From ff20de0b07ac900810c9ea2220c036066d1e248f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
 Date: Wed, 11 Nov 2015 22:47:37 +0200
-Subject: rtmpproto: Include the full path as app when "slist=" is
+Subject: [PATCH 4/5] rtmpproto: Include the full path as app when "slist=" is
  found
 
 This matches what librtmp does. This fixes automatic url parsing of
@@ -26,5 +26,5 @@ index f0c1422..bd1c38a 100644
          // Strip any further query parameters from fname
          amp = strchr(fname, '&');
 -- 
-2.6.2
+2.6.3
 

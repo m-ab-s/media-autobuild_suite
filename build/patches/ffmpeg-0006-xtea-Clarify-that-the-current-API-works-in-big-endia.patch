@@ -1,7 +1,8 @@
-From f9a144f999fd46cb8f9e583b624a08639b5c8e3d Mon Sep 17 00:00:00 2001
+From 0da0391d42cb77c1dc5e64428b4633d70c5b396f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
 Date: Wed, 11 Nov 2015 22:47:52 +0200
-Subject: [PATCH] xtea: Clarify that the current API works in big endian mode
+Subject: [PATCH 5/5] xtea: Clarify that the current API works in big endian
+ mode
 
 xtea: Add functions for little endian mode
 
@@ -109,15 +110,15 @@ index 2065ec6..a0c914f 100644
  
  static void rtmpe9_sig(const uint8_t *in, uint8_t *out, int key_id)
 diff --git a/libavutil/version.h b/libavutil/version.h
-index 909f9a6..bcad658 100644
+index bcad658..8198e6d 100644
 --- a/libavutil/version.h
 +++ b/libavutil/version.h
 @@ -56,7 +56,7 @@
   */
  
  #define LIBAVUTIL_VERSION_MAJOR  55
--#define LIBAVUTIL_VERSION_MINOR   5
-+#define LIBAVUTIL_VERSION_MINOR   6
+-#define LIBAVUTIL_VERSION_MINOR   6
++#define LIBAVUTIL_VERSION_MINOR   7
  #define LIBAVUTIL_VERSION_MICRO 100
  
  #define LIBAVUTIL_VERSION_INT   AV_VERSION_INT(LIBAVUTIL_VERSION_MAJOR, \
@@ -337,5 +338,5 @@ index bcf786c..735427c 100644
   */
  
 -- 
-2.6.2
+2.6.3
 

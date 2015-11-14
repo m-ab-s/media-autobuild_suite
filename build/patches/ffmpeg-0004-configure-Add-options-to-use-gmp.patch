@@ -1,7 +1,7 @@
-From 148dac060a0b3fee3044e0378810871276a29816 Mon Sep 17 00:00:00 2001
+From fbfeed8a6d40efd8fef2c44806b8d36ef2beda48 Mon Sep 17 00:00:00 2001
 From: Ricardo Constantino <wiiaboo@gmail.com>
 Date: Wed, 21 Oct 2015 17:02:27 +0100
-Subject: [PATCH] configure: Add option to use gmp
+Subject: [PATCH 3/5] configure: Add option to use gmp
 
 Enables RTMP(T)E support with SChannel
 ---
@@ -9,7 +9,7 @@ Enables RTMP(T)E support with SChannel
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 961ba10..f9f2ce3 100755
+index 0ecf1aa..8f9f7d1 100755
 --- a/configure
 +++ b/configure
 @@ -199,6 +199,8 @@ External library support:
@@ -21,7 +21,7 @@ index 961ba10..f9f2ce3 100755
    --enable-gnutls          enable gnutls, needed for https support
                             if openssl is not used [no]
    --disable-iconv          disable iconv [autodetect]
-@@ -1394,6 +1396,7 @@ EXTERNAL_LIBRARY_LIST="
+@@ -1395,6 +1397,7 @@ EXTERNAL_LIBRARY_LIST="
      crystalhd
      decklink
      frei0r
@@ -29,7 +29,7 @@ index 961ba10..f9f2ce3 100755
      gnutls
      iconv
      ladspa
-@@ -1945,7 +1948,6 @@ CONFIG_EXTRA="
+@@ -1946,7 +1949,6 @@ CONFIG_EXTRA="
      frame_thread_encoder
      g722dsp
      gcrypt
@@ -37,7 +37,7 @@ index 961ba10..f9f2ce3 100755
      golomb
      gplv3
      h263dsp
-@@ -4756,6 +4758,7 @@ die_license_disabled nonfree nvenc
+@@ -4759,6 +4761,7 @@ die_license_disabled nonfree nvenc
  enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
  enabled gpl && die_license_disabled_gpl nonfree openssl
  
@@ -45,7 +45,7 @@ index 961ba10..f9f2ce3 100755
  die_license_disabled version3 libopencore_amrnb
  die_license_disabled version3 libopencore_amrwb
  die_license_disabled version3 libsmbclient
-@@ -5323,6 +5326,7 @@ enabled avisynth          && { { check_lib2 "windows.h" LoadLibrary; } ||
+@@ -5325,6 +5328,7 @@ enabled avisynth          && { { check_lib2 "windows.h" LoadLibrary; } ||
  enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_version -lchromaprint
  enabled decklink          && { check_header DeckLinkAPI.h || die "ERROR: DeckLinkAPI.h header not found"; }
  enabled frei0r            && { check_header frei0r.h || die "ERROR: frei0r.h header not found"; }
@@ -54,5 +54,5 @@ index 961ba10..f9f2ce3 100755
  enabled ladspa            && { check_header ladspa.h || die "ERROR: ladspa.h header not found"; }
  enabled libiec61883       && require libiec61883 libiec61883/iec61883.h iec61883_cmp_connect -lraw1394 -lavc1394 -lrom1394 -liec61883
 -- 
-2.6.2
+2.6.3
 
