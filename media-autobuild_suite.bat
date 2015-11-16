@@ -164,18 +164,26 @@ if %licenseINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build FFmpeg with which license?
+    echo. Build FFmpeg/rtmpdump with which license?
     echo. 1 = Non-free [unredistributable, but can include anything]
     echo. 2 = GPL^(v3^) [disables OpenSSL and FDK-AAC]
-    echo. 3 = LGPL^(v3^) [also disables x264, x265, XviD, a lot of filters, etc.]
+    echo. 3 = LGPL^(v3^) [disables x264, x265, XviD, a lot of filters, etc.]
     echo.
     echo. If building for yourself, it's OK to choose non-free.
     echo. If building to redistribute online, choose GPL or LGPL.
     echo. If you want to use FFmpeg together with closed source software, choose LGPL
     echo. and follow instructions in https://www.ffmpeg.org/legal.html
     echo.
+    echo. In the case of rtmpdump, since it's the binary is GPL, it will be compiled
+    echo. with GnuTLS if ^(L^)GPL is chosen, but if Non-free will use OpenSSL.
+    echo. If not building rtmpdump, but just librtmp ^(which is LGPL^) to use in FFmpeg,
+    echo. OpenSSL can be used.
+    echo.
     echo. ^(L^)GPL is automatically upgraded to version 3 if using any library that
     echo. needs it, otherwise non-version 3 versions are used.
+    echo.
+    echo. OpenSSL and FDK-AAC have licenses incompatible with GPL but compatible
+    echo. with LGPL, so they won't be disabled automatically.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -247,7 +255,7 @@ if %xpcompINI%==0 (
     echo. 1 = Yes
     echo. 2 = No [recommended]
     echo.
-    echo. Examples: x265, disabled QuickSync, etc.
+    echo. Examples: x265, disabled QuickSync, old mpv, etc.
     echo. This usually causes worse performance in all systems.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
