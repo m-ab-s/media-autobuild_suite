@@ -13,7 +13,7 @@ FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
---disable-w32threads --enable-opencl --enable-libzimg \
+--disable-w32threads --enable-opencl --enable-libzimg --disable-debug \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
@@ -1465,10 +1465,12 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -name x265.exe -newer $LOCALBUILDDIR/last_run | \
-        xargs -r strip --strip-all
+    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay"
+    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -regex ".*\(${nostrip}\)\.exe" \
+        -newer "$LOCALBUILDDIR"/last_run | xargs -r strip --strip-all
     find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
     printf "done!\n"
+    unset nostrip
 fi
 
 if [[ $packing = "y" ]]; then
