@@ -100,7 +100,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
     --enable-fontconfig --enable-libfribidi"; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
-    if do_pkgConfig "freetype2 = 18.0.12"; then
+    if do_pkgConfig "freetype2 = 18.0.12" "2.6"; then
         cd $LOCALBUILDDIR
         do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
         [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
@@ -222,7 +222,7 @@ fi
 if [[ $sox = "y" ]]; then
     if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
         echo -------------------------------------------------
-        echo "libgnurx-2.5.1 is already compiled"
+        echo "libgnurx is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
@@ -241,7 +241,7 @@ if [[ $sox = "y" ]]; then
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
         [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
         echo -------------------------------------------------
-        echo "file-5.25[libmagic] is already compiled"
+        echo "file-5.25 is already compiled"
         echo -------------------------------------------------
     else
         cd $LOCALBUILDDIR
@@ -335,7 +335,8 @@ if do_checkForOptions "--enable-libtesseract"; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } && do_pkgConfig "rubberband = 1.8.1"; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } &&
+    do_pkgConfig "rubberband = 1.8.1"; then
     cd $LOCALBUILDDIR
     if [[ ! -d rubberband-master ]] || [[ -d rubberband-master ]] &&
     { [[ $build32 = "yes" && ! -f rubberband-master/build_successful32bit ]] ||
@@ -826,7 +827,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
     cd $LOCALBUILDDIR
     if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
         echo -------------------------------------------------
-        echo "xavs is already compiled"
+        echo "libxavs is already compiled"
         echo -------------------------------------------------
     else
         echo -ne "\033]0;compile xavs $bits\007"
@@ -961,7 +962,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
     if [[ "$missing" = "n" ]] &&
         grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
         echo -------------------------------------------------
-        echo "DeckLinkAPI is already installed"
+        echo "DeckLinkAPI-10.5 is already installed"
         echo -------------------------------------------------
     else
         echo -ne "\033]0;installing DeckLinkAPI $bits\007"
