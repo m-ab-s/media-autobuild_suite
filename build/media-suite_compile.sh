@@ -540,7 +540,7 @@ if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools bin-audio/oggenc.exe
     [[ -f Makefile ]] && make distclean || ./autogen.sh
     rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
-    do_generic_confmakeinstall --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
+    do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
         $(do_checkForOptions "--enable-libspeex" || echo "--without-speex") \
         $([[ $flac = "y" ]] || echo "--without-flac")
     do_checkIfExist vorbis-tools-git bin-audio/oggenc.exe
