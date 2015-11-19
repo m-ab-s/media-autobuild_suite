@@ -1,10 +1,7 @@
-From 0da0391d42cb77c1dc5e64428b4633d70c5b396f Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
-Date: Wed, 11 Nov 2015 22:47:52 +0200
-Subject: [PATCH 5/5] xtea: Clarify that the current API works in big endian
- mode
-
-xtea: Add functions for little endian mode
+From b361d5c4be606f4252a8ed4f3b844c9050a07276 Mon Sep 17 00:00:00 2001
+From: Ricardo Constantino <wiiaboo@gmail.com>
+Date: Thu, 19 Nov 2015 15:00:43 +0000
+Subject: [PATCH] xtea: Add functions for little endian mode
 
 rtmpcrypt: Do the xtea decryption in little endian mode
 
@@ -18,10 +15,9 @@ type 8 (XTEA), e.g. crunchyroll.
 rtmpcrypt: Provide the xtea keys in little endian format for consistency
 ---
  libavformat/rtmpcrypt.c | 68 +++++++++++++++++------------------
- libavutil/version.h     |  2 +-
  libavutil/xtea.c        | 94 ++++++++++++++++++++++++++++++++++++++++++-------
- libavutil/xtea.h        | 29 +++++++++++++--
- 4 files changed, 143 insertions(+), 50 deletions(-)
+ libavutil/xtea.h        | 23 ++++++++++++
+ 3 files changed, 138 insertions(+), 47 deletions(-)
 
 diff --git a/libavformat/rtmpcrypt.c b/libavformat/rtmpcrypt.c
 index 2065ec6..a0c914f 100644
@@ -109,19 +105,6 @@ index 2065ec6..a0c914f 100644
  }
  
  static void rtmpe9_sig(const uint8_t *in, uint8_t *out, int key_id)
-diff --git a/libavutil/version.h b/libavutil/version.h
-index bcad658..8198e6d 100644
---- a/libavutil/version.h
-+++ b/libavutil/version.h
-@@ -56,7 +56,7 @@
-  */
- 
- #define LIBAVUTIL_VERSION_MAJOR  55
--#define LIBAVUTIL_VERSION_MINOR   6
-+#define LIBAVUTIL_VERSION_MINOR   7
- #define LIBAVUTIL_VERSION_MICRO 100
- 
- #define LIBAVUTIL_VERSION_INT   AV_VERSION_INT(LIBAVUTIL_VERSION_MAJOR, \
 diff --git a/libavutil/xtea.c b/libavutil/xtea.c
 index 0d58cba..2139aa5 100644
 --- a/libavutil/xtea.c
@@ -287,21 +270,13 @@ index 0d58cba..2139aa5 100644
  
      printf("Test encryption/decryption success.\n");
 diff --git a/libavutil/xtea.h b/libavutil/xtea.h
-index bcf786c..735427c 100644
+index 06f5a2f..735427c 100644
 --- a/libavutil/xtea.h
 +++ b/libavutil/xtea.h
-@@ -45,12 +45,23 @@ AVXTEA *av_xtea_alloc(void);
-  * Initialize an AVXTEA context.
-  *
-  * @param ctx an AVXTEA context
-- * @param key a key of 16 bytes used for encryption/decryption
-+ * @param key a key of 16 bytes used for encryption/decryption,
-+ *            interpreted as big endian 32 bit numbers
-  */
+@@ -51,6 +51,15 @@ AVXTEA *av_xtea_alloc(void);
  void av_xtea_init(struct AVXTEA *ctx, const uint8_t key[16]);
  
  /**
-- * Encrypt or decrypt a buffer using a previously initialized context.
 + * Initialize an AVXTEA context.
 + *
 + * @param ctx an AVXTEA context
@@ -311,12 +286,10 @@ index bcf786c..735427c 100644
 +void av_xtea_le_init(struct AVXTEA *ctx, const uint8_t key[16]);
 +
 +/**
-+ * Encrypt or decrypt a buffer using a previously initialized context,
-+ * in big endian format.
+  * Encrypt or decrypt a buffer using a previously initialized context,
+  * in big endian format.
   *
-  * @param ctx an AVXTEA context
-  * @param dst destination array, can be equal to src
-@@ -63,6 +74,20 @@ void av_xtea_crypt(struct AVXTEA *ctx, uint8_t *dst, const uint8_t *src,
+@@ -65,6 +74,20 @@ void av_xtea_crypt(struct AVXTEA *ctx, uint8_t *dst, const uint8_t *src,
                     int count, uint8_t *iv, int decrypt);
  
  /**
