@@ -339,7 +339,6 @@ do_changeFFmpegConfig() {
 }
 
 do_checkForOptions() {
-    local isPresent=1
     for option in "$@"; do
         for option2 in $option; do
             if grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
@@ -347,7 +346,7 @@ do_checkForOptions() {
             fi
         done
     done
-    return $isPresent
+    return 1
 }
 
 do_addOption() {
