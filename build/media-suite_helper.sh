@@ -342,7 +342,7 @@ do_checkForOptions() {
     local isPresent=1
     for option in "$@"; do
         for option2 in $option; do
-            if grep -qE "$option2" <(echo "$FFMPEG_OPTS"); then
+            if grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
                 return 0
             fi
         done
