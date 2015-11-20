@@ -342,8 +342,8 @@ do_checkForOptions() {
     local isPresent=1
     for option in "$@"; do
         for option2 in $option; do
-            if echo "$FFMPEG_OPTS" | grep -q -E -e "$option2"; then
-                isPresent=0
+            if grep -qE "$option2" <(echo "$FFMPEG_OPTS"); then
+                return 0
             fi
         done
     done
