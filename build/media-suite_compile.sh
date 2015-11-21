@@ -378,10 +378,17 @@ echo
 echo "-------------------------------------------------------------------------------"
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
-    rm -rf $LOCALBUILDDIR/dcadec-git $LOCALDESTDIR/include/libdcadec
-    rm -f $LOCALDESTDIR/lib/{libdcadec.a,pkgconfig/dcadec.pc}
-    rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
-    do_pacman_install "dcadec-git"
+    do_pacman_remove "dcadec-git"
+    cd $LOCALBUILDDIR
+    do_vcs "https://github.com/foo86/dcadec.git" dcadec
+    if [[ $compile = "true" ]]; then
+        rm -rf $LOCALDESTDIR/include/libdcadec
+        rm -f $LOCALDESTDIR/lib/{libdcadec.a,pkgconfig/dcadec.pc}
+        rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
+        [[ -f libdcadec/libdcadec.a ]] && make clean
+        make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
+        do_checkIfExist dcadec-git libdcadec.a
+    fi
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
