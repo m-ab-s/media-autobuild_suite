@@ -100,14 +100,14 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
     --enable-fontconfig --enable-libfribidi"; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
-    if do_pkgConfig "freetype2 = 18.0.12" "2.6"; then
+    if do_pkgConfig "freetype2 = 18.1.12" "2.6.1"; then
         cd $LOCALBUILDDIR
-        do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.tar.bz2"
+        do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.1.tar.bz2"
         [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
         rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
         rm -f $LOCALDESTDIR/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
         do_generic_confmakeinstall global --with-harfbuzz=no
-        do_checkIfExist freetype-2.6 libfreetype.a
+        do_checkIfExist freetype-2.6.1 libfreetype.a
         buildLibass="y"
     fi
 
