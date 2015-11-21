@@ -1,0 +1,149 @@
+From 6125aa9b5d10dd3b89ac9d033525708904121cd9 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Sat, 21 Nov 2015 23:31:19 +0000
+Subject: [PATCH] CMake: allow static-only builds
+
+---
+ CMakeLists.txt           | 7 +++++++
+ src/CMakeLists.txt       | 8 ++++++++
+ src/tools/CMakeLists.txt | 7 +++++++
+ test/CMakeLists.txt      | 8 +++++++-
+ 4 files changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6d37230..2f6d738 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,5 @@
+ ######## Project settings
++
+ cmake_minimum_required(VERSION 2.8)
+ set (PACKAGE_NAME opencc)
+ project (${PACKAGE_NAME} CXX C)
+@@ -37,6 +38,10 @@ set (DIR_SHARE ${DIR_PREFIX}/share)
+ set (DIR_BIN ${DIR_PREFIX}/bin)
+ set (DIR_ETC ${DIR_PREFIX}/etc)
+ 
++if (DEFINED CMAKE_INSTALL_BINDIR)
++	set (DIR_BIN ${CMAKE_INSTALL_BINDIR})
++endif (DEFINED CMAKE_INSTALL_BINDIR)
++
+ if (DEFINED CMAKE_INSTALL_LIBDIR)
+ 	set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
+ 	set (DIR_LIBRARY_STATIC ${CMAKE_INSTALL_LIBDIR})
+@@ -61,6 +66,8 @@ set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
+ 
+ option(BUILD_STATIC "Build static library"
+        ON)
++option(BUILD_SHARED_LIBS "Build shared library and link executables against it"
++	   ON)
+ 
+ configure_file(
+ 	uchardet.pc.in
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 42574ce..91b66a9 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -45,11 +45,13 @@ add_definitions(
+ 	-Wall
+ )
+ 
++if (BUILD_SHARED_LIBS)
+ add_library(
+ 	${UCHARDET_TARGET}
+ 	SHARED
+ 	${UCHARDET_SOURCES}
+ )
++endif (BUILD_SHARED_LIBS)
+ 
+ if (BUILD_STATIC)
+     add_library(
+@@ -59,6 +61,7 @@ if (BUILD_STATIC)
+     )
+ endif (BUILD_STATIC)
+ 
++if (BUILD_SHARED_LIBS)
+ set_target_properties(
+ 	${UCHARDET_TARGET}
+ 	PROPERTIES
+@@ -71,6 +74,7 @@ set_target_properties(
+ 		SOVERSION
+ 			0
+ )
++endif (BUILD_SHARED_LIBS)
+ 
+ if (BUILD_STATIC)
+     set_target_properties(
+@@ -90,6 +94,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
+ 	)
+ endif (CMAKE_BUILD_TYPE MATCHES Debug)
+ 
++if (BUILD_SHARED_LIBS)
+ if (NOT WIN32)
+ install(
+ 	TARGETS
+@@ -107,6 +112,7 @@ install(
+ 		${DIR_LIBRARY}
+ )
+ endif (NOT WIN32)
++endif (BUILD_SHARED_LIBS)
+ 
+ if (BUILD_STATIC)
+     install(
+@@ -124,6 +130,8 @@ install(
+ 		${DIR_INCLUDE}/uchardet
+ )
+ 
++if (BUILD_SHARED_LIBS)
+ include(symbols.cmake)
++endif (BUILD_SHARED_LIBS)
+ 
+ add_subdirectory(tools)
+diff --git a/src/tools/CMakeLists.txt b/src/tools/CMakeLists.txt
+index 7ad3ff5..bc709ee 100644
+--- a/src/tools/CMakeLists.txt
++++ b/src/tools/CMakeLists.txt
+@@ -8,10 +8,17 @@ add_executable(
+ 	${UCHARDET_SOURCES}
+ )
+ 
++if (BUILD_SHARED_LIBS)
+ target_link_libraries(
+ 	uchardet
+ 	${UCHARDET_TARGET}
+ )
++else (BUILD_SHARED_LIBS)
++	target_link_libraries(
++		uchardet
++		${UCHARDET_STATIC_TARGET}
++	)
++endif (BUILD_SHARED_LIBS)
+ 
+ install(
+ 	TARGETS
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+index 6e48cab..ae307a1 100644
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -7,11 +7,17 @@ add_executable(
+ 	uchardet-tests
+ 	${UCHARDET_TEST_SOURCES}
+ )
+-
++if (BUILD_SHARED_LIBS)
+ target_link_libraries(
+ 	uchardet-tests
+ 	libuchardet
+ )
++else (BUILD_SHARED_LIBS)
++	target_link_libraries(
++		uchardet-tests
++		libuchardet_static
++	)
++endif (BUILD_SHARED_LIBS)
+ 
+ set_target_properties(
+ 	uchardet-tests
+-- 
+2.6.3
+

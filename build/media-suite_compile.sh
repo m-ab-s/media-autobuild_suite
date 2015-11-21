@@ -1371,11 +1371,18 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         do_checkIfExist luajit-git libluajit-5.1.a
     fi
 
-    rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
-    rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
-    do_pacman_install "uchardet-git libarchive"
-    grep -q "Libs.private" "$MINGW_PREFIX"/lib/pkgconfig/uchardet.pc ||
-        sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" "$MINGW_PREFIX"/lib/pkgconfig/uchardet.pc
+    do_pacman_remove "uchardet-git"
+    cd $LOCALBUILDDIR
+    do_vcs "https://github.com/BYVoid/uchardet.git" uchardet
+    if [[ $compile = "true" ]]; then
+        rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
+        rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
+        do_patch "uchardet-0001-CMake-allow-static-only-builds.patch"
+        LDFLAGS+=" -static-libgcc" do_cmakeinstall -DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-global
+        do_checkIfExist uchardet-git libuchardet.a
+    fi
+
+    do_pacman_install "libarchive"
 
     cd $LOCALBUILDDIR
     if [[ $xpcomp = "y" ]]; then
