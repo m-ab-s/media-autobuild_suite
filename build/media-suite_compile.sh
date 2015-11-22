@@ -1237,8 +1237,6 @@ if [[ $ffmpeg != "n" ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_patch "ffmpeg-0004-configure-Add-options-to-use-gmp.patch" am
-        do_patch "ffmpeg-0005-rtmpproto-Include-the-full-path-as-app-when-slist-is.patch" am
-        do_patch "ffmpeg-0006-xtea-Clarify-that-the-current-API-works-in-big-endia.patch" am
 
         rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
         rm -rf $LOCALDESTDIR/include/lib{sw{scale,resample},postproc}
