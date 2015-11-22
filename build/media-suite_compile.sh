@@ -261,7 +261,7 @@ if do_checkForOptions "--enable-libwebp"; then
     cd $LOCALBUILDDIR
     do_vcs "https://chromium.googlesource.com/webm/libwebp" libwebp
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libwebp.a ]]; then
             rm -rf $LOCALDESTDIR/include/webp
@@ -358,7 +358,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
         rm -f $LOCALDESTDIR/include/zimg{.h,++.hpp}
         rm -f $LOCALDESTDIR/lib/{lib,vs}zimg.{,l}a $LOCALDESTDIR/lib/pkgconfig/zimg.pc
         grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" zimg.pc.in
-        autoreconf -fi
+        do_autoreconf
         [[ -f config.log ]] && make distclean
         do_generic_confmakeinstall
         do_checkIfExist zimg-git libzimg.a
@@ -395,7 +395,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/TimothyGu/libilbc.git" libilbc
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libilbc.a ]]; then
             rm -rf $LOCALDESTDIR/include/ilbc.h
@@ -504,7 +504,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libfdk-aac.a ]]; then
             rm -rf $LOCALDESTDIR/include/fdk-aac
@@ -517,7 +517,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac bin-audio/fdkaac.exe
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
@@ -549,7 +549,7 @@ fi
 if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/oggenc.exe ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools bin-audio/oggenc.exe
-    autoreconf -fi
+    do_autoreconf
     [[ -f Makefile ]] && make distclean
     rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
@@ -603,7 +603,7 @@ if do_checkForOptions "--enable-libmp3lame"; then
         do_wget_sf "lame/lame/3.99/lame-3.99.5.tar.gz"
         if grep "xmmintrin\.h" configure.in; then
             do_patch lame-fixes.patch
-            autoreconf -fi
+            do_autoreconf
         fi
         [[ -f libmp3lame/.libs/libmp3lame.a ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libmp3lame.a ]]; then
@@ -655,7 +655,7 @@ if [[ $sox = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
-        ./autogen.sh
+        do_autogen
         [[ -f ./configure ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libsndfile.a ]]; then
             rm -f $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
@@ -672,7 +672,7 @@ if [[ $sox = "y" ]]; then
     do_vcs "git://git.code.sf.net/p/sox/code" sox bin-audio/sox.exe
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/bin-audio/sox.exe ]]; then
             rm -f $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/{sox{,i},play,rec}.exe
@@ -766,7 +766,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libdvdread.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdread
@@ -781,7 +781,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libdvdnav.a ]]; then
             rm -rf $LOCALDESTDIR/include/dvdnav
@@ -796,7 +796,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
     do_vcs "git://git.videolan.org/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libbluray.a ]]; then
             rm -rf $LOCALDESTDIR/include/bluray
@@ -829,7 +829,7 @@ if [[ $mpv = "y" || $mplayer = "y" ]] ||
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" || $buildLibass = "y" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         rm -rf $LOCALDESTDIR/include/ass
         rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
@@ -876,7 +876,7 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
         cd Project/GNU/Library
-        ./autogen.sh
+        do_autogen
         [[ -f "Makefile" ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libzen.a ]]; then
             rm -rf $LOCALDESTDIR/include/ZenLib $LOCALDESTDIR/bin-global/libzen-config
@@ -894,7 +894,7 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
-        ./autogen.sh
+        do_autogen
         [[ -f "Makefile" ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libmediainfo.a ]]; then
             rm -rf $LOCALDESTDIR/include/MediaInfo{,DLL}
@@ -912,7 +912,7 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo bin-video/mediainfo.exe
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
-        ./autogen.sh
+        do_autogen
         [[ -f "Makefile" ]] && make distclean
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
@@ -1018,7 +1018,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
-        autoreconf -fi
+        do_autoreconf
         [[ -f Makefile ]] && make distclean
         if [[ -f $LOCALDESTDIR/lib/libmfx.a ]]; then
             rm -rf $LOCALDESTDIR/include/mfx

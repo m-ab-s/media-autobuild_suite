@@ -543,3 +543,15 @@ do_prompt() {
     while read -s -e -t 0.1; do : ; done
     read -p "$1" ret
 }
+
+do_autoreconf() {
+    if [[ -f ./recently_updated && -z "$(ls build_successful* 2> /dev/null)" ]]; then
+        autoreconf -fiv
+    fi
+}
+
+do_autogen() {
+    if [[ -f ./recently_updated && -z "$(ls build_successful* 2> /dev/null)" ]]; then
+        ./autogen.sh
+    fi
+}
