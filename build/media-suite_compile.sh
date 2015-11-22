@@ -902,6 +902,7 @@ if [[ $mediainfo = "y" ]]; then
             rm -f $LOCALDESTDIR/bin-global/libmediainfo-config
         fi
         do_generic_conf LDFLAGS="$LDFLAGS -static-libgcc"
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
         cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
         do_checkIfExist libmediainfo-git libmediainfo.a
@@ -916,6 +917,7 @@ if [[ $mediainfo = "y" ]]; then
         [[ -f "Makefile" ]] && make distclean
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
         do_checkIfExist mediainfo-git bin-video/mediainfo.exe
     fi
