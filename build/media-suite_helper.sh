@@ -565,5 +565,7 @@ get_first_subdir() {
     if [[ "$subdir" != "$PWD" ]]; then
         subdir="${subdir%%/*}"
         echo "$subdir"
+    else
+        echo "."
     fi
 }
