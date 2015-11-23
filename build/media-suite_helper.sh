@@ -166,7 +166,7 @@ do_wget_sf() {
 
 # check if compiled file exist
 do_checkIfExist() {
-    local packetName="$1"
+    local packetName=$(get_first_subdir)
     local fileName="$2"
     local fileExtension=${fileName##*.}
     local buildSuccess="n"

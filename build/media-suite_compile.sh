@@ -76,7 +76,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
         do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
         do_cmakeinstall -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
-        do_checkIfExist libjpegturbo-git libjpeg.a
+        do_checkIfExist libjpeg.a
     fi
 
     cd $LOCALBUILDDIR
@@ -92,7 +92,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
         do_cmakeinstall -DBUILD_MJ2=on
         # ffmpeg needs this specific openjpeg.h
         cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
-        do_checkIfExist libopenjp2-git libopenmj2.a
+        do_checkIfExist libopenmj2.a
     fi
 fi
 
@@ -107,7 +107,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
         rm -f $LOCALDESTDIR/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
         do_generic_confmakeinstall global --with-harfbuzz=no
-        do_checkIfExist freetype-2.6.1 libfreetype.a
+        do_checkIfExist libfreetype.a
         buildLibass="y"
     fi
 
@@ -119,7 +119,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
         rm -f $LOCALDESTDIR/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
         do_generic_confmakeinstall global
-        do_checkIfExist fontconfig-2.11.94 libfontconfig.a
+        do_checkIfExist libfontconfig.a
         buildLibass="y"
     fi
 
@@ -132,7 +132,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -f $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
         do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
             LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
-        do_checkIfExist harfbuzz-1.0.5 libharfbuzz.a
+        do_checkIfExist libharfbuzz.a
         buildLibass="y"
     fi
 
@@ -143,7 +143,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
         rm -f $LOCALDESTDIR/lib/{libfribidi.{l,}a,pkgconfig/fribidi.pc}
         do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
-        do_checkIfExist fribidi-0.19.7 libfribidi.a
+        do_checkIfExist libfribidi.a
     fi
 fi
 
@@ -158,7 +158,7 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffpla
     CFLAGS="-DDECLSPEC=" do_generic_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
     sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-    do_checkIfExist SDL-1.2.15 libSDL.a
+    do_checkIfExist libSDL.a
 fi
 
 if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
@@ -185,7 +185,7 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
     lib/gnutls.pc
     do_makeinstall
-    do_checkIfExist gnutls-3.4.6 libgnutls.a
+    do_checkIfExist libgnutls.a
 fi
 
 if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
@@ -212,7 +212,7 @@ if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enab
             SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
             sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
             CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" install
-        do_checkIfExist librtmp-git librtmp.a
+        do_checkIfExist librtmp.a
         unset crypto pc req
     fi
 else
@@ -235,7 +235,7 @@ if [[ $sox = "y" ]]; then
         do_patch "libgnurx-1-additional-makefile-rules.patch"
         ./configure --prefix=$LOCALDESTDIR --disable-shared
         do_makeinstall -f Makefile.mxe install-static
-        do_checkIfExist mingw-libgnurx-2.5.1 libgnurx.a
+        do_checkIfExist libgnurx.a
     fi
 
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
@@ -253,7 +253,7 @@ if [[ $sox = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
         fi
         do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
-        do_checkIfExist file-5.25 libmagic.a
+        do_checkIfExist libmagic.a
     fi
 fi
 
@@ -273,7 +273,7 @@ if do_checkForOptions "--enable-libwebp"; then
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
             LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
             LDFLAGS="$LDFLAGS -static -static-libgcc"
-        do_checkIfExist libwebp-git libwebp.a
+        do_checkIfExist libwebp.a
     fi
 fi
 
@@ -288,7 +288,7 @@ if do_checkForOptions "--enable-libtesseract --enable-opencl"; then
         [[ -f "$syspath/OpenCL.dll" ]] && gendef "$syspath/OpenCL.dll"
         [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && mv -f libOpenCL.a $LOCALDESTDIR/lib/
-        do_checkIfExist opencl libOpenCL.a
+        do_checkIfExist libOpenCL.a
         unset syspath
     fi
 fi
@@ -304,7 +304,7 @@ if do_checkForOptions "--enable-libtesseract"; then
             rm -f $LOCALDESTDIR/lib/liblept.{,l}a $LOCALDESTDIR/lib/pkgconfig/lept.pc
         fi
         do_generic_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
-        do_checkIfExist leptonica-1.72 liblept.a
+        do_checkIfExist liblept.a
     fi
 
     cd $LOCALBUILDDIR
@@ -331,7 +331,7 @@ if do_checkForOptions "--enable-libtesseract"; then
                     > need_more_languages.txt
             popd > /dev/null
         fi
-        do_checkIfExist tesseract-git libtesseract.a
+        do_checkIfExist libtesseract.a
     fi
 fi
 
@@ -348,7 +348,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } &&
     [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
     [[ -f "lib/librubberband.a" ]] && make clean
     make PREFIX=$LOCALDESTDIR install-static
-    do_checkIfExist rubberband-master librubberband.a
+    do_checkIfExist librubberband.a
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
@@ -361,7 +361,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
         do_autoreconf
         [[ -f config.log ]] && make distclean
         do_generic_confmakeinstall
-        do_checkIfExist zimg-git libzimg.a
+        do_checkIfExist libzimg.a
     fi
 fi
 
@@ -387,7 +387,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
         rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
         [[ -f libdcadec/libdcadec.a ]] && make clean
         make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
-        do_checkIfExist dcadec-git libdcadec.a
+        do_checkIfExist libdcadec.a
     fi
 fi
 
@@ -402,7 +402,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
             rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
         fi
         do_generic_confmakeinstall
-        do_checkIfExist libilbc-git libilbc.a
+        do_checkIfExist libilbc.a
     fi
 fi
 
@@ -432,7 +432,7 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
         sed -i 's, __declspec(dllexport),,' include/opus_defines.h
 
         do_generic_confmakeinstall --disable-doc
-        do_checkIfExist opus-1.1 libopus.a
+        do_checkIfExist libopus.a
     fi
 
     rm -rf $LOCALDESTDIR/include/opus/opusfile.h $LOCALDESTDIR/lib/libopus{file,url}.{l,}a
@@ -451,7 +451,7 @@ if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } &&
     fi
     do_patch speex-mingw-winmm.patch
     do_generic_confmakeinstall audio --enable-vorbis-psy --enable-binaries
-    do_checkIfExist speex-1.2rc2 libspeex.a
+    do_checkIfExist libspeex.a
 fi
 
 if [[ $flac = "y" || $sox = "y" ]] &&
@@ -464,7 +464,7 @@ if [[ $flac = "y" || $sox = "y" ]] &&
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
     fi
     do_generic_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
-    do_checkIfExist flac-1.3.1 libFLAC.a
+    do_checkIfExist libFLAC.a
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-aacenc"; } &&
@@ -477,7 +477,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-aacenc"; } &&
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
     fi
     do_generic_confmakeinstall
-    do_checkIfExist vo-aacenc-0.1.3 libvo-aacenc.a
+    do_checkIfExist libvo-aacenc.a
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)"; then
@@ -497,7 +497,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-amrwbenc"; } &&
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
     fi
     do_generic_confmakeinstall
-    do_checkIfExist vo-amrwbenc-0.1.2 libvo-amrwbenc.a
+    do_checkIfExist libvo-amrwbenc.a
 fi
 
 if do_checkForOptions "--enable-libfdk-aac"; then
@@ -511,7 +511,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
             rm -f $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
         fi
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall
-        do_checkIfExist fdk-aac-git libfdk-aac.a
+        do_checkIfExist libfdk-aac.a
     fi
 
     cd $LOCALBUILDDIR
@@ -521,7 +521,7 @@ if do_checkForOptions "--enable-libfdk-aac"; then
         [[ -f Makefile ]] && make distclean
         rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
-        do_checkIfExist bin-fdk-aac-git bin-audio/fdkaac.exe
+        do_checkIfExist bin-audio/fdkaac.exe
     fi
 fi
 
@@ -542,7 +542,7 @@ if do_checkForOptions "--enable-libfaac"; then
             rm -f $LOCALDESTDIR/lib/libfaac.a $LOCALDESTDIR/bin-audio/faac.exe
         fi
         do_generic_confmakeinstall audio --without-mp4v2
-        do_checkIfExist faac-1.28 libfaac.a
+        do_checkIfExist libfaac.a
     fi
 fi
 
@@ -555,7 +555,7 @@ if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
         $(do_checkForOptions "--enable-libspeex" || echo "--without-speex") \
         $([[ $flac = "y" ]] || echo "--without-flac")
-    do_checkIfExist vorbis-tools-git bin-audio/oggenc.exe
+    do_checkIfExist bin-audio/oggenc.exe
 fi
 
 if do_checkForOptions "--enable-libopus"; then
@@ -573,7 +573,7 @@ if do_checkForOptions "--enable-libopus"; then
             rm -rf $LOCALDESTDIR/bin-audio/opus{dec,enc,info}.exe
         do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
             $([[ $flac = "y" ]] || echo "--without-flac")
-        do_checkIfExist opus-tools-0.1.9 bin-audio/opusenc.exe
+        do_checkIfExist bin-audio/opusenc.exe
     fi
 fi
 
@@ -588,7 +588,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libsoxr"; } && do_pkgC
     fi
     do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
     sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" $LOCALDESTDIR/lib/pkgconfig/soxr.pc
-    do_checkIfExist soxr-0.1.2-Source libsoxr.a
+    do_checkIfExist libsoxr.a
 fi
 
 if do_checkForOptions "--enable-libmp3lame"; then
@@ -611,7 +611,7 @@ if do_checkForOptions "--enable-libmp3lame"; then
             rm -f $LOCALDESTDIR/lib/libmp3lame.{l,}a $LOCALDESTDIR/bin-audio/lame.exe
         fi
         do_generic_confmakeinstall audio --disable-decoder
-        do_checkIfExist lame-3.99.5 libmp3lame.a
+        do_checkIfExist libmp3lame.a
     fi
 fi
 
@@ -625,7 +625,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libgme"; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libgme.pc
         fi
         do_cmakeinstall
-        do_checkIfExist libgme-git libgme.a
+        do_checkIfExist libgme.a
     fi
 fi
 
@@ -648,7 +648,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbs2b"; } &&
     do_patch "libbs2b-disable-sndfile.patch"
     do_patch "libbs2b-libs-only.patch"
     do_generic_confmakeinstall
-    do_checkIfExist libbs2b-3.1.0 libbs2b.a
+    do_checkIfExist libbs2b.a
 fi
 
 if [[ $sox = "y" ]]; then
@@ -664,7 +664,7 @@ if [[ $sox = "y" ]]; then
         do_generic_conf
         sed -i 's/ examples regtest tests programs//g' Makefile
         do_makeinstall
-        do_checkIfExist sndfile-git libsndfile.a
+        do_checkIfExist libsndfile.a
     fi
 
     cd $LOCALBUILDDIR
@@ -680,7 +680,7 @@ if [[ $sox = "y" ]]; then
         fi
         do_generic_confmakeinstall audio --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
             LIBS='-lpcre -lshlwapi -lz -lgnurx'
-        do_checkIfExist sox-git bin-audio/sox.exe
+        do_checkIfExist bin-audio/sox.exe
     fi
 fi
 
@@ -727,7 +727,7 @@ if [[ ! $vpx = "n" ]]; then
         [[ $vpx = "y"  && -f $LOCALDESTDIR/bin/vpxenc.exe ]] &&
             mv $LOCALDESTDIR/bin/vpx{enc,dec}.exe $LOCALDESTDIR/bin-video/ ||
             rm -f $LOCALDESTDIR/bin/vpx{enc,dec}.exe
-        do_checkIfExist vpx-git libvpx.a
+        do_checkIfExist libvpx.a
         buildFFmpeg="true"
         unset target
     fi
@@ -756,7 +756,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enab
             make all lib-static ARCH=x86_64 -j $cpuCount
         fi
         make install-{pc,prog,static} PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-video
-        do_checkIfExist kvazaar-git libkvazaar.a
+        do_checkIfExist libkvazaar.a
     fi
 else
     pkg-config --exists kvazaar || do_removeOption "--enable-libkvazaar"
@@ -773,7 +773,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
         fi
         do_generic_confmakeinstall
-        do_checkIfExist dvdread-git libdvdread.a
+        do_checkIfExist libdvdread.a
     fi
     grep -q 'ldl' $LOCALDESTDIR/lib/pkgconfig/dvdread.pc ||
         sed -i "/Libs:.*/ a\Libs.private: -ldl" $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
@@ -788,7 +788,7 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
             rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
         fi
         do_generic_confmakeinstall
-        do_checkIfExist dvdnav-git libdvdnav.a
+        do_checkIfExist libdvdnav.a
     fi
 fi
 
@@ -804,7 +804,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
         fi
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
         --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype
-        do_checkIfExist libbluray-git libbluray.a
+        do_checkIfExist libbluray.a
     fi
 fi
 
@@ -820,7 +820,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo"; then
         ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
         make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
         make install RANLIBX="${RANLIB-ranlib}"
-        do_checkIfExist libutvideo-git libutvideo.a
+        do_checkIfExist libutvideo.a
     fi
 fi
 
@@ -835,7 +835,7 @@ if [[ $mpv = "y" || $mplayer = "y" ]] ||
         rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
         [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
-        do_checkIfExist libass-git libass.a
+        do_checkIfExist libass.a
         buildFFmpeg="true"
         unset disable_fc buildLibass
     fi
@@ -867,7 +867,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
         cp -f xavs.h $LOCALDESTDIR/include
         cp -f libxavs.a $LOCALDESTDIR/lib
         cp -f xavs.pc $LOCALDESTDIR/lib/pkgconfig
-        do_checkIfExist xavs-distrotech-xavs libxavs.a
+        do_checkIfExist libxavs.a
     fi
 fi
 
@@ -886,7 +886,7 @@ if [[ $mediainfo = "y" ]]; then
         [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
         rm -f $LOCALDESTDIR/bin/libzen-config
-        do_checkIfExist libzen-git libzen.a
+        do_checkIfExist libzen.a
         buildMediaInfo="true"
     fi
 
@@ -905,7 +905,7 @@ if [[ $mediainfo = "y" ]]; then
         [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
         cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
-        do_checkIfExist libmediainfo-git libmediainfo.a
+        do_checkIfExist libmediainfo.a
         buildMediaInfo="true"
     fi
 
@@ -919,7 +919,7 @@ if [[ $mediainfo = "y" ]]; then
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
         [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
-        do_checkIfExist mediainfo-git bin-video/mediainfo.exe
+        do_checkIfExist bin-video/mediainfo.exe
     fi
 fi
 
@@ -932,7 +932,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvidstab"; then
             rm -rf $LOCALDESTDIR/lib/pkgconfig/vidstab.pc
         fi
         do_cmakeinstall
-        do_checkIfExist vidstab-git libvidstab.a
+        do_checkIfExist libvidstab.a
         buildFFmpeg="true"
     fi
 fi
@@ -959,7 +959,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzvbi"; } && do_pkgC
     cd src
     do_makeinstall
     cp ../zvbi-0.2.pc $LOCALDESTDIR/lib/pkgconfig
-    do_checkIfExist zvbi-0.2.35 libzvbi.a
+    do_checkIfExist libzvbi.a
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-frei0r"; } && do_pkgConfig "frei0r = 1.3.0"; then
@@ -971,7 +971,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-frei0r"; } && do_pkgCo
         rm -rf $LOCALDESTDIR/lib/frei0r-1 $LOCALDESTDIR/lib/pkgconfig/frei0r.pc
     fi
     do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
-    do_checkIfExist frei0r-plugins-1.4 frei0r-1/xfade0r.dll
+    do_checkIfExist frei0r-1/xfade0r.dll
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
@@ -995,7 +995,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
                 touch recently_updated
             cp -f "$file" "$LOCALDESTDIR/include/$file"
         done
-        do_checkIfExist DeckLinkAPI "include/DeckLinkAPI.h"
+        do_checkIfExist "include/DeckLinkAPI.h"
     fi
     unset missing
 fi
@@ -1012,7 +1012,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
             do_wget "http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip"
         [[ ! -f "$LOCALDESTDIR/include/nvEncodeAPI.h" ]] &&
             cp nvenc_5.0.1_sdk/Samples/common/inc/* "$LOCALDESTDIR/include/"
-        do_checkIfExist nvenc_5.0.1_sdk "include/nvEncodeAPI.h"
+        do_checkIfExist "include/nvEncodeAPI.h"
     fi
 fi
 
@@ -1027,7 +1027,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
         fi
         do_generic_confmakeinstall
-        do_checkIfExist libmfx-git libmfx.a
+        do_checkIfExist libmfx.a
     fi
 fi
 
@@ -1056,7 +1056,7 @@ if [[ $mp4box = "y" ]]; then
         make -j $cpuCount
         make install-lib
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
-        do_checkIfExist gpac-git bin-video/MP4Box.exe
+        do_checkIfExist bin-video/MP4Box.exe
     fi
 fi
 
@@ -1079,7 +1079,7 @@ if [[ ! $x264 = "n" ]]; then
             --disable-devices --disable-filters --disable-encoders --disable-muxers
 
             do_makeinstall
-            do_checkIfExist ffmpeg-git libavcodec.a
+            do_checkIfExist libavcodec.a
         else
             extracommands+=" --disable-lavf --disable-swscale --disable-ffms"
         fi
@@ -1096,7 +1096,7 @@ if [[ ! $x264 = "n" ]]; then
                 ./configure --prefix=$LOCALDESTDIR
                 make -j $cpuCount lib
                 make install-lib
-                do_checkIfExist lsmash-git liblsmash.a
+                do_checkIfExist liblsmash.a
             fi
             cd $LOCALBUILDDIR/x264-git
             # x264 prefers and only uses lsmash if available
@@ -1122,7 +1122,7 @@ if [[ ! $x264 = "n" ]]; then
         fi
         CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" ./configure --bit-depth=8 $extracommands
         do_makeinstall
-        do_checkIfExist x264-git libx264.a
+        do_checkIfExist libx264.a
         buildFFmpeg="true"
     fi
 else
@@ -1208,7 +1208,7 @@ EOF
             build_x265
             cp -f x265.exe $LOCALDESTDIR/bin-video/x265-numa.exe
         fi
-        do_checkIfExist x265-hg libx265.a
+        do_checkIfExist libx265.a
         buildFFmpeg="true"
         unset xpsupport assembly cli
     fi
@@ -1255,7 +1255,7 @@ if [[ $ffmpeg != "n" ]]; then
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
-            do_checkIfExist ffmpeg-git bin-video/ffmpegSHARED/bin/ffmpeg.exe
+            do_checkIfExist bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
                 mv build_successful${bits} build_successful${bits}_shared
         fi
@@ -1270,7 +1270,7 @@ if [[ $ffmpeg != "n" ]]; then
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
-            do_checkIfExist ffmpeg-git libavcodec.a
+            do_checkIfExist libavcodec.a
             newFfmpeg="yes"
         fi
     fi
@@ -1287,7 +1287,7 @@ if [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
     fi
     scons libav=none
     [[ -f build/f265cli.exe ]] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
-    do_checkIfExist f265 bin-video/f265cli.exe
+    do_checkIfExist bin-video/f265cli.exe
 else
     echo -------------------------------------------------
     echo "f265 is already compiled"
@@ -1341,7 +1341,7 @@ if [[ $mplayer = "y" ]]; then
         --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav"\
 
         do_makeinstall
-        do_checkIfExist mplayer-svn bin-video/mplayer.exe
+        do_checkIfExist bin-video/mplayer.exe
     fi
 fi
 
@@ -1358,7 +1358,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
         cp -r include/waio  $LOCALDESTDIR/include/
         cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
-        do_checkIfExist waio-git libwaio.a
+        do_checkIfExist libwaio.a
         unset _bits
     fi
 
@@ -1375,7 +1375,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
-        do_checkIfExist luajit-git libluajit-5.1.a
+        do_checkIfExist libluajit-5.1.a
     fi
 
     do_pacman_remove "uchardet-git"
@@ -1386,7 +1386,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
         do_patch "uchardet-0001-CMake-allow-static-only-builds.patch"
         LDFLAGS+=" -static-libgcc" do_cmakeinstall -DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-global
-        do_checkIfExist uchardet-git libuchardet.a
+        do_checkIfExist libuchardet.a
     fi
 
     do_pacman_install "libarchive"
@@ -1435,7 +1435,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
         fi
 
         unset mpv_ldflags mpv_pthreads replace
-        do_checkIfExist mpv-git bin-video/mpv.exe
+        do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
     fi
