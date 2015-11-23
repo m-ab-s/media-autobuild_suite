@@ -545,13 +545,25 @@ do_prompt() {
 }
 
 do_autoreconf() {
-    if [[ -f ./recently_updated && -z "$(ls build_successful* 2> /dev/null)" ]]; then
+    local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
+    if [[ -f "$basedir"/recently_updated &&
+        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
         autoreconf -fiv
     fi
 }
 
 do_autogen() {
-    if [[ -f ./recently_updated && -z "$(ls build_successful* 2> /dev/null)" ]]; then
+    local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
+    if [[ -f "$basedir"/recently_updated &&
+        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
         ./autogen.sh
+    fi
+}
+
+get_first_subdir() {
+    local subdir="${PWD#*build/}"
+    if [[ "$subdir" != "$PWD" ]]; then
+        subdir="${subdir%%/*}"
+        echo "$subdir"
     fi
 }
