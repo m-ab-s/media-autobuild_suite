@@ -1345,7 +1345,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
+if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
     if [[ ! -f $LOCALDESTDIR/lib/libwaio.a ]]; then
         cd $LOCALBUILDDIR
         do_vcs "git://midipix.org/waio" waio
@@ -1394,11 +1394,7 @@ if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat lib
     do_pacman_install "libarchive"
 
     cd $LOCALBUILDDIR
-    if [[ $xpcomp = "y" ]]; then
-        do_vcs "https://github.com/mpv-player/mpv.git#commit=8f7b12d9" mpv bin-video/mpv.exe
-    else
-        do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
-    fi
+    do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.

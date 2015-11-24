@@ -255,7 +255,7 @@ if %xpcompINI%==0 (
     echo. 1 = Yes
     echo. 2 = No [recommended]
     echo.
-    echo. Examples: x265, disabled QuickSync, old mpv, etc.
+    echo. Examples: x265, disabled QuickSync and mpv, etc.
     echo. This usually causes worse performance in all systems.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -543,6 +543,7 @@ if %mpvINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Note: Requires at least Windows Vista.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
