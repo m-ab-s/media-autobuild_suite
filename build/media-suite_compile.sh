@@ -1346,20 +1346,22 @@ if [[ $mplayer = "y" ]]; then
 fi
 
 if [[ $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
-    cd $LOCALBUILDDIR
-    do_vcs "git://midipix.org/waio" waio lib/libwaio.a
-    if [[ $compile = "true" ]]; then
-        [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
-        if [[ -f lib${_bits}/libwaio.a ]]; then
-            ./build-mingw-nt${_bits} clean
-            rm -rf $LOCALDESTDIR/include/waio
-            rm -f $LOCALDESTDIR/lib/libwaio.a
+    if [[ ! -f $LOCALDESTDIR/lib/libwaio.a ]]; then
+        cd $LOCALBUILDDIR
+        do_vcs "git://midipix.org/waio" waio
+        if [[ $compile = "true" ]]; then
+            [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
+            if [[ -f lib${_bits}/libwaio.a ]]; then
+                ./build-mingw-nt${_bits} clean
+                rm -rf $LOCALDESTDIR/include/waio
+                rm -f $LOCALDESTDIR/lib/libwaio.a
+            fi
+            build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
+            cp -r include/waio  $LOCALDESTDIR/include/
+            cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
+            do_checkIfExist libwaio.a
+            unset _bits
         fi
-        build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
-        cp -r include/waio  $LOCALDESTDIR/include/
-        cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
-        do_checkIfExist libwaio.a
-        unset _bits
     fi
 
     cd $LOCALBUILDDIR
