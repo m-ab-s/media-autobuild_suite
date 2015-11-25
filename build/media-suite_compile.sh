@@ -310,8 +310,8 @@ if do_checkForOptions "--enable-libtesseract"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
     if [[ $compile = "true" ]]; then
-        git clean -xfd
-        ./autogen.sh
+        git clean -Xfd
+        do_autogen
         if [[ -f $LOCALDESTDIR/lib/libtesseract.a ]]; then
             rm -rf $LOCALDESTDIR/include/tesseract
             rm -f $LOCALDESTDIR/lib/libtesseract.{,l}a $LOCALDESTDIR/lib/pkgconfig/tesseract.pc
