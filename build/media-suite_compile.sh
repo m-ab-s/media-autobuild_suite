@@ -421,9 +421,9 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libvorbis --enable-libtheora
 fi
 
 if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
-    if do_pkgConfig "opus = 1.1"; then
+    if do_pkgConfig "opus = 1.1.1"; then
         cd $LOCALBUILDDIR
-        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.tar.gz"
+        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.1.tar.gz"
         [[ -f ".libs/libopus.a" ]] && make distclean
         rm -rf $LOCALDESTDIR/include/opus
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
