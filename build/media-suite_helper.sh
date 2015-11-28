@@ -325,7 +325,7 @@ do_changeFFmpegConfig() {
         do_addOption "--disable-debug"
     fi
 
-    if do_checkForOptions "--enable-gnutls --enable-openssl"; then
+    if do_checkForOptions "--enable-openssl"; then
         do_removeOptions "--enable-gcrypt --enable-gmp"
     fi
 
