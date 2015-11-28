@@ -13,7 +13,7 @@ FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
---disable-w32threads --enable-opencl --enable-libzimg --disable-debug \
+--disable-w32threads --enable-opencl --enable-libzimg \
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"

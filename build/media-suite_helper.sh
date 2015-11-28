@@ -318,10 +318,11 @@ do_changeFFmpegConfig() {
         do_addOption "--enable-filter=frei0r"
     fi
 
-    if do_checkForOptions "--enable-debug" ||
-        ! do_checkForOptions "--disable-debug"; then
+    if do_checkForOptions "--enable-debug"; then
         # fix issue with ffprobe not working with debug and strip
         do_addOption "--disable-stripping"
+    else
+        do_addOption "--disable-debug"
     fi
 
     if do_checkForOptions "--enable-gnutls --enable-openssl"; then
