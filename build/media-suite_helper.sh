@@ -557,6 +557,7 @@ do_autogen() {
     local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
     if [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
+        git clean -xfd -e "/build_successful*" -e "/recently_updated"
         ./autogen.sh
     fi
 }
