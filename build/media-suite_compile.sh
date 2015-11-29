@@ -1386,7 +1386,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     if [[ $compile = "true" ]]; then
         rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
         rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
-        do_patch "uchardet-0001-CMake-allow-static-only-builds.patch"
+        do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
         LDFLAGS+=" -static-libgcc" do_cmakeinstall -DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-global
         do_checkIfExist libuchardet.a
     fi
