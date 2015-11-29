@@ -1,7 +1,7 @@
-From 5a4353cc1fef62a3a24de44ca9f3a4ebd90a9c30 Mon Sep 17 00:00:00 2001
+From d1e0ce71bd7fb984191e26c7aed1c91ccd6b5031 Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 17 Aug 2014 13:26:23 +0200
-Subject: [PATCH 2/5] add openhevc intrinsics
+Subject: [PATCH 2/2] add openhevc intrinsics
 
 All patches from http://git.1f0.de/gitweb?p=ffmpeg.git;a=summary;js=1
 hevc: port intrinsic SSE2 IDCT from OpenHEVC
