@@ -310,9 +310,8 @@ if do_checkForOptions "--enable-libtesseract"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
     if [[ $compile = "true" ]]; then
-        # always run git clean because autotools
-        git clean -xfd -e "/build_successful*" -e "/recently_updated"
-        ./autogen.sh
+        do_autogen
+        [[ -f api/.libs/libtesseract.a ]] && make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libtesseract.a ]]; then
             rm -rf $LOCALDESTDIR/include/tesseract
             rm -f $LOCALDESTDIR/lib/libtesseract.{,l}a $LOCALDESTDIR/lib/pkgconfig/tesseract.pc
@@ -877,8 +876,8 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
         cd Project/GNU/Library
-        do_autogen
-        [[ -f "Makefile" ]] && make distclean
+        do_autoreconf
+        [[ -f "Makefile" ]] && make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libzen.a ]]; then
             rm -rf $LOCALDESTDIR/include/ZenLib $LOCALDESTDIR/bin-global/libzen-config
             rm -f $LOCALDESTDIR/lib/libzen.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
@@ -895,8 +894,8 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
-        do_autogen
-        [[ -f "Makefile" ]] && make distclean
+        do_autoreconf
+        [[ -f "Makefile" ]] && make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libmediainfo.a ]]; then
             rm -rf $LOCALDESTDIR/include/MediaInfo{,DLL}
             rm -f $LOCALDESTDIR/lib/libmediainfo.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
@@ -914,8 +913,8 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo bin-video/mediainfo.exe
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
-        do_autogen
-        [[ -f "Makefile" ]] && make distclean
+        do_autoreconf
+        [[ -f "Makefile" ]] && make distclean --ignore-errors
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
         [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
