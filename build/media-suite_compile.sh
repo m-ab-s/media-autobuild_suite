@@ -709,7 +709,7 @@ fi
 
 if [[ ! $vpx = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "https://chromium.googlesource.com/webm/libvpx.git" vpx
+    do_vcs "https://github.com/webmproject/libvpx.git" vpx
     if [[ $compile = "true" ]] || [[ $vpx = "y" && ! -f "$LOCALDESTDIR/bin-video/vpxenc.exe" ]]; then
         if [[ -f $LOCALDESTDIR/lib/libvpx.a ]]; then
             rm -rf $LOCALDESTDIR/include/vpx $LOCALDESTDIR/bin-video/vpx{enc,dec}.exe
