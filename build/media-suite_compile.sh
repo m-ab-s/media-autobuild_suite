@@ -889,6 +889,7 @@ if [[ $mediainfo = "y" ]]; then
         do_checkIfExist libzen.a
         buildMediaInfo="true"
     fi
+    [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' $LOCALDESTDIR/lib/pkgconfig/libzen.pc
 
     # MinGW's libcurl.pc is missing libs
     sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' $MINGW_PREFIX/lib/pkgconfig/libcurl.pc
