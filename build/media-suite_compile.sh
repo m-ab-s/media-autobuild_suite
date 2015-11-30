@@ -98,7 +98,7 @@ fi
 
 if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
-    --enable-fontconfig --enable-libfribidi"; }; then
+    --enable-(lib)?fontconfig --enable-libfribidi"; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
     if do_pkgConfig "freetype2 = 18.1.12" "2.6.1"; then
         cd $LOCALBUILDDIR
@@ -108,10 +108,10 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -f $LOCALDESTDIR/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
         do_generic_confmakeinstall global --with-harfbuzz=no
         do_checkIfExist libfreetype.a
-        buildLibass="y"
+        rebuildLibass="y"
     fi
 
-    if do_pkgConfig "fontconfig = 2.11.94" || [[ "$buildLibass" = "y" ]]; then
+    if do_pkgConfig "fontconfig = 2.11.94" && do_checkForOptions "--enable-(lib)?fontconfig"; then
         do_pacman_install "python2-lxml"
         cd $LOCALBUILDDIR
         do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
@@ -120,10 +120,10 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -f $LOCALDESTDIR/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
         do_generic_confmakeinstall global
         do_checkIfExist libfontconfig.a
-        buildLibass="y"
+        rebuildLibass="y"
     fi
 
-    if do_pkgConfig "harfbuzz = 1.0.5" || [[ "$buildLibass" = "y" ]]; then
+    if do_pkgConfig "harfbuzz = 1.0.5" || [[ "$rebuildLibass" = "y" ]]; then
         do_pacman_install "ragel"
         cd $LOCALBUILDDIR
         do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.0.5.tar.bz2"
@@ -133,7 +133,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
             LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
         do_checkIfExist libharfbuzz.a
-        buildLibass="y"
+        rebuildLibass="y"
     fi
 
     if do_pkgConfig "fribidi = 0.19.7"; then
@@ -828,16 +828,16 @@ if [[ $mpv = "y" || $mplayer = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass"; }; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libass/libass.git" libass
-    if [[ $compile = "true" || $buildLibass = "y" ]]; then
+    if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && make distclean
         rm -rf $LOCALDESTDIR/include/ass
         rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
-        [[ $bits = "64bit" ]] && disable_fc="--disable-fontconfig"
+        do_checkForOptions "--enable-(lib)?fontconfig" || disable_fc="--disable-fontconfig"
         do_generic_confmakeinstall $disable_fc
         do_checkIfExist libass.a
         buildFFmpeg="true"
-        unset disable_fc buildLibass
+        unset rebuildLibass disable_fc
     fi
 fi
 
@@ -1422,14 +1422,6 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
         $python waf install -j $cpuCount
-
-        if [[ $bits = "32bit" ]] && [[ ! -d $LOCALDESTDIR/bin-video/fonts ]]; then
-            do_wget "https://raw.githubusercontent.com/lachs0r/mingw-w64-cmake/master/packages/mpv/mpv/fonts.conf"
-            mkdir -p $LOCALDESTDIR/bin-video/mpv
-            mv -f fonts.conf $LOCALDESTDIR/bin-video/mpv/
-            do_wget "http://srsfckn.biz/noto-mpv.7z" noto-mpv.7z fonts
-            mv fonts $LOCALDESTDIR/bin-video/
-        fi
 
         unset mpv_ldflags mpv_pthreads replace
         do_checkIfExist bin-video/mpv.exe
