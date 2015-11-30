@@ -883,12 +883,15 @@ if [[ $mediainfo = "y" ]]; then
             rm -f $LOCALDESTDIR/lib/libzen.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
         fi
         do_generic_conf
-        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile libzen.pc
         do_makeinstall
         rm -f $LOCALDESTDIR/bin/libzen-config
         do_checkIfExist libzen.a
         buildMediaInfo="true"
     fi
+
+    # MinGW's libcurl.pc is missing libs
+    sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' $MINGW_PREFIX/lib/pkgconfig/libcurl.pc
 
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
@@ -901,9 +904,10 @@ if [[ $mediainfo = "y" ]]; then
             rm -f $LOCALDESTDIR/lib/libmediainfo.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
             rm -f $LOCALDESTDIR/bin-global/libmediainfo-config
         fi
-        do_generic_conf LDFLAGS="$LDFLAGS -static-libgcc"
-        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
+        do_generic_conf --enable-staticlibs --with-libcurl LDFLAGS="$LDFLAGS -static-libgcc"
         do_makeinstall
+        sed -i "s,libmediainfo\.a.*,libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)," \
+            libmediainfo.pc
         cp libmediainfo.pc $LOCALDESTDIR/lib/pkgconfig/
         do_checkIfExist libmediainfo.a
         buildMediaInfo="true"
@@ -917,7 +921,6 @@ if [[ $mediainfo = "y" ]]; then
         [[ -f "Makefile" ]] && make distclean --ignore-errors
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
         do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
-        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile
         do_makeinstall
         do_checkIfExist bin-video/mediainfo.exe
     fi
