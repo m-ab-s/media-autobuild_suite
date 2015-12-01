@@ -1219,6 +1219,8 @@ EOF
 else
     pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
+[[ -f $LOCALDESTDIR/include/x265.h ]] && ! grep -q stdbool $LOCALDESTDIR/include/x265.h &&
+    sed -i '/#include <stdint.h>/ a\#include <stdbool.h>' $LOCALDESTDIR/include/x265.h
 
 do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
 do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
