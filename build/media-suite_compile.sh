@@ -1056,7 +1056,7 @@ if [[ $mp4box = "y" ]]; then
             rm -rf $LOCALDESTDIR/include/gpac
         fi
         [[ -f config.mak ]] && make distclean
-        ./configure --prefix=$LOCALDESTDIR --static-mp4box --extra-libs=-lz --extra-ldflags=-municode
+        ./configure --prefix=$LOCALDESTDIR --static-mp4box
         make -j $cpuCount
         make install-lib
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
