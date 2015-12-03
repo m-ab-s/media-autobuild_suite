@@ -1416,11 +1416,12 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
-            mpv_pthreads="--enable-win32-internal-pthreads"
+            extracommands="--enable-win32-internal-pthreads"
+        [[ $license = *v3 || $license = nonfree ]] && extracommands+=" --enable-gpl3"
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
-        --lua=luajit $mpv_pthreads --disable-libguess --enable-libarchive
+        --lua=luajit $extracommands --disable-libguess --enable-libarchive
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
@@ -1429,7 +1430,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         $python waf install -j $cpuCount
 
-        unset mpv_ldflags mpv_pthreads replace
+        unset mpv_ldflags extracommands replace
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}

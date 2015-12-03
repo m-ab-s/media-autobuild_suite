@@ -245,8 +245,7 @@ do_getFFmpegConfig() {
 
     if do_checkForOptions "--enable-openssl" && [[ $license = "nonfree" ]]; then
         # prefer openssl if both are in options and nonfree
-        do_removeOption "--enable-gnutls"
-        do_removeOption "--enable-libutvideo"
+        do_removeOptions "--enable-gnutls --enable-libutvideo"
     elif do_checkForOptions "--enable-openssl"; then
         # prefer gnutls if both are in options and free
         do_removeOption "--enable-openssl"
@@ -265,11 +264,9 @@ do_changeFFmpegConfig() {
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
     if do_checkForOptions "--disable-w32threads --enable-pthreads --enable-decklink"; then
-        do_addOption "--disable-w32threads"
         do_removeOption "--enable-w32threads"
-        do_addOption "--extra-cflags=-DPTW32_STATIC_LIB"
-        do_addOption "--extra-libs=-lpthread"
-        do_addOption "--extra-libs=-lwsock32"
+        do_addOptions "--disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
+            --extra-libs=-lpthread --extra-libs=-lwsock32"
     fi
 
     # add options for static kvazaar
@@ -281,18 +278,19 @@ do_changeFFmpegConfig() {
     local gpl="--enable-frei0r --enable-cdio --enable-librubberband \
         --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265 \
         --enable-libxavs --enable-libxvid --enable-libzvbi"
-    if [[ $license != "lgpl" ]] && do_checkForOptions "$gpl"; then
+    if [[ $license = gpl* || $license = nonfree ]] && do_checkForOptions "$gpl"; then
         do_addOption "--enable-gpl"
     else
         do_removeOptions "$gpl --enable-gpl"
     fi
 
     # handle (l)gplv3 libs
-    if do_checkForOptions "--enable-libopencore-amrwb --enable-libopencore-amrnb \
-        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp"; then
+    local version3="--enable-libopencore-amrwb --enable-libopencore-amrnb \
+        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp"
+    if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "$version3"; then
         do_addOption "--enable-version3"
     else
-        do_removeOption "--enable-version3"
+        do_removeOptions "$version3 --enable-version3"
     fi
 
     # handle non-free libs
@@ -308,7 +306,7 @@ do_changeFFmpegConfig() {
     if do_checkForOptions "$nonfreegpl"; then
         if [[ $license = "nonfree" ]]; then
             do_addOption "--enable-nonfree"
-        elif [[ $license = "gpl" ]]; then
+        elif [[ $license = gpl* ]]; then
             do_removeOptions "$nonfreegpl"
         fi
         # no lgpl here because they are accepted with it
@@ -332,14 +330,14 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
-        do_removeOption "--enable-decklink" y
-        do_removeOption "--enable-libutvideo" y
-        do_removeOption "--enable-libgme" y
+        do_removeOptions "--enable-decklink --enable-libutvideo --enable-libgme" y
         FFMPEG_OPTS_SHARED="$FFMPEG_OPTS_SHARED --extra-ldflags=-static-libgcc"
     fi
 }
 
 do_checkForOptions() {
+    local option=
+    local option2=
     for option in "$@"; do
         for option2 in $option; do
             if grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
@@ -357,6 +355,13 @@ do_addOption() {
     fi
 }
 
+do_addOptions() {
+    local option=
+    for option in $1; do
+        do_addOption "$option"
+    done
+}
+
 do_removeOption() {
     local option=${1%% *}
     local shared=$2
@@ -368,8 +373,10 @@ do_removeOption() {
 }
 
 do_removeOptions() {
+    local option=
+    local shared=$2
     for option in $1; do
-        do_removeOption "$option"
+        do_removeOption "$option" "$shared"
     done
 }
 

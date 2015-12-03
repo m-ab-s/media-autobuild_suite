@@ -68,7 +68,7 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --disable-w32threads --enable-opencl --enable-libzimg --enable-gmp ^
 --enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
 
-set iniOptions=msys2Arch arch license vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
+set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
 mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
 
 set previousOptions=0
@@ -160,27 +160,31 @@ if %writeArch%==yes echo.arch=^%buildEnv%>>%ini%
 
 :ffmpeglicense
 set "writeLicense=no"
-if %licenseINI%==0 (
+if %license2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build FFmpeg/rtmpdump with which license?
     echo. 1 = Non-free [unredistributable, but can include anything]
-    echo. 2 = GPL^(v3^) [disables OpenSSL and FDK-AAC]
-    echo. 3 = LGPL^(v3^) [disables x264, x265, XviD, a lot of filters, etc.]
+    echo. 2 = GPLv3 [disables OpenSSL and FDK-AAC]
+    echo. 3 = GPLv2.1
+    echo.   [Same disables as GPLv3 with addition of gmp, opencore codecs,
+    echo.    vo-aacenc and NNEDI3 prescaler in mpv]
+    echo. 4 = LGPLv3
+    echo.   [Disables x264, x265, XviD, GPL filters, etc.
+    echo.    but reenables OpenSSL/FDK-AAC]
+    echo. 5 = LGPLv2.1 [same disables as LGPLv3 + GPLv2.1]
     echo.
     echo. If building for yourself, it's OK to choose non-free.
     echo. If building to redistribute online, choose GPL or LGPL.
+    echo. If building to include in a GPLv2.1 binary, choose LGPLv2.1 or GPLv2.1.
     echo. If you want to use FFmpeg together with closed source software, choose LGPL
     echo. and follow instructions in https://www.ffmpeg.org/legal.html
     echo.
     echo. In the case of rtmpdump, since it's the binary is GPL, it will be compiled
-    echo. with GnuTLS if ^(L^)GPL is chosen, but if Non-free will use OpenSSL.
+    echo. with GnuTLS if LGPL is chosen, but if Non-free will use OpenSSL.
     echo. If not building rtmpdump, but just librtmp ^(which is LGPL^) to use in FFmpeg,
     echo. OpenSSL can be used.
-    echo.
-    echo. ^(L^)GPL is automatically upgraded to version 3 if using any library that
-    echo. needs it, otherwise non-version 3 versions are used.
     echo.
     echo. OpenSSL and FDK-AAC have licenses incompatible with GPL but compatible
     echo. with LGPL, so they won't be disabled automatically.
@@ -188,14 +192,16 @@ if %licenseINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P ffmpegLicense="FFmpeg license: "
-    ) else set ffmpegLicense=%licenseINI%
+    ) else set ffmpegLicense=%license2INI%
 if %deleteINI%==1 set "writeLicense=yes"
 
-if %ffmpegLicense%==1 set "license=nonfree"
-if %ffmpegLicense%==2 set "license=gpl"
-if %ffmpegLicense%==3 set "license=lgpl"
-if %ffmpegLicense% GTR 3 GOTO ffmpeglicense
-if %writeLicense%==yes echo.license=^%ffmpegLicense%>>%ini%
+if %ffmpegLicense%==1 set "license2=nonfree"
+if %ffmpegLicense%==2 set "license2=gplv3"
+if %ffmpegLicense%==3 set "license2=gpl"
+if %ffmpegLicense%==4 set "license2=lgplv3"
+if %ffmpegLicense%==5 set "license2=lgpl"
+if %ffmpegLicense% GTR 5 GOTO ffmpeglicense
+if %writeLicense%==yes echo.license2=^%ffmpegLicense%>>%ini%
 
 :vpx
 set "writevpx=no"
@@ -1258,7 +1264,7 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --license=%license%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
+--mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
 
 endlocal
 goto:eof
