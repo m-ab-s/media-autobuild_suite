@@ -224,7 +224,7 @@ do_getFFmpegConfig() {
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
         FFMPEG_OPTS="$FFMPEG_BASE_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
         echo "Imported FFmpeg options from ffmpeg_options.txt"
-    elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice = "y" ]]; then
+    elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
         FFMPEG_DEFAULT_OPTS=$(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
             sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' ')
         FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"
