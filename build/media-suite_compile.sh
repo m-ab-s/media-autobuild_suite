@@ -1006,18 +1006,23 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
     cd $LOCALBUILDDIR
-    if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]]; then
+    nvencver="6"
+    if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]] &&
+        [[ "$nvencver" = "$(grep -Eam1 "NVENCAPI_MAJOR_VERSION" \
+            $LOCALDESTDIR/include/nvEncodeAPI.h | tail -c2)" ]]; then
         echo -------------------------------------------------
-        echo "nvenc is already installed"
+        echo "NVEnc API ${nvencver}.0.1 is already installed"
         echo -------------------------------------------------
     else
-        echo -ne "\033]0;install nvenc $bits\007"
-        [[ ! -d nvenc_5.0.1_sdk ]] &&
-            do_wget "http://developer.download.nvidia.com/compute/nvenc/v5.0/nvenc_5.0.1_sdk.zip"
-        [[ ! -f "$LOCALDESTDIR/include/nvEncodeAPI.h" ]] &&
-            cp nvenc_5.0.1_sdk/Samples/common/inc/* "$LOCALDESTDIR/include/"
+        echo -ne "\033]0;installing NVEnc API ${nvencver}.0.1 $bits\007"
+        rm -f $LOCALDESTDIR/include/nvEncodeAPI.h
+        [[ ! -d nvidia_video_sdk_${nvencver}.0.1 ]] &&
+            do_wget "http://developer.download.nvidia.com/assets/cuda/files/nvidia_video_sdk_${nvencver}.0.1.zip"
+        [[ -d nvidia_video_sdk_${nvencver}.0.1 ]] && cd nvidia_video_sdk_${nvencver}.0.1
+        cp -f Samples/common/inc/*.h "$LOCALDESTDIR/include/"
         do_checkIfExist "include/nvEncodeAPI.h"
     fi
+    unset nvencver
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
