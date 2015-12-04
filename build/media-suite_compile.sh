@@ -601,8 +601,9 @@ if do_checkForOptions "--enable-libmp3lame"; then
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compiling lame $bits\007"
         do_wget_sf "lame/lame/3.99/lame-3.99.5.tar.gz"
-        if grep "xmmintrin\.h" configure.in; then
+        if grep "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
+            touch recently_updated
             do_autoreconf
         fi
         [[ -f libmp3lame/.libs/libmp3lame.a ]] && make distclean
