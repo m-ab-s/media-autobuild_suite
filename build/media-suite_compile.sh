@@ -811,7 +811,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
             rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
         fi
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
-        --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype
+        --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
         do_checkIfExist libbluray.a
     fi
 fi
