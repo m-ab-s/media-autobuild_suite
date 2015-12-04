@@ -198,7 +198,6 @@ fi
 if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
     cd $LOCALBUILDDIR
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
-    extracommands=""
     req=""
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
     if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
@@ -1147,6 +1146,7 @@ if [[ ! $x264 = "n" ]]; then
         do_makeinstall
         do_checkIfExist libx264.a
         buildFFmpeg="true"
+        unset extracommands
     fi
 else
     pkg-config --exists x264 || do_removeOption "--enable-libx264"
@@ -1425,6 +1425,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
             mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
+        extracommands=""
 
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
