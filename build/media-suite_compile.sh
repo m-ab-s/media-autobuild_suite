@@ -1425,7 +1425,6 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
             mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
-        extracommands=""
 
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
@@ -1435,13 +1434,12 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
-        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va" &&
-            extracommands="--enable-win32-internal-pthreads"
-        [[ $license = *v3 || $license = nonfree ]] && extracommands+=" --enable-gpl3"
+        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
-        --lua=luajit $extracommands --disable-libguess --enable-libarchive
+        --lua=luajit $extracommands --disable-libguess --enable-libarchive \
+        $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3")
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
@@ -1450,7 +1448,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         $python waf install -j $cpuCount
 
-        unset mpv_ldflags extracommands replace
+        unset mpv_ldflags replace
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
