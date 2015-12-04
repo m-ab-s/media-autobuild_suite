@@ -175,7 +175,6 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
     do_pacman_install nettle
-    do_pacman_remove libgcrypt
 
     cd $LOCALBUILDDIR
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
@@ -1241,6 +1240,7 @@ fi
 [[ -f $LOCALDESTDIR/include/x265.h ]] && ! grep -q stdbool $LOCALDESTDIR/include/x265.h &&
     sed -i '/#include <stdint.h>/ a\#include <stdbool.h>' $LOCALDESTDIR/include/x265.h
 
+do_checkForOptions "--enable-gcrypt" && do_pacman_install libgcrypt
 do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
 do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
 do_checkForOptions "--enable-libwavpack" && do_pacman_install "wavpack"
