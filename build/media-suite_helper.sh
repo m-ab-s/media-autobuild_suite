@@ -462,9 +462,14 @@ do_makeinstall() {
     make install
 }
 
-do_generic_confmakeinstall() {
+do_generic_confmake() {
     do_generic_conf "$@"
-    do_makeinstall
+    make -j $cpuCount
+}
+
+do_generic_confmakeinstall() {
+    do_generic_confmake "$@"
+    make install
 }
 
 do_hide_pacman_sharedlibs() {

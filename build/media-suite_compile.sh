@@ -112,13 +112,20 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     fi
 
     if do_pkgConfig "fontconfig = 2.11.94" && do_checkForOptions "--enable-(lib)?fontconfig"; then
-        do_pacman_install "python2-lxml"
-        cd $LOCALBUILDDIR
+        do_pacman_remove "python2-lxml"
+        cd "$LOCALBUILDDIR"
+        [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
-        [[ -f "src/.libs/libfontconfig.a" ]] && make distclean
-        rm -rf $LOCALDESTDIR/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
-        rm -f $LOCALDESTDIR/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
-        do_generic_confmakeinstall global
+        [[ -f "src/.libs/libfontconfig.a" ]] && make clean
+        rm -rf "$LOCALDESTDIR"/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
+        rm -f "$LOCALDESTDIR"/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
+        do_generic_conf global
+        make -C fc-blank
+        make -C src
+        mkdir -p "$LOCALDESTDIR"/include/fontconfig
+        cp -f fontconfig/{fcfreetype,fcprivate,fontconfig}.h "$LOCALDESTDIR"/include/fontconfig/
+        cp -f src/.libs/libfontconfig.{,l}a "$LOCALDESTDIR"/lib/
+        cp -f fontconfig.pc "$LOCALDESTDIR"/lib/pkgconfig/
         do_checkIfExist libfontconfig.a
         rebuildLibass="y"
     fi
