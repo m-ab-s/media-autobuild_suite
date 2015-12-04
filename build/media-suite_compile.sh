@@ -1011,15 +1011,21 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
         [[ "$nvencver" = "$(grep -Eam1 "NVENCAPI_MAJOR_VERSION" \
             $LOCALDESTDIR/include/nvEncodeAPI.h | tail -c2)" ]]; then
         echo -------------------------------------------------
-        echo "NVEnc API ${nvencver}.0.1 is already installed"
+        echo "nvEncodeAPI ${nvencver}.0.1 is already installed"
         echo -------------------------------------------------
     else
-        echo -ne "\033]0;installing NVEnc API ${nvencver}.0.1 $bits\007"
-        rm -f $LOCALDESTDIR/include/nvEncodeAPI.h
-        [[ ! -d nvidia_video_sdk_${nvencver}.0.1 ]] &&
-            do_wget "http://developer.download.nvidia.com/assets/cuda/files/nvidia_video_sdk_${nvencver}.0.1.zip"
-        [[ -d nvidia_video_sdk_${nvencver}.0.1 ]] && cd nvidia_video_sdk_${nvencver}.0.1
-        cp -f Samples/common/inc/*.h "$LOCALDESTDIR/include/"
+        echo -ne "\033]0;installing nvEncodeAPI ${nvencver}.0.1 $bits\007"
+        rm -f "$LOCALDESTDIR"/include/{cudaModuleMgr,drvapi_error_string,exception}.h
+        rm -f "$LOCALDESTDIR"/include/dynlink_*.h
+        rm -r "$LOCALDESTDIR"/include/helper_{cuda{,_drvapi},functions,string,timer}.h
+        rm -f "$LOCALDESTDIR"/include/{nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h
+        rm -f "$LOCALDESTDIR"/include/nvEncodeAPI.h
+        mkdir -p NvEncAPI && cd NvEncAPI
+        [[ ! -f recently_updated ]] && rm -f nvEncodeAPI.h
+        [[ ! -f nvEncodeAPI.h ]] &&
+            do_wget "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
+            touch recently_updated
+        cp -f nvEncodeAPI.h "$LOCALDESTDIR"/include/
         do_checkIfExist "include/nvEncodeAPI.h"
     fi
     unset nvencver
