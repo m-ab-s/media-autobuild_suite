@@ -130,10 +130,10 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rebuildLibass="y"
     fi
 
-    if do_pkgConfig "harfbuzz = 1.0.5" || [[ "$rebuildLibass" = "y" ]]; then
+    if do_pkgConfig "harfbuzz = 1.1.2" || [[ "$rebuildLibass" = "y" ]]; then
         do_pacman_install "ragel"
         cd $LOCALBUILDDIR
-        do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.0.5.tar.bz2"
+        do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.1.2.tar.bz2"
         [[ -f "src/.libs/libharfbuzz.a" ]] && make distclean
         rm -rf $LOCALDESTDIR/include/harfbuzz
         rm -f $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
