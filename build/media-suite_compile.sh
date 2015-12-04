@@ -1438,7 +1438,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
-        --lua=luajit $extracommands --disable-libguess --enable-libarchive \
+        --lua=luajit --disable-libguess --enable-libarchive \
         $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3")
 
         # Windows(?) has a lower argument limit than *nix so
