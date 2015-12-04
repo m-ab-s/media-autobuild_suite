@@ -170,14 +170,14 @@ fi
 
 if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; } &&
-    do_pkgConfig "gnutls = 3.4.6"; then
+    do_pkgConfig "gnutls = 3.4.7"; then
 
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
     do_pacman_install nettle
 
     cd $LOCALBUILDDIR
-    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.6.tar.xz"
+    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.7.tar.xz"
     [[ -d build ]] && rm -rf build
     mkdir build && cd build
     if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
