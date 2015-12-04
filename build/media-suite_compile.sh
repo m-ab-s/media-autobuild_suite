@@ -1023,7 +1023,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
         echo -ne "\033]0;installing nvEncodeAPI ${nvencver}.0.1 $bits\007"
         rm -f "$LOCALDESTDIR"/include/{cudaModuleMgr,drvapi_error_string,exception}.h
         rm -f "$LOCALDESTDIR"/include/dynlink_*.h
-        rm -r "$LOCALDESTDIR"/include/helper_{cuda{,_drvapi},functions,string,timer}.h
+        rm -f "$LOCALDESTDIR"/include/helper_{cuda{,_drvapi},functions,string,timer}.h
         rm -f "$LOCALDESTDIR"/include/{nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h
         rm -f "$LOCALDESTDIR"/include/nvEncodeAPI.h
         mkdir -p NvEncAPI && cd NvEncAPI
