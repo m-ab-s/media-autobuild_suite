@@ -184,7 +184,7 @@ do_checkIfExist() {
     if [[ $buildSuccess = "y" ]]; then
         echo -
         echo -------------------------------------------------
-        echo "build $packetName done..."
+        echo "Building of $packetName done..."
         echo -------------------------------------------------
         echo -
         if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
@@ -195,7 +195,7 @@ do_checkIfExist() {
             rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
         fi
         echo -------------------------------------------------
-        echo "Build of $packetName failed..."
+        echo "Building of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
         echo "If you're sure there are no dependencies <Enter> to continue building."
         do_prompt "Close this window if you wish to stop building."
