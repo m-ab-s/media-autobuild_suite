@@ -358,7 +358,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
         rm -f $LOCALDESTDIR/include/zimg{.h,++.hpp}
         rm -f $LOCALDESTDIR/lib/{lib,vs}zimg.{,l}a $LOCALDESTDIR/lib/pkgconfig/zimg.pc
         grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" zimg.pc.in
-        sed -i "/vszimg/d" Makefile.am # temp fix
         do_autoreconf
         [[ -f config.log ]] && make distclean
         do_generic_confmakeinstall
