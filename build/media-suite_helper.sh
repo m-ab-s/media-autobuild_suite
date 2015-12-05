@@ -282,7 +282,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl libs
-    local gpl="--enable-frei0r --enable-cdio --enable-librubberband \
+    local gpl="--enable-frei0r --enable-libcdio --enable-librubberband \
         --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265 \
         --enable-libxavs --enable-libxvid --enable-libzvbi"
     if [[ $license = gpl* || $license = nonfree ]] && do_checkForOptions "$gpl"; then
