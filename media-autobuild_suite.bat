@@ -715,11 +715,9 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     GOTO unpack
     )
 
-if exist %build%\wget.exe (
-    del %build%\grep.exe
-    del %build%\wget.exe
-    del %build%\7za.exe
-    )
+del %build%\grep.exe
+del %build%\wget.exe
+del %build%\7za.exe
 
 :getMintty
 set "mintty=%instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
