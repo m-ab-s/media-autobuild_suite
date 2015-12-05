@@ -66,10 +66,10 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband ^
 --disable-w32threads --enable-opencl --enable-libzimg --enable-gmp ^
---enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl
+--enable-nonfree --enable-nvenc --enable-openssl
 
-set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac mediainfo soxB ffmpegB ffmpegUpdate ffmpegChoice ^
-mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
+set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -347,6 +347,32 @@ if %buildflac%==1 set "flac=y"
 if %buildflac%==2 set "flac=n"
 if %buildflac% GTR 2 GOTO flac
 if %writeflac%==yes echo.flac=^%buildflac%>>%ini%
+
+:fdkaac
+set "writefdkaac=no"
+if %fdkaacINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build FDK-AAC library and binary? [AAC-LC/HE/HEv2 codec]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note FFmpeg's aac encoder is no longer experimental and considered equal or
+    echo. better in quality from 96kbps and above. It still doesn't support AAC-HE/HEv2
+    echo. so if you need that or want better quality at lower bitrates than 96kbps,
+    echo. use FDK-AAC.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildfdkaac="Build fdkaac: "
+    ) else set buildfdkaac=%fdkaacINI%
+if %deleteINI%==1 set "writefdkaac=yes"
+
+if %buildfdkaac%==1 set "fdkaac=y"
+if %buildfdkaac%==2 set "fdkaac=n"
+if %buildfdkaac% GTR 2 GOTO fdkaac
+if %writefdkaac%==yes echo.fdkaac=^%buildfdkaac%>>%ini%
 
 :mediainfo
 set "writemediainfo=no"
@@ -1260,7 +1286,7 @@ IF ERRORLEVEL == 1 (
 
 start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login %build%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
---vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --mediainfo=%mediainfo% ^
+--vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
 

@@ -14,7 +14,7 @@ FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
 --disable-w32threads --enable-opencl --enable-libzimg --enable-gmp \
---enable-nonfree --enable-nvenc --enable-libfdk-aac --enable-openssl"
+--enable-nonfree --enable-nvenc --enable-openssl"
 [[ ! -f "$LOCALBUILDDIR/last_run" ]] \
     && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
@@ -31,6 +31,7 @@ while true; do
 --x265=* ) x265="${1#*=}"; shift ;;
 --other265=* ) other265="${1#*=}"; shift ;;
 --flac=* ) flac="${1#*=}"; shift ;;
+--fdkaac=* ) fdkaac="${1#*=}"; shift ;;
 --mediainfo=* ) mediainfo="${1#*=}"; shift ;;
 --sox=* ) sox="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
@@ -505,7 +506,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-amrwbenc"; } &&
     do_checkIfExist libvo-amrwbenc.a
 fi
 
-if do_checkForOptions "--enable-libfdk-aac"; then
+if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
