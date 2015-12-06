@@ -28,22 +28,23 @@ Included Tools And Libraries
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
 	- decklink 10.5
-	- fontconfig
-	- freetype
+	- fontconfig (2.11.94)
+	- freetype (2.6.2)
 	- frei0r (1.4)
-	- fribidi
-	- gnutls (3.4.4) or openssl
+	- fribidi (0.19.7)
+	- gnutls (3.4.7) or openssl
 		- if `--enable-openssl` and `--enable-nonfree` are present openssl is preferred
-	- harfbuzz
+	- harfbuzz (1.1.2)
 	- libass (git) (with directwrite backend) (with fontconfig too if 32-bit)
 	- libbs2b (3.1.0)
 	- libbluray (git)
 	- libcaca
 	- libcdio-paranoia
-	- libdcadec
+	- libdcadec (git)
 	- libfaac (1.28)
 		- Not compiled by default
 	- libfdk-aac (git)
+		- Not compiled by default
 	- libgsm
 	- libilbc (git)
 	- libkvazaar (git)
@@ -78,7 +79,7 @@ Included Tools And Libraries
 	- libxvid
 	- libzimg (git)
 	- libzvbi (0.2.35)
-	- nvenc (5.0.1)
+	- nvenc (6.0.1)
 	- sdl (1.2.15)
 	- vidstab (git)
 	
@@ -104,7 +105,7 @@ Included Tools And Libraries
 	- sox (git)
 	- tesseract (git)
 	- vorbis-tools (1.4.0)
-	- vpx (VP8 and VP9 8, 10 and 12 bit) (git)
+	- vpx (VP8, VP9 and VP10 8, 10 and 12 bit) (git)
 	- webp tools (git)
 	- x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
 	- x265 (8, 10 and 12 bit) (git)
