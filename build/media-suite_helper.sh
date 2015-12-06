@@ -241,6 +241,9 @@ do_getFFmpegConfig() {
     fi
     export arch
 
+    # we set these accordingly for static or shared
+    do_removeOption "--(en|dis)able-(shared|static)"
+
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
     # If nonfree will use SChannel if neither openssl or gnutls are in the options
     if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
@@ -373,9 +376,9 @@ do_removeOption() {
     local option=${1%% *}
     local shared=$2
     if [[ $shared = "y" ]]; then
-        FFMPEG_OPTS_SHARED=$(echo "$FFMPEG_OPTS_SHARED" | sed "s/ *$option//g")
+        FFMPEG_OPTS_SHARED=$(echo "$FFMPEG_OPTS_SHARED" | sed -r "s/ *$option//g")
     else
-        FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed "s/ *$option//g")
+        FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed -r "s/ *$option//g")
     fi
 }
 

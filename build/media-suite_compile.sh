@@ -1097,7 +1097,7 @@ if [[ ! $x264 = "n" ]]; then
             rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
             rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
             [[ -f "config.mak" ]] && make distclean
-            ./configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-shared --disable-programs \
+            ./configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-programs \
             --disable-devices --disable-filters --disable-encoders --disable-muxers
 
             do_makeinstall
@@ -1290,8 +1290,7 @@ if [[ $ffmpeg != "n" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
             [[ -f config.mak ]] && make distclean
-            ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video \
-                --enable-static --disable-shared $FFMPEG_OPTS
+            ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video $FFMPEG_OPTS
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
