@@ -1089,7 +1089,7 @@ if [[ ! $x264 = "n" ]]; then
         extracommands="--host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
         if [[ $x264 = "f" ]]; then
             cd $LOCALBUILDDIR
-            do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg lib/libavcodec.a
+            do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg lib/libavcodec.a
             rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
             rm -rf $LOCALDESTDIR/include/{libsw{scale,resample},libpostproc}
             rm -f $LOCALDESTDIR/lib/libav{codec,device,filter,format,util,resample}.a
@@ -1257,7 +1257,7 @@ do_hide_all_sharedlibs
 if [[ $ffmpeg != "n" ]]; then
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
-    do_vcs "git://git.videolan.org/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
+    do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]] ||
         [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
@@ -1343,7 +1343,7 @@ if [[ $mplayer = "y" ]]; then
             if [ ! $ffmpeg = "n" ]; then
                 git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
                 git checkout -f --no-track -B master origin/HEAD
-            elif ! git clone --depth 1 git://git.videolan.org/ffmpeg.git ffmpeg; then
+            elif ! git clone --depth 1 http://source.ffmpeg.org/git/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
