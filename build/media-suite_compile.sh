@@ -902,7 +902,7 @@ if [[ $mediainfo = "y" ]]; then
     sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' $MINGW_PREFIX/lib/pkgconfig/libcurl.pc
 
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/MediaArea/MediaInfoLib#commit=0824912b" libmediainfo
+    do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
         do_autoreconf
