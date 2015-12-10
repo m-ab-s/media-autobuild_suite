@@ -769,16 +769,15 @@ else
     pkg-config --exists kvazaar || do_removeOption "--enable-libkvazaar"
 fi
 
-if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
+if [[ $mplayer = "y" ]] ||
+    { [[ $mpv = "y" ]] && do_checkForOptions "--enable-libbluray"; }; then
     cd $LOCALBUILDDIR
-    do_vcs "git://git.videolan.org/libdvdread.git" dvdread
+    do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && make distclean
-        if [[ -f $LOCALDESTDIR/lib/libdvdread.a ]]; then
-            rm -rf $LOCALDESTDIR/include/dvdread
-            rm -rf $LOCALDESTDIR/lib/libdvdread.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
-        fi
+        rm -rf $LOCALDESTDIR/include/dvdread
+        rm -f $LOCALDESTDIR/lib/{libdvdread.{l,}a,pkgconfig/dvdread.pc}
         do_generic_confmakeinstall
         do_checkIfExist libdvdread.a
     fi
@@ -786,14 +785,12 @@ if [[ $mplayer = "y" ]] || [[ $mpv = "y" ]]; then
         sed -i "/Libs:.*/ a\Libs.private: -ldl" $LOCALDESTDIR/lib/pkgconfig/dvdread.pc
 
     cd $LOCALBUILDDIR
-    do_vcs "git://git.videolan.org/libdvdnav.git" dvdnav
+    do_vcs "http://git.videolan.org/git/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && make distclean
-        if [[ -f $LOCALDESTDIR/lib/libdvdnav.a ]]; then
-            rm -rf $LOCALDESTDIR/include/dvdnav
-            rm -rf $LOCALDESTDIR/lib/libdvdnav.{l,}a $LOCALDESTDIR/lib/pkgconfig/dvdnav.pc
-        fi
+        rm -rf $LOCALDESTDIR/include/dvdnav
+        rm -f $LOCALDESTDIR/lib/{libdvdnav.{l,}a,pkgconfig/dvdnav.pc}
         do_generic_confmakeinstall
         do_checkIfExist libdvdnav.a
     fi
@@ -801,14 +798,12 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
-    do_vcs "git://git.videolan.org/libbluray.git" libbluray
+    do_vcs "http://git.videolan.org/git/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && make distclean
-        if [[ -f $LOCALDESTDIR/lib/libbluray.a ]]; then
-            rm -rf $LOCALDESTDIR/include/bluray
-            rm -rf $LOCALDESTDIR/lib/libbluray.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
-        fi
+        rm -rf $LOCALDESTDIR/include/bluray
+        rm -f $LOCALDESTDIR/lib/{libbluray.{l,}a,pkgconfig/libbluray.pc}
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
         --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
         do_checkIfExist libbluray.a
@@ -1084,7 +1079,7 @@ fi
 
 if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "git://git.videolan.org/x264.git" x264
+    do_vcs "http://git.videolan.org/git/x264.git" x264
     if [[ $compile = "true" ]] || [[ $x264 != "l" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
         extracommands="--host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
         if [[ $x264 = "f" ]]; then
