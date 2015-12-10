@@ -169,23 +169,26 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffpla
     do_checkIfExist libSDL.a
 fi
 
-if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
-    [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; } &&
-    do_pkgConfig "gnutls = 3.4.7"; then
+
+if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
+    [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
+[[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
+[[ -n "$gnutls_ver" ]] &&
+    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') ||
+    gnutls_ver="3.4.7"
+if do_pkgConfig "gnutls = $gnutls_ver"; then
 
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
     do_pacman_install nettle
 
     cd $LOCALBUILDDIR
-    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-3.4.7.tar.xz"
+    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
     [[ -d build ]] && rm -rf build
     mkdir build && cd build
-    if [[ -f $LOCALDESTDIR/lib/libgnutls.a ]]; then
-        rm -rf $LOCALDESTDIR/include/gnutls $LOCALDESTDIR/lib/libgnutls*
-        rm -f $LOCALDESTDIR/lib/pkgconfig/gnutls.pc
-        rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
-    fi
+    rm -rf $LOCALDESTDIR/include/gnutls
+    rm -f $LOCALDESTDIR/lib/{libgnutls*,pkgconfig/gnutls.pc}
+    rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
     ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
         --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
         --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
@@ -193,6 +196,7 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
     lib/gnutls.pc
     do_makeinstall
     do_checkIfExist libgnutls.a
+fi
 fi
 
 if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
