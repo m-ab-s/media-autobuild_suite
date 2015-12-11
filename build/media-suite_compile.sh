@@ -566,6 +566,7 @@ if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/
         $(do_checkForOptions "--enable-libspeex" || echo "--without-speex") \
         $([[ $flac = "y" ]] || echo "--without-flac")
     do_checkIfExist bin-audio/oggenc.exe
+    _to_remove+=($(pwd))
 fi
 
 if do_checkForOptions "--enable-libopus"; then
@@ -1370,36 +1371,34 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     if [[ ! -f $LOCALDESTDIR/lib/libwaio.a ]]; then
         cd $LOCALBUILDDIR
         do_vcs "git://midipix.org/waio" waio
-        if [[ $compile = "true" ]]; then
-            [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
-            if [[ -f lib${_bits}/libwaio.a ]]; then
-                ./build-mingw-nt${_bits} clean
-                rm -rf $LOCALDESTDIR/include/waio
-                rm -f $LOCALDESTDIR/lib/libwaio.a
-            fi
-            build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
-            cp -r include/waio  $LOCALDESTDIR/include/
-            cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
-            do_checkIfExist libwaio.a
-            unset _bits
+        [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
+        if [[ -f lib${_bits}/libwaio.a ]]; then
+            ./build-mingw-nt${_bits} clean
+            rm -rf $LOCALDESTDIR/include/waio
+            rm -f $LOCALDESTDIR/lib/libwaio.a
         fi
+        build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
+        cp -r include/waio  $LOCALDESTDIR/include/
+        cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
+        do_checkIfExist libwaio.a
+        unset _bits
+        _to_remove+=($(pwd))
     fi
 
     if [[ ! -f "$LOCALDESTDIR"/lib/libluajit-5.1.a ]]; then
         cd $LOCALBUILDDIR
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
-        if [[ $compile = "true" ]]; then
-            rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
-            rm -f "$LOCALDESTDIR"/lib/{libluajit-5.1.a,pkgconfig/luajit.pc}
-            rm -rf ./temp
-            [[ -f "src/luajit.exe" ]] && make clean
-            make BUILDMODE=static amalg
-            make BUILDMODE=static PREFIX=$LOCALDESTDIR DESTDIR=$(pwd)/temp install
-            cp -rf temp/$LOCALDESTDIR/{lib,include} $LOCALDESTDIR/
-            # luajit comes with a broken .pc file
-            sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
-            do_checkIfExist libluajit-5.1.a
-        fi
+        rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
+        rm -f "$LOCALDESTDIR"/lib/{libluajit-5.1.a,pkgconfig/luajit.pc}
+        rm -rf ./temp
+        [[ -f "src/luajit.exe" ]] && make clean
+        make BUILDMODE=static amalg
+        make BUILDMODE=static PREFIX=$LOCALDESTDIR DESTDIR=$(pwd)/temp install
+        cp -rf temp/$LOCALDESTDIR/{lib,include} $LOCALDESTDIR/
+        # luajit comes with a broken .pc file
+        sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
+        do_checkIfExist libluajit-5.1.a
+        _to_remove+=($(pwd))
     fi
 
     do_pacman_remove "uchardet-git"
@@ -1482,6 +1481,7 @@ run_builds() {
 
 cd $LOCALBUILDDIR
 if [[ "$(pwd)" = "$LOCALBUILDDIR" ]]; then
+    unset _to_remove
     run_builds
 else
     read -p "Something serious has failed. Let us know before running this script again."
@@ -1549,6 +1549,8 @@ if [[ $deleteSource = "y" ]]; then
     echo
     find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d \
         ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" | xargs rm -rf
+    echo ${_to_remove[*]} | xargs -r rm -rf
+    unset _to_remove
 fi
 
 echo -ne "\033]0;compiling done...\007"
