@@ -1385,20 +1385,21 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         fi
     fi
 
-    cd $LOCALBUILDDIR
-    do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
-    if [[ $compile = "true" ]]; then
-        if [[ -f "$LOCALDESTDIR/lib/libluajit-5.1.a" ]]; then
-            rm -rf $LOCALDESTDIR/include/luajit-2.0 $LOCALDESTDIR/bin-global/luajit*.exe $LOCALDESTDIR/lib/lua
-            rm -rf $LOCALDESTDIR/lib/libluajit-5.1.a $LOCALDESTDIR/lib/pkgconfig/luajit.pc
+    if [[ ! -f "$LOCALDESTDIR"/lib/libluajit-5.1.a ]]; then
+        cd $LOCALBUILDDIR
+        do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
+        if [[ $compile = "true" ]]; then
+            rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
+            rm -f "$LOCALDESTDIR"/lib/{libluajit-5.1.a,pkgconfig/luajit.pc}
+            rm -rf ./temp
+            [[ -f "src/luajit.exe" ]] && make clean
+            make BUILDMODE=static amalg
+            make BUILDMODE=static PREFIX=$LOCALDESTDIR DESTDIR=$(pwd)/temp install
+            cp -rf temp/$LOCALDESTDIR/{lib,include} $LOCALDESTDIR/
+            # luajit comes with a broken .pc file
+            sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
+            do_checkIfExist libluajit-5.1.a
         fi
-        [[ -f "src/luajit.exe" ]] && make clean
-        make BUILDMODE=static amalg
-        make BUILDMODE=static PREFIX=$LOCALDESTDIR INSTALL_BIN=$LOCALDESTDIR/bin-global FILE_T=luajit.exe \
-        INSTALL_TNAME='luajit-$(VERSION).exe' INSTALL_TSYMNAME=luajit.exe install
-        # luajit comes with a broken .pc file
-        sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
-        do_checkIfExist libluajit-5.1.a
     fi
 
     do_pacman_remove "uchardet-git"
