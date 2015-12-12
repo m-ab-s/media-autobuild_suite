@@ -366,7 +366,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
     if [[ $compile = "true" ]]; then
         rm -f $LOCALDESTDIR/include/zimg{.h,++.hpp}
         rm -f $LOCALDESTDIR/lib/{lib,vs}zimg.{,l}a $LOCALDESTDIR/lib/pkgconfig/zimg.pc
-        grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:.*/ i\Libs.private: -lstdc++" zimg.pc.in
+        grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:/ i\Libs.private: -lstdc++" zimg.pc.in
         do_autoreconf
         [[ -f config.log ]] && make distclean
         do_generic_confmakeinstall
@@ -1407,7 +1407,9 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
         rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
         do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
-        LDFLAGS+=" -static-libgcc" do_cmakeinstall -DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-global
+        grep -q "Libs.private" uchardet.pc.in ||
+            sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
+        LDFLAGS+=" -static" do_cmakeinstall -DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-global
         do_checkIfExist libuchardet.a
     fi
 
