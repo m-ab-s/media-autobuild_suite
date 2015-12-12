@@ -248,16 +248,15 @@ do_getFFmpegConfig() {
     # If nonfree will use SChannel if neither openssl or gnutls are in the options
     if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
         do_checkForOptions "--enable-librtmp"; then
-        if [[ "$license" != "nonfree" ]]; then
-            do_addOption "--enable-gnutls"
-        fi
+        [[ $license = gpl* ]] && do_addOption "--enable-gnutls" || do_addOption "--enable-openssl"
+        do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
-    if do_checkForOptions "--enable-openssl" && [[ $license = "nonfree" ]]; then
-        # prefer openssl if both are in options and nonfree
+    if do_checkForOptions "--enable-openssl" && [[ $license != gpl* ]]; then
+        # prefer openssl if both are in options and not gpl
         do_removeOptions "--enable-gnutls --enable-libutvideo"
     elif do_checkForOptions "--enable-openssl"; then
-        # prefer gnutls if both are in options and free
+        # prefer gnutls if both are in options and gpl
         do_removeOption "--enable-openssl"
         do_addOption "--enable-gnutls"
     fi

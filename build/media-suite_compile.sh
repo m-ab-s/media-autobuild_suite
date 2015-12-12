@@ -174,8 +174,7 @@ if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
 [[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
 [[ -n "$gnutls_ver" ]] &&
-    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') ||
-    gnutls_ver="3.4.7"
+    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.7"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
 
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
