@@ -1280,12 +1280,14 @@ if [[ $ffmpeg != "n" ]]; then
             do_checkIfExist bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
                 mv build_successful${bits} build_successful${bits}_shared
+            do_checkForOptions "--enable-debug" &&
+                create_debug_link "$LOCALDESTDIR"/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
         # static
         if [[ $ffmpeg != "s" ]]; then
             echo -ne "\033]0;compiling static FFmpeg $bits\007"
-            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe
+            rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe{,.debug}
             [[ -f config.mak ]] && make distclean
             ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video $FFMPEG_OPTS
             # cosmetics
@@ -1293,6 +1295,8 @@ if [[ $ffmpeg != "n" ]]; then
             do_makeinstall
             do_checkIfExist libavcodec.a
             newFfmpeg="yes"
+            do_checkForOptions "--enable-debug" &&
+                create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
         fi
     fi
 fi
@@ -1427,7 +1431,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         [[ ! -f waf ]] && $python bootstrap.py
         if [[ -d build ]]; then
             $python waf distclean
-            rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}
+            rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}{,.debug}
         fi
 
         # for purely cosmetic reasons, show the last release version when doing -V
@@ -1437,7 +1441,8 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
-        $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3")
+        $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
+        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
@@ -1450,6 +1455,8 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
+        do_checkForOptions "--enable-debug" &&
+            create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
     fi
 fi
 
@@ -1506,8 +1513,8 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay"
-    find /local*/{bin-*,lib} -regex ".*\.\(exe\|dll\)" -not -regex ".*\(${nostrip}\)\.exe" \
+    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay\|mpv"
+    find /local*/bin-* -regex ".*\.\(exe\|dll\|com\)" -not -regex ".*\(${nostrip}\)\.exe" \
         -newer "$LOCALBUILDDIR"/last_run | xargs -r strip --strip-all
     find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
     printf "done!\n"

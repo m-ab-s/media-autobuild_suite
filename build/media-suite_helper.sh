@@ -605,3 +605,15 @@ get_last_version() {
         echo $ret | grep -oP "$version"
     fi
 }
+
+create_debug_link() {
+    local file=
+    for file in $@; do
+        if [[ -f "$file" && ! -f "$file".debug ]]; then
+            echo "Stripping and creating debug link for ${file##*/}..."
+            objcopy --only-keep-debug "$file" "$file".debug
+            strip -s "$file"
+            objcopy --add-gnu-debuglink="$file".debug "$file"
+        fi
+    done
+}
