@@ -1,26 +1,20 @@
-From 6125aa9b5d10dd3b89ac9d033525708904121cd9 Mon Sep 17 00:00:00 2001
+From af8024fdcbc399fd40d665beba9df374e5432456 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sat, 21 Nov 2015 23:31:19 +0000
 Subject: [PATCH] CMake: allow static-only builds
 
 ---
- CMakeLists.txt           | 7 +++++++
+ CMakeLists.txt           | 6 ++++++
  src/CMakeLists.txt       | 8 ++++++++
  src/tools/CMakeLists.txt | 7 +++++++
  test/CMakeLists.txt      | 8 +++++++-
- 4 files changed, 29 insertions(+), 1 deletion(-)
+ 4 files changed, 28 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 6d37230..2f6d738 100644
+index 4f279e1..9d6d6ee 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1,4 +1,5 @@
- ######## Project settings
-+
- cmake_minimum_required(VERSION 2.8)
- set (PACKAGE_NAME opencc)
- project (${PACKAGE_NAME} CXX C)
-@@ -37,6 +38,10 @@ set (DIR_SHARE ${DIR_PREFIX}/share)
+@@ -37,6 +37,10 @@ set (DIR_SHARE ${DIR_PREFIX}/share)
  set (DIR_BIN ${DIR_PREFIX}/bin)
  set (DIR_ETC ${DIR_PREFIX}/etc)
  
@@ -31,7 +25,7 @@ index 6d37230..2f6d738 100644
  if (DEFINED CMAKE_INSTALL_LIBDIR)
  	set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
  	set (DIR_LIBRARY_STATIC ${CMAKE_INSTALL_LIBDIR})
-@@ -61,6 +66,8 @@ set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
+@@ -61,6 +65,8 @@ set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
  
  option(BUILD_STATIC "Build static library"
         ON)
@@ -41,10 +35,10 @@ index 6d37230..2f6d738 100644
  configure_file(
  	uchardet.pc.in
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 42574ce..91b66a9 100644
+index 901ce18..d810786 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -45,11 +45,13 @@ add_definitions(
+@@ -51,11 +51,13 @@ add_definitions(
  	-Wall
  )
  
@@ -58,7 +52,7 @@ index 42574ce..91b66a9 100644
  
  if (BUILD_STATIC)
      add_library(
-@@ -59,6 +61,7 @@ if (BUILD_STATIC)
+@@ -65,6 +67,7 @@ if (BUILD_STATIC)
      )
  endif (BUILD_STATIC)
  
@@ -66,7 +60,7 @@ index 42574ce..91b66a9 100644
  set_target_properties(
  	${UCHARDET_TARGET}
  	PROPERTIES
-@@ -71,6 +74,7 @@ set_target_properties(
+@@ -77,6 +80,7 @@ set_target_properties(
  		SOVERSION
  			0
  )
@@ -74,7 +68,7 @@ index 42574ce..91b66a9 100644
  
  if (BUILD_STATIC)
      set_target_properties(
-@@ -90,6 +94,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
+@@ -96,6 +100,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
  	)
  endif (CMAKE_BUILD_TYPE MATCHES Debug)
  
@@ -82,7 +76,7 @@ index 42574ce..91b66a9 100644
  if (NOT WIN32)
  install(
  	TARGETS
-@@ -107,6 +112,7 @@ install(
+@@ -113,6 +118,7 @@ install(
  		${DIR_LIBRARY}
  )
  endif (NOT WIN32)
@@ -90,7 +84,7 @@ index 42574ce..91b66a9 100644
  
  if (BUILD_STATIC)
      install(
-@@ -124,6 +130,8 @@ install(
+@@ -130,6 +136,8 @@ install(
  		${DIR_INCLUDE}/uchardet
  )
  
@@ -122,7 +116,7 @@ index 7ad3ff5..bc709ee 100644
  install(
  	TARGETS
 diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
-index 6e48cab..ae307a1 100644
+index a36a739..087314c 100644
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
 @@ -7,11 +7,17 @@ add_executable(
