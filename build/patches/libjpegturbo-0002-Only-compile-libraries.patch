@@ -1,14 +1,14 @@
-From 143a2491ca34b9bc57d6c81d5a2cedca6c558763 Mon Sep 17 00:00:00 2001
+From c3ebe222560c323f171ad16b042e5cfad82432cf Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sun, 16 Aug 2015 18:47:07 +0100
-Subject: [PATCH] Only compile libraries
+Subject: [PATCH 2/2] Only compile libraries
 
 ---
  CMakeLists.txt | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index df874e9..6461bab 100644
+index 308754d..8dbaec6 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -295,7 +295,7 @@ else()
@@ -48,8 +48,8 @@ index df874e9..6461bab 100644
 -install(TARGETS rdjpgcom wrjpgcom RUNTIME DESTINATION bin)
 +#install(TARGETS rdjpgcom wrjpgcom RUNTIME DESTINATION bin)
  
- install(FILES ${CMAKE_SOURCE_DIR}/README ${CMAKE_SOURCE_DIR}/README-turbo.txt
+ install(FILES ${CMAKE_SOURCE_DIR}/README.ijg ${CMAKE_SOURCE_DIR}/README.md
    ${CMAKE_SOURCE_DIR}/example.c ${CMAKE_SOURCE_DIR}/libjpeg.txt
 -- 
-2.5.0
+2.6.3
 

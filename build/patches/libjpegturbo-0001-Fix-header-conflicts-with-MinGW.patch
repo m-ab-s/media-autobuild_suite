@@ -1,17 +1,17 @@
-From 61989d5f45db5f1d51f819cc0083fdce8d9ec3d8 Mon Sep 17 00:00:00 2001
+From eb6416cf4b8c3e9f1a405b324160890a6ff71116 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sun, 2 Aug 2015 00:51:12 +0100
-Subject: [PATCH] Fix header conflicts with MinGW
+Subject: [PATCH 1/2] Fix header conflicts with MinGW
 
 ---
  jmorecfg.h | 6 ++++++
  1 file changed, 6 insertions(+)
 
 diff --git a/jmorecfg.h b/jmorecfg.h
-index e86ccc6..8dcdd80 100644
+index 1d96786..7d908df 100644
 --- a/jmorecfg.h
 +++ b/jmorecfg.h
-@@ -25,6 +25,12 @@
+@@ -26,6 +26,12 @@
  
  #define MAX_COMPONENTS  10      /* maximum number of image components */
  
@@ -25,5 +25,5 @@ index e86ccc6..8dcdd80 100644
  /*
   * Basic data types.
 -- 
-2.5.0
+2.6.3
 
