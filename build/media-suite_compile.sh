@@ -1419,6 +1419,20 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
     do_pacman_install "libarchive"
 
+    if [[ $bits = "64bit" && ! -f $LOCALDESTDIR/lib/libEGL.a ]]; then
+        cd $LOCALBUILDDIR
+        do_vcs "https://chromium.googlesource.com/angle/angle" angle
+        rm -rf $LOCALDESTDIR/include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h}
+        rm -f $LOCALDESTDIR/lib/{lib{EGL,GLESv2}.a,pkgconfig/libEGL.pc}
+        do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
+        [[ -f libEGL.a ]] && make clean
+        make STATIC=y
+        cp -f lib{EGL,GLESv2}.a $LOCALDESTDIR/lib/
+        cp -f libEGL.pc $LOCALDESTDIR/lib/pkgconfig/
+        cp -rf include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h} $LOCALDESTDIR/include/
+        do_checkIfExist libEGL.a
+    fi
+
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
@@ -1436,8 +1450,13 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
-        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
+        if [[ $bits = "64bit" ]]; then
+            mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
+            mpv_cflags="-DGL_APICALL= -DEGLAPI="
+            do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
+        fi
 
+        CFLAGS="$CFLAGS $mpv_cflags" \
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
@@ -1451,7 +1470,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         $python waf install -j $cpuCount
 
-        unset mpv_ldflags replace
+        unset mpv_ldflags mpv_cflags replace
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
