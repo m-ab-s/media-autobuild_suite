@@ -1,24 +1,34 @@
-From 64062254b23d81fca9a071379ce57c98dbc7bd4d Mon Sep 17 00:00:00 2001
+From d67d53ff82846d4c6f2bde61ff4a4dfd1b1ac1de Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Wed, 16 Dec 2015 19:05:35 +0000
 Subject: [PATCH] Add makefile and pkgconfig file
 
+Custom makefile originally made by rossy in
+https://gist.github.com/rossy/a73d58faa15b8db19b57
 ---
- Makefile  | 294 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- libEGL.pc |   6 ++
- 2 files changed, 300 insertions(+)
+ Makefile     | 338 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ libEGL.pc.in |  10 ++
+ 2 files changed, 348 insertions(+)
  create mode 100644 Makefile
- create mode 100644 libEGL.pc
+ create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..602927a
+index 0000000..6a0fb4b
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,294 @@
+@@ -0,0 +1,338 @@
++VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
 +RANLIB ?= ranlib
++INSTALL ?= install
++
++PREFIX ?= /usr/local
++BINDIR ?= $(PREFIX)/bin
++LIBDIR ?= $(PREFIX)/lib
++INCLUDEDIR ?= $(PREFIX)/include
++
 +DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 \
 +        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DGL_GLEXT_PROTOTYPES \
 +        -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
@@ -260,12 +270,14 @@ index 0000000..602927a
 +LIBGLESv2_DEP = $(LIBGLESv2_OBJ:.o=.d)
 +LIBEGL_OBJ = src/libEGL/libEGL.egl.o
 +LIBEGL_DEP = $(LIBEGL_OBJ:.o=.d)
++PCDEFS = -DGL_APICALL= -DEGLAPI=
 +
-+ifneq ($(STATIC),)
++ifneq ($(SHARED),)
++    TARGET = libEGL.dll
++else
 +    TARGET = libEGL.a libGLESv2.a
 +    DEFS += -DLIBGLESV2_EXPORT_H_ -DEGLAPIENTRY= -DANGLE_EXPORT=
-+else
-+    TARGET = libEGL.dll
++    PCDEFS += -DEGLAPIENTRY=
 +endif
 +
 +all: $(TARGET)
@@ -301,28 +313,66 @@ index 0000000..602927a
 +
 +clean:
 +	-rm -f $(LIBGLESv2_OBJ) $(LIBGLESv2_DEP) $(LIBEGL_OBJ) $(LIBEGL_DEP)
-+	-rm -f libGLESv2.dll libEGL.dll libGLESv2.dll.a libEGL.dll.a libGLESv2.a libEGL.a
++	-rm -f libGLESv2.dll libEGL.dll libGLESv2.dll.a libEGL.dll.a libGLESv2.a libEGL.a libEGL.pc
 +	-rm -f src/id/commit.h
 +	-rmdir src/id
 +.PHONY: clean
++
++.PHONY: libEGL.pc
++libEGL.pc: libEGL.pc.in
++	sed 's,%PREFIX%,$(PREFIX),;s,%LIBDIR%,$(LIBDIR),;s,%INCLUDEDIR%,$(INCLUDEDIR),;s,%VERSION%,$(VERSION),;s,%CFLAGS%,$(PCDEFS),' $< > $@
++
++install: $(TARGET) libEGL.pc
++	$(INSTALL) -d $(INCLUDEDIR)/{EGL,GLES{2,3},GLSLANG,KHR,platform}
++	$(INSTALL) -d $(BINDIR)
++	$(INSTALL) -d $(LIBDIR)
++	$(INSTALL) -d $(LIBDIR)/pkgconfig
++	$(INSTALL) -m 644 include/EGL/*.h $(INCLUDEDIR)/EGL
++	$(INSTALL) -m 644 include/GLES2/*.h $(INCLUDEDIR)/GLES2
++	$(INSTALL) -m 644 include/GLES3/*.h $(INCLUDEDIR)/GLES3
++	$(INSTALL) -m 644 include/GLSLANG/*.h $(INCLUDEDIR)/GLSLANG
++	$(INSTALL) -m 644 include/KHR/*.h $(INCLUDEDIR)/KHR
++	$(INSTALL) -m 644 include/platform/Platform.h $(INCLUDEDIR)/platform
++	$(INSTALL) -m 644 include/angle_gl.h $(INCLUDEDIR)
++	$(INSTALL) -m 644 libEGL.pc $(LIBDIR)/pkgconfig
++ifneq ($(SHARED),)
++	$(INSTALL) -m 644 libEGL.dll libGLESv2.dll $(BINDIR)
++	$(INSTALL) -m 644 libEGL.dll.a libGLESv2.dll.a $(LIBDIR)
++else
++	$(INSTALL) -m 644 libEGL.a libGLESv2.a $(LIBDIR)
++endif
++
++uninstall:
++	-rm -f $(BINDIR)/lib{EGL,GLESv2}.dll
++	-rm -f $(LIBDIR)/lib{EGL,GLESv2}.dll.a
++	-rm -f $(LIBDIR)/lib{EGL,GLESv2}.a
++	-rm -f $(LIBDIR)/pkgconfig/libEGL.pc
++	-rm -rf $(INCLUDEDIR)/{EGL,GLES{2,3},GLSLANG,KHR}
++	-rm -f $(INCLUDEDIR)/platform/Platform.h
++	-rm -f $(INCLUDEDIR)/angle_gl.h
++.PHONY: install-dev uninstall
 +
 +test: $(TARGET)
 +	printf "#include <EGL/egl.h>\nint main(int argc, char **argv)\n{ eglCreateWindowSurface(0, 0, 0, 0); return 0; }\n" > test.c
 +	$(CC) test.c -I/local64/include -o test.exe -DGL_APICALL= -DEGLAPI= -L. -lEGL -lGLESv2 -ld3d9 -lstdc++
 +.PHONY: test
 \ No newline at end of file
-diff --git a/libEGL.pc b/libEGL.pc
+diff --git a/libEGL.pc.in b/libEGL.pc.in
 new file mode 100644
-index 0000000..1a64e20
+index 0000000..dd4e52a
 --- /dev/null
-+++ b/libEGL.pc
-@@ -0,0 +1,6 @@
-+Name: libEGL
-+Version: 0.0.0
-+Description: A conformant OpenGL ES 2 implementation for Windows.
++++ b/libEGL.pc.in
+@@ -0,0 +1,10 @@
++prefix=%PREFIX%
++libdir=%LIBDIR%
++includedir=%INCLUDEDIR%
 +
-+Libs: -lEGL
-+Libs.private: -lGLESv2 -ld3d9 -lstdc++
++Name: libEGL
++Description: A conformant OpenGL ES 2 implementation for Windows.
++Version: %VERSION%
++Libs: -L${libdir} -lEGL
++Libs.private: -lGLESv2 -ldxguid -ld3d9 -lstdc++
++Cflags: %CFLAGS%
 -- 
 2.6.3
 

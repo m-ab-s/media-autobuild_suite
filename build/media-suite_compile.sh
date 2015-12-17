@@ -1419,18 +1419,18 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
     do_pacman_install "libarchive"
 
-    if [[ $bits = "64bit" && ! -f $LOCALDESTDIR/lib/libEGL.a ]]; then
+    if [[ ! -f $LOCALDESTDIR/lib/libEGL.a ]]; then
         cd $LOCALBUILDDIR
         do_vcs "https://chromium.googlesource.com/angle/angle" angle
-        rm -rf $LOCALDESTDIR/include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h}
-        rm -f $LOCALDESTDIR/lib/{lib{EGL,GLESv2}.a,pkgconfig/libEGL.pc}
         do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
+        make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
-        make STATIC=y
-        cp -f lib{EGL,GLESv2}.a $LOCALDESTDIR/lib/
-        cp -f libEGL.pc $LOCALDESTDIR/lib/pkgconfig/
-        cp -rf include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h} $LOCALDESTDIR/include/
+        make PREFIX=$LOCALDESTDIR install
         do_checkIfExist libEGL.a
+    else
+        echo -------------------------------------------------
+        echo "ANGLE is already compiled"
+        echo -------------------------------------------------
     fi
 
     cd $LOCALBUILDDIR
@@ -1450,13 +1450,9 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
-        if [[ $bits = "64bit" ]]; then
-            mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
-            mpv_cflags="-DGL_APICALL= -DEGLAPI="
-            do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
-        fi
+        [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
+        do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
 
-        CFLAGS="$CFLAGS $mpv_cflags" \
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
@@ -1470,7 +1466,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
         $python waf install -j $cpuCount
 
-        unset mpv_ldflags mpv_cflags replace
+        unset mpv_ldflags replace
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
