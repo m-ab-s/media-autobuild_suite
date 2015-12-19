@@ -1457,7 +1457,8 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
         $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
-        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
+        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build") \
+        --disable-egl-angle
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
