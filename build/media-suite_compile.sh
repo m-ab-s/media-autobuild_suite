@@ -176,7 +176,6 @@ if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
 [[ -n "$gnutls_ver" ]] &&
     gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.7"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
-
     rm -rf $LOCALDESTDIR/include/nettle $LOCALDESTDIR/bin-global/{nettle-*,{sexp,pkcs1}-conv}.exe
     rm -rf $LOCALDESTDIR/lib/libnettle.a $LOCALDESTDIR/lib/pkgconfig/nettle.pc
     do_pacman_install nettle
@@ -814,18 +813,19 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgConfig "libutvideo = 15.1.0"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0" libutvideo
     if [[ $compile = "true" ]]; then
-        if [[ -f utv_core/libutvideo.a ]]; then
-            rm -rf $LOCALDESTDIR/include/utvideo
-            rm -rf $LOCALDESTDIR/lib/libutvideo.a $LOCALDESTDIR/lib/pkgconfig/libutvideo.pc
-            make distclean
-        fi
-        ./configure --cross-prefix=$cross --prefix=$LOCALDESTDIR
-        make -j $cpuCount AR="${AR-ar}" RANLIB="${RANLIB-ranlib}"
-        make install RANLIBX="${RANLIB-ranlib}"
+        rm -rf $LOCALDESTDIR/include/utvideo
+        rm -f $LOCALDESTDIR/lib/{libutvideo.a,pkgconfig/libutvideo.pc}
+        [[ -f config.log ]] && make distclean
+        grep "#if 0" utv_core/utv_core.cpp || sed -i -e '/APIENTRY DllMain/ i\#if 0' \
+            -e '/#ifdef _DEBUG/ i\#endif' utv_core/utv_core.cpp
+        sed -i '/_countof/ c\' utv_core/stdafx.h
+        ./configure --prefix=$LOCALDESTDIR
+        make -j $cpuCount
+        make install
         do_checkIfExist libutvideo.a
     fi
 fi
@@ -1423,6 +1423,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         cd $LOCALBUILDDIR
         do_vcs "https://chromium.googlesource.com/angle/angle" angle
         do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
+        sed -i 's/#ifdef ANGLE_PLATFORM_WINDOWS/#if 0/' src/libGLESv2/global_state.cpp
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
         make PREFIX=$LOCALDESTDIR install
@@ -1457,8 +1458,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
         $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
-        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build") \
-        --disable-egl-angle
+        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two

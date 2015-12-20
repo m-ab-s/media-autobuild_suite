@@ -254,7 +254,7 @@ do_getFFmpegConfig() {
 
     if do_checkForOptions "--enable-openssl" && [[ $license != gpl* ]]; then
         # prefer openssl if both are in options and not gpl
-        do_removeOptions "--enable-gnutls --enable-libutvideo"
+        do_removeOptions "--enable-gnutls"
     elif do_checkForOptions "--enable-openssl"; then
         # prefer gnutls if both are in options and gpl
         do_removeOption "--enable-openssl"
