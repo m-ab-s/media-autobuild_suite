@@ -1,0 +1,40 @@
+From f5a7c99461ed065dc10c49830b96fe9f0c95f779 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Sun, 20 Dec 2015 01:42:48 +0000
+Subject: [PATCH] Avoid defined _countof and don't use DllMain
+
+---
+ utv_core/stdafx.h     | 2 ++
+ utv_core/utv_core.cpp | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/utv_core/stdafx.h b/utv_core/stdafx.h
+index 8a52b5e..0a6eeb4 100644
+--- a/utv_core/stdafx.h
++++ b/utv_core/stdafx.h
+@@ -49,7 +49,9 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
+ #endif
+ 
+ #ifndef _MSC_VER // XXX
++#ifndef __MINGW32__
+ #define _countof(x) (sizeof(x) / sizeof((x)[0]))
++#endif
+ #define _ASSERT(x) do {} while(/*CONSTCOND*/0)
+ #define _RPT(...) do {} while(/*CONSTCOND*/0)
+ #define _RPT0 _RPT
+diff --git a/utv_core/utv_core.cpp b/utv_core/utv_core.cpp
+index e1f6459..7687bb0 100644
+--- a/utv_core/utv_core.cpp
++++ b/utv_core/utv_core.cpp
+@@ -5,7 +5,7 @@
+ #include "utvideo.h"
+ #include "TunedFunc.h"
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(__MINGW32__)
+ 
+ HMODULE hModule;
+ 
+-- 
+2.6.3
+

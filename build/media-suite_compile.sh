@@ -820,9 +820,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgCon
         rm -rf $LOCALDESTDIR/include/utvideo
         rm -f $LOCALDESTDIR/lib/{libutvideo.a,pkgconfig/libutvideo.pc}
         [[ -f config.log ]] && make distclean
-        grep "#if 0" utv_core/utv_core.cpp || sed -i -e '/APIENTRY DllMain/ i\#if 0' \
-            -e '/#ifdef _DEBUG/ i\#endif' utv_core/utv_core.cpp
-        sed -i '/_countof/ c\' utv_core/stdafx.h
+        do_patch "libutvideo-0001-Avoid-defined-_countof-and-don-t-use-DllMain.patch" am
         ./configure --prefix=$LOCALDESTDIR
         make -j $cpuCount
         make install
@@ -1423,7 +1421,8 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         cd $LOCALBUILDDIR
         do_vcs "https://chromium.googlesource.com/angle/angle" angle
         do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
-        sed -i 's/#ifdef ANGLE_PLATFORM_WINDOWS/#if 0/' src/libGLESv2/global_state.cpp
+        sed -i 's;def ANGLE_PLATFORM_WINDOWS; defined(ANGLE_PLATFORM_WINDOWS) \&\& !defined(__MINGW32__);' \
+            src/libGLESv2/global_state.cpp
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
         make $([[ -n $cpuCount ]] && echo -j $cpuCount) PREFIX=$LOCALDESTDIR install
