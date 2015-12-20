@@ -1,4 +1,4 @@
-From d67d53ff82846d4c6f2bde61ff4a4dfd1b1ac1de Mon Sep 17 00:00:00 2001
+From fe09f8c6dbdcee46340b9d65214a181d396b1cd6 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Wed, 16 Dec 2015 19:05:35 +0000
 Subject: [PATCH] Add makefile and pkgconfig file
@@ -6,18 +6,18 @@ Subject: [PATCH] Add makefile and pkgconfig file
 Custom makefile originally made by rossy in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 ---
- Makefile     | 338 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 343 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 348 insertions(+)
+ 2 files changed, 353 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..6a0fb4b
+index 0000000..6cea8a1
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,338 @@
+@@ -0,0 +1,343 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -28,6 +28,11 @@ index 0000000..6a0fb4b
 +BINDIR ?= $(PREFIX)/bin
 +LIBDIR ?= $(PREFIX)/lib
 +INCLUDEDIR ?= $(PREFIX)/include
++
++ifndef V
++$(foreach VAR,CXX ASM AR RANLIB,\
++    $(eval override $(VAR) = @printf " %s\t%s\n" $(VAR) "$$@"; $($(VAR))))
++endif
 +
 +DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 \
 +        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DGL_GLEXT_PROTOTYPES \

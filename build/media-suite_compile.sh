@@ -1426,7 +1426,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         sed -i 's/#ifdef ANGLE_PLATFORM_WINDOWS/#if 0/' src/libGLESv2/global_state.cpp
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
-        make PREFIX=$LOCALDESTDIR install
+        make $([[ -n $cpuCount ]] && echo -j $cpuCount) PREFIX=$LOCALDESTDIR install
         do_checkIfExist libEGL.a
     else
         echo -------------------------------------------------
