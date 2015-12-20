@@ -1369,22 +1369,8 @@ if [[ $mplayer = "y" ]]; then
 fi
 
 if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
-    if [[ ! -f $LOCALDESTDIR/lib/libwaio.a ]]; then
-        cd $LOCALBUILDDIR
-        do_vcs "git://midipix.org/waio" waio
-        [[ $bits = "32bit" ]] && _bits="32" || _bits="64"
-        if [[ -f lib${_bits}/libwaio.a ]]; then
-            ./build-mingw-nt${_bits} clean
-            rm -rf $LOCALDESTDIR/include/waio
-            rm -f $LOCALDESTDIR/lib/libwaio.a
-        fi
-        build-mingw-nt${_bits} AR=${targetBuild}-gcc-ar LD=ld STRIP=strip lib-static
-        cp -r include/waio  $LOCALDESTDIR/include/
-        cp -r lib${_bits}/libwaio.a $LOCALDESTDIR/lib/
-        do_checkIfExist libwaio.a
-        unset _bits
-        _to_remove+=($(pwd))
-    fi
+    [[ -d $LOCALBUILDDIR/waio-git ]] && rm -rf $LOCALDESTDIR/{include/waio,lib/libwaio.a} &&
+        rm -rf $LOCALBUILDDIR/waio-git
 
     if [[ ! -f "$LOCALDESTDIR"/lib/libluajit-5.1.a ]]; then
         cd $LOCALBUILDDIR

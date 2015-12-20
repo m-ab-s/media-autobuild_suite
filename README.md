@@ -65,7 +65,6 @@ Included Tools And Libraries
 	- libtheora
 	- libtwolame (git)
 	- libutvideo (git/15.1.0)
-		- If using `--enable-openssl`, this lib is disabled
 		- Not compiled by default
 	- libvo-aacenc (0.1.3)
 		- Not compiled by default
@@ -97,7 +96,7 @@ Included Tools And Libraries
 	- mpv (git) including in addition to ffmpeg libs:
 		- libjpeg-turbo (git)
 		- uchardet
-		- libwaio (git)
+		- ANGLE (git snapshot)
 		- luajit (git)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
