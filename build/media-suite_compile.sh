@@ -1514,7 +1514,8 @@ if [[ $stripping = "y" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     printf "Stripping binaries and libs... "
-    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay\|mpv"
+    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay"
+    [[ -n $(find /local*/bin-video -name "mpv.exe.debug") ]] && nostrip+="\|mpv"
     find /local*/bin-* -regex ".*\.\(exe\|dll\|com\)" -not -regex ".*\(${nostrip}\)\.exe" \
         -newer "$LOCALBUILDDIR"/last_run | xargs -r strip --strip-all
     find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
