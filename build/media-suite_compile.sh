@@ -749,23 +749,12 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enab
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
-        if [[ -f "$LOCALDESTDIR/lib/libkvazaar.a" ]]; then
-            rm -f "$LOCALDESTDIR/include/kvazaar.h"
-            rm -f "$LOCALDESTDIR/include/kvazaar_version.h"
-            rm -f "$LOCALDESTDIR/lib/libkvazaar.a"
-            rm -f "$LOCALDESTDIR/lib/pkgconfig/kvazaar.pc"
-            rm -f "$LOCALDESTDIR/bin-video/kvazaar.exe"
-        fi
-        cd src
-        if [[ -f intra.o ]]; then
-            make clean
-        fi
-        if [[ "$bits" = "32bit" ]]; then
-            make all lib-static ARCH=i686 -j $cpuCount
-        else
-            make all lib-static ARCH=x86_64 -j $cpuCount
-        fi
-        make install-{pc,prog,static} PREFIX=$LOCALDESTDIR BINDIR=$LOCALDESTDIR/bin-video
+        rm -f "$LOCALDESTDIR"/include/kvazaar{,_version}.h
+        rm -f "$LOCALDESTDIR"/bin-video/kvazaar.exe
+        rm -f "$LOCALDESTDIR"/lib/{libkvazaar.{,l}a,pkgconfig/kvazaar.pc}
+        do_autogen
+        [[ -f config.log ]] && make distclean
+        do_generic_confmakeinstall video
         do_checkIfExist libkvazaar.a
     fi
 else
