@@ -412,7 +412,7 @@ do_patch() {
     fi
     if [[ -n "$patchpath" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am "$patchpath"; then
+            if ! git am --ignore-whitespace "$patchpath"; then
                 git am --abort
                 echo "Patch couldn't be applied with 'git am'. Continuing without patching."
             fi
