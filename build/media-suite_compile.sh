@@ -809,7 +809,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgCon
         rm -rf $LOCALDESTDIR/include/utvideo
         rm -f $LOCALDESTDIR/lib/{libutvideo.a,pkgconfig/libutvideo.pc}
         [[ -f config.log ]] && make distclean
-        do_patch "libutvideo-0001-Avoid-defined-_countof-and-don-t-use-DllMain.patch" am
+        do_patch "libutvideo-0001-Avoid-_countof-and-DllMain-in-MinGW.patch" am
         ./configure --prefix=$LOCALDESTDIR
         make -j $cpuCount
         make install
