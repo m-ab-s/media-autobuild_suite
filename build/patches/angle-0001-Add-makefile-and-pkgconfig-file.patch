@@ -1,4 +1,4 @@
-From fe09f8c6dbdcee46340b9d65214a181d396b1cd6 Mon Sep 17 00:00:00 2001
+From cb6d996fdc3df3ce84974ecc664412b9d42b0634 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Wed, 16 Dec 2015 19:05:35 +0000
 Subject: [PATCH] Add makefile and pkgconfig file
@@ -6,18 +6,18 @@ Subject: [PATCH] Add makefile and pkgconfig file
 Custom makefile originally made by rossy in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 ---
- Makefile     | 343 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 345 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 353 insertions(+)
+ 2 files changed, 355 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..6cea8a1
+index 0000000..33c7f0c
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,343 @@
+@@ -0,0 +1,345 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -294,7 +294,9 @@ index 0000000..6cea8a1
 +	mkdir -p $@
 +
 +src/id/commit.h: src/commit.h | src/id
-+	cp src/commit.h $@
++	printf '#define ANGLE_COMMIT_HASH "%s"\n' '$(shell git rev-parse --short=12 HEAD)' >$@
++	printf '#define ANGLE_COMMIT_HASH_SIZE 12\n' >>$@
++	printf '#define ANGLE_COMMIT_DATE "%s"\n' '$(shell git show -s --format=%ci HEAD)' >>$@
 +
 +%.o: %.cpp src/id/commit.h
 +	$(CXX) -c -o $@ $(CPPFLAGS) $(DEFS) $(LIBGLESv2_DEFS) $(CXXFLAGS) $(DEPFLAGS) $<

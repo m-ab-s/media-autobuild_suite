@@ -1394,7 +1394,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
     if [[ ! -f $LOCALDESTDIR/lib/libEGL.a ]]; then
         cd $LOCALBUILDDIR
-        do_vcs "https://chromium.googlesource.com/angle/angle" angle
+        do_vcs "https://chromium.googlesource.com/angle/angle#commit=66988745" angle
         do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
         sed -i 's;def ANGLE_PLATFORM_WINDOWS; defined(ANGLE_PLATFORM_WINDOWS) \&\& !defined(__MINGW32__);' \
             src/libGLESv2/global_state.cpp
