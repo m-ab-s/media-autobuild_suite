@@ -1,6 +1,6 @@
-From cb6d996fdc3df3ce84974ecc664412b9d42b0634 Mon Sep 17 00:00:00 2001
+From 3ac4d6db1e21db088aeb5798beaaeb2f18ba410a Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
-Date: Wed, 16 Dec 2015 19:05:35 +0000
+Date: Wed, 23 Dec 2015 02:22:50 +0000
 Subject: [PATCH] Add makefile and pkgconfig file
 
 Custom makefile originally made by rossy in
@@ -14,7 +14,7 @@ https://gist.github.com/rossy/a73d58faa15b8db19b57
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..33c7f0c
+index 0000000..bb44d23
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,345 @@
@@ -294,9 +294,9 @@ index 0000000..33c7f0c
 +	mkdir -p $@
 +
 +src/id/commit.h: src/commit.h | src/id
-+	printf '#define ANGLE_COMMIT_HASH "%s"\n' '$(shell git rev-parse --short=12 HEAD)' >$@
++	printf '#define ANGLE_COMMIT_HASH "%s"\n' '$(shell git rev-parse --short=12 HEAD^)' >$@
 +	printf '#define ANGLE_COMMIT_HASH_SIZE 12\n' >>$@
-+	printf '#define ANGLE_COMMIT_DATE "%s"\n' '$(shell git show -s --format=%ci HEAD)' >>$@
++	printf '#define ANGLE_COMMIT_DATE "%s"\n' '$(shell git show -s --format=%ci HEAD^)' >>$@
 +
 +%.o: %.cpp src/id/commit.h
 +	$(CXX) -c -o $@ $(CPPFLAGS) $(DEFS) $(LIBGLESv2_DEFS) $(CXXFLAGS) $(DEPFLAGS) $<
@@ -363,7 +363,6 @@ index 0000000..33c7f0c
 +	printf "#include <EGL/egl.h>\nint main(int argc, char **argv)\n{ eglCreateWindowSurface(0, 0, 0, 0); return 0; }\n" > test.c
 +	$(CC) test.c -I/local64/include -o test.exe -DGL_APICALL= -DEGLAPI= -L. -lEGL -lGLESv2 -ld3d9 -lstdc++
 +.PHONY: test
-\ No newline at end of file
 diff --git a/libEGL.pc.in b/libEGL.pc.in
 new file mode 100644
 index 0000000..dd4e52a
