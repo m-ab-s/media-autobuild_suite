@@ -83,17 +83,15 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
-        if [[ -f $LOCALDESTDIR/lib/libopenmj2.a ]]; then
+        if [[ -f $LOCALDESTDIR/lib/libopenjp2.a ]]; then
             rm -rf $LOCALDESTDIR/include/openjpeg{-2.1,.h} $LOCALDESTDIR/lib/openjpeg-2.1
             rm -f $LOCALDESTDIR/lib/libopenjp{2,wl}.a $LOCALDESTDIR/lib/libopenmj2.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libopenjp{2,wl}.pc
             rm -f $LOCALDESTDIR/bin-global/opj_*.exe
         fi
         do_patch "openjpeg-0001-Only-compile-libraries.patch" am
-        do_cmakeinstall -DBUILD_MJ2=on
-        # ffmpeg needs this specific openjpeg.h
-        cp ../src/lib/openmj2/openjpeg.h $LOCALDESTDIR/include/
-        do_checkIfExist libopenmj2.a
+        do_cmakeinstall
+        do_checkIfExist libopenjp2.a
     fi
 fi
 
