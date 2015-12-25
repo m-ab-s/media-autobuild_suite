@@ -1392,20 +1392,13 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
     do_pacman_install "libarchive"
 
-    if [[ ! -f $LOCALDESTDIR/lib/libEGL.a ]]; then
-        cd $LOCALBUILDDIR
-        do_vcs "https://chromium.googlesource.com/angle/angle#commit=66988745" angle
-        do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
-        sed -i 's;def ANGLE_PLATFORM_WINDOWS; defined(ANGLE_PLATFORM_WINDOWS) \&\& !defined(__MINGW32__);' \
-            src/libGLESv2/global_state.cpp
+    cd $LOCALBUILDDIR
+    do_vcs "https://github.com/wiiaboo/angleproject.git" angle
+    if [[ $compile = "true" ]]; then
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
         make $([[ -n $cpuCount ]] && echo -j $cpuCount) PREFIX=$LOCALDESTDIR install
         do_checkIfExist libEGL.a
-    else
-        echo -------------------------------------------------
-        echo "ANGLE is already compiled"
-        echo -------------------------------------------------
     fi
 
     cd $LOCALBUILDDIR
