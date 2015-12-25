@@ -1,4 +1,4 @@
-From d1e0ce71bd7fb984191e26c7aed1c91ccd6b5031 Mon Sep 17 00:00:00 2001
+From 1d8575ac2faa31847683448a5b03096692439b8d Mon Sep 17 00:00:00 2001
 From: Hendrik Leppkes <h.leppkes@gmail.com>
 Date: Sun, 17 Aug 2014 13:26:23 +0200
 Subject: [PATCH 2/2] add openhevc intrinsics
@@ -1793,7 +1793,7 @@ index ad8168f..74184f6 100644
 +
  #endif // AVCODEC_X86_HEVCDSP_H
 diff --git a/libavcodec/x86/hevcdsp_init.c b/libavcodec/x86/hevcdsp_init.c
-index 2181f6d..8ae8268 100644
+index 0de0163..5ca8df1 100644
 --- a/libavcodec/x86/hevcdsp_init.c
 +++ b/libavcodec/x86/hevcdsp_init.c
 @@ -719,6 +719,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
@@ -1822,7 +1822,7 @@ index 2181f6d..8ae8268 100644
          }
          if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
              c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_10_ssse3;
-@@ -1071,6 +1083,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -1069,6 +1081,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
              c->idct_dc[1] = ff_hevc_idct8x8_dc_12_sse2;
              c->idct_dc[2] = ff_hevc_idct16x16_dc_12_sse2;
              c->idct_dc[3] = ff_hevc_idct32x32_dc_12_sse2;
@@ -1835,7 +1835,7 @@ index 2181f6d..8ae8268 100644
          }
          if (EXTERNAL_SSSE3(cpu_flags) && ARCH_X86_64) {
              c->hevc_v_loop_filter_luma = ff_hevc_v_loop_filter_luma_12_ssse3;
-@@ -1107,3 +1125,35 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
+@@ -1103,3 +1121,35 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
          }
      }
  }
