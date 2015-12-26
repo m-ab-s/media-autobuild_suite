@@ -1146,8 +1146,9 @@ if %build32%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='32bit'
-            echo.MINGW_PREFIX="/mingw32"
             echo.MINGW_CHOST="i686-w64-mingw32"
+            echo.MINGW_PREFIX="/mingw32"
+            echo.MINGW_PACKAGE_PREFIX="mingw-w64-i686"
             echo.
             echo.# rest is the same in both profiles
             echo.alias dir='ls -la --color=auto'
@@ -1203,8 +1204,9 @@ if %build64%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='64bit'
-            echo.MINGW_PREFIX="/mingw64"
             echo.MINGW_CHOST="x86_64-w64-mingw32"
+            echo.MINGW_PREFIX="/mingw64"
+            echo.MINGW_PACKAGE_PREFIX="mingw-w64-x86_64"
             echo.
             echo.# rest is the same in both profiles
             echo.alias dir='ls -la --color=auto'
