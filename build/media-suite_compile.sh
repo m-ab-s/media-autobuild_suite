@@ -185,7 +185,7 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
     rm -rf $LOCALDESTDIR/include/gnutls
     rm -f $LOCALDESTDIR/lib/{libgnutls*,pkgconfig/gnutls.pc}
     rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
-    ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$targetBuild --disable-cxx \
+    ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$MINGW_CHOST --disable-cxx \
         --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
         --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
@@ -853,7 +853,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
             rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         fi
         sed -i 's,"NUL","/dev/null",g' configure
-        ./configure --host=$targetHost --prefix=$LOCALDESTDIR
+        ./configure --host=$MINGW_CHOST --prefix=$LOCALDESTDIR
         make -j $cpuCount libxavs.a
         cp -f xavs.h $LOCALDESTDIR/include
         cp -f libxavs.a $LOCALDESTDIR/lib
@@ -1070,7 +1070,7 @@ if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "http://git.videolan.org/git/x264.git" x264
     if [[ $compile = "true" ]] || [[ $x264 != "l" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
-        extracommands="--host=$targetHost --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
+        extracommands="--host=$MINGW_CHOST --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
         if [[ $x264 = "f" ]]; then
             cd $LOCALBUILDDIR
             do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg lib/libavcodec.a

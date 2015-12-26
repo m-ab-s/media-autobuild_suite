@@ -456,7 +456,7 @@ do_generic_conf() {
         ;;
     esac
     shift 1
-    ./configure --build=$targetBuild --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
+    ./configure --build=$MINGW_CHOST --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
 }
 
 do_makeinstall() {

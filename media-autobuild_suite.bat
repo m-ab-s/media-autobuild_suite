@@ -1150,9 +1150,6 @@ if %build32%==yes (
             echo.MINGW_CHOST="i686-w64-mingw32"
             echo.
             echo.# rest is the same in both profiles
-            echo.targetBuild="${MINGW_CHOST}"
-            echo.targetHost="${MINGW_CHOST}"
-            echo.cross="${MINGW_CHOST}-"
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
@@ -1210,9 +1207,6 @@ if %build64%==yes (
             echo.MINGW_CHOST="x86_64-w64-mingw32"
             echo.
             echo.# rest is the same in both profiles
-            echo.targetBuild="${MINGW_CHOST}"
-            echo.targetHost="${MINGW_CHOST}"
-            echo.cross="${MINGW_CHOST}-"
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
