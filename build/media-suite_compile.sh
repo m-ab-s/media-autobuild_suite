@@ -1391,8 +1391,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     do_pacman_install "libarchive"
 
     cd $LOCALBUILDDIR
-    [[ -d angle-git ]] && rm -rf angle-git
-    do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject
+    do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject lib/libEGL.a
     if [[ $compile = "true" ]]; then
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
