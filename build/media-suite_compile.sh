@@ -1422,6 +1422,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
         --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
         --lua=luajit --disable-libguess --enable-libarchive \
+        --disable-vapoursynth --disable-vapoursynth-lazy \
         $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
         $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
