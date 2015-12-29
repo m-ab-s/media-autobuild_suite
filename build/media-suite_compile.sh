@@ -301,6 +301,7 @@ fi
 
 if do_checkForOptions "--enable-libtesseract"; then
     do_pacman_remove "tesseract-ocr"
+    do_pacman_install "libtiff"
     cd $LOCALBUILDDIR
     if do_pkgConfig "lept = 1.72"; then
         do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
