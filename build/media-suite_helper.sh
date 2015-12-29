@@ -530,7 +530,8 @@ do_pacman_install() {
         grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
     if [[ -n "$install" ]]; then
-        pacman -S --noconfirm --needed ${install[*]} >/dev/null
+        echo "Installing ${install[@]}"
+        pacman -S --force --noconfirm --needed ${install[*]} >/dev/null
         pacman -D --asexplicit ${install[*]} >/dev/null
     fi
     do_hide_all_sharedlibs
