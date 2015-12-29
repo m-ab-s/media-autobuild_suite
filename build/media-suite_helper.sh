@@ -494,24 +494,34 @@ do_hide_pacman_sharedlibs() {
 
 do_hide_all_sharedlibs() {
     [[ x"$1" = "xdry" ]] && local dryrun="y"
-    local files=$(find /mingw{32,64} -name *.dll.a)
+    local files=$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name *.dll.a 2>/dev/null)
+    local tomove=()
     for file in $files; do
-        [[ -f "${file%*.dll.a}.a" ]] &&
-            { [[ $dryrun != "y" ]] && mv -f "${file}" "${file}.dyn" || echo "${file}"; }
+        [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
+    [[ $dryrun != "y" ]] &&
+        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}' '{}.dyn' || printf "%s\n" "${tomove[@]}"
 }
 
 do_unhide_all_sharedlibs() {
     [[ x"$1" = "xdry" ]] && local dryrun="y"
-    local files=$(find /mingw{32,64} -name *.dll.a.dyn)
-
+    local files=$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name *.dll.a.dyn 2>/dev/null)
+    local tomove=()
+    local todelete=()
     for file in $files; do
         if [[ -f "${file%*.dyn}" ]]; then
-            [[ $dryrun != "y" ]] && rm -f "${file}" || echo "rm ${file}"
+            todelete+=("$file")
         else
-            [[ $dryrun != "y" ]] && mv -f "${file}" "${file%*.dyn}" || echo "${file}"
+            tomove+=("${file%*.dyn}")
         fi
     done
+    if [[ $dryrun != "y" ]]; then
+        printf "%s\n" "${todelete[@]}" | xargs -i rm -f '{}'
+        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}.dyn' '{}'
+    else
+        printf "rm %s\n" "${todelete[@]}"
+        printf "%s\n" "${tomove[@]}"
+    fi
 }
 
 do_pacman_install() {
