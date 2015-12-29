@@ -1245,6 +1245,9 @@ if [[ $ffmpeg != "n" ]]; then
         [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
         do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
+        do_checkForOptions "--enable-gcrypt" &&
+            do_patch "ffmpeg-0003-rtmpdh-Initialize-gcrypt-before-using-it.patch" am &&
+            do_patch "ffmpeg-0004-configure-Use-libgcrypt-config-if-available.patch" am
 
         rm -rf $LOCALDESTDIR/include/libav{codec,device,filter,format,util,resample}
         rm -rf $LOCALDESTDIR/include/lib{sw{scale,resample},postproc}
