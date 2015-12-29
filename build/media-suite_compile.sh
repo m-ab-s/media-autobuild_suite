@@ -1388,7 +1388,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkIfExist libuchardet.a
     fi
 
-    do_pacman_install "libarchive"
+    do_pacman_install "libarchive lcms2"
 
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject lib/libEGL.a

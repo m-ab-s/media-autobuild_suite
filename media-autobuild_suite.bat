@@ -51,8 +51,7 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2u
 intltool libtool patch python scons xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty-git texinfo
 
-set mingwpackages=cmake dlfcn doxygen lcms2 libpng gcc giflib nasm pcre tools-git ^
-yasm ninja pkg-config
+set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
 set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
