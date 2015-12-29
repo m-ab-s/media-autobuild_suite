@@ -608,8 +608,7 @@ get_last_version() {
     local filelist="$1"
     local filter="$2"
     local version="$3"
-    local ret=
-    ret=$(echo "$filelist" | grep -E "$filter" | sort -V | tail -1)
+    local ret=$(echo "$filelist" | grep -E "$filter" | sort -V | tail -1)
     if [[ -z "$version" ]]; then
         echo $ret
     else
