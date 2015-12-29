@@ -102,7 +102,7 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             read -p "install packs [y/n]? " yn
             case $yn in
                 [Yy]* )
-                    pacman -S --noconfirm --needed $install
+                    pacman -S --noconfirm --needed --force $install
                     pacman -D --asexplicit $install
                     break;;
                 [Nn]* ) exit;;
