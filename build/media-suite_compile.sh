@@ -1385,7 +1385,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     if [[ $compile = "true" ]]; then
         make PREFIX=$LOCALDESTDIR uninstall
         [[ -f libEGL.a ]] && make clean
-        make $([[ -n $cpuCount ]] && echo -j $cpuCount) PREFIX=$LOCALDESTDIR install
+        make -j ${cpuCount:=1} PREFIX=$LOCALDESTDIR install
         do_checkIfExist libEGL.a
     fi
 
@@ -1446,7 +1446,7 @@ run_builds() {
         source /local32/etc/profile.local
         buildProcess
         echo "-------------------------------------------------------------------------------"
-        echo "compile all tools 32bit done..."
+        echo "32bit compilation done..."
         echo "-------------------------------------------------------------------------------"
     fi
 
@@ -1454,7 +1454,7 @@ run_builds() {
         source /local64/etc/profile.local
         buildProcess
         echo "-------------------------------------------------------------------------------"
-        echo "compile all tools 64bit done..."
+        echo "64bit compilation done..."
         echo "-------------------------------------------------------------------------------"
     fi
 }
