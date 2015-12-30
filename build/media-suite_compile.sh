@@ -6,7 +6,7 @@ buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_BASE_OPTS="--enable-avisynth --pkg-config-flags=--static"
 alloptions="$@"
-printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
+echo -e "\nBuild start: $(date +"%F %T %z")" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
   case $1 in
@@ -42,19 +42,15 @@ done
 [[ -f $LOCALBUILDDIR/media-suite_helper.sh ]] && source $LOCALBUILDDIR/media-suite_helper.sh
 
 buildProcess() {
+echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color}"
 [[ -f "$HOME"/custom_build_options ]] &&
-    echo "importing custom build options (unsupported)" && source "$HOME"/custom_build_options
+    echo "Importing custom build options (unsupported)" && source "$HOME"/custom_build_options
 
 cd $LOCALBUILDDIR
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile global tools $bits"
-echo
-echo "-------------------------------------------------------------------------------"
 
 do_getFFmpegConfig
 if [[ -n $alloptions ]]; then
-    thisrun=$(printf '%s\n' "#!/bin/bash" "FFMPEG_DEFAULT_OPTS=${FFMPEG_DEFAULT_OPTS}" \
+    thisrun=$(printf '%s\n' "#!/bin/bash" "FFMPEG_DEFAULT_OPTS=\"$(echo -n ${FFMPEG_DEFAULT_OPTS})\"" \
         "$LOCALBUILDDIR/media-suite_compile.sh $alloptions")
     [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
         { diff -q <(echo "$thisrun") $LOCALBUILDDIR/last_run_successful >/dev/null 2>&1 ||
@@ -63,6 +59,7 @@ if [[ -n $alloptions ]]; then
     unset alloptions thisrun
 fi
 
+echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
@@ -100,7 +97,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         cd $LOCALBUILDDIR
         do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
-        [[ -f "objs/.libs/libfreetype.a" ]] && make distclean
+        [[ -f "objs/.libs/libfreetype.a" ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/freetype2 $LOCALDESTDIR/bin-global/freetype-config
         rm -f $LOCALDESTDIR/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
         do_generic_confmakeinstall global --with-harfbuzz=no
@@ -117,8 +114,8 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         rm -rf "$LOCALDESTDIR"/include/fontconfig $LOCALDESTDIR/bin-global/fc-*
         rm -f "$LOCALDESTDIR"/lib/{libfontconfig.{l,}a,pkgconfig/fontconfig.pc}
         do_generic_conf global
-        make -C fc-blank
-        make -C src
+        log "premake" make -C fc-blanks
+        do_make -C src
         mkdir -p "$LOCALDESTDIR"/include/fontconfig
         cp -f fontconfig/{fcfreetype,fcprivate,fontconfig}.h "$LOCALDESTDIR"/include/fontconfig/
         cp -f src/.libs/libfontconfig.{,l}a "$LOCALDESTDIR"/lib/
@@ -131,11 +128,11 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
         do_pacman_install "ragel"
         cd $LOCALBUILDDIR
         do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-1.1.2.tar.bz2"
-        [[ -f "src/.libs/libharfbuzz.a" ]] && make distclean
+        [[ -f "src/.libs/libharfbuzz.a" ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/harfbuzz
         rm -f $LOCALDESTDIR/lib/{libharfbuzz.{l,}a,pkgconfig/harfbuzz.pc}
-        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no \
-            LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++"
+        LDFLAGS+=" -static -static-libstdc++" \
+        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no
         do_checkIfExist libharfbuzz.a
         rebuildLibass="y"
     fi
@@ -143,7 +140,7 @@ if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
     if do_pkgConfig "fribidi = 0.19.7"; then
         cd $LOCALBUILDDIR
         do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-        [[ -f "lib/.libs/libfribidi.a" ]] && make distclean
+        [[ -f "lib/.libs/libfribidi.a" ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/fribidi $LOCALDESTDIR/bin-global/fribidi.exe
         rm -f $LOCALDESTDIR/lib/{libfribidi.{l,}a,pkgconfig/fribidi.pc}
         do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
@@ -156,7 +153,7 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffpla
     do_pacman_remove "SDL"
     cd $LOCALBUILDDIR
     do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
-    [[ -f "build/.libs/libSDL.a" ]] && make distclean
+    [[ -f "build/.libs/libSDL.a" ]] && log "distclean" make distclean
     rm -rf $LOCALDESTDIR/include/SDL $LOCALDESTDIR/bin-global/sdl-config
     rm -f $LOCALDESTDIR/lib/{libSDL{,main}.{l,}a,pkgconfig/sdl.pc}
     CFLAGS="-DDECLSPEC=" do_generic_confmakeinstall global
@@ -183,7 +180,7 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
     rm -rf $LOCALDESTDIR/include/gnutls
     rm -f $LOCALDESTDIR/lib/{libgnutls*,pkgconfig/gnutls.pc}
     rm -f $LOCALDESTDIR/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
-    ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$MINGW_CHOST --disable-cxx \
+    log "configure" ../configure --prefix=$LOCALDESTDIR --disable-shared --build=$MINGW_CHOST --disable-cxx \
         --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
         --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
@@ -195,33 +192,27 @@ fi
 
 if [[ $sox = "y" ]]; then
     if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
-        echo -------------------------------------------------
-        echo "libgnurx is already compiled"
-        echo -------------------------------------------------
+        do_print_status "libgnurx 2.5.1" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile libgnurx $bits\007"
         do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
             mingw-libgnurx-2.5.1.tar.gz
-        [[ -f "libgnurx.a" ]] && make distclean
+        [[ -f "libgnurx.a" ]] && log "distclean" make distclean
         [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]] &&
             rm -f $LOCALDESTDIR/lib/lib{gnurx,regex}.a $LOCALDESTDIR/include/regex.h
         do_patch "libgnurx-1-additional-makefile-rules.patch"
-        ./configure --prefix=$LOCALDESTDIR --disable-shared
-        do_makeinstall -f Makefile.mxe install-static
+        do_configure --prefix=$LOCALDESTDIR --disable-shared
+        do_make -f Makefile.mxe install-static
         do_checkIfExist libgnurx.a
     fi
 
     if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
         [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
-        echo -------------------------------------------------
-        echo "file-5.25 is already compiled"
-        echo -------------------------------------------------
+        do_print_status "file 5.25" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile file $bits\007"
         do_wget "https://fossies.org/linux/misc/file-5.25.tar.gz"
-        [[ -f "src/.libs/libmagic.a" ]] && make distclean
+        [[ -f "src/.libs/libmagic.a" ]] && log "distclean" make distclean
         if [[ -f "$LOCALDESTDIR/lib/libmagic.a" ]]; then
             rm -rf $LOCALDESTDIR/include/magic.h $LOCALDESTDIR/bin-global/file.exe
             rm -rf $LOCALDESTDIR/lib/libmagic.{l,}a
@@ -236,7 +227,7 @@ if do_checkForOptions "--enable-libwebp"; then
     do_vcs "https://chromium.googlesource.com/webm/libwebp" libwebp
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libwebp.a ]]; then
             rm -rf $LOCALDESTDIR/include/webp
             rm -f $LOCALDESTDIR/lib/libwebp{,demux,mux,decoder}.{,l}a
@@ -259,7 +250,7 @@ if do_checkForOptions "--enable-libtesseract --enable-opencl"; then
         mkdir opencl && cd opencl
         syspath=$(cygpath -S)
         [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
-        [[ -f "$syspath/OpenCL.dll" ]] && gendef "$syspath/OpenCL.dll"
+        [[ -f "$syspath/OpenCL.dll" ]] && gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && mv -f libOpenCL.a $LOCALDESTDIR/lib/
         do_checkIfExist libOpenCL.a
@@ -273,7 +264,7 @@ if do_checkForOptions "--enable-libtesseract"; then
     cd $LOCALBUILDDIR
     if do_pkgConfig "lept = 1.72"; then
         do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/liblept.a ]]; then
             rm -rf $LOCALDESTDIR/include/leptonica
             rm -f $LOCALDESTDIR/lib/liblept.{,l}a $LOCALDESTDIR/lib/pkgconfig/lept.pc
@@ -286,7 +277,7 @@ if do_checkForOptions "--enable-libtesseract"; then
     do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
     if [[ $compile = "true" ]]; then
         do_autogen
-        [[ -f api/.libs/libtesseract.a ]] && make distclean --ignore-errors
+        [[ -f api/.libs/libtesseract.a ]] && log "distclean" make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libtesseract.a ]]; then
             rm -rf $LOCALDESTDIR/include/tesseract
             rm -f $LOCALDESTDIR/lib/libtesseract.{,l}a $LOCALDESTDIR/lib/pkgconfig/tesseract.pc
@@ -322,7 +313,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } &&
     cd rubberband-master
     [[ -f $LOCALDESTDIR/lib/librubberband.a ]] && make PREFIX=$LOCALDESTDIR uninstall
     [[ -f "lib/librubberband.a" ]] && make clean
-    make PREFIX=$LOCALDESTDIR install-static
+    do_make PREFIX=$LOCALDESTDIR install-static
     do_checkIfExist librubberband.a
 fi
 
@@ -334,24 +325,12 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
         rm -f $LOCALDESTDIR/lib/{lib,vs}zimg.{,l}a $LOCALDESTDIR/lib/pkgconfig/zimg.pc
         grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:/ i\Libs.private: -lstdc++" zimg.pc.in
         do_autoreconf
-        [[ -f config.log ]] && make distclean
+        [[ -f config.log ]] && log "distclean" make distclean
         do_generic_confmakeinstall
         do_checkIfExist libzimg.a
     fi
 fi
-
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile global tools $bits done..."
-echo
-echo "-------------------------------------------------------------------------------"
-
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile audio tools $bits"
-echo
-echo "-------------------------------------------------------------------------------"
-
+echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
     do_pacman_remove "dcadec-git"
     cd $LOCALBUILDDIR
@@ -360,8 +339,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
         rm -rf $LOCALDESTDIR/include/libdcadec
         rm -f $LOCALDESTDIR/lib/{libdcadec.a,pkgconfig/dcadec.pc}
         rm -f $LOCALDESTDIR/bin-audio/dcadec.exe
-        [[ -f libdcadec/libdcadec.a ]] && make clean
-        make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
+        [[ -f libdcadec/libdcadec.a ]] && log "make" make clean
+        do_make CONFIG_WINDOWS=1 SMALL=1 PREFIX=$LOCALDESTDIR install-lib
         do_checkIfExist libdcadec.a
     fi
 fi
@@ -371,7 +350,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
     do_vcs "https://github.com/TimothyGu/libilbc.git" libilbc
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libilbc.a ]]; then
             rm -rf $LOCALDESTDIR/include/ilbc.h
             rm -rf $LOCALDESTDIR/lib/libilbc.{l,}a $LOCALDESTDIR/lib/pkgconfig/libilbc.pc
@@ -399,7 +378,7 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
     if do_pkgConfig "opus = 1.1.1"; then
         cd $LOCALBUILDDIR
         do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.1.tar.gz"
-        [[ -f ".libs/libopus.a" ]] && make distclean
+        [[ -f ".libs/libopus.a" ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/opus
         rm -rf $LOCALDESTDIR/lib/libopus.{l,}a $LOCALDESTDIR/lib/pkgconfig/opus.pc
 
@@ -419,7 +398,7 @@ if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } &&
     do_pkgConfig "speex = 1.2rc2"; then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
-    [[ -f "libspeex/.libs/libspeex.a" ]] && make distclean
+    [[ -f "libspeex/.libs/libspeex.a" ]] && log "distclean" make distclean
     if [[ -f $LOCALDESTDIR/lib/libspeex.a ]]; then
         rm -rf $LOCALDESTDIR/include/speex $LOCALDESTDIR/bin-audio/speex{enc,dec}.exe
         rm -rf $LOCALDESTDIR/lib/libspeex.{l,}a $LOCALDESTDIR/lib/pkgconfig/speex.pc
@@ -433,7 +412,7 @@ if [[ $flac = "y" || $sox = "y" ]] &&
     { do_pkgConfig "flac = 1.3.1" || [[ ! -f $LOCALDESTDIR/bin-audio/flac.exe ]]; } then
     cd $LOCALBUILDDIR
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
-    [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && make distclean
+    [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && log "distclean" make distclean
     if [[ -f $LOCALDESTDIR/lib/libFLAC.a ]]; then
         rm -rf $LOCALDESTDIR/include/FLAC{,++} $LOCALDESTDIR/bin-audio/{meta,}flac.exe
         rm -rf $LOCALDESTDIR/lib/libFLAC.{l,}a $LOCALDESTDIR/lib/pkgconfig/flac{,++}.pc
@@ -446,7 +425,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-aacenc"; } &&
     do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd $LOCALBUILDDIR
     do_wget_sf "opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
-    [[ -f ".libs/libvo-aacenc.a" ]] && make distclean
+    [[ -f ".libs/libvo-aacenc.a" ]] && log "distclean" make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-aacenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-aacenc
         rm -rf $LOCALDESTDIR/lib/libvo-aacenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-aacenc.pc
@@ -466,7 +445,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-amrwbenc"; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd $LOCALBUILDDIR
     do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
-    [[ -f ".libs/libvo-amrwbenc.a" ]] && make distclean
+    [[ -f ".libs/libvo-amrwbenc.a" ]] && log "distclean" make distclean
     if [[ -f $LOCALDESTDIR/lib/libvo-amrwbenc.a ]]; then
         rm -rf $LOCALDESTDIR/include/vo-amrwbenc
         rm -rf $LOCALDESTDIR/lib/libvo-amrwbenc.{l,}a $LOCALDESTDIR/lib/pkgconfig/vo-amrwbenc.pc
@@ -480,7 +459,7 @@ if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
     do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libfdk-aac.a ]]; then
             rm -rf $LOCALDESTDIR/include/fdk-aac
             rm -f $LOCALDESTDIR/lib/libfdk-aac.{l,}a $LOCALDESTDIR/lib/pkgconfig/fdk-aac.pc
@@ -493,7 +472,7 @@ if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac bin-audio/fdkaac.exe
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         rm -f $LOCALDESTDIR/bin-audio/fdkaac.exe
         CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
         do_checkIfExist bin-audio/fdkaac.exe
@@ -503,13 +482,12 @@ fi
 if do_checkForOptions "--enable-libfaac"; then
     if [[ -f $LOCALDESTDIR/bin-audio/faac.exe ]] &&
         [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
-        do_print_status "faac 1.28:" "$green_color" "Up-to-date"
+        do_print_status "faac 1.28" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile faac $bits\007"
         do_wget_sf "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
         sh bootstrap
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libfaac.a ]]; then
             rm -f $LOCALDESTDIR/include/faac{,cfg}.h
             rm -f $LOCALDESTDIR/lib/libfaac.a $LOCALDESTDIR/bin-audio/faac.exe
@@ -523,7 +501,7 @@ if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/
     cd $LOCALBUILDDIR
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools bin-audio/oggenc.exe
     do_autoreconf
-    [[ -f Makefile ]] && make distclean
+    [[ -f Makefile ]] && log "distclean" make distclean
     rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
         $(do_checkForOptions "--enable-libspeex" || echo "--without-speex") \
@@ -535,12 +513,11 @@ fi
 if do_checkForOptions "--enable-libopus"; then
     if [[ -f $LOCALDESTDIR/bin-audio/opusenc.exe ]] &&
         [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
-        do_print_status "opus-tools 0.1.9:" "$green_color" "Up-to-date"
+        do_print_status "opus-tools 0.1.9" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
-        echo -ne "\033]0;compile opus-tools $bits\007"
         do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
-        [[ -f "opusenc.exe" ]] && make distclean
+        [[ -f "opusenc.exe" ]] && log "distclean" make distclean
         [[ -f "$LOCALDESTDIR/bin-audio/opusenc.exe" ]] &&
             rm -rf $LOCALDESTDIR/bin-audio/opus{dec,enc,info}.exe
         do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
@@ -566,17 +543,16 @@ fi
 if do_checkForOptions "--enable-libmp3lame"; then
     if [[ -f $LOCALDESTDIR/bin-audio/lame.exe ]] &&
         [[ $(lame.exe 2>&1) = *"3.99.5"* ]]; then
-        do_print_status "lame 3.99.5:" "$green_color" "Up-to-date"
+        do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
-        echo -ne "\033]0;compiling lame $bits\007"
         do_wget_sf "lame/lame/3.99/lame-3.99.5.tar.gz"
-        if grep "xmmintrin\.h" configure.in configure; then
+        if grep -q "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
             touch recently_updated
             do_autoreconf
         fi
-        [[ -f libmp3lame/.libs/libmp3lame.a ]] && make distclean
+        [[ -f libmp3lame/.libs/libmp3lame.a ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libmp3lame.a ]]; then
             rm -rf $LOCALDESTDIR/include/lame
             rm -f $LOCALDESTDIR/lib/libmp3lame.{l,}a $LOCALDESTDIR/bin-audio/lame.exe
@@ -611,7 +587,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbs2b"; } &&
     do_pkgConfig "libbs2b = 3.1.0"; then
     cd $LOCALBUILDDIR
     do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
-    [[ -f "src/.libs/libbs2b.a" ]] && make distclean
+    [[ -f "src/.libs/libbs2b.a" ]] && log "distclean" make distclean
     if [[ -f "$LOCALDESTDIR/lib/libbs2b.a" ]]; then
         rm -rf $LOCALDESTDIR/include/bs2b $LOCALDESTDIR/bin-audio/bs2b*
         rm -rf $LOCALDESTDIR/lib/libbs2b.{l,}a $LOCALDESTDIR/lib/pkgconfig/libbs2b.pc
@@ -627,7 +603,7 @@ if [[ $sox = "y" ]]; then
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         do_autogen
-        [[ -f ./configure ]] && make distclean
+        [[ -f ./configure ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libsndfile.a ]]; then
             rm -f $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
             rm -f $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
@@ -644,7 +620,7 @@ if [[ $sox = "y" ]]; then
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/bin-audio/sox.exe ]]; then
             rm -f $LOCALDESTDIR/include/sox.h $LOCALDESTDIR/bin-audio/{sox{,i},play,rec}.exe
             rm -f $LOCALDESTDIR/lib/libsox.{l,}a $LOCALDESTDIR/lib/pkgconfig/sox.pc
@@ -660,17 +636,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmodplug"; then
     do_addOption "--extra-cflags=-DMODPLUG_STATIC"
 fi
 
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile audio tools $bits done..."
-echo
-echo "-------------------------------------------------------------------------------"
-
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile video tools $bits"
-echo
-echo "-------------------------------------------------------------------------------"
+echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
 if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
     cd $LOCALBUILDDIR
@@ -690,11 +656,11 @@ if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enab
             rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
             rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,gw}.exe
         fi
-        [[ -f "librtmp/librtmp.a" ]] && make clean
-        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
+        [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
+        do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
             sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
-            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" install
+            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
         do_checkIfExist librtmp.a
         unset crypto pc req
     fi
@@ -716,9 +682,9 @@ if [[ ! $vpx = "n" ]]; then
             rm -rf $LOCALDESTDIR/include/vpx $LOCALDESTDIR/bin-video/vpx{enc,dec}.exe
             rm -f $LOCALDESTDIR/lib/libvpx.a $LOCALDESTDIR/lib/pkgconfig/vpx.pc
         fi
-        [[ -f libvpx.a ]] && make distclean
+        [[ -f libvpx.a ]] && log "distclean" make distclean
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-        LDFLAGS+=" -static-libgcc -static" ./configure --target="${target}-gcc" \
+        LDFLAGS+=" -static-libgcc -static" do_configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix=$LOCALDESTDIR \
@@ -744,7 +710,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enab
         rm -f "$LOCALDESTDIR"/bin-video/kvazaar.exe
         rm -f "$LOCALDESTDIR"/lib/{libkvazaar.{,l}a,pkgconfig/kvazaar.pc}
         do_autogen
-        [[ -f config.log ]] && make distclean
+        [[ -f config.log ]] && log "distclean" make distclean
         do_generic_confmakeinstall video
         do_checkIfExist libkvazaar.a
     fi
@@ -758,7 +724,7 @@ if [[ $mplayer = "y" ]] ||
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/dvdread
         rm -f $LOCALDESTDIR/lib/{libdvdread.{l,}a,pkgconfig/dvdread.pc}
         do_generic_confmakeinstall
@@ -771,7 +737,7 @@ if [[ $mplayer = "y" ]] ||
     do_vcs "http://git.videolan.org/git/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/dvdnav
         rm -f $LOCALDESTDIR/lib/{libdvdnav.{l,}a,pkgconfig/dvdnav.pc}
         do_generic_confmakeinstall
@@ -784,7 +750,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     do_vcs "http://git.videolan.org/git/libbluray.git" libbluray
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/bluray
         rm -f $LOCALDESTDIR/lib/{libbluray.{l,}a,pkgconfig/libbluray.pc}
         do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
@@ -799,11 +765,10 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgCon
     if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/include/utvideo
         rm -f $LOCALDESTDIR/lib/{libutvideo.a,pkgconfig/libutvideo.pc}
-        [[ -f config.log ]] && make distclean
+        [[ -f config.log ]] && log "distclean" make distclean
         do_patch "libutvideo-0001-Avoid-_countof-and-DllMain-in-MinGW.patch" am
-        ./configure --prefix=$LOCALDESTDIR
-        make -j $cpuCount
-        make install
+        do_configure --prefix=$LOCALDESTDIR
+        do_makeinstall
         do_checkIfExist libutvideo.a
     fi
 fi
@@ -814,7 +779,7 @@ if [[ $mpv = "y" || $mplayer = "y" ]] ||
     do_vcs "https://github.com/libass/libass.git" libass
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         rm -rf $LOCALDESTDIR/include/ass
         rm -f $LOCALDESTDIR/lib/libass.{,l}a $LOCALDESTDIR/lib/pkgconfig/libass.pc
         do_checkForOptions "--enable-(lib)?fontconfig" || disable_fc="--disable-fontconfig"
@@ -828,9 +793,8 @@ fi
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
     cd $LOCALBUILDDIR
     if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
-        do_print_status "libxavs snapshot:" "$green_color" "Up-to-date"
+        do_print_status "libxavs snapshot" "$green_color" "Up-to-date"
     else
-        echo -ne "\033]0;compile xavs $bits\007"
         if [[ ! -d xavs ]] || [[ -d xavs ]] &&
         { [[ $build32 = "yes" && ! -f xavs/build_successful32bit ]] ||
           [[ $build64 = "yes" && ! -f xavs/build_successful64bit ]]; }; then
@@ -838,14 +802,14 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
             do_wget https://github.com/Distrotech/xavs/archive/distrotech-xavs.zip
         fi
         cd xavs-distrotech-xavs
-        [[ -f "libxavs.a" ]] && make distclean
+        [[ -f "libxavs.a" ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libxavs.a ]]; then
             rm -rf $LOCALDESTDIR/include/xavs.h
             rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         fi
         sed -i 's,"NUL","/dev/null",g' configure
-        ./configure --host=$MINGW_CHOST --prefix=$LOCALDESTDIR
-        make -j $cpuCount libxavs.a
+        do_configure --host=$MINGW_CHOST --prefix=$LOCALDESTDIR
+        do_make libxavs.a
         cp -f xavs.h $LOCALDESTDIR/include
         cp -f libxavs.a $LOCALDESTDIR/lib
         cp -f xavs.pc $LOCALDESTDIR/lib/pkgconfig
@@ -859,7 +823,7 @@ if [[ $mediainfo = "y" ]]; then
     if [[ $compile = "true" ]]; then
         cd Project/GNU/Library
         do_autoreconf
-        [[ -f "Makefile" ]] && make distclean --ignore-errors
+        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libzen.a ]]; then
             rm -rf $LOCALDESTDIR/include/ZenLib $LOCALDESTDIR/bin-global/libzen-config
             rm -f $LOCALDESTDIR/lib/libzen.{l,}a $LOCALDESTDIR/lib/pkgconfig/libzen.pc
@@ -881,13 +845,13 @@ if [[ $mediainfo = "y" ]]; then
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/Library
         do_autoreconf
-        [[ -f "Makefile" ]] && make distclean --ignore-errors
+        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         if [[ -f $LOCALDESTDIR/lib/libmediainfo.a ]]; then
             rm -rf $LOCALDESTDIR/include/MediaInfo{,DLL}
             rm -f $LOCALDESTDIR/lib/libmediainfo.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc
             rm -f $LOCALDESTDIR/bin-global/libmediainfo-config
         fi
-        do_generic_conf --enable-staticlibs --with-libcurl LDFLAGS="$LDFLAGS -static-libgcc"
+        LDFLAGS+=" -static" do_generic_conf --enable-staticlibs --with-libcurl
         do_makeinstall
         sed -i "s,libmediainfo\.a.*,libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)," \
             libmediainfo.pc
@@ -901,9 +865,9 @@ if [[ $mediainfo = "y" ]]; then
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd Project/GNU/CLI
         do_autoreconf
-        [[ -f "Makefile" ]] && make distclean --ignore-errors
+        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
-        do_generic_conf video --enable-staticlibs LDFLAGS="$LDFLAGS -static-libgcc"
+        LDFLAGS+=" -static" do_generic_conf video --enable-staticlibs
         do_makeinstall
         do_checkIfExist bin-video/mediainfo.exe
     fi
@@ -933,7 +897,7 @@ fi
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzvbi"; } && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd $LOCALBUILDDIR
     do_wget_sf "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
-    [[ -f "src/.libs/libzvbi.a" ]] && make distclean
+    [[ -f "src/.libs/libzvbi.a" ]] && log "distclean" make distclean
     if [[ -f $LOCALDESTDIR/lib/libzvbi.a ]]; then
         rm -rf $LOCALDESTDIR/include/libzvbi.h
         rm -rf $LOCALDESTDIR/lib/libzvbi.{l,}a $LOCALDESTDIR/lib/pkgconfig/zvbi-0.2.pc
@@ -968,9 +932,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
     done
     if [[ "$missing" = "n" ]] &&
         grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
-        do_print_status "DeckLinkAPI 10.5:" "$green_color" "Up-to-date"
+        do_print_status "DeckLinkAPI 10.5" "$green_color" "Up-to-date"
     else
-        echo -ne "\033]0;installing DeckLinkAPI $bits\007"
         mkdir -p DeckLinkAPI && cd DeckLinkAPI
         [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
         for file in DeckLinkAPI{{,Version}.h,_i.c}; do
@@ -990,9 +953,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]] &&
         [[ "$nvencver" = "$(grep -Eam1 "NVENCAPI_MAJOR_VERSION" \
             $LOCALDESTDIR/include/nvEncodeAPI.h | tail -c2)" ]]; then
-        do_print_status "nvEncodeAPI ${nvencver.0.1}:" "$green_color" "Up-to-date"
+        do_print_status "nvEncodeAPI ${nvencver}.0.1" "$green_color" "Up-to-date"
     else
-        echo -ne "\033]0;installing nvEncodeAPI ${nvencver}.0.1 $bits\007"
         rm -f "$LOCALDESTDIR"/include/{cudaModuleMgr,drvapi_error_string,exception}.h
         rm -f "$LOCALDESTDIR"/include/dynlink_*.h
         rm -f "$LOCALDESTDIR"/include/helper_{cuda{,_drvapi},functions,string,timer}.h
@@ -1014,7 +976,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libmfx.a ]]; then
             rm -rf $LOCALDESTDIR/include/mfx
             rm -f $LOCALDESTDIR/lib/libmfx.{l,}a $LOCALDESTDIR/lib/pkgconfig/libmfx.pc
@@ -1044,10 +1006,10 @@ if [[ $mp4box = "y" ]]; then
             rm -f $LOCALDESTDIR/bin-video/MP4Box.exe $LOCALDESTDIR/lib/libgpac*
             rm -rf $LOCALDESTDIR/include/gpac
         fi
-        [[ -f config.mak ]] && make distclean
-        ./configure --prefix=$LOCALDESTDIR --static-mp4box
-        make -j $cpuCount
-        make install-lib
+        [[ -f config.mak ]] && log "distclean" make distclean
+        do_configure --prefix=$LOCALDESTDIR --static-mp4box
+        do_make
+        log "install" make install-lib
         cp bin/gcc/MP4Box.exe $LOCALDESTDIR/bin-video
         do_checkIfExist bin-video/MP4Box.exe
     fi
@@ -1067,8 +1029,8 @@ if [[ ! $x264 = "n" ]]; then
             rm -f $LOCALDESTDIR/lib/{libsw{scale,resample},libpostproc}.a
             rm -f $LOCALDESTDIR/lib/pkgconfig/libav{codec,device,filter,format,util,resample}.pc
             rm -f $LOCALDESTDIR/lib/pkgconfig/{libsw{scale,resample},libpostproc}.pc
-            [[ -f "config.mak" ]] && make distclean
-            ./configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-programs \
+            [[ -f "config.mak" ]] && log "distclean" make distclean
+            do_configure $FFMPEG_BASE_OPTS --prefix=$LOCALDESTDIR --disable-programs \
             --disable-devices --disable-filters --disable-encoders --disable-muxers
 
             do_makeinstall
@@ -1081,14 +1043,13 @@ if [[ ! $x264 = "n" ]]; then
             cd $LOCALBUILDDIR
             do_vcs "https://github.com/l-smash/l-smash.git" lsmash
             if [[ $compile = "true" ]]; then
-                [[ -f "config.mak" ]] && make distclean
+                [[ -f "config.mak" ]] && log "distclean" make distclean
                 if [[ -f $LOCALDESTDIR/lib/liblsmash.a ]]; then
                     rm -f $LOCALDESTDIR/include/lsmash.h $LOCALDESTDIR/lib/liblsmash.a
                     rm -f $LOCALDESTDIR/lib/pkgconfig/liblsmash.pc
                 fi
-                ./configure --prefix=$LOCALDESTDIR
-                make -j $cpuCount lib
-                make install-lib
+                do_configure --prefix=$LOCALDESTDIR
+                do_make install-lib
                 do_checkIfExist liblsmash.a
             fi
             cd $LOCALBUILDDIR/x264-git
@@ -1098,22 +1059,21 @@ if [[ ! $x264 = "n" ]]; then
             extracommands+=" --disable-lsmash"
         fi
 
-        echo -ne "\033]0;compile x264-git $bits\007"
         if [ -f $LOCALDESTDIR/lib/libx264.a ]; then
             rm -f $LOCALDESTDIR/include/x264{,_config}.h $LOCALDESTDIR/bin/x264{,-10bit}.exe
             rm -f $LOCALDESTDIR/lib/libx264.a $LOCALDESTDIR/lib/pkgconfig/x264.pc
         fi
-        [[ -f "libx264.a" ]] && make distclean
+        [[ -f "libx264.a" ]] && log "distclean" make distclean
         if [[ $x264 != "l" ]]; then
             extracommands+=" --bindir=$LOCALDESTDIR/bin-video"
-            CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" ./configure --bit-depth=10 $extracommands
-            make -j $cpuCount
+            CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" do_configure --bit-depth=10 $extracommands
+            do_make
             cp x264.exe $LOCALDESTDIR/bin-video/x264-10bit.exe
-            make clean
+            log "clean" make clean
         else
             extracommands+=" --disable-interlaced --disable-gpac --disable-cli"
         fi
-        CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" ./configure --bit-depth=8 $extracommands
+        CFLAGS="$(echo $CFLAGS | sed 's/ -O2 / /')" do_configure --bit-depth=8 $extracommands
         do_makeinstall
         do_checkIfExist libx264.a
         buildFFmpeg="true"
@@ -1138,12 +1098,12 @@ if [[ ! $x265 = "n" ]]; then
         rm -rf $LOCALBUILDDIR/x265-hg/build/msys/{8,10,12}bit
 
         do_x265_cmake() {
-            cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
-            -DCMAKE_CXX_FLAGS="$CXXFLAGS -static-libgcc -static-libstdc++" \
-            -DCMAKE_C_FLAGS="$CFLAGS -static-libgcc -static-libstdc++" \
+            CFLAGS+=" -static-libgcc -static-libstdc++" \
+            CXXFLAGS+=" -static-libgcc -static-libstdc++" \
+            log "cmake" cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_INSTALL_PREFIX=$LOCALDESTDIR -DBIN_INSTALL_DIR=$LOCALDESTDIR/bin-video \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON "$@"
-            ninja -j $cpuCount
+            log "ninja" ninja -j ${cpuCount:=1}
         }
         mkdir -p {8,10,12}bit
 
@@ -1194,7 +1154,7 @@ EOF
         fi
         }
         build_x265
-        ninja -j $cpuCount install
+        log "install" ninja -j ${cpuCount:=1} install
         if [[ $x265 = "d" ]]; then
             cd ..
             rm -f $LOCALDESTDIR/bin-video/x265-numa.exe
@@ -1244,27 +1204,27 @@ if [[ $ffmpeg != "n" ]]; then
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
-            echo -ne "\033]0;compiling shared FFmpeg $bits\007"
-            [[ -f config.mak ]] && make distclean
+            [[ -f config.mak ]] && log "distclean" make distclean
             rm -rf $LOCALDESTDIR/bin-video/ffmpegSHARED
-            ./configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
+            do_configure --prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED \
                 --disable-static --enable-shared $FFMPEG_OPTS_SHARED
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
-                mv build_successful${bits} build_successful${bits}_shared
+                mv build_successful${bits}{,_shared} && mv ab-suite.{,shared.}configure.log &&
+                mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
+                mv ab-suite.{,shared.}install.error.log
             do_checkForOptions "--enable-debug" &&
                 create_debug_link "$LOCALDESTDIR"/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
         # static
         if [[ $ffmpeg != "s" ]]; then
-            echo -ne "\033]0;compiling static FFmpeg $bits\007"
             rm -f $LOCALDESTDIR/bin-video/ff{mpeg,play,probe}.exe{,.debug}
-            [[ -f config.mak ]] && make distclean
-            ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video $FFMPEG_OPTS
+            [[ -f config.mak ]] && log "distclean" make distclean
+            do_configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video $FFMPEG_OPTS
             # cosmetics
             sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
@@ -1278,7 +1238,7 @@ fi
 
 if [[ $bits = "64bit" && $other265 = "y" ]]; then
 if [[ -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
-    do_print_status "f265 snapshot:" "$green_color" "Up-to-date"
+    do_print_status "f265 snapshot" "$green_color" "Up-to-date"
 else
     cd $LOCALBUILDDIR
     do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
@@ -1287,7 +1247,7 @@ else
         rm -rf build .sconf_temp
         rm -f .sconsign.dblite config.log options.py
     fi
-    scons libav=none
+    log "scons" scons libav=none
     [[ -f build/f265cli.exe ]] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
     do_checkIfExist bin-video/f265cli.exe
 fi
@@ -1312,7 +1272,7 @@ if [[ $mplayer = "y" ]]; then
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
         [[ -f $LOCALDESTDIR/bin-video/mplayer.exe ]] &&
             rm -f $LOCALDESTDIR/bin-video/{mplayer,mencoder}.exe
-        [[ -f config.mak ]] && make distclean
+        [[ -f config.mak ]] && log "distclean" make distclean
         if ! test -e ffmpeg ; then
             if [ ! $ffmpeg = "n" ]; then
                 git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
@@ -1331,7 +1291,7 @@ if [[ $mplayer = "y" ]]; then
         grep -q "windows" libmpcodecs/ad_spdif.c ||
             sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
 
-        ./configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
+        do_configure --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --cc=gcc \
         --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
         --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
         --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
@@ -1353,9 +1313,9 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
         rm -f "$LOCALDESTDIR"/lib/{libluajit-5.1.a,pkgconfig/luajit.pc}
         rm -rf ./temp
-        [[ -f "src/luajit.exe" ]] && make clean
-        make BUILDMODE=static amalg
-        make BUILDMODE=static PREFIX=$LOCALDESTDIR DESTDIR=$(pwd)/temp install
+        [[ -f "src/luajit.exe" ]] && log "clean" make clean
+        do_make BUILDMODE=static amalg
+        do_makeinstall BUILDMODE=static PREFIX=$LOCALDESTDIR DESTDIR=$(pwd)/temp
         cp -rf temp/$LOCALDESTDIR/{lib,include} $LOCALDESTDIR/
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" $LOCALDESTDIR/lib/pkgconfig/luajit.pc
@@ -1381,9 +1341,9 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject lib/libEGL.a
     if [[ $compile = "true" ]]; then
-        make PREFIX=$LOCALDESTDIR uninstall
-        [[ -f libEGL.a ]] && make clean
-        make -j ${cpuCount:=1} PREFIX=$LOCALDESTDIR install
+        log "uninstall" make PREFIX=$LOCALDESTDIR uninstall
+        [[ -f libEGL.a ]] && log "clean" make clean
+        do_makeinstall PREFIX=$LOCALDESTDIR
         do_checkIfExist libEGL.a
     fi
 
@@ -1396,9 +1356,9 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
             mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
 
-        [[ ! -f waf ]] && $python bootstrap.py
+        [[ ! -f waf ]] && $python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
-            $python waf distclean
+            $python waf distclean >/dev/null 2>&1
             rm -f $LOCALDESTDIR/bin-video/mpv.{exe,com}{,.debug}
         fi
 
@@ -1407,19 +1367,19 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
         do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
 
-        LDFLAGS="$LDFLAGS $mpv_ldflags" $python waf configure --prefix=$LOCALDESTDIR \
-        --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
-        --lua=luajit --disable-libguess --enable-libarchive \
-        --disable-vapoursynth --disable-vapoursynth-lazy \
-        $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
-        $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
+        LDFLAGS+=" $mpv_ldflags" log "configure" $python waf configure \
+            --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
+            --lua=luajit --disable-libguess --enable-libarchive \
+            --disable-vapoursynth --disable-vapoursynth-lazy \
+            $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
+            $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
-        $python waf install -j $cpuCount
+        log "install" $python waf install -j ${cpuCount:=1}
 
         unset mpv_ldflags replace
         do_checkIfExist bin-video/mpv.exe
@@ -1430,11 +1390,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
     fi
 fi
 
-echo "-------------------------------------------------------------------------------"
-echo
-echo "compile video tools $bits done..."
-echo
-echo "-------------------------------------------------------------------------------"
+echo -e "\n\t${orange_color}Finished $bits compilation of all tools${reset_color}"
 }
 
 run_builds() {
@@ -1443,17 +1399,11 @@ run_builds() {
     if [[ $build32 = "yes" ]]; then
         source /local32/etc/profile.local
         buildProcess
-        echo "-------------------------------------------------------------------------------"
-        echo "32bit compilation done..."
-        echo "-------------------------------------------------------------------------------"
     fi
 
     if [[ $build64 = "yes" ]]; then
         source /local64/etc/profile.local
         buildProcess
-        echo "-------------------------------------------------------------------------------"
-        echo "64bit compilation done..."
-        echo "-------------------------------------------------------------------------------"
     fi
 }
 
@@ -1478,62 +1428,46 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 if [[ $stripping = "y" ]]; then
-    echo -ne "\033]0;Stripping $bits binaries\007"
-    echo
-    echo "-------------------------------------------------------------------------------"
-    echo
-    printf "Stripping binaries and libs... "
+    echo -ne "\n\t${orange_color}Stripping binaries and shared libs... "
     nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay"
     [[ -n $(find /local*/bin-video -name "mpv.exe.debug") ]] && nostrip+="\|mpv"
     find /local*/bin-* -regex ".*\.\(exe\|dll\|com\)" -not -regex ".*\(${nostrip}\)\.exe" \
         -newer "$LOCALBUILDDIR"/last_run | xargs -r strip --strip-all
     find /local*/bin-video -name x265.exe -newer $LOCALBUILDDIR/last_run | xargs -r strip --strip-unneeded
-    printf "done!\n"
+    echo "done!${reset_color}"
     unset nostrip
 fi
 
 if [[ $packing = "y" ]]; then
     if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
-        echo -ne "\033]0;Installing UPX\007"
         cd $LOCALBUILDDIR
         rm -rf upx391w
         do_wget_sf "upx/upx/3.91/upx391w.zip"
     fi
-    echo -ne "\033]0;Packing $bits binaries\007"
-    echo
-    echo "-------------------------------------------------------------------------------"
-    echo
-    echo "Packing binaries and shared libs... "
+    echo -e "\n\t${orange_color}Packing binaries and shared libs...${reset_color}"
     packcmd="$LOCALBUILDDIR/upx391w/upx.exe -9 -qq"
     [[ $stripping = "y" ]] && packcmd="$packcmd --strip-relocs=0"
     find /local*/bin-* -regex ".*\.\(exe\|dll\)" -newer $LOCALBUILDDIR/last_run | xargs -r $packcmd
 fi
 
-echo
-echo "-------------------------------------------------------------------------------"
-echo
-echo "deleting status files..."
+echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
 cd $LOCALBUILDDIR
 find . -maxdepth 2 -name recently_updated | xargs rm -f
 find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
+find . -maxdepth 4 -name ab-suite.*.log | xargs rm -f
 [[ -f last_run ]] && mv last_run last_successful_run
 [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
 unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
 rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
 
 if [[ $deleteSource = "y" ]]; then
-    echo -ne "\033]0;deleting source folders\007"
-    echo
-    echo "deleting source folders..."
-    echo
+    echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
     find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d \
         ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" | xargs rm -rf
     echo ${_to_remove[*]} | xargs -r rm -rf
     unset _to_remove
 fi
 
-echo -ne "\033]0;compiling done...\007"
-echo
-echo "Compilation successful."
-echo "This window will close automatically in 5 seconds."
+echo -e "\n\t${green_color}Compilation successful.${reset_color}"
+echo -e "\t${green_color}This window will close automatically in 5 seconds.${reset_color}"
 sleep 5

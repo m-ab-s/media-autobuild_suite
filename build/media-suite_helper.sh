@@ -4,6 +4,7 @@ if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test $ncolors -ge 8; then
         bold_color=$(tput bold)
+        blue_color=$(tput setaf 4)
         orange_color=$(tput setaf 3)
         green_color=$(tput setaf 2)
         red_color=$(tput setaf 1)
@@ -18,30 +19,30 @@ do_print_status() {
 
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
-        svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
+        svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
-        "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
+        "$vcsType" -q clone "$vcsURL" "$vcsFolder-$vcsType"
     fi
 }
 
 vcs_update() {
     if [[ "$vcsType" = "svn" ]]; then
         oldHead=$(svnversion)
-        svn update -r "$ref"
+        svn update -q -r "$ref"
         newHead=$(svnversion)
     elif [[ "$vcsType" = "hg" ]]; then
         oldHead=$(hg id --id)
-        hg pull
-        hg update -C -r "$ref"
+        hg -q pull
+        hg -q update -C -r "$ref"
         newHead=$(hg id --id)
     elif [[ "$vcsType" = "git" ]]; then
         local unshallow=""
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         [[ "$vcsURL" != "$(git config --get remote.origin.url)" ]] &&
-            git remote set-url origin "$vcsURL"
+            git remote -q set-url origin "$vcsURL"
         [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
         [[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
-            git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+            git config -q remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         git checkout -qf --no-track -B ab-suite "$ref"
         git fetch -qt $unshallow origin
         oldHead=$(git rev-parse HEAD)
@@ -93,7 +94,6 @@ do_vcs() {
     fi
     compile="false"
 
-    echo -ne "\033]0;compiling $vcsFolder $bits\007"
     if [ ! -d "$vcsFolder-$vcsType" ]; then
         vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
@@ -120,12 +120,14 @@ do_vcs() {
         vcs_log
         echo "" >> "$LOCALBUILDDIR"/newchangelog
         compile="true"
+        do_print_status "${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]] ||
          [[ -z "$vcsCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$vcsFolder.pc" ]] ||
          [[ ! -z "$vcsCheck" && ! -f "$LOCALDESTDIR/$vcsCheck" ]]; then
         compile="true"
+        do_print_status "${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     else
-        do_print_status "${vcsFolder} ${vcsType}:" "$green_color" "Up-to-date"
+        do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
     fi
 }
 
@@ -147,19 +149,20 @@ do_wget() {
           [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
         rm -rf $dirName
     fi
-    local response_code=$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" -o "$archive" "$url")
+    local response_code=$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")
     if [[ $response_code = "200" || $response_code = "226" ]]; then
+        do_print_status "$dirName" "$orange_color" "Updates found"
         case $archive_type in
         zip)
-            unzip "$archive"
+            log "extract" unzip "$archive"
             [[ $deleteSource = "y" ]] && rm "$archive"
             ;;
         7z)
-            7z x -o"$dirName" "$archive"
+            log "extract" 7z x -o"$dirName" "$archive"
             [[ $deleteSource = "y" ]] && rm "$archive"
             ;;
         tar*)
-            tar -xaf "$archive"
+            log "extract" tar -xaf "$archive"
             [[ $deleteSource = "y" ]] && rm "$archive"
             cd "$dirName"
             ;;
@@ -192,11 +195,7 @@ do_checkIfExist() {
     fi
 
     if [[ $buildSuccess = "y" ]]; then
-        echo -
-        echo -------------------------------------------------
-        echo "Building of $packetName done..."
-        echo -------------------------------------------------
-        echo -
+        do_print_status "$packetName" "$blue_color" "Updated"
         [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
             touch $LOCALBUILDDIR/$packetName/build_successful$bits
     else
@@ -215,11 +214,10 @@ do_pkgConfig() {
     local version=$2
     [[ -z "$version" ]] && version="${1##*= }"
     [[ "$version" = "$1" ]] && version="" || version=" $version"
-    echo -ne "\033]0;compiling $pkg $bits\007"
     local prefix=$(pkg-config --variable=prefix --silence-errors "$1")
     [[ ! -z "$prefix" ]] && prefix="$(cygpath -u "$prefix")"
     if [[ "$prefix" = "$LOCALDESTDIR" || "$prefix" = "/trunk${LOCALDESTDIR}" ]]; then
-        do_print_status "${pkg}${version}:" "$green_color" "Up-to-date"
+        do_print_status "${pkg}${version}" "$green_color" "Up-to-date"
         return 1
     fi
 }
@@ -417,13 +415,13 @@ do_patch() {
     fi
     if [[ -n "$patchpath" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am --ignore-whitespace "$patchpath"; then
-                git am --abort
+            if ! git am -q --ignore-whitespace "$patchpath"; then
+                git am -q --abort
                 echo "Patch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run -N -p$strip -i "$patchpath"; then
-                patch -N -p$strip -i "$patchpath"
+            if patch --dry-run -s -N -p$strip -i "$patchpath"; then
+                patch -s -N -p$strip -i "$patchpath"
             else
                 echo "Patch couldn't be applied with 'patch'. Continuing without patching."
             fi
@@ -440,8 +438,38 @@ do_cmakeinstall() {
         mkdir build
     fi
     cd build
-    cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
-    ninja $([[ -n "$cpuCount" ]] && echo "-j $cpuCount") install
+    log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
+    log "install" ninja $([[ -n "$cpuCount" ]] && echo "-j $cpuCount") install
+}
+
+compilation_fail() {
+    local reason="$1"
+    local operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
+    do_prompt "$reason failed. Check $(pwd)/ab-suite.$operation.error.log"
+    exit 1
+}
+
+log() {
+    local cmd="$1"
+    shift 1
+    if [[ $logging != "n" ]]; then
+        echo "Running $cmd..."
+        "$@" > ab-suite.$cmd.log 2> ab-suite.$cmd.error.log || compilation_fail $cmd
+    else
+        "$@"
+    fi
+}
+
+do_configure() {
+    log "configure" ./configure "$@"
+}
+
+do_make() {
+    log "make" make -j"${cpuCount:=1}" "$@"
+}
+
+do_makeinstall() {
+    log "install" make install "$@"
 }
 
 do_generic_conf() {
@@ -461,22 +489,18 @@ do_generic_conf() {
         ;;
     esac
     shift 1
-    ./configure --build=$MINGW_CHOST --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
-}
-
-do_makeinstall() {
-    make -j $cpuCount "$@"
-    make install
+    do_configure --build=$MINGW_CHOST --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
 }
 
 do_generic_confmake() {
     do_generic_conf "$@"
-    make -j $cpuCount
+    do_make
 }
 
 do_generic_confmakeinstall() {
-    do_generic_confmake "$@"
-    make install
+    do_generic_conf "$@"
+    do_make
+    do_makeinstall
 }
 
 do_hide_pacman_sharedlibs() {
@@ -586,7 +610,7 @@ do_autoreconf() {
     local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
     if [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
-        autoreconf -fiv
+        log "autoreconf" autoreconf -fiv
     fi
 }
 
@@ -594,8 +618,8 @@ do_autogen() {
     local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
     if [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
-        git clean -xfd -e "/build_successful*" -e "/recently_updated"
-        ./autogen.sh
+        git clean -qxfd -e "/build_successful*" -e "/recently_updated"
+        log "autogen" ./autogen.sh
     fi
 }
 
