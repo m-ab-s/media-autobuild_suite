@@ -193,36 +193,6 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
 fi
 fi
 
-if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
-    cd $LOCALBUILDDIR
-    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
-    req=""
-    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
-    if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
-        crypto=GNUTLS
-        pc=gnutls
-    else
-        crypto=OPENSSL
-        pc=libssl
-    fi
-    if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
-        if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
-            rm -rf $LOCALDESTDIR/include/librtmp
-            rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
-            rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,gw}.exe
-        fi
-        [[ -f "librtmp/librtmp.a" ]] && make clean
-        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
-            SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
-            sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
-            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" install
-        do_checkIfExist librtmp.a
-        unset crypto pc req
-    fi
-else
-    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] || do_removeOption "--enable-librtmp"
-fi
-
 if [[ $sox = "y" ]]; then
     if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
         echo -------------------------------------------------
@@ -701,6 +671,36 @@ echo
 echo "compile video tools $bits"
 echo
 echo "-------------------------------------------------------------------------------"
+
+if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
+    cd $LOCALBUILDDIR
+    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
+    req=""
+    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
+    if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
+        crypto=GNUTLS
+        pc=gnutls
+    else
+        crypto=OPENSSL
+        pc=libssl
+    fi
+    if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
+        if [[ -f "$LOCALDESTDIR/lib/librtmp.a" ]]; then
+            rm -rf $LOCALDESTDIR/include/librtmp
+            rm -f $LOCALDESTDIR/lib/librtmp.a $LOCALDESTDIR/lib/pkgconfig/librtmp.pc
+            rm -f $LOCALDESTDIR/bin-video/rtmp{dump,suck,srv,gw}.exe
+        fi
+        [[ -f "librtmp/librtmp.a" ]] && make clean
+        make XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
+            SYS=mingw prefix=$LOCALDESTDIR bindir=$LOCALDESTDIR/bin-video \
+            sbindir=$LOCALDESTDIR/bin-video mandir=$LOCALDESTDIR/share/man \
+            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" install
+        do_checkIfExist librtmp.a
+        unset crypto pc req
+    fi
+else
+    [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] || do_removeOption "--enable-librtmp"
+fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libtheora"; then
     rm -rf $LOCALDESTDIR/include/theora $LOCALDESTDIR/lib/libtheora{,enc,dec}.{l,}a
