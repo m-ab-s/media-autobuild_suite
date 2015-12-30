@@ -1,5 +1,21 @@
 #!/bin/bash
 
+if which tput >/dev/null 2>&1; then
+    ncolors=$(tput colors)
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        bold_color=$(tput bold)
+        orange_color=$(tput setaf 3)
+        green_color=$(tput setaf 2)
+        red_color=$(tput setaf 1)
+        reset_color=$(tput sgr0)
+    fi
+    ncols=72
+fi
+
+do_print_status() {
+    printf '%s%*s%s%s%s\n' "$1" $(($ncols-${#1}-${#3}+3)) "[$2" "$3" "$reset_color]"
+}
+
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
@@ -109,9 +125,7 @@ do_vcs() {
          [[ ! -z "$vcsCheck" && ! -f "$LOCALDESTDIR/$vcsCheck" ]]; then
         compile="true"
     else
-        echo -------------------------------------------------
-        echo "$vcsFolder is already up to date"
-        echo -------------------------------------------------
+        do_print_status "${vcsFolder} ${vcsType}:" "$green_color" "Up-to-date"
     fi
 }
 
@@ -172,13 +186,9 @@ do_checkIfExist() {
     local buildSuccess="n"
 
     if [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
-        if [ -f "$LOCALDESTDIR/lib/$fileName" ]; then
-            buildSuccess="y"
-        fi
+        [[ -f "$LOCALDESTDIR/lib/$fileName" ]] && buildSuccess="y"
     else
-        if [ -f "$LOCALDESTDIR/$fileName" ]; then
-            buildSuccess="y"
-        fi
+        [[ -f "$LOCALDESTDIR/$fileName" ]] && buildSuccess="y"
     fi
 
     if [[ $buildSuccess = "y" ]]; then
@@ -187,13 +197,11 @@ do_checkIfExist() {
         echo "Building of $packetName done..."
         echo -------------------------------------------------
         echo -
-        if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
+        [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
             touch $LOCALBUILDDIR/$packetName/build_successful$bits
-        fi
     else
-        if [[ -d "$LOCALBUILDDIR/$packetName" ]]; then
+        [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
             rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
-        fi
         echo -------------------------------------------------
         echo "Building of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
@@ -211,9 +219,7 @@ do_pkgConfig() {
     local prefix=$(pkg-config --variable=prefix --silence-errors "$1")
     [[ ! -z "$prefix" ]] && prefix="$(cygpath -u "$prefix")"
     if [[ "$prefix" = "$LOCALDESTDIR" || "$prefix" = "/trunk${LOCALDESTDIR}" ]]; then
-        echo -------------------------------------------------
-        echo "${pkg}${version} is already compiled"
-        echo -------------------------------------------------
+        do_print_status "${pkg}${version}:" "$green_color" "Up-to-date"
         return 1
     fi
 }
@@ -397,7 +403,7 @@ do_patch() {
         strip="1"
     fi
     local patchpath=""
-    local response_code="$(curl --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
+    local response_code="$(curl -s --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code != "200" ]]; then

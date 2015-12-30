@@ -535,9 +535,7 @@ fi
 if do_checkForOptions "--enable-libfaac"; then
     if [[ -f $LOCALDESTDIR/bin-audio/faac.exe ]] &&
         [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
-        echo -------------------------------------------------
-        echo "faac-1.28 is already compiled"
-        echo -------------------------------------------------
+        do_print_status "faac 1.28:" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile faac $bits\007"
@@ -569,9 +567,7 @@ fi
 if do_checkForOptions "--enable-libopus"; then
     if [[ -f $LOCALDESTDIR/bin-audio/opusenc.exe ]] &&
         [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
-        echo -------------------------------------------------
-        echo "opus-tools-0.1.9 is already compiled"
-        echo -------------------------------------------------
+        do_print_status "opus-tools 0.1.9:" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compile opus-tools $bits\007"
@@ -602,9 +598,7 @@ fi
 if do_checkForOptions "--enable-libmp3lame"; then
     if [[ -f $LOCALDESTDIR/bin-audio/lame.exe ]] &&
         [[ $(lame.exe 2>&1) = *"3.99.5"* ]]; then
-        echo -------------------------------------------------
-        echo "lame 3.99.5 is already compiled"
-        echo -------------------------------------------------
+        do_print_status "lame 3.99.5:" "$green_color" "Up-to-date"
     else
         cd $LOCALBUILDDIR
         echo -ne "\033]0;compiling lame $bits\007"
@@ -836,9 +830,7 @@ fi
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
     cd $LOCALBUILDDIR
     if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
-        echo -------------------------------------------------
-        echo "libxavs is already compiled"
-        echo -------------------------------------------------
+        do_print_status "libxavs snapshot:" "$green_color" "Up-to-date"
     else
         echo -ne "\033]0;compile xavs $bits\007"
         if [[ ! -d xavs ]] || [[ -d xavs ]] &&
@@ -978,9 +970,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
     done
     if [[ "$missing" = "n" ]] &&
         grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
-        echo -------------------------------------------------
-        echo "DeckLinkAPI-10.5 is already installed"
-        echo -------------------------------------------------
+        do_print_status "DeckLinkAPI 10.5:" "$green_color" "Up-to-date"
     else
         echo -ne "\033]0;installing DeckLinkAPI $bits\007"
         mkdir -p DeckLinkAPI && cd DeckLinkAPI
@@ -1002,9 +992,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]] &&
         [[ "$nvencver" = "$(grep -Eam1 "NVENCAPI_MAJOR_VERSION" \
             $LOCALDESTDIR/include/nvEncodeAPI.h | tail -c2)" ]]; then
-        echo -------------------------------------------------
-        echo "nvEncodeAPI ${nvencver}.0.1 is already installed"
-        echo -------------------------------------------------
+        do_print_status "nvEncodeAPI ${nvencver.0.1}:" "$green_color" "Up-to-date"
     else
         echo -ne "\033]0;installing nvEncodeAPI ${nvencver}.0.1 $bits\007"
         rm -f "$LOCALDESTDIR"/include/{cudaModuleMgr,drvapi_error_string,exception}.h
@@ -1291,7 +1279,9 @@ if [[ $ffmpeg != "n" ]]; then
 fi
 
 if [[ $bits = "64bit" && $other265 = "y" ]]; then
-if [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
+if [[ -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
+    do_print_status "f265 snapshot:" "$green_color" "Up-to-date"
+else
     cd $LOCALBUILDDIR
     do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
     rm -rf f265 && mv f265_development_snapshot f265 && cd f265
@@ -1302,10 +1292,6 @@ if [[ ! -f $LOCALDESTDIR/bin-video/f265cli.exe ]]; then
     scons libav=none
     [[ -f build/f265cli.exe ]] && cp build/f265cli.exe $LOCALDESTDIR/bin-video/f265cli.exe
     do_checkIfExist bin-video/f265cli.exe
-else
-    echo -------------------------------------------------
-    echo "f265 is already compiled"
-    echo -------------------------------------------------
 fi
 fi
 
