@@ -456,6 +456,8 @@ log() {
         echo "Running $cmd..."
         "$@" > ab-suite.$cmd.log 2> ab-suite.$cmd.error.log || compilation_fail $cmd
     else
+        echo -e "\e]0;Running $cmd in $(get_first_subdir)\007"
+        echo -e "${bold_color}Running $cmd in $(get_first_subdir)${reset_color}"
         "$@"
     fi
 }
