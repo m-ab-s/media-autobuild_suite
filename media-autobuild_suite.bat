@@ -65,7 +65,7 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --enable-nonfree --enable-nvenc --enable-openssl
 
 set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -677,6 +677,30 @@ if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
+:logging
+set "writeLogging=no"
+if %loggingINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Write logs of compilation commands?
+    echo. 1 = Yes [recommended]
+    echo. 2 = No
+    echo.
+    echo Note: Setting this to yes will also hide output from these commands.
+    echo On successful compilation, these logs are deleted since they aren't needed.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P loggingF="Write logs: "
+    ) else set loggingF=%loggingINI%
+if %deleteINI%==1 set "writeLogging=yes"
+
+if %loggingF%==1 set "logging=y"
+if %loggingF%==2 set "logging=n"
+if %loggingF% GTR 2 GOTO logging
+if %writeLogging%==yes echo.logging=^%loggingF%>>%ini%
+
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -1280,7 +1304,8 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
---mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump%
+--mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
+--logging=%logging%
 
 endlocal
 goto:eof

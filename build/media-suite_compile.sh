@@ -33,6 +33,7 @@ while true; do
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
+--logging=* ) logging="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
