@@ -18,6 +18,7 @@ libilbc
 libmediainfo
 libmfx (intel quick sync hw accelerator)
 libopenjp2 (openjpeg 2)
+librtmp
 libutvideo
 libwebp
 libzen
@@ -75,7 +76,7 @@ mediainfo
 MP4Box
 mplayer
 mpv
-rtmpdump
+rtmpdump (if rtmpdump=y)
 x264
 x265
 vpxenc

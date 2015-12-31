@@ -642,7 +642,7 @@ echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_col
 
 if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
     cd $LOCALBUILDDIR
-    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp bin-video/rtmpdump.exe
+    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp $([[ $rtmpdump = "y" ]] && echo "bin-video/rtmpdump.exe")
     req=""
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req=$(pkg-config --print-requires librtmp)
     if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
