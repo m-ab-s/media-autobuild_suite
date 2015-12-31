@@ -605,7 +605,7 @@ if [[ $sox = "y" ]]; then
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         do_autogen
-        [[ -f ./configure ]] && log "distclean" make distclean
+        [[ -f Makefile ]] && log "distclean" make distclean
         if [[ -f $LOCALDESTDIR/lib/libsndfile.a ]]; then
             rm -f $LOCALDESTDIR/include/sndfile.{h,}h $LOCALDESTDIR/bin-audio/sndfile-*
             rm -f $LOCALDESTDIR/lib/libsndfile.{l,}a $LOCALDESTDIR/lib/pkgconfig/sndfile.pc
