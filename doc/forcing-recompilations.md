@@ -38,46 +38,42 @@ x265
 zimg
 zvbi-0.2 (libzvbi)
 ```
+
 ## Libraries not using pkg-config
 To recompile these libs, delete `<libname>.a` with the same name in `/local32/lib` or `/local64/lib`:
 ```
 libjpeg (libjpeg-turbo)
 libgnurx
-libwaio
 libxavs
 ```
 
 ## Apps
 To recompile these, delete `<appname>.exe` in corresponding binary directories:
 
-#### /bin-audio
 ```
-faac
-fdkaac (fdk-aac encoder)
-flac
-lame (MP3 encoder)
-oggenc (Vorbis encoder)
-opusenc (Opus encoder)
-sox
-```
+/bin-audio
+    faac
+    fdkaac (fdk-aac encoder)
+    flac
+    lame (MP3 encoder)
+    oggenc (Vorbis encoder)
+    opusenc (Opus encoder)
+    sox
 
-#### /bin-global
-```
-file
-```
+/bin-global
+    file
 
-#### /bin-video
-```
-f265cli
-ffmpeg (for static and both)
-ffmpegSHARED/ffmpeg (for shared only)
-kvazaar
-mediainfo
-MP4Box
-mplayer
-mpv
-rtmpdump (if rtmpdump=y)
-x264
-x265
-vpxenc
+/bin-video
+    f265cli
+    ffmpeg (for static and both)
+    ffmpegSHARED/ffmpeg (for shared only)
+    kvazaar
+    mediainfo
+    MP4Box
+    mplayer
+    mpv
+    rtmpdump (if rtmpdump=y)
+    x264
+    x265
+    vpxenc
 ```
