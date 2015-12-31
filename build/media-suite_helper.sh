@@ -14,7 +14,9 @@ if which tput >/dev/null 2>&1; then
 fi
 
 do_print_status() {
-    printf '%s%*s%s%s%s\n' "$1" $(($ncols-${#1}-${#3}+3)) "[$2" "$3" "$reset_color]"
+    local pad=$(printf '%0.1s' "."{1..40})
+    local padlen=$((${#pad}-${#1}-${#3}))
+    printf '%s %*.*s%s%s%s\n' "$1" 0 "$padlen" "$pad" " [$2" "$3" "$reset_color]"
 }
 
 vcs_clone() {
@@ -120,12 +122,12 @@ do_vcs() {
         vcs_log
         echo "" >> "$LOCALBUILDDIR"/newchangelog
         compile="true"
-        do_print_status "${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]] ||
          [[ -z "$vcsCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$vcsFolder.pc" ]] ||
          [[ ! -z "$vcsCheck" && ! -f "$LOCALDESTDIR/$vcsCheck" ]]; then
         compile="true"
-        do_print_status "${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
     fi
@@ -151,7 +153,7 @@ do_wget() {
     fi
     local response_code=$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")
     if [[ $response_code = "200" || $response_code = "226" ]]; then
-        do_print_status "$dirName" "$orange_color" "Updates found"
+        do_print_status "┌ $dirName" "$orange_color" "Updates found"
         case $archive_type in
         zip)
             log "extract" unzip "$archive"
@@ -195,7 +197,7 @@ do_checkIfExist() {
     fi
 
     if [[ $buildSuccess = "y" ]]; then
-        do_print_status "$packetName" "$blue_color" "Updated"
+        do_print_status "└ $packetName" "$blue_color" "Updated"
         [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
             touch $LOCALBUILDDIR/$packetName/build_successful$bits
     else
@@ -453,7 +455,7 @@ log() {
     local cmd="$1"
     shift 1
     if [[ $logging != "n" ]]; then
-        echo "Running $cmd..."
+        echo "├ Running $cmd..."
         "$@" > ab-suite.$cmd.log 2> ab-suite.$cmd.error.log || compilation_fail $cmd
     else
         echo -e "\e]0;Running $cmd in $(get_first_subdir)\007"
