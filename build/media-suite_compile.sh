@@ -5,18 +5,7 @@ compile="false"
 buildFFmpeg="false"
 newFfmpeg="no"
 FFMPEG_BASE_OPTS="--enable-avisynth --pkg-config-flags=--static"
-FFMPEG_DEFAULT_OPTS="--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca \
---enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame \
---enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger \
---enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis \
---enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract \
---enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype \
---enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 \
---enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband \
---disable-w32threads --enable-opencl --enable-libzimg --enable-gmp \
---enable-nonfree --enable-nvenc --enable-openssl"
-[[ ! -f "$LOCALBUILDDIR/last_run" ]] \
-    && printf "#!/bin/bash\nbash $LOCALBUILDDIR/media-suite_compile.sh $*" > "$LOCALBUILDDIR/last_run"
+alloptions="$@"
 printf "\nBuild start: $(date +"%F %T %z")\n" >> $LOCALBUILDDIR/newchangelog
 
 while true; do
@@ -64,6 +53,15 @@ echo
 echo "-------------------------------------------------------------------------------"
 
 do_getFFmpegConfig
+if [[ -n $alloptions ]]; then
+    thisrun=$(printf '%s\n' "#!/bin/bash" "FFMPEG_DEFAULT_OPTS=${FFMPEG_DEFAULT_OPTS}" \
+        "$LOCALBUILDDIR/media-suite_compile.sh $alloptions")
+    [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
+        { diff -q <(echo "$thisrun") $LOCALBUILDDIR/last_run_successful >/dev/null 2>&1 ||
+            buildFFmpeg="true"; }
+    echo "$thisrun" > "$LOCALBUILDDIR/last_run"
+    unset alloptions thisrun
+fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
     cd $LOCALBUILDDIR

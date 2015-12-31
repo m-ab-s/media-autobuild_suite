@@ -228,17 +228,16 @@ do_getFFmpegConfig() {
     [[ -z "$license" && -n "$1" ]] && local license="$1"
     configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
-        FFMPEG_OPTS="$FFMPEG_BASE_OPTS $(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')"
+        FFMPEG_DEFAULT_OPTS=$(cat "$configfile" | sed -e 's:\\::g' -e 's/#.*//')
         echo "Imported FFmpeg options from ffmpeg_options.txt"
     elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
         FFMPEG_DEFAULT_OPTS=$(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
             sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' ')
-        FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"
         echo "Imported default FFmpeg options from .bat"
     else
-        FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"
         echo "Using default FFmpeg options"
     fi
+    FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"
 
     if [[ $bits = "32bit" ]]; then
         arch=x86
