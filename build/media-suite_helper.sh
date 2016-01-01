@@ -23,7 +23,7 @@ vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
-        "$vcsType" -q clone "$vcsURL" "$vcsFolder-$vcsType"
+        "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
     fi
 }
 
@@ -41,7 +41,7 @@ vcs_update() {
         local unshallow=""
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         [[ "$vcsURL" != "$(git config --get remote.origin.url)" ]] &&
-            git remote -q set-url origin "$vcsURL"
+            git remote set-url origin "$vcsURL"
         [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
         [[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
             git config -q remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
