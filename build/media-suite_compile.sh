@@ -724,7 +724,7 @@ fi
 if [[ $mplayer = "y" ]] ||
     { [[ $mpv = "y" ]] && do_checkForOptions "--enable-libbluray"; }; then
     cd $LOCALBUILDDIR
-    do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
+    do_vcs "https://github.com/mirror/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
