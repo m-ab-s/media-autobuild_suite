@@ -165,7 +165,7 @@ do_wget() {
             [[ $deleteSource = "y" ]] && rm "$archive"
             ;;
         tar*)
-            log "extract" tar -xaf "$archive"
+            log "extract" tar -xhaf "$archive"
             [[ $deleteSource = "y" ]] && rm "$archive"
             cd "$dirName"
             ;;
