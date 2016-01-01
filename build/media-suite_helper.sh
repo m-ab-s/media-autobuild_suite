@@ -13,6 +13,9 @@ if which tput >/dev/null 2>&1; then
     ncols=72
 fi
 
+[[ -f "$LOCALBUILDDIR"/grep.exe ]] &&
+    rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
+
 do_print_status() {
     local pad=$(printf '%0.1s' "."{1..40})
     local padlen=$((${#pad}-${#1}-${#3}))
@@ -362,7 +365,7 @@ do_checkForOptions() {
     local option2=
     for option in "$@"; do
         for option2 in $option; do
-            if grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
+            if /usr/bin/grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
                 return 0
             fi
         done
@@ -518,7 +521,7 @@ do_generic_confmakeinstall() {
 do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
-    local files=$(pacman -Qql $packages 2>/dev/null | grep .dll.a)
+    local files=$(pacman -Qql $packages 2>/dev/null | /usr/bin/grep .dll.a)
 
     for file in $files; do
         if [[ -f "${file%*.dll.a}.a" ]]; then
@@ -571,14 +574,14 @@ do_pacman_install() {
     [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
     [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
     local install=()
-    local installed="$(pacman -Qqe | grep "^${mingw}-")"
+    local installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
     for pkg in $packages; do
         if [[ "$pkg" = "${mingw}-"* ]]; then
-            grep -q "^${pkg}$" <(echo "$installed") || install+=("$pkg")
+            /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || install+=("$pkg")
         else
-            grep -q "^${mingw}-${pkg}$" <(echo "$installed") || install+=("${mingw}-${pkg}")
+            /usr/bin/grep -q "^${mingw}-${pkg}$" <(echo "$installed") || install+=("${mingw}-${pkg}")
         fi
-        grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || echo "${pkg}" >> /etc/pac-mingw-extra.pk
+        /usr/bin/grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
     if [[ -n "$install" ]]; then
         echo "Installing ${install[@]}"
@@ -594,12 +597,12 @@ do_pacman_remove() {
     [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
     [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
     local uninstall=""
-    local installed="$(pacman -Qqe | grep "^${mingw}-")"
+    local installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
     for pkg in $packages; do
         if [[ "$pkg" = "${mingw}-"* ]]; then
-            grep -q "^${pkg}$" <(echo "$installed") && uninstall="$pkg"
+            /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && uninstall="$pkg"
         else
-            grep -q "^${mingw}-${pkg}$" <(echo "$installed") && uninstall="${mingw}-${pkg}"
+            /usr/bin/grep -q "^${mingw}-${pkg}$" <(echo "$installed") && uninstall="${mingw}-${pkg}"
         fi
         sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
         if [[ -n "$uninstall" ]]; then
@@ -649,11 +652,11 @@ get_last_version() {
     local filelist="$1"
     local filter="$2"
     local version="$3"
-    local ret=$(echo "$filelist" | grep -E "$filter" | sort -V | tail -1)
+    local ret=$(echo "$filelist" | /usr/bin/grep -E "$filter" | sort -V | tail -1)
     if [[ -z "$version" ]]; then
         echo $ret
     else
-        echo $ret | grep -oP "$version"
+        echo $ret | /usr/bin/grep -oP "$version"
     fi
 }
 

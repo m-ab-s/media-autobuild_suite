@@ -16,7 +16,6 @@ done
 
 [[ -d "/trunk/build" ]] && cd "/trunk/build" || cd "$(cygpath -w /)../build"
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
-rm -f 7za.exe wget.exe grep.exe
 
 # --------------------------------------------------
 # update suite
