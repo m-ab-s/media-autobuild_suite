@@ -785,7 +785,9 @@ if not exist %instdir%\mintty.lnk (
         echo.clear
         echo.echo ""
         echo.echo -------------------------------------------------------------------------------
-        echo.echo "You probably will need to manually close this window after this."
+        echo.echo "You probably will need to manually close this window or"
+        echo.echo "run 'exit' after this if closing or pressing Alt+F4"
+        echo.echo "doesn't work."
         echo.echo -------------------------------------------------------------------------------
         echo.pacman --noconfirm -S --needed --asdeps bash pacman msys2-runtime
         echo.sleep ^4
