@@ -1369,10 +1369,11 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
         do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
 
+
         LDFLAGS+=" $mpv_ldflags" log "configure" $python waf configure \
             --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
             --lua=luajit --disable-libguess --enable-libarchive \
-            --disable-vapoursynth --disable-vapoursynth-lazy \
+            $(which vapoursynth.dll &>/dev/null || echo "--disable-vapoursynth --disable-vapoursynth-lazy") \
             $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
             $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
