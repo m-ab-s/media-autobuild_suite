@@ -226,6 +226,7 @@ fi
 
 if do_checkForOptions "--enable-libwebp"; then
     cd $LOCALBUILDDIR
+    do_pacman_install "libtiff"
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
         do_autoreconf
