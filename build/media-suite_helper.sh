@@ -94,6 +94,7 @@ do_vcs() {
             ref="HEAD"
         fi
     fi
+    [[ -z "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
     compile="false"
 
     if [ ! -d "$vcsFolder-$vcsType" ]; then

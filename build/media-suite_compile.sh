@@ -226,7 +226,7 @@ fi
 
 if do_checkForOptions "--enable-libwebp"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://chromium.googlesource.com/webm/libwebp" libwebp
+    do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -276,7 +276,7 @@ if do_checkForOptions "--enable-libtesseract"; then
     fi
 
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/tesseract-ocr/tesseract.git" tesseract
+    do_vcs "https://github.com/tesseract-ocr/tesseract.git"
     if [[ $compile = "true" ]]; then
         do_autogen
         [[ -f api/.libs/libtesseract.a ]] && log "distclean" make distclean --ignore-errors
@@ -321,7 +321,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/sekrit-twc/zimg.git" zimg
+    do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
         rm -f $LOCALDESTDIR/include/zimg{.h,++.hpp}
         rm -f $LOCALDESTDIR/lib/{lib,vs}zimg.{,l}a $LOCALDESTDIR/lib/pkgconfig/zimg.pc
@@ -336,7 +336,7 @@ echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_col
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
     do_pacman_remove "dcadec-git"
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/foo86/dcadec.git" dcadec
+    do_vcs "https://github.com/foo86/dcadec.git"
     if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/include/libdcadec
         rm -f $LOCALDESTDIR/lib/{libdcadec.a,pkgconfig/dcadec.pc}
@@ -349,7 +349,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/TimothyGu/libilbc.git" libilbc
+    do_vcs "https://github.com/TimothyGu/libilbc.git"
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -458,7 +458,7 @@ fi
 
 if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/mstorsjo/fdk-aac" fdk-aac
+    do_vcs "https://github.com/mstorsjo/fdk-aac"
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -749,7 +749,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     cd $LOCALBUILDDIR
-    do_vcs "http://git.videolan.org/git/libbluray.git" libbluray
+    do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -763,7 +763,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgConfig "libutvideo = 15.1.0"; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0" libutvideo
+    do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0"
     if [[ $compile = "true" ]]; then
         rm -rf $LOCALDESTDIR/include/utvideo
         rm -f $LOCALDESTDIR/lib/{libutvideo.a,pkgconfig/libutvideo.pc}
@@ -778,7 +778,7 @@ fi
 if [[ $mpv = "y" || $mplayer = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass"; }; then
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/libass/libass.git" libass
+    do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -1019,7 +1019,7 @@ fi
 
 if [[ ! $x264 = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "http://git.videolan.org/git/x264.git" x264
+    do_vcs "http://git.videolan.org/git/x264.git"
     if [[ $compile = "true" ]] || [[ $x264 != "l" && ! -f "$LOCALDESTDIR/bin-video/x264.exe" ]]; then
         extracommands="--host=$MINGW_CHOST --prefix=$LOCALDESTDIR --enable-static --enable-win32thread"
         if [[ $x264 = "f" ]]; then
@@ -1087,7 +1087,7 @@ fi
 
 if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
-    do_vcs "hg::https://bitbucket.org/multicoreware/x265" x265
+    do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     if [[ $compile = "true" ]] || [[ $x265 != "l"* && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
         cd build/msys
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
@@ -1327,7 +1327,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
 
     do_pacman_remove "uchardet-git"
     cd $LOCALBUILDDIR
-    do_vcs "https://github.com/BYVoid/uchardet.git" uchardet
+    do_vcs "https://github.com/BYVoid/uchardet.git"
     if [[ $compile = "true" ]]; then
         rm -f $LOCALDESTDIR/include/uchardet.h $LOCALDESTDIR/bin/uchardet.exe
         rm -f $LOCALDESTDIR/lib/{libuchardet.a,pkgconfig/uchardet.pc}
