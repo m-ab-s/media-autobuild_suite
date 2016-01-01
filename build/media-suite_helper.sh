@@ -144,37 +144,44 @@ do_wget() {
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
-    # accepted: zip, 7z, tar.gz, tar.bz2 and tar.xz
-    local archive_type=$(expr $archive : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
     [[ -z "$dirName" ]] && dirName=$(expr $archive : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
-    if [[ -d "$dirName" && $archive_type = tar* ]] &&
-        { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
-          [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
-        rm -rf $dirName
-    fi
     local response_code=$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")
     if [[ $response_code = "200" || $response_code = "226" ]]; then
         do_print_status "┌ $dirName" "$orange_color" "Updates found"
-        case $archive_type in
-        zip)
-            log "extract" unzip "$archive"
-            [[ $deleteSource = "y" ]] && rm "$archive"
-            ;;
-        7z)
-            log "extract" 7z x -o"$dirName" "$archive"
-            [[ $deleteSource = "y" ]] && rm "$archive"
-            ;;
-        tar*)
-            log "extract" 7z x "$archive" -so | 7z x -si -ttar
-            [[ $deleteSource = "y" ]] && rm "$archive"
-            cd "$dirName"
-            ;;
-        esac
+        log "extract" do_extract "$archive" "$dirName"
     elif [[ $response_code -gt 400 ]]; then
         echo "Error $response_code while downloading $URL"
         echo "Try again later or <Enter> to continue"
         do_prompt "if you're sure nothing depends on it."
     fi
+}
+
+do_extract() {
+    local archive="$1"
+    local dirName="$2"
+    # accepted: zip, 7z, tar.gz, tar.bz2 and tar.xz
+    local archive_type=$(expr $archive : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+
+    if [[ -d "$dirName" && $archive_type = tar* ]] &&
+        { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
+          [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
+        rm -rf $dirName
+    fi
+    case $archive_type in
+    zip)
+        unzip "$archive"
+        [[ $deleteSource = "y" ]] && rm "$archive"
+        ;;
+    7z)
+        7z x -o"$dirName" "$archive"
+        [[ $deleteSource = "y" ]] && rm "$archive"
+        ;;
+    tar*)
+        7z x "$archive" -so | 7z x -si -ttar
+        [[ $deleteSource = "y" ]] && rm "$archive"
+        cd "$dirName"
+        ;;
+    esac
 }
 
 do_wget_sf() {
