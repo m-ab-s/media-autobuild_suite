@@ -585,7 +585,7 @@ do_pacman_install() {
     done
     if [[ -n "$install" ]]; then
         echo "Installing ${install[@]}"
-        pacman -S --force --noconfirm --needed ${install[*]} >/dev/null
+        pacman -S --force --noconfirm --needed ${install[*]} >/dev/null 2>&1
         pacman -D --asexplicit ${install[*]} >/dev/null
     fi
     do_hide_all_sharedlibs
