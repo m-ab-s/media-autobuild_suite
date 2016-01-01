@@ -180,7 +180,7 @@ do_extract() {
         [[ $deleteSource = "y" ]] && rm "$archive"
         ;;
     tar*)
-        7z x "$archive" -so | 7z x -si -ttar
+        tar -xaf "$archive" || 7z x "$archive" -so | 7z x -aoa -si -ttar
         [[ $deleteSource = "y" ]] && rm "$archive"
         cd "$dirName"
         ;;
