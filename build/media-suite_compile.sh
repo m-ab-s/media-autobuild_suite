@@ -1350,6 +1350,40 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkIfExist libEGL.a
     fi
 
+    if [[ "$bits" = "64bit" ]] && which vapoursynth.dll &>/dev/null &&
+        pkg-config --exists zimg; then
+        printf '%s\n' "${orange_color}" \
+            "Compiling mpv with Vapoursynth." \
+            "Vapoursynth is not needed to run mpv but" \
+            "is needed for use of vapoursynth filter.${reset_color}"
+        if ! pkg-config --exists "vapoursynth >= 29" ||
+            [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ||
+               ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
+            vsprefix=$(cygpath -m "$(echo "$(which vapoursynth.dll)" | sed 's;core64.*;sdk;')")
+            cp -f "$vsprefix"/lib64/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
+            cp -rf "$vsprefix"/include/vapoursynth "$LOCALDESTDIR"/include/
+            curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in |
+            sed -e "s;@prefix@;$LOCALDESTDIR;" \
+                -e 's;@exec_prefix@;${prefix};' \
+                -e 's;@libdir@;${prefix}/lib;' \
+                -e 's;@includedir@;${prefix}/include;' \
+                -e 's;@VERSION@;29;' \
+                -e '/Libs.private/ d' \
+                > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth.pc
+            curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth-script.pc.in |
+            sed -e "s;@prefix@;$LOCALDESTDIR;" \
+                -e 's;@exec_prefix@;${prefix};' \
+                -e 's;@libdir@;${prefix}/lib;' \
+                -e 's;@includedir@;${prefix}/include;' \
+                -e 's;@VERSION@;29;' \
+                -e '/Requires.private/ d' \
+                -e 's;lvapoursynth-script;lvsscript;' \
+                -e '/Libs.private/ d' \
+                > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+            unset vsprefix
+        fi
+    fi
+
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/mpv-player/mpv.git" mpv bin-video/mpv.exe
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
@@ -1369,16 +1403,11 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
         do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
-        if which vapoursynth.dll &>/dev/null && pkg-config --exists vapoursynth; then
-            echo -e "${orange_color}Warning: compiling with shared vapoursynth.${reset_color}"
-            echo -e "${orange_color}Vapoursynth DLLs will be needed to run mpv!${reset_color}"
-            withvs=y
-        fi
 
         LDFLAGS+=" $mpv_ldflags" log "configure" $python waf configure \
             --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
             --lua=luajit --disable-libguess --enable-libarchive \
-            $([[ $withvs = y ]] || echo "--disable-vapoursynth --disable-vapoursynth-lazy") \
+            --disable-vapoursynth-lazy \
             $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
             $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
