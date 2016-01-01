@@ -19,7 +19,7 @@ fi
 do_print_status() {
     local pad=$(printf '%0.1s' "."{1..40})
     local padlen=$((${#pad}-${#1}-${#3}))
-    printf '%s %*.*s%s%s%s\n' "$1" 0 "$padlen" "$pad" " [$2" "$3" "$reset_color]"
+    printf '%s %*.*s%s%s%s\n' "${bold_color}$1${reset_color}" 0 "$padlen" "$pad" " [$2" "$3" "$reset_color]"
 }
 
 vcs_clone() {
