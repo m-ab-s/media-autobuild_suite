@@ -151,7 +151,9 @@ do_wget() {
     local response_code=$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")
     if [[ $response_code = "200" || $response_code = "226" ]]; then
         do_print_status "┌ $dirName" "$orange_color" "Updates found"
+        archive="$(pwd)/${archive}"
         log "extract" do_extract "$archive" "$dirName"
+        [[ $deleteSource = "y" ]] && rm -f "$archive"
     elif [[ $response_code -gt 400 ]]; then
         echo "Error $response_code while downloading $URL"
         echo "Try again later or <Enter> to continue"
@@ -173,15 +175,12 @@ do_extract() {
     case $archive_type in
     zip)
         unzip "$archive"
-        [[ $deleteSource = "y" ]] && rm "$archive"
         ;;
     7z)
         7z x -o"$dirName" "$archive"
-        [[ $deleteSource = "y" ]] && rm "$archive"
         ;;
     tar*)
         tar -xaf "$archive" || 7z x "$archive" -so | 7z x -aoa -si -ttar
-        [[ $deleteSource = "y" ]] && rm "$archive"
         cd "$dirName"
         ;;
     esac
