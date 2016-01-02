@@ -1,0 +1,18 @@
+diff -r 375ce77b8c35 source/cmake/version.cmake
+--- a/source/cmake/version.cmake	Mon Dec 28 16:06:55 2015 -0600
++++ b/source/cmake/version.cmake	Sat Jan 02 15:38:46 2016 +0000
+@@ -52,12 +52,13 @@
+         )
+     execute_process(
+         COMMAND
+-        ${HG_EXECUTABLE} log -r. --template "{node|short}"
++        ${HG_EXECUTABLE} log -r. --template "{node}"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+         OUTPUT_VARIABLE HG_REVISION_ID
+         ERROR_QUIET
+         OUTPUT_STRIP_TRAILING_WHITESPACE
+         )
++    string(SUBSTRING "${HG_REVISION_ID}" 0 16 HG_REVISION_ID)
+ 
+     if(X265_LATEST_TAG MATCHES "^r")
+         string(SUBSTRING ${X265_LATEST_TAG} 1 -1 X265_LATEST_TAG)

@@ -1090,6 +1090,7 @@ if [[ ! $x265 = "n" ]]; then
     cd $LOCALBUILDDIR
     do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     if [[ $compile = "true" ]] || [[ $x265 != "l"* && ! -f "$LOCALDESTDIR"/bin-video/x265.exe ]]; then
+        do_patch "x265-revid.patch"
         cd build/msys
         rm -f $LOCALDESTDIR/include/x265{,_config}.h
         rm -f $LOCALDESTDIR/lib/libx265{,_main10,_main12}.a $LOCALDESTDIR/lib/pkgconfig/x265.pc
