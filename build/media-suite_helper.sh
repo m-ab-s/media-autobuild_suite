@@ -36,6 +36,7 @@ vcs_update() {
         svn update -q -r "$ref"
         newHead=$(svnversion)
     elif [[ "$vcsType" = "hg" ]]; then
+        hg -q update -C -r "$ref"
         oldHead=$(hg id --id)
         hg -q pull
         hg -q update -C -r "$ref"
