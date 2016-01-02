@@ -1185,6 +1185,12 @@ if do_checkForOptions "--enable-libxvid"; then
     [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f $MINGW_PREFIX/lib/xvidcore.dll.a{,.dyn}
     [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f $MINGW_PREFIX/bin/xvidcore.dll{,.disabled}
 fi
+if do_checkForOptions "--enable-libssh"; then
+    do_pacman_install "libssh"
+    do_addOption "--extra-cflags=-DLIBSSH_STATIC"
+    grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
+        sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+fi
 do_hide_all_sharedlibs
 
 if [[ $ffmpeg != "n" ]]; then
