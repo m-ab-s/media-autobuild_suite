@@ -1362,7 +1362,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
             vsprefix=""
         fi
         [[ x"$vsprefix" != "x" ]] && echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
-        if [[ -n "$vsprefix" ]] && ! pkg-config --exists "vapoursynth >= 29" ||
+        if [[ x"$vsprefix" != "x" ]] && ! pkg-config --exists "vapoursynth >= 29" ||
             [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
             [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
             cp -f "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
