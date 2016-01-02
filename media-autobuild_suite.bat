@@ -570,8 +570,12 @@ if %mpvINI%==0 (
     echo. Build static mpv binary?
     echo. 1 = Yes
     echo. 2 = No
+    echo. 3 = compile with Vapoursynth, if installed [see Warning]
     echo.
     echo. Note: Requires at least Windows Vista.
+    echo. Warning: the third option isn't completely static. There's no way to include
+    echo. a library dependant on Python statically. All users of the compiled binary
+    echo. will need VapourSynth installed using the official package to even open mpv!
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
@@ -580,7 +584,8 @@ if %deleteINI%==1 set "writeMPV=yes"
 
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
-if %buildmpv% GTR 2 GOTO mpv
+if %buildmpv%==3 set "mpv=v"
+if %buildmpv% GTR 3 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
 
 :numCores

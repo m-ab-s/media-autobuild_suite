@@ -92,7 +92,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
     fi
 fi
 
-if [[ "$mpv" = "y" || "$mplayer" = "y" ]] ||
+if [[ "$mpv" != "n" || "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
     --enable-(lib)?fontconfig --enable-libfribidi"; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
@@ -722,7 +722,7 @@ else
 fi
 
 if [[ $mplayer = "y" ]] ||
-    { [[ $mpv = "y" ]] && do_checkForOptions "--enable-libbluray"; }; then
+    { [[ $mpv != "n" ]] && do_checkForOptions "--enable-libbluray"; }; then
     cd $LOCALBUILDDIR
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
@@ -776,7 +776,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgCon
     fi
 fi
 
-if [[ $mpv = "y" || $mplayer = "y" ]] ||
+if [[ $mpv != "n" || $mplayer = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass"; }; then
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libass/libass.git"
@@ -1306,7 +1306,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
+if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
     [[ -d $LOCALBUILDDIR/waio-git ]] && rm -rf $LOCALDESTDIR/{include/waio,lib/libwaio.a} &&
         rm -rf $LOCALBUILDDIR/waio-git
 
@@ -1350,16 +1350,20 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkIfExist libEGL.a
     fi
 
-    if pkg-config --exists zimg && [[ -d "/c/Program Files (x86)/VapourSynth/sdk" ]]; then
-        printf '%s\n' "${orange_color}" \
-            "Compiling mpv with Vapoursynth." \
-            "Vapoursynth is not needed to run mpv but" \
-            "is needed for use of vapoursynth filter.${reset_color}"
-        if ! pkg-config --exists "vapoursynth >= 29" ||
+    if [[ "$mpv" = "v" ]] && pkg-config --exists zimg &&
+        [[ -d "/c/Program Files (x86)/VapourSynth" ]]; then
+        vsprefix="/c/Program Files (x86)/VapourSynth/sdk"
+        if [[ "$bits" = "64bit" && -d "$vsprefix/../core64" ]]; then
+            vsprefix+="/lib64"
+        elif [[ "$bits" = "32bit" && -d "$vsprefix/../core32" ]]; then
+            vsprefix+="/lib32"
+        else
+            vsprefix=""
+        fi
+        [[ -n "$vsprefix" ]] && echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
+        if [[ -n "$vsprefix" ]] && ! pkg-config --exists "vapoursynth >= 29" ||
             [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
             [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
-            vsprefix="/c/Program Files (x86)/VapourSynth/sdk"
-            [[ "$bits" = "64bit" ]] && vsprefix+="/lib64" || vsprefix+="/lib32"
             cp -f "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
             cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
             curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in |
@@ -1380,8 +1384,8 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
                 -e 's;lvapoursynth-script;lvsscript;' \
                 -e '/Libs.private/ d' \
                 > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
-            unset vsprefix
         fi
+        unset vsprefix
     fi
 
     cd $LOCALBUILDDIR
@@ -1408,6 +1412,7 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
             --prefix=$LOCALDESTDIR --bindir=$LOCALDESTDIR/bin-video --enable-static-build \
             --lua=luajit --disable-libguess --enable-libarchive \
             --disable-vapoursynth-lazy \
+            $([[ $mpv = "v" ]] || echo "--disable-vapoursynth") \
             $([[ $license = *v3 || $license = nonfree ]] && echo "--enable-gpl3") \
             $(do_checkForOptions "--enable-debug" || echo "--disable-debug-build")
 
