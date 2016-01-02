@@ -1384,6 +1384,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
                 -e 's;lvapoursynth-script;lvsscript;' \
                 -e '/Libs.private/ d' \
                 > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+        else
+            rm -f "$LOCALDESTDIR"/lib/pkgconfig/{vapoursynth,vsscript}.pc
+            rm -f "$LOCALDESTDIR"/lib/{vapoursynth,vsscript}.lib
+            rm -rf "$LOCALDESTDIR"/include/vapoursynth
         fi
         unset vsprefix
     fi
