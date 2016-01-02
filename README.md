@@ -98,6 +98,7 @@ Included Tools And Libraries
 		- uchardet
 		- ANGLE (git snapshot)
 		- luajit (git)
+		- vapoursynth (if installed)
 	- opus-tools (0.1.9)
 	- rtmpdump (git)
 	- speex (1.2rc2)
