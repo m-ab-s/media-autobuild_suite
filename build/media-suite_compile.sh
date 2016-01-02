@@ -1350,18 +1350,18 @@ if [[ $xpcomp = "n" && $mpv = "y" ]] && pkg-config --exists "libavcodec libavuti
         do_checkIfExist libEGL.a
     fi
 
-    if [[ "$bits" = "64bit" ]] && which vapoursynth.dll &>/dev/null &&
-        pkg-config --exists zimg; then
+    if pkg-config --exists zimg && [[ -d "/c/Program Files (x86)/VapourSynth/sdk" ]]; then
         printf '%s\n' "${orange_color}" \
             "Compiling mpv with Vapoursynth." \
             "Vapoursynth is not needed to run mpv but" \
             "is needed for use of vapoursynth filter.${reset_color}"
         if ! pkg-config --exists "vapoursynth >= 29" ||
-            [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ||
-               ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
-            vsprefix=$(cygpath -m "$(echo "$(which vapoursynth.dll)" | sed 's;core64.*;sdk;')")
-            cp -f "$vsprefix"/lib64/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
-            cp -rf "$vsprefix"/include/vapoursynth "$LOCALDESTDIR"/include/
+            [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
+            [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
+            vsprefix="/c/Program Files (x86)/VapourSynth/sdk"
+            [[ "$bits" = "64bit" ]] && vsprefix+="/lib64" || vsprefix+="/lib32"
+            cp -f "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
+            cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
             curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
