@@ -51,9 +51,9 @@ echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color
 cd $LOCALBUILDDIR
 
 do_getFFmpegConfig
-if [[ -n $alloptions ]]; then
+if [[ -n "$alloptions" ]]; then
     thisrun=$(printf '%s\n' "#!/bin/bash" "FFMPEG_DEFAULT_OPTS=\"$(echo -n ${FFMPEG_DEFAULT_OPTS})\"" \
-        "$LOCALBUILDDIR/media-suite_compile.sh $alloptions")
+        "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions")
     [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
         { diff -q <(echo "$thisrun") $LOCALBUILDDIR/last_run_successful >/dev/null 2>&1 ||
             buildFFmpeg="true"; }
