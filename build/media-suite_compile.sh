@@ -1174,26 +1174,26 @@ else
     pkg-config --exists x265 || do_removeOption "--enable-libx265"
 fi
 
-do_checkForOptions "--enable-gcrypt" && do_pacman_install libgcrypt
-do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
-do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
-do_checkForOptions "--enable-libwavpack" && do_pacman_install "wavpack"
-do_checkForOptions "--enable-libsnappy" && do_pacman_install "snappy"
-if do_checkForOptions "--enable-libxvid"; then
-    do_pacman_install "xvidcore"
-    [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
-    [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f $MINGW_PREFIX/lib/xvidcore.dll.a{,.dyn}
-    [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f $MINGW_PREFIX/bin/xvidcore.dll{,.disabled}
-fi
-if do_checkForOptions "--enable-libssh"; then
-    do_pacman_install "libssh"
-    do_addOption "--extra-cflags=-DLIBSSH_STATIC"
-    grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
-        sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
-fi
-do_hide_all_sharedlibs
-
 if [[ $ffmpeg != "n" ]]; then
+    do_checkForOptions "--enable-gcrypt" && do_pacman_install libgcrypt
+    do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
+    do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
+    do_checkForOptions "--enable-libwavpack" && do_pacman_install "wavpack"
+    do_checkForOptions "--enable-libsnappy" && do_pacman_install "snappy"
+    if do_checkForOptions "--enable-libxvid"; then
+        do_pacman_install "xvidcore"
+        [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f $MINGW_PREFIX/lib/{,lib}xvidcore.a
+        [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f $MINGW_PREFIX/lib/xvidcore.dll.a{,.dyn}
+        [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f $MINGW_PREFIX/bin/xvidcore.dll{,.disabled}
+    fi
+    if do_checkForOptions "--enable-libssh"; then
+        do_pacman_install "libssh"
+        do_addOption "--extra-cflags=-DLIBSSH_STATIC"
+        grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
+            sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+    fi
+    do_hide_all_sharedlibs
+
     cd $LOCALBUILDDIR
     do_changeFFmpegConfig
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
