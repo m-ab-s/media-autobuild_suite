@@ -871,7 +871,7 @@ if [[ $mediainfo = "y" ]]; then
         do_autoreconf
         [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         rm -f $LOCALDESTDIR/bin-video/mediainfo.exe
-        LDFLAGS+=" -static" do_generic_conf video --enable-staticlibs
+        LDFLAGS+=" -static-libgcc -static-libstdc++" do_generic_conf video --enable-staticlibs
         do_makeinstall
         do_checkIfExist bin-video/mediainfo.exe
     fi
