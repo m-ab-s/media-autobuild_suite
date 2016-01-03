@@ -52,15 +52,19 @@ Included Tools And Libraries
 	- libmodplug
 	- libmp3lame (3.99.5)
 	- libopencore-amrwb/nb
-	- libopenjpeg 2.1 (git)
+	- libopenjpeg2 (git)
 		- Not compiled by default
 	- libopus (1.1)
 	- librtmp (git)
 		- Not compiled by default
 	- librubberband (git)
 	- libschroedinger
+	- libsnappy
+		- Not compiled by default
 	- libsoxr (0.1.1)
 	- libspeex (1.2rc2)
+	- libssh
+		- Not compiled by default
 	- libtesseract (git)
 	- libtheora
 	- libtwolame (git)
@@ -71,6 +75,8 @@ Included Tools And Libraries
 	- libvo-amrwbenc (0.1.2)
 	- libvorbis
 	- libvpx (git)
+	- libwavpack
+		- Not compiled by default
 	- libwebp (git) (needed for webp encoding)
 	- libx264 (git)
 	- libx265 (hg)
@@ -94,7 +100,6 @@ Included Tools And Libraries
 	- mp4box (git)
 	- mplayer (svn)
 	- mpv (git) including in addition to ffmpeg libs:
-		- libjpeg-turbo (git)
 		- uchardet
 		- ANGLE (git snapshot)
 		- luajit (git)
