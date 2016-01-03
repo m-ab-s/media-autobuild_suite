@@ -1419,6 +1419,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags $(git rev-list --tags --max-count=1) | cut -c 2- > VERSION
         [[ $bits = "64bit" ]] && mpv_ldflags="-Wl,--image-base,0x140000000,--high-entropy-va"
+        do_checkForOptions "--enable-libssh" && mpv_ldflags+=" -Wl,--allow-multiple-definition"
         do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
 
         LDFLAGS+=" $mpv_ldflags" log "configure" $python waf configure \
