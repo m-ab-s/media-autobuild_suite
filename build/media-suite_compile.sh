@@ -1189,6 +1189,7 @@ if [[ $ffmpeg != "n" ]]; then
     if do_checkForOptions "--enable-libssh"; then
         do_pacman_install "libssh"
         do_addOption "--extra-cflags=-DLIBSSH_STATIC"
+        do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
