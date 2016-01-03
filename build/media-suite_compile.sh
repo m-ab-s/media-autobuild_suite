@@ -63,6 +63,7 @@ fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
+    do_pacman_remove "openjpeg2"
     cd $LOCALBUILDDIR
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
     if [[ $compile = "true" ]]; then
