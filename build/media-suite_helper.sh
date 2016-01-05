@@ -576,7 +576,8 @@ do_pacman_install() {
         else
             /usr/bin/grep -q "^${mingw}-${pkg}$" <(echo "$installed") || install+=("${mingw}-${pkg}")
         fi
-        /usr/bin/grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || echo "${pkg}" >> /etc/pac-mingw-extra.pk
+        [[ -f /etc/pac-mingw-extra.pk ]] && /usr/bin/grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || 
+            echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
     if [[ -n "$install" ]]; then
         echo "Installing ${install[@]}"
