@@ -1510,7 +1510,7 @@ echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
 cd $LOCALBUILDDIR
 find . -maxdepth 2 -name recently_updated | xargs rm -f
 find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" | xargs rm -f
-find . -maxdepth 4 -name "ab-suite.*.log" | xargs rm -f
+find . -maxdepth 5 -name "ab-suite.*.log" | xargs rm -f
 [[ -f last_run ]] && mv last_run last_successful_run
 [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
 unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
