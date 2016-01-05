@@ -458,6 +458,8 @@ do_cmakeinstall() {
 compilation_fail() {
     local reason="$1"
     local operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
+    echo "Likely error:"
+    tail ab-suite.${operation}.error.log
     do_prompt "$reason failed. Check $(pwd)/ab-suite.$operation.error.log"
     exit 1
 }
