@@ -799,18 +799,16 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
     if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
         do_print_status "libxavs snapshot" "$green_color" "Up-to-date"
     else
-        if [[ ! -d xavs ]] || [[ -d xavs ]] &&
-        { [[ $build32 = "yes" && ! -f xavs/build_successful32bit ]] ||
-          [[ $build64 = "yes" && ! -f xavs/build_successful64bit ]]; }; then
+        if [[ ! -d xavs-distrotech-xavs ]] || [[ -d xavs-distrotech-xavs ]] &&
+        { [[ $build32 = "yes" && ! -f xavs-distrotech-xavs/build_successful32bit ]] ||
+          [[ $build64 = "yes" && ! -f xavs-distrotech-xavs/build_successful64bit ]]; }; then
             rm -rf distrotech-xavs.zip xavs-distrotech-xavs
             do_wget https://github.com/Distrotech/xavs/archive/distrotech-xavs.zip
         fi
         cd xavs-distrotech-xavs
         [[ -f "libxavs.a" ]] && log "distclean" make distclean
-        if [[ -f $LOCALDESTDIR/lib/libxavs.a ]]; then
-            rm -rf $LOCALDESTDIR/include/xavs.h
-            rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
-        fi
+        rm -rf $LOCALDESTDIR/include/xavs.h
+        rm -rf $LOCALDESTDIR/lib/libxavs.a $LOCALDESTDIR/lib/pkgconfig/xavs.pc
         sed -i 's,"NUL","/dev/null",g' configure
         do_configure --host=$MINGW_CHOST --prefix=$LOCALDESTDIR
         do_make libxavs.a
