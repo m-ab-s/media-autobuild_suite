@@ -1284,16 +1284,16 @@ if [[ $mplayer = "y" ]]; then
             rm -f $LOCALDESTDIR/bin-video/{mplayer,mencoder}.exe
         [[ -f config.mak ]] && log "distclean" make distclean
         if ! test -e ffmpeg ; then
-            if [ ! $ffmpeg = "n" ]; then
+            if [[ "$ffmpeg" != "n" ]]; then
                 git clone $LOCALBUILDDIR/ffmpeg-git ffmpeg
-                git checkout -f --no-track -B master origin/HEAD
-            elif ! git clone --depth 1 http://source.ffmpeg.org/git/ffmpeg.git ffmpeg; then
+                git checkout -C ffmpeg -f --no-track -B master origin/HEAD
+            elif ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
                 echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
                 echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-                echo "git clone --depth 1 https://github.com/FFmpeg/FFmpeg ffmpeg"
+                echo "git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg"
                 exit 1
             fi
         fi
