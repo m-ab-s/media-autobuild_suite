@@ -940,7 +940,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
         [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
         for file in DeckLinkAPI{{,Version}.h,_i.c}; do
             [[ ! -f "$file" ]] &&
-                curl -OL "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$file" &&
+                curl -OLs "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$file" &&
                 touch recently_updated
             cp -f "$file" "$LOCALDESTDIR/include/$file"
         done
@@ -965,7 +965,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
         mkdir -p NvEncAPI && cd NvEncAPI
         [[ ! -f recently_updated ]] && rm -f nvEncodeAPI.h
         [[ ! -f nvEncodeAPI.h ]] &&
-            curl -OL "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
+            curl -OLs "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
             touch recently_updated
         cp -f nvEncodeAPI.h "$LOCALDESTDIR"/include/
         do_checkIfExist "include/nvEncodeAPI.h"
