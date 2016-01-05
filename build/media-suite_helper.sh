@@ -493,18 +493,10 @@ do_makeinstall() {
 do_generic_conf() {
     local bindir=""
     case "$1" in
-    global)
-        bindir="--bindir=$LOCALDESTDIR/bin-global"
-        ;;
-    audio)
-        bindir="--bindir=$LOCALDESTDIR/bin-audio"
-        ;;
-    video)
-        bindir="--bindir=$LOCALDESTDIR/bin-video"
-        ;;
-    *)
-        bindir="$1"
-        ;;
+    global) bindir="--bindir=$LOCALDESTDIR/bin-global" ;;
+    audio) bindir="--bindir=$LOCALDESTDIR/bin-audio" ;;
+    video) bindir="--bindir=$LOCALDESTDIR/bin-video" ;;
+    *) bindir="$1" ;;
     esac
     shift 1
     do_configure --build=$MINGW_CHOST --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
