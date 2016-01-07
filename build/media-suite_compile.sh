@@ -1199,7 +1199,9 @@ if [[ $ffmpeg != "n" ]]; then
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]] ||
         [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
-        do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
+        do_checkForOptions "--enable-libgme --enable-libopencore-amr(nb|wb) --enable-libtheora \
+            --enable-libtwolame --enable-libvorbis --enable-openssl" &&
+            do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions "--enable-gcrypt" &&
             do_patch "ffmpeg-0003-configure-Use-libgcrypt-config-if-available.patch" am &&

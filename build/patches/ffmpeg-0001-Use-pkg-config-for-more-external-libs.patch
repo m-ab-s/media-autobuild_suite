@@ -1,17 +1,17 @@
-From d718a416460080a767f3de4642637413dbf97aff Mon Sep 17 00:00:00 2001
+From 2940263e7d90d6782c9e7e9539379ef728f346b5 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Tue, 23 Jun 2015 16:14:50 +0100
-Subject: [PATCH 1/2] Use pkg-config for more external libs
+Subject: [PATCH] Use pkg-config for more external libs
 
 ---
  configure | 17 +++++++----------
  1 file changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/configure b/configure
-index 73abf28..a50742a 100755
+index 1bff7f6..eb36a2b 100755
 --- a/configure
 +++ b/configure
-@@ -5423,7 +5423,7 @@ enabled fontconfig        && enable libfontconfig
+@@ -5443,7 +5443,7 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_libfreetype
  enabled libfribidi        && require_pkg_config fribidi fribidi.h fribidi_version_info
@@ -20,7 +20,7 @@ index 73abf28..a50742a 100755
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
                                     check_lib "${gsm_hdr}" gsm_create -lgsm && break;
                                 done || die "ERROR: libgsm not found"; }
-@@ -5433,8 +5433,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
+@@ -5453,8 +5453,8 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
  enabled libmodplug        && require_pkg_config libmodplug libmodplug/modplug.h ModPlug_Load
  enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
  enabled libnut            && require libnut libnut.h nut_demuxer_init -lnut
@@ -31,9 +31,9 @@ index 73abf28..a50742a 100755
  enabled libopencv         && require_pkg_config opencv opencv/cxcore.h cvCreateImageHeader
  enabled libopenh264       && require_pkg_config openh264 wels/codec_api.h WelsGetCodecVersion
  enabled libopenjpeg       && { check_lib openjpeg-2.1/openjpeg.h opj_version -lopenjp2 -DOPJ_STATIC ||
-@@ -5459,8 +5459,8 @@ enabled libstagefright_h264 && require_cpp libstagefright_h264 "binder/ProcessSt
-     media/stagefright/MediaBufferGroup.h media/stagefright/MediaDebug.h media/stagefright/MediaDefs.h
-     media/stagefright/OMXClient.h media/stagefright/OMXCodec.h" android::OMXClient -lstagefright -lmedia -lutils -lbinder -lgnustl_static
+@@ -5476,8 +5476,8 @@ enabled libsoxr           && require libsoxr soxr.h soxr_create -lsoxr && LIBSOX
+ enabled libssh            && require_pkg_config libssh libssh/sftp.h sftp_init
+ enabled libspeex          && require_pkg_config speex speex/speex.h speex_decoder_init -lspeex
  enabled libtesseract      && require_pkg_config tesseract tesseract/capi.h TessBaseAPICreate
 -enabled libtheora         && require libtheora theora/theoraenc.h th_info_init -ltheoraenc -ltheoradec -logg
 -enabled libtwolame        && require libtwolame twolame.h twolame_init -ltwolame &&
@@ -42,7 +42,7 @@ index 73abf28..a50742a 100755
                               { check_lib twolame.h twolame_encode_buffer_float32_interleaved -ltwolame ||
                                 die "ERROR: libtwolame must be installed and version must be >= 0.3.10"; }
  enabled libutvideo        && require_cpp utvideo "stdint.h stdlib.h utvideo/utvideo.h utvideo/Codec.h" 'CCodec*' -lutvideo -lstdc++
-@@ -5468,7 +5468,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
+@@ -5485,7 +5485,7 @@ enabled libv4l2           && require_pkg_config libv4l2 libv4l2.h v4l2_ioctl
  enabled libvidstab        && require_pkg_config "vidstab >= 0.98" vid.stab/libvidstab.h vsMotionDetectInit
  enabled libvo_aacenc      && require libvo_aacenc vo-aacenc/voAAC.h voGetAACEncAPI -lvo-aacenc
  enabled libvo_amrwbenc    && require libvo_amrwbenc vo-amrwbenc/enc_if.h E_IF_init -lvo-amrwbenc
@@ -51,7 +51,7 @@ index 73abf28..a50742a 100755
  
  enabled libvpx            && {
      enabled libvpx_vp8_decoder && {
-@@ -5544,10 +5544,7 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
+@@ -5561,10 +5561,7 @@ enabled opengl            && { check_lib GL/glx.h glXGetProcAddress "-lGL" ||
                                 check_lib2 ES2/gl.h glGetError "-isysroot=${sysroot} -Wl,-framework,OpenGLES" ||
                                 die "ERROR: opengl not found."
                               }
