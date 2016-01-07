@@ -14,7 +14,11 @@ while true; do
   esac
 done
 
-[[ -d "/trunk/build" ]] && cd "/trunk/build" || cd_safe "$(cygpath -w /)../build"
+if [[ -d "/trunk/build" ]]; then
+    cd "/trunk/build"
+else
+    cd_safe "$(cygpath -w /)../build"
+fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 
 # --------------------------------------------------
@@ -37,7 +41,7 @@ if [[ "$update" = "yes" ]]; then
     if [[ -d .git ]]; then
         if [[ -n $(git status -s) ]]; then
             diffname="$(date +%F-%H.%M.%S)"
-            git diff --diff-filter=M >> build/user-changes-${diffname}.diff
+            git diff --diff-filter=M >> "build/user-changes-${diffname}.diff"
             echo "Your changes have been exported to build/user-changes-${diffname}.diff."
             git reset --hard origin/master
         fi
@@ -45,13 +49,13 @@ if [[ "$update" = "yes" ]]; then
         git fetch -qt origin
         git checkout -qfB master "origin/HEAD"
         newHead=$(git rev-parse HEAD)
-        if git apply build/user-changes-${diffname}.diff; then
-            rm build/user-changes-${diffname}.diff
+        if git apply "build/user-changes-${diffname}.diff"; then
+            rm "build/user-changes-${diffname}.diff"
             echo "Your changes have been successfully applied!"
         elif [[ -f build/user-changes-${diffname}.diff ]]; then
             echo "Your changes couldn't be applied. Script will run without them."
         fi
-        if [[ $oldHead != $newHead ]]; then
+        if [[ $oldHead != "$newHead" ]]; then
             touch build/suite_updated
             echo "Script will now restart to use the new changes."
             sleep 5
@@ -82,9 +86,9 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     old=$(pacman -Qqe | sort)
     new=$(cat /etc/pac-base.pk)
     newmingw=$(cat /etc/pac-mingw.pk)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n$(cat /etc/pac-mingw-extra.pk)")
-    [[ "$build32" = "yes" ]] && new+=$(printf "\n$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
-    [[ "$build64" = "yes" ]] && new+=$(printf "\n$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
+    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(cat /etc/pac-mingw-extra.pk)")
+    [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
+    [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
     diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
     install=$(echo "$diff" | sed -nr 's/> (.*)/\1/p')
     uninstall=$(echo "$diff" | sed -nr 's/< (.*)/\1/p')
@@ -99,7 +103,7 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
         echo "Install:"
         echo "$install"
         while true; do
-            read -p "install packs [y/n]? " yn
+            read -r -p "install packs [y/n]? " yn
             case $yn in
                 [Yy]* )
                     pacman -S --noconfirm --needed --force $install
@@ -120,12 +124,12 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
         echo "Remove:"
         echo "$uninstall"
         while true; do
-            read -p "remove packs [y/n]? " yn
+            read -r -p "remove packs [y/n]? " yn
             case $yn in
                 [Yy]* )
                     for pkg in $uninstall; do
-                        pacman -Rs --noconfirm $pkg 2>/dev/null
-                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --asdeps $pkg >/dev/null
+                        pacman -Rs --noconfirm "$pkg" 2>/dev/null
+                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --asdeps "$pkg" >/dev/null
                     done
                     break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
@@ -145,7 +149,11 @@ echo "Checking profiles..."
 echo "-------------------------------------------------------------------------------"
 echo
 
-[[ -d "/trunk" ]] && cd "/trunk" || cd_safe "$(cygpath -w /).."
+if [[ -d "/trunk" ]]; then
+    cd "/trunk"
+else
+    cd_safe "$(cygpath -w /).."
+fi
 
 check_profiles() {
     local profilebits="$1"
