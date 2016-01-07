@@ -253,16 +253,16 @@ do_getFFmpegConfig() {
     [[ -z "$license" && -n "$1" ]] && local license="$1"
     configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
-        FFMPEG_DEFAULT_OPTS=$(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' ')
+        FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
         echo "Imported FFmpeg options from ffmpeg_options.txt"
     elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
-        FFMPEG_DEFAULT_OPTS=$(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
-            sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' ')
+        FFMPEG_DEFAULT_OPTS=($(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
+            sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' '))
         echo "Imported default FFmpeg options from .bat"
     else
         echo "Using default FFmpeg options"
     fi
-    FFMPEG_OPTS="$FFMPEG_BASE_OPTS $FFMPEG_DEFAULT_OPTS"
+    FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
 
     if [[ $bits = "32bit" ]]; then
         arch=x86
@@ -297,8 +297,8 @@ do_getFFmpegConfig() {
 
     # handle WinXP-incompatible libs
     if [[ $xpcomp = "y" ]]; then
-        do_removeOptions "--enable-libmfx --enable-decklink --enable-tesseract \
-            --enable-opencl --enable-libcaca"
+        do_removeOptions --enable-libmfx --enable-decklink --enable-tesseract \
+            --enable-opencl --enable-libcaca
     fi
 }
 
@@ -308,8 +308,8 @@ do_changeFFmpegConfig() {
     # decklink depends on pthreads
     if do_checkForOptions "--disable-w32threads --enable-pthreads --enable-decklink"; then
         do_removeOption "--enable-w32threads"
-        do_addOptions "--disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
-            --extra-libs=-lpthread --extra-libs=-lwsock32"
+        do_addOptions --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
+            --extra-libs=-lpthread --extra-libs=-lwsock32
     fi
 
     # add options for static kvazaar
@@ -328,7 +328,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle (l)gplv3 libs
-    local version3="--enable-libopencore-amrwb --enable-libopencore-amrnb \
+    local version3="--enable-libopencore-amr(wb|nb) \
         --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp"
     if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "$version3"; then
         do_addOption "--enable-version3"
@@ -372,51 +372,48 @@ do_changeFFmpegConfig() {
 
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
-        FFMPEG_OPTS_SHARED=$FFMPEG_OPTS
+        FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
         do_removeOptions "--enable-decklink --enable-libutvideo --enable-libgme" y
-        FFMPEG_OPTS_SHARED="$FFMPEG_OPTS_SHARED --extra-ldflags=-static-libgcc"
+        FFMPEG_OPTS_SHARED+=("--extra-ldflags=-static-libgcc")
     fi
 }
 
 do_checkForOptions() {
-    local option=
-    local option2=
-    for option in "$@"; do
-        for option2 in $option; do
-            if /usr/bin/grep -qE -e "$option2" <(echo "$FFMPEG_OPTS"); then
-                return 0
-            fi
-        done
+    local option
+    for option in $@; do
+        if /usr/bin/grep -qE -e "$option" <(echo "${FFMPEG_OPTS[*]}"); then
+            return
+        fi
     done
     return 1
 }
 
 do_addOption() {
-    local option=${1%% *}
+    local option="$1"
     if ! do_checkForOptions "$option"; then
-        FFMPEG_OPTS="$FFMPEG_OPTS $option"
+        FFMPEG_OPTS+=("$option")
     fi
 }
 
 do_addOptions() {
-    local option=
-    for option in $1; do
+    local option
+    for option in "$@"; do
         do_addOption "$option"
     done
 }
 
 do_removeOption() {
-    local option=${1%% *}
+    local option=$1
     local shared=$2
     if [[ $shared = "y" ]]; then
-        FFMPEG_OPTS_SHARED=$(echo "$FFMPEG_OPTS_SHARED" | sed -r "s/ *$option//g")
+        FFMPEG_OPTS_SHARED=($(echo "${FFMPEG_OPTS_SHARED[*]}" | sed -r "s/ *$option//g"))
     else
-        FFMPEG_OPTS=$(echo "$FFMPEG_OPTS" | sed -r "s/ *$option//g")
+        FFMPEG_OPTS=($(echo "${FFMPEG_OPTS[*]}" | sed -r "s/ *$option//g"))
     fi
 }
 
 do_removeOptions() {
-    local option=
+    local option
     local shared=$2
     for option in $1; do
         do_removeOption "$option" "$shared"
