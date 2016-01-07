@@ -26,6 +26,11 @@ do_print_status() {
         "$padlen" "$pad" "${color}${status}${reset_color}"
 }
 
+cd_safe() {
+    cd "$1" ||
+        { do_prompt "Failed changing to directory $1." && exit 1; }
+}
+
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
@@ -108,7 +113,7 @@ do_vcs() {
     if [ ! -d "$vcsFolder-$vcsType" ]; then
         vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
-            cd "$vcsFolder-$vcsType"
+            cd_safe "$vcsFolder-$vcsType"
             touch recently_updated
         else
             echo "$vcsFolder $vcsType seems to be down"
@@ -117,7 +122,7 @@ do_vcs() {
             return
         fi
     else
-        cd "$vcsFolder-$vcsType"
+        cd_safe "$vcsFolder-$vcsType"
     fi
     vcs_update
     if [[ "$oldHead" != "$newHead" ]]; then
@@ -186,7 +191,7 @@ do_extract() {
         ;;
     tar*)
         tar -xaf "$archive" || 7z x "$archive" -so | 7z x -aoa -si -ttar
-        cd "$dirName"
+        cd_safe "$dirName"
         ;;
     esac
 }
@@ -456,7 +461,7 @@ do_cmakeinstall() {
     else
         mkdir build
     fi
-    cd build
+    cd_safe build
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
     log "install" ninja $([[ -n "$cpuCount" ]] && echo "-j $cpuCount") install
 }

@@ -14,7 +14,7 @@ while true; do
   esac
 done
 
-[[ -d "/trunk/build" ]] && cd "/trunk/build" || cd "$(cygpath -w /)../build"
+[[ -d "/trunk/build" ]] && cd "/trunk/build" || cd_safe "$(cygpath -w /)../build"
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 
 # --------------------------------------------------
@@ -33,7 +33,7 @@ if [[ "$update" = "yes" ]]; then
         fi
         cp -fr ab-git/.git ..
     fi
-    cd ..
+    cd_safe ..
     if [[ -d .git ]]; then
         if [[ -n $(git status -s) ]]; then
             diffname="$(date +%F-%H.%M.%S)"
@@ -145,7 +145,7 @@ echo "Checking profiles..."
 echo "-------------------------------------------------------------------------------"
 echo
 
-[[ -d "/trunk" ]] && cd "/trunk" || cd "$(cygpath -w /).."
+[[ -d "/trunk" ]] && cd "/trunk" || cd_safe "$(cygpath -w /).."
 
 check_profiles() {
     local profilebits="$1"
