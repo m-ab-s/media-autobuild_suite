@@ -54,7 +54,7 @@ cd_safe "$LOCALBUILDDIR"
 
 do_getFFmpegConfig
 if [[ -n "$alloptions" ]]; then
-    thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"$(echo -n "${FFMPEG_DEFAULT_OPTS}")\"" \
+    thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"${FFMPEG_DEFAULT_OPTS[*]}\"" \
             "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions")"
     [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
         { diff -q <(echo "$thisrun") "$LOCALBUILDDIR/last_run_successful" >/dev/null 2>&1 ||
@@ -1431,7 +1431,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         [[ $license = *v3 || $license = nonfree ]] && extracommands+=("--enable-gpl3")
         do_checkForOptions "--enable-debug" || extracommands+=("--disable-debug-build")
 
-        LDFLAGS+=" ${mpv_ldflags[@]}" log configure /usr/bin/python waf configure \
+        LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
             --lua=luajit --disable-libguess --enable-libarchive --disable-vapoursynth-lazy \
             "${extracommands[@]}"
@@ -1508,7 +1508,7 @@ if [[ $packing = "y" ]]; then
     fi
     echo -e "\n\t${orange_color}Packing binaries and shared libs...${reset_color}"
     packcmd=("$LOCALBUILDDIR/upx391w/upx.exe" "-9" "-qq")
-    [[ $stripping = "y" ]] && packcmd=("$packcmd" "--strip-relocs=0")
+    [[ $stripping = "y" ]] && packcmd+=("--strip-relocs=0")
     find /local*/bin-* -regex ".*\.\(exe\|dll\)" -newer "$LOCALBUILDDIR"/last_run -print0 |
         xargs -0 -r "${packcmd[@]}"
 fi
@@ -1526,7 +1526,7 @@ rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
 
 if [[ $deleteSource = "y" ]]; then
     echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
-    find $LOCALBUILDDIR -mindepth 1 -maxdepth 1 -type d \
+    find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
         ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
         xargs -0 rm -rf
     echo "${_to_remove[@]}" | xargs -r rm -rf
