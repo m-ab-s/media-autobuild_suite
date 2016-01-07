@@ -428,15 +428,17 @@ do_patch() {
     fi
     if [[ -n "$patchpath" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchpath"; then
+            if ! git am -q --ignore-whitespace "$patchpath" 2>/dev/null; then
                 git am -q --abort
-                echo "Patch couldn't be applied with 'git am'. Continuing without patching."
+                echo "Patch '${patchpath##*/} couldn't be applied"
+                echo "with 'git am'. Continuing without patching."
             fi
         else
             if patch --dry-run -s -N -p$strip -i "$patchpath"; then
                 patch -s -N -p$strip -i "$patchpath"
             else
-                echo "Patch couldn't be applied with 'patch'. Continuing without patching."
+                echo "Patch '${patchpath##*/} couldn't be applied"
+                echo "with 'patch'. Continuing without patching."
             fi
         fi
     else
