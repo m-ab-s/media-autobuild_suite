@@ -17,9 +17,13 @@ fi
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
 
 do_print_status() {
-    local pad=$(printf '%0.1s' "."{1..40})
-    local padlen=$((${#pad}-${#1}-${#3}))
-    printf '%s %*.*s%s%s%s\n' "${bold_color}$1${reset_color}" 0 "$padlen" "$pad" " [$2" "$3" "$reset_color]"
+    local name="$1 "
+    local color="$2"
+    local status="$3"
+    local pad=$(printf '%0.1s' "."{1..72})
+    local padlen=$((${ncols}-${#name}-${#status}-3))
+    printf '%s%*.*s [%s]\n' "${bold_color}$name${reset_color}" 0 \
+        "$padlen" "$pad" "${color}${status}${reset_color}"
 }
 
 vcs_clone() {
