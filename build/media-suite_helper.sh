@@ -2,7 +2,7 @@
 
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
-    if test -n "$ncolors" && test $ncolors -ge 8; then
+    if test -n "$ncolors" && test "$ncolors" -ge 8; then
         bold_color=$(tput bold)
         blue_color=$(tput setaf 4)
         orange_color=$(tput setaf 3)
@@ -20,8 +20,9 @@ do_print_status() {
     local name="$1 "
     local color="$2"
     local status="$3"
-    local pad=$(printf '%0.1s' "."{1..72})
-    local padlen=$((${ncols}-${#name}-${#status}-3))
+    local pad
+    pad=$(printf '%0.1s' "."{1..72})
+    local padlen=$((ncols-${#name}-${#status}-3))
     printf '%s%*.*s [%s]\n' "${bold_color}$name${reset_color}" 0 \
         "$padlen" "$pad" "${color}${status}${reset_color}"
 }
@@ -55,7 +56,7 @@ vcs_update() {
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         [[ "$vcsURL" != "$(git config --get remote.origin.url)" ]] &&
             git remote set-url origin "$vcsURL"
-        [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard @{u}
+        [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard "@{u}"
         [[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
             git config -q remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         git checkout -qf --no-track -B ab-suite "$ref"
@@ -157,8 +158,9 @@ do_wget() {
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
-    [[ -z "$dirName" ]] && dirName=$(expr $archive : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
-    local response_code=$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")
+    [[ -z "$dirName" ]] && dirName=$(expr "$archive" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    local response_code
+    response_code="$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")"
     if [[ $response_code = "200" || $response_code = "226" ]]; then
         do_print_status "┌ $dirName" "$orange_color" "Updates found"
         archive="$(pwd)/${archive}"
@@ -175,12 +177,13 @@ do_extract() {
     local archive="$1"
     local dirName="$2"
     # accepted: zip, 7z, tar.gz, tar.bz2 and tar.xz
-    local archive_type=$(expr $archive : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    local archive_type
+    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
 
     if [[ -d "$dirName" && $archive_type = tar* ]] &&
         { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
           [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
-        rm -rf $dirName
+        rm -rf "$dirName"
     fi
     case $archive_type in
     zip)
@@ -200,12 +203,13 @@ do_wget_sf() {
     local url="$1"
     shift 1
     local dir="${url:0:1}/${url:0:2}"
-    do_wget "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/${dir}/${url}" $@
+    do_wget "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/${dir}/${url}" "$@"
 }
 
 # check if compiled file exist
 do_checkIfExist() {
-    local packetName=$(get_first_subdir)
+    local packetName
+    packetName="$(get_first_subdir)"
     local fileName="$1"
     local fileExtension=${fileName##*.}
     local buildSuccess="n"
@@ -219,10 +223,10 @@ do_checkIfExist() {
     if [[ $buildSuccess = "y" ]]; then
         do_print_status "└ $packetName" "$blue_color" "Updated"
         [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-            touch $LOCALBUILDDIR/$packetName/build_successful$bits
+            touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
     else
         [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-            rm -f $LOCALBUILDDIR/$packetName/build_successful$bits
+            rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
         echo -------------------------------------------------
         echo "Building of $packetName failed..."
         echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
@@ -236,7 +240,8 @@ do_pkgConfig() {
     local version=$2
     [[ -z "$version" ]] && version="${1##*= }"
     [[ "$version" = "$1" ]] && version="" || version=" $version"
-    local prefix=$(pkg-config --variable=prefix --silence-errors "$1")
+    local prefix
+    prefix="$(pkg-config --variable=prefix --silence-errors "$1")"
     [[ ! -z "$prefix" ]] && prefix="$(cygpath -u "$prefix")"
     if [[ "$prefix" = "$LOCALDESTDIR" || "$prefix" = "/trunk${LOCALDESTDIR}" ]]; then
         do_print_status "${pkg}${version}" "$green_color" "Up-to-date"
@@ -273,7 +278,11 @@ do_getFFmpegConfig() {
     # If nonfree will use SChannel if neither openssl or gnutls are in the options
     if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
         do_checkForOptions "--enable-librtmp"; then
-        [[ $license = gpl* ]] && do_addOption "--enable-gnutls" || do_addOption "--enable-openssl"
+        if [[ $license = gpl* ]]; then
+            do_addOption "--enable-gnutls"
+        else
+            do_addOption "--enable-openssl"
+        fi
         do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
@@ -422,7 +431,8 @@ do_patch() {
         strip="1"
     fi
     local patchpath=""
-    local response_code="$(curl -s --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
+    local response_code
+    response_code="$(curl -s --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code != "200" ]]; then
@@ -437,13 +447,13 @@ do_patch() {
     fi
     if [[ -n "$patchpath" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchpath" 2>/dev/null; then
+            if ! git am -q --ignore-whitespace "$patchpath" >/dev/null 2>&1; then
                 git am -q --abort
                 echo "Patch '${patchpath##*/} couldn't be applied"
                 echo "with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run -s -N -p$strip -i "$patchpath"; then
+            if patch --dry-run -s -N -p$strip -i "$patchpath" >/dev/null 2>&1; then
                 patch -s -N -p$strip -i "$patchpath"
             else
                 echo "Patch '${patchpath##*/} couldn't be applied"
@@ -451,7 +461,7 @@ do_patch() {
             fi
         fi
     else
-        echo "No patch found anywhere. Continuing without patching."
+        echo "${patchpath##*/} not found anywhere. Continuing without patching."
     fi
 }
 
@@ -463,14 +473,15 @@ do_cmakeinstall() {
     fi
     cd_safe build
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
-    log "install" ninja $([[ -n "$cpuCount" ]] && echo "-j $cpuCount") install
+    log "install" ninja "$([[ -n $cpuCount ]] && echo "-j $cpuCount")" install
 }
 
 compilation_fail() {
     local reason="$1"
-    local operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
+    local operation
+    operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
     echo "Likely error:"
-    tail ab-suite.${operation}.error.log
+    tail "ab-suite.${operation}.error.log"
     do_prompt "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.error.log${reset_color}"
     exit 1
 }
@@ -480,8 +491,8 @@ log() {
     shift 1
     if [[ $logging != "n" ]]; then
         echo "├ Running $cmd..."
-        echo "$ $@" > ab-suite.$cmd.log
-        "$@" >> ab-suite.$cmd.log 2> ab-suite.$cmd.error.log || compilation_fail $cmd
+        echo "$ $*" > "ab-suite.$cmd.log"
+        "$@" >> "ab-suite.$cmd.log" 2> "ab-suite.$cmd.error.log" || compilation_fail "$cmd"
     else
         echo -e "\e]0;Running $cmd in $(get_first_subdir)\007"
         echo -e "${bold_color}Running $cmd in $(get_first_subdir)${reset_color}"
@@ -510,7 +521,7 @@ do_generic_conf() {
     *) bindir="$1" ;;
     esac
     shift 1
-    do_configure --build=$MINGW_CHOST --prefix=$LOCALDESTDIR --disable-shared "$bindir" "$@"
+    do_configure --build="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --disable-shared "$bindir" "$@"
 }
 
 do_generic_confmake() {
@@ -527,7 +538,8 @@ do_generic_confmakeinstall() {
 do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
-    local files=$(pacman -Qql $packages 2>/dev/null | /usr/bin/grep .dll.a)
+    local files
+    files="$(pacman -Qql "$packages" 2>/dev/null | /usr/bin/grep .dll.a)"
 
     for file in $files; do
         if [[ -f "${file%*.dll.a}.a" ]]; then
@@ -544,7 +556,8 @@ do_hide_pacman_sharedlibs() {
 
 do_hide_all_sharedlibs() {
     [[ x"$1" = "xdry" ]] && local dryrun="y"
-    local files=$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name *.dll.a 2>/dev/null)
+    local files
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2>/dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
@@ -555,7 +568,8 @@ do_hide_all_sharedlibs() {
 
 do_unhide_all_sharedlibs() {
     [[ x"$1" = "xdry" ]] && local dryrun="y"
-    local files=$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name *.dll.a.dyn 2>/dev/null)
+    local files
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2>/dev/null)"
     local tomove=()
     local todelete=()
     for file in $files; do
@@ -577,10 +591,11 @@ do_unhide_all_sharedlibs() {
 do_pacman_install() {
     local packages="$1"
     local mingw=""
-    [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
-    [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
+    [[ $bits = "32bit" ]] && mingw="mingw-w64-i686"
+    [[ $bits = "64bit" ]] && mingw="mingw-w64-x86_64"
     local install=()
-    local installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
+    local installed
+    installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
     for pkg in $packages; do
         if [[ "$pkg" = "${mingw}-"* ]]; then
             /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || install+=("$pkg")
@@ -590,10 +605,10 @@ do_pacman_install() {
         [[ -f /etc/pac-mingw-extra.pk ]] && /usr/bin/grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || 
             echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
-    if [[ -n "$install" ]]; then
-        echo "Installing ${install[@]}"
-        pacman -S --force --noconfirm --needed ${install[*]} >/dev/null 2>&1
-        pacman -D --asexplicit ${install[*]} >/dev/null
+    if [[ -n "${install[*]}" ]]; then
+        echo "Installing ${install[*]}"
+        pacman -S --force --noconfirm --needed "${install[@]}" >/dev/null 2>&1
+        pacman -D --asexplicit "${install[@]}" >/dev/null
     fi
     do_hide_all_sharedlibs
 }
@@ -601,10 +616,11 @@ do_pacman_install() {
 do_pacman_remove() {
     local packages="$1"
     local mingw=""
-    [[ $bits = "32bit" ]] && mingw=mingw-w64-i686
-    [[ $bits = "64bit" ]] && mingw=mingw-w64-x86_64
+    [[ $bits = "32bit" ]] && mingw="mingw-w64-i686"
+    [[ $bits = "64bit" ]] && mingw="mingw-w64-x86_64"
     local uninstall=""
-    local installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
+    local installed
+    installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
     for pkg in $packages; do
         if [[ "$pkg" = "${mingw}-"* ]]; then
             /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && uninstall="$pkg"
@@ -624,12 +640,13 @@ do_pacman_remove() {
 
 do_prompt() {
     # from http://superuser.com/a/608509
-    while read -s -e -t 0.1; do : ; done
-    read -p "$1" ret
+    while read -r -s -e -t 0.1; do : ; done
+    read -r -p "$1" ret
 }
 
 do_autoreconf() {
-    local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
+    local basedir="$LOCALBUILDDIR"
+    basedir+="/$(get_first_subdir)" || basedir="."
     if [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
         log "autoreconf" autoreconf -fiv
@@ -637,7 +654,8 @@ do_autoreconf() {
 }
 
 do_autogen() {
-    local basedir="$LOCALBUILDDIR/$(get_first_subdir)"
+    local basedir="$LOCALBUILDDIR"
+    basedir+="/$(get_first_subdir)" || basedir="."
     if [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated"
@@ -659,17 +677,18 @@ get_last_version() {
     local filelist="$1"
     local filter="$2"
     local version="$3"
-    local ret=$(echo "$filelist" | /usr/bin/grep -E "$filter" | sort -V | tail -1)
+    local ret
+    ret="$(echo "$filelist" | /usr/bin/grep -E "$filter" | sort -V | tail -1)"
     if [[ -z "$version" ]]; then
-        echo $ret
+        echo "$ret"
     else
-        echo $ret | /usr/bin/grep -oP "$version"
+        echo "$ret" | /usr/bin/grep -oP "$version"
     fi
 }
 
 create_debug_link() {
     local file=
-    for file in $@; do
+    for file in "$@"; do
         if [[ -f "$file" && ! -f "$file".debug ]]; then
             echo "Stripping and creating debug link for ${file##*/}..."
             objcopy --only-keep-debug "$file" "$file".debug
