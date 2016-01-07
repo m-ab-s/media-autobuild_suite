@@ -296,7 +296,7 @@ if do_checkForOptions "--enable-libtesseract"; then
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             pushd "$LOCALDESTDIR"/bin-global/tessdata > /dev/null
-            do_wget "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
+            curl -OLs "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
             printf "%s\n" "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata/blob/master/"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
