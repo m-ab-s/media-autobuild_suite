@@ -64,7 +64,7 @@ if [[ -n "$alloptions" ]]; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     do_pacman_remove "openjpeg2"
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
@@ -96,8 +96,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopenjpeg"; then
 fi
 
 if [[ "$mpv" != "n" || "$mplayer" = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass --enable-libfreetype \
-    --enable-(lib)?fontconfig --enable-libfribidi"; }; then
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass --enable-libfreetype \
+    "--enable-(lib)?fontconfig" --enable-libfribidi; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         cd_safe "$LOCALBUILDDIR"
@@ -153,7 +153,7 @@ if [[ "$mpv" != "n" || "$mplayer" = "y" ]] ||
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffplay"; } &&
+if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions --disable-sdl --disable-ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove "SDL"
     cd_safe "$LOCALBUILDDIR"
@@ -168,7 +168,7 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions "--disable-sdl --disable-ffpla
 fi
 
 
-if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions "--enable-gnutls"; } ||
+if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions --enable-gnutls; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
 [[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
 [[ -n "$gnutls_ver" ]] &&
@@ -227,7 +227,7 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions "--enable-libwebp"; then
+if do_checkForOptions --enable-libwebp; then
     cd_safe "$LOCALBUILDDIR"
     do_pacman_install "libtiff"
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
@@ -248,7 +248,7 @@ if do_checkForOptions "--enable-libwebp"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libtesseract --enable-opencl"; then
+if do_checkForOptions --enable-libtesseract --enable-opencl; then
     cd_safe "$LOCALBUILDDIR"
     do_pacman_install "opencl-headers"
     if [[ ! -f $LOCALDESTDIR/lib/libOpenCL.a ]]; then
@@ -264,7 +264,7 @@ if do_checkForOptions "--enable-libtesseract --enable-opencl"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libtesseract"; then
+if do_checkForOptions --enable-libtesseract; then
     do_pacman_remove "tesseract-ocr"
     do_pacman_install "libtiff"
     cd_safe "$LOCALBUILDDIR"
@@ -307,7 +307,7 @@ if do_checkForOptions "--enable-libtesseract"; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } &&
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } &&
     do_pkgConfig "rubberband = 1.8.1"; then
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d rubberband-master ]] || [[ -d rubberband-master ]] &&
@@ -323,7 +323,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librubberband"; } &&
     do_checkIfExist librubberband.a
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
@@ -337,7 +337,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzimg"; then
     fi
 fi
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
     do_pacman_remove "dcadec-git"
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/foo86/dcadec.git"
@@ -351,7 +351,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libdcadec"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libilbc; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/TimothyGu/libilbc.git"
     if [[ $compile = "true" ]]; then
@@ -367,20 +367,20 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libilbc"; then
 fi
 
 if [[ $flac = "y" || $sox = "y" ]] ||
-    do_checkForOptions "--enable-libtheora --enable-libvorbis --enable-libspeex"; then
+    do_checkForOptions --enable-libtheora --enable-libvorbis --enable-libspeex; then
     rm -rf "$LOCALDESTDIR"/include/ogg "$LOCALDESTDIR"/share/aclocal/ogg.m4
     rm -rf "$LOCALDESTDIR"/lib/libogg.{l,}a "$LOCALDESTDIR"/lib/pkgconfig/ogg.pc
     do_pacman_install "libogg"
 fi
 
-if [[ $sox = "y" ]] || do_checkForOptions "--enable-libvorbis --enable-libtheora"; then
+if [[ $sox = "y" ]] || do_checkForOptions --enable-libvorbis --enable-libtheora; then
     rm -rf "$LOCALDESTDIR"/include/vorbis "$LOCALDESTDIR"/share/aclocal/vorbis.m4
     rm -f "$LOCALDESTDIR"/lib/libvorbis{,enc,file}.{l,}a
     rm -f "$LOCALDESTDIR"/lib/pkgconfig/vorbis{,enc,file}.pc
     do_pacman_install "libvorbis"
 fi
 
-if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
+if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
     if do_pkgConfig "opus = 1.1.1"; then
         cd_safe "$LOCALBUILDDIR"
         do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.1.tar.gz"
@@ -400,7 +400,7 @@ if [[ $sox = "y" ]] || do_checkForOptions "--enable-libopus"; then
     do_pacman_install "opusfile"
 fi
 
-if { [[ $sox = "y" ]] || do_checkForOptions "--enable-libspeex"; } &&
+if { [[ $sox = "y" ]] || do_checkForOptions --enable-libspeex; } &&
     do_pkgConfig "speex = 1.2rc2"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
@@ -427,7 +427,7 @@ if [[ $flac = "y" || $sox = "y" ]] &&
     do_checkIfExist libFLAC.a
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-aacenc"; } &&
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-aacenc; } &&
     do_pkgConfig "vo-aacenc = 0.1.3"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget_sf "opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
@@ -447,7 +447,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)";
     do_pacman_install "opencore-amr"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-amrwbenc"; } &&
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
@@ -460,7 +460,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvo-amrwbenc"; } &&
     do_checkIfExist libvo-amrwbenc.a
 fi
 
-if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
+if do_checkForOptions --enable-libfdk-aac || [[ $fdkaac = "y" ]]; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/mstorsjo/fdk-aac"
     if [[ $compile = "true" ]]; then
@@ -485,7 +485,7 @@ if do_checkForOptions "--enable-libfdk-aac" || [[ $fdkaac = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions "--enable-libfaac"; then
+if do_checkForOptions --enable-libfaac; then
     if [[ -f $LOCALDESTDIR/bin-audio/faac.exe ]] &&
         [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
         do_print_status "faac 1.28" "$green_color" "Up-to-date"
@@ -503,20 +503,20 @@ if do_checkForOptions "--enable-libfaac"; then
     fi
 fi
 
-if do_checkForOptions "--enable-libvorbis" && [[ ! -f "$LOCALDESTDIR"/bin-audio/oggenc.exe ]]; then
+if do_checkForOptions --enable-libvorbis && [[ ! -f "$LOCALDESTDIR"/bin-audio/oggenc.exe ]]; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools bin-audio/oggenc.exe
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
     rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
-        "$(do_checkForOptions "--enable-libspeex" || echo "--without-speex")" \
+        "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
     do_checkIfExist bin-audio/oggenc.exe
     _to_remove+=($(pwd))
 fi
 
-if do_checkForOptions "--enable-libopus"; then
+if do_checkForOptions --enable-libopus; then
     if [[ -f $LOCALDESTDIR/bin-audio/opusenc.exe ]] &&
         [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
         do_print_status "opus-tools 0.1.9" "$green_color" "Up-to-date"
@@ -532,7 +532,7 @@ if do_checkForOptions "--enable-libopus"; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libsoxr"; } && do_pkgConfig "soxr = 0.1.2"; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget_sf "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
@@ -546,7 +546,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libsoxr"; } && do_pkgC
     do_checkIfExist libsoxr.a
 fi
 
-if do_checkForOptions "--enable-libmp3lame"; then
+if do_checkForOptions --enable-libmp3lame; then
     if [[ -f $LOCALDESTDIR/bin-audio/lame.exe ]] &&
         [[ $(lame.exe 2>&1) = *"3.99.5"* ]]; then
         do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
@@ -568,7 +568,7 @@ if do_checkForOptions "--enable-libmp3lame"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libgme"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libgme; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
@@ -582,14 +582,14 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libgme"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libtwolame"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtwolame; then
     rm -rf "$LOCALDESTDIR"/include/twolame.h "$LOCALDESTDIR"/bin-audio/twolame.exe
     rm -rf "$LOCALDESTDIR"/lib/libtwolame.{l,}a "$LOCALDESTDIR"/lib/pkgconfig/twolame.pc
     do_pacman_install "twolame"
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbs2b"; } &&
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbs2b; } &&
     do_pkgConfig "libbs2b = 3.1.0"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
@@ -637,19 +637,19 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmodplug"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmodplug; then
     do_pacman_install "libmodplug"
     do_addOption "--extra-cflags=-DMODPLUG_STATIC"
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
-if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-librtmp"; }; then
+if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librtmp; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "$([[ $rtmpdump = "y" ]] && echo "bin-video/rtmpdump.exe")"
     req=""
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] && req="$(pkg-config --print-requires librtmp)"
-    if do_checkForOptions "--enable-gnutls" || [[ "$license" != "nonfree" ]]; then
+    if do_checkForOptions --enable-gnutls || [[ "$license" != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
     else
@@ -674,7 +674,7 @@ else
     [[ -f "$LOCALDESTDIR/lib/pkgconfig/librtmp.pc" ]] || do_removeOption "--enable-librtmp"
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libtheora"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
     rm -rf "$LOCALDESTDIR"/include/theora "$LOCALDESTDIR"/lib/libtheora{,enc,dec}.{l,}a
     rm -rf "$LOCALDESTDIR"/lib/pkgconfig/theora{,enc,dec}.pc
     do_pacman_install "libtheora"
@@ -710,7 +710,7 @@ else
     pkg-config --exists vpx || do_removeOption "--enable-libvpx"
 fi
 
-if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libkvazaar"; }; then
+if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libkvazaar; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar bin-video/kvazaar.exe
     if [[ $compile = "true" ]]; then
@@ -727,7 +727,7 @@ else
 fi
 
 if [[ $mplayer = "y" ]] ||
-    { [[ $mpv != "n" ]] && do_checkForOptions "--enable-libbluray"; }; then
+    { [[ $mpv != "n" ]] && do_checkForOptions --enable-libbluray; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
@@ -753,7 +753,7 @@ if [[ $mplayer = "y" ]] ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
@@ -767,7 +767,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libbluray"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgConfig "libutvideo = 15.1.0"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libutvideo && do_pkgConfig "libutvideo = 15.1.0"; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0"
     if [[ $compile = "true" ]]; then
@@ -782,7 +782,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libutvideo" && do_pkgCon
 fi
 
 if [[ $mpv != "n" || $mplayer = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libass"; }; then
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
@@ -798,7 +798,7 @@ if [[ $mpv != "n" || $mplayer = "y" ]] ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libxavs"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libxavs; then
     cd_safe "$LOCALBUILDDIR"
     if [[ -f "$LOCALDESTDIR/lib/libxavs.a" ]]; then
         do_print_status "libxavs snapshot" "$green_color" "Up-to-date"
@@ -879,7 +879,7 @@ if [[ $mediainfo = "y" ]]; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvidstab"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvidstab; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
@@ -893,14 +893,14 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libvidstab"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libcaca"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcaca; then
     rm -rf "$LOCALDESTDIR"/include/caca* "$LOCALDESTDIR"/bin-video/caca*
     rm -rf "$LOCALDESTDIR"/lib/libcaca.{l,}a "$LOCALDESTDIR"/lib/pkgconfig/caca.pc
     do_pacman_install "libcaca"
     do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzvbi"; } && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzvbi; } && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget_sf "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     [[ -f "src/.libs/libzvbi.a" ]] && log "distclean" make distclean
@@ -918,7 +918,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libzvbi"; } && do_pkgC
     do_checkIfExist libzvbi.a
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-frei0r"; } && do_pkgConfig "frei0r = 1.3.0"; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
     cd_safe "$LOCALBUILDDIR"
     do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
@@ -930,7 +930,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-frei0r"; } && do_pkgCo
     do_checkIfExist frei0r-1/xfade0r.dll
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-decklink; then
     cd_safe "$LOCALBUILDDIR"
     missing="n"
     for file in DeckLinkAPI{{,Version}.h,_i.c}; do
@@ -953,7 +953,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-decklink"; then
     unset missing
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then
     cd_safe "$LOCALBUILDDIR"
     nvencver="6"
     if [[ -f $LOCALDESTDIR/include/nvEncodeAPI.h ]] &&
@@ -977,7 +977,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-nvenc"; then
     unset nvencver
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmfx; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
@@ -992,7 +992,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libmfx"; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libcdio"; then
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcdio; then
     rm -rf "$LOCALBUILDDIR"/libcdio_paranoia-git
     rm -rf "$LOCALDESTDIR"/include/cdio "$LOCALDESTDIR"/lib/libcdio_{cdda,paranoia}.{l,}a
     rm -f "$LOCALDESTDIR"/lib/pkgconfig/libcdio_{cdda,paranoia}.pc
@@ -1178,18 +1178,18 @@ else
 fi
 
 if [[ $ffmpeg != "n" ]]; then
-    do_checkForOptions "--enable-gcrypt" && do_pacman_install libgcrypt
-    do_checkForOptions "--enable-libschroedinger" && do_pacman_install "schroedinger"
-    do_checkForOptions "--enable-libgsm" && do_pacman_install "gsm"
-    do_checkForOptions "--enable-libwavpack" && do_pacman_install "wavpack"
-    do_checkForOptions "--enable-libsnappy" && do_pacman_install "snappy"
-    if do_checkForOptions "--enable-libxvid"; then
+    do_checkForOptions --enable-gcrypt && do_pacman_install libgcrypt
+    do_checkForOptions --enable-libschroedinger && do_pacman_install "schroedinger"
+    do_checkForOptions --enable-libgsm && do_pacman_install "gsm"
+    do_checkForOptions --enable-libwavpack && do_pacman_install "wavpack"
+    do_checkForOptions --enable-libsnappy && do_pacman_install "snappy"
+    if do_checkForOptions --enable-libxvid; then
         do_pacman_install "xvidcore"
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
         [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/xvidcore.dll.a{,.dyn}
         [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f "$MINGW_PREFIX"/bin/xvidcore.dll{,.disabled}
     fi
-    if do_checkForOptions "--enable-libssh"; then
+    if do_checkForOptions --enable-libssh; then
         do_pacman_install "libssh"
         do_addOption "--extra-cflags=-DLIBSSH_STATIC"
         do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
@@ -1203,11 +1203,11 @@ if [[ $ffmpeg != "n" ]]; then
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]] ||
         [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
-        do_checkForOptions "--enable-libgme --enable-libopencore-amr(nb|wb) --enable-libtheora \
-            --enable-libtwolame --enable-libvorbis --enable-openssl" &&
+        do_checkForOptions --enable-libgme "--enable-libopencore-amr(nb|wb)" --enable-libtheora \
+            --enable-libtwolame --enable-libvorbis --enable-openssl &&
             do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
-        do_checkForOptions "--enable-gcrypt" &&
+        do_checkForOptions --enable-gcrypt &&
             do_patch "ffmpeg-0003-configure-Use-libgcrypt-config-if-available.patch" am &&
             do_patch "ffmpeg-0004-rtmpdh-Initialize-gcrypt-before-using-it.patch" am
 
@@ -1232,7 +1232,7 @@ if [[ $ffmpeg != "n" ]]; then
                 mv build_successful"${bits}"{,_shared} && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
-            do_checkForOptions "--enable-debug" &&
+            do_checkForOptions --enable-debug &&
                 create_debug_link "$LOCALDESTDIR"/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
@@ -1246,7 +1246,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_makeinstall
             do_checkIfExist libavcodec.a
             newFfmpeg="yes"
-            do_checkForOptions "--enable-debug" &&
+            do_checkForOptions --enable-debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
         fi
     fi
@@ -1410,7 +1410,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
-        do_checkForOptions "--enable-librtmp" && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
+        do_checkForOptions --enable-librtmp && [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] &&
             mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
 
@@ -1424,12 +1424,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         git describe --tags "$(git rev-list --tags --max-count=1)" | cut -c 2- > VERSION
         mpv_ldflags=()
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-        do_checkForOptions "--enable-libssh" && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        do_checkForOptions --enable-libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
         extracommands=()
         [[ $mpv = "v" ]] || extracommands+=("--disable-vapoursynth")
         [[ $license = *v3 || $license = nonfree ]] && extracommands+=("--enable-gpl3")
-        do_checkForOptions "--enable-debug" || extracommands+=("--disable-debug-build")
+        do_checkForOptions --enable-debug || extracommands+=("--disable-debug-build")
 
         LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
@@ -1447,7 +1447,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
-        do_checkForOptions "--enable-debug" &&
+        do_checkForOptions --enable-debug &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
     fi
 fi

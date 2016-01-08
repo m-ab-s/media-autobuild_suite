@@ -276,8 +276,8 @@ do_getFFmpegConfig() {
 
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
     # If nonfree will use SChannel if neither openssl or gnutls are in the options
-    if ! do_checkForOptions "--enable-openssl --enable-gnutls" &&
-        do_checkForOptions "--enable-librtmp"; then
+    if ! do_checkForOptions --enable-openssl --enable-gnutls &&
+        do_checkForOptions --enable-librtmp; then
         if [[ $license = gpl* ]]; then
             do_addOption "--enable-gnutls"
         else
@@ -286,13 +286,13 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
-    if do_checkForOptions "--enable-openssl" && [[ $license != gpl* ]]; then
+    if do_checkForOptions --enable-openssl && [[ $license != gpl* ]]; then
         # prefer openssl if both are in options and not gpl
-        do_removeOptions "--enable-gnutls"
-    elif do_checkForOptions "--enable-openssl"; then
+        do_removeOption --enable-gnutls
+    elif do_checkForOptions --enable-openssl; then
         # prefer gnutls if both are in options and gpl
-        do_removeOption "--enable-openssl"
-        do_addOption "--enable-gnutls"
+        do_removeOption --enable-openssl
+        do_addOption --enable-gnutls
     fi
 
     # handle WinXP-incompatible libs
@@ -306,14 +306,14 @@ do_changeFFmpegConfig() {
     [[ -z "$license" && -n "$1" ]] && local license="$1"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
-    if do_checkForOptions "--disable-w32threads --enable-pthreads --enable-decklink"; then
+    if do_checkForOptions --disable-w32threads --enable-pthreads --enable-decklink; then
         do_removeOption "--enable-w32threads"
         do_addOptions --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lpthread --extra-libs=-lwsock32
     fi
 
     # add options for static kvazaar
-    if do_checkForOptions "--enable-libkvazaar"; then
+    if do_checkForOptions --enable-libkvazaar; then
         do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
     fi
 
@@ -355,18 +355,18 @@ do_changeFFmpegConfig() {
         # no lgpl here because they are accepted with it
     fi
 
-    if do_checkForOptions "--enable-frei0r"; then
+    if do_checkForOptions --enable-frei0r; then
         do_addOption "--enable-filter=frei0r"
     fi
 
-    if do_checkForOptions "--enable-debug"; then
+    if do_checkForOptions --enable-debug; then
         # fix issue with ffprobe not working with debug and strip
         do_addOption "--disable-stripping"
     else
         do_addOption "--disable-debug"
     fi
 
-    if do_checkForOptions "--enable-openssl"; then
+    if do_checkForOptions --enable-openssl; then
         do_removeOptions "--enable-gcrypt --enable-gmp"
     fi
 
@@ -380,7 +380,7 @@ do_changeFFmpegConfig() {
 
 do_checkForOptions() {
     local option
-    for option in $@; do
+    for option in "$@"; do
         if /usr/bin/grep -qE -e "$option" <(echo "${FFMPEG_OPTS[*]}"); then
             return
         fi
@@ -390,7 +390,7 @@ do_checkForOptions() {
 
 do_addOption() {
     local option="$1"
-    if ! do_checkForOptions "$option"; then
+    if ! do_checkForOptions $option; then
         FFMPEG_OPTS+=("$option")
     fi
 }
