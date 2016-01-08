@@ -1208,7 +1208,6 @@ if [[ $ffmpeg != "n" ]]; then
             do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_checkForOptions --enable-gcrypt &&
-            do_patch "ffmpeg-0003-configure-Use-libgcrypt-config-if-available.patch" am &&
             do_patch "ffmpeg-0004-rtmpdh-Initialize-gcrypt-before-using-it.patch" am
 
         rm -rf "$LOCALDESTDIR"/include/libav{codec,device,filter,format,util,resample}
