@@ -710,22 +710,35 @@ if %writeLogging%==yes echo.logging=^%loggingF%>>%ini%
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
 if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
-    echo -------------------------------------------------------------
-    echo.
-    echo - Download wget
-    echo.
-    echo -------------------------------------------------------------
-    if exist %build%\install-wget.js del %build%\install-wget.js
-    cd build
-    if exist %build%\msys2-base.tar.xz GOTO unpack
-    if exist %build%\wget.exe GOTO checkmsys2
-    echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
+echo -------------------------------------------------------------
+echo.
+echo - Download wget
+echo.
+echo -------------------------------------------------------------
+if exist %build%\install-wget.js del %build%\install-wget.js
+cd build
+if exist %build%\msys2-base.tar.xz GOTO unpack
+if exist %build%\wget.exe GOTO checkmsys2
+echo.var wshell = new ActiveXObject("WScript.Shell"); var xmlhttp = new ActiveXObject("MSXML2.ServerXMLHTTP"); var adodb = new ActiveXObject("ADODB.Stream"); var FSO = new ActiveXObject("Scripting.FileSystemObject"); function http_get(url, is_binary) {xmlhttp.open("GET", url); xmlhttp.send(); WScript.echo("retrieving " + url); while (xmlhttp.readyState != 4); WScript.Sleep(10); if (xmlhttp.status != 200) {WScript.Echo("http get failed: " + xmlhttp.status); WScript.Quit(2)}; return is_binary ? xmlhttp.responseBody : xmlhttp.responseText}; function save_binary(path, data) {adodb.type = 1; adodb.open(); adodb.write(data); adodb.saveToFile(path, 2)}; function download_wget() {var base_url = "http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip"; var filename = "wget.zip"; var installer_data = http_get(base_url, true); save_binary(filename, installer_data); return FSO.GetAbsolutePathName(filename)}; function extract_zip(zip_file, dstdir) {var shell = new ActiveXObject("shell.application"); var dst = shell.NameSpace(dstdir); var zipdir = shell.NameSpace(zip_file); dst.CopyHere(zipdir.items(), 0)}; function install_wget(zip_file) {var rootdir = wshell.CurrentDirectory; extract_zip(zip_file, rootdir)}; install_wget(download_wget())>>install-wget.js
 
-    cscript install-wget.js
+cscript install-wget.js
+if not exist "%build%\wget.exe" (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo Script to download necessary components failed.
+    echo.
+    echo Download and extract this manually to inside "%build%":
+    echo http://blog.pixelcrusher.de/downloads/media-autobuild_suite/wget.zip
+    echo.
+    echo -------------------------------------------------------------------------------
+    pause
+    exit
+    ) else (
     del install-wget.js
     del wget.zip
     del 7zip-license.txt
     del COPYING.txt
+    )
 
 :checkmsys2
 if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
