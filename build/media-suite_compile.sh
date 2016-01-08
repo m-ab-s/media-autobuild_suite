@@ -53,8 +53,10 @@ echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color
 cd_safe "$LOCALBUILDDIR"
 
 do_getFFmpegConfig
+do_getMpvConfig
 if [[ -n "$alloptions" ]]; then
     thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"${FFMPEG_DEFAULT_OPTS[*]}\"" \
+            "MPV_OPTS=\"${MPV_OPTS[*]}\"" \
             "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions")"
     [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
         { diff -q <(echo "$thisrun") "$LOCALBUILDDIR/last_run_successful" >/dev/null 2>&1 ||
@@ -95,9 +97,10 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     fi
 fi
 
-if [[ "$mpv" != "n" || "$mplayer" = "y" ]] ||
+if [[ "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass --enable-libfreetype \
-    "--enable-(lib)?fontconfig" --enable-libfribidi; }; then
+    "--enable-(lib)?fontconfig" --enable-libfribidi; } ||
+    { [[ $mpv != "n" ]] && ! mpv_disabled libass; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         cd_safe "$LOCALBUILDDIR"
@@ -307,8 +310,8 @@ if do_checkForOptions --enable-libtesseract; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } &&
-    do_pkgConfig "rubberband = 1.8.1"; then
+if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
+    ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1"; then
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d rubberband-master ]] || [[ -d rubberband-master ]] &&
     { [[ $build32 = "yes" && ! -f rubberband-master/build_successful32bit ]] ||
@@ -727,7 +730,7 @@ else
 fi
 
 if [[ $mplayer = "y" ]] ||
-    { [[ $mpv != "n" ]] && do_checkForOptions --enable-libbluray; }; then
+    { [[ $mpv != "n" ]] && ! mpv_disabled_all dvdread dvdnav; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
@@ -753,7 +756,8 @@ if [[ $mplayer = "y" ]] ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; } ||
+    { [[ $mpv != "n" ]] && ! mpv_disabled libbluray; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
@@ -781,8 +785,9 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libutvideo && do_pkgConfi
     fi
 fi
 
-if [[ $mpv != "n" || $mplayer = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; }; then
+if [[ $mplayer = "y" ]] ||
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; } ||
+    { [[ $mpv != "n" ]] && ! mpv_disabled libass; }; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
@@ -1322,6 +1327,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
     [[ -d $LOCALBUILDDIR/waio-git ]] && rm -rf "$LOCALDESTDIR"/{include/waio,lib/libwaio.a} &&
         rm -rf "$LOCALBUILDDIR"/waio-git
 
+    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--lua=lua51} ]]; then
+        do_pacman_install lua51
+    elif ! mpv_disabled lua; then
+        do_pacman_remove lua51
     if [[ ! -f "$LOCALDESTDIR"/lib/libluajit-5.1.a ]]; then
         cd_safe "$LOCALBUILDDIR"
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
@@ -1337,22 +1346,27 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         do_checkIfExist libluajit-5.1.a
         _to_remove+=($(pwd))
     fi
-
-    do_pacman_remove "uchardet-git"
-    cd_safe "$LOCALBUILDDIR"
-    do_vcs "https://github.com/BYVoid/uchardet.git"
-    if [[ $compile = "true" ]]; then
-        rm -f "$LOCALDESTDIR"/include/uchardet.h "$LOCALDESTDIR"/bin/uchardet.exe
-        rm -f "$LOCALDESTDIR"/lib/{libuchardet.a,pkgconfig/uchardet.pc}
-        do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
-        grep -q "Libs.private" uchardet.pc.in ||
-            sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
-        LDFLAGS+=" -static" do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
-        do_checkIfExist libuchardet.a
     fi
 
-    do_pacman_install "libarchive lcms2"
+    do_pacman_remove "uchardet-git"
+    if ! mpv_disabled uchardet; then
+        cd_safe "$LOCALBUILDDIR"
+        do_vcs "https://github.com/BYVoid/uchardet.git"
+        if [[ $compile = "true" ]]; then
+            rm -f "$LOCALDESTDIR"/include/uchardet.h "$LOCALDESTDIR"/bin/uchardet.exe
+            rm -f "$LOCALDESTDIR"/lib/{libuchardet.a,pkgconfig/uchardet.pc}
+            do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
+            grep -q "Libs.private" uchardet.pc.in ||
+                sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
+            LDFLAGS+=" -static" do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
+            do_checkIfExist libuchardet.a
+        fi
+    fi
 
+    mpv_enabled libarchive && do_pacman_install libarchive
+    ! mpv_disabled lcms2 && do_pacman_install lcms2
+
+    if ! mpv_disabled egl-angle; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject lib/libEGL.a
     if [[ $compile = "true" ]]; then
@@ -1361,8 +1375,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist libEGL.a
     fi
+    fi
 
-    if [[ "$mpv" = "v" ]] && pkg-config --exists zimg &&
+    if ! mpv_disabled vapoursynth && pkg-config --exists zimg &&
         [[ -d "/c/Program Files (x86)/VapourSynth" ]]; then
         vsprefix="/c/Program Files (x86)/VapourSynth/sdk"
         if [[ "$bits" = "64bit" && -d "$vsprefix/../core64" ]]; then
@@ -1371,6 +1386,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
             vsprefix+="/lib32"
         else
             vsprefix=""
+            mpv_disable vapoursynth
         fi
         [[ x"$vsprefix" != "x" ]] && echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
         if [[ x"$vsprefix" != "x" ]] && { ! pkg-config --exists "vapoursynth >= 29" ||
@@ -1416,7 +1432,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
             /usr/bin/python waf distclean >/dev/null 2>&1
-            rm -f "$LOCALDESTDIR"/bin-video/mpv.{exe,com}{,.debug}
+            rm -f "$LOCALDESTDIR"/bin-video/mpv.{exe{,.debug},com}
         fi
 
         # for purely cosmetic reasons, show the last release version when doing -V
@@ -1424,16 +1440,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         mpv_ldflags=()
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         do_checkForOptions --enable-libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
-        do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
-        extracommands=()
-        [[ $mpv = "v" ]] || extracommands+=("--disable-vapoursynth")
-        [[ $license = *v3 || $license = nonfree ]] && extracommands+=("--enable-gpl3")
-        do_checkForOptions --enable-debug || extracommands+=("--disable-debug-build")
+        ! mpv_disabled egl-angle && do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
+        [[ $license = *v3 || $license = nonfree ]] && MPV_OPTS+=("--enable-gpl3")
 
         LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
-            --lua=luajit --disable-libguess --enable-libarchive --disable-vapoursynth-lazy \
-            "${extracommands[@]}"
+            --disable-libguess --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
@@ -1442,11 +1454,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
 
         log "install" /usr/bin/python waf install -j "${cpuCount:=1}"
 
-        unset mpv_ldflags replace withvs extracommands
+        unset mpv_ldflags replace withvs
         do_checkIfExist bin-video/mpv.exe
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
-        do_checkForOptions --enable-debug &&
+        ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
     fi
 fi

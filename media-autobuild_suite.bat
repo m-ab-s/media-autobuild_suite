@@ -64,6 +64,10 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --disable-w32threads --enable-opencl --enable-libzimg --enable-gmp ^
 --enable-nonfree --enable-nvenc --enable-openssl
 
+set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
+--enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
+--enable-vapoursynth
+
 set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging
 
@@ -469,16 +473,16 @@ if %ffmpegChoiceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Choose ffmpeg optional libraries?
+    echo. Choose ffmpeg and mpv optional libraries?
     echo. 1 = Yes
     echo. 2 = No
     echo.
     echo. If you select yes, we will create a file with the default options
-    echo. we use with FFmpeg. You can remove any that you don't need.
+    echo. we use with FFmpeg and mpv. You can remove any that you don't need.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildffmpegChoice="Choose ffmpeg optional libs: "
+    set /P buildffmpegChoice="Choose ffmpeg and mpv optional libs: "
     ) else set buildffmpegChoice=%ffmpegChoiceINI%
 if %deleteINI%==1 set "writeFFC=yes"
 
@@ -487,8 +491,18 @@ if %buildffmpegChoice%==1 (
     if not exist %build%\ffmpeg_options.txt (
         for %%i in (%ffmpeg_options%) do echo.%%i>>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
-        echo. File with default options has been created in
+        echo. File with default FFmpeg options has been created in
         echo. %build%\ffmpeg_options.txt
+        echo.
+        echo. Edit it now or leave it unedited to compile according to defaults.
+        echo -------------------------------------------------------------------------------
+        pause
+        )
+    if not exist %build%\mpv_options.txt (
+        for %%i in (%mpv_options%) do echo.%%i>>%build%\mpv_options.txt
+        echo -------------------------------------------------------------------------------
+        echo. File with default mpv options has been created in
+        echo. %build%\mpv_options.txt
         echo.
         echo. Edit it now or leave it unedited to compile according to defaults.
         echo -------------------------------------------------------------------------------

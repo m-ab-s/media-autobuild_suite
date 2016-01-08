@@ -251,7 +251,7 @@ do_pkgConfig() {
 
 do_getFFmpegConfig() {
     [[ -z "$license" && -n "$1" ]] && local license="$1"
-    configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
+    local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
         FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
         echo "Imported FFmpeg options from ffmpeg_options.txt"
@@ -386,6 +386,63 @@ do_checkForOptions() {
         fi
     done
     return 1
+}
+
+do_getMpvConfig() {
+    local configfile="$LOCALBUILDDIR"/mpv_options.txt
+    if [[ -f $configfile ]]; then
+        MPV_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
+        echo "Imported mpv options from mpv_options.txt"
+    elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
+        MPV_OPTS=($(sed -rne '/mpv_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
+            sed -e 's/.*mpv_options=//' -e 's/ ^//g' | tr '\n' ' '))
+        echo "Imported default mpv options from .bat"
+    else
+        echo "Using default mpv options"
+    fi
+    if [[ $mpv = "v" ]]; then
+        ! mpv_enabled vapoursynth && ! mpv_disabled vapoursynth &&
+            MPV_OPTS+=(--enable-vapoursynth)
+    elif [[ $mpv = "y" ]]; then
+        mpv_enabled vapoursynth && mpv_disable vapoursynth
+        mpv_disabled vapoursynth || MPV_OPTS+=(--disable-vapoursynth)
+    fi
+}
+
+mpv_enabled() {
+    if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--enable-$1} ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+mpv_disabled() {
+    if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--disable-$1} ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+mpv_enabled_all() {
+    for opt; do
+        mpv_enabled $opt || return 1
+    done
+}
+
+mpv_disabled_all() {
+    for opt; do
+        mpv_disabled $opt || return 1
+    done
+}
+
+mpv_enable() {
+    mpv_disabled $1 && MPV_OPTS=(${MPV_OPTS[@]//--disable-$1/--enable-$1})
+}
+
+mpv_disable() {
+    mpv_enabled $1 && MPV_OPTS=(${MPV_OPTS[@]//--enable-$1/--disable-$1})
 }
 
 do_addOption() {
