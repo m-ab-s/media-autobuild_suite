@@ -684,8 +684,8 @@ do_pacman_remove() {
         [[ -f /etc/pac-mingw-extra.pk ]] && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
         if [[ -n "$uninstall" ]]; then
             do_hide_pacman_sharedlibs "$uninstall" revert
-            if ! pacman -Rs --noconfirm "$uninstall"; then
-                pacman -D --asdeps "$uninstall" >/dev/null
+            if ! pacman -Rs --noconfirm "$uninstall" >/dev/null 2>&1; then
+                pacman -D --asdeps "$uninstall" >/dev/null 2>&1
             fi
         fi
     done
