@@ -1377,21 +1377,20 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
     fi
     fi
 
-    if ! mpv_disabled vapoursynth && pkg-config --exists zimg &&
-        [[ -d "/c/Program Files (x86)/VapourSynth" ]]; then
-        vsprefix="/c/Program Files (x86)/VapourSynth/sdk"
-        if [[ "$bits" = "64bit" && -d "$vsprefix/../core64" ]]; then
-            vsprefix+="/lib64"
-        elif [[ "$bits" = "32bit" && -d "$vsprefix/../core32" ]]; then
-            vsprefix+="/lib32"
+    vsprefix=$(get_vs_prefix)
+    if ! mpv_disabled vapoursynth && pkg-config --exists zimg && [[ -n $vsprefix ]]; then
+        if [[ $bits = 64bit && -d "$vsprefix/core64" ]]; then
+            vsprefix+="/sdk/lib64"
+        elif [[ $bits = 32bit && -d "$vsprefix/core32" ]]; then
+            vsprefix+="/sdk/lib32"
         else
             vsprefix=""
-            mpv_disable vapoursynth
         fi
-        [[ x"$vsprefix" != "x" ]] && echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
-        if [[ x"$vsprefix" != "x" ]] && { ! pkg-config --exists "vapoursynth >= 29" ||
+        if [[ x"$vsprefix" != "x" ]]; then
+            echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
+        if ! pkg-config --exists "vapoursynth >= 29" ||
             [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
-            [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; }; then
+            [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
             cp -f "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
             cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
             curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in |
@@ -1413,9 +1412,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
                 -e '/Libs.private/ d' \
                 > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
         elif [[ x"$vsprefix" = "x" ]]; then
-            rm -f "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth{,-script}.pc
-            rm -f "$LOCALDESTDIR"/lib/{vapoursynth,vsscript}.lib
-            rm -rf "$LOCALDESTDIR"/include/vapoursynth
+            mpv_disable vapoursynth
+        fi
         fi
         unset vsprefix
     fi
