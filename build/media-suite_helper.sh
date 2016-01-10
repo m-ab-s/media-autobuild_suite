@@ -250,7 +250,7 @@ do_pkgConfig() {
 }
 
 do_getFFmpegConfig() {
-    [[ -z "$license" && -n "$1" ]] && local license="$1"
+    local license="$1"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
         FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
@@ -262,6 +262,7 @@ do_getFFmpegConfig() {
     else
         echo "Using default FFmpeg options"
     fi
+    echo "License: $license"
     FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
 
     if [[ $bits = "32bit" ]]; then
@@ -303,7 +304,9 @@ do_getFFmpegConfig() {
 }
 
 do_changeFFmpegConfig() {
-    [[ -z "$license" && -n "$1" ]] && local license="$1"
+    local license="$1"
+    echo "Checking and changing FFmpeg options"
+    echo "License: $license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
     if do_checkForOptions --disable-w32threads --enable-pthreads --enable-decklink; then
@@ -318,39 +321,39 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl libs
-    local gpl="--enable-frei0r --enable-libcdio --enable-librubberband \
-        --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265 \
-        --enable-libxavs --enable-libxvid --enable-libzvbi"
-    if [[ $license = gpl* || $license = nonfree ]] && do_checkForOptions "$gpl"; then
+    local gpl=(--enable-frei0r --enable-libcdio --enable-librubberband
+        --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265
+        --enable-libxavs --enable-libxvid --enable-libzvbi)
+    if [[ $license = gpl* || $license = nonfree ]] && do_checkForOptions "${gpl[@]}"; then
         do_addOption "--enable-gpl"
     else
-        do_removeOptions "$gpl --enable-gpl"
+        do_removeOptions "${gpl[*]} --enable-gpl"
     fi
 
     # handle (l)gplv3 libs
-    local version3="--enable-libopencore-amr(wb|nb) \
-        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp"
-    if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "$version3"; then
+    local version3=("--enable-libopencore-amr(wb|nb)"
+        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp)
+    if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "${version3[@]}"; then
         do_addOption "--enable-version3"
     else
-        do_removeOptions "$version3 --enable-version3"
+        do_removeOptions "${version3[*]} --enable-version3"
     fi
 
     # handle non-free libs
-    local nonfree="--enable-nvenc --enable-libfaac"
-    if [[ $license = "nonfree" ]] && do_checkForOptions "$nonfree"; then
+    local nonfree=(--enable-nvenc --enable-libfaac)
+    if [[ $license = "nonfree" ]] && do_checkForOptions "${nonfree[@]}"; then
         do_addOption "--enable-nonfree"
     else
-        do_removeOptions "$nonfree --enable-nonfree"
+        do_removeOptions "${nonfree[*]} --enable-nonfree"
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl="--enable-libfdk-aac --enable-openssl"
-    if do_checkForOptions "$nonfreegpl"; then
+    local nonfreegpl=(--enable-libfdk-aac --enable-openssl)
+    if do_checkForOptions "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]]; then
             do_addOption "--enable-nonfree"
         elif [[ $license = gpl* ]]; then
-            do_removeOptions "$nonfreegpl"
+            do_removeOptions "${nonfreegpl[*]}"
         fi
         # no lgpl here because they are accepted with it
     fi

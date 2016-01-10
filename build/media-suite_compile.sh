@@ -52,7 +52,7 @@ echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color
 
 cd_safe "$LOCALBUILDDIR"
 
-do_getFFmpegConfig
+do_getFFmpegConfig $license
 do_getMpvConfig
 if [[ -n "$alloptions" ]]; then
     thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"${FFMPEG_DEFAULT_OPTS[*]}\"" \
@@ -1204,7 +1204,7 @@ if [[ $ffmpeg != "n" ]]; then
     do_hide_all_sharedlibs
 
     cd_safe "$LOCALBUILDDIR"
-    do_changeFFmpegConfig
+    do_changeFFmpegConfig $license
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg bin-video/ffmpeg.exe
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]] ||
         [[ $ffmpeg = "s" && ! -f $LOCALDESTDIR/bin-video/ffmpegSHARED/ffmpeg.exe ]]; then
