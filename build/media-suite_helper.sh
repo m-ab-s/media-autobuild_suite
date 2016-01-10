@@ -490,7 +490,8 @@ do_patch() {
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code != "200" ]]; then
-        echo "Patch not found online. Trying local patch. Probably not up-to-date."
+        echo "${patchpath##*/} not found online."
+        echo "Trying local patch. Probably not up-to-date."
         if [[ -f ./"$patch" ]]; then
             patchpath="$patch"
         elif [[ -f "$LOCALBUILDDIR/patches/${patch}" ]]; then
