@@ -645,49 +645,41 @@ do_unhide_all_sharedlibs() {
 
 do_pacman_install() {
     local packages="$1"
-    local mingw=""
-    [[ $bits = "32bit" ]] && mingw="mingw-w64-i686"
-    [[ $bits = "64bit" ]] && mingw="mingw-w64-x86_64"
-    local install=()
     local installed
-    installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
+    local pkg
+    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
     for pkg in $packages; do
-        if [[ "$pkg" = "${mingw}-"* ]]; then
-            /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || install+=("$pkg")
+        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
+        echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
+            pacman -D --asexplicit "$pkg" >/dev/null
+            /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
+                echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+            echo "done"
         else
-            /usr/bin/grep -q "^${mingw}-${pkg}$" <(echo "$installed") || install+=("${mingw}-${pkg}")
+            echo "failed"
         fi
-        [[ -f /etc/pac-mingw-extra.pk ]] && /usr/bin/grep -q "^${pkg}$" /etc/pac-mingw-extra.pk || 
-            echo "${pkg}" >> /etc/pac-mingw-extra.pk
     done
-    if [[ -n "${install[*]}" ]]; then
-        echo "Installing ${install[*]}"
-        pacman -S --force --noconfirm --needed "${install[@]}" >/dev/null 2>&1
-        pacman -D --asexplicit "${install[@]}" >/dev/null
-    fi
     do_hide_all_sharedlibs
 }
 
 do_pacman_remove() {
     local packages="$1"
-    local mingw=""
-    [[ $bits = "32bit" ]] && mingw="mingw-w64-i686"
-    [[ $bits = "64bit" ]] && mingw="mingw-w64-x86_64"
-    local uninstall=""
     local installed
-    installed="$(pacman -Qqe | /usr/bin/grep "^${mingw}-")"
+    local pkg
+    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
     for pkg in $packages; do
-        if [[ "$pkg" = "${mingw}-"* ]]; then
-            /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && uninstall="$pkg"
+        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
+        echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        do_hide_pacman_sharedlibs "$pkg" revert
+        if pacman -Rs --noconfirm "$pkg" >/dev/null 2>&1; then
+            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
+            echo "done"
         else
-            /usr/bin/grep -q "^${mingw}-${pkg}$" <(echo "$installed") && uninstall="${mingw}-${pkg}"
-        fi
-        [[ -f /etc/pac-mingw-extra.pk ]] && sed -i "/^${pkg}$/d" /etc/pac-mingw-extra.pk
-        if [[ -n "$uninstall" ]]; then
-            do_hide_pacman_sharedlibs "$uninstall" revert
-            if ! pacman -Rs --noconfirm "$uninstall" >/dev/null 2>&1; then
-                pacman -D --asdeps "$uninstall" >/dev/null 2>&1
-            fi
+            pacman -D --asdeps "$pkg" >/dev/null 2>&1
+            echo "failed"
         fi
     done
     do_hide_all_sharedlibs
