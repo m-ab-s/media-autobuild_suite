@@ -210,28 +210,45 @@ do_wget_sf() {
 do_checkIfExist() {
     local packetName
     packetName="$(get_first_subdir)"
-    local fileName="$1"
-    local fileExtension=${fileName##*.}
-    local buildSuccess="n"
-
-    if [[ "$fileExtension" = "a" ]] || [[ "$fileExtension" = "dll" ]]; then
-        [[ -f "$LOCALDESTDIR/lib/$fileName" ]] && buildSuccess="y"
+    [[ $1 = dry ]] && local dry=y && shift
+    if [[ -z $dry ]]; then
+        files_exist v "$@"
+        if [[ $? = 0 ]]; then
+            do_print_status "└ $packetName" "$blue_color" "Updated"
+            [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
+                touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
+        elif [[ $? = 1 ]]; then
+            [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
+                rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
+            do_print_status "└ $packetName" "$red_color" "Failed"
+            echo
+            echo "Try deleting '$LOCALBUILDDIR/$packetName' and start the script again."
+            echo "If you're sure there are no dependencies <Enter> to continue building."
+            do_prompt "Close this window if you wish to stop building."
+        else
+            return 1
+        fi
     else
-        [[ -f "$LOCALDESTDIR/$fileName" ]] && buildSuccess="y"
+        files_exist v "$@"
     fi
+}
 
-    if [[ $buildSuccess = "y" ]]; then
-        do_print_status "└ $packetName" "$blue_color" "Updated"
-        [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-            touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
-    else
-        [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-            rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
-        echo -------------------------------------------------
-        echo "Building of $packetName failed..."
-        echo "Delete the source folder under '$LOCALBUILDDIR' and start again."
-        echo "If you're sure there are no dependencies <Enter> to continue building."
-        do_prompt "Close this window if you wish to stop building."
+files_exist() {
+    [[ $1 = v ]] && local verbose=y && shift
+    local file
+    for opt; do
+        case $opt in
+            *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
+            *.a|*.dll) file="$LOCALDESTDIR/lib/$opt" ;;
+            *.h )  file="$LOCALDESTDIR/include/$opt" ;;
+            * )    file="$LOCALDESTDIR/$opt" ;;
+        esac
+        [[ ! -f "$file" ]] && break
+        file=
+    done
+    if [[ -n $file ]]; then
+        [[ -n $verbose ]] && do_print_status "├ $file" "${red_color}" "Not found"
+        return 1
     fi
 }
 

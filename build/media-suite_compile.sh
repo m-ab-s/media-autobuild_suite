@@ -79,7 +79,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
         do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
         do_cmakeinstall -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
-        do_checkIfExist libjpeg.a
+        do_checkIfExist libjpeg.a jpeglib.h
     fi
 
     cd_safe "$LOCALBUILDDIR"
@@ -1343,7 +1343,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         cp -rf temp/"$LOCALDESTDIR"/{lib,include} "$LOCALDESTDIR"/
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" "$LOCALDESTDIR"/lib/pkgconfig/luajit.pc
-        do_checkIfExist libluajit-5.1.a
+        do_checkIfExist libluajit-5.1.a luajit.pc luajit-2.0/luajit.h
         _to_remove+=($(pwd))
     fi
     fi
