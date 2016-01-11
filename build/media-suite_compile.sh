@@ -1331,7 +1331,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
         do_pacman_remove lua51
-    if [[ ! -f "$LOCALDESTDIR"/lib/libluajit-5.1.a ]]; then
+    if do_pkgConfig luajit; then
         cd_safe "$LOCALBUILDDIR"
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
         rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
