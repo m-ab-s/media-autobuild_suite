@@ -71,11 +71,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
     if [[ $compile = "true" ]]; then
-        if [[ -f "$LOCALDESTDIR"/lib/libjpeg.a ]]; then
-            rm -f "$LOCALDESTDIR"/include/j{config,error,morecfg,peglib}.h
-            rm -f "$LOCALDESTDIR"/lib/libjpeg.{l,}a "$LOCALDESTDIR"/bin-global/{c,d}jpeg.exe
-            rm -f "$LOCALDESTDIR"/bin-global/jpegtran.exe "$LOCALDESTDIR"/bin-global/{rd,wr}jpgcom.exe
-        fi
+        do_uninstall j{config,error,morecfg,peglib}.h libjpeg.{l,}a
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
         do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
         do_cmakeinstall -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
@@ -106,8 +102,7 @@ if [[ "$mplayer" = "y" ]] ||
         cd_safe "$LOCALBUILDDIR"
         do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
         [[ -f "objs/.libs/libfreetype.a" ]] && log "distclean" make distclean
-        rm -rf "$LOCALDESTDIR"/include/freetype2 "$LOCALDESTDIR"/bin-global/freetype-config
-        rm -f "$LOCALDESTDIR"/lib/{libfreetype.{l,}a,pkgconfig/freetype.pc}
+        do_uninstall include/freetype2 bin-global/freetype-config libfreetype.{l,}a freetype.pc
         do_generic_confmakeinstall global --with-harfbuzz=no
         do_checkIfExist libfreetype.a
         rebuildLibass="y"
@@ -1334,8 +1329,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
     if do_pkgConfig luajit; then
         cd_safe "$LOCALBUILDDIR"
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
-        rm -rf "$LOCALDESTDIR"/{include/luajit-2.0,lib/lua,bin-global/luajit*.exe}
-        rm -f "$LOCALDESTDIR"/lib/{libluajit-5.1.a,pkgconfig/luajit.pc}
+        do_uninstall include/luajit-2.0 lib/lua libluajit-5.1.a luajit.pc
         rm -rf ./temp
         [[ -f "src/luajit.exe" ]] && log "clean" make clean
         do_make BUILDMODE=static amalg

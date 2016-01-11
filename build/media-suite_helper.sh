@@ -262,6 +262,32 @@ pc_exists() {
     done
 }
 
+do_uninstall() {
+    [[ $1 = dry ]] && local dry=y && shift
+    local file
+    for opt; do
+        case $opt in
+            *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
+            *.a|*.la ) file="$LOCALDESTDIR/lib/$opt" ;;
+            *.h )  file="$LOCALDESTDIR/include/$opt" ;;
+            * )    file="$LOCALDESTDIR/$opt" ;;
+        esac
+        if [[ -f $file ]]; then
+            if [[ $dry ]]; then
+                echo "rm -f $file"
+            else
+                rm -f "$file"
+            fi
+        elif [[ -d $file ]]; then
+            if [[ $dry ]]; then
+                echo "rm -rf $file"
+            else
+                rm -rf "$file"
+            fi
+        fi
+    done
+}
+
 do_pkgConfig() {
     local pkg=${1%% *}
     local check=${1#$pkg}
