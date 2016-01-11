@@ -235,16 +235,28 @@ do_checkIfExist() {
     fi
 }
 
+pc_exists() {
+    for opt; do
+        local pkg=${opt%% *}
+        local check=${opt#$pkg}
+        [[ $pkg = "$check" ]] && check=""
+        [[ $pkg = *.pc ]] || pkg="${LOCALDESTDIR}/lib/pkgconfig/${pkg}.pc"
+        pkg-config --exists --silence-errors "${pkg}${check}" || return
+    done
+}
+
 do_pkgConfig() {
     local pkg=${1%% *}
+    local check=${1#$pkg}
+    [[ $pkg = "$check" ]] && check=""
     local version=$2
-    [[ -z "$version" ]] && version="${1##*= }"
-    [[ "$version" = "$1" ]] && version="" || version=" $version"
-    local prefix
-    prefix="$(pkg-config --variable=prefix --silence-errors "$1")"
-    [[ ! -z "$prefix" ]] && prefix="$(cygpath -u "$prefix")"
-    if [[ "$prefix" = "$LOCALDESTDIR" || "$prefix" = "/trunk${LOCALDESTDIR}" ]]; then
-        do_print_status "${pkg}${version}" "$green_color" "Up-to-date"
+    [[ -z "$version" && -n "$check" ]] && version="${check#*= }"
+    if ! pc_exists "${pkg}"; then
+        do_print_status "${pkg} ${version}" "$red_color" "Not found"
+    elif ! pc_exists "${pkg}${check}"; then
+        do_print_status "${pkg} ${version}" "$orange_color" "Outdated"
+    else
+        do_print_status "${pkg} ${version}" "$green_color" "Up-to-date"
         return 1
     fi
 }
