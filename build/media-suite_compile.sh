@@ -326,7 +326,8 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
     do_checkIfExist librubberband.a
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
+    ! mpv_disabled vapoursynth; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
@@ -1378,42 +1379,50 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
     fi
 
     vsprefix=$(get_vs_prefix)
-    if ! mpv_disabled vapoursynth && pkg-config --exists zimg && [[ -n $vsprefix ]]; then
-        if [[ $bits = 64bit && -d "$vsprefix/core64" ]]; then
+    if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
+        if [[ $bits = 64bit && -f "$vsprefix/core64/vspipe.exe" ]]; then
+            vsversion=$("$vsprefix/core64/vspipe" -v | grep -Po "(?<=Core )R\d+")
             vsprefix+="/sdk/lib64"
-        elif [[ $bits = 32bit && -d "$vsprefix/core32" ]]; then
+        elif [[ $bits = 32bit && -f "$vsprefix/core32/vspipe.exe" ]]; then
+            vsversion=$("$vsprefix/core32/vspipe" -v | grep -Po "(?<=Core )R\d+")
             vsprefix+="/sdk/lib32"
         else
             vsprefix=""
         fi
         if [[ x"$vsprefix" != "x" ]]; then
-            echo -e "${orange_color}Compiling mpv with Vapoursynth!${reset_color}"
-        if ! pkg-config --exists "vapoursynth >= 29" ||
+            if [[ ${vsversion#R} -ge 24 ]]; then
+                echo -e "${orange_color}Compiling mpv with Vapoursynth ${vsversion}${reset_color}"
+            else
+                vsprefix=""
+                echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
+            fi
+        fi
+        if [[ x"$vsprefix" != "x" ]] && ! pkg-config --exists "vapoursynth = ${vsversion#R}" ||
             [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
             [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
-            cp -f "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
+            install -p "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
             cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
-            curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in |
+            curl -sL "https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
                 -e 's;@includedir@;${prefix}/include;' \
-                -e 's;@VERSION@;29;' \
+                -e "s;@VERSION@;${vsversion#R};" \
                 -e '/Libs.private/ d' \
                 > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth.pc
-            curl -sL https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth-script.pc.in |
+            curl -sL "https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth-script.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
                 -e 's;@includedir@;${prefix}/include;' \
-                -e 's;@VERSION@;29;' \
+                -e "s;@VERSION@;${vsversion#R};" \
                 -e '/Requires.private/ d' \
                 -e 's;lvapoursynth-script;lvsscript;' \
                 -e '/Libs.private/ d' \
                 > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+            newFfmpeg="yes"
         elif [[ x"$vsprefix" = "x" ]]; then
             mpv_disable vapoursynth
-        fi
         fi
         unset vsprefix
     fi
