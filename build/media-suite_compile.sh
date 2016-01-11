@@ -1011,10 +1011,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcdio; then
     do_pacman_install "libcddb libcdio libcdio-paranoia"
 fi
 
-#------------------------------------------------
-# final tools
-#------------------------------------------------
-
 if [[ $mp4box = "y" ]]; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/gpac/gpac.git" gpac bin-video/MP4Box.exe
