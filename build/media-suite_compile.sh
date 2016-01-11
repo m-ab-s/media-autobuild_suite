@@ -1319,7 +1319,7 @@ if [[ $mplayer = "y" ]]; then
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale; then
-    [[ -d $LOCALBUILDDIR/waio-git ]] && rm -rf "$LOCALDESTDIR"/{include/waio,lib/libwaio.a} &&
+    [[ -d $LOCALBUILDDIR/waio-git ]] && do_uninstall include/waio libwaio.a &&
         rm -rf "$LOCALBUILDDIR"/waio-git
 
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--lua=lua51} ]]; then
@@ -1347,13 +1347,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         cd_safe "$LOCALBUILDDIR"
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then
-            rm -f "$LOCALDESTDIR"/include/uchardet.h "$LOCALDESTDIR"/bin/uchardet.exe
-            rm -f "$LOCALDESTDIR"/lib/{libuchardet.a,pkgconfig/uchardet.pc}
+            do_uninstall uchardet.h bin{,-global}/uchardet.exe libuchardet.a uchardet.pc
             do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
             grep -q "Libs.private" uchardet.pc.in ||
                 sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
             LDFLAGS+=" -static" do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
-            do_checkIfExist libuchardet.a
+            do_checkIfExist libuchardet.a uchardet.pc
         fi
     fi
 
@@ -1432,7 +1431,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
             /usr/bin/python waf distclean >/dev/null 2>&1
-            rm -f "$LOCALDESTDIR"/bin-video/mpv.{exe{,.debug},com}
+            do_uninstall bin-video/mpv.{exe{,.debug},com}
         fi
 
         # for purely cosmetic reasons, show the last release version when doing -V
@@ -1455,7 +1454,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log "install" /usr/bin/python waf install -j "${cpuCount:=1}"
 
         unset mpv_ldflags replace withvs
-        do_checkIfExist bin-video/mpv.exe
+        do_checkIfExist bin-video/mpv.{exe,com}
         [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
         ! mpv_disabled debug-build &&
