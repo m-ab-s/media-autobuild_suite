@@ -711,7 +711,7 @@ if [[ ! $vpx = "n" ]]; then
         unset target
     fi
 else
-    pkg-config --exists vpx || do_removeOption "--enable-libvpx"
+    pc_exists vpx || do_removeOption "--enable-libvpx"
 fi
 
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libkvazaar; }; then
@@ -727,7 +727,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enabl
         do_checkIfExist libkvazaar.a
     fi
 else
-    pkg-config --exists kvazaar || do_removeOption "--enable-libkvazaar"
+    pc_exists kvazaar || do_removeOption "--enable-libkvazaar"
 fi
 
 if [[ $mplayer = "y" ]] ||
@@ -1088,7 +1088,7 @@ if [[ $x264 != "n" ]]; then
         unset extracommands
     fi
 else
-    pkg-config --exists x264 || do_removeOption "--enable-libx264"
+    pc_exists x264 || do_removeOption "--enable-libx264"
 fi
 
 if [[ ! $x265 = "n" ]]; then
@@ -1176,7 +1176,7 @@ EOF
         unset xpsupport assembly cli
     fi
 else
-    pkg-config --exists x265 || do_removeOption "--enable-libx265"
+    pc_exists x265 || do_removeOption "--enable-libx265"
 fi
 
 if [[ $ffmpeg != "n" ]]; then
@@ -1318,7 +1318,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavutil libavformat libswscale"; then
+if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale; then
     [[ -d $LOCALBUILDDIR/waio-git ]] && rm -rf "$LOCALDESTDIR"/{include/waio,lib/libwaio.a} &&
         rm -rf "$LOCALBUILDDIR"/waio-git
 
@@ -1390,7 +1390,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pkg-config --exists "libavcodec libavut
                 echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
             fi
         fi
-        if [[ x"$vsprefix" != "x" ]] && ! pkg-config --exists "vapoursynth = ${vsversion#R}" ||
+        if [[ x"$vsprefix" != "x" ]] && ! pc_exists "vapoursynth = ${vsversion#R}" ||
             [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
             [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
             install -p "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
