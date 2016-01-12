@@ -241,8 +241,8 @@ files_exist() {
     for opt; do
         case $opt in
             *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
-            *.a|*.dll|*.lib) file="$LOCALDESTDIR/lib/$opt" ;;
-            *.h )  file="$LOCALDESTDIR/include/$opt" ;;
+            *.a|*.la|*.lib) file="$LOCALDESTDIR/lib/$opt" ;;
+            *.h|*.hpp )  file="$LOCALDESTDIR/include/$opt" ;;
             * )    file="$LOCALDESTDIR/$opt" ;;
         esac
         [[ ! -f "$file" ]] && break
@@ -271,7 +271,7 @@ do_uninstall() {
         case $opt in
             *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
             *.a|*.la ) file="$LOCALDESTDIR/lib/$opt" ;;
-            *.h )  file="$LOCALDESTDIR/include/$opt" ;;
+            *.h|*.hpp ) file="$LOCALDESTDIR/include/$opt" ;;
             * )    file="$LOCALDESTDIR/$opt" ;;
         esac
         if [[ -f $file ]]; then
