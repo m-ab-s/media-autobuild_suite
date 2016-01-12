@@ -241,7 +241,7 @@ files_exist() {
     for opt; do
         case $opt in
             *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
-            *.a|*.dll) file="$LOCALDESTDIR/lib/$opt" ;;
+            *.a|*.dll|*.lib) file="$LOCALDESTDIR/lib/$opt" ;;
             *.h )  file="$LOCALDESTDIR/include/$opt" ;;
             * )    file="$LOCALDESTDIR/$opt" ;;
         esac

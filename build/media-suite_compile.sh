@@ -1390,8 +1390,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             fi
         fi
         if [[ x"$vsprefix" != "x" ]] && ! pc_exists "vapoursynth = ${vsversion#R}" ||
-            [[ ! -f "$LOCALDESTDIR"/lib/vapoursynth.lib ]] ||
-            [[ ! -f "$LOCALDESTDIR"/lib/vsscript.lib ]]; then
+            ! files_exist {vapoursynth,vsscript}.lib; then
             install -p "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
             cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
             curl -sL "https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in" |
