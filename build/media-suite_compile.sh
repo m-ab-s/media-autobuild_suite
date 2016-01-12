@@ -108,7 +108,7 @@ if [[ "$mplayer" = "y" ]] ||
         rebuildLibass="y"
     fi
 
-    if do_pkgConfig "fontconfig = 2.11.94" && do_checkForOptions "--enable-(lib)?fontconfig"; then
+    if do_checkForOptions "--enable-(lib)?fontconfig" && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove "python2-lxml"
         cd_safe "$LOCALBUILDDIR"
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
