@@ -83,11 +83,13 @@ vcs_log() {
 do_vcs() {
     local vcsType="${1%::*}"
     local vcsURL="${1#*::}"
+    shift
     [[ "$vcsType" = "$vcsURL" ]] && vcsType="git"
     local vcsBranch="${vcsURL#*#}"
     [[ "$vcsBranch" = "$vcsURL" ]] && vcsBranch=""
-    local vcsFolder="$2"
-    local vcsCheck="$3"
+    local vcsFolder="$1"
+    shift
+    local vcsCheck="$*"
     local ref=""
     if [[ -n "$vcsBranch" ]]; then
         vcsURL="${vcsURL%#*}"
@@ -139,8 +141,8 @@ do_vcs() {
         compile="true"
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]] ||
-         [[ -z "$vcsCheck" && ! -f "$LOCALDESTDIR/lib/pkgconfig/$vcsFolder.pc" ]] ||
-         [[ ! -z "$vcsCheck" && ! -f "$LOCALDESTDIR/$vcsCheck" ]]; then
+         { [[ -z "$vcsCheck" ]] && ! pc_exists $vcsFolder; } ||
+         { [[ ! -z "$vcsCheck" ]] && ! files_exist "$vcsCheck"; }; then
         compile="true"
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     else

@@ -69,7 +69,7 @@ echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_co
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     do_pacman_remove "openjpeg2"
     cd_safe "$LOCALBUILDDIR"
-    do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo lib/libjpeg.a
+    do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo libjpeg.a
     if [[ $compile = "true" ]]; then
         do_uninstall j{config,error,morecfg,peglib}.h libjpeg.{l,}a
         do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
@@ -1030,7 +1030,7 @@ if [[ $x264 != "n" ]]; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" "--enable-static" "--enable-win32thread")
         if [[ $x264 = "f" ]]; then
             cd_safe "$LOCALBUILDDIR"
-            do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg lib/libavcodec.a
+            do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg libavcodec.a
             rm -rf "$LOCALDESTDIR"/include/libav{codec,device,filter,format,util,resample}
             rm -rf "$LOCALDESTDIR"/include/{libsw{scale,resample},libpostproc}
             rm -f "$LOCALDESTDIR"/lib/libav{codec,device,filter,format,util,resample}.a
@@ -1049,7 +1049,7 @@ if [[ $x264 != "n" ]]; then
 
         if [[ $x264 != "l" ]]; then
             cd_safe "$LOCALBUILDDIR"
-            do_vcs "https://github.com/l-smash/l-smash.git" lsmash
+            do_vcs "https://github.com/l-smash/l-smash.git" liblsmash
             if [[ $compile = "true" ]]; then
                 [[ -f "config.mak" ]] && log "distclean" make distclean
                 if [[ -f $LOCALDESTDIR/lib/liblsmash.a ]]; then
@@ -1361,7 +1361,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     if ! mpv_disabled egl-angle; then
     cd_safe "$LOCALBUILDDIR"
-    do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject lib/libEGL.a
+    do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject libEGL.a
     if [[ $compile = "true" ]]; then
         log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
         [[ -f libEGL.a ]] && log "clean" make clean
