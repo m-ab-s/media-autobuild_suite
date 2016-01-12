@@ -373,6 +373,7 @@ if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
 
         do_generic_confmakeinstall --disable-doc
         do_checkIfExist "${_check[@]}"
+        buildOpusEnc="true"
     fi
 
     do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
@@ -479,27 +480,25 @@ if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
     do_uninstall bin-audio/oggdec.exe "${_check[@]}"
-    do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
+    do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
+        --disable-vcut --disable-ogginfo \
         "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
     do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
 fi
 
-if do_checkForOptions --enable-libopus; then
-    _check=(bin-audio/opusenc.exe)
-    if files_exist "${_check[@]}" &&
-        [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
-        do_print_status "opus-tools 0.1.9" "$green_color" "Up-to-date"
-    else
-        cd_safe "$LOCALBUILDDIR"
-        do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
-        [[ -f "opusenc.exe" ]] && log "distclean" make distclean
-        do_uninstall bin-audio/opus{dec,info}.exe "${_check[@]}"
-        do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
-            "$([[ $flac = "y" ]] || echo "--without-flac")"
-        do_checkIfExist "${_check[@]}"
-    fi
+_check=(bin-audio/opusenc.exe)
+if do_checkForOptions --enable-libopus &&
+    { ! files_exist "${_check[@]}" || [[ $buildOpusEnc = "true" ]]; }; then
+    cd_safe "$LOCALBUILDDIR"
+    do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
+    [[ -f "opusenc.exe" ]] && log "distclean" make distclean
+    do_uninstall bin-audio/opus{dec,info}.exe "${_check[@]}"
+    do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
+        "$([[ $flac = "y" ]] || echo "--without-flac")"
+    do_checkIfExist "${_check[@]}"
+    unset buildOpusEnc
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
