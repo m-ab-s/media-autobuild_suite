@@ -267,6 +267,12 @@ pc_exists() {
 do_uninstall() {
     [[ $1 = dry ]] && local dry=y && shift
     local file
+    if [[ $logging != n ]]; then
+        echo "├ Running uninstall..."
+    else
+        echo -e "\e]0;Running uninstall in $(get_first_subdir)\007"
+        echo -e "${bold_color}Running uninstall in $(get_first_subdir)${reset_color}"
+    fi
     for opt; do
         case $opt in
             *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
