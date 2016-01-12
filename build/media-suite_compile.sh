@@ -897,12 +897,14 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then
             "$LOCALDESTDIR"/include/nvEncodeAPI.h | tail -c2)" ]]; then
         do_print_status "nvEncodeAPI ${nvencver}.0.1" "$green_color" "Up-to-date"
     else
-        do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h helper_{cuda{,_drvapi},functions,string,timer}.h \
+        do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
+            helper_{cuda{,_drvapi},functions,string,timer}.h \
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[@]}"
         mkdir -p NvEncAPI && cd_safe NvEncAPI
         [[ ! -f recently_updated ]] && rm -f nvEncodeAPI.h
         [[ ! -f nvEncodeAPI.h ]] &&
-            curl -OLs "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
+            curl -OLs \
+            "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
             touch recently_updated
         cp -f nvEncodeAPI.h "$LOCALDESTDIR"/include/
         do_checkIfExist "${_check[@]}"
@@ -1132,6 +1134,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
             lib{av{codec,device,filter,format,util,resample},sw{scale,resample},postproc}.{a,pc}
 
+        sedflags="prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags"
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             [[ -f config.mak ]] && log "distclean" make distclean
@@ -1139,7 +1142,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
+            sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist bin-video/ffmpegSHARED/bin/ffmpeg.exe
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
@@ -1156,7 +1159,7 @@ if [[ $ffmpeg != "n" ]]; then
             [[ -f config.mak ]] && log "distclean" make distclean
             do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
             # cosmetics
-            sed -ri "s/ ?--(prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags)=(\S+[^\" ]|'[^']+')//g" config.h
+            sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_makeinstall
             do_checkIfExist "${_check[@]}"
             newFfmpeg="yes"
