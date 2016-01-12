@@ -472,13 +472,13 @@ if do_checkForOptions --enable-libfaac; then
     fi
 fi
 
-_check=(bin-audio/ogg{enc,dec}.exe)
+_check=(bin-audio/oggenc.exe)
 if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
-    do_uninstall "${_check[@]}"
+    do_uninstall bin-audio/oggdec.exe "${_check[@]}"
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
         "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
@@ -487,7 +487,7 @@ if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
 fi
 
 if do_checkForOptions --enable-libopus; then
-    _check=(bin-audio/opus{dec,enc,info}.exe)
+    _check=(bin-audio/opusenc.exe)
     if files_exist "${_check[@]}" &&
         [[ $(opusenc.exe --version) = *"opus-tools 0.1.9"* ]]; then
         do_print_status "opus-tools 0.1.9" "$green_color" "Up-to-date"
@@ -495,7 +495,7 @@ if do_checkForOptions --enable-libopus; then
         cd_safe "$LOCALBUILDDIR"
         do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
         [[ -f "opusenc.exe" ]] && log "distclean" make distclean
-        do_uninstall "${_check[@]}"
+        do_uninstall bin-audio/opus{dec,info}.exe "${_check[@]}"
         do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
             "$([[ $flac = "y" ]] || echo "--without-flac")"
         do_checkIfExist "${_check[@]}"
