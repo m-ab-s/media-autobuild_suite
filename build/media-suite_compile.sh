@@ -180,19 +180,18 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
     do_pacman_install nettle
 
     cd_safe "$LOCALBUILDDIR"
+    _check=(libgnutls.{,l}a gnutls.pc)
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
     [[ -d build ]] && rm -rf build
     mkdir build && cd_safe build
-    rm -rf "$LOCALDESTDIR"/include/gnutls
-    rm -f "$LOCALDESTDIR"/lib/{libgnutls*,pkgconfig/gnutls.pc}
-    rm -f "$LOCALDESTDIR"/bin-global/{gnutls-*,{psk,cert,srp,ocsp}tool}.exe
+    do_uninstall include/gnutls "${_check[@]}"
     log "configure" ../configure --prefix="$LOCALDESTDIR" --disable-shared --build="$MINGW_CHOST" \
         --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
         --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
-    lib/gnutls.pc
+        lib/gnutls.pc
     do_makeinstall
-    do_checkIfExist libgnutls.a
+    do_checkIfExist "${_check[@]}"
 fi
 fi
 
@@ -479,7 +478,6 @@ if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
-    rm -f "$LOCALDESTDIR"/bin-audio/ogg{enc,dec}.exe
     do_uninstall "${_check[@]}"
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment --disable-vcut --disable-ogginfo \
         "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
@@ -587,10 +585,6 @@ if [[ $sox = "y" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
-        if [[ -f $LOCALDESTDIR/bin-audio/sox.exe ]]; then
-            rm -f "$LOCALDESTDIR"/include/ "$LOCALDESTDIR"/
-            rm -f "$LOCALDESTDIR"/lib/ "$LOCALDESTDIR"/lib/pkgconfig/sox.pc
-        fi
         do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
         do_generic_confmake --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
             LIBS='-lpcre -lshlwapi -lz -lgnurx'
