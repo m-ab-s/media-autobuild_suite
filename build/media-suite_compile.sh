@@ -861,13 +861,10 @@ fi
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-decklink; then
     cd_safe "$LOCALBUILDDIR"
     _check=(DeckLinkAPI{,Version}.h include/DeckLinkAPI_i.c)
-    missing="n"
-    for file in DeckLinkAPI{{,Version}.h,_i.c}; do
-        [[ ! -f "$LOCALDESTDIR/include/$file" ]] && missing="y"
-    done
-    if [[ "$missing" = "n" ]] &&
-        grep -qE 'API_VERSION_STRING[[:space:]]+"10.5"' "$LOCALDESTDIR/include/DeckLinkAPIVersion.h"; then
-        do_print_status "DeckLinkAPI 10.5" "$green_color" "Up-to-date"
+    _ver="10.5.4"
+    if files_exist "${_check[@]}" &&
+        [[ $_ver = $(get_api_version "$LOCALDESTDIR/include/DeckLinkAPIVersion.h" VERSION_STRING) ]]; then
+        do_print_status "DeckLinkAPI $_ver" "$green_color" "Up-to-date"
     else
         mkdir -p DeckLinkAPI && cd_safe DeckLinkAPI
         [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
@@ -875,11 +872,10 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-decklink; then
             [[ ! -f "$file" ]] &&
                 curl -OLs "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$file" &&
                 touch recently_updated
-            cp -f "$file" "$LOCALDESTDIR/include/$file"
+            cp -f "$file" "$LOCALDESTDIR"/include/
         done
         do_checkIfExist "${_check[@]}"
     fi
-    unset missing
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then

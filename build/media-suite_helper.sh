@@ -839,3 +839,10 @@ get_vs_prefix() {
         echo $(cygpath -u "${vsprefix%/}")
     fi
 }
+
+get_api_version() {
+    local header="$1"
+    local line="$2"
+    local column="$3"
+    /usr/bin/grep "${line:-VERSION}" "$header" | awk '{ print $c }' c="${column:-3}" | sed 's|"||g'
+}
