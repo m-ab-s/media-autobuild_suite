@@ -601,7 +601,8 @@ fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
-if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librtmp; }; then
+if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librtmp; }; then
     cd_safe "$LOCALBUILDDIR"
     _check=(librtmp.{a,pc})
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
@@ -625,6 +626,7 @@ if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enabl
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
     fi
+    buildMediaInfo="true"
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
@@ -768,7 +770,7 @@ fi
 if [[ $mediainfo = "y" ]]; then
     cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
-    if [[ $compile = "true" ]]; then
+    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         _check=(libzen.{{l,}a,pc})
         cd_safe Project/GNU/Library
         do_autoreconf
