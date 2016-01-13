@@ -607,7 +607,7 @@ if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enabl
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires $LOCALDESTDIR/lib/pkgconfig/librtmp.pc)"
-    if do_checkForOptions --enable-gnutls || [[ "$license" != "nonfree" ]]; then
+    if do_checkForOptions --enable-gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
     else
