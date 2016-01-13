@@ -89,7 +89,8 @@ do_vcs() {
     [[ "$vcsBranch" = "$vcsURL" ]] && vcsBranch=""
     local vcsFolder="$1"
     shift
-    local vcsCheck="$*"
+    local vcsCheck=()
+    for opt; do vcsCheck+=($opt); done
     local ref=""
     if [[ -n "$vcsBranch" ]]; then
         vcsURL="${vcsURL%#*}"
@@ -128,6 +129,7 @@ do_vcs() {
         cd_safe "$vcsFolder-$vcsType"
     fi
     vcs_update
+    compile="true"
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful{32,64}bit
@@ -138,15 +140,16 @@ do_vcs() {
         echo "$vcsFolder" >> "$LOCALBUILDDIR"/newchangelog
         vcs_log
         echo "" >> "$LOCALBUILDDIR"/newchangelog
-        compile="true"
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
-    elif [[ -f recently_updated && ! -f "build_successful$bits" ]] ||
-         { [[ -z "$vcsCheck" ]] && ! pc_exists $vcsFolder; } ||
-         { [[ ! -z "$vcsCheck" ]] && ! files_exist "$vcsCheck"; }; then
-        compile="true"
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
+    elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Recently updated"
+    elif [[ -z "$vcsCheck" ]] && ! files_exist "$vcsFolder.pc"; then
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Missing pkg-config"
+    elif [[ ! -z "$vcsCheck" ]] && ! files_exist "${vcsCheck[@]}"; then
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
+        compile="false"
     fi
 }
 
