@@ -176,8 +176,8 @@ if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions --enable-gnutls; } ||
 [[ -n "$gnutls_ver" ]] &&
     gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.7"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
-    do_uninstall include/nettle libnettle.a nettle.pc
-    do_pacman_install nettle
+    do_pacman_install nettle &&
+        do_uninstall include/nettle libnettle.a nettle.pc
 
     cd_safe "$LOCALBUILDDIR"
     _check=(libgnutls.{,l}a gnutls.pc)
@@ -351,13 +351,14 @@ fi
 
 if [[ $flac = "y" || $sox = "y" ]] ||
     do_checkForOptions --enable-libtheora --enable-libvorbis --enable-libspeex; then
-    do_uninstall include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
-    do_pacman_install "libogg"
+    do_pacman_install libogg &&
+        do_uninstall include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
 fi
 
 if [[ $sox = "y" ]] || do_checkForOptions --enable-libvorbis --enable-libtheora; then
-    do_uninstall include/vorbis share/aclocal/vorbis.m4 libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
-    do_pacman_install "libvorbis"
+    do_pacman_install libvorbis &&
+        do_uninstall include/vorbis share/aclocal/vorbis.m4 \
+        libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
 fi
 
 if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
@@ -376,8 +377,8 @@ if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
         buildOpusEnc="true"
     fi
 
-    do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
-    do_pacman_install "opusfile"
+    do_pacman_install opusfile &&
+        do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
 if { [[ $sox = "y" ]] || do_checkForOptions --enable-libspeex; } &&
@@ -416,8 +417,8 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-aacenc; } &&
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)"; then
-    do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
-    do_pacman_install "opencore-amr"
+    do_pacman_install "opencore-amr" &&
+        do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
@@ -544,8 +545,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libgme; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtwolame; then
-    do_uninstall twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
-    do_pacman_install "twolame"
+    do_pacman_install twolame &&
+        do_uninstall twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
 fi
 
@@ -626,8 +627,8 @@ if [[ $rtmpdump = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enabl
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
-    do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
-    do_pacman_install "libtheora"
+    do_pacman_install libtheora &&
+        do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
 
 if [[ ! $vpx = "n" ]]; then
@@ -826,8 +827,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvidstab; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcaca; then
-    do_uninstall libcaca.{l,}a caca.pc
-    do_pacman_install "libcaca"
+    do_pacman_install "libcaca" &&
+        do_uninstall libcaca.{l,}a caca.pc
     do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
 
