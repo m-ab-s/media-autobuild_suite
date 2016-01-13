@@ -880,26 +880,24 @@ fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then
     cd_safe "$LOCALBUILDDIR"
-    nvencver="6"
+    _ver="6"
     _check=(nvEncodeAPI.h)
     if files_exist "${_check[@]}" &&
-        [[ "$nvencver" = "$(grep -Eam1 "NVENCAPI_MAJOR_VERSION" \
-            "$LOCALDESTDIR"/include/nvEncodeAPI.h | tail -c2)" ]]; then
-        do_print_status "nvEncodeAPI ${nvencver}.0.1" "$green_color" "Up-to-date"
+        [[ "$_ver" = $(get_api_version "$LOCALDESTDIR"/include/nvEncodeAPI.h MAJOR | head -n1) ]]; then
+        do_print_status "nvEncodeAPI ${_ver}.0.1" "$green_color" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[@]}"
         mkdir -p NvEncAPI && cd_safe NvEncAPI
-        [[ ! -f recently_updated ]] && rm -f nvEncodeAPI.h
-        [[ ! -f nvEncodeAPI.h ]] &&
+        [[ -f recently_updated ]] || rm -f "$_check"
+        [[ ! -f "$_check" ]] &&
             curl -OLs \
-            "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/nvEncodeAPI.h" &&
+            "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$_check" &&
             touch recently_updated
-        cp -f nvEncodeAPI.h "$LOCALDESTDIR"/include/
+        cp -f "$_check" "$LOCALDESTDIR"/include/
         do_checkIfExist "${_check[@]}"
     fi
-    unset nvencver
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmfx; then
