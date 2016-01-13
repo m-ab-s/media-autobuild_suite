@@ -846,3 +846,19 @@ get_api_version() {
     local column="$3"
     /usr/bin/grep "${line:-VERSION}" "$header" | awk '{ print $c }' c="${column:-3}" | sed 's|"||g'
 }
+
+hide_files() {
+    [[ $1 = "-R" ]] && local reverse=y && shift
+    for opt; do
+        if [[ -z $reverse ]]; then
+            [[ -f "$opt" ]] && mv -f "$opt" "$opt.bak"
+        else
+            [[ -f "$opt.bak" ]] && mv -f "$opt.bak" "$opt"
+        fi
+    done
+}
+
+unhide_files() {
+    local dryrun
+    hide_files -R "$@"
+}

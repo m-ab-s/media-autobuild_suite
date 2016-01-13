@@ -1339,8 +1339,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
-        [[ -f "$MINGW_PREFIX"/lib/librtmp.a ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{,.bak}
-        [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{,.bak}
+        hide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
 
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
@@ -1369,8 +1368,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         unset mpv_ldflags replace withvs
         do_checkIfExist "${_check[@]}"
-        [[ -f "$MINGW_PREFIX"/lib/librtmp.a.bak ]] && mv "$MINGW_PREFIX"/lib/librtmp.a{.bak,}
-        [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
+        unhide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
     fi
