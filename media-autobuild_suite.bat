@@ -69,7 +69,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-vapoursynth
 
 set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -601,6 +601,27 @@ if %buildmpv%==2 set "mpv=n"
 if %buildmpv%==3 set "mpv=v"
 if %buildmpv% GTR 3 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
+
+:bmx
+set "writeBmx=no"
+if %bmxINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build static bmx tools?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildbmx="Build bmx: "
+    ) else set buildbmx=%bmxINI%
+if %deleteINI%==1 set "writeBmx=yes"
+
+if %buildbmx%==1 set "bmx=y"
+if %buildbmx%==2 set "bmx=n"
+if %buildbmx% GTR 2 GOTO bmx
+if %writeBmx%==yes echo.bmx=^%buildbmx%>>%ini%
 
 :numCores
 set "writeCores=no"
@@ -1333,7 +1354,7 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
---logging=%logging%
+--logging=%logging% --bmx=%bmx%
 
 endlocal
 goto:eof

@@ -35,6 +35,7 @@ while true; do
 --packing* ) packing="${1#*=}"; shift ;;
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
+--bmx=* ) bmx="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1370,6 +1371,59 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         [[ -f "$MINGW_PREFIX"/lib/libharfbuzz.a.bak ]] && mv "$MINGW_PREFIX"/lib/libharfbuzz.a{.bak,}
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
+    fi
+fi
+
+if [[ $bmx = "y" ]]; then
+    _ver="0.8.2"
+    if do_pkgConfig "liburiparser = $_ver"; then
+        cd_safe "$LOCALBUILDDIR"
+        _check=(liburiparser.{{,l}a,pc})
+        do_wget_sf "uriparser/Sources/${_ver}/uriparser-${_ver}.tar.bz2"
+        do_uninstall include/uriparser "${_check[@]}"
+        [[ -f Makefile ]] && log distclean make distclean
+        sed -i '/bin_PROGRAMS/ d' Makefile.am
+        do_generic_confmakeinstall --disable-test --disable-doc
+        do_checkIfExist "${_check[@]}"
+        buildBmx="true"
+    fi
+
+    do_vcs git://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0
+    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+        _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
+        sed -i 's| mxf_win32_mmap.c||' mxf/Makefile.am
+        do_autogen
+        do_uninstall include/libMXF-1.0 "${_check[@]}"
+        [[ -f Makefile ]] && log distclean make distclean
+        LDFLAGS+=" -static-libgcc" do_generic_confmakeinstall video \
+            --disable-examples
+        do_checkIfExist "${_check[@]}"
+        buildBmx="true"
+    fi
+
+    do_vcs git://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0
+    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+        _check=(libMXF++-1.0.{{,l}a,pc})
+        do_autogen
+        do_uninstall include/libMXF++-1.0 "${_check[@]}"
+        [[ -f Makefile ]] && log distclean make distclean
+        do_generic_confmakeinstall video --disable-examples
+        do_checkIfExist "${_check[@]}"
+        buildBmx="true"
+    fi
+
+    _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
+    do_vcs git://git.code.sf.net/p/bmxlib/bmx bmx "${_check[@]}"
+    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+        do_patch bmx-0001-configure-no-libcurl.patch am
+        do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
+        do_autogen
+        do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
+            include/bmx-0.1 "${_check[@]}"
+        [[ -f Makefile ]] && log distclean make distclean
+        LDFLAGS+=" -static -static-libgcc -static-libstdc++" \
+            do_generic_confmakeinstall video
+        do_checkIfExist "${_check[@]}"
     fi
 fi
 
