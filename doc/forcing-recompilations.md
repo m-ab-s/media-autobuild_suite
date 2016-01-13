@@ -12,6 +12,8 @@ gnutls
 lept (leptonica)
 libass
 libbluray
+libMXF-1.0
+libMXF++-1.0
 libbs2b
 libgme (game music emu)
 libilbc
@@ -64,6 +66,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
     file
 
 /bin-video
+    bmxtranswrap
     f265cli
     ffmpeg (for static and both)
     ffmpegSHARED/ffmpeg (for shared only)

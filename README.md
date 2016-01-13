@@ -1,17 +1,11 @@
 media-autobuild_suite
 =========
-
-[![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite)
 
 Known Issues
 --------
  - FFmpeg and FFmpeg-based (mplayer, mpv)
 	- if compiled with OpenSSL instead of GnuTLS, packing doesn't work in 64-bit
- - mintty
-	- Recent mintty changes force use of a flag that didn't exist in previous versions. If a window shows up while running the .bat file complaining with something about mintty, fix with:
-		1. run mintty using the shortcut
-		2. enter and run `pacman -Sy --noconfirm --force mintty`
-		3. close mintty and re-run the .bat as normal
 
 Download
 --------
@@ -89,6 +83,7 @@ Included Tools And Libraries
 	- vidstab (git)
 	
  - other tools
+ 	- bmx (git)
 	- f265 (git)
     - faac (1.28)
 	- fdk-aac (git)
@@ -162,8 +157,8 @@ Troubleshooting
 If there's some error during compilation follow these steps:
  1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
  2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste compile.log to some place like [Sprunge.us](http://sprunge.us) or [Gist](https://gist.github.com/), the contents of the .ini file and contents of ffmpeg_options.txt to the post itself if you're using it (these are small, so no need to use other sites);
- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is safe to keep;
+ 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and pack `ffmpeg_options.txt`, `mpv_options.txt`, `media-autobuild_suite.ini`, `compile.log`, `update.log` and every `ab-suite.*.log` files in the package that fails to a .zip and attach to the issue page.
+ 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
  5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 
 
