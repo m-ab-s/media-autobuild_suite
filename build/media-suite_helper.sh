@@ -770,8 +770,9 @@ do_prompt() {
 do_autoreconf() {
     local basedir="$LOCALBUILDDIR"
     basedir+="/$(get_first_subdir)" || basedir="."
-    if [[ -f "$basedir"/recently_updated &&
-        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
+    if { [[ -f "$basedir"/recently_updated &&
+        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
+        [[ ! -f configure ]]; then
         log "autoreconf" autoreconf -fiv
     fi
 }
@@ -779,8 +780,9 @@ do_autoreconf() {
 do_autogen() {
     local basedir="$LOCALBUILDDIR"
     basedir+="/$(get_first_subdir)" || basedir="."
-    if [[ -f "$basedir"/recently_updated &&
-        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; then
+    if { [[ -f "$basedir"/recently_updated &&
+        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
+        [[ ! -f configure ]]; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated"
         log "autogen" ./autogen.sh
     fi
