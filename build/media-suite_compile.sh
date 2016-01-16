@@ -69,7 +69,6 @@ fi
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     do_pacman_remove "openjpeg2"
-    cd_safe "$LOCALBUILDDIR"
     _check=(j{config,error,morecfg,peglib}.h libjpeg.a)
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo "${_check[@]}"
     if [[ $compile = "true" ]]; then
@@ -80,7 +79,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
         _check=(libopenjp2.{a,pc})
@@ -227,7 +225,6 @@ if [[ $sox = "y" ]]; then
 fi
 
 if do_checkForOptions --enable-libwebp; then
-    cd_safe "$LOCALBUILDDIR"
     do_pacman_install "libtiff"
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
@@ -272,7 +269,6 @@ if do_checkForOptions --enable-libtesseract; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/tesseract-ocr/tesseract.git"
     if [[ $compile = "true" ]]; then
         do_autogen
@@ -299,7 +295,6 @@ fi
 
 if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
     ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
     do_vcs https://github.com/lachs0r/rubberband.git
     do_uninstall "${_check[@]}"
@@ -311,7 +306,6 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
     ! mpv_disabled vapoursynth; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
         _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
@@ -326,7 +320,6 @@ fi
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
     do_pacman_remove "dcadec-git"
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/foo86/dcadec.git"
     if [[ $compile = "true" ]]; then
         _check=(libdcadec.a dcadec.pc)
@@ -338,7 +331,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libilbc; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/TimothyGu/libilbc.git"
     if [[ $compile = "true" ]]; then
         _check=(ilbc.h libilbc.{{l,}a,pc})
@@ -434,7 +426,6 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
 fi
 
 if do_checkForOptions --enable-libfdk-aac || [[ $fdkaac = "y" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/mstorsjo/fdk-aac"
     if [[ $compile = "true" ]]; then
         _check=(libfdk-aac.{l,}a fdk-aac.pc)
@@ -446,7 +437,6 @@ if do_checkForOptions --enable-libfdk-aac || [[ $fdkaac = "y" ]]; then
         buildFDK="true"
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-audio/fdkaac.exe)
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
     if [[ $compile = "true" || $buildFDK = "true" ]]; then
@@ -477,7 +467,6 @@ fi
 
 _check=(bin-audio/oggenc.exe)
 if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
@@ -535,7 +524,6 @@ if do_checkForOptions --enable-libmp3lame; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libgme; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(libgme.{a,pc})
     do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
@@ -565,7 +553,6 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbs2b; } &&
 fi
 
 if [[ $sox = "y" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         _check=(libsndfile.{l,}a sndfile.{h,pc})
@@ -578,7 +565,6 @@ if [[ $sox = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     do_pacman_install "libmad"
     _check=(bin-audio/sox.exe)
     do_vcs "git://git.code.sf.net/p/sox/code" sox "${_check[@]}"
@@ -603,7 +589,6 @@ echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_col
 
 if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librtmp; }; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(librtmp.{a,pc})
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
@@ -635,7 +620,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
 fi
 
 if [[ ! $vpx = "n" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/webmproject/libvpx.git" vpx
     if [[ $compile = "true" ]] || [[ $vpx = "y" ]] && ! files_exist bin-video/vpxenc.exe; then
         _check=(libvpx.a vpx.pc)
@@ -663,7 +647,6 @@ else
 fi
 
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libkvazaar; }; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-video/kvazaar.exe libkvazaar.{,l}a kvazaar.pc kvazaar{,_version}.h)
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar
     if [[ $compile = "true" ]]; then
@@ -677,7 +660,6 @@ fi
 
 if [[ $mplayer = "y" ]] ||
     { [[ $mpv != "n" ]] && ! mpv_disabled_all dvdread dvdnav; }; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         _check=(libdvdread.{l,}a dvdread.pc)
@@ -690,7 +672,6 @@ if [[ $mplayer = "y" ]] ||
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
         sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         _check=(libdvdnav.{l,}a dvdnav.pc)
@@ -704,7 +685,6 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; } ||
     { [[ $mpv != "n" ]] && ! mpv_disabled libbluray; }; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
@@ -718,7 +698,6 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; } ||
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libutvideo && do_pkgConfig "libutvideo = 15.1.0"; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0"
     if [[ $compile = "true" ]]; then
         _check=(libutvideo.{a,pc})
@@ -734,7 +713,6 @@ fi
 if [[ $mplayer = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; } ||
     { [[ $mpv != "n" ]] && ! mpv_disabled libass; }; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
@@ -749,26 +727,23 @@ if [[ $mplayer = "y" ]] ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libxavs; then
-    cd_safe "$LOCALBUILDDIR"
-    if do_pkgConfig "xavs"; then
-        do_vcs "https://github.com/Distrotech/xavs.git"
-        _check=(libxavs.a xavs.{h,pc})
-        [[ -f "libxavs.a" ]] && log "distclean" make distclean
-        do_uninstall "${_check[@]}"
-        sed -i 's,"NUL","/dev/null",g' configure
-        do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
-        do_make libxavs.a
-        cp -f xavs.h "$LOCALDESTDIR"/include
-        cp -f libxavs.a "$LOCALDESTDIR"/lib
-        cp -f xavs.pc "$LOCALDESTDIR"/lib/pkgconfig
-        do_checkIfExist "${_check[@]}"
-        _to_remove+=($(pwd))
-    fi
+if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libxavs &&
+    do_pkgConfig "xavs"; then
+    do_vcs "https://github.com/Distrotech/xavs.git"
+    _check=(libxavs.a xavs.{h,pc})
+    [[ -f "libxavs.a" ]] && log "distclean" make distclean
+    do_uninstall "${_check[@]}"
+    sed -i 's,"NUL","/dev/null",g' configure
+    do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
+    do_make libxavs.a
+    cp -f xavs.h "$LOCALDESTDIR"/include
+    cp -f libxavs.a "$LOCALDESTDIR"/lib
+    cp -f xavs.pc "$LOCALDESTDIR"/lib/pkgconfig
+    do_checkIfExist "${_check[@]}"
+    _to_remove+=($(pwd))
 fi
 
 if [[ $mediainfo = "y" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         _check=(libzen.{{l,}a,pc})
@@ -787,7 +762,6 @@ if [[ $mediainfo = "y" ]]; then
     # MinGW's libcurl.pc is missing libs
     sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' "$MINGW_PREFIX"/lib/pkgconfig/libcurl.pc
 
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         _check=(libmediainfo.{{l,}a,pc})
@@ -804,7 +778,6 @@ if [[ $mediainfo = "y" ]]; then
         buildMediaInfo="true"
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-video/mediainfo.exe)
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo "${_check[@]}"
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
@@ -819,7 +792,6 @@ if [[ $mediainfo = "y" ]]; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvidstab; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
         _check=(libvidstab.a vidstab.pc)
@@ -904,7 +876,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmfx; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
         _check=(libmfx.{{l,}a,pc})
@@ -924,7 +895,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcdio; then
 fi
 
 if [[ $mp4box = "y" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-video/MP4Box.exe libgpac_static.a)
     do_vcs "https://github.com/gpac/gpac.git" gpac "${_check[@]}"
     if [[ $compile = "true" ]]; then
@@ -939,12 +909,10 @@ if [[ $mp4box = "y" ]]; then
 fi
 
 if [[ $x264 != "n" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "http://git.videolan.org/git/x264.git"
     if [[ $compile = "true" ]] || [[ $x264 != "l" ]] && ! files_exist bin-video/x264.exe; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static --enable-win32thread)
         if [[ $x264 = "f" ]]; then
-            cd_safe "$LOCALBUILDDIR"
             _check=(libav{codec,format}.{a,pc})
             do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
             do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
@@ -960,7 +928,6 @@ if [[ $x264 != "n" ]]; then
         fi
 
         if [[ $x264 != "l" ]]; then
-            cd_safe "$LOCALBUILDDIR"
             do_vcs "https://github.com/l-smash/l-smash.git" liblsmash
             if [[ $compile = "true" ]]; then
                 _check=(lsmash.h liblsmash.{a,pc})
@@ -1000,7 +967,6 @@ else
 fi
 
 if [[ ! $x265 = "n" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     _check=(x265{,_config}.h libx265.a x265.pc)
     [[ $x265 != "l"* ]] && _check+=(bin-video/x265.exe)
@@ -1108,7 +1074,6 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     do_hide_all_sharedlibs
 
-    cd_safe "$LOCALBUILDDIR"
     do_changeFFmpegConfig $license
     if [[ $ffmpeg = "s" ]]; then
         _check=(bin-video/ffmpegSHARED/ffmpeg.exe)
@@ -1179,7 +1144,6 @@ fi
 fi
 
 if [[ $mplayer = "y" ]]; then
-    cd_safe "$LOCALBUILDDIR"
     [[ $license != "nonfree" ]] && faac=(--disable-faac --disable-faac-lavc)
     _check=(bin-video/mplayer.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
@@ -1236,7 +1200,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     elif ! mpv_disabled lua; then
         do_pacman_remove lua51
     if do_pkgConfig luajit; then
-        cd_safe "$LOCALBUILDDIR"
         _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
         do_uninstall include/luajit-2.0 lib/lua "${_check[@]}"
@@ -1254,7 +1217,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     do_pacman_remove "uchardet-git"
     if ! mpv_disabled uchardet; then
-        cd_safe "$LOCALBUILDDIR"
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then
             _check=(uchardet.{h,pc} libuchardet.a)
@@ -1271,7 +1233,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     if ! mpv_disabled egl-angle; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(libEGL.{a,pc} libGLESv2.a)
     do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject "${_check[@]}"
     if [[ $compile = "true" ]]; then
@@ -1333,7 +1294,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         unset vsprefix
     fi
 
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-video/mpv.{exe,com})
     do_vcs "https://github.com/mpv-player/mpv.git" mpv "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then

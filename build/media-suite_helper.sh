@@ -114,7 +114,8 @@ do_vcs() {
     [[ -z "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
     compile="false"
 
-    if [ ! -d "$vcsFolder-$vcsType" ]; then
+    cd_safe "$LOCALBUILDDIR"
+    if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
