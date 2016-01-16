@@ -53,7 +53,7 @@ gperf winpty-git texinfo
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
-set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-libcaca ^
+set ffmpeg_options=--enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
@@ -62,7 +62,7 @@ set ffmpeg_options=--enable-gnutls --enable-frei0r --enable-libbluray --enable-l
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband ^
 --disable-w32threads --enable-opencl --enable-libzimg --enable-gcrypt ^
---enable-nonfree --enable-nvenc --enable-openssl
+--enable-nonfree --enable-nvenc
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^

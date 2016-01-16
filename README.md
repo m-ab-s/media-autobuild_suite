@@ -27,7 +27,8 @@ Included Tools And Libraries
 	- frei0r (1.4)
 	- fribidi (0.19.7)
 	- gnutls (3.4.7) or openssl
-		- if `--enable-openssl` and `--enable-nonfree` are present openssl is preferred
+		- Not compiled by default (native SChannel is used instead)
+		- If `--enable-openssl` and license is LGPL or nonfree, openssl is preferred
 	- harfbuzz (1.1.2)
 	- libass (git) (with directwrite backend) (with fontconfig too if 32-bit)
 	- libbs2b (3.1.0)
