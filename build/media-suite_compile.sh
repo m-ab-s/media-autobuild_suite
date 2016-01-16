@@ -1118,8 +1118,8 @@ if [[ $ffmpeg != "n" ]]; then
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_checkForOptions --enable-libgme "--enable-libopencore-amr(nb|wb)" --enable-libtheora \
-            --enable-libtwolame --enable-libvorbis --enable-openssl &&
-            do_patch "ffmpeg-0001-Use-pkg-config-for-more-external-libs.patch" am
+            --enable-libtwolame --enable-libvorbis --enable-openssl --enable-libcdio &&
+            do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
         do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
