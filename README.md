@@ -26,8 +26,8 @@ Included Tools And Libraries
 	- freetype (2.6.2)
 	- frei0r (1.4)
 	- fribidi (0.19.7)
-	- gnutls (3.4.7) or openssl
-		- Not compiled by default (native SChannel is used instead)
+	- SChannel, gnutls (3.4.x), or openssl
+		- SChannel used by default
 		- If `--enable-openssl` and license is LGPL or nonfree, openssl is preferred
 	- harfbuzz (1.1.2)
 	- libass (git) (with directwrite backend) (with fontconfig too if 32-bit)
@@ -49,7 +49,7 @@ Included Tools And Libraries
 	- libopencore-amrwb/nb
 	- libopenjpeg2 (git)
 		- Not compiled by default
-	- libopus (1.1)
+	- libopus (1.1.2)
 	- librtmp (git)
 		- Not compiled by default
 	- librubberband (git)
