@@ -1087,14 +1087,14 @@ if [[ $ffmpeg != "n" ]]; then
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
-        do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
-            lib{av{codec,device,filter,format,util,resample},sw{scale,resample},postproc}.{a,pc}
-
+        _uninstall=(include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}}
+            lib{av{codec,device,filter,format,util,resample},sw{scale,resample},postproc}.{a,pc})
         sedflags="prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags"
+
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             [[ -f config.mak ]] && log "distclean" make distclean
-            do_uninstall bin-video/ffmpegSHARED
+            do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             do_configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
@@ -1111,8 +1111,8 @@ if [[ $ffmpeg != "n" ]]; then
 
         # static
         if [[ $ffmpeg != "s" ]]; then
-            do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug}
             [[ -f config.mak ]] && log "distclean" make distclean
+            do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
