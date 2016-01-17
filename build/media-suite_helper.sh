@@ -27,6 +27,15 @@ do_print_status() {
         "$padlen" "$pad" "${color}${status}${reset_color}"
 }
 
+do_print_progress() {
+    if [[ $logging != n ]]; then
+        echo "├ $*..."
+    else
+        echo -e "\e]0;$* in $(get_first_subdir)\007"
+        echo -e "${bold_color}$* in $(get_first_subdir)${reset_color}"
+    fi
+}
+
 cd_safe() {
     cd "$1" ||
         { do_prompt "Failed changing to directory $1." && exit 1; }
