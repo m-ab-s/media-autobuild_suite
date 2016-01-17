@@ -280,12 +280,7 @@ pc_exists() {
 do_uninstall() {
     [[ $1 = dry ]] && local dry=y && shift
     local file
-    if [[ $logging != n ]]; then
-        echo "├ Running uninstall..."
-    else
-        echo -e "\e]0;Running uninstall in $(get_first_subdir)\007"
-        echo -e "${bold_color}Running uninstall in $(get_first_subdir)${reset_color}"
-    fi
+    do_print_progress Running uninstall
     for opt; do
         case $opt in
             *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
@@ -623,14 +618,11 @@ compilation_fail() {
 log() {
     local cmd="$1"
     shift 1
+    do_print_progress Running "$cmd"
     if [[ $logging != "n" ]]; then
-        echo "├ Running $cmd..."
-        echo "$ $*" > "ab-suite.$cmd.log"
         "$@" >> "ab-suite.$cmd.log" 2> "ab-suite.$cmd.error.log" || compilation_fail "$cmd"
     else
-        echo -e "\e]0;Running $cmd in $(get_first_subdir)\007"
-        echo -e "${bold_color}Running $cmd in $(get_first_subdir)${reset_color}"
-        "$@"
+        "$@" || compilation_fail "$cmd"
     fi
 }
 
