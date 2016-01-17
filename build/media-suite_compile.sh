@@ -305,7 +305,7 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
-    ! mpv_disabled vapoursynth; then
+    { ! pc_exists zimg && ! mpv_disabled vapoursynth; } then
     do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
         _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
