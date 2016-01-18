@@ -944,7 +944,7 @@ if [[ $x264 != "n" ]]; then
             extracommands+=(--disable-lsmash)
         fi
 
-        _check=(x264{,_config}.h x264.exe libx264.a x264.pc)
+        _check=(x264{,_config}.h bin-video/x264.exe libx264.a x264.pc)
         do_uninstall x264-10bit.exe "${_check[@]}"
         [[ -f "libx264.a" ]] && log "distclean" make distclean
         if [[ $x264 != "l" ]]; then
