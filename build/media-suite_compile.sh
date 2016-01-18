@@ -1224,7 +1224,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if ! mpv_disabled uchardet; then
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then
-            _check=(uchardet.{h,pc} libuchardet.a)
+            _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
             do_uninstall bin{,-global}/uchardet.exe "${_check[@]}"
             do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
             grep -q "Libs.private" uchardet.pc.in ||
