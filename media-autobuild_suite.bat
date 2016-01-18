@@ -181,13 +181,13 @@ if %license2INI%==0 (
     echo. If you want to use FFmpeg together with closed source software, choose LGPL
     echo. and follow instructions in https://www.ffmpeg.org/legal.html
     echo.
-    echo. In the case of rtmpdump, since it's the binary is GPL, it will be compiled
+    echo. In the case of rtmpdump, since its binaries are GPL, it will be compiled
     echo. with GnuTLS if LGPL is chosen, but if Non-free will use OpenSSL.
     echo. If not building rtmpdump, but just librtmp ^(which is LGPL^) to use in FFmpeg,
     echo. OpenSSL can be used.
     echo.
     echo. OpenSSL and FDK-AAC have licenses incompatible with GPL but compatible
-    echo. with LGPL, so they won't be disabled automatically.
+    echo. with LGPL, so they won't be disabled automatically if you choose LGPL.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ if %vpxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build vpx [VP8/VP9 encoder] binary?
+    echo. Build vpx [VP8/VP9/VP10 encoder] binary?
     echo. 1 = Yes [static]
     echo. 2 = Build library only
     echo. 3 = No
@@ -265,7 +265,7 @@ if %xpcompINI%==0 (
     echo. This usually causes worse performance in all systems.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildxpcomp="Build with XP compatibilty: "
+    set /P buildxpcomp="Build with XP compatibility: "
     ) else set buildxpcomp=%xpcompINI%
 if %deleteINI%==1 set "writexpcomp=yes"
 
@@ -358,7 +358,7 @@ if %fdkaacINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note FFmpeg's aac encoder is no longer experimental and considered equal or
+    echo. Note: FFmpeg's aac encoder is no longer experimental and considered equal or
     echo. better in quality from 96kbps and above. It still doesn't support AAC-HE/HEv2
     echo. so if you need that or want better quality at lower bitrates than 96kbps,
     echo. use FDK-AAC.
