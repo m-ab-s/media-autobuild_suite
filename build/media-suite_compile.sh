@@ -944,16 +944,19 @@ if [[ $x264 != "n" ]]; then
             extracommands+=(--disable-lsmash)
         fi
 
-        _check=(x264{,_config}.h bin-video/x264.exe libx264.a x264.pc)
-        do_uninstall x264-10bit.exe "${_check[@]}"
+        _check=(x264{,_config}.h libx264.a x264.pc)
         [[ -f "libx264.a" ]] && log "distclean" make distclean
         if [[ $x264 != "l" ]]; then
+            _check+=(bin-video/x264{,-10bit}.exe)
+            do_uninstall "${_check[@]}"
             extracommands+=("--bindir=$LOCALDESTDIR/bin-video")
             CFLAGS="${CFLAGS// -O2 / }" do_configure --bit-depth=10 "${extracommands[@]}"
             do_make
             cp x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
             log "clean" make clean
+
         else
+            do_uninstall "${_check[@]}"
             extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
         fi
         CFLAGS="${CFLAGS// -O2 / }" do_configure --bit-depth=8 "${extracommands[@]}"
