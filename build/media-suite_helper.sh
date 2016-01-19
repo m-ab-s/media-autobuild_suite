@@ -829,10 +829,18 @@ get_vs_prefix() {
     local vsprefix
     local programfiles
     local regkey="/HKLM/software/vapoursynth"
-    if regtool -W check "$regkey" >/dev/null 2>&1; then
+    if [[ -n $(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe) ]]; then
+        # look for .dlls in bin-video
+        vsprefix=$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)
+        vsprefix="${vsprefix%/*}"
+        [[ -d "$vsprefix/vapoursynth${bits:0:2}" ]] &&
+            echo "$vsprefix"
+    elif regtool -W check "$regkey" >/dev/null 2>&1; then
         # check in registry for installed VS
-        vsprefix=$(regtool -W get "$regkey/Path")
-        echo $(cygpath -u "${vsprefix}")
+        vsprefix=$(cygpath -u "$(regtool -W get "$regkey/path")")
+        vsprefix="$vsprefix/core${bits:0:2}"
+        [[ -d "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
+            echo "$vsprefix"
     fi
 }
 

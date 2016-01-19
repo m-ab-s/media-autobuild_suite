@@ -1251,52 +1251,60 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     vsprefix=$(get_vs_prefix)
     if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
         cd_safe "$LOCALBUILDDIR"
-        if [[ $bits = 64bit && -f "$vsprefix/core64/vspipe.exe" ]]; then
-            vsversion=$("$vsprefix/core64/vspipe" -v | grep -Po "(?<=Core )R\d+")
-            vsprefix+="/sdk/lib64"
-        elif [[ $bits = 32bit && -f "$vsprefix/core32/vspipe.exe" ]]; then
-            vsversion=$("$vsprefix/core32/vspipe" -v | grep -Po "(?<=Core )R\d+")
-            vsprefix+="/sdk/lib32"
+        vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
+        if [[ $vsversion -ge 24 ]]; then
+            echo -e "${orange_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
         else
             vsprefix=""
+            echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
         fi
-        if [[ x"$vsprefix" != "x" ]]; then
-            if [[ ${vsversion#R} -ge 24 ]]; then
-                echo -e "${orange_color}Compiling mpv with Vapoursynth ${vsversion}${reset_color}"
-            else
-                vsprefix=""
-                echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
-            fi
-        fi
-        _check=({vapoursynth,vsscript}.lib vapoursynth{,-script}.pc)
-        if [[ x"$vsprefix" != "x" ]] &&
-            { ! pc_exists "vapoursynth = ${vsversion#R}" || ! files_exist "${_check[@]}"; }; then
-            install -p "$vsprefix"/{vapoursynth,vsscript}.lib "$LOCALDESTDIR"/lib/
-            cp -rf "$vsprefix"/../include/vapoursynth "$LOCALDESTDIR"/include/
-            curl -sL "https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth.pc.in" |
+        _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
+            vapoursynth/{VS{Helper,Script},VapourSynth}.h)
+        if [[ x"$vsprefix" != x ]] &&
+            { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
+            do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
+            baseurl="https://github.com/vapoursynth/vapoursynth/raw/master"
+            # headers
+            mkdir -p "$LOCALDESTDIR"/include/vapoursynth &&
+                cd_safe "$LOCALDESTDIR"/include/vapoursynth
+            for _file in {VS{Helper,Script},VapourSynth}.h; do
+                curl -sLO "${baseurl}/include/${_file}"
+            done
+
+            # import libs
+            cd_safe "$LOCALDESTDIR"/lib
+            for _file in vapoursynth vsscript; do
+                gendef - "$vsprefix/${_file}.dll" |
+                    sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def" 2>/dev/null
+                dlltool -l "lib${_file}.a" -d "${_file}.def" 2>/dev/null
+                rm -f "${_file}.def"
+            done
+
+            curl -sL "$baseurl/pc/vapoursynth.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
                 -e 's;@includedir@;${prefix}/include;' \
-                -e "s;@VERSION@;${vsversion#R};" \
+                -e "s;@VERSION@;$vsversion;" \
                 -e '/Libs.private/ d' \
-                > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth.pc
-            curl -sL "https://github.com/vapoursynth/vapoursynth/raw/master/pc/vapoursynth-script.pc.in" |
+                > pkgconfig/vapoursynth.pc
+            curl -sL "$baseurl/pc/vapoursynth-script.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
                 -e 's;@includedir@;${prefix}/include;' \
-                -e "s;@VERSION@;${vsversion#R};" \
+                -e "s;@VERSION@;$vsversion;" \
                 -e '/Requires.private/ d' \
                 -e 's;lvapoursynth-script;lvsscript;' \
                 -e '/Libs.private/ d' \
-                > "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+                > pkgconfig/vapoursynth-script.pc
+
             do_checkIfExist "${_check[@]}"
             newFfmpeg="yes"
         elif [[ x"$vsprefix" = "x" ]]; then
             mpv_disable vapoursynth
         fi
-        unset vsprefix
+        unset vsprefix vsversion _file baseurl
     fi
 
     _check=(bin-video/mpv.{exe,com})
