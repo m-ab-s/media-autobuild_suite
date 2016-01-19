@@ -842,6 +842,12 @@ get_vs_prefix() {
         vsprefix="$vsprefix/core${bits:0:2}"
         [[ -d "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
             echo "$vsprefix"
+    elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
+        # last resort, check if vspipe is in path
+        vsprefix=$(which vspipe.exe)
+        vsprefix="${vsprefix%/*}"
+        [[ -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]] &&
+            echo "$vsprefix"
     fi
 }
 
