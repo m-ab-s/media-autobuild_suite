@@ -1274,8 +1274,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             # import libs
             cd_safe "$LOCALDESTDIR"/lib
             for _file in vapoursynth vsscript; do
-                gendef - "$vsprefix/${_file}.dll" |
-                    sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def" 2>/dev/null
+                gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
+                    sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
                 dlltool -l "lib${_file}.a" -d "${_file}.def" 2>/dev/null
                 rm -f "${_file}.def"
             done
