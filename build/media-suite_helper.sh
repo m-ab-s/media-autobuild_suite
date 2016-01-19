@@ -828,19 +828,11 @@ create_debug_link() {
 get_vs_prefix() {
     local vsprefix
     local programfiles
-    local regkey="/HKLM/SOFTWARE/Microsoft/Windows/CurrentVersion/Uninstall/VapourSynth_is1"
-    programfiles=$(env | /usr/bin/grep "^ProgramFiles(x86)" | sed -n 's;.*=;;p')
-    if which vapoursynth.dll >/dev/null 2>&1; then
-        # if core32/core64 are in PATH
-        vsprefix=$(which vapoursynth.dll)
-        echo $(cygpath -u "${vsprefix%/core*/*}")
-    elif [[ -d "$programfiles"/VapourSynth ]]; then
-        # if installed to default dir
-        echo $(cygpath -u "$programfiles"/VapourSynth)
-    elif regtool check "$regkey" >/dev/null 2>&1; then
-        # last resort, check registry for install
-        vsprefix=$(regtool get "$regkey/InstallLocation")
-        echo $(cygpath -u "${vsprefix%\\}")
+    local regkey="/HKLM/software/vapoursynth"
+    if regtool -W check "$regkey" >/dev/null 2>&1; then
+        # check in registry for installed VS
+        vsprefix=$(regtool -W get "$regkey/Path")
+        echo $(cygpath -u "${vsprefix}")
     fi
 }
 
