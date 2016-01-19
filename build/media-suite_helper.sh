@@ -620,6 +620,7 @@ log() {
     shift 1
     do_print_progress Running "$cmd"
     if [[ $logging != "n" ]]; then
+        echo "$@" > "ab-suite.$cmd.log"
         "$@" >> "ab-suite.$cmd.log" 2> "ab-suite.$cmd.error.log" || compilation_fail "$cmd"
     else
         "$@" || compilation_fail "$cmd"
