@@ -647,10 +647,10 @@ else
 fi
 
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libkvazaar; }; then
-    _check=(bin-video/kvazaar.exe libkvazaar.{,l}a kvazaar.pc kvazaar{,_version}.h)
+    _check=(bin-video/kvazaar.exe libkvazaar.{,l}a kvazaar.pc kvazaar.h)
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar
     if [[ $compile = "true" ]]; then
-        do_uninstall "${_check[@]}"
+        do_uninstall kvazaar_version.h "${_check[@]}"
         do_autogen
         [[ -f config.log ]] && log "distclean" make distclean
         do_generic_confmakeinstall video
