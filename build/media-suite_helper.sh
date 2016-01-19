@@ -602,7 +602,7 @@ do_cmakeinstall() {
     fi
     cd_safe build
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
-    log "install" ninja "$([[ -n $cpuCount ]] && echo "-j $cpuCount")" install
+    log "install" ninja -j"${cpuCount:-1}" install
 }
 
 compilation_fail() {
@@ -631,11 +631,11 @@ do_configure() {
 }
 
 do_make() {
-    log "make" make -j"${cpuCount:=1}" "$@"
+    log "make" make -j"${cpuCount:-1}" "$@"
 }
 
 do_makeinstall() {
-    log "install" make install "$@"
+    log "install" make -j"${cpuCount:-1}" install "$@"
 }
 
 do_generic_conf() {
