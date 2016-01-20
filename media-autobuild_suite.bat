@@ -1084,6 +1084,14 @@ for %%s in (%scripts%) do (
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64% --remove=%deleteSource%
 
+if exist "%build%\update_core" (
+    echo.-------------------------------------------------------------------------------
+    echo.critical updates
+    echo.-------------------------------------------------------------------------------
+    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\update-core
+    del "%build%\update_core"
+    )
+
 cls
 
 :rebase2

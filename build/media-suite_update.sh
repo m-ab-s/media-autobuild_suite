@@ -180,13 +180,15 @@ fi
 # packet msys2 system
 # --------------------------------------------------
 
-if [[ -n "$(pacman -Qu)" ]]; then
+have_updates="$(pacman -Quq)"
+if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
     do_unhide_all_sharedlibs
     pacman --noconfirm -Su --force --ignoregroup base
-    pacman --noconfirm -Su --force
+    echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
+        touch build/update_core
 fi
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
     pacman --noconfirm -S --asdeps ca-certificates
