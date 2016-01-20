@@ -620,7 +620,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
 fi
 
 if [[ ! $vpx = "n" ]]; then
-    do_vcs "https://github.com/webmproject/libvpx.git" vpx
+    do_vcs "https://github.com/webmproject/libvpx.git#commit=5232326716a" vpx
     if [[ $compile = "true" ]] || [[ $vpx = "y" ]] && ! files_exist bin-video/vpxenc.exe; then
         _check=(libvpx.a vpx.pc)
         do_uninstall include/vpx bin-video/vpx{enc,dec}.exe "${_check[@]}"
