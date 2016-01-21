@@ -1390,9 +1390,8 @@ if [[ $bmx = "y" ]]; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         LDFLAGS+=" -static -static-libgcc -static-libstdc++" \
-            do_generic_confmakeinstall video
+            do_separate_confmakeinstall video
         do_checkIfExist "${_check[@]}"
     fi
 fi

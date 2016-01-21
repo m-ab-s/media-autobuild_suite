@@ -632,6 +632,28 @@ log() {
     fi
 }
 
+do_separate_conf() {
+    local bindir=""
+    case "$1" in
+    global) bindir="--bindir=$LOCALDESTDIR/bin-global" ;;
+    audio) bindir="--bindir=$LOCALDESTDIR/bin-audio" ;;
+    video) bindir="--bindir=$LOCALDESTDIR/bin-video" ;;
+    *) bindir="$1" ;;
+    esac
+    shift 1
+    [[ -d build-$bits ]] && rm -rf "build-$bits"
+    mkdir "build-$bits" && cd_safe "build-$bits"
+    log configure ../configure --build="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
+        --disable-shared "$bindir" "$@"
+}
+
+do_separate_confmakeinstall() {
+    do_separate_conf "$@"
+    do_make
+    do_makeinstall
+    cd_safe ..
+}
+
 do_configure() {
     log "configure" ./configure "$@"
 }

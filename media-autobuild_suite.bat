@@ -18,12 +18,6 @@
 ::    You should have received a copy of the GNU General Public License
 ::    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ::-------------------------------------------------------------------------------------
-::-------------------------------------------------------------------------------------
-::
-::  This is version 3.3
-::  See HISTORY file for more information
-::
-::-------------------------------------------------------------------------------------
 
 @echo off
 color 80
