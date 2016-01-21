@@ -487,6 +487,7 @@ do_getMpvConfig() {
 }
 
 mpv_enabled() {
+    [[ $mpv = n ]] && return 1
     if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--enable-$1} ]]; then
         return 0
     else
@@ -495,6 +496,7 @@ mpv_enabled() {
 }
 
 mpv_disabled() {
+    [[ $mpv = n ]] && return 0
     if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--disable-$1} ]]; then
         return 0
     else

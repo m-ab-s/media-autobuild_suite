@@ -91,8 +91,7 @@ fi
 
 if [[ "$mplayer" = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass --enable-libfreetype \
-    "--enable-(lib)?fontconfig" --enable-libfribidi; } ||
-    { [[ $mpv != "n" ]] && ! mpv_disabled libass; }; then
+    "--enable-(lib)?fontconfig" --enable-libfribidi; } || ! mpv_disabled libass; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
 
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
@@ -658,8 +657,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enabl
     fi
 fi
 
-if [[ $mplayer = "y" ]] ||
-    { [[ $mpv != "n" ]] && ! mpv_disabled_all dvdread dvdnav; }; then
+if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         _check=(libdvdread.{l,}a dvdread.pc)
@@ -684,7 +682,7 @@ if [[ $mplayer = "y" ]] ||
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; } ||
-    { [[ $mpv != "n" ]] && ! mpv_disabled libbluray; }; then
+    ! mpv_disabled libbluray; then
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
@@ -710,9 +708,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libutvideo && do_pkgConfi
     fi
 fi
 
-if [[ $mplayer = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; } ||
-    { [[ $mpv != "n" ]] && ! mpv_disabled libass; }; then
+if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
+    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; }; then
     do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
