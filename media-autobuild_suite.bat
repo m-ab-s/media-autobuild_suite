@@ -757,11 +757,11 @@ if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOT
 if not exist %build%\wget.exe (
     (
         echo./*from http://superuser.com/a/536400*/
-        echo.var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1");
-        echo.r.Open("GET",WScript.Arguments(0),false);r.Send();
-        echo.b=new ActiveXObject("ADODB.Stream");
-        echo.b.Type=1;b.Open();b.Write(r.ResponseBody);
-        echo.b.SaveToFile(WScript.Arguments(1));
+        echo.var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1"^);
+        echo.r.Open("GET",WScript.Arguments(0^),false^);r.Send(^);
+        echo.b=new ActiveXObject("ADODB.Stream"^);
+        echo.b.Type=1;b.Open(^);b.Write(r.ResponseBody^);
+        echo.b.SaveToFile(WScript.Arguments(1^)^);
         )>wget.js
 
     cscript /nologo wget.js https://eternallybored.org/misc/wget/current/wget.exe wget.exe
