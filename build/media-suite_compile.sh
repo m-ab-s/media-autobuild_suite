@@ -610,8 +610,8 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
             CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
+        buildMediaInfo="true"
     fi
-    buildMediaInfo="true"
 fi
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
