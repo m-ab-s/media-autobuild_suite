@@ -822,17 +822,17 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 :getMintty
 set "mintty=%instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
+    if %msys2%==msys32 (
+        echo.-------------------------------------------------------------------------------
+        echo.rebase msys32 system
+        echo.-------------------------------------------------------------------------------
+        call %instdir%\msys32\autorebase.bat
+        )
+
     echo -------------------------------------------------------------------------------
-    echo.
     echo.- make a first run
-    echo.
     echo -------------------------------------------------------------------------------
-    (
-        echo.sleep ^4
-        echo.exit
-        )>%build%\firstrun.sh
-    %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login %build%\firstrun.sh
-    del %build%\firstrun.sh
+    %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login -c exit
 
     echo.-------------------------------------------------------------------------------
     echo.first update
@@ -936,7 +936,7 @@ if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
         )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
 
 :gitsettings
-if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO rebase
+if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO installBase
     (
         echo.[user]
         echo.name = %USERNAME%
@@ -955,12 +955,6 @@ if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO rebase
         echo.[push]
         echo.default = simple
         )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
-
-:rebase
-echo.-------------------------------------------------------------------------------
-echo.rebase %msys2% system
-echo.-------------------------------------------------------------------------------
-call %instdir%\%msys2%\autorebase.bat
 
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
