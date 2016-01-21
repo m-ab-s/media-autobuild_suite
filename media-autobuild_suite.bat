@@ -777,9 +777,8 @@ if not exist %build%\wget.exe (
     exit
     ) else (
     del wget.js
-    del 7za.exe
-    del grep.exe
-    %build%\wget.exe -q http://j.fsbn.eu/pub/7za.exe
+    del 7za.exe grep.exe 2>nul
+    %build%\wget.exe http://j.fsbn.eu/pub/7za.exe
     if not exist %build%\7za.exe (
         echo -------------------------------------------------------------------------------
         echo Script to download necessary components failed.
@@ -790,7 +789,7 @@ if not exist %build%\wget.exe (
         pause
         exit
         )
-    %build%\wget.exe -q http://j.fsbn.eu/pub/grep.exe
+    %build%\wget.exe http://j.fsbn.eu/pub/grep.exe
     )
 
 :checkmsys2
