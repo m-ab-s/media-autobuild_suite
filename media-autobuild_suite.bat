@@ -764,32 +764,20 @@ if not exist %build%\wget.exe (
         echo.b.SaveToFile(WScript.Arguments(1^)^);
         )>wget.js
 
-    cscript /nologo wget.js https://eternallybored.org/misc/wget/current/wget.exe wget.exe
+    cscript /nologo wget.js http://j.fsbn.eu/pub/wget-pack.exe wget-pack.exe
+    %build%\wget-pack.exe x
     )
 if not exist %build%\wget.exe (
     echo -------------------------------------------------------------------------------
     echo Script to download necessary components failed.
     echo.
-    echo Download and copy this manually to inside "%build%":
-    echo https://eternallybored.org/misc/wget/current/wget.exe
+    echo Download and extract this manually to inside "%build%":
+    echo http://j.fsbn.eu/pub/wget-pack.exe
     echo -------------------------------------------------------------------------------
     pause
     exit
     ) else (
-    del wget.js
-    del 7za.exe grep.exe 2>nul
-    %build%\wget.exe http://j.fsbn.eu/pub/7za.exe
-    if not exist %build%\7za.exe (
-        echo -------------------------------------------------------------------------------
-        echo Script to download necessary components failed.
-        echo.
-        echo Download and copy this manually to inside "%build%":
-        echo https://eternallybored.org/misc/wget/current/wget.exe
-        echo -------------------------------------------------------------------------------
-        pause
-        exit
-        )
-    %build%\wget.exe http://j.fsbn.eu/pub/grep.exe
+    del wget.js wget-pack.exe 2>nul
     )
 
 :checkmsys2
