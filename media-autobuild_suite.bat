@@ -756,6 +756,7 @@ if exist %build%\msys2-base.tar.xz GOTO unpack
 if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
 if not exist %build%\wget.exe (
     (
+        echo./*from http://superuser.com/a/536400*/
         echo.var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1");
         echo.r.Open("GET",WScript.Arguments(0),false);r.Send();
         echo.b=new ActiveXObject("ADODB.Stream");
