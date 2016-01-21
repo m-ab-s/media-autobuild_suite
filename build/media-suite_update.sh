@@ -187,7 +187,7 @@ if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     do_unhide_all_sharedlibs
     pacman --noconfirm -Su --force --ignoregroup base
-    echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
+    echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime|msys2-runtime-devel)$' &&
         touch build/update_core
 fi
 if [[ ! -s /usr/ssl/certs/ca-bundle.crt ]]; then
