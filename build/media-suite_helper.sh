@@ -347,15 +347,18 @@ do_getFFmpegConfig() {
     do_removeOption "--(en|dis)able-(shared|static)"
 
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
-    # If nonfree will use SChannel if neither openssl or gnutls are in the options
-    if ! do_checkForOptions --enable-openssl --enable-gnutls &&
-        do_checkForOptions --enable-librtmp; then
+    # If nonfree will use SChannel if neither openssl or gnutls are in the options and XP
+    # compability isn't required
+    if ! do_checkForOptions --enable-openssl --enable-gnutls ||
+        [[ $xpcomp = y ]]; then
         if [[ $license = gpl* ]]; then
-            do_addOption "--enable-gnutls"
+            do_addOption --enable-gnutls
+            do_checkForOptions --enable-librtmp &&
+                do_removeOption "--enable-(gmp|gcrypt)"
         else
-            do_addOption "--enable-openssl"
+            do_addOption --enable-openssl
+            do_removeOption "--enable-(gmp|gcrypt)"
         fi
-        do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
     if do_checkForOptions --enable-openssl && [[ $license != gpl* ]]; then
@@ -370,7 +373,7 @@ do_getFFmpegConfig() {
     # handle WinXP-incompatible libs
     if [[ $xpcomp = "y" ]]; then
         do_removeOptions --enable-libmfx --enable-decklink --enable-tesseract \
-            --enable-opencl --enable-libcaca
+            --enable-opencl --enable-libcaca --enable-schannel
     fi
 }
 
