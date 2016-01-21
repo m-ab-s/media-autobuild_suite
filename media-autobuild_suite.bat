@@ -888,7 +888,7 @@ if not exist %instdir%\mintty.lnk (
             echo.FontHeight=^9
             echo.FontSmoothing=full
             echo.AllowBlinking=yes
-            echo.Font=DejaVu Sans Mono
+            echo.Font=Consolas
             echo.Columns=120
             echo.Rows=30
             echo.Term=xterm-256color
