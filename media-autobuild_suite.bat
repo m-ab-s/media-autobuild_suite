@@ -957,12 +957,10 @@ if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO rebase
         )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
 
 :rebase
-if %msys2%==msys32 (
-    echo.-------------------------------------------------------------------------------
-    echo.rebase msys32 system
-    echo.-------------------------------------------------------------------------------
-    call %instdir%\msys32\autorebase.bat
-    )
+echo.-------------------------------------------------------------------------------
+echo.rebase %msys2% system
+echo.-------------------------------------------------------------------------------
+call %instdir%\%msys2%\autorebase.bat
 
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
@@ -1100,12 +1098,10 @@ if exist "%build%\update_core" (
 cls
 
 :rebase2
-if %msys2%==msys32 (
-    echo.-------------------------------------------------------------------------------
-    echo.second rebase msys32 system
-    echo.-------------------------------------------------------------------------------
-    call %instdir%\msys32\autorebase.bat
-    )
+echo.-------------------------------------------------------------------------------
+echo.second rebase %msys2% system
+echo.-------------------------------------------------------------------------------
+call %instdir%\%msys2%\autorebase.bat
 
 :checkdyn
 
