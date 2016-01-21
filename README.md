@@ -6,6 +6,9 @@ Known Issues
 --------
  - FFmpeg and FFmpeg-based (mplayer, mpv)
 	- if compiled with OpenSSL instead of GnuTLS, packing doesn't work in 64-bit
+ - `error: GPGME error: Invalid crypto engine`
+ 	- probably rare bug with Win7 64-bits, use msys32 instead of msys64
+ 	- Check #252 for more information
 
 Download
 --------
