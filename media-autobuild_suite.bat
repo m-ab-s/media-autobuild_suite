@@ -859,7 +859,6 @@ if not exist %instdir%\mintty.lnk (
         )>%build%\secondUpdate.sh
     %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
     del %build%\secondUpdate.sh
-    cls
 
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
@@ -1086,8 +1085,6 @@ if exist "%build%\update_core" (
     %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\update-core
     del "%build%\update_core"
     )
-
-cls
 
 :rebase2
 echo.-------------------------------------------------------------------------------
