@@ -221,6 +221,21 @@ do_wget_sf() {
     do_wget "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/${dir}/${url}" "$@"
 }
 
+do_strip() {
+    local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
+    local file
+    [[ -n $(find "$LOCALDESTDIR"/bin-video -name "mpv.exe.debug") ]] && nostrip+="|mpv"
+    do_print_progress Stripping
+    for file; do
+        if echo "$file" | grep -qE "\.(exe|dll|com)$" &&
+            echo "$file" | grep -qvE "(${nostrip})\.exe"; then
+            strip -s "$LOCALDESTDIR/$file"
+        elif echo "$file" | grep -qE "x265(|-numa)\.exe"; then
+            strip --strip-unneeded "$LOCALDESTDIR/$file"
+        fi
+    done
+}
+
 # check if compiled file exist
 do_checkIfExist() {
     local packetName
@@ -229,6 +244,7 @@ do_checkIfExist() {
     if [[ -z $dry ]]; then
         files_exist v "$@"
         if [[ $? = 0 ]]; then
+            [[ $stripping = y ]] && do_strip "$@"
             do_print_status "└ $packetName" "$blue_color" "Updated"
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"

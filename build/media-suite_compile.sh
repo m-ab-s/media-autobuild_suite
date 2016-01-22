@@ -951,7 +951,6 @@ if [[ $x264 != "n" ]]; then
             do_make
             cp x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
             log "clean" make clean
-
         else
             do_uninstall "${_check[@]}"
             extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
@@ -1044,6 +1043,7 @@ EOF
             xpsupport="-DWINXP_SUPPORT=OFF"
             build_x265
             cp -f x265.exe "$LOCALDESTDIR"/bin-video/x265-numa.exe
+            _check+=(bin-video/x265-numa.exe)
         fi
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"
@@ -1147,7 +1147,7 @@ fi
 
 if [[ $mplayer = "y" ]]; then
     [[ $license != "nonfree" ]] && faac=(--disable-faac --disable-faac-lavc)
-    _check=(bin-video/mplayer.exe)
+    _check=(bin-video/m{player,encoder}.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
 
     if [ -d "ffmpeg" ]; then
@@ -1161,7 +1161,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 
     if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
-        do_uninstall bin-video/mencoder.exe "${_check[@]}"
+        do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log "distclean" make distclean
         if ! test -e ffmpeg ; then
             if [[ "$ffmpeg" != "n" ]]; then
@@ -1221,8 +1221,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if ! mpv_disabled uchardet; then
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then
-            _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
-            do_uninstall bin{,-global}/uchardet.exe "${_check[@]}"
+            _check=(uchardet/uchardet.h uchardet.pc libuchardet.a bin-global/uchardet.exe)
+            do_uninstall "${_check[@]}"
             do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
             grep -q "Libs.private" uchardet.pc.in ||
                 sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
@@ -1337,10 +1337,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log "install" /usr/bin/python waf install -j "${cpuCount:=1}"
 
         unset mpv_ldflags replace withvs
-        do_checkIfExist "${_check[@]}"
         unhide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
+        do_checkIfExist "${_check[@]}"
     fi
 fi
 
