@@ -1438,18 +1438,6 @@ while [[ $new_updates = "yes" ]]; do
     fi
 done
 
-if [[ $stripping = "y" ]]; then
-    echo -ne "\n\t${orange_color}Stripping binaries and shared libs... "
-    nostrip="x265\|x265-numa\|ffmpeg\|ffprobe\|ffplay"
-    [[ -n $(find /local*/bin-video -name "mpv.exe.debug") ]] && nostrip+="\|mpv"
-    find /local*/bin-* -regex ".*\.\(exe\|dll\|com\)" -not -regex ".*\(${nostrip}\)\.exe" \
-        -newer "$LOCALBUILDDIR"/last_run -print0 | xargs -0 -r strip --strip-all
-    find /local*/bin-video -name x265.exe -newer "$LOCALBUILDDIR"/last_run -print0 |
-        xargs -0 -r strip --strip-unneeded
-    echo "done!${reset_color}"
-    unset nostrip
-fi
-
 if [[ $packing = "y" ]]; then
     if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
         cd_safe "$LOCALBUILDDIR"
