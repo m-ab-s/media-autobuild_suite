@@ -1080,7 +1080,6 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     do_hide_all_sharedlibs
 
-    do_changeFFmpegConfig $license
     if [[ $ffmpeg = "s" ]]; then
         _check=(bin-video/ffmpegSHARED/ffmpeg.exe)
     else
@@ -1088,6 +1087,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
+        do_changeFFmpegConfig $license
         do_checkForOptions --enable-libgme "--enable-libopencore-amr(nb|wb)" --enable-libtheora \
             --enable-libtwolame --enable-libvorbis --enable-openssl --enable-libcdio &&
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am

@@ -395,8 +395,7 @@ do_getFFmpegConfig() {
 
 do_changeFFmpegConfig() {
     local license="$1"
-    echo "Checking and changing FFmpeg options"
-    echo "License: $license"
+    do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
     if do_checkForOptions --disable-w32threads --enable-pthreads --enable-decklink; then
