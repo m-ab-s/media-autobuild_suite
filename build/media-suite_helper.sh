@@ -225,7 +225,7 @@ do_strip() {
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
     local file
     [[ -n $(find "$LOCALDESTDIR"/bin-video -name "mpv.exe.debug") ]] && nostrip+="|mpv"
-    do_print_progress Stripping
+    [[ ${*%.exe} != $* || ${*%.dll} != $* ]] && do_print_progress Stripping
     for file; do
         if echo "$file" | grep -qE "\.(exe|dll|com)$" &&
             echo "$file" | grep -qvE "(${nostrip})\.exe"; then
