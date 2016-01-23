@@ -957,14 +957,25 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.-------------------------------------------------------------------------------
     echo.install msys2 base system
     echo.-------------------------------------------------------------------------------
+    if exist %build%\install_base_failed del %build%\install_base_failed
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
+    echo.[[ $? = 1 ]] && touch "%build%\install_base_failed" && exit 1
     echo.sleep ^3
     echo.exit
         )>%build%\pacman.sh
     %mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
     del %build%\pacman.sh
+    if exist %build%\install_base_failed (
+        echo.-------------------------------------------------------------------------------
+        echo.Installing base system failed.
+        echo.If it is the GPGME error, change from msys64 to msys32 to fix it.
+        echo.Otherwise, let us know.
+        echo.-------------------------------------------------------------------------------
+        pause
+        exit
+        )
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
