@@ -1156,32 +1156,33 @@ if [[ $mplayer = "y" ]]; then
     _check=(bin-video/m{player,encoder}.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
 
-    if [ -d "ffmpeg" ]; then
-        cd_safe ffmpeg
-        git checkout -f --no-track -B master origin/HEAD
-        git fetch
-        oldHead=$(git rev-parse HEAD)
-        git checkout -f --no-track -B master origin/HEAD
-        newHead=$(git rev-parse HEAD)
-        cd_safe ..
-    fi
-
-    if [[ $compile == "true" ]] || [[ "$oldHead" != "$newHead"  ]] || [[ $buildFFmpeg == "true" ]]; then
+    if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log "distclean" make distclean
-        if ! test -e ffmpeg ; then
-            if [[ "$ffmpeg" != "n" ]]; then
-                git clone "$LOCALBUILDDIR"/ffmpeg-git ffmpeg
-                git checkout -C ffmpeg -f --no-track -B master origin/HEAD
-            elif ! git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg; then
+        if [[ ! -d ffmpeg ]]; then
+            if [[ "$ffmpeg" != "n" ]] &&
+                git clone -q "$LOCALBUILDDIR"/ffmpeg-git ffmpeg; then
+                pushd ffmpeg >/dev/null
+                git checkout -qf --no-track -B master origin/HEAD
+                popd >/dev/null
+            elif ! git clone http://source.ffmpeg.org/git/ffmpeg.git ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
                 echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
-                echo "To use a github mirror via http (e.g. because a firewall blocks git):"
-                echo "git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg"
-                exit 1
+                echo "Either re-run the script or extract above to inside /build/mplayer-svn."
+                do_prompt "<Enter> to continue or <Ctrl+c> to exit the script"
             fi
+        fi
+        if [[ -d ffmpeg ]]; then
+            cd_safe ffmpeg
+            git reset -q --hard
+            git fetch -q origin
+            _lastrelease=$(git tag -l "n2.*" | tail -2 | head -1)
+            git checkout -f --no-track -B master "${_lastrelease:-origin/HEAD}"
+            cd_safe ..
+        else
+            compilation_fail "Finding valid ffmpeg dir"
         fi
 
         grep -q "windows" libmpcodecs/ad_spdif.c ||
