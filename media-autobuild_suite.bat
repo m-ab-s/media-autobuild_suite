@@ -816,10 +816,12 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 :getMintty
 set "mintty=%instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
+    if %msys2%=="msys32" (
     echo.-------------------------------------------------------------------------------
     echo.rebase %msys2% system
     echo.-------------------------------------------------------------------------------
     call %instdir%\%msys2%\autorebase.bat
+    )
 
     echo -------------------------------------------------------------------------------
     echo.- make a first run
@@ -1081,10 +1083,12 @@ if exist "%build%\update_core" (
     )
 
 :rebase2
+if %msys2%=="msys32" (
 echo.-------------------------------------------------------------------------------
 echo.second rebase %msys2% system
 echo.-------------------------------------------------------------------------------
 call %instdir%\%msys2%\autorebase.bat
+)
 
 :checkdyn
 
