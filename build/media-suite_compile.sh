@@ -1176,10 +1176,8 @@ if [[ $mplayer = "y" ]]; then
         fi
         if [[ -d ffmpeg ]]; then
             cd_safe ffmpeg
-            git reset -q --hard
             git fetch -q origin
-            _lastrelease=$(git tag -l "n2.*" | tail -2 | head -1)
-            git checkout -f --no-track -B master "${_lastrelease:-origin/HEAD}"
+            git checkout -qf --no-track -B master origin/HEAD
             cd_safe ..
         else
             compilation_fail "Finding valid ffmpeg dir"
