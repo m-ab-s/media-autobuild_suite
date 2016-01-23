@@ -913,7 +913,7 @@ fi
 
 if [[ $x264 != "n" ]]; then
     do_vcs "http://git.videolan.org/git/x264.git"
-    if [[ $compile = "true" ]] || [[ $x264 != "l" ]] && ! files_exist bin-video/x264.exe; then
+    if [[ $compile = "true" ]] || { [[ $x264 != "l" ]] && ! files_exist bin-video/x264.exe; }; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static --enable-win32thread)
         if [[ $x264 = "f" ]]; then
             _check=(libav{codec,format}.{a,pc})
