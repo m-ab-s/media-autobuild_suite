@@ -631,8 +631,15 @@ compilation_fail() {
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
     echo "Likely error:"
     tail "ab-suite.${operation}.error.log"
-    do_prompt "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.error.log${reset_color}"
-    exit 1
+    echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.error.log${reset_color}"
+    if [[ -n "$_notrequired" ]]; then
+        echo "This isn't required for anything so we can move on."
+        return 1
+    else
+        echo "${red_color}This is required for other packages, so this script will exit.${reset_color}"
+        do_prompt "Try running the build again at a later time."
+        exit 1
+    fi
 }
 
 log() {
