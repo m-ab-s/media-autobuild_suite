@@ -961,7 +961,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
-    echo.[[ $? = 1 ]] && touch "%build%\install_base_failed" && exit 1
+    echo.[[ $? = 1 ]] ^&^& touch "%build%\install_base_failed" ^&^& exit 1
     echo.sleep ^3
     echo.exit
         )>%build%\pacman.sh
