@@ -1305,10 +1305,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
             do_checkIfExist "${_check[@]}"
             newFfmpeg="yes"
-        elif [[ x"$vsprefix" = "x" ]]; then
+        elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
         unset vsprefix vsversion _file baseurl
+    elif ! mpv_disabled vapoursynth; then
+        mpv_disable vapoursynth
     fi
 
     _check=(bin-video/mpv.{exe,com})
