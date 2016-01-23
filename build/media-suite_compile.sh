@@ -149,7 +149,7 @@ if [[ "$mplayer" = "y" ]] ||
         [[ -f "lib/.libs/libfribidi.a" ]] && log "distclean" make distclean
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
         do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist "${_check[@]}" bin-global/fribidi.exe
     fi
 fi
 
@@ -229,8 +229,8 @@ if do_checkForOptions --enable-libwebp; then
     if [[ $compile = "true" ]]; then
         do_autoreconf
         [[ -f Makefile ]] && log "distclean" make distclean
-        _check=(libwebp{,demux,mux,decoder}.{{,l}a,pc})
-        do_uninstall include/webp bin-global/{{c,d}webp,gif2webp,webpmux}.exe "${_check[@]}"
+        _check=(libwebp{,demux,mux,decoder}.{{,l}a,pc} bin-global/{{c,d}webp,webpmux}.exe)
+        do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
         do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
             --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
             LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
@@ -393,7 +393,7 @@ if [[ $flac = "y" || $sox = "y" ]]; then
     [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && log "distclean" make distclean
     do_uninstall include/FLAC{,++} bin-audio/metaflac.exe "${_check[@]}"
     do_generic_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist "${_check[@]}" bin-audio/metaflac.exe
     fi
 fi
 
@@ -474,7 +474,7 @@ if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
         --disable-vcut --disable-ogginfo \
         "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist "${_check[@]}" bin-audio/oggdec.exe
     _to_remove+=($(pwd))
 fi
 
@@ -487,7 +487,7 @@ if do_checkForOptions --enable-libopus &&
     do_uninstall bin-audio/opus{dec,info}.exe "${_check[@]}"
     do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist "${_check[@]}" bin-audio/opus{dec,info}.exe
     unset buildOpusEnc
 fi
 
@@ -607,6 +607,7 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
             CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
+        [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
         buildMediaInfo="true"
@@ -619,10 +620,11 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
 fi
 
 if [[ ! $vpx = "n" ]]; then
-    do_vcs "https://github.com/webmproject/libvpx.git#commit=5232326716a" vpx
-    if [[ $compile = "true" ]] || [[ $vpx = "y" ]] && ! files_exist bin-video/vpxenc.exe; then
-        _check=(libvpx.a vpx.pc)
-        do_uninstall include/vpx bin-video/vpx{enc,dec}.exe "${_check[@]}"
+    _check=(libvpx.a vpx.pc)
+    [[ $vpx = "y" ]] && _check+=(bin-video/vpxenc.exe)
+    do_vcs "https://github.com/webmproject/libvpx.git#commit=5232326716a" vpx "${_check[@]}"
+    if [[ $compile = "true" ]]; then
+        do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f libvpx.a ]] && log "distclean" make distclean
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
         LDFLAGS+=" -static-libgcc -static" do_configure --target="${target}-gcc" \
@@ -634,6 +636,7 @@ if [[ ! $vpx = "n" ]]; then
         do_makeinstall
         if [[ $vpx = "y" ]] && files_exist bin/vpx{enc,dec}.exe; then
             mv "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe "$LOCALDESTDIR"/bin-video/
+            _check+=(bin-video/vpxdec.exe)
         else
             rm -f "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe
         fi
@@ -827,6 +830,9 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-frei0r; } && do_pkgConf
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
     do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
+    pushd "$LOCALDESTDIR" >/dev/null
+    _check+=($(find lib/frei0r-1 -name "*.dll"))
+    popd >/dev/null
     do_checkIfExist "${_check[@]}"
 fi
 
