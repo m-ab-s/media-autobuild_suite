@@ -637,9 +637,20 @@ compilation_fail() {
         return 1
     else
         echo "${red_color}This is required for other packages, so this script will exit.${reset_color}"
+        zip_logs
         do_prompt "Try running the build again at a later time."
         exit 1
     fi
+}
+
+zip_logs() {
+    local failed=$(get_first_subdir)
+    pushd "$LOCALBUILDDIR" >/dev/null
+    rm -f logs.zip
+    7za -mx=9 a logs.zip *.log *.ini *_options.txt -i!"$failed/*.log" >/dev/null
+    popd >/dev/null
+    [[ -f "$LOCALBUILDDIR/logs.zip" ]] &&
+        echo "${green_color}Attach $LOCALBUILDDIR/logs.zip to the GitHub issue.${reset_color}"
 }
 
 log() {
