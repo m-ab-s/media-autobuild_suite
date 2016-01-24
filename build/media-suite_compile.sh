@@ -504,9 +504,11 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libsoxr; } && do_pkgCon
 fi
 
 if do_checkForOptions --enable-libmp3lame; then
-    _check=(bin-audio/lame.exe libmp3lame.{l,}a)
+    _check=(libmp3lame.{l,}a)
+    _ver="3.99.5"
+    [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        [[ $(lame.exe 2>&1) = *"3.99.5"* ]]; then
+        strings "$LOCALDESTDIR"/lib/libmp3lame.a | grep -q "$_ver"; then
         do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
     else
         cd_safe "$LOCALBUILDDIR"
@@ -518,7 +520,8 @@ if do_checkForOptions --enable-libmp3lame; then
         fi
         [[ -f libmp3lame/.libs/libmp3lame.a ]] && log "distclean" make distclean
         do_uninstall include/lame "${_check[@]}"
-        do_generic_confmakeinstall audio --disable-decoder
+        do_generic_confmakeinstall audio --disable-decoder \
+            $([[ $standalone = y ]] || echo "--disable-frontend")
         do_checkIfExist "${_check[@]}"
     fi
 fi
