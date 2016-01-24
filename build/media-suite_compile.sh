@@ -463,16 +463,18 @@ if do_checkForOptions --enable-libfaac; then
 fi
 
 _check=(bin-audio/oggenc.exe)
-if do_checkForOptions --enable-libvorbis && ! files_exist "${_check[@]}"; then
+if [[ $standalone = y ]] && do_checkForOptions --enable-libvorbis &&
+    ! files_exist "${_check[@]}"; then
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
+    _check+=(bin-audio/oggdec.exe)
     do_autoreconf
     [[ -f Makefile ]] && log "distclean" make distclean
-    do_uninstall bin-audio/oggdec.exe "${_check[@]}"
+    do_uninstall "${_check[@]}"
     do_generic_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
         --disable-vcut --disable-ogginfo \
         "$(do_checkForOptions --enable-libspeex || echo "--without-speex")" \
         "$([[ $flac = "y" ]] || echo "--without-flac")"
-    do_checkIfExist "${_check[@]}" bin-audio/oggdec.exe
+    do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
 fi
 
