@@ -416,7 +416,8 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if do_checkForOptions --enable-libfdk-aac || [[ $fdkaac = "y" ]]; then
+if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libfdk-aac; } ||
+    [[ $fdkaac = "y" ]]; then
     do_vcs "https://github.com/mstorsjo/fdk-aac"
     if [[ $compile = "true" ]]; then
         _check=(libfdk-aac.{l,}a fdk-aac.pc)
@@ -427,7 +428,9 @@ if do_checkForOptions --enable-libfdk-aac || [[ $fdkaac = "y" ]]; then
         do_checkIfExist "${_check[@]}"
         buildFDK="true"
     fi
+fi
 
+if [[ $fdkaac = y ]]; then
     _check=(bin-audio/fdkaac.exe)
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
     if [[ $compile = "true" || $buildFDK = "true" ]]; then
