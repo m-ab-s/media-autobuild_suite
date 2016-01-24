@@ -68,8 +68,6 @@ Included Tools And Libraries
 	- libtwolame (git)
 	- libutvideo (git/15.1.0)
 		- Not compiled by default
-	- libvo-aacenc (0.1.3)
-		- Not compiled by default
 	- libvo-amrwbenc (0.1.2)
 	- libvorbis
 	- libvpx (git)

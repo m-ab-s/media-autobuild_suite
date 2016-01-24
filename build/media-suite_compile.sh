@@ -397,16 +397,8 @@ if [[ $flac = "y" || $sox = "y" ]]; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-aacenc; } &&
-    do_pkgConfig "vo-aacenc = 0.1.3"; then
-    cd_safe "$LOCALBUILDDIR"
-    _check=(libvo-aacenc.{l,}a vo-aacenc.pc)
-    do_wget_sf "opencore-amr/vo-aacenc/vo-aacenc-0.1.3.tar.gz"
-    [[ -f ".libs/libvo-aacenc.a" ]] && log "distclean" make distclean
-    do_uninstall include/vo-aacenc "${_check[@]}"
-    do_generic_confmakeinstall
-    do_checkIfExist "${_check[@]}"
-fi
+_check=(libvo-aacenc.{l,}a vo-aacenc.pc)
+files_exist "${_check[@]}" && do_uninstall include/vo-aacenc "${_check[@]}"
 
 if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)"; then
     do_pacman_install "opencore-amr" &&

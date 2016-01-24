@@ -32,7 +32,6 @@ soxr (sox resampling library only)
 speex
 tesseract
 vidstab
-vo-aacenc
 vo-amrwbenc
 vpx
 x264

@@ -421,7 +421,7 @@ do_changeFFmpegConfig() {
 
     # handle (l)gplv3 libs
     local version3=("--enable-libopencore-amr(wb|nb)"
-        --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-gmp)
+        --enable-libvo-amrwbenc --enable-gmp)
     if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "${version3[@]}"; then
         do_addOption "--enable-version3"
     else

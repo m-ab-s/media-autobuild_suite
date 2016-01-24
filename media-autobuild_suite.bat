@@ -163,7 +163,7 @@ if %license2INI%==0 (
     echo. 2 = GPLv3 [disables OpenSSL and FDK-AAC]
     echo. 3 = GPLv2.1
     echo.   [Same disables as GPLv3 with addition of gmp, opencore codecs,
-    echo.    vo-aacenc and NNEDI3 prescaler in mpv]
+    echo.    and NNEDI3 prescaler in mpv]
     echo. 4 = LGPLv3
     echo.   [Disables x264, x265, XviD, GPL filters, etc.
     echo.    but reenables OpenSSL/FDK-AAC]
