@@ -31,6 +31,7 @@ while true; do
 --mpv=* ) mpv="${1#*=}"; shift ;;
 --deleteSource=* ) deleteSource="${1#*=}"; shift ;;
 --license=* ) license="${1#*=}"; shift ;;
+--standalone=* ) standalone="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;

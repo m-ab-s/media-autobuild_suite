@@ -63,7 +63,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-vapoursynth
 
 set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -320,6 +320,29 @@ if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
+
+:standalone
+set "writestandalone=no"
+if %standaloneINI%==0 (
+     echo -------------------------------------------------------------------------------
+     echo -------------------------------------------------------------------------------
+     echo.
+     echo. Build standalone binaries for libraries in FFmpeg?
+     echo. eg. Compile fdkaac.exe if --enable-libfdk-aac
+     echo. eg. Compile vpxenc.exe if --enable-libvpx
+     echo. 1 = Yes
+     echo. 2 = No
+     echo.
+     echo -------------------------------------------------------------------------------
+     echo -------------------------------------------------------------------------------
+     set /P buildstandalone="Build standalone binaries: "
+     ) else set buildstandalone=%standaloneINI%
+if %deleteINI%==1 set "writestandalone=yes"
+
+if %buildstandalone%==1 set "standalone=y"
+if %buildstandalone%==2 set "standalone=n"
+if %buildstandalone% GTR 2 GOTO standalone
+if %writestandalone%==yes echo.standalone=^%buildstandalone%>>%ini%
 
 :flac
 set "writeflac=no"
@@ -1358,7 +1381,7 @@ start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /ms
 --vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
---logging=%logging% --bmx=%bmx%
+--logging=%logging% --bmx=%bmx% --standalone=%standalone%
 
 endlocal
 goto:eof
