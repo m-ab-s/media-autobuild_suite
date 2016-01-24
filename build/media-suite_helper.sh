@@ -584,9 +584,9 @@ do_patch() {
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code != "200" ]]; then
-        echo "${patchpath##*/} not found online."
-        echo "Trying local patch. Probably not up-to-date."
-        if [[ -f ./"$patch" ]]; then
+        echo -e "\t${patch##*/} not found online."
+        echo -e "\tTrying local patch. Probably not up-to-date."
+        if [[ -f "./$patch" ]]; then
             patchpath="$patch"
         elif [[ -f "$LOCALBUILDDIR/patches/${patch}" ]]; then
             patchpath="$LOCALBUILDDIR/patches/${patch}"
@@ -598,19 +598,19 @@ do_patch() {
         if [[ "$am" = "am" ]]; then
             if ! git am -q --ignore-whitespace "$patchpath" >/dev/null 2>&1; then
                 git am -q --abort
-                echo "Patch '${patchpath##*/} couldn't be applied"
-                echo "with 'git am'. Continuing without patching."
+                echo -e "\tPatch '${patchpath##*/} couldn't be applied"
+                echo -e "\twith 'git am'. Continuing without patching."
             fi
         else
             if patch --dry-run -s -N -p$strip -i "$patchpath" >/dev/null 2>&1; then
                 patch -s -N -p$strip -i "$patchpath"
             else
-                echo "Patch '${patchpath##*/} couldn't be applied"
-                echo "with 'patch'. Continuing without patching."
+                echo -e "\tPatch '${patchpath##*/} couldn't be applied"
+                echo -e "\twith 'patch'. Continuing without patching."
             fi
         fi
     else
-        echo "${patchpath##*/} not found anywhere. Continuing without patching."
+        echo -e "\t${patch##*/} not found anywhere. Continuing without patching."
     fi
 }
 
