@@ -1276,6 +1276,7 @@ if %build32%==yes (
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
             echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
+            echo.cd /trunk
             )>>%instdir%\local32\etc\profile.local
         )
 
@@ -1333,6 +1334,7 @@ if %build64%==yes (
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
             echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
+            echo.cd /trunk
             )>>%instdir%\local64\etc\profile.local
         )
 
