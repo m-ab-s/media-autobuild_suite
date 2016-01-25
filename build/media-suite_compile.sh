@@ -193,15 +193,15 @@ if [[ $sox = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    if [[ -f $LOCALDESTDIR/bin-global/file.exe ]] &&
-        [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
-        do_print_status "file 5.25" "$green_color" "Up-to-date"
+    _check=(magic.h libmagic.{l,}a bin-global/file.exe)
+    _ver="5.25"
+    if files_exist "${_check[@]}" &&
+        grep -q "$_ver" "$LOCALDESTDIR/lib/libmagic.a"; then
+        do_print_status "file $_ver" "$green_color" "Up-to-date"
     else
-        _check=(magic.h libmagic.{l,}a)
-        do_wget "https://fossies.org/linux/misc/file-5.25.tar.gz"
-        [[ -f "src/.libs/libmagic.a" ]] && log "distclean" make distclean
-        do_uninstall bin-global/file.exe "${_check[@]}"
-        do_generic_confmakeinstall global CFLAGS=-DHAVE_PREAD
+        do_wget "https://fossies.org/linux/misc/file-${_ver}.tar.gz"
+        do_uninstall "${_check[@]}"
+        do_separate_confmakeinstall global CFLAGS=-DHAVE_PREAD
         do_checkIfExist "${_check[@]}"
     fi
 fi
