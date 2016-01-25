@@ -304,8 +304,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
         do_uninstall "${_check[@]}"
         grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:/ i\Libs.private: -lstdc++" zimg.pc.in
         do_autoreconf
-        [[ -f config.log ]] && log "distclean" make distclean
-        do_generic_confmakeinstall
+        do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
 fi
