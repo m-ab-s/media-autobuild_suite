@@ -480,7 +480,7 @@ if do_checkForOptions --enable-libmp3lame; then
     _ver="3.99.5"
     [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        strings "$LOCALDESTDIR"/lib/libmp3lame.a | grep -q "$_ver"; then
+        grep -q "$_ver" "$LOCALDESTDIR/lib/libmp3lame.a"; then
         do_print_status "lame $_ver" "$green_color" "Up-to-date"
     else
         do_wget_sf "lame/lame/3.99/lame-${_ver}.tar.gz"
