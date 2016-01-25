@@ -98,9 +98,8 @@ if [[ "$mplayer" = "y" ]] ||
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         _check=(libfreetype.{l,}a freetype2.pc)
         do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
-        [[ -f "objs/.libs/libfreetype.a" ]] && log "distclean" make distclean
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
-        do_generic_confmakeinstall global --with-harfbuzz=no
+        do_separate_confmakeinstall global --with-harfbuzz=no
         do_checkIfExist "${_check[@]}" 
         rebuildLibass="y"
     fi
