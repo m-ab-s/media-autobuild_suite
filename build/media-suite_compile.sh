@@ -360,14 +360,15 @@ if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
         do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
-if { [[ $sox = "y" ]] || do_checkForOptions --enable-libspeex; } &&
+if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
     do_pkgConfig "speex = 1.2rc2"; then
-    _check=(bin-audio/speex{enc,dec}.exe libspeex.{l,}a speex.pc)
+    _check=(libspeex.{l,}a speex.pc)
+    [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
-    [[ -f "libspeex/.libs/libspeex.a" ]] && log "distclean" make distclean
     do_uninstall include/speex "${_check[@]}"
     do_patch speex-mingw-winmm.patch
-    do_generic_confmakeinstall audio --enable-vorbis-psy --enable-binaries
+    do_separate_confmakeinstall audio --enable-vorbis-psy \
+        $([[ $standalone = y ]] && echo --enable-binaries || echo --disable-binaries)
     do_checkIfExist "${_check[@]}"
 fi
 
