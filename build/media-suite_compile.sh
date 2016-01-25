@@ -348,13 +348,10 @@ if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
         _check=(libopus.{l,}a opus.pc)
         do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
-        [[ -f ".libs/libopus.a" ]] && log "distclean" make distclean
         do_uninstall include/opus "${_check[@]}"
-
         # needed to allow building shared FFmpeg with libopus
         sed -i 's, __declspec(dllexport),,' include/opus_defines.h
-
-        do_generic_confmakeinstall --disable-doc
+        do_separate_confmakeinstall --disable-doc
         do_checkIfExist "${_check[@]}"
         buildOpusEnc="true"
     fi
