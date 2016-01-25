@@ -365,8 +365,7 @@ do_getFFmpegConfig() {
 
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
     # If nonfree will use SChannel if neither openssl or gnutls are in the options
-    if ! do_checkForOptions --enable-openssl --enable-gnutls &&
-        do_checkForOptions --enable-librtmp; then
+    if ! enabled_any openssl gnutls && enabled librtmp; then
         if [[ $license = gpl* ]]; then
             do_addOption --enable-gnutls
         else
@@ -375,10 +374,10 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
-    if do_checkForOptions --enable-openssl && [[ $license != gpl* ]]; then
+    if enabled openssl && [[ $license != gpl* ]]; then
         # prefer openssl if both are in options and not gpl
         do_removeOption --enable-gnutls
-    elif do_checkForOptions --enable-openssl; then
+    elif enabled openssl; then
         # prefer gnutls if both are in options and gpl
         do_removeOption --enable-openssl
         do_addOption --enable-gnutls
@@ -396,69 +395,60 @@ do_changeFFmpegConfig() {
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
-    if do_checkForOptions --disable-w32threads --enable-pthreads --enable-decklink; then
-        do_removeOption "--enable-w32threads"
+    if disabled w32threads || enabled_any pthreads decklink; then
+        do_removeOption --enable-w32threads
         do_addOptions --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lpthread --extra-libs=-lwsock32
     fi
 
     # add options for static kvazaar
-    if do_checkForOptions --enable-libkvazaar; then
-        do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
-    fi
+    enabled libkvazaar && do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
 
     # handle gpl libs
-    local gpl=(--enable-frei0r --enable-libcdio --enable-librubberband
-        --enable-libutvideo --enable-libvidstab --enable-libx264 --enable-libx265
-        --enable-libxavs --enable-libxvid --enable-libzvbi)
-    if [[ $license = gpl* || $license = nonfree ]] && do_checkForOptions "${gpl[@]}"; then
-        do_addOption "--enable-gpl"
+    local gpl=(frei0r lib{cdio,rubberband,utvideo,vidstab,x264,x265,xavs,xvid,zvbi})
+    if [[ $license = gpl* || $license = nonfree ]] && enabled_any "${gpl[@]}"; then
+        do_addOption --enable-gpl
     else
-        do_removeOptions "${gpl[*]} --enable-gpl"
+        do_removeOptions "${gpl[*]/#/--enable-} --enable-gpl"
     fi
 
     # handle (l)gplv3 libs
-    local version3=("--enable-libopencore-amr(wb|nb)"
-        --enable-libvo-amrwbenc --enable-gmp)
-    if [[ $license = *v3 || $license = nonfree ]] && do_checkForOptions "${version3[@]}"; then
-        do_addOption "--enable-version3"
+    local version3=(libopencore-amr{wb,nb} libvo-amrwbenc gmp)
+    if [[ $license = *v3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
+        do_addOption --enable-version3
     else
-        do_removeOptions "${version3[*]} --enable-version3"
+        do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
     # handle non-free libs
-    local nonfree=(--enable-nvenc --enable-libfaac)
-    if [[ $license = "nonfree" ]] && do_checkForOptions "${nonfree[@]}"; then
+    local nonfree=(nvenc libfaac)
+    if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
         do_addOption "--enable-nonfree"
     else
-        do_removeOptions "${nonfree[*]} --enable-nonfree"
+        do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=(--enable-libfdk-aac --enable-openssl)
-    if do_checkForOptions "${nonfreegpl[@]}"; then
+    local nonfreegpl=(libfdk-aac openssl)
+    if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]]; then
             do_addOption "--enable-nonfree"
         elif [[ $license = gpl* ]]; then
-            do_removeOptions "${nonfreegpl[*]}"
+            do_removeOptions "${nonfreegpl[*]/#/--enable-}"
         fi
         # no lgpl here because they are accepted with it
     fi
 
-    if do_checkForOptions --enable-frei0r; then
-        do_addOption "--enable-filter=frei0r"
-    fi
+    enabled frei0r && do_addOption "--enable-filter=frei0r"
 
-    if do_checkForOptions --enable-debug; then
+    if enabled debug; then
         # fix issue with ffprobe not working with debug and strip
         do_addOption "--disable-stripping"
     else
         do_addOption "--disable-debug"
     fi
 
-    if do_checkForOptions --enable-openssl; then
-        do_removeOptions "--enable-gcrypt --enable-gmp"
-    fi
+    enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
 
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
@@ -474,6 +464,30 @@ do_checkForOptions() {
         if /usr/bin/grep -qE -e "$option" <(echo "${FFMPEG_OPTS[*]}"); then
             return
         fi
+    done
+    return 1
+}
+
+enabled() {
+    test "${FFMPEG_OPTS[*]}" != "${FFMPEG_OPTS[*]#--enable-$1}"
+}
+
+disabled() {
+    test "${FFMPEG_OPTS[*]}" != "${FFMPEG_OPTS[*]#--disable-$1}"
+}
+
+enabled_any() {
+    local opt
+    for opt; do
+        enabled "$opt" && return 0
+    done
+    return 1
+}
+
+disabled_any() {
+    local opt
+    for opt; do
+        disabled "$opt" && return 0
     done
     return 1
 }
@@ -501,20 +515,12 @@ do_getMpvConfig() {
 
 mpv_enabled() {
     [[ $mpv = n ]] && return 1
-    if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--enable-$1} ]]; then
-        return 0
-    else
-        return 1
-    fi
+    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--enable-$1}"
 }
 
 mpv_disabled() {
     [[ $mpv = n ]] && return 0
-    if [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--disable-$1} ]]; then
-        return 0
-    else
-        return 1
-    fi
+    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--disable-$1}"
 }
 
 mpv_enabled_all() {
