@@ -608,7 +608,8 @@ if [[ ! $vpx = "n" ]]; then
     do_vcs "https://github.com/webmproject/libvpx.git#commit=5232326716a" vpx "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
-        [[ -f libvpx.a ]] && log "distclean" make distclean
+        [[ -f config.mk ]] && log "distclean" make distclean
+        do_patch vpx-0001-Fix-compilation-with-mingw64.patch am
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
         LDFLAGS+=" -static-libgcc -static" do_configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \

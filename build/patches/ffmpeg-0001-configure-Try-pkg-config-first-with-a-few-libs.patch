@@ -1,5 +1,5 @@
 From 343a7c6d62128534fda95185e9ee40d5b9d05c5a Mon Sep 17 00:00:00 2001
-From: Ricardo Constantino <wiiaboo@gmail.com>
+From: RiCON <RiCON@nowhere>
 Date: Sat, 16 Jan 2016 14:30:25 +0000
 Subject: [PATCH] configure: Try pkg-config first with a few libs
 

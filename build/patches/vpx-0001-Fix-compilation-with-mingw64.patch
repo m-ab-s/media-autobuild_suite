@@ -1,0 +1,35 @@
+From 2575e68836bb6963cf273729f4cd3be8848b1580 Mon Sep 17 00:00:00 2001
+From: RiCON <RiCON@nowhere>
+Date: Mon, 25 Jan 2016 23:21:57 +0000
+Subject: [PATCH] Fix compilation with mingw64
+
+From https://bugs.chromium.org/p/webm/issues/detail?id=1137
+---
+ vp8/common/threading.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/vp8/common/threading.h b/vp8/common/threading.h
+index bc99dbb..18f217b 100644
+--- a/vp8/common/threading.h
++++ b/vp8/common/threading.h
+@@ -20,7 +20,7 @@ extern "C" {
+ #if CONFIG_OS_SUPPORT && CONFIG_MULTITHREAD
+ 
+ /* Thread management macros */
+-#ifdef _WIN32
++#if defined(_WIN32) && !HAVE_PTHREAD_H
+ /* Win32 */
+ #include <process.h>
+ #include <windows.h>
+@@ -78,7 +78,7 @@ extern "C" {
+ #endif
+ 
+ /* Syncrhronization macros: Win32 and Pthreads */
+-#ifdef _WIN32
++#if defined(_WIN32) && !HAVE_PTHREAD_H
+ #define sem_t HANDLE
+ #define pause(voidpara) __asm PAUSE
+ #define sem_init(sem, sem_attr1, sem_init_value) (int)((*sem = CreateSemaphore(NULL,0,32768,NULL))==NULL)
+-- 
+2.7.0
+
