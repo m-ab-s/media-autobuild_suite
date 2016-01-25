@@ -120,19 +120,17 @@ if [[ "$mplayer" = "y" ]] ||
 
     [[ -z $harfbuzz_ver ]] &&
         harfbuzz_ver=$(curl -sl "http://www.freedesktop.org/software/harfbuzz/release/" |
-        grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"' | sed 's;";;g')
+            grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')
     [[ -n $harfbuzz_ver ]] &&
         harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
-    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || [[ "$rebuildLibass" = "y" ]]; then
+    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || [[ $rebuildLibass = y ]]; then
         do_pacman_install "ragel"
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
-        [[ -f "src/.libs/libharfbuzz.a" ]] && log "distclean" make distclean
         do_uninstall include/harfbuzz "${_check[@]}"
-        LDFLAGS+=" -static -static-libstdc++" \
-        do_generic_confmakeinstall global --with-icu=no --with-glib=no --with-gobject=no
+        do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
         do_checkIfExist "${_check[@]}"
-        rebuildLibass="y"
+        rebuildLibass=y
     fi
 
     if do_pkgConfig "fribidi = 0.19.7"; then
