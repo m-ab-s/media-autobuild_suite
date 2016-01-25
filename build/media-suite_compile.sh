@@ -315,7 +315,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
     if [[ $compile = "true" ]]; then
         _check=(libdcadec.a dcadec.pc)
         do_uninstall include/libdcadec "${_check[@]}"
-        [[ -f libdcadec/libdcadec.a ]] && log "make" make clean
+        log "make" make clean
         do_make CONFIG_WINDOWS=1 SMALL=1 PREFIX="$LOCALDESTDIR" install-lib
         do_checkIfExist "${_check[@]}"
     fi
