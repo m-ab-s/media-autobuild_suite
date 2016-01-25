@@ -161,22 +161,19 @@ if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions --enable-gnutls; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
 [[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
 [[ -n "$gnutls_ver" ]] &&
-    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.7"
+    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.8"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
     do_pacman_install nettle &&
         do_uninstall include/nettle libnettle.a nettle.pc
 
     _check=(libgnutls.{,l}a gnutls.pc)
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
-    [[ -d build ]] && rm -rf build
-    mkdir build && cd_safe build
     do_uninstall include/gnutls "${_check[@]}"
-    log "configure" ../configure --prefix="$LOCALDESTDIR" --disable-shared --build="$MINGW_CHOST" \
+    do_separate_confmakeinstall \
         --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
         --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
     sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
-        lib/gnutls.pc
-    do_makeinstall
+        "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
     do_checkIfExist "${_check[@]}"
 fi
 fi
