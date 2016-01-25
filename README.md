@@ -49,6 +49,8 @@ Included Tools And Libraries
 	- libmfx (git)
 	- libmodplug
 	- libmp3lame (3.99.5)
+	- libopencl
+		- Not compiled by default
 	- libopencore-amrwb/nb
 	- libopenjpeg2 (git)
 		- Not compiled by default

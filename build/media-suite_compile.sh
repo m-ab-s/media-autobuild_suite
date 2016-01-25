@@ -229,21 +229,24 @@ if do_checkForOptions --enable-libwebp; then
     fi
 fi
 
-if do_checkForOptions --enable-libtesseract --enable-opencl; then
-    cd_safe "$LOCALBUILDDIR"
-    do_pacman_install "opencl-headers"
+syspath=$(cygpath -S)
+[[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
+if do_checkForOptions --enable-opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
+    echo -e "${orange_color}Tesseract, FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
     if ! files_exist libOpenCL.a; then
+        cd_safe "$LOCALBUILDDIR"
+        do_pacman_install "opencl-headers"
         [[ -d opencl ]] && rm -rf opencl
         mkdir opencl && cd_safe opencl
-        syspath=$(cygpath -S)
-        [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
-        [[ -f "$syspath/OpenCL.dll" ]] && gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
+        gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && mv -f libOpenCL.a "$LOCALDESTDIR"/lib/
         do_checkIfExist libOpenCL.a
-        unset syspath
     fi
+else
+    do_removeOption --enable-opencl
 fi
+unset syspath
 
 if do_checkForOptions --enable-libtesseract; then
     do_pacman_remove "tesseract-ocr"

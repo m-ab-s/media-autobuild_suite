@@ -55,7 +55,7 @@ set ffmpeg_options=--enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband ^
---disable-w32threads --enable-opencl --enable-libzimg --enable-gcrypt ^
+--disable-w32threads --enable-libzimg --enable-gcrypt ^
 --enable-nonfree --enable-nvenc
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
