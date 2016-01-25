@@ -509,10 +509,10 @@ if do_checkForOptions --enable-libmp3lame; then
     [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
         strings "$LOCALDESTDIR"/lib/libmp3lame.a | grep -q "$_ver"; then
-        do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
+        do_print_status "lame $_ver" "$green_color" "Up-to-date"
     else
         cd_safe "$LOCALBUILDDIR"
-        do_wget_sf "lame/lame/3.99/lame-3.99.5.tar.gz"
+        do_wget_sf "lame/lame/3.99/lame-${_ver}.tar.gz"
         if grep -q "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
             touch recently_updated
