@@ -290,7 +290,7 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
     _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
     do_vcs https://github.com/lachs0r/rubberband.git
     do_uninstall "${_check[@]}"
-    [[ -f "lib/librubberband.a" ]] && log "clean" make clean
+    log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
     do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
