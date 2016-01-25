@@ -137,10 +137,9 @@ if [[ "$mplayer" = "y" ]] ||
         _check=(libfribidi.{l,}a fribidi.pc)
         [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
         do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-        [[ -f "lib/.libs/libfribidi.a" ]] && log "distclean" make distclean
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
-        do_generic_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
+        do_separate_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
         do_checkIfExist "${_check[@]}"
     fi
 fi
