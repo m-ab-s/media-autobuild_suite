@@ -1433,25 +1433,7 @@ if [[ $packing = "y" ]]; then
         xargs -0 -r "${packcmd[@]}"
 fi
 
-echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
-cd_safe "$LOCALBUILDDIR"
-find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
-find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
-    xargs -0 rm -f
-find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
-[[ -f last_run ]] && mv last_run last_successful_run
-[[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
-unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
-rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
-
-if [[ $deleteSource = "y" ]]; then
-    echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
-    find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
-        ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
-        xargs -0 rm -rf
-    echo "${_to_remove[@]}" | xargs -r rm -rf
-    unset _to_remove
-fi
+clean_suite
 
 echo -e "\n\t${green_color}Compilation successful.${reset_color}"
 echo -e "\t${green_color}This window will close automatically in 5 seconds.${reset_color}"
