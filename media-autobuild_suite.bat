@@ -1254,11 +1254,11 @@ if %build32%==yes (
             echo.export CC=gcc
             echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="/usr/share/man:${MINGW_PREFIX}/share/man:${LOCALDESTDIR}/man:${LOCALDESTDIR}/share/man"
-            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:${MINGW_PREFIX}/share/info"
+            echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
+            echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
             echo.
             echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
-            echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
             echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
@@ -1312,11 +1312,11 @@ if %build64%==yes (
             echo.export CC=gcc
             echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="/usr/share/man:${MINGW_PREFIX}/share/man:${LOCALDESTDIR}/man:${LOCALDESTDIR}/share/man"
-            echo.INFOPATH="/usr/local/info:/usr/share/info:/usr/info:${MINGW_PREFIX}/share/info"
+            echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
+            echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
             echo.
             echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
-            echo.ACLOCAL_PATH="${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+            echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
             echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
