@@ -149,9 +149,8 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions --disable-sdl --disable-ffplay
     do_pacman_remove "SDL"
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
     do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
-    [[ -f "build/.libs/libSDL.a" ]] && log "distclean" make distclean
     do_uninstall include/SDL "${_check[@]}"
-    CFLAGS="-DDECLSPEC=" do_generic_confmakeinstall global
+    CFLAGS="-DDECLSPEC=" do_separate_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
     sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
     do_checkIfExist "${_check[@]}"
