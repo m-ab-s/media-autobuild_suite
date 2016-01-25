@@ -17,11 +17,11 @@ diff -Nur mingw-libgnurx-2.5.1/Makefile.mxe mingw-libgnurx-2.5.1-mxe/Makefile.mx
 +	cp -p ${srcdir}/regex.h ${includedir}
 +
 +install-static: install-common libgnurx.a
-+	cp -p ${srcdir}/libgnurx.a ${libdir}
++	cp -p libgnurx.a ${libdir}
 +	ln -sf ${libdir}/libgnurx.a ${libdir}/libregex.a
 +
 +install-shared: install-common libgnurx-$(DLLVERSION).dll libgnurx.dll.a
-+	cp -p ${srcdir}/libgnurx.dll.a ${libdir}
-+	cp -p ${srcdir}/libgnurx-$(DLLVERSION).dll ${bindir}
++	cp -p libgnurx.dll.a ${libdir}
++	cp -p libgnurx-$(DLLVERSION).dll ${bindir}
 +	ln -sf ${libdir}/libgnurx.dll.a ${libdir}/libregex.dll.a
 +	ln -sf ${bindir}/libgnurx-$(DLLVERSION).dll ${bindir}/libregex-$(DLLVERSION).dll

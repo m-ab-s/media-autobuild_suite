@@ -179,16 +179,16 @@ fi
 fi
 
 if [[ $sox = "y" ]]; then
+    _ver="2.5.1"
     if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
-        do_print_status "libgnurx 2.5.1" "$green_color" "Up-to-date"
+        do_print_status "libgnurx ${_ver}" "$green_color" "Up-to-date"
     else
         _check=(lib{gnurx,regex}.a regex.h)
-        do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
-            mingw-libgnurx-2.5.1.tar.gz
-        [[ -f "libgnurx.a" ]] && log "distclean" make distclean
+        do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-${_ver}/mingw-libgnurx-${_ver}-src.tar.gz" \
+            "mingw-libgnurx-${_ver}.tar.gz"
         do_uninstall "${_check[@]}"
+        do_separate_conf
         do_patch "libgnurx-1-additional-makefile-rules.patch"
-        do_configure --prefix="$LOCALDESTDIR" --disable-shared
         do_make -f Makefile.mxe install-static
         do_checkIfExist "${_check[@]}"
     fi
