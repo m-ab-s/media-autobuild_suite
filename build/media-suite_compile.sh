@@ -263,12 +263,13 @@ if do_checkForOptions --enable-libtesseract; then
     if [[ $compile = "true" ]]; then
         do_autogen
         _check=(libtesseract.{,l}a tesseract.pc bin-global/tesseract.exe)
-        [[ -f api/.libs/libtesseract.a ]] && log "distclean" make distclean --ignore-errors
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i 's# @OPENCL_LIB@# -lOpenCL -lstdc++#' tesseract.pc.in
-        do_generic_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
-            LIBLEPT_HEADERSDIR="$LOCALDESTDIR"/include LDFLAGS="$LDFLAGS -static -static-libgcc" \
-            LIBS="$(pkg-config --static --libs lept libtiff-4)" --datadir="$LOCALDESTDIR"/bin-global
+        opencl=""
+        do_checkForOptions --enable-opencl && opencl="-lOpenCL"
+        sed -i "s|@OPENCL_LIB@|$opencl -lstdc++|" tesseract.pc.in
+        do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
+            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" LDFLAGS="$LDFLAGS -static -static-libgcc" \
+            LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             pushd "$LOCALDESTDIR"/bin-global/tessdata > /dev/null
@@ -280,6 +281,7 @@ if do_checkForOptions --enable-libtesseract; then
             popd > /dev/null
         fi
         do_checkIfExist "${_check[@]}"
+        unset opencl
     fi
 fi
 
