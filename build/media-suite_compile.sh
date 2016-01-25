@@ -605,19 +605,22 @@ fi
 if [[ ! $vpx = "n" ]]; then
     _check=(libvpx.a vpx.pc)
     [[ $vpx = "y" ]] && _check+=(bin-video/vpxenc.exe)
-    do_vcs "https://github.com/webmproject/libvpx.git#commit=5232326716a" vpx "${_check[@]}"
+    do_vcs "https://github.com/webmproject/libvpx.git" vpx "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f config.mk ]] && log "distclean" make distclean
         do_patch vpx-0001-Fix-compilation-with-mingw64.patch am
+        [[ -d build-$bits ]] && rm -rf "build-$bits"
+        mkdir "build-$bits" && cd_safe "build-$bits"
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-        LDFLAGS+=" -static-libgcc -static" do_configure --target="${target}-gcc" \
+        LDFLAGS+=" -static-libgcc" log "configure" ../configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" \
             "$([[ $vpx = "l" ]] && echo "--disable-examples" || echo "--enable-vp10")"
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
+        cd_safe ..
         if [[ $vpx = "y" ]] && files_exist bin/vpx{enc,dec}.exe; then
             mv "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe "$LOCALDESTDIR"/bin-video/
             _check+=(bin-video/vpxdec.exe)
