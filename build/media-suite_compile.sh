@@ -109,15 +109,11 @@ if [[ "$mplayer" = "y" ]] ||
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
-        [[ -f "src/.libs/libfontconfig.a" ]] && make clean
         do_uninstall include/fontconfig "${_check[@]}"
-        do_generic_conf global
-        log "premake" make -C fc-blanks
-        do_make -C src
-        mkdir -p "$LOCALDESTDIR"/include/fontconfig
-        cp -f fontconfig/{fcfreetype,fcprivate,fontconfig}.h "$LOCALDESTDIR"/include/fontconfig/
-        cp -f src/.libs/libfontconfig.{,l}a "$LOCALDESTDIR"/lib/
-        cp -f fontconfig.pc "$LOCALDESTDIR"/lib/pkgconfig/
+        [[ $standalone = y ]] || sed -i Makefile.in -e 's/SUBDIRS = .*/SUBDIRS = fontconfig src/' \
+            -e '/fc-cache fc-cat fc-list/,+1d' \
+            -e 's/CROSS_COMPILING_TRUE/CROSS_COMPILING_FALSE/'
+        do_separate_confmakeinstall global
         do_checkIfExist "${_check[@]}"
         rebuildLibass="y"
     fi
