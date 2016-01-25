@@ -619,12 +619,8 @@ do_patch() {
 }
 
 do_cmakeinstall() {
-    if [ -d "build" ]; then
-        rm -rf ./build/*
-    else
-        mkdir build
-    fi
-    cd_safe build
+    [[ -d build-$bits ]] && rm -rf "build-$bits"
+    mkdir "build-$bits" && cd_safe "build-$bits"
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
     log "install" ninja -j"${cpuCount:-$(($(nproc)/2))}" install
 }
