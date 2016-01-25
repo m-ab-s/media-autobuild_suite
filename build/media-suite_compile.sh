@@ -96,7 +96,6 @@ if [[ "$mplayer" = "y" ]] ||
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
 
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
-        cd_safe "$LOCALBUILDDIR"
         _check=(libfreetype.{l,}a freetype2.pc)
         do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
         [[ -f "objs/.libs/libfreetype.a" ]] && log "distclean" make distclean
@@ -108,7 +107,6 @@ if [[ "$mplayer" = "y" ]] ||
 
     if do_checkForOptions "--enable-(lib)?fontconfig" && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove "python2-lxml"
-        cd_safe "$LOCALBUILDDIR"
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
@@ -132,7 +130,6 @@ if [[ "$mplayer" = "y" ]] ||
         harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || [[ "$rebuildLibass" = "y" ]]; then
         do_pacman_install "ragel"
-        cd_safe "$LOCALBUILDDIR"
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         [[ -f "src/.libs/libharfbuzz.a" ]] && log "distclean" make distclean
@@ -146,7 +143,6 @@ if [[ "$mplayer" = "y" ]] ||
     if do_pkgConfig "fribidi = 0.19.7"; then
         _check=(libfribidi.{l,}a fribidi.pc)
         [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
-        cd_safe "$LOCALBUILDDIR"
         do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
         [[ -f "lib/.libs/libfribidi.a" ]] && log "distclean" make distclean
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
@@ -159,7 +155,6 @@ fi
 if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions --disable-sdl --disable-ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove "SDL"
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
     do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
     [[ -f "build/.libs/libSDL.a" ]] && log "distclean" make distclean
@@ -180,7 +175,6 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
     do_pacman_install nettle &&
         do_uninstall include/nettle libnettle.a nettle.pc
 
-    cd_safe "$LOCALBUILDDIR"
     _check=(libgnutls.{,l}a gnutls.pc)
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
     [[ -d build ]] && rm -rf build
@@ -200,7 +194,6 @@ if [[ $sox = "y" ]]; then
     if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
         do_print_status "libgnurx 2.5.1" "$green_color" "Up-to-date"
     else
-        cd_safe "$LOCALBUILDDIR"
         _check=(lib{gnurx,regex}.a regex.h)
         do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz" \
             mingw-libgnurx-2.5.1.tar.gz
@@ -216,7 +209,6 @@ if [[ $sox = "y" ]]; then
         [[ $(file.exe --version) = *"file.exe-5.25"* ]]; then
         do_print_status "file 5.25" "$green_color" "Up-to-date"
     else
-        cd_safe "$LOCALBUILDDIR"
         _check=(magic.h libmagic.{l,}a)
         do_wget "https://fossies.org/linux/misc/file-5.25.tar.gz"
         [[ -f "src/.libs/libmagic.a" ]] && log "distclean" make distclean
@@ -261,7 +253,6 @@ fi
 if do_checkForOptions --enable-libtesseract; then
     do_pacman_remove "tesseract-ocr"
     do_pacman_install "libtiff"
-    cd_safe "$LOCALBUILDDIR"
     if do_pkgConfig "lept = 1.72"; then
         _check=(liblept.{,l}a lept.pc)
         do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
@@ -359,7 +350,6 @@ fi
 if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
         _check=(libopus.{l,}a opus.pc)
-        cd_safe "$LOCALBUILDDIR"
         do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
         [[ -f ".libs/libopus.a" ]] && log "distclean" make distclean
         do_uninstall include/opus "${_check[@]}"
@@ -378,7 +368,6 @@ fi
 
 if { [[ $sox = "y" ]] || do_checkForOptions --enable-libspeex; } &&
     do_pkgConfig "speex = 1.2rc2"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(bin-audio/speex{enc,dec}.exe libspeex.{l,}a speex.pc)
     do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     [[ -f "libspeex/.libs/libspeex.a" ]] && log "distclean" make distclean
@@ -391,7 +380,6 @@ fi
 if [[ $flac = "y" || $sox = "y" ]]; then
     _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
     if do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
-    cd_safe "$LOCALBUILDDIR"
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && log "distclean" make distclean
     do_uninstall include/FLAC{,++} bin-audio/metaflac.exe "${_check[@]}"
@@ -410,7 +398,6 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
-    cd_safe "$LOCALBUILDDIR"
     do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
     [[ -f ".libs/libvo-amrwbenc.a" ]] && log "distclean" make distclean
     _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
@@ -452,7 +439,6 @@ if do_checkForOptions --enable-libfaac; then
         [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
         do_print_status "faac 1.28" "$green_color" "Up-to-date"
     else
-        cd_safe "$LOCALBUILDDIR"
         do_wget_sf "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
         sh bootstrap
         [[ -f Makefile ]] && log "distclean" make distclean
@@ -482,7 +468,6 @@ _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && do_checkForOptions --enable-libopus &&
     { ! files_exist "${_check[@]}" || [[ $buildOpusEnc = "true" ]]; }; then
     _check+=(bin-audio/opus{dec,info}.exe)
-    cd_safe "$LOCALBUILDDIR"
     do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     [[ -f "opusenc.exe" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
@@ -493,7 +478,6 @@ if [[ $standalone = y ]] && do_checkForOptions --enable-libopus &&
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(soxr.h libsoxr.a soxr.pc)
     do_wget_sf "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
@@ -511,7 +495,6 @@ if do_checkForOptions --enable-libmp3lame; then
         strings "$LOCALDESTDIR"/lib/libmp3lame.a | grep -q "$_ver"; then
         do_print_status "lame $_ver" "$green_color" "Up-to-date"
     else
-        cd_safe "$LOCALBUILDDIR"
         do_wget_sf "lame/lame/3.99/lame-${_ver}.tar.gz"
         if grep -q "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
@@ -544,7 +527,6 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbs2b; } &&
     do_pkgConfig "libbs2b = 3.1.0"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(libbs2b.{{l,}a,pc} )
     do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     [[ -f "src/.libs/libbs2b.a" ]] && log "distclean" make distclean
@@ -812,7 +794,6 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcaca; then
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzvbi; } && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
     do_wget_sf "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     [[ -f "src/.libs/libzvbi.a" ]] && log "distclean" make distclean
@@ -828,7 +809,6 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzvbi; } && do_pkgCon
 fi
 
 if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(frei0r.{h,pc})
     do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
@@ -1142,7 +1122,6 @@ if [[ $bits = "64bit" && $other265 = "y" ]]; then
 if files_exist "${_check[@]}"; then
     do_print_status "f265 snapshot" "$green_color" "Up-to-date"
 else
-    cd_safe "$LOCALBUILDDIR"
     do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
     rm -rf f265 && mv f265_development_snapshot f265 && cd_safe f265
     if [ -d "build" ]; then
@@ -1359,7 +1338,6 @@ fi
 if [[ $bmx = "y" ]]; then
     _ver="0.8.2"
     if do_pkgConfig "liburiparser = $_ver"; then
-        cd_safe "$LOCALBUILDDIR"
         _check=(liburiparser.{{,l}a,pc})
         do_wget_sf "uriparser/Sources/${_ver}/uriparser-${_ver}.tar.bz2"
         do_uninstall include/uriparser "${_check[@]}"
@@ -1446,7 +1424,6 @@ done
 
 if [[ $packing = "y" ]]; then
     if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
-        cd_safe "$LOCALBUILDDIR"
         rm -rf upx391w
         do_wget_sf "upx/upx/3.91/upx391w.zip"
     fi

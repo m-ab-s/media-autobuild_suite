@@ -175,6 +175,7 @@ do_wget() {
     fi
     [[ -z "$dirName" ]] && dirName=$(expr "$archive" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
     local response_code
+    cd_safe "$LOCALBUILDDIR"
     response_code="$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")"
     if [[ $response_code = "200" || $response_code = "226" ]]; then
         do_print_status "┌ $dirName" "$orange_color" "Updates found"
