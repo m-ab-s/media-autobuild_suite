@@ -207,17 +207,24 @@ if [[ $sox = "y" ]]; then
 fi
 
 if do_checkForOptions --enable-libwebp; then
-    do_pacman_install "libtiff"
+    do_pacman_install libtiff
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
-        _check=(libwebp{,demux,mux,decoder}.{{,l}a,pc} bin-global/{{c,d}webp,webpmux}.exe)
+        _check=(libwebp{,mux}.{{,l}a,pc})
+        if [[ $standalone = y ]]; then
+            extracommands=(--enable-libwebp{demux,decoder,extras}
+                LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental
+                LDFLAGS="$LDFLAGS -static-libgcc")
+            _check+=(libwebp{,mux,demux,decoder,extras}.{{,l}a,pc}
+                bin-global/{{c,d}webp,webpmux}.exe)
+        else
+            extracommands=()
+            sed -i 's/ examples man//' Makefile.in
+        fi
         do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
-        do_generic_confmakeinstall global --enable-swap-16bit-csp --enable-experimental \
-            --enable-libwebpmux --enable-libwebpdemux --enable-libwebpdecoder \
-            LIBS="$(pkg-config --static --libs libtiff-4)" LIBPNG_CONFIG="pkg-config --static" \
-            LDFLAGS="$LDFLAGS -static -static-libgcc"
+        do_separate_confmakeinstall global --enable-swap-16bit-csp \
+            --enable-libwebpmux "${extracommands[@]}"
         do_checkIfExist "${_check[@]}"
     fi
 fi
