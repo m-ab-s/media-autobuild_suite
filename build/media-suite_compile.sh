@@ -254,9 +254,8 @@ if do_checkForOptions --enable-libtesseract; then
     if do_pkgConfig "lept = 1.72"; then
         _check=(liblept.{,l}a lept.pc)
         do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/leptonica "${_check[@]}"
-        do_generic_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
+        do_separate_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
         do_checkIfExist "${_check[@]}"
     fi
 
