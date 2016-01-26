@@ -700,29 +700,6 @@ do_makeinstall() {
     log "install" make -j"${cpuCount:-$(($(nproc)/2))}" install "$@"
 }
 
-do_generic_conf() {
-    local bindir=""
-    case "$1" in
-    global) bindir="--bindir=$LOCALDESTDIR/bin-global" ;;
-    audio) bindir="--bindir=$LOCALDESTDIR/bin-audio" ;;
-    video) bindir="--bindir=$LOCALDESTDIR/bin-video" ;;
-    *) bindir="$1" ;;
-    esac
-    shift 1
-    do_configure --build="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --disable-shared "$bindir" "$@"
-}
-
-do_generic_confmake() {
-    do_generic_conf "$@"
-    do_make
-}
-
-do_generic_confmakeinstall() {
-    do_generic_conf "$@"
-    do_make
-    do_makeinstall
-}
-
 do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
