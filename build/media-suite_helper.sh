@@ -216,10 +216,11 @@ do_extract() {
 }
 
 do_wget_sf() {
+    # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
     local url="$1"
     shift 1
     local dir="${url:0:1}/${url:0:2}"
-    do_wget "https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/${dir}/${url}" "$@"
+    do_wget "http://download.sourceforge.net/${url}" "$@"
 }
 
 do_strip() {
