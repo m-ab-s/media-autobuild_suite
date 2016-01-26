@@ -144,7 +144,7 @@ if [[ "$mplayer" = "y" ]] ||
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions --disable-sdl --disable-ffplay; } &&
+if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove "SDL"
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)

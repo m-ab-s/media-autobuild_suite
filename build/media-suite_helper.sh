@@ -477,7 +477,6 @@ disabled() {
 }
 
 enabled_any() {
-    local opt
     for opt; do
         enabled "$opt" && return 0
     done
@@ -485,7 +484,6 @@ enabled_any() {
 }
 
 disabled_any() {
-    local opt
     for opt; do
         disabled "$opt" && return 0
     done
