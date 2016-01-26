@@ -762,7 +762,8 @@ if [[ $mediainfo = "y" ]]; then
         do_autoreconf
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_generic_confmakeinstall video --enable-staticlibs --enable-silent-rules
+        do_generic_confmakeinstall video --enable-staticlibs --enable-silent-rules \
+            LIBS="$($PKG_CONFIG --libs libmediainfo)"
         do_checkIfExist "${_check[@]}"
     fi
 fi
