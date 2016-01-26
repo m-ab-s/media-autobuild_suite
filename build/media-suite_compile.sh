@@ -417,7 +417,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
     fi
 fi
 
-if [[ $fdkaac = y ]]; then
+if [[ $fdkaac = y || $standalone = y ]]; then
     _check=(bin-audio/fdkaac.exe)
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
     if [[ $compile = "true" || $buildFDK = "true" ]]; then
