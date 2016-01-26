@@ -653,9 +653,9 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     if [[ $compile = "true" ]]; then
         _check=(libdvdread.{l,}a dvdread.pc)
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/dvdread "${_check[@]}"
-        do_generic_confmakeinstall
+        [[ -f Makefile ]] && log "distclean" make distclean
+        do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
