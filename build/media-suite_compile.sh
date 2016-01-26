@@ -752,11 +752,10 @@ if [[ $mediainfo = "y" ]]; then
         _check=(libmediainfo.{{l,}a,pc})
         cd_safe Project/GNU/Library
         do_autoreconf
-        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}"
-        do_generic_conf --enable-staticlibs --with-libcurl
-        do_makeinstall
-        sed -i "s,libmediainfo\.a.*,libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)," \
+        [[ -f Makefile ]] && log distclean make distclean
+        do_generic_confmakeinstall --enable-staticlibs --with-libcurl --enable-silent-rules
+        sed -i "s|libmediainfo\.a.*|libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)|" \
             libmediainfo.pc
         cp libmediainfo.pc "$LOCALDESTDIR"/lib/pkgconfig/
         do_checkIfExist "${_check[@]}"
@@ -768,10 +767,9 @@ if [[ $mediainfo = "y" ]]; then
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         cd_safe Project/GNU/CLI
         do_autoreconf
-        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         do_uninstall "${_check[@]}"
-        do_generic_conf video --enable-staticlibs
-        do_makeinstall
+        [[ -f Makefile ]] && log distclean make distclean
+        do_generic_confmakeinstall video --enable-staticlibs --enable-silent-rules
         do_checkIfExist "${_check[@]}"
     fi
 fi
