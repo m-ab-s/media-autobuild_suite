@@ -634,14 +634,16 @@ else
     pc_exists vpx || do_removeOption "--enable-libvpx"
 fi
 
-if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libkvazaar; }; then
+if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; then
     _check=(bin-video/kvazaar.exe libkvazaar.{,l}a kvazaar.pc kvazaar.h)
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar
     if [[ $compile = "true" ]]; then
         do_uninstall kvazaar_version.h "${_check[@]}"
         do_autogen
-        [[ -f config.log ]] && log "distclean" make distclean
-        do_generic_confmakeinstall video
+        [[ -f Makefile ]] && log distclean make distclean
+        [[ $standalone = y || $other265 = y ]] ||
+            sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
+        do_separate_confmakeinstall video
         do_checkIfExist "${_check[@]}"
     fi
 fi
