@@ -156,7 +156,6 @@ if { [[ $ffmpeg != "n" ]] && ! do_checkForOptions --disable-sdl --disable-ffplay
     do_checkIfExist "${_check[@]}"
 fi
 
-
 if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions --enable-gnutls; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
 [[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
@@ -431,17 +430,19 @@ if [[ $fdkaac = y ]]; then
     fi
 fi
 
-if do_checkForOptions --enable-libfaac; then
-    _check=(bin-audio/faac.exe libfaac.a faac{,cfg}.h)
+if enabled libfaac; then
+    _check=(libfaac.a faac{,cfg}.h)
+    _ver="1.28"
+    [[ $standalone = y ]] && _check+=(bin-audio/faac.exe)
     if files_exist "${_check[@]}" &&
-        [[ $(faac.exe) = *"FAAC 1.28"* ]]; then
-        do_print_status "faac 1.28" "$green_color" "Up-to-date"
+        grep -q "$_ver" "$LOCALDESTDIR/lib/libfaac.a"; then
+        do_print_status "faac $_ver" "$green_color" "Up-to-date"
     else
-        do_wget_sf "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
-        sh bootstrap
-        [[ -f Makefile ]] && log "distclean" make distclean
+        do_wget_sf "faac/faac-src/faac-${_ver}/faac-${_ver}.tar.bz2"
+        ./bootstrap 2>/dev/null
         do_uninstall "${_check[@]}"
-        do_generic_confmakeinstall audio --without-mp4v2
+        [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
+        do_separate_confmakeinstall audio --without-mp4v2
         do_checkIfExist "${_check[@]}"
     fi
 fi
