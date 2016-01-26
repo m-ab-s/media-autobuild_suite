@@ -806,19 +806,16 @@ if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
+if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
     _check=(frei0r.{h,pc})
     do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
     do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
-    pushd "$LOCALDESTDIR" >/dev/null
-    _check+=($(find lib/frei0r-1 -name "*.dll"))
-    popd >/dev/null
     do_checkIfExist "${_check[@]}"
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-decklink; then
+if [[ $ffmpeg != "n" ]] && enabled decklink; then
     cd_safe "$LOCALBUILDDIR"
     _check=(DeckLinkAPI{,Version}.h include/DeckLinkAPI_i.c)
     _ver="10.5.4"
@@ -838,7 +835,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-decklink; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-nvenc; then
+if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     cd_safe "$LOCALBUILDDIR"
     _ver="6"
     _check=(nvEncodeAPI.h)
