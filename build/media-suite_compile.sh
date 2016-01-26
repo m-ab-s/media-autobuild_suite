@@ -589,9 +589,9 @@ if [[ $ffmpeg != "n" ]] && enabled libtheora; then
         do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
 
-if [[ ! $vpx = "n" ]]; then
+if [[ $vpx = y ]]; then
     _check=(libvpx.a vpx.pc)
-    [[ $vpx = "y" ]] && _check+=(bin-video/vpxenc.exe)
+    [[ $standalone = y ]] && _check+=(bin-video/vpxenc.exe)
     do_vcs "https://github.com/webmproject/libvpx.git" vpx "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
@@ -603,11 +603,10 @@ if [[ ! $vpx = "n" ]]; then
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" \
-            "$([[ $vpx = "l" ]] && echo "--disable-examples" || echo "--enable-vp10")"
+            "$([[ $standalone != y ]] && echo "--disable-examples" || echo "--enable-vp10")"
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
-        cd_safe ..
-        if [[ $vpx = "y" ]] && files_exist bin/vpx{enc,dec}.exe; then
+        if [[ $standalone ]] && files_exist bin/vpx{enc,dec}.exe; then
             mv "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe "$LOCALDESTDIR"/bin-video/
             _check+=(bin-video/vpxdec.exe)
         else

@@ -62,7 +62,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
 --enable-vapoursynth
 
-set iniOptions=msys2Arch arch license2 vpx x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
+set iniOptions=msys2Arch arch license2 vpx2 x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone
 
 set previousOptions=0
@@ -197,28 +197,74 @@ if %ffmpegLicense%==5 set "license2=lgpl"
 if %ffmpegLicense% GTR 5 GOTO ffmpeglicense
 if %writeLicense%==yes echo.license2=^%ffmpegLicense%>>%ini%
 
-:vpx
-set "writevpx=no"
-if %vpxINI%==0 (
+:xpcomp
+set "writexpcomp=no"
+if %xpcompINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build vpx [VP8/VP9/VP10 encoder] binary?
-    echo. 1 = Yes [static]
-    echo. 2 = Build library only
-    echo. 3 = No
+    echo. Build libraries/binaries compatible with Windows XP when possible?
+    echo. 1 = Yes
+    echo. 2 = No [recommended]
+    echo.
+    echo. Examples: x265, disabled QuickSync and mpv, etc.
+    echo. This usually causes worse performance in all systems.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildxpcomp="Build with XP compatibility: "
+    ) else set buildxpcomp=%xpcompINI%
+if %deleteINI%==1 set "writexpcomp=yes"
+
+if %buildxpcomp%==1 set "xpcomp=y"
+if %buildxpcomp%==2 set "xpcomp=n"
+if %buildxpcomp% GTR 2 GOTO xpcomp
+if %writexpcomp%==yes echo.xpcomp=^%buildxpcomp%>>%ini%
+
+:standalone
+set "writestandalone=no"
+if %standaloneINI%==0 (
+     echo -------------------------------------------------------------------------------
+     echo -------------------------------------------------------------------------------
+     echo.
+     echo. Build standalone binaries for libraries included in FFmpeg?
+     echo. eg. Compile fdkaac.exe if --enable-libfdk-aac
+     echo. eg. Compile vpxenc.exe if --enable-libvpx
+     echo. 1 = Yes
+     echo. 2 = No
+     echo.
+     echo -------------------------------------------------------------------------------
+     echo -------------------------------------------------------------------------------
+     set /P buildstandalone="Build standalone binaries: "
+     ) else set buildstandalone=%standaloneINI%
+if %deleteINI%==1 set "writestandalone=yes"
+
+if %buildstandalone%==1 set "standalone=y"
+if %buildstandalone%==2 set "standalone=n"
+if %buildstandalone% GTR 2 GOTO standalone
+if %writestandalone%==yes echo.standalone=^%buildstandalone%>>%ini%
+
+:vpx
+set "writevpx=no"
+if %vpx2INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vpx [VP8/VP9/VP10 encoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone=y"
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvpx="Build vpx: "
-    ) else set buildvpx=%vpxINI%
+    ) else set buildvpx=%vpx2INI%
 if %deleteINI%==1 set "writevpx=yes"
 
-if %buildvpx%==1 set "vpx=y"
-if %buildvpx%==2 set "vpx=l"
-if %buildvpx%==3 set "vpx=n"
-if %buildvpx% GTR 3 GOTO vpx
-if %writevpx%==yes echo.vpx=^%buildvpx%>>%ini%
+if %buildvpx%==1 set "vpx2=y"
+if %buildvpx%==2 set "vpx2=n"
+if %buildvpx% GTR 2 GOTO vpx
+if %writevpx%==yes echo.vpx2=^%buildvpx%>>%ini%
 
 :x264
 set "writex264=no"
@@ -244,29 +290,6 @@ if %buildx264%==3 set "x264=n"
 if %buildx264%==4 set "x264=f"
 if %buildx264% GTR 4 GOTO x264
 if %writex264%==yes echo.x264=^%buildx264%>>%ini%
-
-:xpcomp
-set "writexpcomp=no"
-if %xpcompINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build libraries/binaries compatible with Windows XP when possible?
-    echo. 1 = Yes
-    echo. 2 = No [recommended]
-    echo.
-    echo. Examples: x265, disabled QuickSync and mpv, etc.
-    echo. This usually causes worse performance in all systems.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildxpcomp="Build with XP compatibility: "
-    ) else set buildxpcomp=%xpcompINI%
-if %deleteINI%==1 set "writexpcomp=yes"
-
-if %buildxpcomp%==1 set "xpcomp=y"
-if %buildxpcomp%==2 set "xpcomp=n"
-if %buildxpcomp% GTR 2 GOTO xpcomp
-if %writexpcomp%==yes echo.xpcomp=^%buildxpcomp%>>%ini%
 
 :x265
 set "writex265=no"
@@ -320,29 +343,6 @@ if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
-
-:standalone
-set "writestandalone=no"
-if %standaloneINI%==0 (
-     echo -------------------------------------------------------------------------------
-     echo -------------------------------------------------------------------------------
-     echo.
-     echo. Build standalone binaries for libraries in FFmpeg?
-     echo. eg. Compile fdkaac.exe if --enable-libfdk-aac
-     echo. eg. Compile vpxenc.exe if --enable-libvpx
-     echo. 1 = Yes
-     echo. 2 = No
-     echo.
-     echo -------------------------------------------------------------------------------
-     echo -------------------------------------------------------------------------------
-     set /P buildstandalone="Build standalone binaries: "
-     ) else set buildstandalone=%standaloneINI%
-if %deleteINI%==1 set "writestandalone=yes"
-
-if %buildstandalone%==1 set "standalone=y"
-if %buildstandalone%==2 set "standalone=n"
-if %buildstandalone% GTR 2 GOTO standalone
-if %writestandalone%==yes echo.standalone=^%buildstandalone%>>%ini%
 
 :flac
 set "writeflac=no"
@@ -1380,7 +1380,7 @@ IF ERRORLEVEL == 1 (
 
 start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login %build%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
---vpx=%vpx% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
+--vpx=%vpx2% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone%
