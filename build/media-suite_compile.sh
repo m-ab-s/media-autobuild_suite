@@ -1334,7 +1334,7 @@ if [[ $bmx = "y" ]]; then
         do_uninstall include/uriparser "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         sed -i '/bin_PROGRAMS/ d' Makefile.am
-        do_generic_confmakeinstall --disable-test --disable-doc
+        do_separate_confmakeinstall --disable-test --disable-doc
         do_checkIfExist "${_check[@]}"
         buildBmx="true"
     fi
