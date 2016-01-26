@@ -551,11 +551,12 @@ if [[ $sox = "y" ]]; then
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
-        do_generic_confmake --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
+        [[ -f Makefile ]] && log "distclean" make distclean
+        do_separate_conf --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
             LIBS='-lpcre -lshlwapi -lz -lgnurx'
-        install src/sox.exe "$LOCALDESTDIR"/bin-audio/
+        do_make
+        cp -f src/sox.exe "$LOCALDESTDIR/bin-audio/"
         do_checkIfExist "${_check[@]}"
     fi
 fi
