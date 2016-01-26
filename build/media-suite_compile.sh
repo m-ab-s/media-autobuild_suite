@@ -700,18 +700,17 @@ if [[ $ffmpeg != "n" ]] && enabled libutvideo && do_pkgConfig "libutvideo = 15.1
 fi
 
 if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass; }; then
+    { [[ $ffmpeg != "n" ]] && enabled libass; }; then
     do_vcs "https://github.com/libass/libass.git"
     if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
         _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall "${_check[@]}"
-        do_checkForOptions "--enable-(lib)?fontconfig" || disable_fc="--disable-fontconfig"
-        do_generic_confmakeinstall $disable_fc
+        [[ -f Makefile ]] && log "distclean" make distclean
+        do_separate_confmakeinstall $(enabled_any {lib,}fontconfig && echo --disable-fontconfig)
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"
-        unset rebuildLibass disable_fc
+        unset rebuildLibass
     fi
 fi
 
