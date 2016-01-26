@@ -938,8 +938,8 @@ clean_suite() {
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
         xargs -0 rm -f
-    find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
-    find . -maxdepth 2 -type d -name "build-32bits" -o -name "build-64bits" -print0 |
+    find . -maxdepth 6 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
+    find . -maxdepth 6 -type d -name "build-32bits" -o -name "build-64bits" -print0 |
         xargs -0 rm -rf
 
     [[ -f last_run ]] && mv last_run last_successful_run

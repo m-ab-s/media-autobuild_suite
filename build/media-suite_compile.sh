@@ -735,11 +735,10 @@ if [[ $mediainfo = "y" ]]; then
         _check=(libzen.{{l,}a,pc})
         cd_safe Project/GNU/Library
         do_autoreconf
-        [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}"
-        do_generic_conf
-        [[ $bits = "64bit" ]] && sed -i 's/ -DSIZE_T_IS_LONG//g' Makefile libzen.pc
-        do_makeinstall
+        [[ -f Makefile ]] && log distclean make distclean
+        [[ $bits = "64bit" ]] && sed -i 's|size_t_is_long="yes"|size_t_is_long="no"|' configure
+        do_separate_confmakeinstall --enable-silent-rules
         rm -f "$LOCALDESTDIR"/bin/libzen-config
         do_checkIfExist "${_check[@]}"
         buildMediaInfo="true"
