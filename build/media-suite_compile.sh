@@ -506,7 +506,7 @@ if enabled libmp3lame; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libgme; then
+if [[ $ffmpeg != "n" ]] && enabled libgme; then
     _check=(libgme.{a,pc})
     do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme
     if [[ $compile = "true" ]]; then
@@ -516,7 +516,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libgme; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtwolame; then
+if [[ $ffmpeg != "n" ]] && enabled libtwolame; then
     do_pacman_install twolame &&
         do_uninstall twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
