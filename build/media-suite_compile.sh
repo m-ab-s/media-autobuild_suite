@@ -872,13 +872,13 @@ if [[ $mp4box = "y" ]]; then
     fi
 fi
 
-if [[ $x264 != "n" ]]; then
+if [[ $x264 != n ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
-    [[ $x264 != l || $standalone = y ]] && _check+=(bin-video/x264.exe)
+    [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     do_vcs "http://git.videolan.org/git/x264.git" x264 "${_check[@]}"
     if [[ $compile = "true" ]]; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
-        if [[ $x264 = "f" ]]; then
+        if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
             do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
@@ -893,7 +893,7 @@ if [[ $x264 != "n" ]]; then
             extracommands+=(--disable-lavf --disable-swscale --disable-ffms)
         fi
 
-        if [[ $x264 != "l" ]]; then
+        if [[ $standalone = y ]]; then
             do_vcs "https://github.com/l-smash/l-smash.git" liblsmash
             if [[ $compile = "true" ]]; then
                 _check=(lsmash.h liblsmash.{a,pc})
@@ -911,10 +911,16 @@ if [[ $x264 != "n" ]]; then
             extracommands+=(--disable-lsmash)
         fi
 
+        _check=(x264{,_config}.h libx264.a x264.pc)
         [[ -f "config.h" ]] && log "distclean" make distclean
-        if [[ $x264 != "l" ]]; then
-            _check+=(bin-video/x264{,-10bit}.exe)
+        if [[ $standalone = y ]]; then
             extracommands+=("--bindir=$LOCALDESTDIR/bin-video")
+            _check+=(bin-video/x264.exe)
+        else
+            extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
+        fi
+        if [[ $standalone = y && $x264 != h ]]; then
+            _check+=(bin-video/x264-10bit.exe)
             do_uninstall "${_check[@]}"
             create_build_dir
             CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 "${extracommands[@]}"
@@ -922,11 +928,11 @@ if [[ $x264 != "n" ]]; then
             cp -f x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
             cd_safe ..
         else
-            extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
             do_uninstall "${_check[@]}"
+            [[ $x264 = h ]] && extracommands+=(--bit-depth=10)
         fi
         create_build_dir
-        CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=8 "${extracommands[@]}"
+        CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
         do_makeinstall
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"

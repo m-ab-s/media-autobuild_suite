@@ -62,7 +62,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
 --enable-vapoursynth
 
-set iniOptions=msys2Arch arch license2 vpx2 x264 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
+set iniOptions=msys2Arch arch license2 vpx2 x2642 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone
 
 set previousOptions=0
@@ -268,15 +268,17 @@ if %writevpx%==yes echo.vpx2=^%buildvpx%>>%ini%
 
 :x264
 set "writex264=no"
-if %x264INI%==0 (
+if %x2642INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build x264 [H.264 encoder]?
-    echo. 1 = 8 and 10-bit binaries and 8-bit library [static]
-    echo. 2 = Build library only
-    echo. 3 = No
-    echo. 4 = 8 and 10-bit binaries with libavformat and library [static]
+    echo. 1 = 8-bit lib/binary and 10-bit binary
+    echo. 2 = No
+    echo. 3 = 10-bit lib/binary
+    echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat
+    echo.
+    echo. Binaries being built depends on "standalone=y"
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -284,12 +286,12 @@ if %x264INI%==0 (
     ) else set buildx264=%x264INI%
 if %deleteINI%==1 set "writex264=yes"
 
-if %buildx264%==1 set "x264=y"
-if %buildx264%==2 set "x264=l"
-if %buildx264%==3 set "x264=n"
-if %buildx264%==4 set "x264=f"
+if %buildx264%==1 set "x2642=y"
+if %buildx264%==2 set "x2642=n"
+if %buildx264%==3 set "x2642=h"
+if %buildx264%==4 set "x2642=f"
 if %buildx264% GTR 4 GOTO x264
-if %writex264%==yes echo.x264=^%buildx264%>>%ini%
+if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
 
 :x265
 set "writex265=no"
@@ -1380,7 +1382,7 @@ IF ERRORLEVEL == 1 (
 
 start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login %build%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
---vpx=%vpx2% --x264=%x264% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
+--vpx=%vpx2% --x264=%x2642% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone%
