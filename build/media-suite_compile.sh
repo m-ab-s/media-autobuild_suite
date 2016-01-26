@@ -464,13 +464,13 @@ if [[ $standalone = y ]] && enabled libvorbis &&
 fi
 
 _check=(bin-audio/opusenc.exe)
-if [[ $standalone = y ]] && do_checkForOptions --enable-libopus &&
+if [[ $standalone = y ]] && enabled libopus &&
     { ! files_exist "${_check[@]}" || [[ $buildOpusEnc = "true" ]]; }; then
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
-    [[ -f "opusenc.exe" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
-    do_generic_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
+    [[ -f Makefile ]] && log distclean make distclean
+    do_separate_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
     do_checkIfExist "${_check[@]}"
     unset buildOpusEnc
 fi
