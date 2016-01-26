@@ -857,14 +857,14 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmfx; then
+if [[ $ffmpeg != "n" ]] && enabled libmfx; then
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx
     if [[ $compile = "true" ]]; then
         _check=(libmfx.{{l,}a,pc})
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/mfx "${_check[@]}"
-        do_generic_confmakeinstall
+        [[ -f Makefile ]] && log "distclean" make distclean
+        do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
 fi
