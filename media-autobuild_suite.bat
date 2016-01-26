@@ -62,7 +62,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
 --enable-vapoursynth
 
-set iniOptions=msys2Arch arch license2 vpx2 x2642 x265 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
+set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone
 
 set previousOptions=0
@@ -294,34 +294,34 @@ if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
 
 :x265
 set "writex265=no"
-if %x265INI%==0 (
+if %x2652INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build x265 [H.265 encoder]?
-    echo. 1 = Static x265.exe and library with Main, Main10 and Main12 included
-    echo. 2 = Static library only with Main, Main10 and Main12 included
-    echo. 3 = No
-    echo. 4 = Static x265.exe and library [Main] with shared high bit-depth libraries
-    echo. 5 = Static x265.exe and library [Main]
-    echo. 6 = Static library only [Main]
-    echo. 7 = Same as 1 with addition of non-XP compatible x265-numa.exe
+    echo. 1 = Lib/binary with Main, Main10 and Main12
+    echo. 2 = No
+    echo. 3 = Lib/binary with Main10 only
+    echo. 4 = Lib/binary with Main only
+    echo. 5 = Lib/binary with Main, shared libs with Main10 and Main12
+    echo. 6 = Same as 1 with addition of non-XP compatible x265-numa.exe
+    echo.
+    echo. Binaries being built depends on "standalone=y"
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
-    ) else set buildx265=%x265INI%
+    ) else set buildx265=%x2652INI%
 if %deleteINI%==1 set "writex265=yes"
 
-if %buildx265%==1 set "x265=y"
-if %buildx265%==2 set "x265=l"
-if %buildx265%==3 set "x265=n"
-if %buildx265%==4 set "x265=s"
-if %buildx265%==5 set "x265=y8"
-if %buildx265%==6 set "x265=l8"
-if %buildx265%==7 set "x265=d"
-if %buildx265% GTR 7 GOTO x265
-if %writex265%==yes echo.x265=^%buildx265%>>%ini%
+if %buildx265%==1 set "x2652=y"
+if %buildx265%==2 set "x2652=n"
+if %buildx265%==3 set "x2652=o10"
+if %buildx265%==4 set "x2652=o8"
+if %buildx265%==5 set "x2652=s"
+if %buildx265%==6 set "x2652=d"
+if %buildx265% GTR 6 GOTO x265
+if %writex265%==yes echo.x2652=^%buildx265%>>%ini%
 
 :other265
 set "writeother265=no"
@@ -1381,7 +1381,7 @@ IF ERRORLEVEL == 1 (
 
 start %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login %build%\media-suite_compile.sh ^
 --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% --mp4box=%mp4box% ^
---vpx=%vpx2% --x264=%x2642% --x265=%x265% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
+--vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% ^
 --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone%

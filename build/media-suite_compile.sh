@@ -945,62 +945,68 @@ fi
 if [[ ! $x265 = "n" ]]; then
     do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     _check=(x265{,_config}.h libx265.a x265.pc)
-    [[ $x265 != "l"* ]] && _check+=(bin-video/x265.exe)
     if [[ $compile = "true" ]] || ! files_exist "${_check[@]}"; then
         do_patch "x265-revid.patch"
         cd_safe build/msys
         do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
-        [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF" || assembly="-DENABLE_ASSEMBLY=ON"
-        [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON" || xpsupport="-DWINXP_SUPPORT=OFF"
+        [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
+        [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
         build_x265() {
         rm -rf "$LOCALBUILDDIR"/x265-hg/build/msys/{8,10,12}bit
 
         do_x265_cmake() {
-            log "cmake" cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            log "cmake" cmake ../../../source -G Ninja -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
-            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON "$@"
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON \
+            -DENABLE_ASSEMBLY=ON -DWINXP_SUPPORT=OFF $xpsupport "$@"
             log "ninja" ninja -j "${cpuCount:=1}"
         }
         mkdir -p {8,10,12}bit
+        [[ $standalone = y ]] && cli="-DENABLE_CLI=ON" && _check+=(bin-video/x265.exe)
 
-        if [[ $x265 != *8 ]]; then
-            cd_safe 12bit
-            if [[ $x265 = "s" ]]; then
-                # libx265_main12.dll
+        if [[ $x265 != o* ]]; then
+            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/12bit
+            if [[ $x265 = s ]]; then
+                do_print_progress "Building shared 12-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
                 cp libx265.dll "$LOCALDESTDIR"/bin-video/libx265_main12.dll
+                _check+=(bin-video/libx265_main12.dll)
             else
-                # multilib
+                do_print_progress "Building 12-bit lib for multilib"
                 do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
                 cp libx265.a ../8bit/libx265_main12.a
             fi
+        fi
 
-            cd_safe ../10bit
-            if [[ $x265 = "s" ]]; then
-                # libx265_main10.dll
+        if [[ $x265 != o8 ]]; then
+            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/10bit
+            if [[ $x265 = s ]]; then
+                do_print_progress "Building shared 10-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON
                 cp libx265.dll "$LOCALDESTDIR"/bin-video/libx265_main10.dll
+                _check+=(bin-video/libx265_main10.dll)
+            elif [[ $x265 = o10 ]]; then
+                do_print_progress "Building 10-bit lib/bin"
+                do_x265_cmake $assembly $cli
             else
-                # multilib
+                do_print_progress "Building 10-bit lib for multilib"
                 do_x265_cmake $assembly -DEXPORT_C_API=OFF
                 cp libx265.a ../8bit/libx265_main10.a
             fi
-            cd_safe ..
         fi
 
-        cd_safe 8bit
-        if [[ $x265 = "s" || $x265 = *8 ]]; then
-            # 8-bit static x265.exe/library
-            [[ $x265 != "l8" ]] && cli="-DENABLE_CLI=ON"
-            do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
-        else
-            # multilib
-            [[ $x265 != "l" ]] && cli="-DENABLE_CLI=ON"
-            do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
-                -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
-            mv libx265.a libx265_main.a
-            ar -M <<EOF
+        if [[ $x265 != o10 ]]; then
+            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/8bit
+            if [[ $x265 = s || $x265 = o8 ]]; then
+                do_print_progress "Building 8-bit lib/bin"
+                do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
+            else
+                do_print_progress "Building multilib lib/bin"
+                do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
+                    -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+                mv libx265.a libx265_main.a
+                ar -M <<EOF
 CREATE libx265.a
 ADDLIB libx265_main.a
 ADDLIB libx265_main10.a
@@ -1008,15 +1014,16 @@ ADDLIB libx265_main12.a
 SAVE
 END
 EOF
+            fi
         fi
         }
         build_x265
         log "install" ninja -j "${cpuCount:=1}" install
-        if [[ $x265 = "d" ]]; then
+        if [[ $standalone = y && $x265 = d ]]; then
             cd_safe ..
             do_uninstall bin-video/x265-numa.exe
-            xpsupport="-DWINXP_SUPPORT=OFF"
-            build_x265
+            do_print_progress "Building NUMA version of binary"
+            xpsupport="" build_x265
             cp -f x265.exe "$LOCALDESTDIR"/bin-video/x265-numa.exe
             _check+=(bin-video/x265-numa.exe)
         fi
