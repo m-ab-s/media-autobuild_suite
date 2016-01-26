@@ -714,13 +714,12 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libxavs &&
-    do_pkgConfig "xavs"; then
+if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; then
     do_vcs "https://github.com/Distrotech/xavs.git"
     _check=(libxavs.a xavs.{h,pc})
     [[ -f "libxavs.a" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
-    sed -i 's,"NUL","/dev/null",g' configure
+    sed -i 's|"NUL"|"/dev/null"|g' configure
     do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
     do_make libxavs.a
     cp -f xavs.h "$LOCALDESTDIR"/include
