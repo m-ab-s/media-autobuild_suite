@@ -561,7 +561,7 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libmodplug; then
+if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
     do_pacman_install "libmodplug"
     do_addOption "--extra-cflags=-DMODPLUG_STATIC"
 fi
@@ -569,13 +569,13 @@ fi
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
 if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librtmp; }; then
+    { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
     _check=(librtmp.{a,pc})
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires $LOCALDESTDIR/lib/pkgconfig/librtmp.pc)"
-    if do_checkForOptions --enable-gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
+    if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
     else
@@ -583,20 +583,20 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
         pc=libssl
     fi
     if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
-        do_uninstall include/librtmp bin-video/rtmp{dump,suck,srv,gw}.exe "${_check[@]}"
+        [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
+        do_uninstall include/librtmp "${_check[@]}"
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
             CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
-        [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
         buildMediaInfo="true"
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libtheora; then
+if [[ $ffmpeg != "n" ]] && enabled libtheora; then
     do_pacman_install libtheora &&
         do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
