@@ -404,15 +404,15 @@ if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libfdk-aac; } ||
+if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
     [[ $fdkaac = "y" ]]; then
     do_vcs "https://github.com/mstorsjo/fdk-aac"
     if [[ $compile = "true" ]]; then
         _check=(libfdk-aac.{l,}a fdk-aac.pc)
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/fdk-aac "${_check[@]}"
-        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_generic_confmakeinstall
+        [[ -f Makefile ]] && log distclean make distclean
+        CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
         buildFDK="true"
     fi
