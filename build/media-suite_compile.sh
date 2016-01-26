@@ -869,7 +869,7 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcdio; then
+if [[ $ffmpeg != "n" ]] && enabled libcdio; then
     [[ -d "$LOCALBUILDDIR/libcdio_paranoia-git" ]] &&
         _to_remove+=("$LOCALBUILDDIR/libcdio_paranoia-git") &&
         do_uninstall include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
