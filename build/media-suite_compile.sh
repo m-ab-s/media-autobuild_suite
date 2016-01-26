@@ -214,8 +214,7 @@ if do_checkForOptions --enable-libwebp; then
         _check=(libwebp{,mux}.{{,l}a,pc})
         if [[ $standalone = y ]]; then
             extracommands=(--enable-libwebp{demux,decoder,extras}
-                LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental
-                LDFLAGS="$LDFLAGS -static-libgcc")
+                LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental)
             _check+=(libwebp{,mux,demux,decoder,extras}.{{,l}a,pc}
                 bin-global/{{c,d}webp,webpmux}.exe)
         else
@@ -268,7 +267,7 @@ if do_checkForOptions --enable-libtesseract; then
         do_checkForOptions --enable-opencl && opencl="-lOpenCL"
         sed -i "s|@OPENCL_LIB@|$opencl -lstdc++|" tesseract.pc.in
         do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
-            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" LDFLAGS="$LDFLAGS -static -static-libgcc" \
+            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
@@ -466,8 +465,7 @@ if [[ $standalone = y ]] && do_checkForOptions --enable-libopus &&
     do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     [[ -f "opusenc.exe" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
-    do_generic_confmakeinstall audio LDFLAGS="$LDFLAGS -static -static-libgcc -static-libstdc++" \
-        "$([[ $flac = y ]] || echo "--without-flac")"
+    do_generic_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
     do_checkIfExist "${_check[@]}"
     unset buildOpusEnc
 fi
@@ -611,7 +609,7 @@ if [[ ! $vpx = "n" ]]; then
         [[ -d build-$bits ]] && rm -rf "build-$bits"
         mkdir "build-$bits" && cd_safe "build-$bits"
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-        LDFLAGS+=" -static-libgcc" log "configure" ../configure --target="${target}-gcc" \
+        log "configure" ../configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" \
@@ -754,7 +752,7 @@ if [[ $mediainfo = "y" ]]; then
         do_autoreconf
         [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}"
-        LDFLAGS+=" -static" do_generic_conf --enable-staticlibs --with-libcurl
+        do_generic_conf --enable-staticlibs --with-libcurl
         do_makeinstall
         sed -i "s,libmediainfo\.a.*,libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)," \
             libmediainfo.pc
@@ -770,7 +768,7 @@ if [[ $mediainfo = "y" ]]; then
         do_autoreconf
         [[ -f "Makefile" ]] && log "distclean" make distclean --ignore-errors
         do_uninstall "${_check[@]}"
-        LDFLAGS+=" -static-libgcc -static-libstdc++" do_generic_conf video --enable-staticlibs
+        do_generic_conf video --enable-staticlibs
         do_makeinstall
         do_checkIfExist "${_check[@]}"
     fi
@@ -799,8 +797,8 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzvbi; } && do_pkgCon
     do_uninstall "${_check[@]}"
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
-    do_generic_conf --disable-dvb --disable-bktr --disable-nls --disable-proxy --without-doxygen \
-    CFLAGS="$CFLAGS -DPTW32_STATIC_LIB" LIBS="$LIBS -lpng"
+    CFLAGS+=" -DPTW32_STATIC_LIB" do_generic_conf --disable-dvb --disable-bktr \
+        --disable-nls --disable-proxy --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
     cp ../zvbi-0.2.pc "$LOCALDESTDIR"/lib/pkgconfig
@@ -969,8 +967,6 @@ if [[ ! $x265 = "n" ]]; then
         rm -rf "$LOCALBUILDDIR"/x265-hg/build/msys/{8,10,12}bit
 
         do_x265_cmake() {
-            CFLAGS+=" -static-libgcc -static-libstdc++" \
-            CXXFLAGS+=" -static-libgcc -static-libstdc++" \
             log "cmake" cmake ../../../source -G Ninja $xpsupport -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON "$@"
@@ -1214,7 +1210,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
             grep -q "Libs.private" uchardet.pc.in ||
                 sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
-            LDFLAGS+=" -static" do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
+            do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
             do_checkIfExist "${_check[@]}"
         fi
     fi
@@ -1354,8 +1350,7 @@ if [[ $bmx = "y" ]]; then
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        LDFLAGS+=" -static-libgcc" do_generic_confmakeinstall video \
-            --disable-examples
+        do_generic_confmakeinstall video --disable-examples
         do_checkIfExist "${_check[@]}"
         buildBmx="true"
     fi
@@ -1379,8 +1374,7 @@ if [[ $bmx = "y" ]]; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
-        LDFLAGS+=" -static -static-libgcc -static-libstdc++" \
-            do_separate_confmakeinstall video
+        do_generic_confmakeinstall video
         do_checkIfExist "${_check[@]}"
     fi
 fi

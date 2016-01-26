@@ -1264,7 +1264,7 @@ if %build32%==yes (
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
             echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
+            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.PYTHONHOME=/usr
@@ -1322,7 +1322,7 @@ if %build64%==yes (
             echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
             echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe"
+            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.PYTHONHOME=/usr
