@@ -672,16 +672,16 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     fi
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbluray; } ||
+if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     ! mpv_disabled libbluray; then
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/bluray "${_check[@]}"
-        do_generic_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
-        --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
+        [[ -f Makefile ]] && log "distclean" make distclean
+        do_separate_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
+            --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
         do_checkIfExist "${_check[@]}"
     fi
 fi
