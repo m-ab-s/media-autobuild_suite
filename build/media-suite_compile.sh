@@ -1346,7 +1346,7 @@ if [[ $bmx = "y" ]]; then
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_generic_confmakeinstall video --disable-examples
+        do_separate_confmakeinstall video --disable-examples
         do_checkIfExist "${_check[@]}"
         buildBmx="true"
     fi
