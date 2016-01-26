@@ -877,15 +877,15 @@ if [[ $ffmpeg != "n" ]] && enabled libcdio; then
 fi
 
 if [[ $mp4box = "y" ]]; then
-    _check=(bin-video/MP4Box.exe libgpac_static.a)
+    _check=(libgpac_static.a)
+    [[ $standalone = y ]] && _check+=(bin-video/MP4Box.exe)
     do_vcs "https://github.com/gpac/gpac.git" gpac "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/gpac "${_check[@]}"
-        [[ -f config.mak ]] && log "distclean" make distclean
-        do_configure --prefix="$LOCALDESTDIR" --static-mp4box
+        do_separate_conf --static-mp4box
         do_make
         log "install" make install-lib
-        cp bin/gcc/MP4Box.exe "$LOCALDESTDIR"/bin-video
+        [[ $standalone = y ]] && cp -f bin/gcc/MP4Box.exe "$LOCALDESTDIR"/bin-video
         do_checkIfExist "${_check[@]}"
     fi
 fi
