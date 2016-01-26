@@ -68,7 +68,7 @@ if [[ -n "$alloptions" ]]; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
+if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
     do_pacman_remove "openjpeg2"
     _check=(j{config,error,morecfg,peglib}.h libjpeg.a)
     do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo "${_check[@]}"
@@ -90,9 +90,8 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libopenjpeg; then
     fi
 fi
 
-if [[ "$mplayer" = "y" ]] ||
-    { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libass --enable-libfreetype \
-    "--enable-(lib)?fontconfig" --enable-libfribidi; } || ! mpv_disabled libass; then
+if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
+    { [[ $ffmpeg != "n" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove "freetype fontconfig harfbuzz fribidi"
 
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
@@ -104,7 +103,7 @@ if [[ "$mplayer" = "y" ]] ||
         rebuildLibass="y"
     fi
 
-    if do_checkForOptions "--enable-(lib)?fontconfig" && do_pkgConfig "fontconfig = 2.11.94"; then
+    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove "python2-lxml"
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
@@ -156,7 +155,7 @@ if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if { { [[ "$ffmpeg" != "n" ]] && do_checkForOptions --enable-gnutls; } ||
+if { { [[ "$ffmpeg" != "n" ]] && enabled gnutls; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
 [[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
 [[ -n "$gnutls_ver" ]] &&
@@ -205,7 +204,7 @@ if [[ $sox = "y" ]]; then
     fi
 fi
 
-if do_checkForOptions --enable-libwebp; then
+if enabled libwebp; then
     do_pacman_install libtiff
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
@@ -230,7 +229,7 @@ fi
 
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
-if do_checkForOptions --enable-opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
+if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     echo -e "${orange_color}Tesseract, FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
     if ! files_exist libOpenCL.a; then
         cd_safe "$LOCALBUILDDIR"
@@ -247,7 +246,7 @@ else
 fi
 unset syspath
 
-if do_checkForOptions --enable-libtesseract; then
+if enabled libtesseract; then
     do_pacman_remove "tesseract-ocr"
     do_pacman_install "libtiff"
     if do_pkgConfig "lept = 1.72"; then
@@ -264,7 +263,7 @@ if do_checkForOptions --enable-libtesseract; then
         _check=(libtesseract.{,l}a tesseract.pc bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
         opencl=""
-        do_checkForOptions --enable-opencl && opencl="-lOpenCL"
+        enabled opencl && opencl="-lOpenCL"
         sed -i "s|@OPENCL_LIB@|$opencl -lstdc++|" tesseract.pc.in
         do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
@@ -284,7 +283,7 @@ if do_checkForOptions --enable-libtesseract; then
     fi
 fi
 
-if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
+if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1"; then
     _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
     do_vcs https://github.com/lachs0r/rubberband.git
@@ -295,7 +294,7 @@ if { { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-librubberband; } ||
     _to_remove+=($(pwd))
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
+if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     { ! pc_exists zimg && ! mpv_disabled vapoursynth; } then
     do_vcs "https://github.com/sekrit-twc/zimg.git"
     if [[ $compile = "true" ]]; then
@@ -309,7 +308,7 @@ if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzimg; } ||
     fi
 fi
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
+if [[ $ffmpeg != "n" ]] && enabled libdcadec; then
     do_pacman_remove "dcadec-git"
     do_vcs "https://github.com/foo86/dcadec.git"
     if [[ $compile = "true" ]]; then
@@ -321,7 +320,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libdcadec; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libilbc; then
+if [[ $ffmpeg != "n" ]] && enabled libilbc; then
     do_vcs "https://github.com/TimothyGu/libilbc.git"
     if [[ $compile = "true" ]]; then
         _check=(ilbc.h libilbc.{{l,}a,pc})
@@ -334,18 +333,18 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libilbc; then
 fi
 
 if [[ $flac = "y" || $sox = "y" ]] ||
-    do_checkForOptions --enable-libtheora --enable-libvorbis --enable-libspeex; then
+    enabled_any libtheora libvorbis libspeex; then
     do_pacman_install libogg &&
         do_uninstall include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
 fi
 
-if [[ $sox = "y" ]] || do_checkForOptions --enable-libvorbis --enable-libtheora; then
+if [[ $sox = "y" ]] || enabled_any libvorbis libtheora; then
     do_pacman_install libvorbis &&
         do_uninstall include/vorbis share/aclocal/vorbis.m4 \
         libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
 fi
 
-if [[ $sox = "y" ]] || do_checkForOptions --enable-libopus; then
+if [[ $sox = "y" ]] || enabled libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
         _check=(libopus.{l,}a opus.pc)
         do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
@@ -388,7 +387,7 @@ fi
 _check=(libvo-aacenc.{l,}a vo-aacenc.pc)
 files_exist "${_check[@]}" && do_uninstall include/vo-aacenc "${_check[@]}"
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)"; then
+if [[ $ffmpeg != "n" ]] && enabled_any libopencore-amr{wb,nb}; then
     do_pacman_install "opencore-amr" &&
         do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
@@ -1036,18 +1035,18 @@ else
 fi
 
 if [[ $ffmpeg != "n" ]]; then
-    do_checkForOptions --enable-gcrypt && do_pacman_install libgcrypt
-    do_checkForOptions --enable-libschroedinger && do_pacman_install schroedinger
-    do_checkForOptions --enable-libgsm && do_pacman_install gsm
-    do_checkForOptions --enable-libwavpack && do_pacman_install wavpack
-    do_checkForOptions --enable-libsnappy && do_pacman_install snappy
-    if do_checkForOptions --enable-libxvid; then
+    enabled gcrypt && do_pacman_install libgcrypt
+    enabled libschroedinger && do_pacman_install schroedinger
+    enabled libgsm && do_pacman_install gsm
+    enabled libwavpack && do_pacman_install wavpack
+    enabled libsnappy && do_pacman_install snappy
+    if enabled libxvid; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
         [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/xvidcore.dll.a{,.dyn}
         [[ -f $MINGW_PREFIX/bin/xvidcore.dll ]] && mv -f "$MINGW_PREFIX"/bin/xvidcore.dll{,.disabled}
     fi
-    if do_checkForOptions --enable-libssh; then
+    if enabled libssh; then
         do_pacman_install libssh
         do_addOption "--extra-cflags=-DLIBSSH_STATIC"
         do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
@@ -1064,8 +1063,7 @@ if [[ $ffmpeg != "n" ]]; then
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_changeFFmpegConfig $license
-        do_checkForOptions --enable-libgme "--enable-libopencore-amr(nb|wb)" --enable-libtheora \
-            --enable-libtwolame --enable-libvorbis --enable-openssl --enable-libcdio &&
+        enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis openssl libcdio &&
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
@@ -1088,7 +1086,7 @@ if [[ $ffmpeg != "n" ]]; then
                 mv build_successful"${bits}"{,_shared} && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
-            do_checkForOptions --enable-debug &&
+            enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
@@ -1103,7 +1101,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_makeinstall
             do_checkIfExist "${_check[@]}"
             newFfmpeg="yes"
-            do_checkForOptions --enable-debug &&
+            enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
         fi
     fi
@@ -1304,7 +1302,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         git describe --tags "$(git rev-list --tags --max-count=1)" | cut -c 2- > VERSION
         mpv_ldflags=()
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-        do_checkForOptions --enable-libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         ! mpv_disabled egl-angle && do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
         [[ $license = *v3 || $license = nonfree ]] && MPV_OPTS+=("--enable-gpl3")
 
