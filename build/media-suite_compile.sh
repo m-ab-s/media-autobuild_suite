@@ -774,7 +774,7 @@ if [[ $mediainfo = "y" ]]; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvidstab; then
+if [[ $ffmpeg != "n" ]] && enabled libvidstab; then
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab
     if [[ $compile = "true" ]]; then
         _check=(libvidstab.a vidstab.pc)
@@ -784,7 +784,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvidstab; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libcaca; then
+if [[ $ffmpeg != "n" ]] && enabled libcaca; then
     do_pacman_install "libcaca" &&
         do_uninstall libcaca.{l,}a caca.pc
     do_addOption "--extra-cflags=-DCACA_STATIC"
