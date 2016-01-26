@@ -790,18 +790,19 @@ if [[ $ffmpeg != "n" ]] && enabled libcaca; then
     do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libzvbi; } && do_pkgConfig "zvbi-0.2 = 0.2.35"; then
-    _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
-    do_wget_sf "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
-    [[ -f "src/.libs/libzvbi.a" ]] && log "distclean" make distclean
-    do_uninstall "${_check[@]}"
+_check=(libzvbi.{h,{l,}a})
+_ver="0.2.35"
+if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
+    { ! files_exist "${_check[@]}" || ! grep -q "${_ver}" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
+    do_wget_sf "zapping/zvbi/${_ver}/zvbi-${_ver}.tar.bz2"
+    do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
-    CFLAGS+=" -DPTW32_STATIC_LIB" do_generic_conf --disable-dvb --disable-bktr \
+    [[ -f Makefile ]] && log distclean make distclean
+    CFLAGS+=" -DPTW32_STATIC_LIB" do_separate_conf --disable-dvb --disable-bktr \
         --disable-nls --disable-proxy --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
-    cp ../zvbi-0.2.pc "$LOCALDESTDIR"/lib/pkgconfig
     do_checkIfExist "${_check[@]}"
 fi
 
