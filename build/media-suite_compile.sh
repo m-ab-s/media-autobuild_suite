@@ -731,10 +731,10 @@ fi
 if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
-        _check=(libzen.{{l,}a,pc})
+        _check=(libzen.{a,pc})
         cd_safe Project/CMake
-        sed -i -e 's|NOT SIZE_T|SIZE_T|' -e 's|NOT WIN32|UNIX|' ../CMakeLists.txt
-        do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}"
+        do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
+        sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' CMakeLists.txt
         do_cmakeinstall
         do_checkIfExist "${_check[@]}"
         buildMediaInfo="true"
@@ -745,15 +745,12 @@ if [[ $mediainfo = "y" ]]; then
 
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
-        _check=(libmediainfo.{{l,}a,pc})
-        cd_safe Project/GNU/Library
-        do_autoreconf
-        do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
-        do_generic_confmakeinstall --enable-staticlibs --with-libcurl --enable-silent-rules
-        sed -i "s|libmediainfo\.a.*|libmediainfo.a $(pkg-config --static --libs libcurl librtmp libzen)|" \
-            libmediainfo.pc
-        cp libmediainfo.pc "$LOCALDESTDIR"/lib/pkgconfig/
+        _check=(libmediainfo.{a,pc})
+        cd_safe Project/CMake
+        do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
+        sed -i 's|NOT WIN32|UNIX|g' CMakeLists.txt
+        do_cmakeinstall
+        sed -i 's|libzen|libcurl librtmp libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist "${_check[@]}"
         buildMediaInfo="true"
     fi
