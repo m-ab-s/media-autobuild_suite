@@ -227,8 +227,7 @@ if %standaloneINI%==0 (
      echo -------------------------------------------------------------------------------
      echo.
      echo. Build standalone binaries for libraries included in FFmpeg?
-     echo. eg. Compile fdkaac.exe if --enable-libfdk-aac
-     echo. eg. Compile vpxenc.exe if --enable-libvpx
+     echo. eg. Compile opusenc.exe if --enable-libopus
      echo. 1 = Yes
      echo. 2 = No
      echo.
@@ -283,7 +282,7 @@ if %x2642INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx264="Build x264: "
-    ) else set buildx264=%x264INI%
+    ) else set buildx264=%x2642INI%
 if %deleteINI%==1 set "writex264=yes"
 
 if %buildx264%==1 set "x2642=y"
