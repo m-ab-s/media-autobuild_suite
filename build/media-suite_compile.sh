@@ -522,15 +522,14 @@ if [[ $ffmpeg != "n" ]] && enabled libtwolame; then
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libbs2b; } &&
-    do_pkgConfig "libbs2b = 3.1.0"; then
-    _check=(libbs2b.{{l,}a,pc} )
+if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
+    _check=(libbs2b.{{l,}a,pc})
     do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
-    [[ -f "src/.libs/libbs2b.a" ]] && log "distclean" make distclean
     do_uninstall include/bs2b "${_check[@]}"
     do_patch "libbs2b-disable-sndfile.patch"
     do_patch "libbs2b-libs-only.patch"
-    do_generic_confmakeinstall
+    [[ -f Makefile ]] && log distclean make distclean
+    do_separate_confmakeinstall
     do_checkIfExist "${_check[@]}"
 fi
 
