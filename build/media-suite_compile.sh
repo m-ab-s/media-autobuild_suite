@@ -484,7 +484,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; 
     do_checkIfExist "${_check[@]}"
 fi
 
-if do_checkForOptions --enable-libmp3lame; then
+if enabled libmp3lame; then
     _check=(libmp3lame.{l,}a)
     _ver="3.99.5"
     [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
@@ -498,9 +498,9 @@ if do_checkForOptions --enable-libmp3lame; then
             touch recently_updated
             do_autoreconf
         fi
-        [[ -f libmp3lame/.libs/libmp3lame.a ]] && log "distclean" make distclean
         do_uninstall include/lame "${_check[@]}"
-        do_generic_confmakeinstall audio --disable-decoder \
+        [[ -f Makefile ]] && log distclean make distclean
+        do_separate_confmakeinstall audio --disable-decoder \
             $([[ $standalone = y ]] || echo "--disable-frontend")
         do_checkIfExist "${_check[@]}"
     fi
