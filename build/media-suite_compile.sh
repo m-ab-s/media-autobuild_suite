@@ -394,13 +394,13 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions "--enable-libopencore-amr(wb|nb)";
         do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libvo-amrwbenc; } &&
+if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
-    [[ -f ".libs/libvo-amrwbenc.a" ]] && log "distclean" make distclean
     _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
     do_uninstall include/vo-amrwbenc "${_check[@]}"
-    do_generic_confmakeinstall
+    [[ -f Makefile ]] && log distclean make distclean
+    do_separate_confmakeinstall
     do_checkIfExist "${_check[@]}"
 fi
 
