@@ -475,13 +475,12 @@ if [[ $standalone = y ]] && enabled libopus &&
     unset buildOpusEnc
 fi
 
-if { [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
+if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
     _check=(soxr.h libsoxr.a soxr.pc)
     do_wget_sf "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
     do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
-    sed -i "/Name:.*/ i\prefix=$LOCALDESTDIR\n" "$LOCALDESTDIR"/lib/pkgconfig/soxr.pc
     do_checkIfExist "${_check[@]}"
 fi
 
