@@ -423,9 +423,9 @@ if [[ $fdkaac = y ]]; then
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
     if [[ $compile = "true" || $buildFDK = "true" ]]; then
         do_autoreconf
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall "${_check[@]}"
-        CXXFLAGS+=" -O2" do_generic_confmakeinstall audio
+        [[ -f Makefile ]] && log distclean make distclean
+        CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
         do_checkIfExist "${_check[@]}"
         unset buildFDK
     fi
