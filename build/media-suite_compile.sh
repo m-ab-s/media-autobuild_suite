@@ -538,11 +538,10 @@ if [[ $sox = "y" ]]; then
     if [[ $compile = "true" ]]; then
         _check=(libsndfile.{l,}a sndfile.{h,pc})
         do_autogen
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_uninstall include/sndfile.hh "${_check[@]}"
-        do_generic_conf
-        sed -i 's/ examples regtest tests programs//g' Makefile
-        do_makeinstall
+        [[ -f Makefile ]] && log "distclean" make distclean
+        sed -i 's/ examples regtest tests programs//g' Makefile.am
+        do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
 
