@@ -885,9 +885,11 @@ if [[ $mp4box = "y" ]]; then
 fi
 
 if [[ $x264 != "n" ]]; then
-    do_vcs "http://git.videolan.org/git/x264.git"
-    if [[ $compile = "true" ]] || { [[ $x264 != "l" ]] && ! files_exist bin-video/x264.exe; }; then
-        extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static --enable-win32thread)
+    _check=(x264{,_config}.h libx264.a x264.pc)
+    [[ $x264 != l || $standalone = y ]] && _check+=(bin-video/x264.exe)
+    do_vcs "http://git.videolan.org/git/x264.git" x264 "${_check[@]}"
+    if [[ $compile = "true" ]]; then
+        extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
         if [[ $x264 = "f" ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
@@ -921,21 +923,22 @@ if [[ $x264 != "n" ]]; then
             extracommands+=(--disable-lsmash)
         fi
 
-        _check=(x264{,_config}.h libx264.a x264.pc)
-        [[ -f "libx264.a" ]] && log "distclean" make distclean
+        [[ -f "config.h" ]] && log "distclean" make distclean
         if [[ $x264 != "l" ]]; then
             _check+=(bin-video/x264{,-10bit}.exe)
-            do_uninstall "${_check[@]}"
             extracommands+=("--bindir=$LOCALDESTDIR/bin-video")
-            CFLAGS="${CFLAGS// -O2 / }" do_configure --bit-depth=10 "${extracommands[@]}"
-            do_make
-            cp x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
-            log "clean" make clean
-        else
             do_uninstall "${_check[@]}"
+            create_build_dir
+            CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 "${extracommands[@]}"
+            do_make
+            cp -f x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
+            cd_safe ..
+        else
             extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
+            do_uninstall "${_check[@]}"
         fi
-        CFLAGS="${CFLAGS// -O2 / }" do_configure --bit-depth=8 "${extracommands[@]}"
+        create_build_dir
+        CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=8 "${extracommands[@]}"
         do_makeinstall
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"
