@@ -732,13 +732,10 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
         _check=(libzen.{{l,}a,pc})
-        cd_safe Project/GNU/Library
-        do_autoreconf
+        cd_safe Project/CMake
+        sed -i -e 's|NOT SIZE_T|SIZE_T|' -e 's|NOT WIN32|UNIX|' ../CMakeLists.txt
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
-        [[ $bits = "64bit" ]] && sed -i 's|size_t_is_long="yes"|size_t_is_long="no"|' configure
-        do_separate_confmakeinstall --enable-silent-rules
-        rm -f "$LOCALDESTDIR"/bin/libzen-config
+        do_cmakeinstall
         do_checkIfExist "${_check[@]}"
         buildMediaInfo="true"
     fi
