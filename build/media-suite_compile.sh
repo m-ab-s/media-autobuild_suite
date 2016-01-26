@@ -327,6 +327,7 @@ if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libilbc; then
     if [[ $compile = "true" ]]; then
         _check=(ilbc.h libilbc.{{l,}a,pc})
         do_autoreconf
+        [[ -f Makefile ]] && log distclean make distclean
         do_uninstall "${_check[@]}"
         do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
