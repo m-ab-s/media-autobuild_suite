@@ -378,10 +378,11 @@ if [[ $flac = "y" || $sox = "y" ]]; then
     _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
     if do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
     do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
-    [[ -f "src/libFLAC/.libs/libFLAC.a" ]] && log "distclean" make distclean
-    do_uninstall include/FLAC{,++} bin-audio/metaflac.exe "${_check[@]}"
-    do_generic_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
-    do_checkIfExist "${_check[@]}" bin-audio/metaflac.exe
+    _check+=(bin-audio/metaflac.exe)
+    do_uninstall include/FLAC{,++} "${_check[@]}"
+    [[ -f Makefile ]] && log distclean make distclean
+    do_separate_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
+    do_checkIfExist "${_check[@]}"
     fi
 fi
 
