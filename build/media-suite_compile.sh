@@ -609,8 +609,7 @@ if [[ ! $vpx = "n" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f config.mk ]] && log "distclean" make distclean
         do_patch vpx-0001-Fix-compilation-with-mingw64.patch am
-        [[ -d build-$bits ]] && rm -rf "build-$bits"
-        mkdir "build-$bits" && cd_safe "build-$bits"
+        create_build_dir
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
         log "configure" ../configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
@@ -915,7 +914,8 @@ if [[ $x264 != "n" ]]; then
                 _check=(lsmash.h liblsmash.{a,pc})
                 [[ -f "config.mak" ]] && log "distclean" make distclean
                 do_uninstall "${_check[@]}"
-                do_configure --prefix="$LOCALDESTDIR"
+                create_build_dir
+                log configure ../configure --prefix="$LOCALDESTDIR"
                 do_make install-lib
                 do_checkIfExist "${_check[@]}"
             fi

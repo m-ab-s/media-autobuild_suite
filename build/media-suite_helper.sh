@@ -617,8 +617,7 @@ do_patch() {
 }
 
 do_cmakeinstall() {
-    [[ -d build-$bits ]] && rm -rf "build-$bits"
-    mkdir "build-$bits" && cd_safe "build-$bits"
+    create_build_dir
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
     log "install" ninja -j"${cpuCount:-$(($(nproc)/2))}" install
 }
@@ -663,6 +662,11 @@ log() {
     fi
 }
 
+create_build_dir() {
+    [[ -d build-$bits ]] && rm -rf "build-$bits"
+    mkdir "build-$bits" && cd_safe "build-$bits"
+}
+
 do_separate_conf() {
     local bindir=""
     case "$1" in
@@ -672,8 +676,7 @@ do_separate_conf() {
     *) bindir="$1" ;;
     esac
     shift 1
-    [[ -d build-$bits ]] && rm -rf "build-$bits"
-    mkdir "build-$bits" && cd_safe "build-$bits"
+    create_build_dir
     log configure ../configure --build="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
         --disable-shared "$bindir" "$@"
 }
