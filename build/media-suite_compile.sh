@@ -686,7 +686,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && do_checkForOptions --enable-libutvideo && do_pkgConfig "libutvideo = 15.1.0"; then
+if [[ $ffmpeg != "n" ]] && enabled libutvideo && do_pkgConfig "libutvideo = 15.1.0"; then
     do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0"
     if [[ $compile = "true" ]]; then
         _check=(libutvideo.{a,pc})
