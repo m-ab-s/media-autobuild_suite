@@ -308,17 +308,6 @@ if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     fi
 fi
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
-if [[ $ffmpeg != "n" ]] && enabled libdcadec; then
-    do_pacman_remove "dcadec-git"
-    do_vcs "https://github.com/foo86/dcadec.git"
-    if [[ $compile = "true" ]]; then
-        _check=(libdcadec.a dcadec.pc)
-        do_uninstall include/libdcadec "${_check[@]}"
-        log "make" make clean
-        do_make CONFIG_WINDOWS=1 SMALL=1 PREFIX="$LOCALDESTDIR" install-lib
-        do_checkIfExist "${_check[@]}"
-    fi
-fi
 
 if [[ $ffmpeg != "n" ]] && enabled libilbc; then
     do_vcs "https://github.com/TimothyGu/libilbc.git"
@@ -1053,6 +1042,9 @@ if [[ $ffmpeg != "n" ]]; then
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
+    enabled libdcadec && do_pacman_install dcadec &&
+        do_uninstall include/libdcadec libdcadec.a dcadec.pc
+
     do_hide_all_sharedlibs
 
     if [[ $ffmpeg = "s" ]]; then
