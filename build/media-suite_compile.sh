@@ -211,6 +211,7 @@ if do_checkForOptions --enable-libwebp; then
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
     if [[ $compile = "true" ]]; then
         do_autoreconf
+        [[ -f Makefile ]] && log distclean make distclean
         _check=(libwebp{,mux}.{{,l}a,pc})
         if [[ $standalone = y ]]; then
             extracommands=(--enable-libwebp{demux,decoder,extras}
