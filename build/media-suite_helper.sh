@@ -317,9 +317,10 @@ pc_exists() {
 
 do_uninstall() {
     [[ $1 = dry ]] && local dry=y && shift
+    [[ $1 = q ]] && local quiet=y && shift
     local files=($(files_exist -l "$@"))
     if [[ $files ]]; then
-        do_print_progress Running uninstall
+        [[ ! quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
             echo "rm -rf ${files[@]}"
         else
