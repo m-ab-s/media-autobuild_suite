@@ -243,14 +243,15 @@ do_checkIfExist() {
     local packetName
     packetName="$(get_first_subdir)"
     [[ $1 = dry ]] && local dry=y && shift
-    if [[ -z $dry ]]; then
-        files_exist v "$@"
-        if [[ $? = 0 ]]; then
+    if [[ $dry ]]; then
+        files_exist -v -s "$@"
+    else
+        if files_exist -v "$@"; then
             [[ $stripping = y ]] && do_strip "$@"
             do_print_status "└ $packetName" "$blue_color" "Updated"
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
-        elif [[ $? = 1 ]]; then
+        else
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
             do_print_status "└ $packetName" "$red_color" "Failed"
@@ -258,31 +259,50 @@ do_checkIfExist() {
             echo "Try deleting '$LOCALBUILDDIR/$packetName' and start the script again."
             echo "If you're sure there are no dependencies <Enter> to continue building."
             do_prompt "Close this window if you wish to stop building."
-        else
-            return 1
         fi
-    else
-        files_exist v "$@"
     fi
 }
 
-files_exist() {
-    [[ $1 = v ]] && local verbose=y && shift
+file_installed() {
     local file
-    for opt; do
-        case $opt in
-            *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
-            *.a|*.la|*.lib) file="$LOCALDESTDIR/lib/$opt" ;;
-            *.h|*.hpp )  file="$LOCALDESTDIR/include/$opt" ;;
-            * )    file="$LOCALDESTDIR/$opt" ;;
+    case $1 in
+        *.pc )
+            file="lib/pkgconfig/$1" ;;
+        *.a|*.la|*.lib )
+            file="lib/$1" ;;
+        *.h|*.hpp )
+            file="include/$1" ;;
+        * )
+            file="$1" ;;
+    esac
+    file="$LOCALDESTDIR/$file"
+    echo "$file" && test -e "$file"
+}
+
+files_exist() {
+    local verbose list soft term="\n"
+    while true; do
+        case $1 in
+            -v) verbose=y && shift;;
+            -l) list=y && shift;;
+            -s) soft=y && shift;;
+            -l0) list=y && term="\0" && shift;;
+            --) shift; break;;
+            *) break;;
         esac
-        [[ ! -f "$file" ]] && break
-        file=
     done
-    if [[ -n $file ]]; then
-        [[ -n $verbose ]] && do_print_status "├ $file" "${red_color}" "Not found"
-        return 1
-    fi
+    local file
+    [[ $list ]] && verbose= && soft=y
+    for opt; do
+        if file=$(file_installed $opt); then
+            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green_color}" "Found"
+            [[ $list ]] && echo -n "$file" && echo -ne "$term"
+        else
+            [[ $verbose ]] && do_print_status "├ $file" "${red_color}" "Not found"
+            [[ ! $soft ]] && return 1
+        fi
+    done
+    return 0
 }
 
 pc_exists() {
@@ -297,29 +317,15 @@ pc_exists() {
 
 do_uninstall() {
     [[ $1 = dry ]] && local dry=y && shift
-    local file
-    do_print_progress Running uninstall
-    for opt; do
-        case $opt in
-            *.pc ) file="$LOCALDESTDIR/lib/pkgconfig/$opt";;
-            *.a|*.la ) file="$LOCALDESTDIR/lib/$opt" ;;
-            *.h|*.hpp ) file="$LOCALDESTDIR/include/$opt" ;;
-            * )    file="$LOCALDESTDIR/$opt" ;;
-        esac
-        if [[ -f $file ]]; then
-            if [[ $dry ]]; then
-                echo "rm -f $file"
-            else
-                rm -f "$file"
-            fi
-        elif [[ -d $file ]]; then
-            if [[ $dry ]]; then
-                echo "rm -rf $file"
-            else
-                rm -rf "$file"
-            fi
+    local files=($(files_exist -l "$@"))
+    if [[ $files ]]; then
+        do_print_progress Running uninstall
+        if [[ $dry ]]; then
+            echo "rm -rf ${files[@]}"
+        else
+            rm -rf "${files[@]}"
         fi
-    done
+    fi
 }
 
 do_pkgConfig() {
