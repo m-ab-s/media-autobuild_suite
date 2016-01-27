@@ -70,15 +70,7 @@ fi
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
     do_pacman_remove "openjpeg2"
-    _check=(j{config,error,morecfg,peglib}.h libjpeg.a)
-    do_vcs "https://github.com/libjpeg-turbo/libjpeg-turbo.git" libjpegturbo "${_check[@]}"
-    if [[ $compile = "true" ]]; then
-        do_uninstall "${_check[@]}"
-        do_patch "libjpegturbo-0001-Fix-header-conflicts-with-MinGW.patch" am
-        do_patch "libjpegturbo-0002-Only-compile-libraries.patch" am
-        do_cmakeinstall -DWITH_TURBOJPEG=off -DWITH_JPEG8=on -DENABLE_SHARED=off
-        do_checkIfExist "${_check[@]}"
-    fi
+    do_uninstall j{config,error,morecfg,peglib}.h libjpeg.a
 
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
     if [[ $compile = "true" ]]; then
