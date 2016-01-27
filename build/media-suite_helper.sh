@@ -594,7 +594,7 @@ do_patch() {
         -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
 
     if [[ $response_code != "200" ]]; then
-        echo -e "${orange_color}${patchpath##*/}${reset_color}"
+        echo -e "${orange_color}${patch}${reset_color}"
         echo -e "\tPatch not found online. Trying local copy."
         if [[ -f "./$patch" ]]; then
             patchpath="$patch"
