@@ -505,7 +505,7 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     do_uninstall include/bs2b "${_check[@]}"
     do_patch "libbs2b-disable-sndfile.patch"
-    do_patch "libbs2b-libs-only.patch"
+    [[ $standalone = y ]] || sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
     do_checkIfExist "${_check[@]}"
