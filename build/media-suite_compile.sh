@@ -589,24 +589,26 @@ if [[ $ffmpeg != "n" ]] && enabled libtheora; then
         do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
 
-if [[ $vpx = y ]]; then
+if [[ $vpx != n ]]; then
     _check=(libvpx.a vpx.pc)
+    extracommands=()
     [[ $standalone = y ]] && _check+=(bin-video/vpxenc.exe)
     do_vcs "https://github.com/webmproject/libvpx.git" vpx "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f config.mk ]] && log "distclean" make distclean
         do_patch vpx-0001-Fix-compilation-with-mingw64.patch am
+        [[ $standalone = y ]] && extracommands+=(--enable-vp10) || extracommands+=(--disable-examples)
         create_build_dir
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
         log "configure" ../configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" \
-            "$([[ $standalone != y ]] && echo "--disable-examples" || echo "--enable-vp10")"
+            "${extracommands[@]}"
         sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
         do_makeinstall
-        if [[ $standalone ]] && files_exist bin/vpx{enc,dec}.exe; then
+        if [[ $standalone = y ]] && files_exist bin/vpx{enc,dec}.exe; then
             mv "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe "$LOCALDESTDIR"/bin-video/
             _check+=(bin-video/vpxdec.exe)
         else
@@ -614,7 +616,7 @@ if [[ $vpx = y ]]; then
         fi
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"
-        unset target
+        unset target extracommands
     fi
 else
     pc_exists vpx || do_removeOption "--enable-libvpx"
