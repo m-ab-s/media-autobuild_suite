@@ -152,8 +152,8 @@ if { { [[ "$ffmpeg" != "n" ]] && enabled gnutls; } ||
 [[ -n "$gnutls_ver" ]] &&
     gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.8"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
-    do_pacman_install nettle &&
-        do_uninstall include/nettle libnettle.a nettle.pc
+    do_pacman_install nettle
+    do_uninstall include/nettle libnettle.a nettle.pc
 
     _check=(libgnutls.{,l}a gnutls.pc)
     do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
@@ -314,13 +314,13 @@ fi
 
 if [[ $flac = "y" || $sox = "y" ]] ||
     enabled_any libtheora libvorbis libspeex; then
-    do_pacman_install libogg &&
-        do_uninstall include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
+    do_pacman_install libogg
+    do_uninstall include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
 fi
 
 if [[ $sox = "y" ]] || enabled_any libvorbis libtheora; then
-    do_pacman_install libvorbis &&
-        do_uninstall include/vorbis share/aclocal/vorbis.m4 \
+    do_pacman_install libvorbis
+    do_uninstall include/vorbis share/aclocal/vorbis.m4 \
         libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
 fi
 
@@ -336,8 +336,8 @@ if [[ $sox = "y" ]] || enabled libopus; then
         buildOpusEnc="true"
     fi
 
-    do_pacman_install opusfile &&
-        do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
+    do_pacman_install opusfile
+    do_uninstall opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
 if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
@@ -364,12 +364,11 @@ if [[ $flac = "y" || $sox = "y" ]]; then
     fi
 fi
 
-_check=(libvo-aacenc.{l,}a vo-aacenc.pc)
-files_exist "${_check[@]}" && do_uninstall include/vo-aacenc "${_check[@]}"
+do_uninstall include/vo-aacenc libvo-aacenc.{l,}a vo-aacenc.pc
 
 if [[ $ffmpeg != "n" ]] && enabled_any libopencore-amr{wb,nb}; then
-    do_pacman_install "opencore-amr" &&
-        do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
+    do_pacman_install "opencore-amr"
+    do_uninstall include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
 
 if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
@@ -496,8 +495,8 @@ if [[ $ffmpeg != "n" ]] && enabled libgme; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libtwolame; then
-    do_pacman_install twolame &&
-        do_uninstall twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
+    do_pacman_install twolame
+    do_uninstall twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
 fi
 
@@ -576,8 +575,8 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libtheora; then
-    do_pacman_install libtheora &&
-        do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
+    do_pacman_install libtheora
+    do_uninstall include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
 
 if [[ $vpx != n ]]; then
@@ -760,8 +759,8 @@ if [[ $ffmpeg != "n" ]] && enabled libvidstab; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libcaca; then
-    do_pacman_install "libcaca" &&
-        do_uninstall libcaca.{l,}a caca.pc
+    do_pacman_install "libcaca"
+    do_uninstall libcaca.{l,}a caca.pc
     do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
 
@@ -846,8 +845,8 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled libcdio; then
     [[ -d "$LOCALBUILDDIR/libcdio_paranoia-git" ]] &&
-        _to_remove+=("$LOCALBUILDDIR/libcdio_paranoia-git") &&
-        do_uninstall include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
+        _to_remove+=("$LOCALBUILDDIR/libcdio_paranoia-git")
+    do_uninstall include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
     do_pacman_install "libcddb libcdio libcdio-paranoia"
 fi
 
@@ -1047,8 +1046,9 @@ if [[ $ffmpeg != "n" ]]; then
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
-    enabled libdcadec && do_pacman_install dcadec &&
-        do_uninstall include/libdcadec libdcadec.a dcadec.pc
+    enabled libdcadec && do_pacman_install dcadec
+    [[ -d "$LOCALBUILDDIR/dcadec-git" ]] && _to_remove+=("$LOCALBUILDDIR/dcadec-git")
+    do_uninstall include/libdcadec libdcadec.a dcadec.pc
 
     do_hide_all_sharedlibs
 
