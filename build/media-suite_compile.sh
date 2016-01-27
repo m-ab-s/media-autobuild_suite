@@ -1113,23 +1113,6 @@ if [[ $ffmpeg != "n" ]]; then
     fi
 fi
 
-if [[ $bits = "64bit" && $other265 = "y" ]]; then
-    _check=(bin-video/f265cli.exe)
-if files_exist "${_check[@]}"; then
-    do_print_status "f265 snapshot" "$green_color" "Up-to-date"
-else
-    do_wget "http://f265.org/f265/static/bin/f265_development_snapshot.zip"
-    rm -rf f265 && mv f265_development_snapshot f265 && cd_safe f265
-    if [ -d "build" ]; then
-        rm -rf build .sconf_temp
-        rm -f .sconsign.dblite config.log options.py
-    fi
-    log "scons" scons libav=none
-    [[ -f build/f265cli.exe ]] && cp build/f265cli.exe "$LOCALDESTDIR"/bin-video/f265cli.exe
-    do_checkIfExist "${_check[@]}"
-fi
-fi
-
 if [[ $mplayer = "y" ]]; then
     [[ $license != "nonfree" ]] && faac=(--disable-faac --disable-faac-lavc)
     _check=(bin-video/m{player,encoder}.exe)

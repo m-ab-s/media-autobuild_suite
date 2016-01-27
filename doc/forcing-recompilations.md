@@ -66,7 +66,6 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
 
 /bin-video
     bmxtranswrap
-    f265cli
     ffmpeg (for static and both)
     ffmpegSHARED/ffmpeg (for shared only)
     kvazaar

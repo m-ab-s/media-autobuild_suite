@@ -88,7 +88,6 @@ Included Tools And Libraries
 	
  - other tools
  	- bmx (git)
-	- f265 (git)
     - faac (1.28)
 	- fdk-aac (git)
 	- file (5.22)

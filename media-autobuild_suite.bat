@@ -329,14 +329,14 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build H.265 encoders other than x265?
+    echo. Build Kvazaar?
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Included: kvazaar and f265
+    echo. Binary being built depends on "standalone=y"
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildother265="Build other265: "
+    set /P buildother265="Build kvazaar: "
     ) else set buildother265=%other265INI%
 if %deleteINI%==1 set "writeother265=yes"
 
