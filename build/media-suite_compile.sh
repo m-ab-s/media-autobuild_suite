@@ -909,7 +909,7 @@ if [[ $x264 != n ]]; then
             extracommands+=("--bindir=$LOCALDESTDIR/bin-video")
             _check+=(bin-video/x264.exe)
         else
-            extracommands+=(--disable-interlaced --disable-gpac --disable-cli)
+            extracommands+=(--disable-gpac --disable-cli)
         fi
         if [[ $standalone = y && $x264 != h ]]; then
             _check+=(bin-video/x264-10bit.exe)
