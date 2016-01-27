@@ -84,8 +84,7 @@ if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
     if [[ $compile = "true" ]]; then
         _check=(libopenjp2.{a,pc})
         do_uninstall {include,lib}/openjpeg-2.1 libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
-        do_patch "openjpeg-0001-Only-compile-libraries.patch" am
-        do_cmakeinstall
+        do_cmakeinstall -DBUILD_CODEC=off
         do_checkIfExist "${_check[@]}"
     fi
 fi
