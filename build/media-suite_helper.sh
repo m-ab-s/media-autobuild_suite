@@ -923,6 +923,9 @@ clean_suite() {
     find . -maxdepth 6 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
     find . -maxdepth 5 -type d '(' -name "build-32bit" -o -name "build-64bit" ')' -print0 |
         xargs -0 rm -rf
+    find . -maxdepth 2 -name "build" -type d -exec test -f "{}/CMakeCache.txt" ';' -print0 |
+        xargs -0 rm -rf
+    rm -rf ./x265-hg/build/msys/{8,10,12}bit
 
     [[ -f last_run ]] && mv last_run last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
