@@ -808,13 +808,9 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     if %msys2%==msys32 (
     set "msysprefix=i686"
     ) else set "msysprefix=x86_64"
-    set "msysbase=https://www.mirrorservice.org/sites/download.sourceforge.net/pub/sourceforge/m/ms/msys2/Base/%msysprefix%"
-    for /F %%b in (
-        '%build%\wget --no-check-certificate -qO- "%msysbase%/?C=M;O=D" ^| ^
-        %build%\grep -oPm 1 "(?<=href=.)msys2-base-%msysprefix%-\d{8}.tar.xz"'
-        ) do (
-        %build%\wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz %msysbase%/%%b
-        )
+    set "msysversion=20150916"
+    wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz ^
+    "http://download.sourceforge.net/project/msys2/Base/%msysprefix%/msys2-base-%msysprefix%-%msysversion%.tar.xz"
     
 :unpack
 if exist %build%\msys2-base.tar.xz (
