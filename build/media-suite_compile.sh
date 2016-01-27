@@ -1060,7 +1060,7 @@ if [[ $ffmpeg != "n" ]]; then
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
         do_changeFFmpegConfig $license
-        enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis openssl libcdio &&
+        enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis libcdio &&
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
