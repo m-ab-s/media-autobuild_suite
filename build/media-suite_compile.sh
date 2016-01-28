@@ -262,7 +262,7 @@ if enabled libtesseract; then
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             pushd "$LOCALDESTDIR"/bin-global/tessdata > /dev/null
-            curl -OLs "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
+            do_wget -c -r "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
             printf "%s\n" "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata/blob/master/"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
@@ -801,7 +801,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
         [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
         for file in DeckLinkAPI{{,Version}.h,_i.c}; do
             [[ ! -f "$file" ]] &&
-                curl -OLs "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$file" &&
+                do_wget -r -c "$LOCALBUILDDIR/extras/$file" &&
                 touch recently_updated
             cp -f "$file" "$LOCALDESTDIR"/include/
         done
@@ -1224,7 +1224,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             mkdir -p "$LOCALDESTDIR"/include/vapoursynth &&
                 cd_safe "$LOCALDESTDIR"/include/vapoursynth
             for _file in {VS{Helper,Script},VapourSynth}.h; do
-                curl -sLO "${baseurl}/include/${_file}"
+                do_wget -r -c "${baseurl}/include/${_file}"
             done
 
             # import libs
