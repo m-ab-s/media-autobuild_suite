@@ -183,18 +183,19 @@ check_hash() {
 
 # get wget download
 do_wget() {
-    local nocd norm quiet hash
+    local nocd norm quiet hash notmodified
     while true; do
         case $1 in
             -c) nocd=nocd && shift;;
             -r) norm=y && shift;;
             -q) quiet=y && shift;;
             -h) hash="$2" && shift 2;;
+            -z) notmodified=y && shift;;
             --) shift; break;;
             *) break;;
         esac
     done
-    local url="$1" archive="$2" dirName="$3" response_code
+    local url="$1" archive="$2" dirName="$3" response_code curlcmd
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
@@ -205,14 +206,17 @@ do_wget() {
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
         [[ ${url#$LOCALBUILDDIR} != ${url} ]] && url="https://github.com/jb-alvarado/media-autobuild_suite/raw/master${url}"
-        response_code="$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")"
+        [[ $notmodified && -f $archive ]] && notmodified="-z $archive" || unset notmodified
+        response_code="$(curl --retry 20 --retry-max-time 5 -sLkf $notmodified -w "%{response_code}" -o "$archive" "$url")"
         if [[ $response_code = "200" || $response_code = "226" ]]; then
             [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Updates found"
+        elif [[ $response_code = "304" ]]; then
+            [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "File up-to-date"
         elif [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
-                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local copy"
+                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local file"
             elif [[ -f $LOCALBUILDDIR/${url#media-autobuild_suite/master/build/} ]]; then
-                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local copy"
+                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local file"
                 cp -f "$LOCALBUILDDIR/${url#media-autobuild_suite/master/build/}" .
             else
                 do_print_status "┌ $dirName" "$red_color" "Failed"
@@ -223,7 +227,7 @@ do_wget() {
             fi
         fi
     else
-        [[ $quiet ]] || do_print_status "┌ $dirName" "$green_color" "Archive exists"
+        [[ $quiet ]] || do_print_status "┌ $dirName" "$green_color" "File up-to-date"
     fi
     do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
     [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
