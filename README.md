@@ -2,6 +2,10 @@ media-autobuild_suite
 =========
 [![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite)
 
+This source code is also mirrored in [GitLab](https://gitlab.com/RiCON/media-autobuild_suite).
+
+Most git sources in the suite use GitHub, so if it's down, it's probably useless to run the suite at that time.
+
 Known Issues
 --------
  - FFmpeg and FFmpeg-based (mplayer, mpv)
