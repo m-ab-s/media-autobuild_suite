@@ -195,32 +195,39 @@ do_wget() {
             *) break;;
         esac
     done
-    local url="$1" archive="$2" dirName="$3" response_code curlcmd
+    local url="$1" archive="$2" dirName="$3" response_code status curlcmds
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
-    [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
+    [[ ! $dirName ]] && dirName=$(guess_dirname "$archive")
+    [[ ! $dirName ]] && status="├ $archive" || status="┌ $dirName"
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
-        [[ ${url#$LOCALBUILDDIR} != ${url} ]] && url="https://github.com/jb-alvarado/media-autobuild_suite/raw/master${url}"
-        [[ $notmodified && -f $archive ]] && notmodified="-z $archive" || unset notmodified
-        response_code="$(curl --retry 20 --retry-max-time 5 -sLkf $notmodified -w "%{response_code}" -o "$archive" "$url")"
+        [[ ${url#$LOCALBUILDDIR} != ${url} ]] &&
+            url="https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master${url}"
+
+        curlcmds=(curl --retry 20 --retry-max-time 5 -sLkf)
+        [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
+        response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
+
         if [[ $response_code = "200" || $response_code = "226" ]]; then
-            [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Updates found"
+            [[ $quiet ]] || do_print_status "$status" "$orange_color" "Updates found"
         elif [[ $response_code = "304" ]]; then
-            [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "File up-to-date"
+            [[ $quiet ]] || do_print_status "$status" "$orange_color" "File up-to-date"
         elif [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
-                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local file"
+                echo -e "${orange_color}${archive}${reset_color}"
+                echo -e "\tFile not found online. Using local copy."
             elif [[ -f $LOCALBUILDDIR/${url#media-autobuild_suite/master/build/} ]]; then
-                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local file"
+                echo -e "${orange_color}${archive}${reset_color}"
+                echo -e "\tFile not found online. Using local copy."
                 cp -f "$LOCALBUILDDIR/${url#media-autobuild_suite/master/build/}" .
             else
-                do_print_status "┌ $dirName" "$red_color" "Failed"
-                echo "Error $response_code while downloading $URL"
+                do_print_status "$status" "$red_color" "Failed"
+                echo "Error $response_code while downloading $url"
                 echo "<Ctrl+c> to cancel build or <Enter> to continue"
                 do_prompt "if you're sure nothing depends on it."
                 return 1
@@ -273,7 +280,6 @@ do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
     local url="$1"
     shift 1
-    local dir="${url:0:1}/${url:0:2}"
     do_wget "http://download.sourceforge.net/${url}" "$@"
 }
 
@@ -637,44 +643,26 @@ do_removeOptions() {
 
 do_patch() {
     local patch=${1%% *}
-    local am=$2     # "am" to apply patch with "git am"
-    local strip=$3  # value of "patch" -p i.e. leading directories to strip
-    if [[ -z $strip ]]; then
-        strip="1"
-    fi
-    local patchpath=""
-    local response_code
-    response_code="$(curl -s --retry 20 --retry-max-time 5 -L -k -f -w "%{response_code}" \
-        -O "https://raw.github.com/jb-alvarado/media-autobuild_suite/master${LOCALBUILDDIR}/patches/$patch")"
-
-    if [[ $response_code != "200" ]]; then
-        echo -e "${orange_color}${patch}${reset_color}"
-        echo -e "\tPatch not found online. Trying local copy."
-        if [[ -f "./$patch" ]]; then
-            patchpath="$patch"
-        elif [[ -f "$LOCALBUILDDIR/patches/${patch}" ]]; then
-            patchpath="$LOCALBUILDDIR/patches/${patch}"
-        fi
-    else
-        patchpath="$patch"
-    fi
-    if [[ -n "$patchpath" ]]; then
+    local am=$2          # "am" to apply patch with "git am"
+    local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
+    do_wget -c -r -q "$LOCALBUILDDIR/patches/$patch"
+    if [[ -f "$patch" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchpath" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
                 git am -q --abort
-                echo -e "${orange_color}${patchpath##*/}${reset_color}"
+                echo -e "${orange_color}${patch}${reset_color}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run -s -N -p$strip -i "$patchpath" >/dev/null 2>&1; then
-                patch -s -N -p$strip -i "$patchpath"
+            if patch --dry-run -s -N -p$strip -i "$patch" >/dev/null 2>&1; then
+                patch -s -N -p$strip -i "$patch"
             else
-                echo -e "${orange_color}${patchpath##*/}${reset_color}"
+                echo -e "${orange_color}${patch}${reset_color}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
             fi
         fi
     else
-        echo -e "${orange_color}${patchpath##*/}${reset_color}"
+        echo -e "${orange_color}${patch}${reset_color}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
     fi
 }
