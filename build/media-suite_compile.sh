@@ -169,10 +169,10 @@ fi
 
 if [[ $sox = "y" ]]; then
     _ver="2.5.1"
-    if [[ -f "$LOCALDESTDIR/lib/libgnurx.a" ]]; then
+    _check=(lib{gnurx,regex}.a regex.h)
+    if files_exist "${_check[@]}"; then
         do_print_status "libgnurx ${_ver}" "$green_color" "Up-to-date"
     else
-        _check=(lib{gnurx,regex}.a regex.h)
         do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-${_ver}/mingw-libgnurx-${_ver}-src.tar.gz" \
             "mingw-libgnurx-${_ver}.tar.gz"
         do_uninstall "${_check[@]}"
