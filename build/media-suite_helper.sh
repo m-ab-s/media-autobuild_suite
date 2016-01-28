@@ -195,14 +195,13 @@ do_wget() {
             *) break;;
         esac
     done
-    local url="$1" archive="$2" dirName="$3" response_code status curlcmds
+    local url="$1" archive="$2" dirName="$3" response_code curlcmds
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
     [[ ! $dirName ]] && dirName=$(guess_dirname "$archive")
-    [[ ! $dirName ]] && status="├ $archive" || status="┌ $dirName"
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
@@ -214,9 +213,9 @@ do_wget() {
         response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
 
         if [[ $response_code = "200" || $response_code = "226" ]]; then
-            [[ $quiet ]] || do_print_status "$status" "$orange_color" "Updates found"
+            [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "Downloaded"
         elif [[ $response_code = "304" ]]; then
-            [[ $quiet ]] || do_print_status "$status" "$orange_color" "File up-to-date"
+            [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "File up-to-date"
         elif [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange_color}${archive}${reset_color}"
@@ -226,7 +225,7 @@ do_wget() {
                 echo -e "\tFile not found online. Using local copy."
                 cp -f "$LOCALBUILDDIR/${url#media-autobuild_suite/master/build/}" .
             else
-                do_print_status "$status" "$red_color" "Failed"
+                do_print_status "└ ${dirName:-$archive}" "$red_color" "Failed"
                 echo "Error $response_code while downloading $url"
                 echo "<Ctrl+c> to cancel build or <Enter> to continue"
                 do_prompt "if you're sure nothing depends on it."
@@ -234,7 +233,7 @@ do_wget() {
             fi
         fi
     else
-        [[ $quiet ]] || do_print_status "┌ $dirName" "$green_color" "File up-to-date"
+        [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
     do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
     [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
@@ -396,7 +395,7 @@ do_pkgConfig() {
     local version=$2
     [[ -z "$version" && -n "$check" ]] && version="${check#*= }"
     if ! pc_exists "${pkg}"; then
-        do_print_status "${pkg} ${version}" "$red_color" "Not found"
+        do_print_status "${pkg} ${version}" "$red_color" "Not installed"
     elif ! pc_exists "${pkg}${check}"; then
         do_print_status "${pkg} ${version}" "$orange_color" "Outdated"
     else
