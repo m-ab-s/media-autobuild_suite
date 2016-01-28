@@ -163,56 +163,106 @@ do_vcs() {
     fi
 }
 
+guess_dirname() {
+    echo $(expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+}
+
+check_hash() {
+    local file="$1" check="$2" sum
+    if [[ -f $file ]]; then
+        sum=$(md5sum "$file" | awk '{ print $1 }')
+        if [[ $check = print ]]; then
+            echo "$sum"
+        else
+            test "$sum" = "$check"
+        fi
+    else
+        return 1
+    fi
+}
+
 # get wget download
 do_wget() {
-    local url="$1"
-    local archive="$2"
-    local dirName="$3"
+    local nocd norm quiet hash
+    while true; do
+        case $1 in
+            -c) nocd=nocd && shift;;
+            -r) norm=y && shift;;
+            -q) quiet=y && shift;;
+            -h) hash="$2" && shift 2;;
+            --) shift; break;;
+            *) break;;
+        esac
+    done
+    local url="$1" archive="$2" dirName="$3" response_code
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
-    [[ -z "$dirName" ]] && dirName=$(expr "$archive" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
-    local response_code
-    cd_safe "$LOCALBUILDDIR"
-    response_code="$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")"
-    if [[ $response_code = "200" || $response_code = "226" ]]; then
-        do_print_status "┌ $dirName" "$orange_color" "Updates found"
-        archive="$(pwd)/${archive}"
-        log "extract" do_extract "$archive" "$dirName"
-        [[ $deleteSource = "y" ]] && rm -f "$archive"
-    elif [[ $response_code -gt 400 ]]; then
-        echo "Error $response_code while downloading $URL"
-        echo "Try again later or <Enter> to continue"
-        do_prompt "if you're sure nothing depends on it."
+    [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
+
+    [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
+    if ! check_hash "$archive" "$hash"; then
+        [[ ${url#$LOCALBUILDDIR} != ${url} ]] && url="https://github.com/jb-alvarado/media-autobuild_suite/raw/master${url}"
+        response_code="$(curl --retry 20 --retry-max-time 5 -s -L -k -f -w "%{response_code}" -o "$archive" "$url")"
+        if [[ $response_code = "200" || $response_code = "226" ]]; then
+            [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Updates found"
+        elif [[ $response_code -gt 400 ]]; then
+            if [[ -f $archive ]]; then
+                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local copy"
+            elif [[ -f $LOCALBUILDDIR/${url#media-autobuild_suite/master/build/} ]]; then
+                [[ $quiet ]] || do_print_status "┌ $dirName" "$orange_color" "Using local copy"
+                cp -f "$LOCALBUILDDIR/${url#media-autobuild_suite/master/build/}" .
+            else
+                do_print_status "┌ $dirName" "$red_color" "Failed"
+                echo "Error $response_code while downloading $URL"
+                echo "<Ctrl+c> to cancel build or <Enter> to continue"
+                do_prompt "if you're sure nothing depends on it."
+                return 1
+            fi
+        fi
+    else
+        [[ $quiet ]] || do_print_status "┌ $dirName" "$green_color" "Archive exists"
     fi
+    do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
+    [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
+    [[ ! $norm && $dirName ]] && _to_remove+=("$(pwd)/$dirName")
+}
+
+real_extract() {
+    case $archive_type in
+    zip|7z|tar)
+        7z x -y -o"$2" "$1"
+        ;;
+    tar.*)
+        7z x "$1" -so | 7z x -y -aoa -si -ttar
+        ;;
+    esac
 }
 
 do_extract() {
-    local archive="$1"
-    local dirName="$2"
-    # accepted: zip, 7z, tar.gz, tar.bz2 and tar.xz
-    local archive_type
+    [[ $1 = nocd ]] && local nocd=y && shift
+    local archive="$1" dirName="$2" archive_type
+    # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
+    [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
     archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
 
-    if [[ -d "$dirName" && $archive_type = tar* ]] &&
+    if [[ $dirName != "." && -d "$dirName" ]] &&
         { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
           [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
         rm -rf "$dirName"
+    elif [[ -d "$dirName" ]]; then
+        [[ $nocd ]] || cd_safe "$dirName"
+        return 0
+    elif [[ ! $archive_type ]]; then
+        return 0
     fi
-    case $archive_type in
-    zip)
-        unzip "$archive"
-        ;;
-    7z)
-        7z x -o"$dirName" "$archive"
-        ;;
-    tar*)
-        tar -xaf "$archive" || 7z x "$archive" -so | 7z x -aoa -si -ttar
-        cd_safe "$dirName"
-        ;;
-    esac
+    log extract real_extract "$archive" "$dirName"
+    [[ -d "$dirName/$dirName" ]] &&
+        find "$dirName/$dirName" -maxdepth 1 -print0 | xargs -0 mv -t "$dirName/" &&
+        rmdir "$dirName/$dirName" 2>/dev/null
+    [[ $nocd ]] || cd_safe "$dirName"
 }
 
 do_wget_sf() {
