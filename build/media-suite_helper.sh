@@ -994,13 +994,22 @@ clean_suite() {
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
 
-    if [[ $deleteSource = "y" ]]; then
+    if [[ $deleteSource = y ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
         printf '%s\n' "${_to_remove[@]}" | grep "^$LOCALBUILDDIR/" |
-            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort | uniq | xargs -r rm -rf
+            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
             ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
             xargs -0 -r rm -rf
+        unset _to_remove
+    elif [[ $deleteSource = f ]]; then
+        echo -e "\n\t${orange_color}Saving ok-to-delete files to can_remove.txt...${reset_color}"
+        printf '%s\n' "${_to_remove[@]}" | grep "^$LOCALBUILDDIR/" |
+            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u |
+            xargs -r echo rm -rf >> can_remove.txt
+        find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
+            ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
+            xargs -0 -r echo rm -rf >> can_remove.txt
         unset _to_remove
     fi
     popd >/dev/null
