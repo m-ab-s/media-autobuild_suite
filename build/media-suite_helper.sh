@@ -235,9 +235,9 @@ do_wget() {
     else
         [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
-    do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
     [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
-    [[ ! $norm && $dirName ]] && _to_remove+=("$(pwd)/$dirName")
+    do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
+    [[ ! $norm && $dirName && ! $nocd ]] && _to_remove+=("$(pwd)")
 }
 
 real_extract() {
@@ -986,7 +986,7 @@ clean_suite() {
     if [[ $deleteSource = "y" ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
         printf '%s\n' "${_to_remove[@]}" | grep "^$LOCALBUILDDIR/" |
-            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | uniq | xargs -r rm -rf
+            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort | uniq | xargs -r rm -rf
         find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
             ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
             xargs -0 -r rm -rf
