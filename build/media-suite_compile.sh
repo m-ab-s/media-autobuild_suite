@@ -1097,6 +1097,7 @@ if [[ $ffmpeg != "n" ]]; then
             libav{codec,device,filter,format,util,resample}.{a,pc}
             lib{sw{scale,resample},postproc}.{a,pc}
             )
+        _check=()
         sedflags="prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags"
 
         # shared
@@ -1110,14 +1111,15 @@ if [[ $ffmpeg != "n" ]]; then
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
             if ! disabled_any programs avcodec avformat; then
+                _check+=(bin-video/ffmpegSHARED)
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpegSHARED/bin/ffmpeg.exe)
                     disabled_any sdl ffplay || _check+=(bin-video/ffmpegSHARED/bin/ffplay.exe)
                 fi
                 disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
             fi
-            [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
-                mv build_successful"${bits}"{,_shared} && mv ab-suite.{,shared.}configure.log &&
+            files_exist "${_check[@]}" && touch build_successful${bits}_shared
+            [[ $ffmpeg = "b" ]] && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
         fi
@@ -1127,6 +1129,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_print_progress "Compiling ${bold_color}static${reset_color} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             if ! disabled_any programs avcodec avformat; then
+                _check+=(libavutil.{a,pc})
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
                     disabled_any sdl ffplay || _check+=(bin-video/ffplay.exe)
