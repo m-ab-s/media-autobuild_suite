@@ -242,11 +242,17 @@ do_wget() {
 
 real_extract() {
     case $archive_type in
-    zip|7z|tar)
-        7z x -y -o"$2" "$1"
+    zip|7z)
+        7z x -aoa -o"$2" "$1"
         ;;
-    tar.*)
-        7z x "$1" -so | 7z x -y -aoa -si -ttar
+    tar*)
+        [[ $archive_type = tar.* ]] && 7z x -aoa "$1"
+        if [[ $(/usr/bin/file -b "${1%.tar*}.tar") = POSIX* ]]; then
+            tar -xf "${1%.tar*}.tar" || 7z x -aoa "${1%.tar*}.tar"
+        else
+           7z x -aoa "${1%.tar*}.tar"
+        fi
+        rm -f "${1%.tar*}.tar"
         ;;
     esac
 }
