@@ -842,20 +842,20 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     _ver="6"
-    _check=nvEncodeAPI.h
-    _hash=dcf25c9910a0af2b3aa20e969eb8c8ad
-    if files_exist -v "$_check" &&
-        check_hash "$(file_installed "$_check")" "$_hash"; then
+    _check=(nvEncodeAPI.h)
+    _hash=(dcf25c9910a0af2b3aa20e969eb8c8ad)
+    if files_exist -v "${_check[@]}" &&
+        check_hash "$(file_installed "${_check[0]}")" "${_hash[0]}"; then
         do_print_status "nvEncodeAPI ${_ver}.0.1" "$green_color" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
-            {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[@]}"
+            {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[0]}"
         mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
-        do_wget -r -c -h "$_hash" "$LOCALBUILDDIR/extras/$_check"
-        do_install "$_check" include/
-        do_checkIfExist "$_check"
+        do_wget -r -c -h "$_hash" "$LOCALBUILDDIR/extras/${_check[0]}"
+        do_install "${_check[0]}" include/
+        do_checkIfExist "${_check[0]}"
     fi
 fi
 
