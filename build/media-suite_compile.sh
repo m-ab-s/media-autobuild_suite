@@ -832,8 +832,8 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
         mkdir -p DeckLinkAPI && cd_safe DeckLinkAPI
         count="$((${#_check[@]}-1))"
         while [[ $count -ge 0 ]]; do
-            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]}"
-            cp -f "${_check[$count]}" "$LOCALDESTDIR/include/"
+            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]#include/}"
+            cp -f "${_check[$count]#include/}" "$LOCALDESTDIR/include/"
             let count-=1
         done
         do_checkIfExist "${_check[@]}"
