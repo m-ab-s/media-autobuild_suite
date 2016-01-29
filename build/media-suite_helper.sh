@@ -338,7 +338,7 @@ file_installed() {
             file="lib/pkgconfig/$1" ;;
         *.a|*.la|*.lib )
             file="lib/$1" ;;
-        *.h|*.hpp )
+        *.h|*.hpp|*.c )
             file="include/$1" ;;
         * )
             file="$1" ;;
@@ -381,6 +381,12 @@ pc_exists() {
         [[ $pkg = *.pc ]] || pkg="${LOCALDESTDIR}/lib/pkgconfig/${pkg}.pc"
         pkg-config --exists --silence-errors "${pkg}${check}" || return
     done
+}
+
+do_install() {
+    [[ $1 = dry ]] && local dryrun=y && shift
+    [[ $dryrun ]] && echo install -D "$1" "$(file_installed "$2")" ||
+        install -D "$1" "$(file_installed "$2")"
 }
 
 do_uninstall() {
@@ -912,8 +918,7 @@ get_last_version() {
 }
 
 create_debug_link() {
-    local file=
-    for file in "$@"; do
+    for file; do
         if [[ -f "$file" && ! -f "$file".debug ]]; then
             echo "Stripping and creating debug link for ${file##*/}..."
             objcopy --only-keep-debug "$file" "$file".debug

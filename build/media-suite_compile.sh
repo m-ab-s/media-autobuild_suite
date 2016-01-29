@@ -809,32 +809,31 @@ if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0";
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled decklink; then
-    cd_safe "$LOCALBUILDDIR"
     _check=(DeckLinkAPI.h
            DeckLinkAPIVersion.h
-           include/DeckLinkAPI_i.c)
+           DeckLinkAPI_i.c)
     _hash=(edd36fa98ae1a632d53809329703d9a3
            ba4cf1d70f540e48f500e3e8ad5accbc
            01d77d75bebb50f22d480326a6c5f174)
     _ver="10.5.4"
-    if files_exist "${_check[@]}" &&
+    if files_exist -v "${_check[@]}" &&
         {
-            count="$((${#_check[@]}-1))"
-            while [[ $count -ge 0 ]]; do
-                check_hash "$LOCALDESTDIR/include/${_check[$count]#include/}" \
-                    "${_hash[$count]}" || break
-                let count-=1
+            count=0
+            while [[ x"${_check[$count]}" != x"" ]]; do
+                check_hash "$(file_installed "${_check[$count]}")" "${_hash[$count]}" || break
+                let count+=1
             done
-            test $count = -1
+            test x"${_check[$count]}" = x""
         }; then
         do_print_status "DeckLinkAPI $_ver" "$green_color" "Up-to-date"
     else
-        mkdir -p DeckLinkAPI && cd_safe DeckLinkAPI
-        count="$((${#_check[@]}-1))"
-        while [[ $count -ge 0 ]]; do
-            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]#include/}"
-            cp -f "${_check[$count]#include/}" "$LOCALDESTDIR/include/"
-            let count-=1
+        mkdir -p "$LOCALBUILDDIR/DeckLinkAPI" &&
+            cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
+        count=0
+        while [[ x"${_check[$count]}" != x"" ]]; do
+            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]}"
+            do_install "${_check[$count]}" include/
+            let count+=1
         done
         do_checkIfExist "${_check[@]}"
     fi
@@ -842,20 +841,20 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled nvenc; then
-    cd_safe "$LOCALBUILDDIR"
     _ver="6"
     _check=nvEncodeAPI.h
     _hash=dcf25c9910a0af2b3aa20e969eb8c8ad
-    if files_exist "$_check" &&
-        check_hash "$LOCALDESTDIR/include/$_check" "$_hash"; then
+    if files_exist -v "$_check" &&
+        check_hash "$(file_installed "$_check")" "$_hash"; then
         do_print_status "nvEncodeAPI ${_ver}.0.1" "$green_color" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[@]}"
-        mkdir -p NvEncAPI && cd_safe NvEncAPI
+        mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
+            cd_safe "$LOCALBUILDDIR/NvEncAPI"
         do_wget -r -c -h "$_hash" "$LOCALBUILDDIR/extras/$_check"
-        cp -f "$_check" "$LOCALDESTDIR/include/"
+        do_install "$_check" include/
         do_checkIfExist "$_check"
     fi
 fi
