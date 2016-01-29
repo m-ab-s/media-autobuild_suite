@@ -277,9 +277,12 @@ do_extract() {
 
 do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
+    local hash
+    [[ $1 = "-h" ]] && hash="$2" && shift 2
     local url="$1"
     shift 1
-    do_wget "http://download.sourceforge.net/${url}" "$@"
+    do_wget $([[ $hash ]] && echo "-h $hash") \
+        "http://download.sourceforge.net/${url}" "$@"
 }
 
 do_strip() {

@@ -87,7 +87,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         _check=(libfreetype.{l,}a freetype2.pc)
-        do_wget "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
+        do_wget -h 86109d0c998787d81ac582bad9adf82e \
+            "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
         do_separate_confmakeinstall global --with-harfbuzz=no
         do_checkIfExist "${_check[@]}" 
@@ -98,7 +99,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_pacman_remove "python2-lxml"
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
-        do_wget "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
+        do_wget -h 479be870c7f83f15f87bac085b61d641 \
+            "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -i Makefile.in -e 's/SUBDIRS = .*/SUBDIRS = fontconfig src/' \
             -e '/fc-cache fc-cat fc-list/,+1d' \
@@ -126,7 +128,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     if do_pkgConfig "fribidi = 0.19.7"; then
         _check=(libfribidi.{l,}a fribidi.pc)
         [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
-        do_wget "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
+        do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
+            "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
         do_separate_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
@@ -138,7 +141,8 @@ if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove "SDL"
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
-    do_wget "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
+    do_wget -h 9d96df8417572a2afb781a7c4c811a85 \
+        "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
     do_uninstall include/SDL "${_check[@]}"
     CFLAGS="-DDECLSPEC=" do_separate_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
@@ -169,11 +173,13 @@ fi
 
 if [[ $sox = "y" ]]; then
     _ver="2.5.1"
+    _hash="35c8fed3101ca1f253e9b6b1966661f6"
     _check=(lib{gnurx,regex}.a regex.h)
     if files_exist "${_check[@]}"; then
         do_print_status "libgnurx ${_ver}" "$green_color" "Up-to-date"
     else
-        do_wget_sf "mingw/Other/UserContributed/regex/mingw-regex-${_ver}/mingw-libgnurx-${_ver}-src.tar.gz" \
+        do_wget_sf -h "$_hash" \
+            "mingw/Other/UserContributed/regex/mingw-regex-${_ver}/mingw-libgnurx-${_ver}-src.tar.gz" \
             "mingw-libgnurx-${_ver}.tar.gz"
         do_uninstall "${_check[@]}"
         do_separate_conf
@@ -184,11 +190,12 @@ if [[ $sox = "y" ]]; then
 
     _check=(magic.h libmagic.{l,}a bin-global/file.exe)
     _ver="5.25"
+    _hash="e6a972d4e10d9e76407a432f4a63cd4c"
     if files_exist "${_check[@]}" &&
         grep -q "$_ver" "$LOCALDESTDIR/lib/libmagic.a"; then
         do_print_status "file $_ver" "$green_color" "Up-to-date"
     else
-        do_wget "https://fossies.org/linux/misc/file-${_ver}.tar.gz"
+        do_wget -h "$_hash" "https://fossies.org/linux/misc/file-${_ver}.tar.gz"
         do_uninstall "${_check[@]}"
         do_separate_confmakeinstall global CFLAGS=-DHAVE_PREAD
         do_checkIfExist "${_check[@]}"
@@ -242,7 +249,8 @@ if enabled libtesseract; then
     do_pacman_install "libtiff"
     if do_pkgConfig "lept = 1.72"; then
         _check=(liblept.{,l}a lept.pc)
-        do_wget "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
+        do_wget -h 7581db29f8442197ce68e766c6047c4b \
+            "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
         do_uninstall include/leptonica "${_check[@]}"
         do_separate_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
         do_checkIfExist "${_check[@]}"
@@ -262,7 +270,8 @@ if enabled libtesseract; then
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             pushd "$LOCALDESTDIR"/bin-global/tessdata > /dev/null
-            do_wget -c -r "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
+            do_wget -c -r -h 59a99c829aa385ae8cde35775e32e57f \
+                "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
             printf "%s\n" "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata/blob/master/"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
@@ -327,7 +336,8 @@ fi
 if [[ $sox = "y" ]] || enabled libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
         _check=(libopus.{l,}a opus.pc)
-        do_wget "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
+        do_wget -h 1f08a661bc72930187893a07f3741a91 \
+            "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
         do_uninstall include/opus "${_check[@]}"
         # needed to allow building shared FFmpeg with libopus
         sed -i 's, __declspec(dllexport),,' include/opus_defines.h
@@ -344,7 +354,8 @@ if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
     do_pkgConfig "speex = 1.2rc2"; then
     _check=(libspeex.{l,}a speex.pc)
     [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
-    do_wget "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
+    do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
+        "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     do_uninstall include/speex "${_check[@]}"
     do_patch speex-mingw-winmm.patch
     do_separate_confmakeinstall audio --enable-vorbis-psy \
@@ -355,7 +366,8 @@ fi
 if [[ $flac = "y" || $sox = "y" ]]; then
     _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
     if do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
-    do_wget "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
+    do_wget -h b9922c9a0378c88d3e901b234f852698 \
+        "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     _check+=(bin-audio/metaflac.exe)
     do_uninstall include/FLAC{,++} "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
@@ -373,7 +385,8 @@ fi
 
 if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
-    do_wget_sf "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+    do_wget_sf -h 588205f686adc23532e31fe3646ddcb6 \
+        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
     _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
     do_uninstall include/vo-amrwbenc "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
@@ -411,12 +424,13 @@ fi
 if enabled libfaac; then
     _check=(libfaac.a faac{,cfg}.h)
     _ver="1.28"
+    _hash="c5dde68840cefe46532089c9392d1df0"
     [[ $standalone = y ]] && _check+=(bin-audio/faac.exe)
     if files_exist "${_check[@]}" &&
         grep -q "$_ver" "$LOCALDESTDIR/lib/libfaac.a"; then
         do_print_status "faac $_ver" "$green_color" "Up-to-date"
     else
-        do_wget_sf "faac/faac-src/faac-${_ver}/faac-${_ver}.tar.bz2"
+        do_wget_sf -h "$_hash" "faac/faac-src/faac-${_ver}/faac-${_ver}.tar.bz2"
         ./bootstrap 2>/dev/null
         do_uninstall "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
@@ -445,7 +459,8 @@ _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
     { ! files_exist "${_check[@]}" || [[ $buildOpusEnc = "true" ]]; }; then
     _check+=(bin-audio/opus{dec,info}.exe)
-    do_wget "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
+    do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
+        "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
@@ -455,7 +470,7 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
     _check=(soxr.h libsoxr.a soxr.pc)
-    do_wget_sf "soxr/soxr-0.1.2-Source.tar.xz"
+    do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
     do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
@@ -470,7 +485,7 @@ if enabled libmp3lame; then
         grep -q "$_ver" "$LOCALDESTDIR/lib/libmp3lame.a"; then
         do_print_status "lame $_ver" "$green_color" "Up-to-date"
     else
-        do_wget_sf "lame/lame/3.99/lame-${_ver}.tar.gz"
+        do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-${_ver}.tar.gz"
         if grep -q "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
             touch recently_updated
@@ -502,7 +517,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
     _check=(libbs2b.{{l,}a,pc})
-    do_wget_sf "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
+    do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     do_uninstall include/bs2b "${_check[@]}"
     do_patch "libbs2b-disable-sndfile.patch"
     [[ $standalone = y ]] || sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
@@ -766,9 +781,10 @@ fi
 
 _check=(libzvbi.{h,{l,}a})
 _ver="0.2.35"
+_hash="95e53eb208c65ba6667fd4341455fa27"
 if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
     { ! files_exist "${_check[@]}" || ! grep -q "${_ver}" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
-    do_wget_sf "zapping/zvbi/${_ver}/zvbi-${_ver}.tar.bz2"
+    do_wget_sf -h "$_hash" "zapping/zvbi/${_ver}/zvbi-${_ver}.tar.bz2"
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
@@ -782,7 +798,8 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
     _check=(frei0r.{h,pc})
-    do_wget "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
+    do_wget -h 202375d1bcb545c1b6eb8f34e0260ec5 \
+        "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
     do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
@@ -791,43 +808,53 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled decklink; then
     cd_safe "$LOCALBUILDDIR"
-    _check=(DeckLinkAPI{,Version}.h include/DeckLinkAPI_i.c)
+    _check=(DeckLinkAPI.h
+           DeckLinkAPIVersion.h
+           include/DeckLinkAPI_i.c)
+    _hash=(edd36fa98ae1a632d53809329703d9a3
+           ba4cf1d70f540e48f500e3e8ad5accbc
+           01d77d75bebb50f22d480326a6c5f174)
     _ver="10.5.4"
     if files_exist "${_check[@]}" &&
-        [[ $_ver = $(get_api_version "$LOCALDESTDIR/include/DeckLinkAPIVersion.h" VERSION_STRING) ]]; then
+        {
+            count="$((${#_check[@]}-1))"
+            while [[ $count -ge 0 ]]; do
+                check_hash "$LOCALDESTDIR/include/${_check[$count]#include/}" \
+                    "${_hash[$count]}" || break
+                let count-=1
+            done
+            test $count = -1
+        }; then
         do_print_status "DeckLinkAPI $_ver" "$green_color" "Up-to-date"
     else
         mkdir -p DeckLinkAPI && cd_safe DeckLinkAPI
-        [[ ! -f recently_updated ]] && rm -f DeckLinkAPI{{,Version}.h,_i.c}
-        for file in DeckLinkAPI{{,Version}.h,_i.c}; do
-            [[ ! -f "$file" ]] &&
-                do_wget -r -c "$LOCALBUILDDIR/extras/$file" &&
-                touch recently_updated
-            cp -f "$file" "$LOCALDESTDIR"/include/
+        count="$((${#_check[@]}-1))"
+        while [[ $count -ge 0 ]]; do
+            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]}"
+            cp -f "${_check[$count]}" "$LOCALDESTDIR/include/"
+            let count-=1
         done
         do_checkIfExist "${_check[@]}"
     fi
+    unset count
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     cd_safe "$LOCALBUILDDIR"
     _ver="6"
-    _check=(nvEncodeAPI.h)
-    if files_exist "${_check[@]}" &&
-        [[ "$_ver" = $(get_api_version "$LOCALDESTDIR"/include/nvEncodeAPI.h MAJOR | head -n1) ]]; then
+    _check=nvEncodeAPI.h
+    _hash=dcf25c9910a0af2b3aa20e969eb8c8ad
+    if files_exist "$_check" &&
+        check_hash "$LOCALDESTDIR/include/$_check" "$_hash"; then
         do_print_status "nvEncodeAPI ${_ver}.0.1" "$green_color" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[@]}"
         mkdir -p NvEncAPI && cd_safe NvEncAPI
-        [[ -f recently_updated ]] || rm -f "$_check"
-        [[ ! -f "$_check" ]] &&
-            curl -OLs \
-            "https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/extras/$_check" &&
-            touch recently_updated
-        cp -f "$_check" "$LOCALDESTDIR"/include/
-        do_checkIfExist "${_check[@]}"
+        do_wget -r -c -h "$_hash" "$LOCALBUILDDIR/extras/$_check"
+        cp -f "$_check" "$LOCALDESTDIR/include/"
+        do_checkIfExist "$_check"
     fi
 fi
 
@@ -1323,6 +1350,7 @@ fi
 
 if [[ $bmx = "y" ]]; then
     _ver="0.8.2"
+    _hash="c5cf6b3941d887deb7defc2a86c40f1d"
     if do_pkgConfig "liburiparser = $_ver"; then
         _check=(liburiparser.{{,l}a,pc})
         do_wget_sf "uriparser/Sources/${_ver}/uriparser-${_ver}.tar.bz2"
@@ -1410,7 +1438,7 @@ done
 if [[ $packing = "y" ]]; then
     if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
         rm -rf upx391w
-        do_wget_sf "upx/upx/3.91/upx391w.zip"
+        do_wget_sf -h 531753e089ed713c6c089d73e261d8c7 "upx/upx/3.91/upx391w.zip"
     fi
     echo -e "\n\t${orange_color}Packing binaries and shared libs...${reset_color}"
     packcmd=("$LOCALBUILDDIR/upx391w/upx.exe" "-9" "-qq")
