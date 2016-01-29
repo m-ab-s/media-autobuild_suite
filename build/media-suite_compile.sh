@@ -1120,8 +1120,6 @@ if [[ $ffmpeg != "n" ]]; then
                 mv build_successful"${bits}"{,_shared} && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
-            enabled debug &&
-                create_debug_link "$LOCALDESTDIR"/bin-video/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
         # static
