@@ -1092,7 +1092,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
-        _uninstall=(include/libav{codec,device,filter,format,util,resample
+        _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
             libav{codec,device,filter,format,util,resample}.{a,pc}
             lib{sw{scale,resample},postproc}.{a,pc}
