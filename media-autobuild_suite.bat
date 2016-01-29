@@ -686,7 +686,7 @@ if %deleteINI%==1 set "writeDel=yes"
 
 if %deleteS%==1 set "deleteSource=y"
 if %deleteS%==2 set "deleteSource=n"
-if %deleteS%==2 set "deleteSource=f"
+if %deleteS%==3 set "deleteSource=f"
 if %deleteS% GTR 3 GOTO delete
 if %writeDel%==yes echo.deleteSource=^%deleteS%>>%ini%
 
