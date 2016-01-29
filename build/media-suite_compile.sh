@@ -1103,7 +1103,7 @@ if [[ $ffmpeg != "n" ]]; then
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold_color}shared${reset_color} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
-            do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}" "${_check[@]}"
+            do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             do_configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
@@ -1135,7 +1135,7 @@ if [[ $ffmpeg != "n" ]]; then
                 fi
                 disabled ffprobe || _check+=(bin-video/ffprobe.exe)
             fi
-            do_uninstall bin-video/ff{mpeg,play,probe}.exe.debug "${_uninstall[@]}" "${_check[@]}"
+            do_uninstall bin-video/ff{mpeg,play,probe}.exe.debug "${_uninstall[@]}"
             do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
