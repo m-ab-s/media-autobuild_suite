@@ -1053,9 +1053,9 @@ if [[ $ffmpeg != "n" ]]; then
     do_hide_all_sharedlibs
 
     if [[ $ffmpeg = "s" ]]; then
-        _check=(bin-video/ffmpegSHARED/ffmpeg.exe)
+        _check=(bin-video/ffmpegSHARED)
     else
-        _check=(bin-video/ffmpeg.exe libavcodec.{a,pc})
+        _check=(libavutil.{a,pc})
     fi
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
@@ -1064,43 +1064,59 @@ if [[ $ffmpeg != "n" ]]; then
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
 
-        _uninstall=(include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}}
-            lib{av{codec,device,filter,format,util,resample},sw{scale,resample},postproc}.{a,pc})
+        _uninstall=(include/libav{codec,device,filter,format,util,resample
+            include/lib{sw{scale,resample},postproc}
+            libav{codec,device,filter,format,util,resample}.{a,pc}
+            lib{sw{scale,resample},postproc}.{a,pc}
+            )
         sedflags="prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags"
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold_color}shared${reset_color} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
-            do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
+            do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}" "${_check[@]}"
             do_configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
-            do_makeinstall
-            do_checkIfExist bin-video/ffmpegSHARED/bin/ffmpeg.exe
+            do_make && do_makeinstall
+            if ! disabled_any programs avcodec avformat; then
+                if ! disabled swresample; then
+                    disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpegSHARED/bin/ffmpeg.exe)
+                    disabled_any sdl ffplay || _check+=(bin-video/ffmpegSHARED/bin/ffplay.exe)
+                fi
+                disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
+            fi
             [[ $ffmpeg = "b" ]] && [[ -f build_successful${bits} ]] &&
                 mv build_successful"${bits}"{,_shared} && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
             enabled debug &&
-                create_debug_link "$LOCALDESTDIR"/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
+                create_debug_link "$LOCALDESTDIR"/bin-video/ffmpegSHARED/bin/ff{mpeg,probe,play}.exe
         fi
 
         # static
         if [[ $ffmpeg != "s" ]]; then
             do_print_progress "Compiling ${bold_color}static${reset_color} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
-            do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
+            if ! disabled_any programs avcodec avformat; then
+                if ! disabled swresample; then
+                    disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
+                    disabled_any sdl ffplay || _check+=(bin-video/ffplay.exe)
+                fi
+                disabled ffprobe || _check+=(bin-video/ffprobe.exe)
+            fi
+            do_uninstall bin-video/ff{mpeg,play,probe}.exe.debug "${_uninstall[@]}" "${_check[@]}"
             do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
-            do_makeinstall
-            do_checkIfExist "${_check[@]}"
+            do_make && do_makeinstall
             newFfmpeg="yes"
             enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
         fi
+        do_checkIfExist "${_check[@]}"
     fi
 fi
 
