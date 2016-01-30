@@ -674,7 +674,6 @@ if %deleteSourceINI%==0 (
     echo. Delete versioned source folders after compile is done?
     echo. 1 = Yes [recommended]
     echo. 2 = No
-    echo. 3 = Save list of extra files/folders to can_remove.txt
     echo.
     echo. This will save a bit of space for libraries not compiled from git/hg/svn.
     echo.
@@ -686,8 +685,7 @@ if %deleteINI%==1 set "writeDel=yes"
 
 if %deleteS%==1 set "deleteSource=y"
 if %deleteS%==2 set "deleteSource=n"
-if %deleteS%==3 set "deleteSource=f"
-if %deleteS% GTR 3 GOTO delete
+if %deleteS% GTR 2 GOTO delete
 if %writeDel%==yes echo.deleteSource=^%deleteS%>>%ini%
 
 :stripEXE
