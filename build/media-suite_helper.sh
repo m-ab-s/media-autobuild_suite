@@ -255,7 +255,8 @@ do_wget() {
         [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
     [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
-    do_extract "$([[ $nocd ]] && echo nocd)" "$archive" "$dirName"
+    [[ $nocd ]] && do_extract nocd "$archive" "$dirName" ||
+        do_extract "$archive" "$dirName"
     [[ ! $norm && $dirName && ! $nocd ]] && _to_remove+=("$(pwd)")
 }
 
