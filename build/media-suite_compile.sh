@@ -1,8 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-buildFFmpeg="false"
-newFfmpeg="no"
 FFMPEG_BASE_OPTS=("--enable-avisynth" "--pkg-config-flags=--static")
 alloptions="$*"
 echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
@@ -90,11 +88,11 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
         do_separate_confmakeinstall global --with-harfbuzz=no
-        do_checkIfExist "${_check[@]}" 
-        rebuildLibass="y"
+        do_checkIfExist "${_check[@]}"
     fi
 
-    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.94"; then
+    if enabled_any {lib,}fontconfig && { do_pkgConfig "fontconfig = 2.11.94" ||
+        test_newer installed freetype2.pc; }; then
         do_pacman_remove "python2-lxml"
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
@@ -106,7 +104,6 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             -e 's/CROSS_COMPILING_TRUE/CROSS_COMPILING_FALSE/'
         do_separate_confmakeinstall global
         do_checkIfExist "${_check[@]}"
-        rebuildLibass="y"
     fi
 
     [[ -z $harfbuzz_ver ]] &&
@@ -114,7 +111,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')
     [[ -n $harfbuzz_ver ]] &&
         harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
-    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || [[ $rebuildLibass = y ]]; then
+    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
         do_pacman_install "ragel"
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget -h 671daf05153d57258e5cb992aa28c64a \
@@ -122,7 +119,6 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
         do_checkIfExist "${_check[@]}"
-        rebuildLibass=y
     fi
 
     if do_pkgConfig "fribidi = 0.19.7"; then
@@ -344,7 +340,6 @@ if [[ $sox = "y" ]] || enabled libopus; then
         sed -i 's, __declspec(dllexport),,' include/opus_defines.h
         do_separate_confmakeinstall --disable-doc
         do_checkIfExist "${_check[@]}"
-        buildOpusEnc="true"
     fi
 
     do_pacman_install opusfile
@@ -405,20 +400,18 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
         [[ -f Makefile ]] && log distclean make distclean
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
-        buildFDK="true"
     fi
 fi
 
 if [[ $fdkaac = y || $standalone = y ]]; then
     _check=(bin-audio/fdkaac.exe)
     do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
-    if [[ $compile = "true" || $buildFDK = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed fdk-aac.pc; then
         do_autoreconf
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
         do_checkIfExist "${_check[@]}"
-        unset buildFDK
     fi
 fi
 
@@ -458,7 +451,7 @@ fi
 
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
-    { ! files_exist "${_check[@]}" || [[ $buildOpusEnc = "true" ]]; }; then
+    { ! files_exist "${_check[@]}" || test_newer installed opus.pc; }; then
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
@@ -466,7 +459,6 @@ if [[ $standalone = y ]] && enabled libopus &&
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
     do_checkIfExist "${_check[@]}"
-    unset buildOpusEnc
 fi
 
 if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
@@ -586,7 +578,6 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
             CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
-        buildMediaInfo="true"
     fi
 fi
 
@@ -621,7 +612,6 @@ if [[ $vpx != n ]]; then
             rm -f "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe
         fi
         do_checkIfExist "${_check[@]}"
-        buildFFmpeg="true"
         unset target extracommands
     fi
 else
@@ -696,15 +686,13 @@ fi
 if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled libass; }; then
     do_vcs "https://github.com/libass/libass.git"
-    if [[ $compile = "true" || $rebuildLibass = "y" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed {freetype2,fontconfig,harfbuzz,fribidi}.pc; then
         _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
         do_autoreconf
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall "$(enabled_any {lib,}fontconfig && echo --disable-fontconfig)"
         do_checkIfExist "${_check[@]}"
-        buildFFmpeg="true"
-        unset rebuildLibass
     fi
 fi
 
@@ -725,21 +713,20 @@ fi
 
 if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
-    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
+    if [[ $compile = "true" ]]; then
         _check=(libzen.{a,pc})
         cd_safe Project/CMake
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
         sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' CMakeLists.txt
         do_cmakeinstall
         do_checkIfExist "${_check[@]}"
-        buildMediaInfo="true"
     fi
 
     # MinGW's libcurl.pc is missing libs
     sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' "$MINGW_PREFIX"/lib/pkgconfig/libcurl.pc
 
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
-    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed lib{rtmp,zen}.pc; then
         _check=(libmediainfo.{a,pc})
         cd_safe Project/CMake
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
@@ -747,12 +734,11 @@ if [[ $mediainfo = "y" ]]; then
         do_cmakeinstall
         sed -i 's|libzen|libcurl librtmp libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist "${_check[@]}"
-        buildMediaInfo="true"
     fi
 
     _check=(bin-video/mediainfo.exe)
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo "${_check[@]}"
-    if [[ $compile = "true" || $buildMediaInfo = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed lib{zen,mediainfo}.pc; then
         cd_safe Project/GNU/CLI
         do_autoreconf
         do_uninstall "${_check[@]}"
@@ -954,7 +940,6 @@ if [[ $x264 != n ]]; then
         CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
         do_makeinstall
         do_checkIfExist "${_check[@]}"
-        buildFFmpeg="true"
         unset extracommands
     fi
 else
@@ -1084,7 +1069,8 @@ if [[ $ffmpeg != "n" ]]; then
         _check=(libavutil.{a,pc})
     fi
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
-    if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
+    if [[ $compile = "true" ]] ||
+        { [[ $ffmpegUpdate = y ]] && test_newer installed {libass,x264,x265,vpx}.pc; }; then
         do_changeFFmpegConfig "$license"
         enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis libcdio &&
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
@@ -1139,7 +1125,6 @@ if [[ $ffmpeg != "n" ]]; then
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
-            newFfmpeg="yes"
             enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
         fi
@@ -1152,7 +1137,7 @@ if [[ $mplayer = "y" ]]; then
     _check=(bin-video/m{player,encoder}.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
 
-    if [[ $compile = "true" || $buildFFmpeg = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed {libass,x264,x265,vpx}.pc; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log "distclean" make distclean
         if [[ ! -d ffmpeg ]]; then
@@ -1299,7 +1284,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 > pkgconfig/vapoursynth-script.pc
 
             do_checkIfExist "${_check[@]}"
-            newFfmpeg="yes"
         elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
@@ -1310,7 +1294,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     _check=(bin-video/mpv.{exe,com})
     do_vcs "https://github.com/mpv-player/mpv.git" mpv "${_check[@]}"
-    if [[ $compile = "true" ]] || [[ $newFfmpeg = "yes" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed {libass,libavcodec,vapoursynth}.pc; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
         hide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
@@ -1359,11 +1343,10 @@ if [[ $bmx = "y" ]]; then
         sed -i '/bin_PROGRAMS/ d' Makefile.am
         do_separate_confmakeinstall --disable-test --disable-doc
         do_checkIfExist "${_check[@]}"
-        buildBmx="true"
     fi
 
     do_vcs git://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0
-    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+    if [[ $compile = "true" ]]; then
         _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
         sed -i 's| mxf_win32_mmap.c||' mxf/Makefile.am
         do_autogen
@@ -1371,23 +1354,21 @@ if [[ $bmx = "y" ]]; then
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
         do_checkIfExist "${_check[@]}"
-        buildBmx="true"
     fi
 
     do_vcs git://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0
-    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed libMXF-1.0.pc; then
         _check=(libMXF++-1.0.{{,l}a,pc})
         do_autogen
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
         do_checkIfExist "${_check[@]}"
-        buildBmx="true"
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
     do_vcs git://git.code.sf.net/p/bmxlib/bmx bmx "${_check[@]}"
-    if [[ $compile = "true" || $buildBmx = "true" ]]; then
+    if [[ $compile = "true" ]] || test_newer installed {liburiparser,libMXF{,++}-1.0}.pc; then
         do_patch bmx-0001-configure-no-libcurl.patch am
         do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
         do_autogen

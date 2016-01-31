@@ -48,6 +48,18 @@ cd_safe() {
         { do_prompt "Failed changing to directory $1." && exit 1; }
 }
 
+test_newer() {
+    [[ $1 = installed ]] && local installed=y && shift
+    local file
+    [[ -f $LOCALBUILDDIR/last_successful_run ]] || return 0
+    for file; do
+        [[ $installed ]] && file="$(file_installed $file)"
+        [[ -f $file ]] &&
+            [[ $file -nt $LOCALBUILDDIR/last_successful_run ]] && return
+    done
+    return 1
+}
+
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
@@ -1009,7 +1021,7 @@ clean_suite() {
         xargs -0 rm -rf
     rm -rf ./x265-hg/build/msys/{8,10,12}bit
 
-    [[ -f last_run ]] && mv last_run last_successful_run
+    [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
