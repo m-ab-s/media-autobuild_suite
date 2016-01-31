@@ -1137,7 +1137,7 @@ if [[ $mplayer = "y" ]]; then
     _check=(bin-video/m{player,encoder}.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
 
-    if [[ $compile = "true" ]] || test_newer installed {libass,x264,x265,vpx}.pc; then
+    if [[ $compile = "true" ]]; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log "distclean" make distclean
         if [[ ! -d ffmpeg ]]; then
