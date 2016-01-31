@@ -1031,7 +1031,7 @@ clean_suite() {
         printf '%s\n' "${_to_remove[@]}" | grep "^$LOCALBUILDDIR/" |
             grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
-            ! -regex ".*\(-\(git\|hg\|svn\)\|upx.*\|extras\|patches\)\$" -print0 |
+            ! -regex ".*\(-\(git\|hg\|svn\)\|extras\|patches\)\$" -print0 |
             xargs -0 -r rm -rf
         unset _to_remove
     fi

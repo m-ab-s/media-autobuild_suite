@@ -1417,12 +1417,12 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 if [[ $packing = "y" ]]; then
-    if [ ! -f "$LOCALBUILDDIR/upx391w/upx.exe" ]; then
-        rm -rf upx391w
+    if ! files_exist bin-global/upx.exe; then
         do_wget_sf -h 531753e089ed713c6c089d73e261d8c7 "upx/upx/3.91/upx391w.zip"
+        do_install upx.exe bin-global/upx.exe
     fi
     echo -e "\n\t${orange_color}Packing binaries and shared libs...${reset_color}"
-    packcmd=("$LOCALBUILDDIR/upx391w/upx.exe" "-9" "-qq")
+    packcmd=("$LOCALDESTDIR/bin-global/upx.exe" "-9" "-qq")
     [[ $stripping = "y" ]] && packcmd+=("--strip-relocs=0")
     find /local*/bin-* -regex ".*\.\(exe\|dll\)" -newer "$LOCALBUILDDIR"/last_run -print0 |
         xargs -0 -r "${packcmd[@]}"
