@@ -1,8 +1,11 @@
 #!/bin/bash
+shopt -q extglob; extglob_set=$?
+((extglob_set)) && shopt -s extglob
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
     cpuCount="$(($(nproc)/2))"
 fi
+bits="${bits:-64bit}"
 
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
@@ -157,9 +160,9 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Recently updated"
-    elif [[ -z "$vcsCheck" ]] && ! files_exist "$vcsFolder.pc"; then
+    elif [[ -z "${vcsCheck[@]}" ]] && ! files_exist "$vcsFolder.pc"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Missing pkg-config"
-    elif [[ ! -z "$vcsCheck" ]] && ! files_exist "${vcsCheck[@]}"; then
+    elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
@@ -168,7 +171,7 @@ do_vcs() {
 }
 
 guess_dirname() {
-    echo $(expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$'
 }
 
 check_hash() {
@@ -209,7 +212,7 @@ do_wget() {
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
-        [[ ${url#$LOCALBUILDDIR} != ${url} ]] &&
+        [[ ${url#$LOCALBUILDDIR} != "${url}" ]] &&
             url="https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master${url}"
 
         curlcmds=(curl --retry 20 --retry-max-time 5 -sLkf)
@@ -240,7 +243,7 @@ do_wget() {
         [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
     [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
-    do_extract $([[ $nocd ]] && echo nocd) "$archive" "$dirName"
+    do_extract "$([[ $nocd ]] && echo nocd)" "$archive" "$dirName"
     [[ ! $norm && $dirName && ! $nocd ]] && _to_remove+=("$(pwd)")
 }
 
@@ -287,25 +290,31 @@ do_extract() {
 
 do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
-    local hash
+    local hash baseurl
     [[ $1 = "-h" ]] && hash="$2" && shift 2
-    local url="$1"
+    local url="http://download.sourceforge.net/$1"
     shift 1
-    do_wget $([[ $hash ]] && echo "-h $hash") \
-        "http://download.sourceforge.net/${url}" "$@"
+    if [[ -n $hash ]]; then
+        do_wget -h "$hash" "$url" "$@"
+    else
+        do_wget "$url" "$@"
+    fi
 }
 
 do_strip() {
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
     local file
-    [[ -n $(find "$LOCALDESTDIR"/bin-video -name "mpv.exe.debug") ]] && nostrip+="|mpv"
-    [[ ${*%.exe} != $* || ${*%.dll} != $* ]] && do_print_progress Stripping
+    [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
+    [[ "$@" =~ \.(exe|dll|com)$ ]] &&
+        [[ ! "$@" =~ ($nostrip)\.exe$ ]] && do_print_progress Stripping
     for file; do
-        if echo "$file" | grep -qE "\.(exe|dll|com)$" &&
-            echo "$file" | grep -qvE "(${nostrip})\.exe"; then
-            strip -s "$LOCALDESTDIR/$file"
-        elif echo "$file" | grep -qE "x265(|-numa)\.exe"; then
-            strip --strip-unneeded "$LOCALDESTDIR/$file"
+        file=$(file_installed $file)
+        [[ $? = 0 ]] || continue
+        if [[ $file =~ \.(exe|dll|com)$ ]] &&
+            [[ ! $file =~ ($nostrip)\.exe$ ]]; then
+            strip -s "$file"
+        elif [[ $file =~ x265(|-numa)\.exe$ ]]; then
+            strip --strip-unneeded "$file"
         fi
     done
 }
@@ -389,18 +398,21 @@ pc_exists() {
 
 do_install() {
     [[ $1 = dry ]] && local dryrun=y && shift
-    [[ $dryrun ]] && echo install -D "$1" "$(file_installed "$2")" ||
+    if [[ -n $dryrun ]]; then
+        echo install -D "$1" "$(file_installed "$2")"
+    else
         install -D "$1" "$(file_installed "$2")"
+    fi
 }
 
 do_uninstall() {
     [[ $1 = dry ]] && local dry=y && shift
     [[ $1 = q ]] && local quiet=y && shift
     local files=($(files_exist -l "$@"))
-    if [[ $files ]]; then
-        [[ ! quiet ]] && do_print_progress Running uninstall
+    if [[ -n ${files[@]} ]]; then
+        [[ ! $quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
-            echo "rm -rf ${files[@]}"
+            echo "rm -rf ${files[*]}"
         else
             rm -rf "${files[@]}"
         fi
@@ -624,16 +636,16 @@ mpv_disabled_all() {
 }
 
 mpv_enable() {
-    mpv_disabled $1 && MPV_OPTS=(${MPV_OPTS[@]//--disable-$1/--enable-$1})
+    mpv_disabled "$1" && MPV_OPTS=(${MPV_OPTS[@]//--disable-$1/--enable-$1})
 }
 
 mpv_disable() {
-    mpv_enabled $1 && MPV_OPTS=(${MPV_OPTS[@]//--enable-$1/--disable-$1})
+    mpv_enabled "$1" && MPV_OPTS=(${MPV_OPTS[@]//--enable-$1/--disable-$1})
 }
 
 do_addOption() {
     local option="$1"
-    if ! do_checkForOptions $option; then
+    if ! do_checkForOptions "$option"; then
         FFMPEG_OPTS+=("$option")
     fi
 }
@@ -676,8 +688,8 @@ do_patch() {
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run -s -N -p$strip -i "$patch" >/dev/null 2>&1; then
-                patch -s -N -p$strip -i "$patch"
+            if patch --dry-run -s -N -p"$strip" -i "$patch" >/dev/null 2>&1; then
+                patch -s -N -p"$strip" -i "$patch"
             else
                 echo -e "${orange_color}${patch}${reset_color}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
@@ -714,10 +726,11 @@ compilation_fail() {
 }
 
 zip_logs() {
-    local failed=$(get_first_subdir)
+    local failed
+    failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
-    7za -mx=9 a logs.zip *.log *.ini *_options.txt -ir!"$failed/*.log" >/dev/null
+    7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt -ir!"$failed/*.log" >/dev/null
     popd >/dev/null
     [[ -f "$LOCALBUILDDIR/logs.zip" ]] &&
         echo "${green_color}Attach $LOCALBUILDDIR/logs.zip to the GitHub issue.${reset_color}"
@@ -835,7 +848,7 @@ do_pacman_install() {
     for pkg in $packages; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         if /usr/bin/grep -q "^${pkg}$" <(echo "$installed"); then
-            [[ -z $noop ]] && none=y
+            [[ -z $noop ]] && noop=y
             continue
         else
             noop=n
@@ -938,7 +951,6 @@ create_debug_link() {
 
 get_vs_prefix() {
     local vsprefix
-    local programfiles
     local regkey="/HKLM/software/vapoursynth"
     if [[ -n $(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe) ]]; then
         # look for .dlls in bin-video
@@ -1013,3 +1025,5 @@ clean_suite() {
     fi
     popd >/dev/null
 }
+
+((extglob_set)) && shopt -u extglob

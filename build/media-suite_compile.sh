@@ -1,4 +1,5 @@
 #!/bin/bash
+shopt -s extglob
 
 buildFFmpeg="false"
 newFfmpeg="no"
@@ -52,17 +53,17 @@ echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color
 
 cd_safe "$LOCALBUILDDIR"
 
-do_getFFmpegConfig $license
+do_getFFmpegConfig "$license"
 do_getMpvConfig
 if [[ -n "$alloptions" ]]; then
-    thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"${FFMPEG_DEFAULT_OPTS[*]}\"" \
-            "MPV_OPTS=\"${MPV_OPTS[*]}\"" \
-            "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions")"
-    [[ -f "$LOCALBUILDDIR/last_successful_run" ]] &&
-        { diff -q <(echo "$thisrun") "$LOCALBUILDDIR/last_successful_run" >/dev/null 2>&1 ||
-            buildFFmpeg="true"; }
-    echo "$thisrun" > "$LOCALBUILDDIR/last_run"
-    unset alloptions thisrun
+    {
+        echo '#!/bin/bash'
+        echo 'FFMPEG_DEFAULT_OPTS=('
+        printf '\t"%s"\n' "${FFMPEG_DEFAULT_OPTS[@]}"
+        echo ')'
+        echo "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions"
+    } > "$LOCALBUILDDIR/last_run"
+    unset alloptions
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
@@ -359,7 +360,7 @@ if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
     do_uninstall include/speex "${_check[@]}"
     do_patch speex-mingw-winmm.patch
     do_separate_confmakeinstall audio --enable-vorbis-psy \
-        $([[ $standalone = y ]] && echo --enable-binaries || echo --disable-binaries)
+        "$([[ $standalone = y ]] && echo --enable-binaries || echo --disable-binaries)"
     do_checkIfExist "${_check[@]}"
 fi
 
@@ -449,8 +450,8 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
         --disable-vcut --disable-ogginfo \
-        "$(enabled libspeex || echo "--without-speex")" \
-        "$([[ $flac = "y" ]] || echo "--without-flac")"
+        "$(enabled libspeex || echo --without-speex)" \
+        "$([[ $flac = "y" ]] || echo --without-flac)"
     do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
 fi
@@ -494,7 +495,7 @@ if enabled libmp3lame; then
         do_uninstall include/lame "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall audio --disable-decoder \
-            $([[ $standalone = y ]] || echo "--disable-frontend")
+            "$([[ $standalone = y ]] || echo --disable-frontend)"
         do_checkIfExist "${_check[@]}"
     fi
 fi
@@ -567,7 +568,7 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
     do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
     req=""
-    pc_exists librtmp && req="$(pkg-config --print-requires $LOCALDESTDIR/lib/pkgconfig/librtmp.pc)"
+    pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
@@ -700,7 +701,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
         do_autoreconf
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
-        do_separate_confmakeinstall $(enabled_any {lib,}fontconfig && echo --disable-fontconfig)
+        do_separate_confmakeinstall "$(enabled_any {lib,}fontconfig && echo --disable-fontconfig)"
         do_checkIfExist "${_check[@]}"
         buildFFmpeg="true"
         unset rebuildLibass
@@ -851,7 +852,7 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[0]}"
         mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
-        do_wget -r -c -h "$_hash" "$LOCALBUILDDIR/extras/${_check[0]}"
+        do_wget -r -c -h "${_hash[0]}" "$LOCALBUILDDIR/extras/${_check[0]}"
         do_install "${_check[0]}" include/
         do_checkIfExist "${_check[0]}"
     fi
@@ -1046,7 +1047,6 @@ EOF
             _check+=(bin-video/x265-numa.exe)
         fi
         do_checkIfExist "${_check[@]}"
-        buildFFmpeg="true"
         unset xpsupport assembly cli
     fi
 else
@@ -1085,7 +1085,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] || [[ $buildFFmpeg = "true" && $ffmpegUpdate = "y" ]]; then
-        do_changeFFmpegConfig $license
+        do_changeFFmpegConfig "$license"
         enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis libcdio &&
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
@@ -1116,7 +1116,7 @@ if [[ $ffmpeg != "n" ]]; then
                 fi
                 disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
             fi
-            files_exist "${_check[@]}" && touch build_successful${bits}_shared
+            files_exist "${_check[@]}" && touch "build_successful${bits}_shared"
             [[ $ffmpeg = "b" ]] && mv ab-suite.{,shared.}configure.log &&
                 mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
                 mv ab-suite.{,shared.}install.error.log
@@ -1152,7 +1152,7 @@ if [[ $mplayer = "y" ]]; then
     _check=(bin-video/m{player,encoder}.exe)
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer "${_check[@]}"
 
-    if [[ $compile == "true" ]] || [[ $buildFFmpeg == "true" ]]; then
+    if [[ $compile = "true" || $buildFFmpeg = "true" ]]; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log "distclean" make distclean
         if [[ ! -d ffmpeg ]]; then
@@ -1199,7 +1199,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     [[ -d $LOCALBUILDDIR/waio-git ]] && do_uninstall include/waio libwaio.a &&
         _to_remove+=("$LOCALBUILDDIR/waio-git")
 
-    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != ${MPV_OPTS[@]#--lua=lua51} ]]; then
+    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
         do_pacman_remove lua51
