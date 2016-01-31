@@ -470,6 +470,10 @@ do_getFFmpegConfig() {
         do_removeOptions --enable-libmfx --enable-decklink --enable-tesseract \
             --enable-opencl --enable-libcaca
     fi
+
+    enabled_any libvo-aacenc libaacplus && do_removeOption "--enable-lib(vo-aacenc|aacplus)" &&
+        echo -e "${orange_color}Remove --enable-libvo-aacenc and --enable-libaacplus from ffmpeg_options.txt." &&
+        echo -e "${orange_color}These libs were removed from FFmpeg.${reset_color}"
 }
 
 do_changeFFmpegConfig() {
