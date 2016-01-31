@@ -665,9 +665,9 @@ if %deleteINI%==1 set "writeCores=yes"
 if "%cpuCount%"=="" GOTO :numCores
 if %writeCores%==yes echo.cores=^%cpuCount%>>%ini%
 
-:delete
 set "writeDel=no"
 if %deleteSourceINI%==0 (
+:delete
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
