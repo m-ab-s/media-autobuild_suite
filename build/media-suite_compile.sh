@@ -60,8 +60,8 @@ if [[ -n "$alloptions" ]]; then
     thisrun="$(printf '%s\n' '#!/bin/bash' "FFMPEG_DEFAULT_OPTS=\"${FFMPEG_DEFAULT_OPTS[*]}\"" \
             "MPV_OPTS=\"${MPV_OPTS[*]}\"" \
             "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions")"
-    [[ -f "$LOCALBUILDDIR/last_run_successful" ]] &&
-        { diff -q <(echo "$thisrun") "$LOCALBUILDDIR/last_run_successful" >/dev/null 2>&1 ||
+    [[ -f "$LOCALBUILDDIR/last_successful_run" ]] &&
+        { diff -q <(echo "$thisrun") "$LOCALBUILDDIR/last_successful_run" >/dev/null 2>&1 ||
             buildFFmpeg="true"; }
     echo "$thisrun" > "$LOCALBUILDDIR/last_run"
     unset alloptions thisrun
