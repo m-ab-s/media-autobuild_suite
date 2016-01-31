@@ -441,10 +441,11 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     do_autoreconf
     do_uninstall "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
+    extracommands=()
+    enabled libspeex || extracommands+=(--without-speex)
+    [[ $flac = y ]] || extracommands+=(--without-flac)
     do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
-        --disable-vcut --disable-ogginfo \
-        "$(enabled libspeex || echo --without-speex)" \
-        "$([[ $flac = "y" ]] || echo --without-flac)"
+        --disable-vcut --disable-ogginfo "${extracommands[@]}"
     do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
 fi
@@ -457,7 +458,9 @@ if [[ $standalone = y ]] && enabled libopus &&
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
-    do_separate_confmakeinstall audio "$([[ $flac = y ]] || echo "--without-flac")"
+    extracommands=()
+    [[ $flac = y ]] || extracommands+=(--without-flac)
+    do_separate_confmakeinstall audio "${extracommands[@]}"
     do_checkIfExist "${_check[@]}"
 fi
 
@@ -691,7 +694,9 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
         do_autoreconf
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
-        do_separate_confmakeinstall "$(enabled_any {lib,}fontconfig && echo --disable-fontconfig)"
+        extracommands=()
+        enabled_any {lib,}fontconfig && extracommands+=(--disable-fontconfig)
+        do_separate_confmakeinstall "${extracommands[@]}"
         do_checkIfExist "${_check[@]}"
     fi
 fi
