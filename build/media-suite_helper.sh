@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
+    cpuCount="$(($(nproc)/2))"
+fi
+
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test "$ncolors" -ge 8; then
@@ -688,7 +692,7 @@ do_patch() {
 do_cmakeinstall() {
     create_build_dir
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
-    log "install" ninja -j"${cpuCount:-$(($(nproc)/2))}" install
+    log "install" ninja -j"$cpuCount" install
 }
 
 compilation_fail() {
@@ -762,11 +766,11 @@ do_configure() {
 }
 
 do_make() {
-    log "make" make -j"${cpuCount:-$(($(nproc)/2))}" "$@"
+    log "make" make -j"$cpuCount" "$@"
 }
 
 do_makeinstall() {
-    log "install" make -j"${cpuCount:-$(($(nproc)/2))}" install "$@"
+    log "install" make -j"$cpuCount" install "$@"
 }
 
 do_hide_pacman_sharedlibs() {
