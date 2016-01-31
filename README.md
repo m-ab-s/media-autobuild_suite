@@ -42,7 +42,8 @@ Included Tools And Libraries
 	- libbluray (git)
 	- libcaca
 	- libcdio-paranoia
-	- libdcadec (git)
+	- libdcadec
+		- Not compiled by default
 	- libfaac (1.28)
 		- Not compiled by default
 	- libfdk-aac (git)

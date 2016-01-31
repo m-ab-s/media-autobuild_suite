@@ -52,7 +52,7 @@ set ffmpeg_options=--enable-frei0r --enable-libbluray --enable-libcaca ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
 --enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
 --enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract ^
---enable-libzvbi --enable-libdcadec --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
+--enable-libzvbi --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
 --enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband ^
 --disable-w32threads --enable-libzimg --enable-gcrypt ^
