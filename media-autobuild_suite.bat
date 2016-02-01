@@ -43,7 +43,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python scons xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty-git texinfo msys2-runtime-devel libgpgme
+gperf winpty-git texinfo libgpgme
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
@@ -854,6 +854,7 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
+        echo.sed -i "s;#IgnorePkg.*;IgnorePkg = msys2-runtime;" /etc/pacman.conf
         echo.sleep ^4
         echo.exit
         )>%build%\firstUpdate.sh
@@ -863,7 +864,8 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\update-core
+    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\pacman -S --needed ^
+        --noconfirm --asdeps bash pacman
 
     echo.-------------------------------------------------------------------------------
     echo.second update
