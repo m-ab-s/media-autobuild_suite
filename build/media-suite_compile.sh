@@ -359,7 +359,7 @@ if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
 fi
 
 _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
-if [[ $flac = y ]] && do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
+if [[ $flac = y ]] && { do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; }; then
     do_wget -h b9922c9a0378c88d3e901b234f852698 \
         "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     _check+=(bin-audio/metaflac.exe)
