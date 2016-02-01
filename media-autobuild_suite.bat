@@ -864,7 +864,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime
+    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime"
 
     echo.-------------------------------------------------------------------------------
     echo.second update
@@ -1110,7 +1110,7 @@ if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime
+    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime"
     del "%build%\update_core"
     )
 
