@@ -854,7 +854,7 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.echo -ne "\033]0;first msys2 update\007"
         echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
-        echo.sed -i "s;#IgnorePkg.*;IgnorePkg = msys2-runtime;" /etc/pacman.conf
+        echo.sed -i "s;^^IgnorePkg.*;#&;" /etc/pacman.conf
         echo.sleep ^4
         echo.exit
         )>%build%\firstUpdate.sh
@@ -864,7 +864,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman
+    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime
 
     echo.-------------------------------------------------------------------------------
     echo.second update
@@ -1110,7 +1110,7 @@ if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman
+    %instdir%\%msys2%\usr\bin\sh.exe -l -c pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime
     del "%build%\update_core"
     )
 
