@@ -864,7 +864,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\pacman -S --needed ^
+    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\pacman.exe -S --needed ^
         --noconfirm --asdeps bash pacman
 
     echo.-------------------------------------------------------------------------------
@@ -1111,7 +1111,8 @@ if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\update-core
+    %instdir%\%msys2%\usr\bin\sh.exe -l %instdir%\%msys2%\usr\bin\pacman.exe -S --needed ^
+        --noconfirm --asdeps bash pacman
     del "%build%\update_core"
     )
 
