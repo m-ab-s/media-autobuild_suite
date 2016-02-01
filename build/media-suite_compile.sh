@@ -66,7 +66,7 @@ fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
-    do_pacman_remove "openjpeg2"
+    do_pacman_remove openjpeg2
     do_uninstall q j{config,error,morecfg,peglib}.h libjpeg.a
 
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2
@@ -80,7 +80,7 @@ fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
-    do_pacman_remove "freetype fontconfig harfbuzz fribidi"
+    do_pacman_remove freetype fontconfig harfbuzz fribidi
 
     if do_pkgConfig "freetype2 = 18.2.12" "2.6.2"; then
         _check=(libfreetype.{l,}a freetype2.pc)
@@ -93,7 +93,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     if enabled_any {lib,}fontconfig && { do_pkgConfig "fontconfig = 2.11.94" ||
         test_newer installed freetype2.pc; }; then
-        do_pacman_remove "python2-lxml"
+        do_pacman_remove python2-lxml
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget -h 479be870c7f83f15f87bac085b61d641 \
@@ -112,7 +112,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ -n $harfbuzz_ver ]] &&
         harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
-        do_pacman_install "ragel"
+        do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget -h 671daf05153d57258e5cb992aa28c64a \
             "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
@@ -135,7 +135,7 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
-    do_pacman_remove "SDL"
+    do_pacman_remove SDL
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
     do_wget -h 9d96df8417572a2afb781a7c4c811a85 \
         "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
@@ -228,7 +228,7 @@ if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     echo -e "${orange_color}Tesseract, FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
     if ! files_exist libOpenCL.a; then
         cd_safe "$LOCALBUILDDIR"
-        do_pacman_install "opencl-headers"
+        do_pacman_install opencl-headers
         [[ -d opencl ]] && rm -rf opencl
         mkdir opencl && cd_safe opencl
         gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
@@ -242,8 +242,8 @@ fi
 unset syspath
 
 if enabled libtesseract; then
-    do_pacman_remove "tesseract-ocr"
-    do_pacman_install "libtiff"
+    do_pacman_remove tesseract-ocr
+    do_pacman_install libtiff
     if do_pkgConfig "lept = 1.72"; then
         _check=(liblept.{,l}a lept.pc)
         do_wget -h 7581db29f8442197ce68e766c6047c4b \
@@ -372,7 +372,7 @@ fi
 do_uninstall q include/vo-aacenc libvo-aacenc.{l,}a vo-aacenc.pc
 
 if [[ $ffmpeg != "n" ]] && enabled_any libopencore-amr{wb,nb}; then
-    do_pacman_install "opencore-amr"
+    do_pacman_install opencore-amr
     do_uninstall q include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
 
@@ -433,6 +433,7 @@ fi
 _check=(bin-audio/oggenc.exe)
 if [[ $standalone = y ]] && enabled libvorbis &&
     ! files_exist "${_check[@]}"; then
+    do_pacman_install flac
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
     _check+=(bin-audio/oggdec.exe)
     do_autoreconf
@@ -440,7 +441,6 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     [[ -f Makefile ]] && log distclean make distclean
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
-    [[ $flac = y ]] || extracommands+=(--without-flac)
     do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
         --disable-vcut --disable-ogginfo "${extracommands[@]}"
     do_checkIfExist "${_check[@]}"
@@ -450,13 +450,13 @@ fi
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
     { ! files_exist "${_check[@]}" || test_newer installed opus.pc; }; then
+    do_pacman_install flac
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
     extracommands=()
-    [[ $flac = y ]] || extracommands+=(--without-flac)
     do_separate_confmakeinstall audio "${extracommands[@]}"
     do_checkIfExist "${_check[@]}"
 fi
@@ -519,9 +519,10 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     do_checkIfExist "${_check[@]}"
 fi
 
-if [[ $sox = y && $flac = y ]] && enabled_all libvorbis libopus libspeex; then
+if [[ $sox = y ]] && enabled_all libvorbis libopus libspeex; then
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
+        do_pacman_install flac
         _check=(libsndfile.{l,}a sndfile.{h,pc})
         do_autogen
         do_uninstall include/sndfile.hh "${_check[@]}"
@@ -533,7 +534,7 @@ if [[ $sox = y && $flac = y ]] && enabled_all libvorbis libopus libspeex; then
 fi
 
 if [[ $sox = y ]]; then
-    do_pacman_install "libmad"
+    do_pacman_install libmad flac
     _check=(bin-audio/sox.exe)
     do_vcs "git://git.code.sf.net/p/sox/code" sox "${_check[@]}"
     if [[ $compile = "true" ]]; then
@@ -542,7 +543,6 @@ if [[ $sox = y ]]; then
         do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         extracommands=()
-        [[ $flac = y ]] || extracommands+=(--without-flac)
         enabled libvorbis || extracommands+=(--without-oggvorbis)
         enabled libopus || extracommands+=(--without-opus)
         enabled libtwolame || extracommands+=(--without-twolame)
@@ -556,7 +556,7 @@ if [[ $sox = y ]]; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
-    do_pacman_install "libmodplug"
+    do_pacman_install libmodplug
     do_addOption "--extra-cflags=-DMODPLUG_STATIC"
 fi
 
@@ -771,7 +771,7 @@ if [[ $ffmpeg != "n" ]] && enabled libvidstab; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libcaca; then
-    do_pacman_install "libcaca"
+    do_pacman_install libcaca
     do_uninstall q libcaca.{l,}a caca.pc
     do_addOption "--extra-cflags=-DCACA_STATIC"
 fi
@@ -870,7 +870,7 @@ if [[ $ffmpeg != "n" ]] && enabled libcdio; then
     [[ -d "$LOCALBUILDDIR/libcdio_paranoia-git" ]] &&
         _to_remove+=("$LOCALBUILDDIR/libcdio_paranoia-git")
     do_uninstall q include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
-    do_pacman_install "libcddb libcdio libcdio-paranoia"
+    do_pacman_install libcddb libcdio libcdio-paranoia
 fi
 
 if [[ $mp4box = "y" ]]; then
@@ -1214,7 +1214,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
     fi
 
-    do_pacman_remove "uchardet-git"
+    do_pacman_remove uchardet-git
     if ! mpv_disabled uchardet; then
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then

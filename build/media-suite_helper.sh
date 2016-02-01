@@ -853,12 +853,11 @@ do_unhide_all_sharedlibs() {
 }
 
 do_pacman_install() {
-    local packages="$1"
     local installed
     local pkg
     local noop
     installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
-    for pkg in $packages; do
+    for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         if /usr/bin/grep -q "^${pkg}$" <(echo "$installed"); then
             [[ -z $noop ]] && noop=y
@@ -881,11 +880,10 @@ do_pacman_install() {
 }
 
 do_pacman_remove() {
-    local packages="$1"
     local installed
     local pkg
     installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
-    for pkg in $packages; do
+    for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
         echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
