@@ -168,7 +168,7 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
 fi
 fi
 
-if [[ $sox = "y" ]]; then
+if [[ $sox = y ]]; then
     _ver="2.5.1"
     _hash="35c8fed3101ca1f253e9b6b1966661f6"
     _check=(lib{gnurx,regex}.a regex.h)
@@ -318,19 +318,19 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc; then
     fi
 fi
 
-if [[ $flac = "y" || $sox = "y" ]] ||
+if [[ $flac = y || $sox = y ]] ||
     enabled_any libtheora libvorbis libspeex; then
     do_pacman_install libogg
     do_uninstall q include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
 fi
 
-if [[ $sox = "y" ]] || enabled_any libvorbis libtheora; then
+if enabled_any libvorbis libtheora; then
     do_pacman_install libvorbis
     do_uninstall q include/vorbis share/aclocal/vorbis.m4 \
         libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
 fi
 
-if [[ $sox = "y" ]] || enabled libopus; then
+if enabled libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
         _check=(libopus.{l,}a opus.pc)
         do_wget -h 1f08a661bc72930187893a07f3741a91 \
@@ -346,8 +346,7 @@ if [[ $sox = "y" ]] || enabled libopus; then
     do_uninstall q opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
-if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
-    do_pkgConfig "speex = 1.2rc2"; then
+if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
     _check=(libspeex.{l,}a speex.pc)
     [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
     do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
@@ -359,9 +358,8 @@ if { [[ $sox = "y" ]] || { [[ $ffmpeg != n ]] && enabled libspeex; }; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if [[ $flac = "y" || $sox = "y" ]]; then
-    _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
-    if do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
+_check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
+if [[ $flac = y ]] && do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; then
     do_wget -h b9922c9a0378c88d3e901b234f852698 \
         "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     _check+=(bin-audio/metaflac.exe)
@@ -369,7 +367,6 @@ if [[ $flac = "y" || $sox = "y" ]]; then
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
     do_checkIfExist "${_check[@]}"
-    fi
 fi
 
 do_uninstall q include/vo-aacenc libvo-aacenc.{l,}a vo-aacenc.pc
@@ -505,7 +502,7 @@ if [[ $ffmpeg != "n" ]] && enabled libgme; then
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && enabled libtwolame; then
+if enabled libtwolame; then
     do_pacman_install twolame
     do_uninstall q twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
     do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
@@ -522,7 +519,7 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     do_checkIfExist "${_check[@]}"
 fi
 
-if [[ $sox = "y" ]]; then
+if [[ $sox = y && $flac = y ]] && enabled_all libvorbis libopus libspeex; then
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile
     if [[ $compile = "true" ]]; then
         _check=(libsndfile.{l,}a sndfile.{h,pc})
@@ -533,7 +530,9 @@ if [[ $sox = "y" ]]; then
         do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
+fi
 
+if [[ $sox = y ]]; then
     do_pacman_install "libmad"
     _check=(bin-audio/sox.exe)
     do_vcs "git://git.code.sf.net/p/sox/code" sox "${_check[@]}"
@@ -542,8 +541,14 @@ if [[ $sox = "y" ]]; then
         do_autoreconf
         do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
+        extracommands=()
+        [[ $flac = y ]] || extracommands+=(--without-flac)
+        enabled libvorbis || extracommands+=(--without-oggvorbis)
+        enabled libopus || extracommands+=(--without-opus)
+        enabled libtwolame || extracommands+=(--without-twolame)
+        enabled libmp3lame || extracommands+=(--without-lame)
         do_separate_conf --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
-            LIBS='-lpcre -lshlwapi -lz -lgnurx'
+            LIBS='-lpcre -lshlwapi -lz -lgnurx' "${extracommands[@]}"
         do_make
         cp -f src/sox.exe "$LOCALDESTDIR/bin-audio/"
         do_checkIfExist "${_check[@]}"
