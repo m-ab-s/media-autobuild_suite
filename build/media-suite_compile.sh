@@ -114,8 +114,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
         do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
-        do_wget -h 671daf05153d57258e5cb992aa28c64a \
-            "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
+        do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
         do_checkIfExist "${_check[@]}"
@@ -156,8 +155,7 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
     do_uninstall q include/nettle libnettle.a nettle.pc
 
     _check=(libgnutls.{,l}a gnutls.pc)
-    do_wget -h a26e6dd8d5ad92016e3f068795b89624 \
-        "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
+    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
     do_uninstall include/gnutls "${_check[@]}"
     do_separate_confmakeinstall \
         --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \

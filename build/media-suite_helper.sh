@@ -214,7 +214,7 @@ do_wget() {
             *) break;;
         esac
     done
-    local url="$1" archive="$2" dirName="$3" response_code curlcmds
+    local url="$1" archive="$2" dirName="$3" response_code curlcmds tries=1
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
@@ -229,13 +229,23 @@ do_wget() {
 
         curlcmds=(curl --retry 20 --retry-max-time 5 -sLkf)
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
-        response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
+        [[ $hash ]] && tries=3
+        while [[ $tries -gt 0 ]]; do
+            response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
+            let tries-=1
 
-        if [[ $response_code = "200" || $response_code = "226" ]]; then
-            [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "Downloaded"
-        elif [[ $response_code = "304" ]]; then
-            [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "File up-to-date"
-        elif [[ $response_code -gt 400 ]]; then
+            if [[ $response_code = "200" || $response_code = "226" ]]; then
+                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "Downloaded"
+                if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
+                    tries=0
+                fi
+            elif [[ $response_code = "304" ]]; then
+                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "File up-to-date"
+                if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
+                    tries=0
+                fi
+        done
+        if [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange_color}${archive}${reset_color}"
                 echo -e "\tFile not found online. Using local copy."
