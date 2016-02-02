@@ -981,22 +981,14 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     if exist %build%\install_base_failed del %build%\install_base_failed
     (
     echo.echo -ne "\033]0;install base system\007"
-    echo.pacman --noconfirm -S --force $(cat /etc/pac-base.pk ^| sed -e 's#\\##'^)
-    echo.[[ $? = 1 ]] ^&^& touch "%build%\install_base_failed" ^&^& exit 1
+    echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
+    echo.echo $msysbasesystem ^| xargs -n 1 pacman -Sw --noconfirm --needed
+    echo.echo $msysbasesystem ^| xargs -n 4 pacman -S --noconfirm --needed
     echo.sleep ^3
     echo.exit
         )>%build%\pacman.sh
     %mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
     del %build%\pacman.sh
-    if exist %build%\install_base_failed (
-        echo.-------------------------------------------------------------------------------
-        echo.Installing base system failed.
-        echo.If it is the GPGME error, change from msys64 to msys32 to fix it.
-        echo.Otherwise, let us know.
-        echo.-------------------------------------------------------------------------------
-        pause
-        exit
-        )
 
     for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
         if %%~zi==0 (
@@ -1037,7 +1029,9 @@ if %build32%==yes (
     echo.-------------------------------------------------------------------------------
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-i686-^&#g'^)
+        echo.mingw32compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-i686-&;g' | tr '\n\r' '  ')"
+        echo.echo $mingw32compiler ^| xargs -n 1 pacman -Sw --noconfirm --needed
+        echo.echo $mingw32compiler ^| xargs -n 4 pacman -S --noconfirm --needed
         echo.sleep ^3
         echo.exit
         )>%build%\mingw32.sh
@@ -1067,7 +1061,9 @@ if %build64%==yes (
     echo.-------------------------------------------------------------------------------
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.pacman --noconfirm -S --force $(cat /etc/pac-mingw.pk ^| sed -e 's#\\##' -e 's#.*#mingw-w64-x86_64-^&#g'^)
+        echo.mingw64compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-x86_64-&;g' | tr '\n\r' '  ')"
+        echo.echo $mingw64compiler ^| xargs -n 1 pacman -Sw --noconfirm --needed
+        echo.echo $mingw64compiler ^| xargs -n 4 pacman -S --noconfirm --needed
         echo.sleep ^3
         echo.exit
             )>%build%\mingw64.sh
