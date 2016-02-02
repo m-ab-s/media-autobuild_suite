@@ -534,7 +534,7 @@ fi
 if [[ $sox = y ]]; then
     do_pacman_install libmad flac
     _check=(bin-audio/sox.exe)
-    do_vcs "git://git.code.sf.net/p/sox/code" sox "${_check[@]}"
+    do_vcs "http://git.code.sf.net/p/sox/code" sox "${_check[@]}"
     if [[ $compile = "true" ]]; then
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
         do_autoreconf
@@ -564,7 +564,7 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
     _check=(librtmp.{a,pc})
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
-    do_vcs "git://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
+    do_vcs "http://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
@@ -1353,7 +1353,7 @@ if [[ $bmx = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    do_vcs git://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0
+    do_vcs http://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0
     if [[ $compile = "true" ]]; then
         _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
         sed -i 's| mxf_win32_mmap.c||' mxf/Makefile.am
@@ -1364,7 +1364,7 @@ if [[ $bmx = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    do_vcs git://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0
+    do_vcs http://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0
     if [[ $compile = "true" ]] || test_newer installed libMXF-1.0.pc; then
         _check=(libMXF++-1.0.{{,l}a,pc})
         do_autogen
@@ -1375,7 +1375,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
-    do_vcs git://git.code.sf.net/p/bmxlib/bmx bmx "${_check[@]}"
+    do_vcs http://git.code.sf.net/p/bmxlib/bmx bmx "${_check[@]}"
     if [[ $compile = "true" ]] || test_newer installed {liburiparser,libMXF{,++}-1.0}.pc; then
         do_patch bmx-0001-configure-no-libcurl.patch am
         do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
