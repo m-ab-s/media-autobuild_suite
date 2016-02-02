@@ -238,12 +238,17 @@ do_wget() {
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "Downloaded"
                 if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
                     tries=0
+                else
+                    rm -f "$archive"
                 fi
             elif [[ $response_code = "304" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "File up-to-date"
                 if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
                     tries=0
+                else
+                    rm -f "$archive"
                 fi
+            fi
         done
         if [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
