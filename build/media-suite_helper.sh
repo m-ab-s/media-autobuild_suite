@@ -605,6 +605,20 @@ disabled_any() {
     return 1
 }
 
+enabled_all() {
+    for opt; do
+        enabled "$opt" || return 1
+    done
+    return 0
+}
+
+disabled_all() {
+    for opt; do
+        disabled "$opt" || return 1
+    done
+    return 0
+}
+
 do_getMpvConfig() {
     local configfile="$LOCALBUILDDIR"/mpv_options.txt
     if [[ -f $configfile ]]; then
