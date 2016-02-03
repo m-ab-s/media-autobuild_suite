@@ -166,37 +166,6 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
 fi
 fi
 
-if [[ $sox = y ]]; then
-    _ver="2.5.1"
-    _hash="35c8fed3101ca1f253e9b6b1966661f6"
-    _check=(lib{gnurx,regex}.a regex.h)
-    if files_exist "${_check[@]}"; then
-        do_print_status "libgnurx ${_ver}" "$green_color" "Up-to-date"
-    else
-        do_wget_sf -h "$_hash" \
-            "mingw/Other/UserContributed/regex/mingw-regex-${_ver}/mingw-libgnurx-${_ver}-src.tar.gz" \
-            "mingw-libgnurx-${_ver}.tar.gz"
-        do_uninstall "${_check[@]}"
-        do_separate_conf
-        do_patch "libgnurx-1-additional-makefile-rules.patch"
-        do_make -f Makefile.mxe install-static
-        do_checkIfExist "${_check[@]}"
-    fi
-
-    _check=(magic.h libmagic.{l,}a bin-global/file.exe)
-    _ver="5.25"
-    _hash="e6a972d4e10d9e76407a432f4a63cd4c"
-    if files_exist "${_check[@]}" &&
-        grep -q "$_ver" "$LOCALDESTDIR/lib/libmagic.a"; then
-        do_print_status "file $_ver" "$green_color" "Up-to-date"
-    else
-        do_wget -h "$_hash" "https://fossies.org/linux/misc/file-${_ver}.tar.gz"
-        do_uninstall "${_check[@]}"
-        do_separate_confmakeinstall global CFLAGS=-DHAVE_PREAD
-        do_checkIfExist "${_check[@]}"
-    fi
-fi
-
 if enabled libwebp; then
     do_pacman_install libtiff
     do_vcs "https://chromium.googlesource.com/webm/libwebp"
@@ -532,7 +501,10 @@ if [[ $sox = y ]] && enabled_all libvorbis libopus libspeex; then
 fi
 
 if [[ $sox = y ]]; then
-    do_pacman_install libmad flac
+    do_pacman_install libmad
+    [[ $flac = y ]] || do_pacman_install flac
+    do_uninstall lib{gnurx,regex}.a regex.h magic.h libmagic.{l,}a bin-global/file.exe
+
     _check=(bin-audio/sox.exe)
     do_vcs "http://git.code.sf.net/p/sox/code" sox "${_check[@]}"
     if [[ $compile = "true" ]]; then
@@ -545,8 +517,8 @@ if [[ $sox = y ]]; then
         enabled libopus || extracommands+=(--without-opus)
         enabled libtwolame || extracommands+=(--without-twolame)
         enabled libmp3lame || extracommands+=(--without-lame)
-        do_separate_conf --disable-symlinks CPPFLAGS='-DPCRE_STATIC' \
-            LIBS='-lpcre -lshlwapi -lz -lgnurx' "${extracommands[@]}"
+        do_separate_conf --disable-symlinks \
+            LIBS='-lshlwapi -lz' "${extracommands[@]}"
         do_make
         cp -f src/sox.exe "$LOCALDESTDIR/bin-audio/"
         do_checkIfExist "${_check[@]}"
