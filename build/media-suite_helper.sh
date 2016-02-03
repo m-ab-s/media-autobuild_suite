@@ -254,10 +254,10 @@ do_wget() {
             if [[ -f $archive ]]; then
                 echo -e "${orange_color}${archive}${reset_color}"
                 echo -e "\tFile not found online. Using local copy."
-            elif [[ -f $LOCALBUILDDIR/${url#media-autobuild_suite/master/build/} ]]; then
+            elif [[ -f $LOCALBUILDDIR/${url#*media-autobuild_suite/master/build/} ]]; then
                 echo -e "${orange_color}${archive}${reset_color}"
                 echo -e "\tFile not found online. Using local copy."
-                cp -f "$LOCALBUILDDIR/${url#media-autobuild_suite/master/build/}" .
+                cp -f "$LOCALBUILDDIR/${url#*media-autobuild_suite/master/build/}" .
             else
                 do_print_status "└ ${dirName:-$archive}" "$red_color" "Failed"
                 echo "Error $response_code while downloading $url"
