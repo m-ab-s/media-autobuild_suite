@@ -730,8 +730,8 @@ do_patch() {
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run -s -N -p"$strip" -i "$patch" >/dev/null 2>&1; then
-                patch -s -N -p"$strip" -i "$patch"
+            if patch --dry-run --binary -s -N -p"$strip" -i "$patch" >/dev/null 2>&1; then
+                patch --binary -s -N -p"$strip" -i "$patch"
             else
                 echo -e "${orange_color}${patch}${reset_color}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
