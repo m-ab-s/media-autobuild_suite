@@ -579,15 +579,13 @@ if [[ $vpx != n ]]; then
         log "configure" ../configure --target="${target}-gcc" \
             --disable-shared --enable-static --disable-unit-tests --disable-docs \
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
-            --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" \
+            --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" --disable-install-bins \
             "${extracommands[@]}"
-        sed -i 's/HAVE_GNU_STRIP=yes/HAVE_GNU_STRIP=no/g' "libs-${target}-gcc.mk"
+        do_make
         do_makeinstall
-        if [[ $standalone = y ]] && files_exist bin/vpx{enc,dec}.exe; then
-            mv "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe "$LOCALDESTDIR"/bin-video/
+        if [[ $standalone = y ]]; then
+            do_install vpx{enc,dec}.exe bin-video/
             _check+=(bin-video/vpxdec.exe)
-        else
-            rm -f "$LOCALDESTDIR"/bin/vpx{enc,dec}.exe
         fi
         do_checkIfExist "${_check[@]}"
         unset target extracommands

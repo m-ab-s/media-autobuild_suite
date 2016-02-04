@@ -427,9 +427,9 @@ pc_exists() {
 do_install() {
     [[ $1 = dry ]] && local dryrun=y && shift
     if [[ -n $dryrun ]]; then
-        echo install -D "$1" "$(file_installed "$2")"
+        echo install -D "${@:1:$#-1}" "$(file_installed "${@:$#}")"
     else
-        install -D "$1" "$(file_installed "$2")"
+        install -D "${@:1:$#-1}" "$(file_installed "${@:$#}")"
     fi
 }
 
