@@ -65,6 +65,7 @@ if [[ -n "$alloptions" ]]; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
+
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
     do_pacman_remove openjpeg2
     do_uninstall q j{config,error,morecfg,peglib}.h libjpeg.a
@@ -1393,18 +1394,6 @@ while [[ $new_updates = "yes" ]]; do
         break
     fi
 done
-
-if [[ $packing = "y" ]]; then
-    if ! files_exist bin-global/upx.exe; then
-        do_wget_sf -h 531753e089ed713c6c089d73e261d8c7 "upx/upx/3.91/upx391w.zip"
-        do_install upx.exe bin-global/upx.exe
-    fi
-    echo -e "\n\t${orange_color}Packing binaries and shared libs...${reset_color}"
-    packcmd=("$LOCALDESTDIR/bin-global/upx.exe" "-9" "-qq")
-    [[ $stripping = "y" ]] && packcmd+=("--strip-relocs=0")
-    find /local*/bin-* -regex ".*\.\(exe\|dll\)" -newer "$LOCALBUILDDIR"/last_run -print0 |
-        xargs -0 -r "${packcmd[@]}"
-fi
 
 clean_suite
 

@@ -330,20 +330,45 @@ do_wget_sf() {
 }
 
 do_strip() {
+    local cmd exts nostrip file
+    local cmd=(strip)
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
-    local file
+    local exts="exe|dll|com"
     [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
-    [[ "$@" =~ \.(exe|dll|com)$ ]] &&
+    [[ "$@" =~ \.($exts)$ ]] &&
         [[ ! "$@" =~ ($nostrip)\.exe$ ]] && do_print_progress Stripping
     for file; do
-        file=$(file_installed $file)
+        file="$(file_installed $file)"
         [[ $? = 0 ]] || continue
-        if [[ $file =~ \.(exe|dll|com)$ ]] &&
+        if [[ $file =~ \.($exts)$ ]] &&
             [[ ! $file =~ ($nostrip)\.exe$ ]]; then
-            strip -s "$file"
+            cmd+=(-s)
         elif [[ $file =~ x265(|-numa)\.exe$ ]]; then
-            strip --strip-unneeded "$file"
+            cmd+=(--strip-unneeded)
+        else
+            file=""
         fi
+        [[ $file ]] && eval "${cmd[@]}" "$file"
+    done
+}
+
+do_packing() {
+    local file
+    local cmd=(/usr/bin/upx -9 -qq)
+    local nopack=""
+    local exts="exe|dll"
+    [[ $bits = 64bit ]] && enabled openssl && nopack="ffmpeg|mplayer|mpv"
+    [[ "$@" =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]] &&
+        do_print_progress Packing with UPX
+    for file; do
+        file="$(file_installed $file)"
+        [[ $? = 0 ]] || continue
+        if [[ $file =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]]; then
+            [[ $stripping = y ]] && cmd+=(--strip-relocs=0)
+        else
+            file=""
+        fi
+        [[ $file ]] && eval "${cmd[@]}" "$file"
     done
 }
 
@@ -357,6 +382,7 @@ do_checkIfExist() {
     else
         if files_exist -v "$@"; then
             [[ $stripping = y ]] && do_strip "$@"
+            [[ $packing = y ]] && do_pack "$@"
             do_print_status "└ $packetName" "$blue_color" "Updated"
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"

@@ -43,7 +43,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python scons xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty-git texinfo libgpgme
+gperf winpty-git texinfo upx
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
@@ -722,7 +722,10 @@ if %packINI%==0 (
     echo. 2 = No [recommended]
     echo.
     echo. Attention: Some security applications may detect packed binaries as malware.
-    echo. Makes binaries a lot smaller at a big time cost after compiling.
+    echo. Increases delay on runtime during which files need to be unpacked.
+    echo. Makes binaries smaller at a big time cost after compiling and on runtime.
+    echo.
+    echo. If distributing the files, consider packing them with 7-zip instead.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
