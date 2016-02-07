@@ -582,6 +582,9 @@ if [[ $vpx != n ]]; then
             --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
             --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" --disable-install-bins \
             "${extracommands[@]}"
+        for _ff in *.mk; do
+            sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
+        done
         do_make
         do_makeinstall
         if [[ $standalone = y ]]; then
