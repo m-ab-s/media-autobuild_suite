@@ -473,7 +473,7 @@ fi
 if enabled libtwolame; then
     do_pacman_install twolame
     do_uninstall q twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
-    do_addOption "--extra-cflags=-DLIBTWOLAME_STATIC"
+    do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
@@ -528,7 +528,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
     do_pacman_install libmodplug
-    do_addOption "--extra-cflags=-DMODPLUG_STATIC"
+    do_addOption --extra-cflags=-DMODPLUG_STATIC
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
@@ -731,7 +731,7 @@ fi
 if [[ $ffmpeg != "n" ]] && enabled libcaca; then
     do_pacman_install libcaca
     do_uninstall q libcaca.{l,}a caca.pc
-    do_addOption "--extra-cflags=-DCACA_STATIC"
+    do_addOption --extra-cflags=-DCACA_STATIC
 fi
 
 _check=(libzvbi.{h,{l,}a})
@@ -1020,8 +1020,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     if enabled libssh; then
         do_pacman_install libssh
-        do_addOption "--extra-cflags=-DLIBSSH_STATIC"
-        do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
+        do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi

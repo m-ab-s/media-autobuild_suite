@@ -552,12 +552,12 @@ do_changeFFmpegConfig() {
     # decklink depends on pthreads
     if disabled w32threads || enabled_any pthreads decklink; then
         do_removeOption --enable-w32threads
-        do_addOptions --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
+        do_addOption --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lpthread --extra-libs=-lwsock32
     fi
 
     # add options for static kvazaar
-    enabled libkvazaar && do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
+    enabled libkvazaar && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
 
     # handle gpl libs
     local gpl=(frei0r lib{cdio,rubberband,vidstab,x264,x265,xavs,xvid} postproc)
@@ -578,7 +578,7 @@ do_changeFFmpegConfig() {
     # handle non-free libs
     local nonfree=(nvenc libfaac)
     if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
-        do_addOption "--enable-nonfree"
+        do_addOption --enable-nonfree
     else
         do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
     fi
@@ -587,20 +587,20 @@ do_changeFFmpegConfig() {
     local nonfreegpl=(libfdk-aac openssl)
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]]; then
-            do_addOption "--enable-nonfree"
+            do_addOption --enable-nonfree
         elif [[ $license = gpl* ]]; then
             do_removeOptions "${nonfreegpl[*]/#/--enable-}"
         fi
         # no lgpl here because they are accepted with it
     fi
 
-    enabled frei0r && do_addOption "--enable-filter=frei0r"
+    enabled frei0r && do_addOption --enable-filter=frei0r
 
     if enabled debug; then
         # fix issue with ffprobe not working with debug and strip
-        do_addOption "--disable-stripping"
+        do_addOption --disable-stripping
     else
-        do_addOption "--disable-debug"
+        do_addOption --disable-debug
     fi
 
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
@@ -613,12 +613,13 @@ do_changeFFmpegConfig() {
     fi
 }
 
-do_checkForOptions() {
-    local option
-    for option in "$@"; do
-        if /usr/bin/grep -qE -e "$option" <(echo "${FFMPEG_OPTS[*]}"); then
-            return
-        fi
+opt_exists() {
+    local array="${1}[@]" && shift 1
+    local opt value
+    for opt; do
+        for value in "${!array}"; do
+            [[ "$value" =~ $opt ]] && return
+        done
     done
     return 1
 }
@@ -632,6 +633,7 @@ disabled() {
 }
 
 enabled_any() {
+    local opt
     for opt; do
         enabled "$opt" && return 0
     done
@@ -639,6 +641,7 @@ enabled_any() {
 }
 
 disabled_any() {
+    local opt
     for opt; do
         disabled "$opt" && return 0
     done
@@ -646,6 +649,7 @@ disabled_any() {
 }
 
 enabled_all() {
+    local opt
     for opt; do
         enabled "$opt" || return 1
     done
@@ -653,6 +657,7 @@ enabled_all() {
 }
 
 disabled_all() {
+    local opt
     for opt; do
         disabled "$opt" || return 1
     done
@@ -672,11 +677,10 @@ do_getMpvConfig() {
         echo "Using default mpv options"
     fi
     if [[ $mpv = "v" ]]; then
-        ! mpv_enabled vapoursynth && ! mpv_disabled vapoursynth &&
-            MPV_OPTS+=(--enable-vapoursynth)
+        ! mpv_disabled vapoursynth && do_addOption MPV_OPTS --enable-vapoursynth
     elif [[ $mpv = "y" ]]; then
-        mpv_enabled vapoursynth && mpv_disable vapoursynth
-        mpv_disabled vapoursynth || MPV_OPTS+=(--disable-vapoursynth)
+        mpv_enabled vapoursynth && mpv_disable vapoursynth ||
+            do_addOption MPV_OPTS --disable-vapoursynth
     fi
 }
 
@@ -711,17 +715,13 @@ mpv_disable() {
 }
 
 do_addOption() {
-    local option="$1"
-    if ! do_checkForOptions "$option"; then
-        FFMPEG_OPTS+=("$option")
+    local varname="$1" array
+    if [[ -v $varname ]]; then
+        array="$varname" && shift 1
+    else
+        array="FFMPEG_OPTS"
     fi
-}
-
-do_addOptions() {
-    local option
-    for option in "$@"; do
-        do_addOption "$option"
-    done
+    ! opt_exists "$array" "$@" && eval "$array"+=\("$@"\)
 }
 
 do_removeOption() {
