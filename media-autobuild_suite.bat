@@ -47,16 +47,17 @@ gperf winpty-git texinfo upx
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
-set ffmpeg_options=--enable-frei0r --enable-libbluray --enable-libcaca ^
---enable-libass --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame ^
---enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libvo-amrwbenc --enable-libschroedinger ^
---enable-libsoxr --enable-libtwolame --enable-libspeex --enable-libtheora --enable-libvorbis ^
---enable-libopus --enable-libvidstab --enable-libxavs --enable-libxvid --enable-libtesseract ^
---enable-libzvbi --enable-libbs2b --enable-libmfx --enable-libcdio --enable-libfreetype ^
---enable-fontconfig --enable-libfribidi --enable-opengl --enable-libvpx --enable-libx264 --enable-libx265 ^
---enable-libkvazaar --enable-libwebp --enable-decklink --enable-libgme --enable-librubberband ^
---disable-w32threads --enable-libzimg --enable-gcrypt ^
---enable-nonfree --enable-nvenc
+set ffmpeg_options=--disable-w32threads --enable-decklink --enable-fontconfig ^
+--enable-frei0r --enable-gcrypt --enable-libass --enable-libbluray --enable-libbs2b ^
+--enable-libcaca --enable-libcdio --enable-libfreetype --enable-libfribidi ^
+--enable-libgme --enable-libgsm --enable-libilbc --enable-libkvazaar ^
+--enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb ^
+--enable-libopencore-amrwb --enable-libopus --enable-librubberband ^
+--enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtesseract ^
+--enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc ^
+--enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 ^
+--enable-libxavs --enable-libxvid --enable-libzimg --enable-libzvbi --enable-nonfree ^
+--enable-nvenc --enable-opengl
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
