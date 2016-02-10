@@ -573,7 +573,6 @@ if [[ $vpx != n ]]; then
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f config.mk ]] && log "distclean" make distclean
-        do_patch vpx-0001-Fix-compilation-with-mingw64.patch am
         [[ $standalone = y ]] && extracommands+=(--enable-vp10) || extracommands+=(--disable-examples)
         create_build_dir
         [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
