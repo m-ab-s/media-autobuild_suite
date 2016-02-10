@@ -541,13 +541,8 @@ do_getFFmpegConfig() {
             --enable-opencl --enable-libcaca
     fi
 
-    enabled_any libvo-aacenc libaacplus && do_removeOption "--enable-lib(vo-aacenc|aacplus)" &&
-        echo -e "${orange_color}Remove --enable-libvo-aacenc and --enable-libaacplus from ffmpeg_options.txt." &&
-        echo -e "${orange_color}These libs were removed from FFmpeg.${reset_color}"
-
-    enabled libutvideo && do_removeOption "--enable-libutvideo" &&
-        echo -e "${orange_color}Remove --enable-libutvideo from ffmpeg_options.txt." &&
-        echo -e "${orange_color}This lib was removed from FFmpeg.${reset_color}"
+    enabled_any lib{vo-aacenc,aacplus,utvideo} && do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo)" &&
+        sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo);;g' "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
 do_changeFFmpegConfig() {
