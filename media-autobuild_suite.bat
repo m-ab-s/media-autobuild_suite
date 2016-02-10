@@ -48,16 +48,13 @@ gperf winpty-git texinfo upx
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
 set ffmpeg_options=--disable-w32threads --enable-decklink --enable-fontconfig ^
---enable-frei0r --enable-gcrypt --enable-libass --enable-libbluray --enable-libbs2b ^
---enable-libcaca --enable-libcdio --enable-libfreetype --enable-libfribidi ^
---enable-libgme --enable-libgsm --enable-libilbc --enable-libkvazaar ^
---enable-libmfx --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb ^
---enable-libopencore-amrwb --enable-libopus --enable-librubberband ^
---enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtesseract ^
---enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc ^
---enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 ^
---enable-libxavs --enable-libxvid --enable-libzimg --enable-libzvbi --enable-nonfree ^
---enable-nvenc --enable-opengl
+--enable-gcrypt --enable-libass --enable-libbluray --enable-libbs2b ^
+--enable-libcaca --enable-libfreetype --enable-libfribidi ^
+--enable-libkvazaar --enable-libmfx --enable-libmp3lame ^
+--enable-libopus --enable-libsoxr --enable-libspeex ^
+--enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwebp ^
+--enable-libx264 --enable-libx265 --enable-libxvid --enable-libzimg ^
+--enable-libzvbi --enable-nonfree --enable-nvenc --enable-opengl
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
