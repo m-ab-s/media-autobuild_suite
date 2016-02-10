@@ -649,19 +649,6 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     fi
 fi
 
-if [[ $ffmpeg != "n" ]] && enabled libutvideo && do_pkgConfig "libutvideo = 15.1.0"; then
-    do_vcs "https://github.com/qyot27/libutvideo.git#branch=15.1.0"
-    if [[ $compile = "true" ]]; then
-        _check=(libutvideo.{a,pc})
-        do_uninstall include/utvideo "${_check[@]}"
-        [[ -f config.log ]] && log "distclean" make distclean
-        do_patch "libutvideo-0001-Avoid-_countof-and-DllMain-in-MinGW.patch" am
-        do_configure --prefix="$LOCALDESTDIR"
-        do_makeinstall
-        do_checkIfExist "${_check[@]}"
-    fi
-fi
-
 if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled libass; }; then
     do_vcs "https://github.com/libass/libass.git"

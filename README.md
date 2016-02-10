@@ -73,8 +73,6 @@ Included Tools And Libraries
 	- libtesseract (git)
 	- libtheora
 	- libtwolame (git)
-	- libutvideo (git/15.1.0)
-		- Not compiled by default
 	- libvo-amrwbenc (0.1.2)
 	- libvorbis
 	- libvpx (git)

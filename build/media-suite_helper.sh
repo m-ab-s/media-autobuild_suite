@@ -544,6 +544,10 @@ do_getFFmpegConfig() {
     enabled_any libvo-aacenc libaacplus && do_removeOption "--enable-lib(vo-aacenc|aacplus)" &&
         echo -e "${orange_color}Remove --enable-libvo-aacenc and --enable-libaacplus from ffmpeg_options.txt." &&
         echo -e "${orange_color}These libs were removed from FFmpeg.${reset_color}"
+
+    enabled libutvideo && do_removeOption "--enable-libutvideo" &&
+        echo -e "${orange_color}Remove --enable-libutvideo from ffmpeg_options.txt." &&
+        echo -e "${orange_color}This lib was removed from FFmpeg.${reset_color}"
 }
 
 do_changeFFmpegConfig() {
@@ -561,7 +565,7 @@ do_changeFFmpegConfig() {
     enabled libkvazaar && do_addOption "--extra-cflags=-DKVZ_STATIC_LIB"
 
     # handle gpl libs
-    local gpl=(frei0r lib{cdio,rubberband,utvideo,vidstab,x264,x265,xavs,xvid} postproc)
+    local gpl=(frei0r lib{cdio,rubberband,vidstab,x264,x265,xavs,xvid} postproc)
     if [[ $license = gpl* || $license = nonfree ]] && enabled_any "${gpl[@]}"; then
         do_addOption --enable-gpl
     else
@@ -609,7 +613,7 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOptions "--enable-decklink --enable-libutvideo --enable-libgme" y
+        do_removeOptions "--enable-decklink --enable-libgme" y
         FFMPEG_OPTS_SHARED+=("--extra-ldflags=-static-libgcc")
     fi
 }
