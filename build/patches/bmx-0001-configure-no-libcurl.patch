@@ -1,4 +1,4 @@
-From a30efa2de225b76d65c1d7e71c0c270f87302f91 Mon Sep 17 00:00:00 2001
+From 05b8fb6cdb497aad71cd2178f84b5d03f600f3c4 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Wed, 13 Jan 2016 19:30:47 +0000
 Subject: [PATCH 1/2] configure: no libcurl
@@ -8,7 +8,7 @@ Subject: [PATCH 1/2] configure: no libcurl
  1 file changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index f6ae575..121f401 100644
+index db8f81b..e415893 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -151,14 +151,6 @@ PKG_CHECK_MODULES(LIBMXFPP, libMXF++-${LIBMXFPP_MAJORMINOR} >= 1.0.3)
