@@ -57,7 +57,7 @@ set ffmpeg_options=--disable-w32threads --enable-decklink --enable-fontconfig ^
 --enable-libzvbi --enable-nonfree --enable-nvenc --enable-opengl
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
---enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
+--enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-egl-angle --disable-debug-build ^
 --enable-vapoursynth
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^

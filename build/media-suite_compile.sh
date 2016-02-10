@@ -1204,14 +1204,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     if ! mpv_disabled egl-angle; then
-    _check=(libEGL.{a,pc} libGLESv2.a)
-    do_vcs "https://github.com/wiiaboo/angleproject.git" angleproject "${_check[@]}"
-    if [[ $compile = "true" ]]; then
-        log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
-        [[ -f libEGL.a ]] && log "clean" make clean
-        do_makeinstall PREFIX="$LOCALDESTDIR"
-        do_checkIfExist "${_check[@]}"
-    fi
+        _check=(libEGL.{a,pc} libGLESv2.a)
+        do_vcs "https://chromium.googlesource.com/angle/angle#commit=4449226" angleproject "${_check[@]}"
+        if [[ $compile = "true" ]]; then
+            do_patch "angle-0001-Add-makefile.patch" am
+            log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
+            [[ -f libEGL.a ]] && log "clean" make clean
+            do_makeinstall PREFIX="$LOCALDESTDIR"
+            do_checkIfExist "${_check[@]}"
+        fi
     fi
 
     vsprefix=$(get_vs_prefix)
