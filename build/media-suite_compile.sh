@@ -640,9 +640,9 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     do_vcs "http://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
+        [[ -f Makefile ]] && git clean -qxfd -e "/build_successful*" -e "/recently_updated"
         do_autoreconf
         do_uninstall include/libbluray "${_check[@]}"
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
             --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
         do_checkIfExist "${_check[@]}"
