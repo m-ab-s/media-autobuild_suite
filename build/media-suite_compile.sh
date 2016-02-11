@@ -641,7 +641,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
         do_autoreconf
-        do_uninstall include/bluray "${_check[@]}"
+        do_uninstall include/libbluray "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall --enable-static --disable-examples --disable-bdjava --disable-doxygen-doc \
             --disable-doxygen-dot --without-libxml2 --without-fontconfig --without-freetype --disable-udf
