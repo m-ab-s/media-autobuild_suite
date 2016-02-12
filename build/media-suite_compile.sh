@@ -1149,7 +1149,7 @@ if [[ $mplayer = "y" ]]; then
     fi
 fi
 
-if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale; then
+if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     [[ -d $LOCALBUILDDIR/waio-git ]] && do_uninstall include/waio libwaio.a &&
         _to_remove+=("$LOCALBUILDDIR/waio-git")
 
