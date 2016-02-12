@@ -1023,11 +1023,17 @@ get_vs_prefix() {
         vsprefix="${vsprefix%/*}"
         [[ -d "$vsprefix/vapoursynth${bits:0:2}" ]] &&
             echo "$vsprefix"
-    elif regtool -W check "$regkey" >/dev/null 2>&1; then
+    elif [[ $bits = 64bit ]] && regtool -q check "$regkey"; then
+        # check in native HKLM for installed VS (R31+)
+        vsprefix="$(regtool -q get "$regkey/path")"
+        [[ -n "$vsprefix" ]] && vsprefix="$(cygpath -u "$vsprefix/core64")" || vsprefix=""
+        [[ -n "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
+            echo "$vsprefix"
+    elif regtool -qW check "$regkey"; then
         # check in registry for installed VS
-        vsprefix=$(cygpath -u "$(regtool -W get "$regkey/path")")
-        vsprefix="$vsprefix/core${bits:0:2}"
-        [[ -d "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
+        vsprefix="$(regtool -W get "$regkey/path")"
+        [[ -n "$vsprefix" ]] && vsprefix=$(cygpath -u "$vsprefix/core${bits:0:2}") || vsprefix=""
+        [[ -n "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
             echo "$vsprefix"
     elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
