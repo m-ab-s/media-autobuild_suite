@@ -97,10 +97,10 @@ vcs_update() {
 
 vcs_log() {
     if [[ "$vcsType" = "git" ]]; then
-        git log --no-merges --pretty="%ci %h %s" \
-            --abbrev-commit "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
+        git log --no-merges --pretty="%ci: %an - %h%n    %s" \
+            "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ "$vcsType" = "hg" ]]; then
-        hg log --template "{date|localdate|isodatesec} {node|short} {desc|firstline}\n" \
+        hg log --template "{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n" \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
 }
