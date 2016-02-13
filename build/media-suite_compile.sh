@@ -366,6 +366,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
+    [[ $standalone = n ]] && do_addOption --enable-libfdkaac
 fi
 
 if [[ $fdkaac = y || $standalone = y ]]; then
@@ -593,8 +594,9 @@ if [[ $vpx != n ]]; then
         do_checkIfExist "${_check[@]}"
         unset target extracommands
     fi
+    [[ $standalone = n ]] && do_addOption --enable-libvpx
 else
-    pc_exists vpx || do_removeOption "--enable-libvpx"
+    pc_exists vpx || do_removeOption --enable-libvpx
 fi
 
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; then
@@ -609,6 +611,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; the
         do_separate_confmakeinstall video
         do_checkIfExist "${_check[@]}"
     fi
+    [[ $standalone = n ]] && do_addOption --enable-libkvazaar
 fi
 
 if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
@@ -912,8 +915,9 @@ if [[ $x264 != n ]]; then
         do_checkIfExist "${_check[@]}"
         unset extracommands
     fi
+    [[ $standalone = n ]] && do_addOption --enable-libx264
 else
-    pc_exists x264 || do_removeOption "--enable-libx264"
+    pc_exists x264 || do_removeOption --enable-libx264
 fi
 
 if [[ ! $x265 = "n" ]]; then
@@ -1004,6 +1008,7 @@ EOF
         do_checkIfExist "${_check[@]}"
         unset xpsupport assembly cli
     fi
+    [[ $standalone = n ]] && do_addOption --enable-libx265
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
