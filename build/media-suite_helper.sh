@@ -352,7 +352,7 @@ do_strip() {
     done
 }
 
-do_packing() {
+do_pack() {
     local file
     local cmd=(/usr/bin/upx -9 -qq)
     local nopack=""
