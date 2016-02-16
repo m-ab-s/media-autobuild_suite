@@ -1094,7 +1094,7 @@ if [[ $ffmpeg != "n" ]]; then
                 fi
                 disabled ffprobe || _check+=(bin-video/ffprobe.exe)
             fi
-            do_uninstall bin-video/ff{mpeg,play,probe}.exe.debug "${_uninstall[@]}"
+            do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
