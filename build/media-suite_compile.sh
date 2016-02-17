@@ -570,7 +570,7 @@ if [[ $vpx != n ]]; then
     _check=(libvpx.a vpx.pc)
     extracommands=()
     [[ $standalone = y ]] && _check+=(bin-video/vpxenc.exe)
-    do_vcs "https://github.com/webmproject/libvpx.git" vpx "${_check[@]}"
+    do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx "${_check[@]}"
     if [[ $compile = "true" ]]; then
         do_uninstall include/vpx bin-video/vpxdec.exe "${_check[@]}"
         [[ -f config.mk ]] && log "distclean" make distclean
