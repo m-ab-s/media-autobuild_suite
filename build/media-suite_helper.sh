@@ -227,7 +227,7 @@ do_wget() {
         [[ ${url#$LOCALBUILDDIR} != "${url}" ]] &&
             url="https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master${url}"
 
-        curlcmds=(curl --retry 20 --retry-max-time 5 -sLkf)
+        curlcmds=(/usr/bin/curl --retry 20 --retry-max-time 5 -sLkf)
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do

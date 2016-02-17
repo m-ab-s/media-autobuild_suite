@@ -108,8 +108,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 
     [[ -z $harfbuzz_ver ]] &&
-        harfbuzz_ver=$(curl -sl "http://www.freedesktop.org/software/harfbuzz/release/" |
-            grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')
+        harfbuzz_ver=$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
+            /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')
     [[ -n $harfbuzz_ver ]] &&
         harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
@@ -148,7 +148,7 @@ fi
 
 if { { [[ "$ffmpeg" != "n" ]] && enabled gnutls; } ||
     [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
-[[ -z "$gnutls_ver" ]] && gnutls_ver=$(curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
+[[ -z "$gnutls_ver" ]] && gnutls_ver=$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
 [[ -n "$gnutls_ver" ]] &&
     gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.8"
 if do_pkgConfig "gnutls = $gnutls_ver"; then
@@ -1240,7 +1240,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             done
 
-            curl -sL "$baseurl/pc/vapoursynth.pc.in" |
+            /usr/bin/curl -sL "$baseurl/pc/vapoursynth.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
@@ -1249,7 +1249,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 -e '/Libs.private/ d' \
                 > vapoursynth.pc
             [[ -f vapoursynth.pc ]] && do_install vapoursynth.pc
-            curl -sL "$baseurl/pc/vapoursynth-script.pc.in" |
+            /usr/bin/curl -sL "$baseurl/pc/vapoursynth-script.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
