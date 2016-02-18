@@ -816,8 +816,10 @@ log() {
 }
 
 create_build_dir() {
-    [[ -d build-$bits ]] && rm -rf "build-$bits"
-    mkdir "build-$bits" && cd_safe "build-$bits"
+    local extra
+    [[ $1 ]] && extra="-$1"
+    [[ -d build${extra}-$bits ]] && rm -rf "build${extra}-$bits"
+    mkdir "build${extra}-$bits" && cd_safe "build${extra}-$bits"
 }
 
 do_separate_conf() {

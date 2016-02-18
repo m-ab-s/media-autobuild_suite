@@ -1046,9 +1046,13 @@ if [[ $ffmpeg != "n" ]]; then
     if [[ $compile = "true" ]] ||
         { [[ $ffmpegUpdate = y ]] && test_newer installed {libass,x264,x265,vpx}.pc; }; then
         do_changeFFmpegConfig "$license"
+        _patches=0
         enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis libcdio &&
-            do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am
-        do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
+            do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am &&
+            let _patches+=1
+        do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
+        [[ $_patches -gt 0 ]] && _patches="$(git describe --tags --match N "HEAD~${_patches}")" ||
+            _patches=""
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
@@ -1056,15 +1060,17 @@ if [[ $ffmpeg != "n" ]]; then
             lib{sw{scale,resample},postproc}.{a,pc}
             )
         _check=()
-        sedflags="prefix|bindir|extra-(cflags|libs|ldflags)|pkg-config-flags"
+        sedflags="prefix|bindir|extra-(cflags|libs|ldflags|version)|pkg-config-flags"
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold_color}shared${reset_color} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
-            do_configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
-                --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
+            create_build_dir shared
+            log configure ../configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
+                --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}" \
+                --extra-version="$_patches"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
@@ -1076,10 +1082,8 @@ if [[ $ffmpeg != "n" ]]; then
                 fi
                 disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
             fi
+            cd_safe ..
             files_exist "${_check[@]}" && touch "build_successful${bits}_shared"
-            [[ $ffmpeg = "b" ]] && mv ab-suite.{,shared.}configure.log &&
-                mv ab-suite.{,shared.}configure.error.log && mv ab-suite.{,shared.}install.log &&
-                mv ab-suite.{,shared.}install.error.log
         fi
 
         # static
@@ -1095,12 +1099,15 @@ if [[ $ffmpeg != "n" ]]; then
                 disabled ffprobe || _check+=(bin-video/ffprobe.exe)
             fi
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
-            do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video "${FFMPEG_OPTS[@]}"
+            create_build_dir static
+            log configure ../configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video \
+                "${FFMPEG_OPTS[@]}" --extra-version="$_patches"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
             enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
+            cd_safe ..
         fi
         do_checkIfExist "${_check[@]}"
     fi
