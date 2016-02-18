@@ -54,7 +54,8 @@ set ffmpeg_options=--disable-w32threads --enable-decklink --enable-fontconfig ^
 --enable-libopus --enable-libsoxr --enable-libspeex ^
 --enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwebp ^
 --enable-libx264 --enable-libx265 --enable-libxvid --enable-libzimg ^
---enable-libzvbi --enable-nonfree --enable-nvenc --enable-opengl
+--enable-libzvbi --enable-nonfree --enable-nvenc --enable-opengl ^
+--enable-avisynth
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-egl-angle --disable-debug-build ^

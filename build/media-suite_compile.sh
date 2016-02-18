@@ -1,7 +1,7 @@
 #!/bin/bash
 shopt -s extglob
 
-FFMPEG_BASE_OPTS=("--enable-avisynth" "--pkg-config-flags=--static")
+FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
 alloptions="$*"
 echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
 echo -ne "\e]0;media-autobuild_suite\007"
