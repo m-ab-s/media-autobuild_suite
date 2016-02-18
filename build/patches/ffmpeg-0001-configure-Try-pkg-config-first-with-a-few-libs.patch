@@ -1,17 +1,17 @@
-From 37f1bba2f5e0e714d80a0f1e7d9fcc6088baed08 Mon Sep 17 00:00:00 2001
+From c3780f7c2efec29c7235514652f61be245f5d937 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sat, 16 Jan 2016 14:30:25 +0000
-Subject: [PATCH] configure: Try pkg-config first with a few libs
+Subject: [PATCH 1/2] configure: Try pkg-config first with a few libs
 
 ---
  configure | 19 +++++++++++++------
  1 file changed, 13 insertions(+), 6 deletions(-)
 
 diff --git a/configure b/configure
-index dba8180..05df502 100755
+index fb81a19..39c2b50 100755
 --- a/configure
 +++ b/configure
-@@ -5473,7 +5473,8 @@ enabled fontconfig        && enable libfontconfig
+@@ -5519,7 +5519,8 @@ enabled fontconfig        && enable libfontconfig
  enabled libfontconfig     && require_pkg_config fontconfig "fontconfig/fontconfig.h" FcInit
  enabled libfreetype       && require_libfreetype
  enabled libfribidi        && require_pkg_config fribidi fribidi.h fribidi_version_info
@@ -21,7 +21,7 @@ index dba8180..05df502 100755
  enabled libgsm            && { for gsm_hdr in "gsm.h" "gsm/gsm.h"; do
                                     check_lib "${gsm_hdr}" gsm_create -lgsm && break;
                                 done || die "ERROR: libgsm not found"; }
-@@ -5483,8 +5484,10 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
+@@ -5529,8 +5530,10 @@ enabled libmfx            && require_pkg_config libmfx "mfx/mfxvideo.h" MFXInit
  enabled libmodplug        && require_pkg_config libmodplug libmodplug/modplug.h ModPlug_Load
  enabled libmp3lame        && require "libmp3lame >= 3.98.3" lame/lame.h lame_set_VBR_quality -lmp3lame
  enabled libnut            && require libnut libnut.h nut_demuxer_init -lnut
@@ -34,7 +34,7 @@ index dba8180..05df502 100755
  enabled libopencv         && { check_header opencv2/core/core_c.h &&
                                 require_pkg_config opencv opencv2/core/core_c.h cvCreateImageHeader ||
                                 require_pkg_config opencv opencv/cxcore.h cvCreateImageHeader; }
-@@ -5507,15 +5510,18 @@ enabled libsoxr           && require libsoxr soxr.h soxr_create -lsoxr && LIBSOX
+@@ -5553,15 +5556,18 @@ enabled libsoxr           && require libsoxr soxr.h soxr_create -lsoxr && LIBSOX
  enabled libssh            && require_pkg_config libssh libssh/sftp.h sftp_init
  enabled libspeex          && require_pkg_config speex speex/speex.h speex_decoder_init -lspeex
  enabled libtesseract      && require_pkg_config tesseract tesseract/capi.h TessBaseAPICreate
@@ -56,7 +56,7 @@ index dba8180..05df502 100755
  
  enabled libvpx            && {
      enabled libvpx_vp8_decoder && {
-@@ -5712,6 +5718,7 @@ enabled jack_indev && check_lib2 jack/jack.h jack_client_open -ljack && check_fu
+@@ -5758,6 +5764,7 @@ enabled jack_indev && check_lib2 jack/jack.h jack_client_open -ljack && check_fu
  enabled_any sndio_indev sndio_outdev && check_lib2 sndio.h sio_open -lsndio
  
  if enabled libcdio; then
