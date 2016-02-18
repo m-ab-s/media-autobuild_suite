@@ -366,7 +366,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
-    [[ $standalone = n ]] && do_addOption --enable-libfdkaac
+    [[ $standalone = n ]] && do_addOption --enable-libfdk-aac
 fi
 
 if [[ $fdkaac = y || $standalone = y ]]; then
