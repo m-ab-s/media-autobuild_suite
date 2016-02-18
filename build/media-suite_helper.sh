@@ -779,8 +779,8 @@ compilation_fail() {
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
     echo "Likely error:"
-    tail "ab-suite.${operation}.error.log"
-    echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.error.log${reset_color}"
+    tail "ab-suite.${operation}.log"
+    echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.log${reset_color}"
     if [[ -n "$_notrequired" ]]; then
         echo "This isn't required for anything so we can move on."
         return 1
@@ -809,7 +809,7 @@ log() {
     do_print_progress Running "$cmd"
     if [[ $logging != "n" ]]; then
         echo "$@" > "ab-suite.$cmd.log"
-        "$@" >> "ab-suite.$cmd.log" 2> "ab-suite.$cmd.error.log" || compilation_fail "$cmd"
+        "$@" >> "ab-suite.$cmd.log" 2>&1 || compilation_fail "$cmd"
     else
         "$@" || compilation_fail "$cmd"
     fi
