@@ -1051,7 +1051,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_patch "ffmpeg-0001-configure-Try-pkg-config-first-with-a-few-libs.patch" am &&
             let _patches+=1
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
-        [[ $_patches -gt 0 ]] && _patches="$(git describe --tags --match N "HEAD~${_patches}")" ||
+        [[ $_patches -gt 0 ]] && _patches=g"$(git rev-parse --short "HEAD~${_patches}")" ||
             _patches=""
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
