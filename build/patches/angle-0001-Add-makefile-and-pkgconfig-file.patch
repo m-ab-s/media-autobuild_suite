@@ -1,23 +1,24 @@
-From b205030bf3588dcc542fb785d4f4b42d0a4a9012 Mon Sep 17 00:00:00 2001
+From 84e3facc21606fc2379dad0be48f2874fff1dac5 Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
 
-Custom Makefile originally made by rossy & RiCON  in
+Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
+Changes by shinchiro.
 ---
- Makefile     | 397 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 393 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 407 insertions(+)
+ 2 files changed, 403 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..99ab1f4
+index 0000000..3bca026
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,397 @@
+@@ -0,0 +1,393 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -29,9 +30,9 @@ index 0000000..99ab1f4
 +LIBDIR ?= $(PREFIX)/lib
 +INCLUDEDIR ?= $(PREFIX)/include
 +
-+DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 -DANGLE_ENABLE_OPENGL \
-+        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DANGLE_ENABLE_ESSL -DANGLE_ENABLE_GLSL \
-+        -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
++DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 \
++        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL \
++        -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
 +        -DEGLAPI= $(DEFS)
 +LIBEGL_DEFS = -DLIBEGL_IMPLEMENTATION
 +LIBGLESv2_DEFS = -DLIBGLESV2_IMPLEMENTATION
@@ -310,8 +311,6 @@ index 0000000..99ab1f4
 +	src/compiler/translator/ShaderLang.o \
 +	src/compiler/translator/ShaderVars.o \
 +	$(angle_translator_lib_sources) \
-+	$(angle_translator_lib_essl_sources) \
-+	$(angle_translator_lib_glsl_sources) \
 +	$(angle_translator_lib_hlsl_sources) \
 +	$(angle_preprocessor_sources) \
 +	$(libangle_common_sources) \
@@ -320,9 +319,7 @@ index 0000000..99ab1f4
 +	$(libangle_d3d9_sources) \
 +	$(libangle_d3d11_sources) \
 +	$(libangle_d3d11_win32_sources) \
-+	$(libglesv2_sources) \
-+	$(libangle_gl_sources) \
-+	$(libangle_gl_wgl_sources) \
++	$(libglesv2_sources)
 +
 +LIBGLESv2_DEP = $(LIBGLESv2_OBJ:.o=.d)
 +LIBEGL_OBJ = src/libEGL/libEGL.egl.o
