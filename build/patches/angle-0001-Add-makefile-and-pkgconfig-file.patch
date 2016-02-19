@@ -1,23 +1,23 @@
-From 86dc62ef73a68df2f08ada4709c7dc0821c28b27 Mon Sep 17 00:00:00 2001
+From b205030bf3588dcc542fb785d4f4b42d0a4a9012 Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
-Date: Thu, 11 Feb 2016 22:43:26 +0800
+Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
 
 Custom Makefile originally made by rossy & RiCON  in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 ---
- Makefile     | 340 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 397 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 350 insertions(+)
+ 2 files changed, 407 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..498d448
+index 0000000..99ab1f4
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,340 @@
+@@ -0,0 +1,397 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -29,9 +29,9 @@ index 0000000..498d448
 +LIBDIR ?= $(PREFIX)/lib
 +INCLUDEDIR ?= $(PREFIX)/include
 +
-+DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 \
-+        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DGL_GLEXT_PROTOTYPES \
-+        -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
++DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 -DANGLE_ENABLE_OPENGL \
++        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DANGLE_ENABLE_ESSL -DANGLE_ENABLE_GLSL \
++        -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
 +        -DEGLAPI= $(DEFS)
 +LIBEGL_DEFS = -DLIBEGL_IMPLEMENTATION
 +LIBGLESv2_DEFS = -DLIBGLESV2_IMPLEMENTATION
@@ -44,11 +44,8 @@ index 0000000..498d448
 +LIBGLESv2_LDFLAGS = -Wl,--out-implib,libGLESv2.dll.a
 +LIBEGL_LDFLAGS = -Wl,--out-implib,libEGL.dll.a
 +
-+LIBGLESv2_OBJ = \
-+	src/compiler/translator/ShaderLang.o \
-+	src/compiler/translator/ShaderVars.o \
++angle_translator_lib_sources = \
 +	src/compiler/translator/BuiltInFunctionEmulator.o \
-+	src/compiler/translator/BuiltInFunctionEmulatorGLSL.o \
 +	src/compiler/translator/Cache.o \
 +	src/compiler/translator/CallDAG.o \
 +	src/compiler/translator/CodeGen.o \
@@ -56,7 +53,6 @@ index 0000000..498d448
 +	src/compiler/translator/Diagnostics.o \
 +	src/compiler/translator/DirectiveHandler.o \
 +	src/compiler/translator/EmulatePrecision.o \
-+	src/compiler/translator/ExtensionGLSL.o \
 +	src/compiler/translator/FlagStd140Structs.o \
 +	src/compiler/translator/ForLoopUnroll.o \
 +	src/compiler/translator/InfoSink.o \
@@ -69,9 +65,6 @@ index 0000000..498d448
 +	src/compiler/translator/Intermediate.o \
 +	src/compiler/translator/LoopInfo.o \
 +	src/compiler/translator/Operator.o \
-+	src/compiler/translator/OutputESSL.o \
-+	src/compiler/translator/OutputGLSL.o \
-+	src/compiler/translator/OutputGLSLBase.o \
 +	src/compiler/translator/ParseContext.o \
 +	src/compiler/translator/PoolAlloc.o \
 +	src/compiler/translator/PruneEmptyDeclarations.o \
@@ -82,8 +75,6 @@ index 0000000..498d448
 +	src/compiler/translator/ScalarizeVecAndMatConstructorArgs.o \
 +	src/compiler/translator/SearchSymbol.o \
 +	src/compiler/translator/SymbolTable.o \
-+	src/compiler/translator/TranslatorESSL.o \
-+	src/compiler/translator/TranslatorGLSL.o \
 +	src/compiler/translator/Types.o \
 +	src/compiler/translator/UnfoldShortCircuitAST.o \
 +	src/compiler/translator/ValidateGlobalInitializer.o \
@@ -92,7 +83,6 @@ index 0000000..498d448
 +	src/compiler/translator/ValidateSwitch.o \
 +	src/compiler/translator/VariableInfo.o \
 +	src/compiler/translator/VariablePacker.o \
-+	src/compiler/translator/VersionGLSL.o \
 +	src/compiler/translator/blocklayout.o \
 +	src/compiler/translator/depgraph/DependencyGraph.o \
 +	src/compiler/translator/depgraph/DependencyGraphBuilder.o \
@@ -104,7 +94,18 @@ index 0000000..498d448
 +	src/compiler/translator/timing/RestrictFragmentShaderTiming.o \
 +	src/compiler/translator/timing/RestrictVertexShaderTiming.o \
 +	src/compiler/translator/util.o \
-+	src/third_party/compiler/ArrayBoundsClamper.o \
++	src/third_party/compiler/ArrayBoundsClamper.o
++angle_translator_lib_essl_sources = \
++	src/compiler/translator/OutputESSL.o \
++	src/compiler/translator/TranslatorESSL.o
++angle_translator_lib_glsl_sources = \
++	src/compiler/translator/BuiltInFunctionEmulatorGLSL.o \
++	src/compiler/translator/ExtensionGLSL.o \
++	src/compiler/translator/OutputGLSL.o \
++	src/compiler/translator/OutputGLSLBase.o \
++	src/compiler/translator/TranslatorGLSL.o \
++	src/compiler/translator/VersionGLSL.o
++angle_translator_lib_hlsl_sources = \
 +	src/compiler/translator/ArrayReturnValueToOutParameter.o \
 +	src/compiler/translator/ASTMetadataHLSL.o \
 +	src/compiler/translator/blocklayoutHLSL.o \
@@ -120,7 +121,8 @@ index 0000000..498d448
 +	src/compiler/translator/TranslatorHLSL.o \
 +	src/compiler/translator/UnfoldShortCircuitToIf.o \
 +	src/compiler/translator/UniformHLSL.o \
-+	src/compiler/translator/UtilsHLSL.o \
++	src/compiler/translator/UtilsHLSL.o
++angle_preprocessor_sources = \
 +	src/compiler/preprocessor/DiagnosticsBase.o \
 +	src/compiler/preprocessor/DirectiveHandlerBase.o \
 +	src/compiler/preprocessor/DirectiveParser.o \
@@ -131,7 +133,8 @@ index 0000000..498d448
 +	src/compiler/preprocessor/MacroExpander.o \
 +	src/compiler/preprocessor/Preprocessor.o \
 +	src/compiler/preprocessor/Token.o \
-+	src/compiler/preprocessor/Tokenizer.o \
++	src/compiler/preprocessor/Tokenizer.o
++libangle_common_sources = \
 +	src/common/Float16ToFloat32.o \
 +	src/common/MemoryBuffer.o \
 +	src/common/angleutils.o \
@@ -139,7 +142,8 @@ index 0000000..498d448
 +	src/common/mathutil.o \
 +	src/common/string_utils.o \
 +	src/common/tls.o \
-+	src/common/utilities.o \
++	src/common/utilities.o
++libangle_sources = \
 +	src/common/event_tracer.o \
 +	src/libANGLE/AttributeMap.o \
 +	src/libANGLE/Buffer.o \
@@ -184,7 +188,8 @@ index 0000000..498d448
 +	src/libANGLE/validationES.o \
 +	src/libANGLE/validationES2.o \
 +	src/libANGLE/validationES3.o \
-+	src/third_party/murmurhash/MurmurHash3.o \
++	src/third_party/murmurhash/MurmurHash3.o
++libangle_d3d_shared_sources = \
 +	src/libANGLE/renderer/d3d/BufferD3D.o \
 +	src/libANGLE/renderer/d3d/CompilerD3D.o \
 +	src/libANGLE/renderer/d3d/copyimage.o \
@@ -212,7 +217,8 @@ index 0000000..498d448
 +	src/libANGLE/renderer/d3d/TransformFeedbackD3D.o \
 +	src/libANGLE/renderer/d3d/VaryingPacking.o \
 +	src/libANGLE/renderer/d3d/VertexBuffer.o \
-+	src/libANGLE/renderer/d3d/VertexDataManager.o \
++	src/libANGLE/renderer/d3d/VertexDataManager.o
++libangle_d3d9_sources = \
 +	src/libANGLE/renderer/d3d/d3d9/Blit9.o \
 +	src/libANGLE/renderer/d3d/d3d9/Buffer9.o \
 +	src/libANGLE/renderer/d3d/d3d9/DebugAnnotator9.o \
@@ -230,7 +236,8 @@ index 0000000..498d448
 +	src/libANGLE/renderer/d3d/d3d9/SwapChain9.o \
 +	src/libANGLE/renderer/d3d/d3d9/TextureStorage9.o \
 +	src/libANGLE/renderer/d3d/d3d9/VertexBuffer9.o \
-+	src/libANGLE/renderer/d3d/d3d9/VertexDeclarationCache.o \
++	src/libANGLE/renderer/d3d/d3d9/VertexDeclarationCache.o
++libangle_d3d11_sources = \
 +	src/libANGLE/renderer/d3d/d3d11/Blit11.o \
 +	src/libANGLE/renderer/d3d/d3d11/Buffer11.o \
 +	src/libANGLE/renderer/d3d/d3d11/Clear11.o \
@@ -257,9 +264,11 @@ index 0000000..498d448
 +	src/libANGLE/renderer/d3d/d3d11/TextureStorage11.o \
 +	src/libANGLE/renderer/d3d/d3d11/Trim11.o \
 +	src/libANGLE/renderer/d3d/d3d11/texture_format_table_autogen.o \
-+	src/libANGLE/renderer/d3d/d3d11/VertexBuffer11.o \
++	src/libANGLE/renderer/d3d/d3d11/VertexBuffer11.o
++libangle_d3d11_win32_sources = \
 +	src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow.o \
-+	src/third_party/systeminfo/SystemInfo.o \
++	src/third_party/systeminfo/SystemInfo.o
++libglesv2_sources = \
 +	src/libGLESv2/entry_points_egl.o \
 +	src/libGLESv2/entry_points_egl_ext.o \
 +	src/libGLESv2/entry_points_gles_2_0.o \
@@ -267,6 +276,54 @@ index 0000000..498d448
 +	src/libGLESv2/entry_points_gles_3_0.o \
 +	src/libGLESv2/global_state.o \
 +	src/libGLESv2/libGLESv2.o
++libangle_gl_sources = \
++	src/libANGLE/renderer/gl/BlitGL.o \
++	src/libANGLE/renderer/gl/BufferGL.o \
++	src/libANGLE/renderer/gl/CompilerGL.o \
++	src/libANGLE/renderer/gl/DisplayGL.o \
++	src/libANGLE/renderer/gl/FenceNVGL.o \
++	src/libANGLE/renderer/gl/FenceSyncGL.o \
++	src/libANGLE/renderer/gl/FramebufferGL.o \
++	src/libANGLE/renderer/gl/FunctionsGL.o \
++	src/libANGLE/renderer/gl/ProgramGL.o \
++	src/libANGLE/renderer/gl/QueryGL.o \
++	src/libANGLE/renderer/gl/RenderbufferGL.o \
++	src/libANGLE/renderer/gl/RendererGL.o \
++	src/libANGLE/renderer/gl/SamplerGL.o \
++	src/libANGLE/renderer/gl/ShaderGL.o \
++	src/libANGLE/renderer/gl/StateManagerGL.o \
++	src/libANGLE/renderer/gl/SurfaceGL.o \
++	src/libANGLE/renderer/gl/TextureGL.o \
++	src/libANGLE/renderer/gl/TransformFeedbackGL.o \
++	src/libANGLE/renderer/gl/VertexArrayGL.o \
++	src/libANGLE/renderer/gl/formatutilsgl.o \
++	src/libANGLE/renderer/gl/renderergl_utils.o
++libangle_gl_wgl_sources = \
++	src/libANGLE/renderer/gl/wgl/DisplayWGL.o \
++	src/libANGLE/renderer/gl/wgl/DXGISwapChainWindowSurfaceWGL.o \
++	src/libANGLE/renderer/gl/wgl/FunctionsWGL.o \
++	src/libANGLE/renderer/gl/wgl/PbufferSurfaceWGL.o \
++	src/libANGLE/renderer/gl/wgl/WindowSurfaceWGL.o \
++	src/libANGLE/renderer/gl/wgl/wgl_utils.o
++
++LIBGLESv2_OBJ = \
++	src/compiler/translator/ShaderLang.o \
++	src/compiler/translator/ShaderVars.o \
++	$(angle_translator_lib_sources) \
++	$(angle_translator_lib_essl_sources) \
++	$(angle_translator_lib_glsl_sources) \
++	$(angle_translator_lib_hlsl_sources) \
++	$(angle_preprocessor_sources) \
++	$(libangle_common_sources) \
++	$(libangle_sources) \
++	$(libangle_d3d_shared_sources) \
++	$(libangle_d3d9_sources) \
++	$(libangle_d3d11_sources) \
++	$(libangle_d3d11_win32_sources) \
++	$(libglesv2_sources) \
++	$(libangle_gl_sources) \
++	$(libangle_gl_wgl_sources) \
++
 +LIBGLESv2_DEP = $(LIBGLESv2_OBJ:.o=.d)
 +LIBEGL_OBJ = src/libEGL/libEGL.egl.o
 +LIBEGL_DEP = $(LIBEGL_OBJ:.o=.d)
