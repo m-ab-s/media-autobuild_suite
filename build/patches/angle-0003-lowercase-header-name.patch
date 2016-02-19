@@ -1,0 +1,25 @@
+From 0d985c374ac327f9447f71b59a20efc70a9e1f07 Mon Sep 17 00:00:00 2001
+From: shinchiro <shinchiro@nowhere.com>
+Date: Thu, 11 Feb 2016 22:54:43 +0800
+Subject: [PATCH] lowercase header name
+
+---
+ src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
+index d0f22e4..20162bb 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
++++ b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
+@@ -10,7 +10,7 @@
+ 
+ #include <EGL/eglext.h>
+ #include <sstream>
+-#include <VersionHelpers.h>
++#include <versionhelpers.h>
+ 
+ #include "common/tls.h"
+ #include "common/utilities.h"
+-- 
+2.7.0
+

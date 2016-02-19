@@ -1202,6 +1202,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_vcs "https://chromium.googlesource.com/angle/angle#commit=4449226" angleproject "${_check[@]}"
         if [[ $compile = "true" ]]; then
             do_patch "angle-0001-Add-makefile.patch" am
+            #do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
+            do_patch "angle-0002-Simplify-secure-API-functions-workaround-for-MinGW.patch" am
+            #do_patch "angle-0003-lowercase-header-name.patch" am
             log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
             [[ -f libEGL.a ]] && log "clean" make clean
             do_makeinstall PREFIX="$LOCALDESTDIR"

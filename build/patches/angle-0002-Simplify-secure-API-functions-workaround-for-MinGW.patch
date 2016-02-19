@@ -1,0 +1,27 @@
+From 38228a03545b2a50a9ae342aa341fc50803cf1a4 Mon Sep 17 00:00:00 2001
+From: shinchiro <shinchiro@nowhere.com>
+Date: Wed, 23 Dec 2015 13:57:49 +0800
+Subject: [PATCH] Simplify secure API functions workaround for MinGW
+
+---
+ src/libANGLE/renderer/d3d/RendererD3D.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/libANGLE/renderer/d3d/RendererD3D.cpp b/src/libANGLE/renderer/d3d/RendererD3D.cpp
+index 4a325c9..1367695 100644
+--- a/src/libANGLE/renderer/d3d/RendererD3D.cpp
++++ b/src/libANGLE/renderer/d3d/RendererD3D.cpp
+@@ -6,6 +6,10 @@
+ 
+ // RendererD3D.cpp: Implementation of the base D3D Renderer.
+ 
++#ifdef __MINGW32__
++#define MINGW_HAS_SECURE_API 1
++#endif
++
+ #include "libANGLE/renderer/d3d/RendererD3D.h"
+ 
+ #include "common/debug.h"
+-- 
+2.6.3
+
