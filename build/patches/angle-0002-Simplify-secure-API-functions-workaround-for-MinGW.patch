@@ -1,14 +1,14 @@
-From 38228a03545b2a50a9ae342aa341fc50803cf1a4 Mon Sep 17 00:00:00 2001
+From b1f2d3c48094a603584e7cb774937aae76f91fe0 Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Wed, 23 Dec 2015 13:57:49 +0800
-Subject: [PATCH] Simplify secure API functions workaround for MinGW
+Subject: [PATCH 2/3] Simplify secure API functions workaround for MinGW
 
 ---
  src/libANGLE/renderer/d3d/RendererD3D.cpp | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/src/libANGLE/renderer/d3d/RendererD3D.cpp b/src/libANGLE/renderer/d3d/RendererD3D.cpp
-index 4a325c9..1367695 100644
+index 163db09..3819381 100644
 --- a/src/libANGLE/renderer/d3d/RendererD3D.cpp
 +++ b/src/libANGLE/renderer/d3d/RendererD3D.cpp
 @@ -6,6 +6,10 @@
@@ -23,5 +23,5 @@ index 4a325c9..1367695 100644
  
  #include "common/debug.h"
 -- 
-2.6.3
+2.7.0
 
