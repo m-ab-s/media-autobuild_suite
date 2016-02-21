@@ -785,7 +785,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
         count=0
         while [[ x"${_check[$count]}" != x"" ]]; do
             do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]}"
-            do_install "${_check[$count]}" include/
+            do_install "${_check[$count]}"
             let count+=1
         done
         do_checkIfExist "${_check[@]}"
@@ -807,7 +807,7 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
         mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
         do_wget -r -c -h "${_hash[0]}" "$LOCALBUILDDIR/extras/${_check[0]}"
-        do_install "${_check[0]}" include/
+        do_install "${_check[0]}"
         do_checkIfExist "${_check[0]}"
     fi
 fi
