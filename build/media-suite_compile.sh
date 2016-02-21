@@ -1199,15 +1199,13 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     if ! mpv_disabled egl-angle; then
         _check=(libEGL.{a,pc} libGLESv2.a)
-        _mingwheaders_ver="$(pacman -Q "$MINGW_PACKAGE_PREFIX-headers-git" | awk '{ print $2 }')"
-        if [[ $(vercmp ${_mingwheaders_ver%.*} 5.0.0.4613) -ge 0 ]]; then
+        if [[ -f $MINGW_PREFIX/$MINGW_CHOST/include/dcomp.h ]]; then
             do_vcs "https://chromium.googlesource.com/angle/angle" angleproject "${_check[@]}"
         else
             do_vcs "https://chromium.googlesource.com/angle/angle#commit=4449226" angleproject "${_check[@]}"
-            _mingwheaders_ver=""
         fi
         if [[ $compile = "true" ]]; then
-            if [[ $_mingwheaders_ver ]]; then
+            if [[ -f $MINGW_PREFIX/$MINGW_CHOST/include/dcomp.h ]]; then
                 do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
                 do_patch "angle-0002-Simplify-secure-API-functions-workaround-for-MinGW.patch" am
                 do_patch "angle-0003-lowercase-header-name.patch" am
@@ -1219,7 +1217,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             do_makeinstall PREFIX="$LOCALDESTDIR"
             do_checkIfExist "${_check[@]}"
         fi
-        unset _mingwheaders_ver
     fi
 
     vsprefix=$(get_vs_prefix)
