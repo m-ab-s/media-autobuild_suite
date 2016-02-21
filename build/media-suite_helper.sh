@@ -453,7 +453,8 @@ pc_exists() {
 do_install() {
     [[ $1 = dry ]] && local dryrun=y && shift
     local files=("$@")
-    local dest="$(file_installed "${files[-1]}")"
+    local dest="${files[-1]}"
+    [[ ${dest::1} != "/" ]] && dest="$(file_installed "$dest")"
     [[ ${#files[@]} -gt 1 ]] && unset files[-1]
     if [[ -n $dryrun ]]; then
         echo install -D "${files[@]}" "$dest"
