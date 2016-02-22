@@ -598,7 +598,8 @@ else
 fi
 
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; then
-    _check=(bin-video/kvazaar.exe libkvazaar.{,l}a kvazaar.pc kvazaar.h)
+    _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
+    [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
     do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar
     if [[ $compile = "true" ]]; then
         do_uninstall kvazaar_version.h "${_check[@]}"
