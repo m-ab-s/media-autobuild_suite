@@ -212,10 +212,10 @@ unset syspath
 if enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
-    if do_pkgConfig "lept = 1.72"; then
+    if do_pkgConfig "lept = 1.73"; then
         _check=(liblept.{,l}a lept.pc)
-        do_wget -h 7581db29f8442197ce68e766c6047c4b \
-            "http://www.leptonica.com/source/leptonica-1.72.tar.gz"
+        do_wget -h 092cea2e568cada79fff178820397922 \
+            "http://www.leptonica.com/source/leptonica-1.73.tar.gz"
         do_uninstall include/leptonica "${_check[@]}"
         do_separate_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
         do_checkIfExist "${_check[@]}"
