@@ -111,7 +111,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         harfbuzz_ver=$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
             /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')
     [[ -n $harfbuzz_ver ]] &&
-        harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.1\.\d+") || harfbuzz_ver="1.1.3"
+        harfbuzz_ver=$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+") || harfbuzz_ver="1.2.1"
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
         do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
