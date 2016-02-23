@@ -98,7 +98,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget -h 479be870c7f83f15f87bac085b61d641 \
-            "http://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
+            "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -i Makefile.in -e 's/SUBDIRS = .*/SUBDIRS = fontconfig src/' \
             -e '/fc-cache fc-cat fc-list/,+1d' \
@@ -115,7 +115,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
         do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
-        do_wget "http://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
+        do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
         do_checkIfExist "${_check[@]}"
@@ -138,7 +138,7 @@ if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_pacman_remove SDL
     _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
     do_wget -h 9d96df8417572a2afb781a7c4c811a85 \
-        "http://www.libsdl.org/release/SDL-1.2.15.tar.gz"
+        "https://www.libsdl.org/release/SDL-1.2.15.tar.gz"
     do_uninstall include/SDL "${_check[@]}"
     CFLAGS="-DDECLSPEC=" do_separate_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
@@ -613,7 +613,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; the
 fi
 
 if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
-    do_vcs "http://git.videolan.org/git/libdvdread.git" dvdread
+    do_vcs "https://git.videolan.org/git/libdvdread.git" dvdread
     if [[ $compile = "true" ]]; then
         _check=(libdvdread.{l,}a dvdread.pc)
         do_autoreconf
@@ -625,7 +625,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
         sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 
-    do_vcs "http://git.videolan.org/git/libdvdnav.git" dvdnav
+    do_vcs "https://git.videolan.org/git/libdvdnav.git" dvdnav
     if [[ $compile = "true" ]]; then
         _check=(libdvdnav.{l,}a dvdnav.pc)
         do_autoreconf
@@ -638,7 +638,7 @@ fi
 
 if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     ! mpv_disabled libbluray; then
-    do_vcs "http://git.videolan.org/git/libbluray.git"
+    do_vcs "https://git.videolan.org/git/libbluray.git"
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
         [[ -f Makefile ]] && git clean -qxfd -e "/build_successful*" -e "/recently_updated"
@@ -848,14 +848,14 @@ fi
 if [[ $x264 != n ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
-    do_vcs "http://git.videolan.org/git/x264.git" x264 "${_check[@]}"
+    do_vcs "https://git.videolan.org/git/x264.git" x264 "${_check[@]}"
     if [[ $compile = "true" ]] ||
         { [[ $x264 != h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *10" $(file_installed x264_config.h); } ||
         { [[ $x264 = h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *8" $(file_installed x264_config.h); }; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
-            do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
+            do_vcs "https://git.videolan.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
             do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
                 lib{av{device,filter,util,resample},sw{scale,resample},postproc}.{a,pc} "${_check[@]}"
             [[ -f "config.mak" ]] && log "distclean" make distclean
@@ -1037,7 +1037,7 @@ if [[ $ffmpeg != "n" ]]; then
     else
         _check=(libavutil.{a,pc})
     fi
-    do_vcs "http://source.ffmpeg.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
+    do_vcs "https://git.videolan.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
     if [[ $compile = "true" ]] ||
         { [[ $ffmpegUpdate = y ]] && test_newer installed {libass,x264,x265,vpx}.pc; }; then
         do_changeFFmpegConfig "$license"
@@ -1122,7 +1122,7 @@ if [[ $mplayer = "y" ]]; then
                 pushd ffmpeg >/dev/null
                 git checkout -qf --no-track -B master origin/HEAD
                 popd >/dev/null
-            elif ! git clone http://source.ffmpeg.org/git/ffmpeg.git ffmpeg; then
+            elif ! git clone "https://git.videolan.org/git/ffmpeg.git" ffmpeg; then
                 rm -rf ffmpeg
                 echo "Failed to get a FFmpeg checkout"
                 echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
