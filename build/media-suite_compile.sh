@@ -642,7 +642,6 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
     if [[ $compile = "true" ]]; then
         _check=(libbluray.{{l,}a,pc})
         [[ -f Makefile ]] && git clean -qxfd -e "/build_successful*" -e "/recently_updated"
-        sed -i '/read_blocks;/ d' src/libbluray/disc/disc.c
         do_autoreconf
         do_uninstall include/libbluray "${_check[@]}"
         do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc,udf} \
