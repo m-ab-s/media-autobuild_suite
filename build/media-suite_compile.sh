@@ -521,7 +521,7 @@ if [[ $sox = y ]]; then
         do_separate_conf --disable-symlinks \
             LIBS='-lshlwapi -lz' "${extracommands[@]}"
         do_make
-        cp -f src/sox.exe "$LOCALDESTDIR/bin-audio/"
+        do_install src/sox.exe bin-audio/
         do_checkIfExist "${_check[@]}"
     fi
 fi
@@ -673,11 +673,10 @@ if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; 
     sed -i 's|"NUL"|"/dev/null"|g' configure
     do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
     do_make libxavs.a
-    cp -f xavs.h "$LOCALDESTDIR"/include
-    cp -f libxavs.a "$LOCALDESTDIR"/lib
-    cp -f xavs.pc "$LOCALDESTDIR"/lib/pkgconfig
+    for _file in xavs.h libxavs.a xavs.pc; do do_install "$_file"; done
     do_checkIfExist "${_check[@]}"
     _to_remove+=($(pwd))
+    unset _file
 fi
 
 if [[ $mediainfo = "y" ]]; then
@@ -841,7 +840,7 @@ if [[ $mp4box = "y" ]]; then
         do_separate_conf --static-mp4box
         do_make
         log "install" make install-lib
-        [[ $standalone = y ]] && cp -f bin/gcc/MP4Box.exe "$LOCALDESTDIR"/bin-video
+        [[ $standalone = y ]] && do_install bin/gcc/MP4Box.exe bin-video/
         do_checkIfExist "${_check[@]}"
     fi
 fi
@@ -901,7 +900,7 @@ if [[ $x264 != n ]]; then
             create_build_dir
             CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 "${extracommands[@]}"
             do_make
-            cp -f x264.exe "$LOCALDESTDIR"/bin-video/x264-10bit.exe
+            do_install x264.exe bin-video/x264-10bit.exe
             cd_safe ..
         else
             do_uninstall "${_check[@]}"
@@ -945,7 +944,7 @@ if [[ ! $x265 = "n" ]]; then
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 12-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
-                cp libx265.dll "$LOCALDESTDIR"/bin-video/libx265_main12.dll
+                do_install libx265.dll bin-video/libx265_main12.dll
                 _check+=(bin-video/libx265_main12.dll)
             else
                 do_print_progress "Building 12-bit lib for multilib"
@@ -959,7 +958,7 @@ if [[ ! $x265 = "n" ]]; then
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 10-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON
-                cp libx265.dll "$LOCALDESTDIR"/bin-video/libx265_main10.dll
+                do_install libx265.dll bin-video/libx265_main10.dll
                 _check+=(bin-video/libx265_main10.dll)
             elif [[ $x265 = o10 ]]; then
                 do_print_progress "Building 10-bit lib/bin"
@@ -999,7 +998,7 @@ EOF
             do_uninstall bin-video/x265-numa.exe
             do_print_progress "Building NUMA version of binary"
             xpsupport="" build_x265
-            cp -f x265.exe "$LOCALDESTDIR"/bin-video/x265-numa.exe
+            do_install x265.exe bin-video/x265-numa.exe
             _check+=(bin-video/x265-numa.exe)
         fi
         do_checkIfExist "${_check[@]}"
@@ -1173,9 +1172,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         [[ -f "src/luajit.exe" ]] && log "clean" make clean
         do_make BUILDMODE=static amalg
         do_makeinstall BUILDMODE=static PREFIX="$LOCALDESTDIR" DESTDIR="$(pwd)/temp"
-        cp -rf temp/"$LOCALDESTDIR"/{lib,include} "$LOCALDESTDIR"/
+        cd_safe "temp${LOCALDESTDIR}"
+        do_install include/luajit-2.0/*.h include/luajit-2.0/
+        do_install lib/libluajit-5.1.a lib/
         # luajit comes with a broken .pc file
-        sed -r -i "s/(Libs.private:).*/\1 -liconv/" "$LOCALDESTDIR"/lib/pkgconfig/luajit.pc
+        sed -r -i "s/(Libs.private:).*/\1 -liconv/" lib/pkgconfig/luajit.pc
+        do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
         do_checkIfExist "${_check[@]}"
         _to_remove+=($(pwd))
     fi
