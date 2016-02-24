@@ -659,7 +659,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         extracommands=()
-        enabled_any {lib,}fontconfig && extracommands+=(--disable-fontconfig)
+        enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
         do_separate_confmakeinstall "${extracommands[@]}"
         do_checkIfExist "${_check[@]}"
     fi
