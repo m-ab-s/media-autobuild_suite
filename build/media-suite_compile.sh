@@ -908,6 +908,7 @@ if [[ $x264 != n ]]; then
         fi
         create_build_dir
         CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
+        do_make
         do_makeinstall
         do_checkIfExist "${_check[@]}"
         unset extracommands
