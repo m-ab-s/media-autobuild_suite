@@ -985,8 +985,8 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.echo -ne "\033]0;install base system\007"
     echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
     echo.[[ "$(uname)" = *6.1 ]] ^&^& nargs="-n 4"
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --needed
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --needed
+    echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --asexplicit
+    echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --asexplicit
     echo.sleep ^3
     echo.exit
         )>%build%\pacman.sh
@@ -1348,7 +1348,7 @@ if %build64%==yes GOTO loginProfile64
         (
             echo.
             echo.if [[ -z "$MSYSTEM" ^&^& -f /local32/etc/profile.local ]]; then
-            echo.       source /local32/etc/profile.local
+            echo.   source /local32/etc/profile.local
             echo.fi
             )>>%instdir%\%msys2%\etc\profile.
     )
@@ -1365,7 +1365,7 @@ if %build64%==yes GOTO loginProfile64
         (
             echo.
             echo.if [[ -z "$MSYSTEM" ^&^& -f /local64/etc/profile.local ]]; then
-            echo.       source /local64/etc/profile.local
+            echo.   source /local64/etc/profile.local
             echo.fi
             )>>%instdir%\%msys2%\etc\profile.
     )
