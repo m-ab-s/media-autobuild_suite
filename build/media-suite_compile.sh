@@ -1174,6 +1174,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_make BUILDMODE=static amalg
         do_makeinstall BUILDMODE=static PREFIX="$LOCALDESTDIR" DESTDIR="$(pwd)/temp"
         cd_safe "temp${LOCALDESTDIR}"
+        mkdir -p "$LOCALDESTDIR/include/luajit-2.0"
         do_install include/luajit-2.0/*.h include/luajit-2.0/
         do_install lib/libluajit-5.1.a lib/
         # luajit comes with a broken .pc file
