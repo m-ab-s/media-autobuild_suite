@@ -1,4 +1,4 @@
-From 4fc72f043d4bcdb1199d6fc9cbf278e673189fc9 Mon Sep 17 00:00:00 2001
+From b231e181f6b700ff397818ec0dc94fdefcd66424 Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Thu, 11 Feb 2016 22:54:43 +0800
 Subject: [PATCH 3/3] lowercase header name
@@ -8,7 +8,7 @@ Subject: [PATCH 3/3] lowercase header name
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
-index f9b0407..a6f4f9c 100644
+index 9b1ffa5..1111669 100644
 --- a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
 +++ b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
 @@ -10,7 +10,7 @@
@@ -21,5 +21,5 @@ index f9b0407..a6f4f9c 100644
  #include "common/tls.h"
  #include "common/utilities.h"
 -- 
-2.7.0
+2.7.1
 

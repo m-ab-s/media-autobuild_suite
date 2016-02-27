@@ -1,4 +1,4 @@
-From b1f2d3c48094a603584e7cb774937aae76f91fe0 Mon Sep 17 00:00:00 2001
+From 8e1d3b93ecd2294d900a141ae983d931c7e02eee Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Wed, 23 Dec 2015 13:57:49 +0800
 Subject: [PATCH 2/3] Simplify secure API functions workaround for MinGW
@@ -23,5 +23,5 @@ index 163db09..3819381 100644
  
  #include "common/debug.h"
 -- 
-2.7.0
+2.7.1
 
