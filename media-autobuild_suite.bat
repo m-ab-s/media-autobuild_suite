@@ -1250,8 +1250,8 @@ if %build32%==yes (
             echo.# rest is the same in both profiles
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
+            echo.export CC=gcc
             echo.
-            echo.export CC="${MINGW_PREFIX}/bin/gcc"
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
             echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
@@ -1308,8 +1308,8 @@ if %build64%==yes (
             echo.# rest is the same in both profiles
             echo.alias dir='ls -la --color=auto'
             echo.alias ls='ls --color=auto'
+            echo.export CC=gcc
             echo.
-            echo.export CC="${MINGW_PREFIX}/bin/gcc"
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
             echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
