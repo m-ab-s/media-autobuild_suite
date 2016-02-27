@@ -1204,19 +1204,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     if ! mpv_disabled egl-angle; then
         _check=(libEGL.{a,pc} libGLESv2.a)
-        if [[ -f $MINGW_PREFIX/$MINGW_CHOST/include/dcomp.h ]]; then
-            do_vcs "https://chromium.googlesource.com/angle/angle" angleproject "${_check[@]}"
-        else
-            do_vcs "https://chromium.googlesource.com/angle/angle#commit=4449226" angleproject "${_check[@]}"
-        fi
+        do_vcs "https://chromium.googlesource.com/angle/angle" angleproject "${_check[@]}"
         if [[ $compile = "true" ]]; then
-            if [[ -f $MINGW_PREFIX/$MINGW_CHOST/include/dcomp.h ]]; then
-                do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
-                do_patch "angle-0002-Simplify-secure-API-functions-workaround-for-MinGW.patch" am
-                do_patch "angle-0003-lowercase-header-name.patch" am
-            else
-                do_patch "angle-0001-Add-makefile.patch" am
-            fi
+            do_patch "angle-0001-Add-makefile-and-pkgconfig-file.patch" am
+            do_patch "angle-0002-Simplify-secure-API-functions-workaround-for-MinGW.patch" am
+            do_patch "angle-0003-lowercase-header-name.patch" am
             log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
             [[ -f libEGL.a ]] && log "clean" make clean
             do_makeinstall PREFIX="$LOCALDESTDIR"
