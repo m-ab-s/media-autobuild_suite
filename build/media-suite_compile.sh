@@ -165,6 +165,26 @@ if do_pkgConfig "gnutls = $gnutls_ver"; then
         "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
     do_checkIfExist "${_check[@]}"
 fi
+
+if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
+    [[ $rtmpdump = y && $license = nonfree ]]; }; then
+    [[ -z "$libressl_ver" ]] && libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")"
+    [[ -n "$libressl_ver" ]] &&
+        libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')" || libressl_ver="2.3.2"
+
+    if do_pkgConfig "libssl = $libressl_ver"; then
+        _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
+        [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
+        do_wget "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
+        do_uninstall etc/ssl include/openssl "${_check[@]}"
+        do_patch "libressl-0001-pc-add-platform-specific-libs-to-Libs.private.patch"
+        _sed="man"
+        [[ $standalone = y ]] || _sed="apps tests $_sed"
+        sed -ri "s/(^SUBDIRS .*) $_sed/\1/" Makefile.in
+        do_separate_confmakeinstall global
+        do_checkIfExist "${_check[@]}"
+        unset _sed
+    fi
 fi
 
 if enabled libwebp; then
@@ -543,13 +563,12 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
-        test_newer installed "${pc}.pc" && compile="true"
     else
         crypto=OPENSSL
         pc=libssl
-        test_newer "$(pkg-config --variable=pcfiledir $pc)/${pc}.pc" && compile="true"
     fi
-    if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
+    if [[ $compile = "true" ]] || [[ $req != *$pc* ]] ||
+        test_newer installed "${pc}.pc"; then
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_uninstall include/librtmp "${_check[@]}"
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
