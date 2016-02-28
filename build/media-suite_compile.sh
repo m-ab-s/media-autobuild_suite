@@ -543,9 +543,11 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         crypto=GNUTLS
         pc=gnutls
+        test_newer installed "${pc}.pc" && compile="true"
     else
         crypto=OPENSSL
         pc=libssl
+        test_newer "$(pkg-config --variable=pcfiledir $pc)/${pc}.pc" && compile="true"
     fi
     if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
