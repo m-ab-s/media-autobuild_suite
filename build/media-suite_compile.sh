@@ -146,24 +146,26 @@ if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_checkIfExist "${_check[@]}"
 fi
 
-if { { [[ "$ffmpeg" != "n" ]] && enabled gnutls; } ||
-    [[ "$rtmpdump" = "y" && "$license" != "nonfree" ]]; }; then
-[[ -z "$gnutls_ver" ]] && gnutls_ver=$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")
-[[ -n "$gnutls_ver" ]] &&
-    gnutls_ver=$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?') || gnutls_ver="3.4.9"
-if do_pkgConfig "gnutls = $gnutls_ver"; then
-    do_pacman_install nettle
-    do_uninstall q include/nettle libnettle.a nettle.pc
+if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
+    [[ $rtmpdump = y && $license != nonfree ]]; }; then
+    [[ -z "$gnutls_ver" ]] && gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")"
+    [[ -n "$gnutls_ver" ]] &&
+        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')" || gnutls_ver="3.4.9"
 
-    _check=(libgnutls.{,l}a gnutls.pc)
-    do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
-    do_uninstall include/gnutls "${_check[@]}"
-    do_separate_confmakeinstall \
-        --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
-        --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
-    sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
-        "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
-    do_checkIfExist "${_check[@]}"
+    if do_pkgConfig "gnutls = $gnutls_ver"; then
+        do_pacman_install nettle
+        do_uninstall q include/nettle libnettle.a nettle.pc
+
+        _check=(libgnutls.{,l}a gnutls.pc)
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
+        do_uninstall include/gnutls "${_check[@]}"
+        do_separate_confmakeinstall \
+            --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
+            --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
+        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
+            "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
+        do_checkIfExist "${_check[@]}"
+    fi
 fi
 
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
