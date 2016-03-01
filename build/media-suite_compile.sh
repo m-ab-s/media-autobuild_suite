@@ -563,9 +563,11 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
+        ssl=GnuTLS
         crypto=GNUTLS
         pc=gnutls
     else
+        ssl=LibreSSL
         crypto=OPENSSL
         pc=libssl
     fi
@@ -574,10 +576,13 @@ if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_uninstall include/librtmp "${_check[@]}"
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
+        _ver="$(printf '%s-%s-g%s-%s_%s-%s-static' "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
+                "$(date +%Y%m%d)" "$(git rev-parse --short HEAD)" "$ssl" \
+                "$(pkg-config --modversion "$pc")" "${MINGW_CHOST%%-*}")"
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
-            CRYPTO=$crypto LIB_${crypto}="$(pkg-config --static --libs $pc) -lz"
+            CRYPTO="$crypto" LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" VERSION="$_ver"
         do_checkIfExist "${_check[@]}"
         unset crypto pc req
     fi
