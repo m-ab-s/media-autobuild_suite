@@ -710,6 +710,15 @@ if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; 
 fi
 
 if [[ $mediainfo = "y" ]]; then
+    if do_pkgConfig "libcurl = 7.47.1"; then
+        _check=(curl/curl.h libcurl.{{,l}a,pc})
+        do_wget -h 9ea3123449439bbd960cd25cf98796fb "https://curl.haxx.se/download/curl-7.47.1.tar.bz2"
+        do_uninstall include/curl bin-global/curl{.exe,-config} "${_check[@]}"
+        do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
+            --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
+        do_checkIfExist "${_check[@]}"
+    fi
+
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
         _check=(libzen.{a,pc})
@@ -720,17 +729,14 @@ if [[ $mediainfo = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
-    # MinGW's libcurl.pc is missing libs
-    sed -i 's/-lidn -lrtmp/-lidn -lintl -liconv -lrtmp/' "$MINGW_PREFIX"/lib/pkgconfig/libcurl.pc
-
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
-    if [[ $compile = "true" ]] || test_newer installed lib{rtmp,zen}.pc; then
+    if [[ $compile = "true" ]] || test_newer installed libzen.pc; then
         _check=(libmediainfo.{a,pc})
         cd_safe Project/CMake
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' CMakeLists.txt
         do_cmakeinstall
-        sed -i 's|libzen|libcurl librtmp libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
+        sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist "${_check[@]}"
     fi
 
