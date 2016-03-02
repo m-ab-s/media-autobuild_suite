@@ -170,9 +170,10 @@ fi
 
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ $rtmpdump = y && $license = nonfree ]]; }; then
-    [[ -z "$libressl_ver" ]] && libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")"
-    [[ -n "$libressl_ver" ]] &&
-        libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')" || libressl_ver="2.3.2"
+    [[ ! "$libressl_ver" ]] &&
+        libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
+        libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
+    [[ "$libressl_ver" ]] || libressl_ver="2.3.2"
 
     if do_pkgConfig "libssl = $libressl_ver"; then
         _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
@@ -182,7 +183,8 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
         do_patch "libressl-0001-pc-add-platform-specific-libs-to-Libs.private.patch"
         _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
-        sed -ri "s/(^SUBDIRS .*) $_sed/\1/" Makefile.in
+        sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.in
+        sed -i 's;DESTDIR)/\$;DESTDIR)$;g' apps/openssl/Makefile.in
         do_separate_confmakeinstall global
         do_checkIfExist "${_check[@]}"
         unset _sed
