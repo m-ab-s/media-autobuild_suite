@@ -801,7 +801,8 @@ zip_logs() {
     failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
-    7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run -ir!"$failed/*.log" >/dev/null
+    7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
+        /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
     popd >/dev/null
     [[ -f "$LOCALBUILDDIR/logs.zip" ]] &&
         echo "${green_color}Attach $LOCALBUILDDIR/logs.zip to the GitHub issue.${reset_color}"
