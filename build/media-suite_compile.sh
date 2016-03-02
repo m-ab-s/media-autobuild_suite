@@ -954,20 +954,19 @@ else
 fi
 
 if [[ ! $x265 = "n" ]]; then
-    do_vcs "hg::https://bitbucket.org/multicoreware/x265"
+    do_vcs "https://github.com/videolan/x265.git"
     _check=(x265{,_config}.h libx265.a x265.pc)
     if [[ $compile = "true" ]] || ! files_exist "${_check[@]}"; then
-        do_patch "x265-revid.patch"
-        cd_safe build/msys
         do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
         [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
         [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
         build_x265() {
-        rm -rf "$LOCALBUILDDIR"/x265-hg/build/msys/{8,10,12}bit
+        cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys
+        rm -rf {8,10,12}bit
 
         do_x265_cmake() {
-            log "cmake" cmake ../../../source -G Ninja -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja \
             -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON \
             -DENABLE_ASSEMBLY=ON -DWINXP_SUPPORT=OFF $xpsupport "$@"
@@ -977,7 +976,7 @@ if [[ ! $x265 = "n" ]]; then
         [[ $standalone = y ]] && cli="-DENABLE_CLI=ON" && _check+=(bin-video/x265.exe)
 
         if [[ $x265 != o* ]]; then
-            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/12bit
+            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/12bit
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 12-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
@@ -991,7 +990,7 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         if [[ $x265 != o8 ]]; then
-            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/10bit
+            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/10bit
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 10-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON
@@ -1008,7 +1007,7 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         if [[ $x265 != o10 ]]; then
-            cd_safe "$LOCALBUILDDIR"/x265-hg/build/msys/8bit
+            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/8bit
             if [[ $x265 = s || $x265 = o8 ]]; then
                 do_print_progress "Building 8-bit lib/bin"
                 do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
@@ -1031,7 +1030,6 @@ EOF
         build_x265
         log "install" ninja -j "${cpuCount:=1}" install
         if [[ $standalone = y && $x265 = d ]]; then
-            cd_safe ..
             do_uninstall bin-video/x265-numa.exe
             do_print_progress "Building NUMA version of binary"
             xpsupport="" build_x265
