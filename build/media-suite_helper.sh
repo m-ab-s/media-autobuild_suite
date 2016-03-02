@@ -797,15 +797,19 @@ compilation_fail() {
 }
 
 zip_logs() {
-    local failed
+    local failed url
     failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
     7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
         /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
+    url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
-    [[ -f "$LOCALBUILDDIR/logs.zip" ]] &&
-        echo "${green_color}Attach $LOCALBUILDDIR/logs.zip to the GitHub issue.${reset_color}"
+    if [[ $url ]]; then
+        echo "${green_color}Paste \"[logs.zip]($url)\" in the GitHub issue.${reset_color}"
+    elif [[ -f "$LOCALBUILDDIR/logs.zip" ]]; then
+        echo "${green_color}Attach $(cygpath -w "$LOCALBUILDDIR/logs.zip") to the GitHub issue.${reset_color}"
+    fi
 }
 
 log() {
