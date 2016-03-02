@@ -557,7 +557,7 @@ fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
-if [[ $rtmpdump = "y" || $mediainfo = "y" ]] ||
+if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
     _check=(librtmp.{a,pc})
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
