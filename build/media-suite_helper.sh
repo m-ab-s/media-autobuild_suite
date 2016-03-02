@@ -494,14 +494,21 @@ do_pkgConfig() {
 }
 
 do_getFFmpegConfig() {
-    local license="$1"
+    local license=nonfree
+    [[ $1 ]] && license="$1"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
-    if [[ -f "$configfile" ]] && [[ $ffmpegChoice != "n" ]]; then
+    if [[ -f "$configfile" ]] && [[ $ffmpegChoice = y ]]; then
         FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
         echo "Imported FFmpeg options from ffmpeg_options.txt"
-    elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
+    elif [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice && $ffmpegChoice != y ]]; then
         FFMPEG_DEFAULT_OPTS=($(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
             sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' '))
+        [[ $ffmpegChoice = z || $ffmpegChoice = f ]] &&
+            FFMPEG_DEFAULT_OPTS+=($(sed -rne '/ffmpeg_options_zeranoe=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
+                sed -e 's/.*ffmpeg_options_zeranoe=//' -e 's/ ^//g' | tr '\n' ' '))
+        [[ $ffmpegChoice = f ]] &&
+            FFMPEG_DEFAULT_OPTS+=($(sed -rne '/ffmpeg_options_full=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
+                sed -e 's/.*ffmpeg_options_full=//' -e 's/ ^//g' | tr '\n' ' '))
         echo "Imported default FFmpeg options from .bat"
     else
         echo "Using default FFmpeg options"
@@ -550,7 +557,8 @@ do_getFFmpegConfig() {
 }
 
 do_changeFFmpegConfig() {
-    local license="$1"
+    local license=nonfree
+    [[ $1 ]] && license="$1"
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads

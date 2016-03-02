@@ -47,15 +47,22 @@ gperf winpty-git texinfo upx
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
-set ffmpeg_options=--disable-w32threads --enable-decklink --enable-fontconfig ^
---enable-gcrypt --enable-libass --enable-libbluray --enable-libbs2b ^
---enable-libcaca --enable-libfreetype --enable-libfribidi ^
---enable-libkvazaar --enable-libmfx --enable-libmp3lame ^
---enable-libopus --enable-libsoxr --enable-libspeex ^
---enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwebp ^
---enable-libx264 --enable-libx265 --enable-libxvid --enable-libzimg ^
---enable-libzvbi --enable-nonfree --enable-nvenc --enable-opengl ^
---enable-avisynth
+set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
+--enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265
+
+set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontconfig ^
+--enable-frei0r --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b ^
+--enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libfribidi ^
+--enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug ^
+--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
+--enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex ^
+--enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc ^
+--enable-libwavpack --enable-libwebp --enable-libxavs --enable-libxvid --enable-libzimg ^
+--enable-openssl
+
+set ffmpeg_options_full=--enable-nvenc --enable-opencl --enable-opengl --enable-libcdio ^
+--enable-libfaac --enable-libfdkaac --enable-libkvazaar --enable-librubberband ^
+--enable-libsnappy --enable-libssh --enable-libtesseract --enable-libzvbi
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-egl-angle --disable-debug-build ^
@@ -492,10 +499,13 @@ if %ffmpegChoiceINI%==0 (
     echo.
     echo. Choose ffmpeg and mpv optional libraries?
     echo. 1 = Yes
-    echo. 2 = No
+    echo. 2 = No ^(Light build^)
+    echo. 3 = No ^(Mimic Zeranoe^)
+    echo. 4 = No ^(All available external libs^)
     echo.
-    echo. If you select yes, we will create a file with the default options
-    echo. we use with FFmpeg and mpv. You can remove any that you don't need.
+    echo. If you select yes, we will create files with the default options
+    echo. we use with FFmpeg and mpv. You can remove any that you don't need or prefix
+    echo. them with #
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -506,7 +516,14 @@ if %deleteINI%==1 set "writeFFC=yes"
 if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
     if not exist %build%\ffmpeg_options.txt (
-        for %%i in (%ffmpeg_options%) do echo.%%i>>%build%\ffmpeg_options.txt
+        (
+            echo.# Lines starting with this character are ignored
+            for %%i in (%ffmpeg_options%) do echo.%%i
+            echo.# Zeranoe
+            for %%i in (%ffmpeg_options_zeranoe%) do echo.#%%i
+            echo.# Full
+            for %%i in (%ffmpeg_options_full%) do echo.#%%i
+            )>>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default FFmpeg options has been created in
         echo. %build%\ffmpeg_options.txt
@@ -527,6 +544,9 @@ if %buildffmpegChoice%==1 (
         )
     )
 if %buildffmpegChoice%==2 set "ffmpegChoice=n"
+if %buildffmpegChoice%==3 set "ffmpegChoice=z"
+if %buildffmpegChoice%==4 set "ffmpegChoice=f"
+if %buildffmpegChoice% GTR 4 GOTO ffmpegChoice
 if %writeFFC%==yes echo.ffmpegChoice=^%buildffmpegChoice%>>%ini%
 
 :mp4boxStatic
