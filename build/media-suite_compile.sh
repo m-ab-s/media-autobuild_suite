@@ -955,6 +955,7 @@ fi
 if [[ ! $x265 = "n" ]]; then
     do_vcs "https://github.com/videolan/x265.git"
     _check=(x265{,_config}.h libx265.a x265.pc)
+    [[ $standalone = y ]] && _check+=(bin-video/x265.exe)
     if [[ $compile = "true" ]] || ! files_exist "${_check[@]}"; then
         do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
         do_patch x265-fix-git-describe.diff
@@ -973,7 +974,7 @@ if [[ ! $x265 = "n" ]]; then
             log "ninja" ninja -j "${cpuCount:-1}"
         }
         mkdir -p {8,10,12}bit
-        [[ $standalone = y ]] && cli="-DENABLE_CLI=ON" && _check+=(bin-video/x265.exe)
+        [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
         if [[ $x265 != o* ]]; then
             cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/12bit
