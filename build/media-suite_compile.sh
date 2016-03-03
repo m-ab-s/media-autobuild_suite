@@ -801,10 +801,10 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
     _check=(DeckLinkAPI.h
            DeckLinkAPIVersion.h
            DeckLinkAPI_i.c)
-    _hash=(edd36fa98ae1a632d53809329703d9a3
-           ba4cf1d70f540e48f500e3e8ad5accbc
-           01d77d75bebb50f22d480326a6c5f174)
-    _ver="10.5.4"
+    _hash=(cd04bb1f07f7aec30ba7944a6bae4378
+           261f45f4fa8c69f75cbfaab6d8b68e7b
+           871cacb23786aba031da0e7a7b505ff2)
+    _ver="10.6.1"
     if files_exist -v "${_check[@]}" &&
         {
             count=0

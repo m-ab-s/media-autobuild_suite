@@ -287,6 +287,11 @@ typedef interface IDeckLinkNotification IDeckLinkNotification;
 typedef interface IDeckLinkAttributes IDeckLinkAttributes;
 #endif
 
+#ifndef __IDeckLinkStatus_FWD_DEFINED__
+#define __IDeckLinkStatus_FWD_DEFINED__
+typedef interface IDeckLinkStatus IDeckLinkStatus;
+#endif
+
 #ifndef __IDeckLinkKeyer_FWD_DEFINED__
 #define __IDeckLinkKeyer_FWD_DEFINED__
 typedef interface IDeckLinkKeyer IDeckLinkKeyer;
@@ -1260,6 +1265,7 @@ typedef enum _BMDDeckLinkConfigurationID {
     bmdDeckLinkConfigHDMI3DPackingFormat = 0x33647066,
     bmdDeckLinkConfigBypass = 0x62797073,
     bmdDeckLinkConfigClockTimingAdjustment = 0x63746164,
+    bmdDeckLinkConfigDuplexMode = 0x64757078,
     bmdDeckLinkConfigAnalogAudioConsumerLevels = 0x6161636c,
     bmdDeckLinkConfigFieldFlickerRemoval = 0x66646672,
     bmdDeckLinkConfigHD1080p24ToHD1080i5994Conversion = 0x746f3539,
@@ -5114,6 +5120,10 @@ typedef enum _BMDDeviceInterface {
     bmdDeviceInterfaceUSB = 0x75736220,
     bmdDeviceInterfaceThunderbolt = 0x7468756e
 } BMDDeviceInterface;
+typedef enum _BMDDuplexMode {
+    bmdDuplexModeFull = 0x66647570,
+    bmdDuplexModeHalf = 0x68647570
+} BMDDuplexMode;
 typedef enum _BMDDeckLinkAttributeID {
     BMDDeckLinkSupportsInternalKeying = 0x6b657969,
     BMDDeckLinkSupportsExternalKeying = 0x6b657965,
@@ -5134,17 +5144,18 @@ typedef enum _BMDDeckLinkAttributeID {
     BMDDeckLinkSupportsQuadLinkSDI = 0x73716c73,
     BMDDeckLinkSupportsIdleOutput = 0x69646f75,
     BMDDeckLinkHasLTCTimecodeInput = 0x686c7463,
+    BMDDeckLinkSupportsDuplexModeConfiguration = 0x64757078,
     BMDDeckLinkMaximumAudioChannels = 0x6d616368,
     BMDDeckLinkMaximumAnalogAudioChannels = 0x61616368,
     BMDDeckLinkNumberOfSubDevices = 0x6e736264,
     BMDDeckLinkSubDeviceIndex = 0x73756269,
     BMDDeckLinkPersistentID = 0x70656964,
+    BMDDeckLinkDeviceGroupID = 0x64676964,
     BMDDeckLinkTopologicalID = 0x746f6964,
     BMDDeckLinkVideoOutputConnections = 0x766f636e,
     BMDDeckLinkVideoInputConnections = 0x7669636e,
     BMDDeckLinkAudioOutputConnections = 0x616f636e,
     BMDDeckLinkAudioInputConnections = 0x6169636e,
-    BMDDeckLinkDeviceBusyState = 0x64627374,
     BMDDeckLinkVideoIOSupport = 0x76696f73,
     BMDDeckLinkDeckControlConnections = 0x6463636e,
     BMDDeckLinkDeviceInterface = 0x64627573,
@@ -5152,6 +5163,7 @@ typedef enum _BMDDeckLinkAttributeID {
     BMDDeckLinkAudioInputXLRChannelCount = 0x61697863,
     BMDDeckLinkAudioOutputRCAChannelCount = 0x616f7263,
     BMDDeckLinkAudioOutputXLRChannelCount = 0x616f7863,
+    BMDDeckLinkPairedDevicePersistentID = 0x70706964,
     BMDDeckLinkVideoInputGainMinimum = 0x7669676d,
     BMDDeckLinkVideoInputGainMaximum = 0x76696778,
     BMDDeckLinkVideoOutputGainMinimum = 0x766f676d,
@@ -5166,6 +5178,33 @@ typedef enum _BMDDeckLinkAttributeID {
 typedef enum _BMDDeckLinkAPIInformationID {
     BMDDeckLinkAPIVersion = 0x76657273
 } BMDDeckLinkAPIInformationID;
+typedef enum _BMDDeckLinkStatusID {
+    bmdDeckLinkStatusDetectedVideoInputMode = 0x6476696d,
+    bmdDeckLinkStatusDetectedVideoInputFlags = 0x64766966,
+    bmdDeckLinkStatusCurrentVideoInputMode = 0x6376696d,
+    bmdDeckLinkStatusCurrentVideoInputPixelFormat = 0x63766970,
+    bmdDeckLinkStatusCurrentVideoInputFlags = 0x63766966,
+    bmdDeckLinkStatusCurrentVideoOutputMode = 0x63766f6d,
+    bmdDeckLinkStatusCurrentVideoOutputFlags = 0x63766f66,
+    bmdDeckLinkStatusPCIExpressLinkWidth = 0x70776964,
+    bmdDeckLinkStatusPCIExpressLinkSpeed = 0x706c6e6b,
+    bmdDeckLinkStatusLastVideoOutputPixelFormat = 0x6f706978,
+    bmdDeckLinkStatusReferenceSignalMode = 0x7265666d,
+    bmdDeckLinkStatusDuplexMode = 0x64757078,
+    bmdDeckLinkStatusBusy = 0x62757379,
+    bmdDeckLinkStatusVideoInputSignalLocked = 0x7669736c,
+    bmdDeckLinkStatusReferenceSignalLocked = 0x7265666c
+} BMDDeckLinkStatusID;
+typedef enum _BMDDeckLinkVideoStatusFlags {
+    bmdDeckLinkVideoStatusPsF = 1 << 0,
+    bmdDeckLinkVideoStatusDualStream3D = 1 << 1
+} BMDDeckLinkVideoStatusFlags;
+typedef enum _BMDDuplexStatus {
+    bmdDuplexStatusFullDuplex = 0x66647570,
+    bmdDuplexStatusHalfDuplex = 0x68647570,
+    bmdDuplexStatusSimplex = 0x73706c78,
+    bmdDuplexStatusInactive = 0x696e6163
+} BMDDuplexStatus;
 enum _BMDDeviceBusyState {
     bmdDeviceCaptureBusy = 1 << 0,
     bmdDevicePlaybackBusy = 1 << 1,
@@ -5184,7 +5223,8 @@ typedef enum _BMD3DPreviewFormat {
     bmd3DPreviewFormatTopBottom = 0x746f7062
 } BMD3DPreviewFormat;
 typedef enum _BMDNotifications {
-    bmdPreferencesChanged = 0x70726566
+    bmdPreferencesChanged = 0x70726566,
+    bmdStatusChanged = 0x73746174
 } BMDNotifications;
 #ifndef __IDeckLinkVideoOutputCallback_FWD_DEFINED__
 #define __IDeckLinkVideoOutputCallback_FWD_DEFINED__
@@ -5314,6 +5354,11 @@ typedef interface IDeckLinkNotification IDeckLinkNotification;
 #ifndef __IDeckLinkAttributes_FWD_DEFINED__
 #define __IDeckLinkAttributes_FWD_DEFINED__
 typedef interface IDeckLinkAttributes IDeckLinkAttributes;
+#endif
+
+#ifndef __IDeckLinkStatus_FWD_DEFINED__
+#define __IDeckLinkStatus_FWD_DEFINED__
+typedef interface IDeckLinkStatus IDeckLinkStatus;
 #endif
 
 #ifndef __IDeckLinkKeyer_FWD_DEFINED__
@@ -9888,6 +9933,184 @@ void __RPC_STUB IDeckLinkAttributes_GetString_Stub(
 #endif  /* __IDeckLinkAttributes_INTERFACE_DEFINED__ */
 
 /*****************************************************************************
+ * IDeckLinkStatus interface
+ */
+#ifndef __IDeckLinkStatus_INTERFACE_DEFINED__
+#define __IDeckLinkStatus_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IDeckLinkStatus, 0x5f558200, 0x4028, 0x49bc, 0xbe,0xac, 0xdb,0x3f,0xa4,0xa9,0x6e,0x46);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+MIDL_INTERFACE("5f558200-4028-49bc-beac-db3fa4a96e46")
+IDeckLinkStatus : public IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE GetFlag(
+        BMDDeckLinkStatusID statusID,
+        BOOL *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetInt(
+        BMDDeckLinkStatusID statusID,
+        LONGLONG *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetFloat(
+        BMDDeckLinkStatusID statusID,
+        double *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetString(
+        BMDDeckLinkStatusID statusID,
+        BSTR *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetBytes(
+        BMDDeckLinkStatusID statusID,
+        void *buffer,
+        unsigned int *bufferSize) = 0;
+
+};
+#ifdef __CRT_UUID_DECL
+__CRT_UUID_DECL(IDeckLinkStatus, 0x5f558200, 0x4028, 0x49bc, 0xbe,0xac, 0xdb,0x3f,0xa4,0xa9,0x6e,0x46)
+#endif
+#else
+typedef struct IDeckLinkStatusVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IDeckLinkStatus* This,
+        REFIID riid,
+        void **ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IDeckLinkStatus* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IDeckLinkStatus* This);
+
+    /*** IDeckLinkStatus methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetFlag)(
+        IDeckLinkStatus* This,
+        BMDDeckLinkStatusID statusID,
+        BOOL *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetInt)(
+        IDeckLinkStatus* This,
+        BMDDeckLinkStatusID statusID,
+        LONGLONG *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetFloat)(
+        IDeckLinkStatus* This,
+        BMDDeckLinkStatusID statusID,
+        double *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetString)(
+        IDeckLinkStatus* This,
+        BMDDeckLinkStatusID statusID,
+        BSTR *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetBytes)(
+        IDeckLinkStatus* This,
+        BMDDeckLinkStatusID statusID,
+        void *buffer,
+        unsigned int *bufferSize);
+
+    END_INTERFACE
+} IDeckLinkStatusVtbl;
+interface IDeckLinkStatus {
+    CONST_VTBL IDeckLinkStatusVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+#ifndef WIDL_C_INLINE_WRAPPERS
+/*** IUnknown methods ***/
+#define IDeckLinkStatus_QueryInterface(This,riid,ppvObject) (This)->lpVtbl->QueryInterface(This,riid,ppvObject)
+#define IDeckLinkStatus_AddRef(This) (This)->lpVtbl->AddRef(This)
+#define IDeckLinkStatus_Release(This) (This)->lpVtbl->Release(This)
+/*** IDeckLinkStatus methods ***/
+#define IDeckLinkStatus_GetFlag(This,statusID,value) (This)->lpVtbl->GetFlag(This,statusID,value)
+#define IDeckLinkStatus_GetInt(This,statusID,value) (This)->lpVtbl->GetInt(This,statusID,value)
+#define IDeckLinkStatus_GetFloat(This,statusID,value) (This)->lpVtbl->GetFloat(This,statusID,value)
+#define IDeckLinkStatus_GetString(This,statusID,value) (This)->lpVtbl->GetString(This,statusID,value)
+#define IDeckLinkStatus_GetBytes(This,statusID,buffer,bufferSize) (This)->lpVtbl->GetBytes(This,statusID,buffer,bufferSize)
+#else
+/*** IUnknown methods ***/
+static FORCEINLINE HRESULT IDeckLinkStatus_QueryInterface(IDeckLinkStatus* This,REFIID riid,void **ppvObject) {
+    return This->lpVtbl->QueryInterface(This,riid,ppvObject);
+}
+static FORCEINLINE ULONG IDeckLinkStatus_AddRef(IDeckLinkStatus* This) {
+    return This->lpVtbl->AddRef(This);
+}
+static FORCEINLINE ULONG IDeckLinkStatus_Release(IDeckLinkStatus* This) {
+    return This->lpVtbl->Release(This);
+}
+/*** IDeckLinkStatus methods ***/
+static FORCEINLINE HRESULT IDeckLinkStatus_GetFlag(IDeckLinkStatus* This,BMDDeckLinkStatusID statusID,BOOL *value) {
+    return This->lpVtbl->GetFlag(This,statusID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkStatus_GetInt(IDeckLinkStatus* This,BMDDeckLinkStatusID statusID,LONGLONG *value) {
+    return This->lpVtbl->GetInt(This,statusID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkStatus_GetFloat(IDeckLinkStatus* This,BMDDeckLinkStatusID statusID,double *value) {
+    return This->lpVtbl->GetFloat(This,statusID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkStatus_GetString(IDeckLinkStatus* This,BMDDeckLinkStatusID statusID,BSTR *value) {
+    return This->lpVtbl->GetString(This,statusID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkStatus_GetBytes(IDeckLinkStatus* This,BMDDeckLinkStatusID statusID,void *buffer,unsigned int *bufferSize) {
+    return This->lpVtbl->GetBytes(This,statusID,buffer,bufferSize);
+}
+#endif
+#endif
+
+#endif
+
+HRESULT STDMETHODCALLTYPE IDeckLinkStatus_GetFlag_Proxy(
+    IDeckLinkStatus* This,
+    BMDDeckLinkStatusID statusID,
+    BOOL *value);
+void __RPC_STUB IDeckLinkStatus_GetFlag_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkStatus_GetInt_Proxy(
+    IDeckLinkStatus* This,
+    BMDDeckLinkStatusID statusID,
+    LONGLONG *value);
+void __RPC_STUB IDeckLinkStatus_GetInt_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkStatus_GetFloat_Proxy(
+    IDeckLinkStatus* This,
+    BMDDeckLinkStatusID statusID,
+    double *value);
+void __RPC_STUB IDeckLinkStatus_GetFloat_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkStatus_GetString_Proxy(
+    IDeckLinkStatus* This,
+    BMDDeckLinkStatusID statusID,
+    BSTR *value);
+void __RPC_STUB IDeckLinkStatus_GetString_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkStatus_GetBytes_Proxy(
+    IDeckLinkStatus* This,
+    BMDDeckLinkStatusID statusID,
+    void *buffer,
+    unsigned int *bufferSize);
+void __RPC_STUB IDeckLinkStatus_GetBytes_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IDeckLinkStatus_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
  * IDeckLinkKeyer interface
  */
 #ifndef __IDeckLinkKeyer_INTERFACE_DEFINED__
@@ -10414,6 +10637,9 @@ __CRT_UUID_DECL(CDeckLinkDiscovery, 0x1073a05c, 0xd885, 0x47e9, 0xb3,0xc6, 0x12,
 #endif
 #endif
 
+typedef enum _BMDDeckLinkAttributeID_v10_5 {
+    BMDDeckLinkDeviceBusyState_v10_5 = 0x64627374
+} BMDDeckLinkAttributeID_v10_5;
 #ifndef __IDeckLinkEncoderConfiguration_v10_5_FWD_DEFINED__
 #define __IDeckLinkEncoderConfiguration_v10_5_FWD_DEFINED__
 typedef interface IDeckLinkEncoderConfiguration_v10_5 IDeckLinkEncoderConfiguration_v10_5;
