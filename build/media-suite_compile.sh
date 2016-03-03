@@ -390,17 +390,16 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist "${_check[@]}"
     fi
-fi
-
-if [[ $fdkaac = y || $standalone = y ]]; then
-    _check=(bin-audio/fdkaac.exe)
-    do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
-    if [[ $compile = "true" ]] || test_newer installed fdk-aac.pc; then
-        do_autoreconf
-        do_uninstall "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
-        CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
-        do_checkIfExist "${_check[@]}"
+    if [[ $standalone = y ]]; then
+        _check=(bin-audio/fdkaac.exe)
+        do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
+        if [[ $compile = "true" ]] || test_newer installed fdk-aac.pc; then
+            do_autoreconf
+            do_uninstall "${_check[@]}"
+            [[ -f Makefile ]] && log distclean make distclean
+            CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
+            do_checkIfExist "${_check[@]}"
+        fi
     fi
 fi
 
