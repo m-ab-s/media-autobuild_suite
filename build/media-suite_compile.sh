@@ -953,10 +953,10 @@ else
 fi
 
 if [[ ! $x265 = "n" ]]; then
-    do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     _check=(x265{,_config}.h libx265.a x265.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x265.exe)
-    if [[ $compile = "true" ]] || ! files_exist "${_check[@]}"; then
+    do_vcs "hg::https://bitbucket.org/multicoreware/x265" x265 "${_check[@]}"
+    if [[ $compile = "true" ]]; then
         do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
         do_patch x265-fix-git-describe.diff
         [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
