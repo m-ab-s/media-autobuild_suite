@@ -61,7 +61,7 @@ set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontc
 --enable-openssl
 
 set ffmpeg_options_full=--enable-nvenc --enable-opencl --enable-opengl --enable-libcdio ^
---enable-libfaac --enable-libfdkaac --enable-libkvazaar --enable-librubberband ^
+--enable-libfaac --enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
 --enable-libsnappy --enable-libssh --enable-libtesseract --enable-libzvbi
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
