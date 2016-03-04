@@ -967,10 +967,10 @@ if [[ ! $x265 = "n" ]]; then
         rm -rf {8,10,12}bit
 
         do_x265_cmake() {
-            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja \
             -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
-            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON \
-            -DENABLE_ASSEMBLY=ON -DWINXP_SUPPORT=OFF $xpsupport "$@"
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
+            $xpsupport "$@"
             log "ninja" ninja -j "${cpuCount:-1}"
         }
         mkdir -p {8,10,12}bit
