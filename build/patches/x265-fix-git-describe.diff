@@ -1,17 +1,21 @@
 diff --git a/source/cmake/version.cmake b/source/cmake/version.cmake
-index a775834..0613532 100644
+index a775834..2333296 100644
 --- a/source/cmake/version.cmake
 +++ b/source/cmake/version.cmake
-@@ -54,7 +54,7 @@ elseif(HG_EXECUTABLE AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.hg)
+@@ -52,39 +52,47 @@ elseif(HG_EXECUTABLE AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.hg)
+         )
+     execute_process(
          COMMAND
-         ${HG_EXECUTABLE} log -r. --template "{node|short}"
+-        ${HG_EXECUTABLE} log -r. --template "{node|short}"
++        ${HG_EXECUTABLE} log -r. --template "{node}"
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 -        OUTPUT_VARIABLE HG_REVISION_ID
 +        OUTPUT_VARIABLE X265_REVISION_ID
          ERROR_QUIET
          OUTPUT_STRIP_TRAILING_WHITESPACE
          )
-@@ -62,29 +62,36 @@ elseif(HG_EXECUTABLE AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.hg)
++    string(SUBSTRING "${x265_REVISION_ID}" 0 16 X265_REVISION_ID)
+ 
      if(X265_LATEST_TAG MATCHES "^r")
          string(SUBSTRING ${X265_LATEST_TAG} 1 -1 X265_LATEST_TAG)
      endif()
@@ -43,7 +47,7 @@ index a775834..0613532 100644
          )
 +    execute_process(
 +        COMMAND
-+        ${GIT_EXECUTABLE} log -1 --format=g%h ${X265_LATEST_TAG}
++        ${GIT_EXECUTABLE} log -1 --format=g%h
 +        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 +        OUTPUT_VARIABLE X265_REVISION_ID
 +        ERROR_QUIET
