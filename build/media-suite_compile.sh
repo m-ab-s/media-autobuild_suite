@@ -953,7 +953,7 @@ else
 fi
 
 if [[ ! $x265 = "n" ]]; then
-    do_vcs "https://github.com/videolan/x265.git"
+    do_vcs "hg::https://bitbucket.org/multicoreware/x265"
     _check=(x265{,_config}.h libx265.a x265.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x265.exe)
     if [[ $compile = "true" ]] || ! files_exist "${_check[@]}"; then
@@ -967,7 +967,7 @@ if [[ ! $x265 = "n" ]]; then
         rm -rf {8,10,12}bit
 
         do_x265_cmake() {
-            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja \
+            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja -DHG_EXECUTABLE=/usr/bin/hg.bat \
             -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DEXPORT_C_API=ON \
             -DENABLE_ASSEMBLY=ON -DWINXP_SUPPORT=OFF $xpsupport "$@"
