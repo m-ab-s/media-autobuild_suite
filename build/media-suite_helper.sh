@@ -122,7 +122,7 @@ do_vcs() {
     local vcsFolder="$1"
     shift
     local vcsCheck=()
-    for opt; do vcsCheck+=($opt); done
+    [[ ${_check[@]} ]] && vcsCheck=(${_check[@]})
     local ref=""
     if [[ -n "$vcsBranch" ]]; then
         vcsURL="${vcsURL%#*}"
