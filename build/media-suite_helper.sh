@@ -51,11 +51,15 @@ cd_safe() {
 test_newer() {
     [[ $1 = installed ]] && local installed=y && shift
     local file
-    [[ -f $LOCALBUILDDIR/last_successful_run ]] || return 0
-    for file; do
+    local files=("$@")
+    local cmp="${files[-1]}"
+    [[ $installed ]] && cmp="$(file_installed $cmp)"
+    [[ ${#files[@]} -gt 1 ]] && unset files[-1]
+    [[ -f $cmp ]] || return 0
+    for file in ${files[@]}; do
         [[ $installed ]] && file="$(file_installed $file)"
         [[ -f $file ]] &&
-            [[ $file -nt $LOCALBUILDDIR/last_successful_run ]] && return
+            [[ $file -nt "$cmp" ]] && return
     done
     return 1
 }
@@ -176,6 +180,9 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Missing pkg-config"
     elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
+    elif [[ ${_deps[@]} ]] && test_newer installed "${_deps[@]}" "${vcsCheck[0]}"; then
+        do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
+        unset _deps
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
         compile="false"
@@ -478,17 +485,22 @@ do_uninstall() {
 }
 
 do_pkgConfig() {
-    local pkg=${1%% *}
-    local check=${1#$pkg}
+    local pkg="${1%% *}"
+    local check="${1#$pkg}"
+    local pkg_and_version="$pkg"
     [[ $pkg = "$check" ]] && check=""
     local version=$2
-    [[ -z "$version" && -n "$check" ]] && version="${check#*= }"
+    [[ ! "$version" && "$check" ]] && version="${check#*= }"
+    [[ "$version" ]] && pkg_and_version="${pkg} ${version}"
     if ! pc_exists "${pkg}"; then
-        do_print_status "${pkg} ${version}" "$red_color" "Not installed"
+        do_print_status "${pkg_and_version}" "$red_color" "Not installed"
     elif ! pc_exists "${pkg}${check}"; then
-        do_print_status "${pkg} ${version}" "$orange_color" "Outdated"
+        do_print_status "${pkg_and_version}" "$orange_color" "Outdated"
+    elif [[ ${_deps[@]} ]] && test_newer installed "${_deps[@]}" "${pkg}.pc"; then
+        do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
+        unset _deps
     else
-        do_print_status "${pkg} ${version}" "$green_color" "Up-to-date"
+        do_print_status "${pkg_and_version}" "$green_color" "Up-to-date"
         return 1
     fi
 }

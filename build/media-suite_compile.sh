@@ -92,8 +92,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_checkIfExist "${_check[@]}"
     fi
 
-    if enabled_any {lib,}fontconfig && { do_pkgConfig "fontconfig = 2.11.94" ||
-        test_newer installed freetype2.pc; }; then
+    _deps=(freetype2.pc)
+    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove python2-lxml
         _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
@@ -112,7 +112,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"') &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
     [[ $harfbuzz_ver ]] || harfbuzz_ver="1.2.3"
-    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}" || test_newer installed {freetype2,fontconfig}.pc; then
+    _deps=({freetype2,fontconfig}.pc)
+    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
@@ -392,8 +393,9 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
     fi
     if [[ $standalone = y ]]; then
         _check=(bin-audio/fdkaac.exe)
+        _deps=(fdk-aac.pc)
         do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac "${_check[@]}"
-        if [[ $compile = "true" ]] || test_newer installed fdk-aac.pc; then
+        if [[ $compile = "true" ]]; then
             do_autoreconf
             do_uninstall "${_check[@]}"
             [[ -f Makefile ]] && log distclean make distclean
@@ -422,8 +424,7 @@ if enabled libfaac; then
 fi
 
 _check=(bin-audio/oggenc.exe)
-if [[ $standalone = y ]] && enabled libvorbis &&
-    ! files_exist "${_check[@]}"; then
+if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}"; then
     do_pacman_install flac
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools
     _check+=(bin-audio/oggdec.exe)
@@ -439,8 +440,9 @@ if [[ $standalone = y ]] && enabled libvorbis &&
 fi
 
 _check=(bin-audio/opusenc.exe)
+_deps=(opus.pc)
 if [[ $standalone = y ]] && enabled libopus &&
-    { ! files_exist "${_check[@]}" || test_newer installed opus.pc; }; then
+    { ! files_exist "${_check[@]}" || test_newer installed "${_deps[@]}" "${_check[0]}"; }; then
     do_pacman_install flac
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
@@ -558,9 +560,6 @@ echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_col
 
 if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
-    _check=(librtmp.{a,pc})
-    [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
-    do_vcs "http://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
@@ -572,8 +571,11 @@ if [[ $rtmpdump = "y" ]] ||
         crypto=OPENSSL
         pc=libssl
     fi
-    if [[ $compile = "true" ]] || [[ $req != *$pc* ]] ||
-        test_newer installed "${pc}.pc"; then
+    _check=(librtmp.{a,pc})
+    _deps=("${pc}.pc")
+    [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
+    do_vcs "http://repo.or.cz/rtmpdump.git" librtmp "${_check[@]}"
+    if [[ $compile = "true" ]] || [[ $req != *$pc* ]]; then
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_uninstall include/librtmp "${_check[@]}"
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
@@ -681,8 +683,9 @@ fi
 
 if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled libass; }; then
+    _deps=({freetype2,fontconfig,harfbuzz,fribidi}.pc)
     do_vcs "https://github.com/libass/libass.git"
-    if [[ $compile = "true" ]] || test_newer installed {freetype2,fontconfig,harfbuzz,fribidi}.pc; then
+    if [[ $compile = "true" ]]; then
         _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
         do_autoreconf
         do_uninstall "${_check[@]}"
@@ -718,9 +721,9 @@ if [[ $mediainfo = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
+    _check=(libzen.{a,pc})
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
-        _check=(libzen.{a,pc})
         cd_safe Project/CMake
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
         sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' CMakeLists.txt
@@ -728,9 +731,10 @@ if [[ $mediainfo = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
+    _check=(libmediainfo.{a,pc})
+    _deps=(libzen.pc)
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
-    if [[ $compile = "true" ]] || test_newer installed libzen.pc; then
-        _check=(libmediainfo.{a,pc})
+    if [[ $compile = "true" ]]; then
         cd_safe Project/CMake
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' CMakeLists.txt
@@ -740,8 +744,9 @@ if [[ $mediainfo = "y" ]]; then
     fi
 
     _check=(bin-video/mediainfo.exe)
+    _deps=(libmediainfo.pc)
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo "${_check[@]}"
-    if [[ $compile = "true" ]] || test_newer installed lib{zen,mediainfo}.pc; then
+    if [[ $compile = "true" ]]; then
         cd_safe Project/GNU/CLI
         do_autoreconf
         do_uninstall "${_check[@]}"
@@ -1073,9 +1078,10 @@ if [[ $ffmpeg != "n" ]]; then
     else
         _check=(libavutil.{a,pc})
     fi
+    [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
+        _deps=({libass,x264,x265,vpx}.pc)
     do_vcs "https://git.videolan.org/git/ffmpeg.git" ffmpeg "${_check[@]}"
-    if [[ $compile = "true" ]] ||
-        { [[ $ffmpegUpdate = y ]] && test_newer installed {libass,x264,x265,vpx}.pc; }; then
+    if [[ $compile = "true" ]]; then
         do_changeFFmpegConfig "$license"
         _patches=0
         enabled_any libgme libopencore-amr{nb,wb} libtheora libtwolame libvorbis libcdio &&
@@ -1315,8 +1321,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     _check=(bin-video/mpv.{exe,com})
+    _deps=({libass,libavcodec,vapoursynth}.pc)
     do_vcs "https://github.com/mpv-player/mpv.git" mpv "${_check[@]}"
-    if [[ $compile = "true" ]] || test_newer installed {libass,libavcodec,vapoursynth}.pc; then
+    if [[ $compile = "true" ]]; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
         hide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
@@ -1378,8 +1385,9 @@ if [[ $bmx = "y" ]]; then
         do_checkIfExist "${_check[@]}"
     fi
 
+    _deps=(libMXF-1.0.pc)
     do_vcs http://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0
-    if [[ $compile = "true" ]] || test_newer installed libMXF-1.0.pc; then
+    if [[ $compile = "true" ]]; then
         _check=(libMXF++-1.0.{{,l}a,pc})
         do_autogen
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
@@ -1389,8 +1397,9 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
+    _deps=({liburiparser,libMXF{,++}-1.0}.pc)
     do_vcs http://git.code.sf.net/p/bmxlib/bmx bmx "${_check[@]}"
-    if [[ $compile = "true" ]] || test_newer installed {liburiparser,libMXF{,++}-1.0}.pc; then
+    if [[ $compile = "true" ]]; then
         do_patch bmx-0001-configure-no-libcurl.patch am
         do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
         do_autogen
