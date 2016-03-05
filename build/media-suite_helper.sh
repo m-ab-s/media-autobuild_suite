@@ -123,6 +123,7 @@ do_vcs() {
     shift
     local vcsCheck=()
     [[ ${_check[@]} ]] && vcsCheck=(${_check[@]})
+    local deps=("${_deps[@]}") && unset _deps
     local ref=""
     if [[ -n "$vcsBranch" ]]; then
         vcsURL="${vcsURL%#*}"
@@ -180,9 +181,8 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Missing pkg-config"
     elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
-    elif [[ ${_deps[@]} ]] && test_newer installed "${_deps[@]}" "${vcsCheck[0]}"; then
+    elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
         do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
-        unset _deps
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
         compile="false"
@@ -490,15 +490,15 @@ do_pkgConfig() {
     local pkg_and_version="$pkg"
     [[ $pkg = "$check" ]] && check=""
     local version=$2
+    local deps=("${_deps[@]}") && unset _deps
     [[ ! "$version" && "$check" ]] && version="${check#*= }"
     [[ "$version" ]] && pkg_and_version="${pkg} ${version}"
     if ! pc_exists "${pkg}"; then
         do_print_status "${pkg_and_version}" "$red_color" "Not installed"
     elif ! pc_exists "${pkg}${check}"; then
         do_print_status "${pkg_and_version}" "$orange_color" "Outdated"
-    elif [[ ${_deps[@]} ]] && test_newer installed "${_deps[@]}" "${pkg}.pc"; then
+    elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
         do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
-        unset _deps
     else
         do_print_status "${pkg_and_version}" "$green_color" "Up-to-date"
         return 1
