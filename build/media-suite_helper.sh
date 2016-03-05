@@ -182,7 +182,7 @@ do_vcs() {
     elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
     elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
-        do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
         compile="false"
