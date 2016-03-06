@@ -402,6 +402,8 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
             CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
             do_checkIfExist "${_check[@]}"
         fi
+    else
+        ! disabled libfdk-aac && do_addOption --enable-libfdk-aac
     fi
 fi
 
