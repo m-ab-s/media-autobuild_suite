@@ -8,8 +8,6 @@ Most git sources in the suite use GitHub, so if it's down, it's probably useless
 
 Known Issues
 --------
- - FFmpeg and FFmpeg-based (mplayer, mpv)
-	- if compiled with OpenSSL instead of GnuTLS, packing doesn't work in 64-bit
  - `error: GPGME error: Invalid crypto engine`
  	- probably rare bug with Win7 64-bits, use msys32 instead of msys64
  	- Check #252 for more information
@@ -28,16 +26,17 @@ Included Tools And Libraries
 ### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/FFmpeg-external-libraries)
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
-	- decklink 10.5
+	- decklink (10.6)
 	- fontconfig (2.11.94)
-	- freetype (2.6.2)
+	- freetype (2.6.3)
 	- frei0r (1.4)
 	- fribidi (0.19.7)
 	- SChannel, gnutls (3.4.x), or openssl
 		- SChannel used by default
 		- If `--enable-openssl` and license is LGPL or nonfree, openssl is preferred
-	- harfbuzz (1.1.2)
-	- libass (git) (with directwrite backend) (with fontconfig too if 32-bit)
+	- harfbuzz (1.2.3)
+	- libass (git) (with directwrite backend)
+		- to also include Fontconfig backend, add --enable-fontconfig in ffmpeg_options.txt
 	- libbs2b (3.1.0)
 	- libbluray (git)
 	- libcaca
@@ -97,6 +96,7 @@ Included Tools And Libraries
 	- flac (1.3.1)
 	- kvazaar (git)
 	- lame (3.99.5)
+	- LibreSSL (drop-in replacement for OpenSSL)
 	- mediainfo cli (git)
 	- mp4box (git)
 	- mplayer (svn)
@@ -148,11 +148,11 @@ The Script writes a ini-file, so you only need to make these choices the first t
 
 For all you need ~7 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Building everything from the beginning takes around ~3 hours.
+Building everything from scratch takes about ~3 hours.
 
-Later when you need only some new builds, delete the .exe files under local32\bin|local64\bin, some libs only produce *.a files, when you want to build them new, then delete that one under /local32/lib or /local64/lib. ffmpeg, x264, x265, libvpx, libbluray, sox and some other tools have frequent updates from git, so for them you probably don't need to delete files or folders to get updated versions. 
+Check doc/forcing-recompilations.md to check how you can force a rebuild of all libs/binaries.
 
-To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders itself.
+To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
 
 Have fun!
 
@@ -162,9 +162,9 @@ Troubleshooting
 
 If there's some error during compilation follow these steps:
  1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
- 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if f265 is failing, delete f265-git folder in /build);
- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and pack `ffmpeg_options.txt`, `mpv_options.txt`, `media-autobuild_suite.ini`, `compile.log`, `update.log` and every `ab-suite.*.log` files in the package that fails to a .zip and attach to the issue page.
- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side and/or some issue with MinGW. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
+ 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
+ 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
+ 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
  5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 
 
@@ -198,6 +198,3 @@ http://ingar.satgnu.net/devenv/mingw32/base.html
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
 
 [1]: https://github.com/rdp/ffmpeg-windows-build-helpers/commit/c48af053657e174e270249e4b28a83c35897e320
-
-
-**Attention: This project is searching for a new owner. Please let it me know if you are interested to continue this project, then I transfer it to you.**
