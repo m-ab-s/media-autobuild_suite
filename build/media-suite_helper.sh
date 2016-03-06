@@ -1100,7 +1100,7 @@ unhide_files() {
 
 clean_suite() {
     echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
-    pushd "$LOCALBUILDDIR" >/dev/null
+    cd_safe "$LOCALBUILDDIR" >/dev/null
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
         xargs -0 rm -f
@@ -1124,7 +1124,6 @@ clean_suite() {
             xargs -0 -r rm -rf
         unset _to_remove
     fi
-    popd >/dev/null
 }
 
 ((extglob_set)) && shopt -u extglob
