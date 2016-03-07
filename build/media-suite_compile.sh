@@ -935,6 +935,7 @@ if [[ $x264 != n ]]; then
         else
             extracommands+=(--disable-gpac --disable-cli)
         fi
+        do_print_progress "Building 10-bit x264"
         if [[ $standalone = y && $x264 != h ]]; then
             _check+=(bin-video/x264-10bit.exe)
             do_uninstall "${_check[@]}"
@@ -943,6 +944,7 @@ if [[ $x264 != n ]]; then
             do_make
             do_install x264.exe bin-video/x264-10bit.exe
             cd_safe ..
+            do_print_progress "Building 8-bit x264"
         else
             do_uninstall "${_check[@]}"
             [[ $x264 = h ]] && extracommands+=(--bit-depth=10)
