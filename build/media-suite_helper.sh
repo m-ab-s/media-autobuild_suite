@@ -802,10 +802,12 @@ compilation_fail() {
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
-    echo "Likely error:"
-    tail "ab-suite.${operation}.log"
-    echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.log${reset_color}"
-    if [[ -n "$_notrequired" ]]; then
+    if [[ $loggging = y ]]; then
+        echo "Likely error:"
+        tail "ab-suite.${operation}.log"
+        echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.log${reset_color}"
+    fi
+    if [[ $_notrequired ]]; then
         echo "This isn't required for anything so we can move on."
         return 1
     else
