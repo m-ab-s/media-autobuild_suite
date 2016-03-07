@@ -749,7 +749,7 @@ if [[ $mediainfo = "y" ]]; then
     do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo
     if [[ $compile = "true" ]]; then
         cd_safe Project/GNU/CLI
-        do_autoreconf
+        do_autogen
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
