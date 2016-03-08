@@ -812,6 +812,7 @@ compilation_fail() {
         return 1
     else
         echo "${red_color}This is required for other packages, so this script will exit.${reset_color}"
+        create_diagnostic
         zip_logs
         do_prompt "Try running the build again at a later time."
         exit 1
@@ -824,7 +825,7 @@ zip_logs() {
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
     7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
-        /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
+        ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
     url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
     if [[ $url ]]; then
@@ -1115,7 +1116,7 @@ clean_suite() {
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
-    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log
+    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt
 
     if [[ $deleteSource = y ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
@@ -1126,6 +1127,15 @@ clean_suite() {
             xargs -0 -r rm -rf
         unset _to_remove
     fi
+}
+
+create_diagnostic() {
+    local cmd cmds=("uname -a" "pacman -Qe" "pacman -Qd")
+    [[ -d /trunk/.git ]] && cmds+=("git log -1 --pretty=%h")
+    rm -f "$LOCALBUILDDIR/diagnostics.txt"
+    for cmd in "${cmds[@]}"; do
+        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >>"$LOCALBUILDDIR/diagnostics.txt"
+    done
 }
 
 ((extglob_set)) && shopt -u extglob
