@@ -635,7 +635,6 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; the
     do_vcs "https://github.com/ultravideo/kvazaar.git"
     if [[ $compile = "true" ]]; then
         do_uninstall kvazaar_version.h "${_check[@]}"
-        do_patch kvazaar-0001-Only-use-version-prefix-in-kvazaar-binary.patch am
         do_autogen
         [[ -f Makefile ]] && log distclean make distclean
         [[ $standalone = y || $other265 = y ]] ||
