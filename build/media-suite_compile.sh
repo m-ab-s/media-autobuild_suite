@@ -632,9 +632,10 @@ fi
 if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; then
     _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
     [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
-    do_vcs "https://github.com/ultravideo/kvazaar.git" kvazaar
+    do_vcs "https://github.com/ultravideo/kvazaar.git"
     if [[ $compile = "true" ]]; then
         do_uninstall kvazaar_version.h "${_check[@]}"
+        do_patch am kvazaar-0001-Only-use-version-prefix-in-kvazaar-binary.patch
         do_autogen
         [[ -f Makefile ]] && log distclean make distclean
         [[ $standalone = y || $other265 = y ]] ||
