@@ -803,7 +803,7 @@ do_patch() {
 do_cmakeinstall() {
     create_build_dir
     log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
-    log "install" ninja -j"$cpuCount" install
+    log "install" ninja install
 }
 
 compilation_fail() {
@@ -844,14 +844,19 @@ zip_logs() {
 }
 
 log() {
-    local cmd="$1"
-    shift 1
-    do_print_progress Running "$cmd"
+    local name="$1" && shift
+    local cmd="$1" && shift
+    local extra
+    do_print_progress Running "$name"
+    [[ $cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging != "n" ]]; then
-        echo "$@" > "ab-suite.$cmd.log"
-        "$@" >> "ab-suite.$cmd.log" 2>&1 || compilation_fail "$cmd"
+        echo "$cmd $@" > "ab-suite.$name.log"
+        $cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
+            { [[ $extra ]] && $cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
+            compilation_fail "$name"
     else
-        "$@" || compilation_fail "$cmd"
+        $cmd $extra "$@" || { [[ $extra ]] && $cmd -j1 "$@"; } ||
+            compilation_fail "$name"
     fi
 }
 
@@ -888,11 +893,11 @@ do_configure() {
 }
 
 do_make() {
-    log "make" make -j"$cpuCount" "$@"
+    log "make" make "$@"
 }
 
 do_makeinstall() {
-    log "install" make -j"$cpuCount" install "$@"
+    log "install" make install "$@"
 }
 
 do_hide_pacman_sharedlibs() {
