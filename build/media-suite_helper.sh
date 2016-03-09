@@ -422,12 +422,13 @@ file_installed() {
 }
 
 files_exist() {
-    local verbose list soft term="\n"
+    local verbose list soft ignorebinaries term="\n"
     while true; do
         case $1 in
             -v) verbose=y && shift;;
             -l) list=y && shift;;
             -s) soft=y && shift;;
+            -b) ignorebinaries=y && shift;;
             -l0) list=y && term="\0" && shift;;
             --) shift; break;;
             *) break;;
@@ -438,7 +439,12 @@ files_exist() {
     for opt; do
         if file=$(file_installed $opt); then
             [[ $verbose && $soft ]] && do_print_status "├ $file" "${green_color}" "Found"
-            [[ $list ]] && echo -n "$file" && echo -ne "$term"
+            if [[ $list ]]; then
+                if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
+                    continue
+                fi
+                echo -n "$file" && echo -ne "$term"
+            fi
         else
             [[ $verbose ]] && do_print_status "├ $file" "${red_color}" "Not found"
             [[ ! $soft ]] && return 1
@@ -471,9 +477,11 @@ do_install() {
 }
 
 do_uninstall() {
-    [[ $1 = dry ]] && local dry=y && shift
-    [[ $1 = q ]] && local quiet=y && shift
-    local files=($(files_exist -l "$@"))
+    local dry quiet all files
+    [[ $1 = dry ]] && dry=y && shift
+    [[ $1 = q ]] && quiet=y && shift
+    [[ $1 = all ]] && all=y && shift
+    [[ $all ]] && files=($(files_exist -l "$@")) || files=($(files_exist -l -b "$@"))
     if [[ -n ${files[@]} ]]; then
         [[ ! $quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
