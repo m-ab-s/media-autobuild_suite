@@ -1,14 +1,14 @@
-From d83141abd2978034b20cc9c1cb7a76524df11640 Mon Sep 17 00:00:00 2001
+From 89d144b6a201e412991a2009b847229b811c68eb Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Thu, 11 Feb 2016 22:54:43 +0800
-Subject: [PATCH 3/3] lowercase header name
+Subject: [PATCH 2/3] lowercase header name
 
 ---
  src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
-index 4c4149f..4327611 100644
+index d59664f..1b52e93 100644
 --- a/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
 +++ b/src/libANGLE/renderer/d3d/d3d11/Renderer11.cpp
 @@ -10,7 +10,7 @@

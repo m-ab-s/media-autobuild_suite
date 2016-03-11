@@ -1,7 +1,7 @@
-From 3b023dc7040a865b1fc0b10376eaa7721600cf7f Mon Sep 17 00:00:00 2001
+From 4f4c96acabb55499f1b1e76eaa6b140eb0eb6fef Mon Sep 17 00:00:00 2001
 From: shinchiro <shinchiro@nowhere.com>
 Date: Wed, 23 Dec 2015 13:57:49 +0800
-Subject: [PATCH 2/3] Simplify secure API functions workaround for MinGW
+Subject: [PATCH 1/3] Simplify secure API functions workaround for MinGW
 
 ---
  src/libANGLE/renderer/d3d/RendererD3D.cpp | 4 ++++

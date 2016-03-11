@@ -1,24 +1,30 @@
-From e24a2387f3cc94d31140f7157d69e96ec6a751f5 Mon Sep 17 00:00:00 2001
+From cf4a601f810950c8b8a200a00853a3d1a305796c Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
-Subject: [PATCH 1/3] Add makefile and pkgconfig file for ANGLE
+Subject: [PATCH 3/3] Add makefile and pkgconfig file for ANGLE
 
 Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
+
+Update to fb57c04
+
+- Get commit hash from origin/master instead of HEAD to ignore patches
+- Add GL renderer
+- Add ESSL/GLSL compilers
 ---
- Makefile     | 399 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 403 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 409 insertions(+)
+ 2 files changed, 413 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..c841799
+index 0000000..dac03f3
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,399 @@
+@@ -0,0 +1,403 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -35,9 +41,9 @@ index 0000000..c841799
 +    $(eval override $(VAR) = @printf " %s\t%s\n" $(VAR) "$$@"; $($(VAR))))
 +endif
 +
-+DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 \
-+        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL \
-+        -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
++DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 -DANGLE_ENABLE_OPENGL \
++        -DANGLE_TRANSLATOR_STATIC -DANGLE_ENABLE_HLSL -DANGLE_ENABLE_ESSL -DANGLE_ENABLE_GLSL \
++        -DGL_GLEXT_PROTOTYPES -DEGL_EGLEXT_PROTOTYPES -DLIBANGLE_IMPLEMENTATION -DGL_APICALL= \
 +        -DEGLAPI= $(DEFS)
 +LIBEGL_DEFS = -DLIBEGL_IMPLEMENTATION
 +LIBGLESv2_DEFS = -DLIBGLESV2_IMPLEMENTATION
@@ -45,7 +51,7 @@ index 0000000..c841799
 +CXXFLAGS := -std=c++11 -fpermissive -msse2 -O2 -Wno-deprecated-declarations \
 +            -Wno-conversion-null $(CXXFLAGS)
 +DEPFLAGS = -MMD -MP
-+LIBGLESv2_LIBS = -ldxguid -ld3d9
++LIBGLESv2_LIBS = -ldxguid -ld3d9 -lopengl32 -lgdi32
 +LIBEGL_LIBS =
 +LIBGLESv2_LDFLAGS = -Wl,--out-implib,libGLESv2.dll.a
 +LIBEGL_LDFLAGS = -Wl,--out-implib,libEGL.dll.a
@@ -85,6 +91,7 @@ index 0000000..c841799
 +	src/compiler/translator/UnfoldShortCircuitAST.o \
 +	src/compiler/translator/ValidateGlobalInitializer.o \
 +	src/compiler/translator/ValidateLimitations.o \
++	src/compiler/translator/ValidateMaxParameters.o \
 +	src/compiler/translator/ValidateOutputs.o \
 +	src/compiler/translator/ValidateSwitch.o \
 +	src/compiler/translator/VariableInfo.o \
@@ -312,18 +319,22 @@ index 0000000..c841799
 +	src/libANGLE/renderer/gl/wgl/wgl_utils.o
 +
 +LIBGLESv2_OBJ = \
-+	src/compiler/translator/ShaderLang.o \
-+	src/compiler/translator/ShaderVars.o \
-+	$(angle_translator_lib_sources) \
-+	$(angle_translator_lib_hlsl_sources) \
-+	$(angle_preprocessor_sources) \
-+	$(libangle_common_sources) \
-+	$(libangle_sources) \
-+	$(libangle_d3d_shared_sources) \
-+	$(libangle_d3d9_sources) \
-+	$(libangle_d3d11_sources) \
-+	$(libangle_d3d11_win32_sources) \
-+	$(libglesv2_sources)
++    src/compiler/translator/ShaderLang.o \
++    src/compiler/translator/ShaderVars.o \
++    $(angle_translator_lib_sources) \
++    $(angle_translator_lib_essl_sources) \
++    $(angle_translator_lib_glsl_sources) \
++    $(angle_translator_lib_hlsl_sources) \
++    $(angle_preprocessor_sources) \
++    $(libangle_common_sources) \
++    $(libangle_sources) \
++    $(libangle_d3d_shared_sources) \
++    $(libangle_d3d9_sources) \
++    $(libangle_d3d11_sources) \
++    $(libangle_d3d11_win32_sources) \
++    $(libglesv2_sources) \
++    $(libangle_gl_sources) \
++    $(libangle_gl_wgl_sources)
 +
 +LIBGLESv2_DEP = $(LIBGLESv2_OBJ:.o=.d)
 +LIBEGL_OBJ = src/libEGL/libEGL.egl.o
@@ -347,9 +358,9 @@ index 0000000..c841799
 +	mkdir -p $@
 +
 +src/id/commit.h: src/commit.h | src/id
-+	printf '#define ANGLE_COMMIT_HASH "%s"\n' '$(shell git rev-parse --short=12 HEAD)' >$@
++	printf '#define ANGLE_COMMIT_HASH "%s"\n' '$(shell git rev-parse --short=12 origin/master)' >$@
 +	printf '#define ANGLE_COMMIT_HASH_SIZE 12\n' >>$@
-+	printf '#define ANGLE_COMMIT_DATE "%s"\n' '$(shell git show -s --format=%ci HEAD)' >>$@
++	printf '#define ANGLE_COMMIT_DATE "%s"\n' '$(shell git show -s --format=%ci origin/master)' >>$@
 +
 +%.o: %.cpp src/id/commit.h
 +	$(CXX) -c -o $@ $(CPPFLAGS) $(DEFS) $(LIBGLESv2_DEFS) $(CXXFLAGS) $(DEPFLAGS) $<
@@ -414,13 +425,12 @@ index 0000000..c841799
 +
 +test: $(TARGET)
 +	printf "#include <EGL/egl.h>\nint main(int argc, char **argv)\n{ eglCreateWindowSurface(0, 0, 0, 0); return 0; }\n" > test.c
-+	$(CC) test.c -Iinclude -o test.exe $(PCDEFS) -L. -lEGL -lGLESv2 -ld3d9 -lstdc++
-+	-rm -f test.c
-+	-rm -f test.exe
++	$(CC) test.c -Iinclude -o test.exe $(PCDEFS) -L. -lEGL -lGLESv2 $(LIBGLESv2_LIBS) -lstdc++
++	-rm -f test.{c,exe}
 +.PHONY: test
 diff --git a/libEGL.pc.in b/libEGL.pc.in
 new file mode 100644
-index 0000000..dd4e52a
+index 0000000..b9ec3c2
 --- /dev/null
 +++ b/libEGL.pc.in
 @@ -0,0 +1,10 @@
@@ -432,7 +442,7 @@ index 0000000..dd4e52a
 +Description: A conformant OpenGL ES 2 implementation for Windows.
 +Version: %VERSION%
 +Libs: -L${libdir} -lEGL
-+Libs.private: -lGLESv2 -ldxguid -ld3d9 -lstdc++
++Libs.private: -lGLESv2 -ldxguid -ld3d9 -lopengl32 -lgdi32 -lstdc++
 +Cflags: %CFLAGS%
 -- 
 2.7.2
