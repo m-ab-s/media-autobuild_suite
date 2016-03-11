@@ -1277,7 +1277,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if [[ x"$vsprefix" != x ]] &&
             { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
             do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
-            baseurl="https://github.com/vapoursynth/vapoursynth/raw/master"
+            baseurl="https://github.com/vapoursynth/vapoursynth/raw/"
+            [[ $(curl -sLw "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac") != 404 ]] &&
+                baseurl+="R${vsversion}" || baseurl+="master"
             mkdir -p "$LOCALBUILDDIR/vapoursynth" && cd_safe "$LOCALBUILDDIR/vapoursynth"
 
             # headers
