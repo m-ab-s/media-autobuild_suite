@@ -115,17 +115,14 @@ vcs_log() {
 do_vcs() {
     local vcsType="${1%::*}"
     local vcsURL="${1#*::}"
-    shift
     [[ "$vcsType" = "$vcsURL" ]] && vcsType="git"
     local vcsBranch="${vcsURL#*#}"
     [[ "$vcsBranch" = "$vcsURL" ]] && vcsBranch=""
-    local vcsFolder="$1"
-    shift
-    local vcsCheck=()
-    [[ ${_check[@]} ]] && vcsCheck=(${_check[@]})
+    local vcsFolder="$2"
+    local vcsCheck=("${_check[@]}")
     local deps=("${_deps[@]}") && unset _deps
-    local ref=""
-    if [[ -n "$vcsBranch" ]]; then
+    local ref
+    if [[ $vcsBranch ]]; then
         vcsURL="${vcsURL%#*}"
         case ${vcsBranch%%=*} in
             commit|tag|revision)
@@ -136,20 +133,20 @@ do_vcs() {
                 ;;
         esac
     else
-        if [[ "$vcsType" = "git" ]]; then
+        if [[ $vcsType = git ]]; then
             ref="origin/HEAD"
-        elif [[ "$vcsType" = "hg" ]]; then
+        elif [[ $vcsType = hg ]]; then
             ref="tip"
-        elif [[ "$vcsType" = "svn" ]]; then
+        elif [[ $vcsType = svn ]]; then
             ref="HEAD"
         fi
     fi
-    [[ -z "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
+    [[ ! "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
     compile="false"
 
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
-        vcs_clone
+        log "$vcsType clone" vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
             touch recently_updated
@@ -162,7 +159,7 @@ do_vcs() {
     else
         cd_safe "$vcsFolder-$vcsType"
     fi
-    vcs_update
+    log "$vcsType update" vcs_update
     compile="true"
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
@@ -173,7 +170,7 @@ do_vcs() {
         fi
         echo "$vcsFolder" >> "$LOCALBUILDDIR"/newchangelog
         vcs_log
-        echo "" >> "$LOCALBUILDDIR"/newchangelog
+        echo >> "$LOCALBUILDDIR"/newchangelog
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Recently updated"
