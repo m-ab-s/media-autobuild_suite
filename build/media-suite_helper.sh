@@ -851,8 +851,9 @@ zip_logs() {
 }
 
 log() {
-    local name="$1" && shift
-    local cmd="$1" && shift
+    local name="${1// /.}"
+    local cmd="$2"
+    shift 2
     local extra
     do_print_progress Running "$name"
     [[ $cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
