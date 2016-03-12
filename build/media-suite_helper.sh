@@ -384,12 +384,15 @@ do_checkIfExist() {
     local packetName
     packetName="$(get_first_subdir)"
     [[ $1 = dry ]] && local dry=y && shift
+    local check=("$@")
+    check+=("${_check[@]}")
+    [[ -z $check ]] && echo "No files to check" && exit 1
     if [[ $dry ]]; then
-        files_exist -v -s "$@"
+        files_exist -v -s "${check[@]}"
     else
-        if files_exist -v "$@"; then
-            [[ $stripping = y ]] && do_strip "$@"
-            [[ $packing = y ]] && do_pack "$@"
+        if files_exist -v "${check[@]}"; then
+            [[ $stripping = y ]] && do_strip "${check[@]}"
+            [[ $packing = y ]] && do_pack "${check[@]}"
             do_print_status "└ $packetName" "$blue_color" "Updated"
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
@@ -403,6 +406,7 @@ do_checkIfExist() {
             do_prompt "Close this window if you wish to stop building."
         fi
     fi
+    unset _check
 }
 
 file_installed() {

@@ -75,7 +75,7 @@ if [[ $ffmpeg != "n" ]] && enabled libopenjpeg; then
     if [[ $compile = "true" ]]; then
         do_uninstall {include,lib}/openjpeg-2.1 libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
         do_cmakeinstall -DBUILD_CODEC=off
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -89,7 +89,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.3.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
         do_separate_confmakeinstall global --with-harfbuzz=no
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _deps=(freetype2.pc)
@@ -104,7 +104,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             -e '/fc-cache fc-cat fc-list/,+1d' \
             -e 's/CROSS_COMPILING_TRUE/CROSS_COMPILING_FALSE/'
         do_separate_confmakeinstall global
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     [[ ! $harfbuzz_ver ]] &&
@@ -119,7 +119,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     if do_pkgConfig "fribidi = 0.19.7"; then
@@ -130,7 +130,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
         do_separate_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -144,7 +144,7 @@ if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     CFLAGS="-DDECLSPEC=" do_separate_confmakeinstall global
     sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
     sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
@@ -165,7 +165,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
             --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
         sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
             "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -187,7 +187,7 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
         sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.in
         sed -i 's;DESTDIR)/\$;DESTDIR)$;g' apps/openssl/Makefile.in
         do_separate_confmakeinstall global
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset _sed
     fi
 fi
@@ -211,7 +211,7 @@ if enabled libwebp; then
         do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
         do_separate_confmakeinstall global --enable-swap-16bit-csp \
             --enable-libwebpmux "${extracommands[@]}"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -219,7 +219,8 @@ syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
 if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     echo -e "${orange_color}Tesseract, FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
-    if ! files_exist libOpenCL.a; then
+    _check=(libOpenCL.a)
+    if ! files_exist "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         do_pacman_install opencl-headers
         [[ -d opencl ]] && rm -rf opencl
@@ -227,7 +228,7 @@ if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
         gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && mv -f libOpenCL.a "$LOCALDESTDIR"/lib/
-        do_checkIfExist libOpenCL.a
+        do_checkIfExist
     fi
 else
     do_removeOption --enable-opencl
@@ -243,7 +244,7 @@ if enabled libtesseract; then
             "http://www.leptonica.com/source/leptonica-1.73.tar.gz"
         do_uninstall include/leptonica "${_check[@]}"
         do_separate_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(libtesseract.{,l}a tesseract.pc)
@@ -268,7 +269,7 @@ if enabled libtesseract; then
                     > need_more_languages.txt
             popd > /dev/null
         fi
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset opencl
     fi
 fi
@@ -280,7 +281,7 @@ if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
     _to_remove+=($(pwd))
 fi
 
@@ -294,7 +295,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
         grep -q "Libs.private" zimg.pc.in || sed -i "/Cflags:/ i\Libs.private: -lstdc++" zimg.pc.in
         do_autoreconf
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
@@ -307,7 +308,7 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc; then
         [[ -f Makefile ]] && log distclean make distclean
         do_uninstall "${_check[@]}"
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -332,7 +333,7 @@ if enabled libopus; then
         # needed to allow building shared FFmpeg with libopus
         sed -i 's, __declspec(dllexport),,' include/opus_defines.h
         do_separate_confmakeinstall --disable-doc
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     do_pacman_install opusfile
@@ -348,7 +349,7 @@ if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
     do_patch speex-mingw-winmm.patch
     do_separate_confmakeinstall audio --enable-vorbis-psy \
         "$([[ $standalone = y ]] && echo --enable-binaries || echo --disable-binaries)"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
@@ -359,7 +360,7 @@ if [[ $flac = y ]] && { do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@
     do_uninstall include/FLAC{,++} "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 do_uninstall q include/vo-aacenc libvo-aacenc.{l,}a vo-aacenc.pc
@@ -377,7 +378,7 @@ if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
     do_uninstall include/vo-amrwbenc "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
@@ -389,7 +390,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
         do_uninstall include/fdk-aac "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
     if [[ $standalone = y ]]; then
         _check=(bin-audio/fdkaac.exe)
@@ -400,7 +401,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } ||
             do_uninstall "${_check[@]}"
             [[ -f Makefile ]] && log distclean make distclean
             CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
-            do_checkIfExist "${_check[@]}"
+            do_checkIfExist
         fi
     else
         ! disabled libfdk-aac && do_addOption --enable-libfdk-aac
@@ -421,7 +422,7 @@ if enabled libfaac; then
         do_uninstall "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
         do_separate_confmakeinstall audio --without-mp4v2
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -437,7 +438,7 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}"; t
     enabled libspeex || extracommands+=(--without-speex)
     do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
         --disable-vcut --disable-ogginfo "${extracommands[@]}"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
     _to_remove+=($(pwd))
 fi
 
@@ -452,7 +453,7 @@ if [[ $standalone = y ]] && enabled libopus &&
     [[ -f Makefile ]] && log distclean make distclean
     extracommands=()
     do_separate_confmakeinstall audio "${extracommands[@]}"
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
@@ -461,7 +462,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; 
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
     do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if enabled libmp3lame; then
@@ -482,7 +483,7 @@ if enabled libmp3lame; then
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall audio --disable-decoder \
             "$([[ $standalone = y ]] || echo --disable-frontend)"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -492,7 +493,7 @@ if [[ $ffmpeg != "n" ]] && enabled libgme; then
     if [[ $compile = "true" ]]; then
         do_uninstall include/gme "${_check[@]}"
         do_cmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -510,7 +511,7 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if [[ $sox = y ]] && enabled_all libvorbis libopus libspeex; then
@@ -523,7 +524,7 @@ if [[ $sox = y ]] && enabled_all libvorbis libopus libspeex; then
         [[ -f Makefile ]] && log "distclean" make distclean
         sed -i 's/ examples regtest tests programs//g' Makefile.am
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -548,7 +549,7 @@ if [[ $sox = y ]]; then
             LIBS='-lshlwapi -lz' "${extracommands[@]}"
         do_make
         do_install src/sox.exe bin-audio/
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -587,7 +588,7 @@ if [[ $rtmpdump = "y" ]] ||
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
             CRYPTO="$crypto" LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" VERSION="$_ver"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset crypto pc req
     fi
 fi
@@ -622,7 +623,7 @@ if [[ $vpx != n ]]; then
             do_install vpx{enc,dec}.exe bin-video/
             _check+=(bin-video/vpxdec.exe)
         fi
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset target extracommands
     fi
 else
@@ -640,7 +641,7 @@ if [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; the
         [[ $standalone = y || $other265 = y ]] ||
             sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
         do_separate_confmakeinstall video
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -652,7 +653,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
         do_uninstall include/dvdread "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
         sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
@@ -664,7 +665,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
         do_uninstall include/dvdnav "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -678,7 +679,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libbluray; } ||
         do_uninstall include/libbluray "${_check[@]}"
         do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc,udf} \
             --without-{libxml2,fontconfig,freetype}
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -694,7 +695,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
         extracommands=()
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
         do_separate_confmakeinstall "${extracommands[@]}"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -707,7 +708,7 @@ if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; 
     do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
     do_make libxavs.a
     for _file in xavs.h libxavs.a xavs.pc; do do_install "$_file"; done
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
     _to_remove+=($(pwd))
     unset _file
 fi
@@ -719,7 +720,7 @@ if [[ $mediainfo = "y" ]]; then
         do_uninstall include/curl bin-global/curl{.exe,-config} "${_check[@]}"
         do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
             --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(libzen.{a,pc})
@@ -729,7 +730,7 @@ if [[ $mediainfo = "y" ]]; then
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
         sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' CMakeLists.txt
         do_cmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(libmediainfo.{a,pc})
@@ -741,7 +742,7 @@ if [[ $mediainfo = "y" ]]; then
         sed -i 's|NOT WIN32|UNIX|g' CMakeLists.txt
         do_cmakeinstall
         sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(bin-video/mediainfo.exe)
@@ -755,7 +756,7 @@ if [[ $mediainfo = "y" ]]; then
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
             --enable-staticlibs --enable-silent-rules LIBS="$($PKG_CONFIG --libs libmediainfo)"
         do_makeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -765,7 +766,7 @@ if [[ $ffmpeg != "n" ]] && enabled libvidstab; then
     if [[ $compile = "true" ]]; then
         do_uninstall include/vid.stab "${_check[@]}"
         do_cmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -789,7 +790,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
         --disable-nls --disable-proxy --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
@@ -799,7 +800,7 @@ if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0";
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
     do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
-    do_checkIfExist "${_check[@]}"
+    do_checkIfExist
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled decklink; then
@@ -829,7 +830,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
             do_install "${_check[$count]}"
             let count+=1
         done
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
     unset count
 fi
@@ -849,7 +850,7 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
         do_wget -r -c -h "${_hash[0]}" "$LOCALBUILDDIR/extras/${_check[0]}"
         do_install "${_check[0]}"
-        do_checkIfExist "${_check[0]}"
+        do_checkIfExist
     fi
 fi
 
@@ -861,7 +862,7 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx; then
         do_uninstall include/mfx "${_check[@]}"
         [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -882,7 +883,7 @@ if [[ $mp4box = "y" ]]; then
         do_make
         log "install" make install-lib
         [[ $standalone = y ]] && do_install bin/gcc/MP4Box.exe bin-video/
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -903,7 +904,7 @@ if [[ $x264 != n ]]; then
             do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" --disable-programs \
             --disable-devices --disable-filters --disable-encoders --disable-muxers
             do_makeinstall
-            do_checkIfExist "${_check[@]}"
+            do_checkIfExist
             cd_safe "$LOCALBUILDDIR"/x264-git
         else
             extracommands+=(--disable-lavf --disable-swscale --disable-ffms)
@@ -918,7 +919,7 @@ if [[ $x264 != n ]]; then
                 create_build_dir
                 log configure ../configure --prefix="$LOCALDESTDIR"
                 do_make install-lib
-                do_checkIfExist "${_check[@]}"
+                do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
             # x264 prefers and only uses lsmash if available
@@ -953,7 +954,7 @@ if [[ $x264 != n ]]; then
         CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
         do_make
         do_makeinstall
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset extracommands
     fi
 else
@@ -1045,7 +1046,7 @@ EOF
             do_install x265.exe bin-video/x265-numa.exe
             _check+=(bin-video/x265-numa.exe)
         fi
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset xpsupport assembly cli
     fi
 else
@@ -1149,7 +1150,7 @@ if [[ $ffmpeg != "n" ]]; then
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
             cd_safe ..
         fi
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -1198,7 +1199,7 @@ if [[ $mplayer = "y" ]]; then
         --disable-gif --disable-cddb "${faac[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
         --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
         do_makeinstall &&
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         unset _notrequired
     fi
 fi
@@ -1226,7 +1227,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" lib/pkgconfig/luajit.pc
         do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
         _to_remove+=($(pwd))
     fi
     fi
@@ -1242,7 +1243,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             grep -q "Libs.private" uchardet.pc.in ||
                 sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
             do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
-            do_checkIfExist "${_check[@]}"
+            do_checkIfExist
         fi
     fi
 
@@ -1259,7 +1260,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
             [[ -f libEGL.a ]] && log "clean" make clean
             do_makeinstall PREFIX="$LOCALDESTDIR"
-            do_checkIfExist "${_check[@]}"
+            do_checkIfExist
         fi
     fi
 
@@ -1319,7 +1320,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 > vapoursynth-script.pc
             [[ -f vapoursynth-script.pc ]] && do_install vapoursynth-script.pc
 
-            do_checkIfExist "${_check[@]}"
+            do_checkIfExist
         elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
@@ -1365,7 +1366,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         unhide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz}.a
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
@@ -1379,7 +1380,7 @@ if [[ $bmx = "y" ]]; then
         [[ -f Makefile ]] && log distclean make distclean
         sed -i '/bin_PROGRAMS/ d' Makefile.am
         do_separate_confmakeinstall --disable-test --disable-doc
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
@@ -1390,7 +1391,7 @@ if [[ $bmx = "y" ]]; then
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(libMXF++-1.0.{{,l}a,pc})
@@ -1401,7 +1402,7 @@ if [[ $bmx = "y" ]]; then
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
@@ -1415,7 +1416,7 @@ if [[ $bmx = "y" ]]; then
             include/bmx-0.1 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video
-        do_checkIfExist "${_check[@]}"
+        do_checkIfExist
     fi
 fi
 
