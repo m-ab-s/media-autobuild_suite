@@ -223,8 +223,7 @@ if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     if ! files_exist "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         do_pacman_install opencl-headers
-        [[ -d opencl ]] && rm -rf opencl
-        mkdir opencl && cd_safe opencl
+        create_build_dir opencl
         gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && mv -f libOpenCL.a "$LOCALDESTDIR"/lib/
