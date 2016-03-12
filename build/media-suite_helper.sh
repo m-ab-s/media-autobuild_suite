@@ -45,7 +45,8 @@ do_print_progress() {
 
 cd_safe() {
     cd "$1" ||
-        { do_prompt "Failed changing to directory $1." && exit 1; }
+        { create_diagnostic && zip_logs &&
+            do_prompt "Failed changing to directory $1." && exit 1; }
 }
 
 test_newer() {
