@@ -192,6 +192,17 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     fi
 fi
 
+if [[ $mediainfo = y || $bmx = y ]]; then
+    if do_pkgConfig "libcurl = 7.47.1"; then
+        _check=(curl/curl.h libcurl.{{,l}a,pc})
+        do_wget -h 9ea3123449439bbd960cd25cf98796fb "https://curl.haxx.se/download/curl-7.47.1.tar.bz2"
+        do_uninstall include/curl bin-global/curl{.exe,-config} "${_check[@]}"
+        do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
+            --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
+        do_checkIfExist
+    fi
+fi
+
 if enabled libwebp; then
     do_pacman_install libtiff
     _check=(libwebp{,mux}.{{,l}a,pc})
@@ -713,15 +724,6 @@ if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; 
 fi
 
 if [[ $mediainfo = "y" ]]; then
-    if do_pkgConfig "libcurl = 7.47.1"; then
-        _check=(curl/curl.h libcurl.{{,l}a,pc})
-        do_wget -h 9ea3123449439bbd960cd25cf98796fb "https://curl.haxx.se/download/curl-7.47.1.tar.bz2"
-        do_uninstall include/curl bin-global/curl{.exe,-config} "${_check[@]}"
-        do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
-            --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
-        do_checkIfExist
-    fi
-
     _check=(libzen.{a,pc})
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
@@ -1403,7 +1405,6 @@ if [[ $bmx = "y" ]]; then
     _deps=({liburiparser,libMXF{,++}-1.0}.pc)
     do_vcs http://git.code.sf.net/p/bmxlib/bmx
     if [[ $compile = "true" ]]; then
-        do_patch bmx-0001-configure-no-libcurl.patch am
         do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
