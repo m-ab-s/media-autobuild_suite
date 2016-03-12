@@ -74,28 +74,27 @@ vcs_clone() {
 }
 
 vcs_update() {
-    if [[ "$vcsType" = "svn" ]]; then
+    if [[ $vcsType = svn ]]; then
         oldHead=$(svnversion)
-        svn update -q -r "$ref"
+        svn update -r "$ref"
         newHead=$(svnversion)
-    elif [[ "$vcsType" = "hg" ]]; then
-        hg -q update -C -r "$ref"
+    elif [[ $vcsType = hg ]]; then
+        hg update -C -r "$ref"
         oldHead=$(hg id --id)
-        hg -q pull
-        hg -q update -C -r "$ref"
+        hg pull
+        hg update -C -r "$ref"
         newHead=$(hg id --id)
-    elif [[ "$vcsType" = "git" ]]; then
-        local unshallow=""
+    elif [[ $vcsType = git ]]; then
+        local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
-        [[ "$vcsURL" != "$(git config --get remote.origin.url)" ]] &&
-            git remote set-url origin "$vcsURL"
-        [[ "ab-suite" != "$(git rev-parse --abbrev-ref HEAD)" ]] && git reset -q --hard "@{u}"
-        [[ "$(git config --get remote.origin.fetch)" = "+refs/heads/master:refs/remotes/origin/master" ]] &&
-            git config -q remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-        git checkout -qf --no-track -B ab-suite "$ref"
-        git fetch -qt $unshallow origin
+        git remote set-url origin "$vcsURL"
+        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+        [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
+        git checkout ab-suite
+        git reset --hard "$ref"
+        git fetch -t $unshallow origin
         oldHead=$(git rev-parse HEAD)
-        git checkout -qf --no-track -B ab-suite "$ref"
+        git reset --hard "$ref"
         newHead=$(git rev-parse HEAD)
     fi
 }
