@@ -1126,14 +1126,15 @@ clean_suite() {
         xargs -0 rm -f
     find . -maxdepth 6 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
     find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
-    find . -maxdepth 2 -name "build" -type d -exec test -f "{}/CMakeCache.txt" ';' -print0 |
+    find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
         xargs -0 rm -rf
-    rm -rf ./x265-hg/build/msys/{8,10,12}bit
+    find . -maxdepth 4 -type d -name "*bit" -print0 | xargs -0 rm -rf
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
-    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt
+    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
+        logs.zip
 
     if [[ $deleteSource = y ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
