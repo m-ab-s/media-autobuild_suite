@@ -840,8 +840,10 @@ zip_logs() {
         ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
     url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
+    echo
     if [[ $url ]]; then
-        echo "${green_color}Paste \"[logs.zip]($url)\" in the GitHub issue.${reset_color}"
+        echo "${green_color}All relevant logs have been anonimously uploaded to $url"
+        echo "${green_color}Copy and paste ${red_color}[logs.zip]($url)${green_color} in the GitHub issue.${reset_color}"
     elif [[ -f "$LOCALBUILDDIR/logs.zip" ]]; then
         echo "${green_color}Attach $(cygpath -w "$LOCALBUILDDIR/logs.zip") to the GitHub issue.${reset_color}"
     fi
