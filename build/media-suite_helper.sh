@@ -1142,7 +1142,7 @@ clean_suite() {
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
 
-    if [[ $deleteSource = y ]]; then
+    if [[ $deleteSource = y && -f _to_remove ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
         grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
             grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
