@@ -1238,8 +1238,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             _check+=(bin-global/uchardet.exe)
             do_uninstall "${_check[@]}"
             do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
-            grep -q "Libs.private" uchardet.pc.in ||
-                sed -i "/Cflags:/ i\Libs.private: -lstdc++" uchardet.pc.in
             do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-global
             do_checkIfExist
         fi

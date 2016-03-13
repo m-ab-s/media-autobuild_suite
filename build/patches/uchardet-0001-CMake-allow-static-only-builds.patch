@@ -1,4 +1,4 @@
-From af8024fdcbc399fd40d665beba9df374e5432456 Mon Sep 17 00:00:00 2001
+From bc6685fd8351cd34312c2167b6f97255534ac9f3 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sat, 21 Nov 2015 23:31:19 +0000
 Subject: [PATCH] CMake: allow static-only builds
@@ -8,7 +8,8 @@ Subject: [PATCH] CMake: allow static-only builds
  src/CMakeLists.txt       | 8 ++++++++
  src/tools/CMakeLists.txt | 7 +++++++
  test/CMakeLists.txt      | 8 +++++++-
- 4 files changed, 28 insertions(+), 1 deletion(-)
+ uchardet.pc.in           | 1 +
+ 5 files changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 4f279e1..9d6d6ee 100644
@@ -35,10 +36,10 @@ index 4f279e1..9d6d6ee 100644
  configure_file(
  	uchardet.pc.in
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 901ce18..d810786 100644
+index 39f460c..e072f25 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -51,11 +51,13 @@ add_definitions(
+@@ -52,11 +52,13 @@ add_definitions(
  	-Wall
  )
  
@@ -52,7 +53,7 @@ index 901ce18..d810786 100644
  
  if (BUILD_STATIC)
      add_library(
-@@ -65,6 +67,7 @@ if (BUILD_STATIC)
+@@ -66,6 +68,7 @@ if (BUILD_STATIC)
      )
  endif (BUILD_STATIC)
  
@@ -60,7 +61,7 @@ index 901ce18..d810786 100644
  set_target_properties(
  	${UCHARDET_TARGET}
  	PROPERTIES
-@@ -77,6 +80,7 @@ set_target_properties(
+@@ -78,6 +81,7 @@ set_target_properties(
  		SOVERSION
  			0
  )
@@ -68,7 +69,7 @@ index 901ce18..d810786 100644
  
  if (BUILD_STATIC)
      set_target_properties(
-@@ -96,6 +100,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
+@@ -97,6 +101,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
  	)
  endif (CMAKE_BUILD_TYPE MATCHES Debug)
  
@@ -76,7 +77,7 @@ index 901ce18..d810786 100644
  if (NOT WIN32)
  install(
  	TARGETS
-@@ -113,6 +118,7 @@ install(
+@@ -114,6 +119,7 @@ install(
  		${DIR_LIBRARY}
  )
  endif (NOT WIN32)
@@ -84,7 +85,7 @@ index 901ce18..d810786 100644
  
  if (BUILD_STATIC)
      install(
-@@ -130,6 +136,8 @@ install(
+@@ -131,6 +137,8 @@ install(
  		${DIR_INCLUDE}/uchardet
  )
  
@@ -138,6 +139,16 @@ index a36a739..087314c 100644
  
  set_target_properties(
  	uchardet-tests
+diff --git a/uchardet.pc.in b/uchardet.pc.in
+index 660a401..8f646fd 100644
+--- a/uchardet.pc.in
++++ b/uchardet.pc.in
+@@ -8,4 +8,5 @@ Description: An encoding detector library ported from Mozilla
+ Version: @UCHARDET_VERSION@
+ Requires:
+ Libs: -L${libdir} -luchardet
++Libs.private: -lstdc++
+ Cflags: -I${includedir}/uchardet
 -- 
-2.6.3
+2.7.2
 
