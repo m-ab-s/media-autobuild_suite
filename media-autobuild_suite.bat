@@ -31,11 +31,24 @@ if not exist %instdir% (
     echo -------------------------------------------------------------------------------
     echo. You have probably run the script in a path with spaces.
     echo. This is not supported.
-    echo. Please move the script to use a path without spaces. Ex.:
+    echo. Please move the script to use a path without spaces. Example:
     echo. Incorrect: C:\build suite\
     echo. Correct:   C:\build_suite\
     pause
     exit
+    )
+
+if not ["%CD:~60,1%"]==[""] (
+    echo -------------------------------------------------------------------------------
+    echo. The total filepath to the suite seems too large (larger than 67 characters^):
+    echo. %CD%
+    echo. Some packages will fail building because of it.
+    echo. Please move the suite directory closer to the root of your drive and maybe
+    echo. rename the suite directory to a smaller name. Examples:
+    echo. Avoid:  C:\Users\Administrator\Desktop\testing\media-autobuild_suite-master
+    echo. Prefer: C:\media-autobuild_suite
+    echo. Prefer: C:\ab-suite
+    pause
     )
 
 set build=%instdir%\build
@@ -839,7 +852,7 @@ if exist %build%\msys2-base.tar.xz (
     %build%\7za.exe x msys2-base.tar.xz -so | %build%\7za.exe x -aoa -si -ttar -o..
     del %build%\msys2-base.tar.xz
     )
-    
+
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo -------------------------------------------------------------------------------
     echo.
