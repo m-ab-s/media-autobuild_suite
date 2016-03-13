@@ -36,7 +36,7 @@ do_print_status() {
 
 do_print_progress() {
     if [[ $logging != n ]]; then
-        echo "├ $*..."
+        [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
     else
         echo -e "\e]0;$* in $(get_first_subdir)\007"
         echo -e "${bold_color}$* in $(get_first_subdir)${reset_color}"
@@ -146,7 +146,8 @@ do_vcs() {
 
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
-        log "$vcsType clone" vcs_clone
+        do_print_progress "  Running $vcsType clone for $vcsFolder"
+        log quiet "$vcsType.clone" vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
             touch recently_updated
@@ -159,7 +160,8 @@ do_vcs() {
     else
         cd_safe "$vcsFolder-$vcsType"
     fi
-    log "$vcsType update" vcs_update
+    do_print_progress "  Running $vcsType update for $vcsFolder"
+    log quiet "$vcsType.update" vcs_update
     compile="true"
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
@@ -847,11 +849,12 @@ zip_logs() {
 }
 
 log() {
+    [[ $1 = quiet ]] && local quiet=y && shift
     local name="${1// /.}"
     local cmd="$2"
     shift 2
     local extra
-    do_print_progress Running "$name"
+    [[ $quiet ]] || do_print_progress Running "$name"
     [[ $cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging != "n" ]]; then
         echo "$cmd $@" > "ab-suite.$name.log"
