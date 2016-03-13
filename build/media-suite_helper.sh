@@ -804,8 +804,10 @@ do_patch() {
 }
 
 do_cmakeinstall() {
+    local root=".."
     create_build_dir
-    log "cmake" cmake .. -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
+    [[ $1 && -d "../$1" ]] && root="../$1" && shift
+    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on "$@"
     log "install" ninja install
 }
 

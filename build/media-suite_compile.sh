@@ -727,10 +727,9 @@ if [[ $mediainfo = "y" ]]; then
     _check=(libzen.{a,pc})
     do_vcs "https://github.com/MediaArea/ZenLib" libzen
     if [[ $compile = "true" ]]; then
-        cd_safe Project/CMake
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
-        sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' CMakeLists.txt
-        do_cmakeinstall
+        sed -i -e 's|NOT SIZE_T_IS_NOT_LONG|false|' -e 's|NOT WIN32|UNIX|' Project/CMake/CMakeLists.txt
+        do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
 
@@ -738,10 +737,9 @@ if [[ $mediainfo = "y" ]]; then
     _deps=(libzen.pc)
     do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo
     if [[ $compile = "true" ]]; then
-        cd_safe Project/CMake
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
-        sed -i 's|NOT WIN32|UNIX|g' CMakeLists.txt
-        do_cmakeinstall
+        sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
+        do_cmakeinstall Project/CMake
         sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist
     fi
