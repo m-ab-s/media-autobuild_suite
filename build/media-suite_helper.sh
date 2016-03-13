@@ -1134,11 +1134,10 @@ clean_suite() {
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
         xargs -0 rm -f
-    find . -maxdepth 6 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
+    find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
     find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
     find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
         xargs -0 rm -rf
-    find . -maxdepth 4 -type d -name "*bit" -print0 | xargs -0 rm -rf
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog

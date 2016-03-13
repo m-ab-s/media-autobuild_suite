@@ -753,7 +753,7 @@ if [[ $mediainfo = "y" ]]; then
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
-            --enable-staticlibs --enable-silent-rules LIBS="$($PKG_CONFIG --libs libmediainfo)"
+            --enable-staticlibs LIBS="$($PKG_CONFIG --libs libmediainfo)"
         do_makeinstall
         do_checkIfExist
     fi
@@ -971,21 +971,21 @@ if [[ ! $x265 = "n" ]]; then
         [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
         build_x265() {
-        cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys
-        rm -rf {8,10,12}bit
+            create_build_dir
+            local build_root="$(pwd)"
+            mkdir -p {8,10,12}bit
 
         do_x265_cmake() {
-            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)"/source -G Ninja \
-            -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR"/bin-video \
+            log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
+            -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
             -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
             $xpsupport "$@"
             log "ninja" ninja -j "${cpuCount:-1}"
         }
-        mkdir -p {8,10,12}bit
         [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
         if [[ $x265 != o* ]]; then
-            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/12bit
+            cd_safe "$build_root/12bit"
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 12-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
@@ -999,7 +999,7 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         if [[ $x265 != o8 ]]; then
-            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/10bit
+            cd_safe "$build_root/10bit"
             if [[ $x265 = s ]]; then
                 do_print_progress "Building shared 10-bit lib"
                 do_x265_cmake $assembly -DENABLE_SHARED=ON
@@ -1016,7 +1016,7 @@ if [[ ! $x265 = "n" ]]; then
         fi
 
         if [[ $x265 != o10 ]]; then
-            cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"/build/msys/8bit
+            cd_safe "$build_root/8bit"
             if [[ $x265 = s || $x265 = o8 ]]; then
                 do_print_progress "Building 8-bit lib/bin"
                 do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
