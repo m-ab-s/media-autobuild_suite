@@ -273,10 +273,10 @@ do_wget() {
     else
         [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
-    [[ $norm ]] || _to_remove+=("$(pwd)/$archive")
+    [[ $norm ]] || add_to_remove "$(pwd)/$archive"
     [[ $nocd ]] && do_extract nocd "$archive" "$dirName" ||
         do_extract "$archive" "$dirName"
-    [[ ! $norm && $dirName && ! $nocd ]] && _to_remove+=("$(pwd)")
+    [[ ! $norm && $dirName && ! $nocd ]] && add_to_remove
 }
 
 real_extract() {
@@ -1118,6 +1118,11 @@ unhide_files() {
     hide_files -R "$@"
 }
 
+add_to_remove() {
+    [[ $1 ]] && echo "$1" >> "$LOCALBUILDDIR/_to_remove" ||
+        echo "$(pwd)" >> "$LOCALBUILDDIR/_to_remove"
+}
+
 clean_suite() {
     echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
@@ -1133,18 +1138,14 @@ clean_suite() {
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
-    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
-        logs.zip
 
     if [[ $deleteSource = y ]]; then
         echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
-        printf '%s\n' "${_to_remove[@]}" | grep "^$LOCALBUILDDIR/" |
+        grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
             grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
-        find "$LOCALBUILDDIR" -mindepth 1 -maxdepth 1 -type d \
-            ! -regex ".*\(-\(git\|hg\|svn\)\|extras\|patches\)\$" -print0 |
-            xargs -0 -r rm -rf
-        unset _to_remove
     fi
+    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
+        logs.zip _to_remove
 }
 
 create_diagnostic() {

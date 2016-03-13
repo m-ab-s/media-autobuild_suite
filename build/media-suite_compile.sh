@@ -292,7 +292,7 @@ if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
     do_checkIfExist
-    _to_remove+=($(pwd))
+    add_to_remove
 fi
 
 if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
@@ -449,7 +449,7 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}"; t
     do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
         --disable-vcut --disable-ogginfo "${extracommands[@]}"
     do_checkIfExist
-    _to_remove+=($(pwd))
+    add_to_remove
 fi
 
 _check=(bin-audio/opusenc.exe)
@@ -719,7 +719,7 @@ if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; 
     do_make libxavs.a
     for _file in xavs.h libxavs.a xavs.pc; do do_install "$_file"; done
     do_checkIfExist
-    _to_remove+=($(pwd))
+    add_to_remove
     unset _file
 fi
 
@@ -869,7 +869,7 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled libcdio; then
     [[ -d "$LOCALBUILDDIR/libcdio_paranoia-git" ]] &&
-        _to_remove+=("$LOCALBUILDDIR/libcdio_paranoia-git")
+        add_to_remove "$LOCALBUILDDIR/libcdio_paranoia-git"
     do_uninstall q include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
     do_pacman_install libcddb libcdio libcdio-paranoia
 fi
@@ -1073,7 +1073,7 @@ if [[ $ffmpeg != "n" ]]; then
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
     enabled libdcadec && do_pacman_remove dcadec-git && do_pacman_install dcadec
-    [[ -d "$LOCALBUILDDIR/dcadec-git" ]] && _to_remove+=("$LOCALBUILDDIR/dcadec-git")
+    [[ -d "$LOCALBUILDDIR/dcadec-git" ]] && add_to_remove "$LOCALBUILDDIR/dcadec-git"
     do_uninstall q include/libdcadec libdcadec.a dcadec.pc
 
     do_hide_all_sharedlibs
@@ -1204,7 +1204,7 @@ fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     [[ -d $LOCALBUILDDIR/waio-git ]] && do_uninstall include/waio libwaio.a &&
-        _to_remove+=("$LOCALBUILDDIR/waio-git")
+        add_to_remove "$LOCALBUILDDIR/waio-git"
 
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
@@ -1226,7 +1226,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" lib/pkgconfig/luajit.pc
         do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
         do_checkIfExist
-        _to_remove+=($(pwd))
+        add_to_remove
     fi
     fi
 
@@ -1433,7 +1433,6 @@ run_builds() {
 }
 
 cd_safe "$LOCALBUILDDIR"
-unset _to_remove
 run_builds
 
 while [[ $new_updates = "yes" ]]; do
