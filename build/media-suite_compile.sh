@@ -1241,10 +1241,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_vcs "https://github.com/BYVoid/uchardet.git"
         if [[ $compile = "true" ]]; then
             do_uninstall "${_check[@]}"
-            do_patch "uchardet-0001-CMake-allow-static-only-builds.patch" am
-            do_patch "uchardet-0002-CMake-Allow-not-building-executable.patch" am
+            do_patch "uchardet-0001-CMake-allow-installing-binary-to-non-default-dir.patch" am
+            do_patch "uchardet-0002-CMake-fix-linking-with-Ninja.patch" am
+            do_patch "uchardet-0003-CMake-Allow-building-static-only-builds.patch" am
+            do_patch "uchardet-0004-CMake-Allow-not-building-executable.patch" am
             do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
-                $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
+                -DCMAKE_BUILD_TYPE=Release $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
             do_checkIfExist
         fi
     fi
