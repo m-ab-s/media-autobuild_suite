@@ -973,6 +973,7 @@ if [[ ! $x265 = "n" ]]; then
     if [[ $compile = "true" ]]; then
         do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
         do_patch x265-fix-git-describe.diff
+        do_patch x265-fix-95bcd37.diff
         [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
         [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
