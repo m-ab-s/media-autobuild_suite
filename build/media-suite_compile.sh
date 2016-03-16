@@ -935,8 +935,8 @@ if [[ $x264 != n ]]; then
         else
             extracommands+=(--disable-gpac --disable-cli)
         fi
-        do_print_progress "Building 10-bit x264"
         if [[ $standalone = y && $x264 != h ]]; then
+            do_print_progress "Building 10-bit x264"
             _check+=(bin-video/x264-10bit.exe)
             do_uninstall "${_check[@]}"
             create_build_dir
@@ -947,7 +947,11 @@ if [[ $x264 != n ]]; then
             do_print_progress "Building 8-bit x264"
         else
             do_uninstall "${_check[@]}"
-            [[ $x264 = h ]] && extracommands+=(--bit-depth=10)
+            if [[ $x264 = h ]]; then
+                extracommands+=(--bit-depth=10) && do_print_progress "Building 10-bit x264"
+            else
+                do_print_progress "Building 8-bit x264"
+            fi
         fi
         create_build_dir
         CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
