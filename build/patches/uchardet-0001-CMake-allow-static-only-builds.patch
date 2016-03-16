@@ -1,7 +1,7 @@
-From bc6685fd8351cd34312c2167b6f97255534ac9f3 Mon Sep 17 00:00:00 2001
+From cf6a908c1a3e9bededee61ee6630def4a3311c10 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Sat, 21 Nov 2015 23:31:19 +0000
-Subject: [PATCH] CMake: allow static-only builds
+Subject: [PATCH 1/2] CMake: allow static-only builds
 
 ---
  CMakeLists.txt           | 6 ++++++
@@ -150,5 +150,5 @@ index 660a401..8f646fd 100644
 +Libs.private: -lstdc++
  Cflags: -I${includedir}/uchardet
 -- 
-2.7.2
+2.7.3
 

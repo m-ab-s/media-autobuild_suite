@@ -1,0 +1,37 @@
+From fdfa657d7f337b34e87a72f657d3731b1b2104b9 Mon Sep 17 00:00:00 2001
+From: "Ricardo Constantino (:RiCON)" <wiiaboo@gmail.com>
+Date: Wed, 16 Mar 2016 01:28:18 +0000
+Subject: [PATCH 2/2] CMake: Allow not building executable
+
+---
+ CMakeLists.txt     | 2 ++
+ src/CMakeLists.txt | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9d6d6ee..6127612 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -67,6 +67,8 @@ option(BUILD_STATIC "Build static library"
+        ON)
+ option(BUILD_SHARED_LIBS "Build shared library and link executables against it"
+ 	   ON)
++option(BUILD_BINARY "Build executable"
++	   ON)
+ 
+ configure_file(
+ 	uchardet.pc.in
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e072f25..88a9966 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -141,4 +141,6 @@ if (BUILD_SHARED_LIBS)
+ include(symbols.cmake)
+ endif (BUILD_SHARED_LIBS)
+ 
++if (BUILD_BINARY)
+ add_subdirectory(tools)
++endif (BUILD_BINARY)
+-- 
+2.7.3
+
