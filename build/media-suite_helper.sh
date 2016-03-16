@@ -1154,7 +1154,8 @@ clean_suite() {
 
 create_diagnostic() {
     local cmd cmds=("uname -a" "pacman -Qe" "pacman -Qd")
-    [[ -d /trunk/.git ]] && cmds+=("git log -1 --pretty=%h")
+    do_print_progress "  Creating diagnostics file"
+    [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
     rm -f "$LOCALBUILDDIR/diagnostics.txt"
     for cmd in "${cmds[@]}"; do
         printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >>"$LOCALBUILDDIR/diagnostics.txt"
