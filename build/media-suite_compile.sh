@@ -195,8 +195,10 @@ fi
 if [[ $mediainfo = y || $bmx = y ]]; then
     if do_pkgConfig "libcurl = 7.47.1"; then
         _check=(curl/curl.h libcurl.{{,l}a,pc})
+        [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
         do_wget -h 9ea3123449439bbd960cd25cf98796fb "https://curl.haxx.se/download/curl-7.47.1.tar.bz2"
-        do_uninstall include/curl bin-global/curl{.exe,-config} "${_check[@]}"
+        do_uninstall include/curl bin-global/curl-config "${_check[@]}"
+        [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
         do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
             --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
         do_checkIfExist
