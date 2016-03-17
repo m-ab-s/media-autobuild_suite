@@ -1,30 +1,26 @@
-From cf4a601f810950c8b8a200a00853a3d1a305796c Mon Sep 17 00:00:00 2001
+From ed78b16ce4feed22d04baa47a0ce9353c5de7ff0 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
-Subject: [PATCH 3/3] Add makefile and pkgconfig file for ANGLE
+Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
 
 Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
 
-Update to fb57c04
-
-- Get commit hash from origin/master instead of HEAD to ignore patches
-- Add GL renderer
-- Add ESSL/GLSL compilers
+Update to 00f394e
 ---
- Makefile     | 403 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 402 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 413 insertions(+)
+ 2 files changed, 412 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..dac03f3
+index 0000000..33f5cd2
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,403 @@
+@@ -0,0 +1,402 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -275,7 +271,6 @@ index 0000000..dac03f3
 +	src/libANGLE/renderer/d3d/d3d11/TextureStorage11.o \
 +	src/libANGLE/renderer/d3d/d3d11/Trim11.o \
 +	src/libANGLE/renderer/d3d/d3d11/texture_format_table_autogen.o \
-+	src/libANGLE/renderer/d3d/d3d11/VertexArray11.o \
 +	src/libANGLE/renderer/d3d/d3d11/VertexBuffer11.o
 +libangle_d3d11_win32_sources = \
 +	src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow.o \
@@ -445,5 +440,5 @@ index 0000000..b9ec3c2
 +Libs.private: -lGLESv2 -ldxguid -ld3d9 -lopengl32 -lgdi32 -lstdc++
 +Cflags: %CFLAGS%
 -- 
-2.7.2
+2.7.3
 
