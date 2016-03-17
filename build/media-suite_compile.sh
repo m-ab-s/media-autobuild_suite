@@ -1205,8 +1205,6 @@ if [[ $mplayer = "y" ]]; then
 
         grep -q "windows" libmpcodecs/ad_spdif.c ||
             sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
-        grep -q MEDIACODEC configure ||
-            sed -i "s/H264_MMAL'/H264_MMAL H264_MEDIACODEC'/" configure
 
         _notrequired="true"
         do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
