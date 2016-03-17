@@ -9,8 +9,8 @@ Most git sources in the suite use GitHub, so if it's down, it's probably useless
 Known Issues
 --------
  - `error: GPGME error: Invalid crypto engine`
- 	- probably rare bug with Win7 64-bits, use msys32 instead of msys64
- 	- Check #252 for more information
+    - probably rare bug with Win7 64-bits, use msys32 instead of msys64
+    - Check #252 for more information
 
 Download
 --------
@@ -26,95 +26,95 @@ Included Tools And Libraries
 ### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/FFmpeg-external-libraries)
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
-	- decklink (10.6)
-	- fontconfig (2.11.94)
-	- freetype (2.6.3)
-	- frei0r (1.4)
-	- fribidi (0.19.7)
-	- SChannel, gnutls (3.4.x), or openssl
-		- SChannel used by default
-		- If `--enable-openssl` and license is LGPL or nonfree, openssl is preferred
-	- harfbuzz (1.2.3)
-	- libass (git) (with directwrite backend)
-		- to also include Fontconfig backend, add --enable-fontconfig in ffmpeg_options.txt
-	- libbs2b (3.1.0)
-	- libbluray (git)
-	- libcaca
-	- libcdio-paranoia
-	- libdcadec
-		- Not compiled by default
-	- libfaac (1.28)
-		- Not compiled by default
-	- libfdk-aac (git)
-		- Not compiled by default
-	- libgsm
-	- libilbc (git)
-	- libkvazaar (git)
-	- libmfx (git)
-	- libmodplug
-	- libmp3lame (3.99.5)
-	- libopencl
-		- Not compiled by default
-	- libopencore-amrwb/nb
-	- libopenjpeg2 (git)
-		- Not compiled by default
-	- libopus (1.1.2)
-	- librtmp (git)
-		- Not compiled by default
-	- librubberband (git)
-	- libschroedinger
-	- libsnappy
-		- Not compiled by default
-	- libsoxr (0.1.1)
-	- libspeex (1.2rc2)
-	- libssh
-		- Not compiled by default
-	- libtesseract (git)
-	- libtheora
-	- libtwolame (git)
-	- libvo-amrwbenc (0.1.2)
-	- libvorbis
-	- libvpx (git)
-	- libwavpack
-		- Not compiled by default
-	- libwebp (git) (needed for webp encoding)
-	- libx264 (git)
-	- libx265 (hg)
-	- libxavs (svn snapshot)
-	- libxvid
-	- libzimg (git)
-	- libzvbi (0.2.35)
-	- nvenc (6.0.1)
-	- sdl (1.2.15)
-	- vidstab (git)
-	
+    - Light build:
+        - avisynth
+        - libmp3lame (3.99.5)
+        - libopus (1.1.2)
+        - libvorbis (mingw)
+        - libvpx (git)
+        - libx264 (git)
+        - libx265 (hg)
+        - schannel with libgcrypt
+            - enabled by default if openssl or gnutls aren't enabled
+            - libgcrypt can be switched by gmp with --enable-gmp
+        - sdl (mingw)
+            - enabled by default, use --disable-sdl or --disable-ffplay if unwanted
+    - Zeranoe-emulating build (in addition to Light)
+        - decklink (10.6)
+        - fontconfig (2.11.94)
+        - frei0r (1.4)
+        - gnutls (latest release)
+        - libressl (latest release)
+            - preferred instead of gnutls if both are in options and license is not GPL
+        - libass (git)
+            - by default with DirectWrite backend
+            - if --enable-fontconfig or XP support required, fontconfig backend included
+        - libbluray (git)
+        - libbs2b (3.1.0)
+        - libcaca (mingw)
+        - libdcadec (mingw)
+        - libfreetype (2.6.3)
+        - libfribidi (0.19.7)
+        - libgme (git)
+        - libgsm (mingw)
+        - libilbc (git)
+        - libmfx (git)
+        - libmodplug (mingw)
+        - libopencore-amr(nb/wb) (mingw)
+        - libopenjpeg2 (git)
+        - librtmp (git)
+            - compiled with gnutls or openssl depending on license chosen
+        - libschroedinger (mingw)
+        - libsoxr (git)
+        - libspeex (1.2rc2)
+        - libtheora (mingw)
+        - libtwolame (mingw)
+        - libvidstab (git)
+        - libvo-amrwbenc (0.1.2)
+        - libwavpack (mingw)
+        - libwebp (git)
+        - libxavs (svn snapshot)
+        - libxvid (mingw)
+        - libzimg (git)
+    - Full build (in addition to Zeranoe)
+        - libcdio (mingw)
+        - libfaac (1.28)
+        - libfdk-aac (git)
+        - libkvazaar (git)
+        - librubberband (git snapshot)
+        - libsnappy (mingw)
+        - libssh (mingw)
+        - libtesseract (git)
+        - libzvbi (0.2.35)
+        - nvenc (6.0.1)
+        - opencl (from system)
+        - opengl (from system)
+
  - other tools
- 	- bmx (git)
+    - bmx (git)
     - faac (1.28)
-	- fdk-aac (git)
-	- file (5.22)
-	- flac (1.3.1)
-	- kvazaar (git)
-	- lame (3.99.5)
-	- LibreSSL (drop-in replacement for OpenSSL)
-	- mediainfo cli (git)
-	- mp4box (git)
-	- mplayer (svn)
-	- mpv (git) including in addition to ffmpeg libs:
-		- uchardet
-		- ANGLE (git snapshot)
-		- luajit (git)
-		- vapoursynth (if installed)
-	- opus-tools (0.1.9)
-	- rtmpdump (git)
-	- speex (1.2rc2)
-	- sox (git)
-	- tesseract (git)
-	- vorbis-tools (1.4.0)
-	- vpx (VP8, VP9 and VP10 8, 10 and 12 bit) (git)
-	- webp tools (git)
-	- x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
-	- x265 (8, 10 and 12 bit) (git)
+    - fdk-aac (git)
+    - flac (1.3.1)
+    - kvazaar (git)
+    - lame (3.99.5)
+    - mediainfo cli (git)
+    - mp4box (git)
+    - mplayer (svn)
+    - mpv (git) including in addition to ffmpeg libs:
+        - uchardet
+        - ANGLE (git snapshot)
+        - luajit (git)
+        - vapoursynth (if installed)
+    - opus-tools (0.1.9)
+    - rtmpdump (git)
+    - speex (1.2rc2)
+    - sox (git)
+    - tesseract (git)
+    - vorbis-tools (1.4.0)
+    - vpx (VP8, VP9 and VP10 8, 10 and 12 bit) (git)
+    - webp tools (git)
+    - x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
+    - x265 (8, 10 and 12 bit) (git)
 
 
 --------
@@ -173,13 +173,13 @@ What The Individual Files Do
 
 media-autobuild_suite.bat
  - This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
-	
+
 /build/media-autobuild_suite.ini
  - This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
-	
+
 /build/media-suite_compile.sh
  - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
-	
+
 /build/media-suite_update.sh
  - This script runs every time you run the batch file. It checks for updates to the MinGW environment.
 
@@ -196,5 +196,3 @@ References
 http://ingar.satgnu.net/devenv/mingw32/base.html
 
 http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
-
-[1]: https://github.com/rdp/ffmpeg-windows-build-helpers/commit/c48af053657e174e270249e4b28a83c35897e320
