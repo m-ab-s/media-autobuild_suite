@@ -112,10 +112,10 @@ Included Tools And Libraries
     - sox (git)
     - tesseract (git)
     - vorbis-tools (1.4.0)
-    - vpx (VP8, VP9 and VP10 8, 10 and 12 bit) (git)
+    - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
-    - x265 (8, 10 and 12 bit) (git)
+    - x265 (8, 10 and 12 bit) (hg)
 
 
 --------
