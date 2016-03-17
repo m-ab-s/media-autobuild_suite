@@ -317,7 +317,6 @@ if [[ $ffmpeg != n ]] && enabled chromaprint; then
     do_vcs "https://bitbucket.org/acoustid/chromaprint.git" libchromaprint
     if [[ $compile = "true" ]]; then
         do_uninstall "${_check[@]}"
-        sed -i "/Libs:.*/ a\Libs.private: -lfftw3 -lm -lstdc++" libchromaprint.pc.cmake
         do_cmakeinstall -DWITH_FFTW3=on
         do_checkIfExist
     fi
