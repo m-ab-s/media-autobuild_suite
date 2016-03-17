@@ -271,15 +271,13 @@ if enabled libtesseract; then
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
+            do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
-            pushd "$LOCALDESTDIR"/bin-global/tessdata > /dev/null
-            do_wget -c -r -h 59a99c829aa385ae8cde35775e32e57f \
-                "https://github.com/tesseract-ocr/tessdata/raw/master/eng.traineddata"
+            do_install "$MINGW_PREFIX/share/tessdata/eng.traineddata" bin-global/tessdata/
             printf "%s\n" "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata/blob/master/"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
-                    > need_more_languages.txt
-            popd > /dev/null
+                    > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
         do_checkIfExist
         unset opencl
