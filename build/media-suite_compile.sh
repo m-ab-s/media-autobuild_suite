@@ -265,8 +265,7 @@ if enabled libtesseract; then
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        enabled opencl && opencl="-lOpenCL" || opencl=""
-        sed -i "s|@OPENCL_LIB@|$opencl -lstdc++|" tesseract.pc.in
+        sed -i "s|Libs.private.*|& -lstdc++|" tesseract.pc.in
         do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
@@ -280,7 +279,6 @@ if enabled libtesseract; then
                     > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
         do_checkIfExist
-        unset opencl
     fi
 fi
 
