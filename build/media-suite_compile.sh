@@ -310,6 +310,20 @@ if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
         do_checkIfExist
     fi
 fi
+
+if [[ $ffmpeg != n ]] && enabled chromaprint; then
+    do_pacman_install fftw
+    _check=(libchromaprint.{a,pc} chromaprint.h)
+    do_vcs "https://bitbucket.org/acoustid/chromaprint.git" libchromaprint
+    if [[ $compile = "true" ]]; then
+        do_uninstall "${_check[@]}"
+        sed -i "/Libs:.*/ a\Libs.private: -lfftw3 -lm -lstdc++" libchromaprint.pc.cmake
+        do_cmakeinstall -DWITH_FFTW3=on
+        do_checkIfExist
+    fi
+    do_addOption --extra-libs=-lfftw3 --extra-libs=-lstdc++ --extra-cflags=-DCHROMAPRINT_NODLL
+fi
+
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 
 if [[ $ffmpeg != "n" ]] && enabled libilbc; then
