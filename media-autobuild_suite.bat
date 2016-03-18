@@ -842,11 +842,10 @@ if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
     echo.
     echo -------------------------------------------------------------------------------
     if %msys2%==msys32 (
-    set "msysprefix=i686"
-    ) else set "msysprefix=x86_64"
-    set "msysversion=20150916"
-    wget --no-check-certificate --tries=20 --retry-connrefused --waitretry=2 -c -O msys2-base.tar.xz ^
-    "http://download.sourceforge.net/project/msys2/Base/%msysprefix%/msys2-base-%msysprefix%-%msysversion%.tar.xz"
+        set "msysprefix=i686"
+        ) else set "msysprefix=x86_64"
+    wget --tries=5 --retry-connrefused --waitretry=5 --continue -O msys2-base.tar.xz ^
+    "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz"
     
 :unpack
 if exist %build%\msys2-base.tar.xz (
@@ -859,7 +858,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo.
     echo.- Download msys2 basic system failed,
     echo.- please download it manually from:
-    echo.- http://downloads.sourceforge.net/project/msys2
+    echo.- http://repo.msys2.org/distrib/
     echo.- and copy the uncompressed folder to:
     echo.- %build%
     echo.- and start the batch script again!
