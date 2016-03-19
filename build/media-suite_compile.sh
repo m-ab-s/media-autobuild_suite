@@ -1103,11 +1103,11 @@ if [[ $ffmpeg != "n" ]]; then
         _deps=({libass,x264,x265,vpx}.pc)
     do_vcs "https://git.videolan.org/git/ffmpeg.git"
     if [[ $compile = "true" ]]; then
-        do_changeFFmpegConfig "$license"
         _patches=0
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
-        [[ $_patches -gt 0 ]] && _patches=g"$(git rev-parse --short "HEAD~${_patches}")" ||
-            _patches=""
+        [[ $_patches -gt 0 ]] &&
+            do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
+        do_changeFFmpegConfig "$license"
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
@@ -1124,8 +1124,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             create_build_dir shared
             log configure ../configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
-                --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}" \
-                --extra-version="$_patches"
+                --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
@@ -1156,7 +1155,7 @@ if [[ $ffmpeg != "n" ]]; then
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
             log configure ../configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video \
-                "${FFMPEG_OPTS[@]}" --extra-version="$_patches"
+                "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
