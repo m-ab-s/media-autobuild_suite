@@ -839,7 +839,7 @@ zip_logs() {
     rm -f logs.zip
     7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
         ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
-    url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
+    [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
     echo
     if [[ $url ]]; then
