@@ -1097,6 +1097,7 @@ if [[ $ffmpeg != "n" ]]; then
         _check=(bin-video/ffmpegSHARED)
     else
         _check=(libavutil.{a,pc})
+        disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
     fi
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=({libass,x264,x265,vpx}.pc)
