@@ -1134,22 +1134,27 @@ clean_suite() {
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
         xargs -0 rm -f
-    find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
-    find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
-    find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
-        xargs -0 rm -rf
+
+    if [[ $deleteSource = y ]]; then
+        echo -e "\t${orange_color}Deleting temporary build dirs...${reset_color}"
+        find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
+        find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
+        find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
+            xargs -0 rm -rf
+
+        if [[ -f _to_remove ]]; then
+            echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
+            grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
+                grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
+        fi
+    fi
+
+    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
+        logs.zip _to_remove
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
-
-    if [[ $deleteSource = y && -f _to_remove ]]; then
-        echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
-        grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
-            grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
-    fi
-    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
-        logs.zip _to_remove
 }
 
 create_diagnostic() {
