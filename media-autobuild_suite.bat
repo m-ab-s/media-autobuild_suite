@@ -1301,12 +1301,9 @@ if %build32%==yes (
             echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
-            echo.PYTHONHOME=/usr
-            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
-            echo.
             echo.LANG=en_US.UTF-8
-            echo.PATH="${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${PATH}"
+            echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
+            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
@@ -1360,12 +1357,9 @@ if %build64%==yes (
             echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
-            echo.PYTHONHOME=/usr
-            echo.PYTHONPATH="/usr/lib/python2.7:/usr/lib/python2.7/Tools/Scripts"
-            echo.
             echo.LANG=en_US.UTF-8
-            echo.PATH="${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PYTHONHOME}:${PYTHONPATH}:${PATH}"
-            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${PATH}"
+            echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
+            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
             echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
             echo.HOME="/home/${USERNAME}"
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
