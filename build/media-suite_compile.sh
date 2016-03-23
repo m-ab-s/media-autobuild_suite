@@ -193,10 +193,10 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
 fi
 
 if [[ $mediainfo = y || $bmx = y ]]; then
-    if do_pkgConfig "libcurl = 7.47.1"; then
+    if do_pkgConfig "libcurl = 7.48.0"; then
         _check=(curl/curl.h libcurl.{{,l}a,pc})
         [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
-        do_wget -h 9ea3123449439bbd960cd25cf98796fb "https://curl.haxx.se/download/curl-7.47.1.tar.bz2"
+        do_wget -h d42e0fc34a5cace5739631cc040974fe "https://curl.haxx.se/download/curl-7.48.0.tar.bz2"
         do_uninstall include/curl bin-global/curl-config "${_check[@]}"
         [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
         do_separate_confmakeinstall global --without-{ssl,gnutls,ca-bundle,ca-path,random,libidn,libssh2} \
