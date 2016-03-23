@@ -1392,7 +1392,6 @@ if [[ $bmx = "y" ]]; then
     _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
     do_vcs http://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0
     if [[ $compile = "true" ]]; then
-        sed -i 's| mxf_win32_mmap.c||' mxf/Makefile.am
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
@@ -1415,7 +1414,6 @@ if [[ $bmx = "y" ]]; then
     _deps=({liburiparser,libMXF{,++}-1.0}.pc)
     do_vcs http://git.code.sf.net/p/bmxlib/bmx
     if [[ $compile = "true" ]]; then
-        do_patch bmx-0002-avoid-mmap-in-MinGW.patch am
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
