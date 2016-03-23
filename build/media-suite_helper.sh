@@ -999,12 +999,13 @@ do_pacman_remove() {
         echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         do_hide_pacman_sharedlibs "$pkg" revert
         if pacman -Rs --noconfirm "$pkg" >/dev/null 2>&1; then
-            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
             echo "done"
         else
             pacman -D --asdeps "$pkg" >/dev/null 2>&1
             echo "failed"
         fi
+        [[ -f /etc/pac-mingw-extra.pk ]] &&
+            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
     done
     do_hide_all_sharedlibs
 }
