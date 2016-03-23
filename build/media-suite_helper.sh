@@ -339,18 +339,21 @@ do_strip() {
     local cmd exts nostrip file
     local cmd=(strip)
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
-    local exts="exe|dll|com"
+    local exts="exe|dll|com|a"
     [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
     [[ "$@" =~ \.($exts)$ ]] &&
         [[ ! "$@" =~ ($nostrip)\.exe$ ]] && do_print_progress Stripping
     for file; do
         file="$(file_installed $file)"
         [[ $? = 0 ]] || continue
-        if [[ $file =~ \.($exts)$ ]] &&
+        if [[ $file =~ \.(exe|com)$ ]] &&
             [[ ! $file =~ ($nostrip)\.exe$ ]]; then
-            cmd+=(-s)
-        elif [[ $file =~ x265(|-numa)\.exe$ ]]; then
+            cmd+=(--strip-all)
+        elif [[ $file =~ \.dll$ ]] ||
+            [[ $file =~ x265(|-numa)\.exe$ ]]; then
             cmd+=(--strip-unneeded)
+        elif ! enabled debug && [[ $file =~ \.a$ ]]; then
+            cmd+=(--strip-debug)
         else
             file=""
         fi
