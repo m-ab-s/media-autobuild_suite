@@ -998,6 +998,8 @@ do_pacman_remove() {
     installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
     for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        [[ -f /etc/pac-mingw-extra.pk ]] &&
+            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
         echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         do_hide_pacman_sharedlibs "$pkg" revert
@@ -1007,8 +1009,6 @@ do_pacman_remove() {
             pacman -D --asdeps "$pkg" >/dev/null 2>&1
             echo "failed"
         fi
-        [[ -f /etc/pac-mingw-extra.pk ]] &&
-            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
     done
     do_hide_all_sharedlibs
 }
