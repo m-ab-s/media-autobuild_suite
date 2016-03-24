@@ -76,7 +76,7 @@ echo
 
 pacman -Sy
 pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - > /dev/null
-
+do_unhide_all_sharedlibs
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
@@ -93,27 +93,6 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     install=$(echo "$diff" | sed -nr 's/> (.*)/\1/p')
     uninstall=$(echo "$diff" | sed -nr 's/< (.*)/\1/p')
 
-    if [[ "$install" != "" ]]; then
-        echo
-        echo "-------------------------------------------------------------------------------"
-        echo "You're missing some packages!"
-        echo "Do you want to install them?"
-        echo "-------------------------------------------------------------------------------"
-        echo
-        echo "Install:"
-        echo "$install"
-        while true; do
-            read -r -p "install packs [y/n]? " yn
-            case $yn in
-                [Yy]* )
-                    pacman -S --noconfirm --needed --force $install
-                    pacman -D --asexplicit $install
-                    break;;
-                [Nn]* ) exit;;
-                * ) echo "Please answer yes or no";;
-            esac
-        done
-    fi
     if [[ ! -z "$uninstall" ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
@@ -133,6 +112,27 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
                     done
                     break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
+                * ) echo "Please answer yes or no";;
+            esac
+        done
+    fi
+    if [[ ! -z "$install" ]]; then
+        echo
+        echo "-------------------------------------------------------------------------------"
+        echo "You're missing some packages!"
+        echo "Do you want to install them?"
+        echo "-------------------------------------------------------------------------------"
+        echo
+        echo "Install:"
+        echo "$install"
+        while true; do
+            read -r -p "install packs [y/n]? " yn
+            case $yn in
+                [Yy]* )
+                    pacman -S --noconfirm --needed --force $install
+                    pacman -D --asexplicit $install
+                    break;;
+                [Nn]* ) exit;;
                 * ) echo "Please answer yes or no";;
             esac
         done
@@ -185,7 +185,6 @@ if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    do_unhide_all_sharedlibs
     pacman --noconfirm -Su --force --ignore pacman,bash,msys2-runtime
     sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
     echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
