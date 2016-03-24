@@ -363,7 +363,10 @@ do_strip() {
         else
             file=""
         fi
-        [[ $file ]] && eval "${cmd[@]}" "$file"
+        [[ $file ]] &&
+            { eval "${cmd[@]}" "$file" 2>/dev/null ||
+              eval "${cmd[@]}" "$file" -o "$file.stripped" 2>/dev/null; }
+        [[ -f ${file}.stripped ]] && mv -f "${file}"{.stripped,}
     done
 }
 
