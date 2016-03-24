@@ -513,7 +513,7 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     _check=(libbs2b.{{l,}a,pc})
     do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     do_uninstall include/bs2b "${_check[@]}"
-    do_patch "libbs2b-disable-sndfile.patch"
+    /usr/bin/grep -q sndfile configure && sed -i '20119,20132d' configure
     sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
