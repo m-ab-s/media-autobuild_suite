@@ -43,8 +43,8 @@ done
     source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 buildProcess() {
-echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color}"
 set_title
+echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color}"
 [[ -f "$HOME"/custom_build_options ]] &&
     echo "Imported custom build options (unsupported)" &&
     source "$HOME"/custom_build_options
@@ -64,8 +64,8 @@ if [[ -n "$alloptions" ]]; then
     unset alloptions
 fi
 
-echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 set_title "compiling global tools"
+echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
 
 _check=(libopenjp2.{a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
@@ -311,8 +311,8 @@ if [[ $ffmpeg != n ]] && enabled chromaprint; then
     do_addOption --extra-libs=-lfftw3 --extra-libs=-lstdc++ --extra-cflags=-DCHROMAPRINT_NODLL
 fi
 
-echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 set_title "compiling audio tools"
+echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 
 _check=(ilbc.h libilbc.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libilbc &&
@@ -559,8 +559,8 @@ if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
     do_addOption --extra-cflags=-DMODPLUG_STATIC
 fi
 
-echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 set_title "compiling video tools"
+echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
 if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
