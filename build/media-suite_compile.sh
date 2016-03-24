@@ -261,7 +261,7 @@ if enabled libtesseract; then
         do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global" \
-            $(enabled opencl && echo "--enable-opencl")
+            $([[ $bits = 64bit ]] && enabled opencl && echo "--enable-opencl")
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
