@@ -931,19 +931,19 @@ do_hide_pacman_sharedlibs() {
 }
 
 do_hide_all_sharedlibs() {
-    [[ x"$1" = "xdry" ]] && local dryrun="y"
+    [[ x"$1" = "xdry" ]] || local dryrun="n"
     local files
     files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2>/dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
-    [[ $dryrun != "y" ]] &&
+    [[ $dryrun = "n" ]] &&
         printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}' '{}.dyn' || printf "%s\n" "${tomove[@]}"
 }
 
 do_unhide_all_sharedlibs() {
-    [[ x"$1" = "xdry" ]] && local dryrun="y"
+    [[ x"$1" = "xdry" ]] || local dryrun="n"
     local files
     files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2>/dev/null)"
     local tomove=()
@@ -955,7 +955,7 @@ do_unhide_all_sharedlibs() {
             tomove+=("${file%*.dyn}")
         fi
     done
-    if [[ $dryrun != "y" ]]; then
+    if [[ $dryrun = "n" ]]; then
         printf "%s\n" "${todelete[@]}" | xargs -i rm -f '{}'
         printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}.dyn' '{}'
     else
