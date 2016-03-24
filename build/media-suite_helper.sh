@@ -142,7 +142,6 @@ do_vcs() {
         fi
     fi
     [[ ! "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
-    compile="false"
 
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
@@ -162,7 +161,6 @@ do_vcs() {
     fi
     do_print_progress "  Running $vcsType update for $vcsFolder"
     log quiet "$vcsType.update" vcs_update
-    compile="true"
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful{32,64}bit
@@ -184,8 +182,9 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
-        compile="false"
+        return 1
     fi
+    return 0
 }
 
 guess_dirname() {
