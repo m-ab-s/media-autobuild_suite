@@ -358,7 +358,7 @@ if enabled libopus; then
         do_checkIfExist
     fi
 
-    do_pacman_install opusfile
+    [[ $sox = y ]] && do_pacman_install opusfile
     do_uninstall q opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
