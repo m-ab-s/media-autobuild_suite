@@ -1189,16 +1189,13 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     do_pacman_remove uchardet-git
-    if ! mpv_disabled uchardet; then
-        _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
-        [[ $standalone = y ]] && _check+=(bin-global/uchardet.exe)
-        do_vcs "https://github.com/BYVoid/uchardet.git"
-        if [[ $compile = "true" ]]; then
-            do_uninstall "${_check[@]}"
-            do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
-                -DCMAKE_BUILD_TYPE=Release $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
-            do_checkIfExist
-        fi
+    _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
+    [[ $standalone = y ]] && _check+=(bin-global/uchardet.exe)
+    if ! mpv_disabled uchardet && do_vcs "https://github.com/BYVoid/uchardet.git"; then
+        do_uninstall "${_check[@]}"
+        do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
+            -DCMAKE_BUILD_TYPE=Release $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
+        do_checkIfExist
     fi
 
     mpv_enabled libarchive && do_pacman_install libarchive
