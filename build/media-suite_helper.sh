@@ -845,9 +845,13 @@ compilation_fail() {
 }
 
 strip_ansi() {
-    local txtfile
+    local txtfile newfile
     for txtfile; do
-        sed -ri 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile"
+        [[ $txtfile != ${txtfile//stripped/} ]] && continue
+        local name="${txtfile%.*}"
+        local ext="${txtfile#*.}"
+        [[ $txtfile != $name ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
+        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile" > "${newfile}"
     done
 }
 
@@ -857,7 +861,7 @@ zip_logs() {
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
     strip_ansi ./*.log
-    7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
+    7za -mx=9 a logs.zip ./*.stripped.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
         ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
     [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
@@ -1172,7 +1176,6 @@ clean_suite() {
 
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
         logs.zip _to_remove
-    strip_ansi ./*.log
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
