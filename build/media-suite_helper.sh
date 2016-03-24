@@ -149,6 +149,7 @@ do_vcs() {
     fi
     [[ ! "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
 
+    echo
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
@@ -188,7 +189,6 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
-        echo
         return 1
     fi
     return 0
