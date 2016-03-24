@@ -225,7 +225,7 @@ fi
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
 if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
-    echo -e "${orange_color}Tesseract, FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
+    echo -e "${orange_color}FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
     _check=(libOpenCL.a)
     if ! files_exist "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
@@ -261,8 +261,7 @@ if enabled libtesseract; then
         sed -i "s|Libs.private.*|& -lstdc++|" tesseract.pc.in
         do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
-            LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global" \
-            $([[ $bits = 64bit ]] && enabled opencl && echo "--enable-opencl")
+            LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
