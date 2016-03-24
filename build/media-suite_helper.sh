@@ -188,6 +188,7 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
+        echo
         return 1
     fi
     return 0
@@ -840,11 +841,19 @@ compilation_fail() {
     fi
 }
 
+strip_ansi() {
+    local txtfile
+    for txtfile; do
+        sed -ri 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile"
+    done
+}
+
 zip_logs() {
     local failed url
     failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
+    strip_ansi ./*.log
     7za -mx=9 a logs.zip ./*.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
         ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
     [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
@@ -1160,6 +1169,7 @@ clean_suite() {
 
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
         logs.zip _to_remove
+    strip_ansi ./*.log
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
