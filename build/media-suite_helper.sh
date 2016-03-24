@@ -38,9 +38,15 @@ do_print_progress() {
     if [[ $logging != n ]]; then
         [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
     else
-        echo -e "\e]0;$* in $(get_first_subdir)\007"
+        set_title "$* in $(get_first_subdir)"
         echo -e "${bold_color}$* in $(get_first_subdir)${reset_color}"
     fi
+}
+
+set_title() {
+    local title="media-autobuild_suite ($bits)"
+    [[ -z $1 ]] || title="$title: $1"
+    echo -ne "\e]0;$title\a"
 }
 
 cd_safe() {

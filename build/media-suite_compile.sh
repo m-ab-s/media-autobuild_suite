@@ -4,7 +4,6 @@ shopt -s extglob
 FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
 alloptions="$*"
 echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
-echo -ne "\e]0;media-autobuild_suite\007"
 
 while true; do
   case $1 in
@@ -45,6 +44,7 @@ done
 
 buildProcess() {
 echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color}"
+set_title
 [[ -f "$HOME"/custom_build_options ]] &&
     echo "Imported custom build options (unsupported)" &&
     source "$HOME"/custom_build_options
@@ -65,6 +65,7 @@ if [[ -n "$alloptions" ]]; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
+set_title "compiling global tools"
 
 _check=(libopenjp2.{a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
@@ -312,6 +313,7 @@ if [[ $ffmpeg != n ]] && enabled chromaprint; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
+set_title "compiling audio tools"
 
 _check=(ilbc.h libilbc.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libilbc &&
@@ -559,6 +561,7 @@ if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
 fi
 
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
+set_title "compiling video tools"
 
 if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
