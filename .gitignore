@@ -11,6 +11,7 @@
 /msys32/
 
 mintty.lnk
+update_suite.sh
 !build/*.sh
 !build/patches/
 !build/extras/

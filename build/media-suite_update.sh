@@ -43,26 +43,12 @@ if [[ "$update" = "yes" ]]; then
             diffname="$(date +%F-%H.%M.%S)"
             git diff --diff-filter=M >> "build/user-changes-${diffname}.diff"
             echo "Your changes have been exported to build/user-changes-${diffname}.diff."
-            git reset --hard origin/master
+            git reset --hard @{u}
         fi
-        oldHead=$(git rev-parse HEAD)
-        git fetch -qt origin
-        git checkout -qfB master "origin/HEAD"
-        newHead=$(git rev-parse HEAD)
-        if git apply "build/user-changes-${diffname}.diff"; then
-            rm "build/user-changes-${diffname}.diff"
-            echo "Your changes have been successfully applied!"
-        elif [[ -f build/user-changes-${diffname}.diff ]]; then
-            echo "Your changes couldn't be applied. Script will run without them."
-        fi
-        if [[ $oldHead != "$newHead" ]]; then
-            touch build/suite_updated
-            echo "Script will now restart to use the new changes."
-            sleep 5
-            exit
-        fi
+        git fetch -t
+        git reset --hard @{u}
     fi
-fi
+fi # end suite update
 
 # --------------------------------------------------
 # packet update system

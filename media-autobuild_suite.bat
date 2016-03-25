@@ -83,7 +83,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-vapoursynth
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -795,6 +795,30 @@ if %loggingF%==2 set "logging=n"
 if %loggingF% GTR 2 GOTO logging
 if %writeLogging%==yes echo.logging=^%loggingF%>>%ini%
 
+:updateSuite
+set "writeUpdateSuite=no"
+if %updateSuiteINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Create script to update suite files automatically?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo If you have made changes to the scripts, they will be reset but saved to a
+    echo .diff text file inside %build%
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P updateSuiteF="Create update script: "
+    ) else set updateSuiteF=%updateSuiteINI%
+if %deleteINI%==1 set "writeUpdateSuite=yes"
+
+if %updateSuiteF%==1 set "updateSuite=y"
+if %updateSuiteF%==2 set "updateSuite=n"
+if %updateSuiteF% GTR 2 GOTO updateSuite
+if %writeUpdateSuite%==yes echo.updateSuite=^%updateSuiteF%>>%ini%
+
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -1137,6 +1161,27 @@ for %%s in (%scripts%) do (
         %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
         https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
         )
+    )
+if %updateSuite%=="y" (
+    if not exist %instdir%\update_suite.sh (
+        echo -------------------------------------------------------------------------------
+        echo. Creating suite update file...
+        echo.
+        echo. Run this file by dragging it to mintty before the next time you run
+        echo. the suite and before reporting an issue.
+        echo.
+        echo. It needs to be run separately and with the suite not running!
+        echo -------------------------------------------------------------------------------
+        )
+    (
+        echo.#!/bin/bash
+        echo.
+        echo.# Run this file by dragging it to mintty shortcut.
+        echo.# Be sure the suite is not running before using it!
+        echo.
+        %instdir%\%msys2%\usr\bin\sed -n '/trunk\/build/,/end suite update/p' ^
+            %build%/media-suite_update.sh
+        )>%instdir%\update_suite.sh
     )
 
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
