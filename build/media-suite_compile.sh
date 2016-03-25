@@ -770,7 +770,7 @@ if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0";
         "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
-    do_cmakeinstall -DCMAKE_BUILD_TYPE=Release
+    do_cmakeinstall
     do_checkIfExist
 fi
 
@@ -1194,7 +1194,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if ! mpv_disabled uchardet && do_vcs "https://github.com/BYVoid/uchardet.git"; then
         do_uninstall "${_check[@]}"
         do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
-            -DCMAKE_BUILD_TYPE=Release $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
+            $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
         do_checkIfExist
     fi
 
