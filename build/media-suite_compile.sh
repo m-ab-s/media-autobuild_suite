@@ -1169,9 +1169,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
-    elif ! mpv_disabled lua; then
+    elif ! mpv_disabled lua && do_pkgConfig luajit; then
         do_pacman_remove lua51
-    if do_pkgConfig luajit; then
         _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
         do_uninstall include/luajit-2.0 lib/lua "${_check[@]}"
@@ -1188,7 +1187,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
         do_checkIfExist
         add_to_remove
-    fi
     fi
 
     do_pacman_remove uchardet-git
