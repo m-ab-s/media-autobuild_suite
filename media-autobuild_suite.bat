@@ -895,7 +895,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 :getMintty
 set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
-    if %msys2%=="msys32" (
+    if %msys2%==msys32 (
     echo.-------------------------------------------------------------------------------
     echo.rebase %msys2% system
     echo.-------------------------------------------------------------------------------
@@ -1162,7 +1162,7 @@ for %%s in (%scripts%) do (
         https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
         )
     )
-if %updateSuite%=="y" (
+if %updateSuite%==y (
     if not exist %instdir%\update_suite.sh (
         echo -------------------------------------------------------------------------------
         echo. Creating suite update file...
@@ -1196,7 +1196,7 @@ if exist "%build%\update_core" (
     )
 
 :rebase2
-if %msys2%=="msys32" (
+if %msys2%==msys32 (
 echo.-------------------------------------------------------------------------------
 echo.second rebase %msys2% system
 echo.-------------------------------------------------------------------------------
