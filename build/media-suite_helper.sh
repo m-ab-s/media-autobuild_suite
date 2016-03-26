@@ -831,7 +831,7 @@ compilation_fail() {
     if [[ $loggging = y ]]; then
         echo "Likely error:"
         tail "ab-suite.${operation}.log"
-        echo "${red_color}$reason failed. Check $(pwd)/ab-suite.$operation.log${reset_color}"
+        echo "${red_color}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset_color}"
     fi
     if [[ $_notrequired ]]; then
         echo "This isn't required for anything so we can move on."
