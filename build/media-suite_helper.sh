@@ -835,6 +835,7 @@ compilation_fail() {
     fi
     if [[ $_notrequired ]]; then
         echo "This isn't required for anything so we can move on."
+        unset _notrequired
         return 1
     else
         echo "${red_color}This is required for other packages, so this script will exit.${reset_color}"
