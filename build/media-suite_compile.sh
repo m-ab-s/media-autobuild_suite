@@ -607,6 +607,8 @@ if [[ $vpx != n ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx
     [[ $standalone = y ]] && _check+=(bin-video/vpxdec.exe) ||
         extracommands+=(--disable-examples)
     do_uninstall include/vpx "${_check[@]}"
+    /usr/bin/grep -q cstdlib third_party/libwebm/mkvmuxer/mkvmuxer.cc ||
+        sed -i '/cstring/ i\#include <cstdlib>' third_party/libwebm/mkvmuxer/mkvmuxer.cc
     create_build_dir
     [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
     log "configure" ../configure --target="${target}-gcc" \
