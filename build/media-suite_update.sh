@@ -46,7 +46,17 @@ if [[ "$update" = "yes" ]]; then
             git reset --hard @{u}
         fi
         git fetch -t
+        oldHead=$(git rev-parse HEAD)
         git reset --hard @{u}
+        newHead=$(git rev-parse HEAD)
+        if [[ $oldHead != $newHead ]]; then
+            echo "Suite has been updated!"
+            echo "If you had an issue try running the suite again before reporting."
+        else
+            echo "Suite up-to-date."
+            echo "If you had an issue, please report it in GitHub."
+        fi
+        sleep 15
     fi
 fi # end suite update
 
