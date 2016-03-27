@@ -52,7 +52,6 @@ Included Tools And Libraries
         - libbluray (git)
         - libbs2b (3.1.0)
         - libcaca (mingw)
-        - libdcadec (mingw)
         - libfreetype (2.6.3)
         - libfribidi (0.19.7)
         - libgme (git)

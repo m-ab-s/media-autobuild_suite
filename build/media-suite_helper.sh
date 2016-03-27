@@ -587,8 +587,9 @@ do_getFFmpegConfig() {
             --enable-opencl --enable-libcaca
     fi
 
-    enabled_any lib{vo-aacenc,aacplus,utvideo} && do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo)" &&
-        sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo);;g' "$LOCALBUILDDIR/ffmpeg_options.txt"
+    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec} &&
+        do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo|dcadec)" &&
+        sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo|dcadec);;g' "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
 do_changeFFmpegConfig() {

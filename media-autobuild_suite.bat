@@ -65,7 +65,7 @@ set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
 
 set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontconfig ^
 --enable-frei0r --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b ^
---enable-libcaca --enable-libdcadec --enable-libfreetype --enable-libfribidi ^
+--enable-libcaca --enable-libfreetype --enable-libfribidi ^
 --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
 --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex ^

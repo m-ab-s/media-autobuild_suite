@@ -1040,7 +1040,6 @@ if [[ $ffmpeg != "n" ]]; then
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
-    enabled libdcadec && do_pacman_remove dcadec-git && do_pacman_install dcadec
     [[ -d "$LOCALBUILDDIR/dcadec-git" ]] && add_to_remove "$LOCALBUILDDIR/dcadec-git"
     do_uninstall q include/libdcadec libdcadec.a dcadec.pc
 
