@@ -6,7 +6,6 @@ while true; do
   case $1 in
 --build32=* ) build32="${1#*=}"; shift ;;
 --build64=* ) build64="${1#*=}"; shift ;;
---remove=* ) remove="${1#*=}"; shift ;;
 --update=* ) update="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
@@ -43,13 +42,13 @@ if [[ "$update" = "yes" ]]; then
             diffname="$(date +%F-%H.%M.%S)"
             git diff --diff-filter=M >> "build/user-changes-${diffname}.diff"
             echo "Your changes have been exported to build/user-changes-${diffname}.diff."
-            git reset --hard @{u}
+            git reset --hard "@{upstream}"
         fi
         git fetch -t
         oldHead=$(git rev-parse HEAD)
-        git reset --hard @{u}
+        git reset --hard "@{upstream}"
         newHead=$(git rev-parse HEAD)
-        if [[ $oldHead != $newHead ]]; then
+        if [[ $oldHead != "$newHead" ]]; then
             echo "Suite has been updated!"
             echo "If you had an issue try running the suite again before reporting."
         else
@@ -146,7 +145,7 @@ echo "--------------------------------------------------------------------------
 echo
 
 if [[ -d "/trunk" ]]; then
-    cd "/trunk"
+    cd "/trunk" || exit 1
 else
     cd_safe "$(cygpath -w /).."
 fi

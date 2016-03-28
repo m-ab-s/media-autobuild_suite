@@ -60,11 +60,11 @@ test_newer() {
     local file
     local files=("$@")
     local cmp="${files[-1]}"
-    [[ $installed ]] && cmp="$(file_installed $cmp)"
+    [[ $installed ]] && cmp="$(file_installed "$cmp")"
     [[ ${#files[@]} -gt 1 ]] && unset files[-1]
     [[ -f $cmp ]] || return 0
-    for file in ${files[@]}; do
-        [[ $installed ]] && file="$(file_installed $file)"
+    for file in "${files[@]}"; do
+        [[ $installed ]] && file="$(file_installed "$file")"
         [[ -f $file ]] &&
             [[ $file -nt "$cmp" ]] && return
     done
@@ -282,8 +282,7 @@ do_wget() {
         [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
     fi
     [[ $norm ]] || add_to_remove "$(pwd)/$archive"
-    [[ $nocd ]] && do_extract nocd "$archive" "$dirName" ||
-        do_extract "$archive" "$dirName"
+    do_extract "$archive" "$dirName"
     [[ ! $norm && $dirName && ! $nocd ]] && add_to_remove
 }
 
@@ -305,7 +304,7 @@ real_extract() {
 }
 
 do_extract() {
-    [[ $1 = nocd ]] && local nocd=y && shift
+    local nocd="${nocd:-}"
     local archive="$1" dirName="$2" archive_type
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
@@ -330,7 +329,7 @@ do_extract() {
 
 do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
-    local hash baseurl
+    local hash
     [[ $1 = "-h" ]] && hash="$2" && shift 2
     local url="http://download.sourceforge.net/$1"
     shift 1
@@ -394,11 +393,10 @@ do_pack() {
 do_checkIfExist() {
     local packetName
     packetName="$(get_first_subdir)"
-    [[ $1 = dry ]] && local dry=y && shift
-    local check=("$@")
-    check+=("${_check[@]}")
-    [[ -z $check ]] && echo "No files to check" && exit 1
-    if [[ $dry ]]; then
+    local dry="${dry:-n}"
+    local check=("${_check[@]}")
+    [[ -z ${check[@]} ]] && echo "No files to check" && exit 1
+    if [[ $dry = y ]]; then
         files_exist -v -s "${check[@]}"
     else
         if files_exist -v "${check[@]}"; then
@@ -529,8 +527,7 @@ do_pkgConfig() {
 }
 
 do_getFFmpegConfig() {
-    local license=nonfree
-    [[ $1 ]] && license="$1"
+    local license="${1:-nonfree}"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice = y ]]; then
         FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
@@ -593,8 +590,7 @@ do_getFFmpegConfig() {
 }
 
 do_changeFFmpegConfig() {
-    local license=nonfree
-    [[ $1 ]] && license="$1"
+    local license="${1:-nonfree}"
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink depends on pthreads
@@ -724,11 +720,12 @@ do_getMpvConfig() {
     else
         echo "Using default mpv options"
     fi
-    if [[ $mpv = "v" ]]; then
-        ! mpv_disabled vapoursynth && do_addOption MPV_OPTS --enable-vapoursynth
+    if [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
+        do_addOption MPV_OPTS --enable-vapoursynth
+    elif [[ $mpv = "y" ]] && mpv_enabled vapoursynth; then
+        mpv_disable vapoursynth
     elif [[ $mpv = "y" ]]; then
-        mpv_enabled vapoursynth && mpv_disable vapoursynth ||
-            do_addOption MPV_OPTS --disable-vapoursynth
+        do_addOption MPV_OPTS --disable-vapoursynth
     fi
 }
 
@@ -831,7 +828,7 @@ compilation_fail() {
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
-    if [[ $loggging = y ]]; then
+    if [[ $logging = y ]]; then
         echo "Likely error:"
         tail "ab-suite.${operation}.log"
         echo "${red_color}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset_color}"
@@ -853,10 +850,10 @@ compilation_fail() {
 strip_ansi() {
     local txtfile newfile
     for txtfile; do
-        [[ $txtfile != ${txtfile//stripped/} ]] && continue
+        [[ $txtfile != "${txtfile//stripped/}" ]] && continue
         local name="${txtfile%.*}"
         local ext="${txtfile##*.}"
-        [[ $txtfile != $name ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
+        [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
         sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile" > "${newfile}"
     done
 }
@@ -889,7 +886,7 @@ log() {
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging != "n" ]]; then
-        echo "$cmd $@" > "ab-suite.$name.log"
+        echo "$cmd $*" > "ab-suite.$name.log"
         $cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
             { [[ $extra ]] && $cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
             compilation_fail "$name"
@@ -959,7 +956,7 @@ do_hide_pacman_sharedlibs() {
 }
 
 do_hide_all_sharedlibs() {
-    [[ x"$1" = "xdry" ]] || local dryrun="n"
+    local dryrun="${dry:-n}"
     local files
     files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2>/dev/null)"
     local tomove=()
@@ -971,7 +968,7 @@ do_hide_all_sharedlibs() {
 }
 
 do_unhide_all_sharedlibs() {
-    [[ x"$1" = "xdry" ]] || local dryrun="n"
+    local dryrun="${dry:-n}"
     local files
     files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2>/dev/null)"
     local tomove=()
@@ -1155,8 +1152,9 @@ unhide_files() {
 }
 
 add_to_remove() {
-    [[ $1 ]] && echo "$1" >> "$LOCALBUILDDIR/_to_remove" ||
-        echo "$(pwd)" >> "$LOCALBUILDDIR/_to_remove"
+    local garbage="$1"
+    [[ ! $garbage ]] && garbage="$(pwd)"
+    echo "$garbage" >> "$LOCALBUILDDIR/_to_remove"
 }
 
 clean_suite() {

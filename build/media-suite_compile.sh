@@ -858,8 +858,8 @@ if [[ $x264 != n ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     if do_vcs "https://git.videolan.org/git/x264.git" ||
-        { [[ $x264 != h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *10" $(file_installed x264_config.h); } ||
-        { [[ $x264 = h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *8" $(file_installed x264_config.h); }; then
+        { [[ $x264 != h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *10" "$(file_installed x264_config.h)"; } ||
+        { [[ $x264 = h ]] && /usr/bin/grep -q "X264_BIT_DEPTH *8" "$(file_installed x264_config.h)"; }; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
@@ -940,7 +940,8 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
 
     build_x265() {
         create_build_dir
-        local build_root="$(pwd)"
+        local build_root
+        build_root="$(pwd)"
         mkdir -p {8,10,12}bit
 
     do_x265_cmake() {
