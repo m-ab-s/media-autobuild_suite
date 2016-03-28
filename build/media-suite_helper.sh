@@ -763,13 +763,15 @@ mpv_disable() {
 }
 
 do_addOption() {
-    local varname="$1" array
+    local varname="$1" array opt
     if [[ -v $varname ]]; then
         array="$varname" && shift 1
     else
         array="FFMPEG_OPTS"
     fi
-    ! opt_exists "$array" "$@" && eval "$array"+=\("$@"\)
+    for opt; do
+        ! opt_exists "$array" "$opt" && declare -ag "$array+=('$opt')"
+    done
 }
 
 do_removeOption() {
