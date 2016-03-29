@@ -159,6 +159,8 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
         _check=(libgnutls.{,l}a gnutls.pc)
         do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
+        /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
+            sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,rpath,libdane,guile} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts
