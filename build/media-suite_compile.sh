@@ -1159,6 +1159,7 @@ if [[ $mplayer = "y" ]] &&
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
     do_makeinstall &&
     do_checkIfExist
+    unset _notrequired
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
