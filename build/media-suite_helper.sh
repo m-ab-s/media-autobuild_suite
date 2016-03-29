@@ -1178,7 +1178,7 @@ clean_suite() {
     fi
 
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
-        logs.zip _to_remove
+        logs.zip _to_remove ./*.stripped.log
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
     [[ -f CHANGELOG.txt ]] && cat CHANGELOG.txt >> newchangelog
