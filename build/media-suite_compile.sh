@@ -110,14 +110,14 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         harfbuzz_ver=$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
             /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"') &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
-    [[ $harfbuzz_ver ]] || harfbuzz_ver="1.2.3"
+    [[ $harfbuzz_ver ]] || harfbuzz_ver="1.2.4"
     _deps=({freetype2,fontconfig}.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
-        do_separate_confmakeinstall --with-icu=no --with-glib=no --with-gobject=no
+        do_separate_confmakeinstall --with-{icu,glob,gobject}=no
         do_checkIfExist
     fi
 
@@ -128,7 +128,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
         do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
-        do_separate_confmakeinstall global --disable-deprecated --with-glib=no --disable-debug
+        do_separate_confmakeinstall global --disable-{deprecated,debug} --with-glib=no
         do_checkIfExist
     fi
 fi
@@ -150,7 +150,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
     [[ -z "$gnutls_ver" ]] && gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")"
     [[ -n "$gnutls_ver" ]] &&
-        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')" || gnutls_ver="3.4.9"
+        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')" || gnutls_ver="3.4.10"
 
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
@@ -160,10 +160,8 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
         do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
         do_separate_confmakeinstall \
-            --disable-cxx --disable-doc --disable-tools --disable-tests --without-p11-kit --disable-rpath \
-            --disable-libdane --without-idn --without-tpm --enable-local-libopts --disable-guile
-        sed -i 's/-lgnutls *$/-lgnutls -lnettle -lhogweed -lcrypt32 -lws2_32 -lz -lgmp -lintl -liconv/' \
-            "$LOCALDESTDIR/lib/pkgconfig/gnutls.pc"
+            --disable-{cxx,doc,tools,tests,rpath,libdane,guile} \
+            --without-{p11-kit,idn,tpm} --enable-local-libopts
         do_checkIfExist
     fi
 fi
@@ -173,7 +171,7 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
-    [[ "$libressl_ver" ]] || libressl_ver="2.3.2"
+    [[ "$libressl_ver" ]] || libressl_ver="2.3.3"
 
     if do_pkgConfig "libssl = $libressl_ver"; then
         _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
@@ -210,15 +208,15 @@ if enabled libwebp && do_vcs "https://chromium.googlesource.com/webm/libwebp"; t
     if [[ $standalone = y ]]; then
         extracommands=(--enable-libwebp{demux,decoder,extras}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental)
-        _check+=(libwebp{,mux,demux,decoder,extras}.{{,l}a,pc}
+        _check+=(libwebp{demux,decoder,extras}.{{,l}a,pc}
             bin-global/{{c,d}webp,webpmux}.exe)
     else
         extracommands=()
         sed -i 's/ examples man//' Makefile.in
     fi
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
-    do_separate_confmakeinstall global --enable-swap-16bit-csp \
-        --enable-libwebpmux "${extracommands[@]}"
+    do_separate_confmakeinstall global --enable-{swap-16bit-csp,libwebpmux} \
+        "${extracommands[@]}"
     do_checkIfExist
 fi
 
@@ -249,7 +247,7 @@ if enabled libtesseract; then
         do_wget -h 092cea2e568cada79fff178820397922 \
             "http://www.leptonica.com/source/leptonica-1.73.tar.gz"
         do_uninstall include/leptonica "${_check[@]}"
-        do_separate_confmakeinstall --disable-programs --without-libopenjpeg --without-libwebp
+        do_separate_confmakeinstall --disable-programs --without-lib{openjpeg,webp}
         do_checkIfExist
     fi
 
@@ -259,7 +257,7 @@ if enabled libtesseract; then
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
         sed -i "s|Libs.private.*|& -lstdc++|" tesseract.pc.in
-        do_separate_confmakeinstall global --disable-graphics --disable-tessdata-prefix \
+        do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
@@ -359,8 +357,9 @@ if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
         "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     do_uninstall include/speex "${_check[@]}"
     do_patch speex-mingw-winmm.patch
-    do_separate_confmakeinstall audio --enable-vorbis-psy \
-        "$([[ $standalone = y ]] && echo --enable-binaries || echo --disable-binaries)"
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(--disable-binaries)
+    do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
     do_checkIfExist
 fi
 
@@ -372,7 +371,7 @@ if [[ $flac = y ]] &&
     _check+=(bin-audio/metaflac.exe)
     do_uninstall include/FLAC{,++} "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
-    do_separate_confmakeinstall audio --disable-xmms-plugin --disable-doxygen-docs
+    do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
 fi
 
@@ -445,8 +444,8 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     [[ -f Makefile ]] && log distclean make distclean
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
-    do_separate_confmakeinstall audio --disable-ogg123 --disable-vorbiscomment \
-        --disable-vcut --disable-ogginfo "${extracommands[@]}"
+    do_separate_confmakeinstall audio \
+        --disable-{ogg123,vorbiscomment,vcut,ogginfo} "${extracommands[@]}"
     do_checkIfExist
     add_to_remove
 fi
@@ -470,7 +469,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; 
     do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
-    do_cmakeinstall -DWITH_OPENMP=off -DWITH_LSR_BINDINGS=off
+    do_cmakeinstall -DWITH_{OPENMP,LSR_BINDINGS}=off
     do_checkIfExist
 fi
 
@@ -490,8 +489,9 @@ if enabled libmp3lame; then
         fi
         do_uninstall include/lame "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_separate_confmakeinstall audio --disable-decoder \
-            "$([[ $standalone = y ]] || echo --disable-frontend)"
+        extracommands=()
+        [[ $standalone = y ]] || extracommands+=(--disable-frontend)
+        do_separate_confmakeinstall audio --disable-decoder "${extracommands[@]}"
         do_checkIfExist
     fi
 fi
@@ -589,7 +589,7 @@ if [[ $rtmpdump = "y" ]] ||
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
-            CRYPTO="$crypto" LIB_${crypto}="$(pkg-config --static --libs $pc) -lz" VERSION="$_ver"
+            CRYPTO="$crypto" LIB_${crypto}="$($PKG_CONFIG --libs $pc) -lz" VERSION="$_ver"
         do_checkIfExist
         unset crypto pc req
     fi
@@ -610,10 +610,9 @@ if [[ $vpx != n ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx
     do_uninstall include/vpx "${_check[@]}"
     create_build_dir
     [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-    log "configure" ../configure --target="${target}-gcc" \
-        --disable-shared --enable-static --disable-unit-tests --disable-docs \
-        --enable-postproc --enable-vp9-postproc --enable-runtime-cpu-detect \
-        --enable-vp9-highbitdepth --prefix="$LOCALDESTDIR" --disable-install-bins \
+    log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
+        --disable-{shared,unit-tests,docs,install-bins} \
+        --enable-{static,postproc,vp9-postproc,runtime-cpu-detect,vp9-highbitdepth} \
         "${extracommands[@]}"
     for _ff in *.mk; do
         sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
@@ -758,8 +757,8 @@ if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
     [[ -f Makefile ]] && log distclean make distclean
-    CFLAGS+=" -DPTW32_STATIC_LIB" do_separate_conf --disable-dvb --disable-bktr \
-        --disable-nls --disable-proxy --without-doxygen LIBS="$LIBS -lpng"
+    CFLAGS+=" -DPTW32_STATIC_LIB" do_separate_conf --disable-{dvb,bktr,nls,proxy} \
+        --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
     do_checkIfExist
@@ -867,13 +866,13 @@ if [[ $x264 != n ]]; then
             do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
                 lib{av{device,filter,util,resample},sw{scale,resample},postproc}.{a,pc} "${_check[@]}"
             [[ -f "config.mak" ]] && log "distclean" make distclean
-            do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" --disable-programs \
-            --disable-devices --disable-filters --disable-encoders --disable-muxers
+            do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
+            --disable-{programs,devices,filters,encoders,muxers}
             do_makeinstall
             do_checkIfExist
             cd_safe "$LOCALBUILDDIR"/x264-git
         else
-            extracommands+=(--disable-lavf --disable-swscale --disable-ffms)
+            extracommands+=(--disable-{lavf,swscale,ffms})
         fi
 
         if [[ $standalone = y ]]; then
@@ -896,10 +895,10 @@ if [[ $x264 != n ]]; then
         _check=(x264{,_config}.h libx264.a x264.pc)
         [[ -f "config.h" ]] && log "distclean" make distclean
         if [[ $standalone = y ]]; then
-            extracommands+=("--bindir=$LOCALDESTDIR/bin-video")
+            extracommands+=(--bindir="$LOCALDESTDIR/bin-video")
             _check+=(bin-video/x264.exe)
         else
-            extracommands+=(--disable-gpac --disable-cli)
+            extracommands+=(--disable-{gpac,cli})
         fi
         if [[ $standalone = y && $x264 != h ]]; then
             do_print_progress "Building 10-bit x264"
@@ -1103,8 +1102,8 @@ if [[ $ffmpeg != "n" ]]; then
             fi
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
-            log configure ../configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video \
-                "${FFMPEG_OPTS[@]}"
+            log configure ../configure --prefix="$LOCALDESTDIR" \
+                --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
@@ -1153,8 +1152,8 @@ if [[ $mplayer = "y" ]] &&
     do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
     --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
     --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
-    --extra-ldflags='-Wl,--allow-multiple-definition' --enable-static --enable-runtime-cpudetection \
-    --disable-gif --disable-cddb "${faac[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
+    --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
+    --disable-{gif,cddb} "${faac[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
     do_makeinstall &&
     do_checkIfExist
@@ -1297,7 +1296,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
-            --disable-libguess --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
+            --disable-{libguess,vapoursynth-lazy} "${MPV_OPTS[@]}"
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
