@@ -292,8 +292,6 @@ if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     if do_vcs "https://github.com/sekrit-twc/zimg.git"; then
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        grep -q "Libs.private" zimg.pc.in ||
-            sed -i "/Cflags:/ i\Libs.private: -lstdc++" zimg.pc.in
         do_autoreconf
         do_separate_confmakeinstall
         do_checkIfExist
