@@ -180,7 +180,7 @@ if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    pacman --noconfirm -Su --force --ignore pacman,bash,msys2-runtime
+    pacman --noconfirm -Suu --force --ignore pacman,bash,msys2-runtime
     sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
     echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
         touch build/update_core
