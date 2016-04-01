@@ -1276,7 +1276,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     _check=(bin-video/mpv.{exe,com})
     _deps=({libass,libavcodec,vapoursynth}.pc)
-    if do_vcs "https://github.com/mpv-player/mpv.git"; then
+    if do_vcs "https://github.com/mpv-player/mpv.git#commit=02dfc2c"; then
         # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
         # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
         hide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz,gnutls}.a
