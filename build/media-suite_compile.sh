@@ -632,6 +632,8 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; }
     do_vcs "https://github.com/ultravideo/kvazaar.git"; then
     do_uninstall kvazaar_version.h "${_check[@]}"
     do_autogen
+    /usr/bin/grep -q "time\.h" src/encmain.c ||
+        sed -i '/<string.h>/ a\#include <time.h>' src/encmain.c
     [[ -f Makefile ]] && log distclean make distclean
     [[ $standalone = y || $other265 = y ]] ||
         sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
