@@ -23,7 +23,7 @@ For information about the compiler environment see the wiki, there you also have
 Included Tools And Libraries
 --------
 
-### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/FFmpeg-external-libraries)
+### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/ffmpeg_options.txt)
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
