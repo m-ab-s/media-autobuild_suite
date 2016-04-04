@@ -117,7 +117,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         _check=(libharfbuzz.{l,}a harfbuzz.pc)
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
-        do_separate_confmakeinstall --with-{icu,glob,gobject}=no
+        do_separate_confmakeinstall --with-{icu,glib,gobject}=no
         do_checkIfExist
     fi
 
