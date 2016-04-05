@@ -55,15 +55,15 @@ do_getFFmpegConfig "$license"
 do_getMpvConfig
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
-lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.{,l}a \
-lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio}.{l,}a \
+lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,gnurx,regex}.{,l}a \
+lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic}.{l,}a \
 include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
-opus/opusfile.h \
+opus/opusfile.h regex.h magic.h \
 {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
 {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
 libcdio_{cdda,paranoia}.{{l,}a,pc} \
 share/aclocal/{ogg,vorbis}.m4 \
-twolame.h bin-audio/{twolame,cd-paranoia}.exe
+twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe
 
 if [[ -n "$alloptions" ]]; then
     {
@@ -518,8 +518,6 @@ fi
 _check=(bin-audio/sox.exe)
 if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     do_pacman_install libmad
-    do_uninstall lib{gnurx,regex}.a regex.h magic.h libmagic.{l,}a bin-global/file.exe
-
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
     do_autoreconf
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
