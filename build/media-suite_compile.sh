@@ -332,7 +332,7 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc &&
     do_checkIfExist
 fi
 
-enabled_any libvorbis && do_pacman_install libvorbis
+enabled libvorbis && do_pacman_install libvorbis
 
 if enabled libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
