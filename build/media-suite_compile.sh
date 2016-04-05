@@ -363,17 +363,22 @@ if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
     do_checkIfExist
 fi
 
-_check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
-if [[ $flac = y ]] &&
-    { do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; }; then
+_check=(libFLAC{,++}.{,l}a flac{,++}.pc)
+[[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
+if [[ $flac = y ]] && do_vcs "https://git.xiph.org/flac.git"; then
+    # release = #tag=1.3.1
     do_pacman_install libogg
-    do_wget -h b9922c9a0378c88d3e901b234f852698 \
-        "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
-    _check+=(bin-audio/metaflac.exe)
-    do_uninstall include/FLAC{,++} "${_check[@]}"
-    [[ -f Makefile ]] && log distclean make distclean
+    do_autogen
+    if [[ $standalone = y ]]; then
+        _check+=(bin-audio/metaflac.exe)
+    else
+        sed -i "/^SUBDIRS/,/[^\\]$/{/flac/d;}" src/Makefile.in
+    fi
+    do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
     do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
+elif [[ $sox = y ]] || enabled_any libvorbis libopus; then
+    do_pacman_install flac
 fi
 
 if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
@@ -430,7 +435,6 @@ fi
 _check=(bin-audio/oggenc.exe)
 if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools; then
-    do_pacman_install flac
     _check+=(bin-audio/oggdec.exe)
     do_autoreconf
     do_uninstall "${_check[@]}"
@@ -446,7 +450,6 @@ fi
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
     test_newer installed opus.pc "${_check[0]}"; then
-    do_pacman_install flac
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
@@ -510,7 +513,6 @@ fi
 _check=(libsndfile.{l,}a sndfile.{h,pc})
 if [[ $sox = y ]] && enabled_all libvorbis libopus &&
     do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
-    [[ $flac = y ]] || do_pacman_install flac
     do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
     [[ -f Makefile ]] && log "distclean" make distclean
@@ -522,7 +524,6 @@ fi
 _check=(bin-audio/sox.exe)
 if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     do_pacman_install libmad
-    [[ $flac = y ]] || do_pacman_install flac
     do_uninstall lib{gnurx,regex}.a regex.h magic.h libmagic.{l,}a bin-global/file.exe
 
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac

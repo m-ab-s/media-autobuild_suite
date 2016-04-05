@@ -8,6 +8,7 @@ chromaprint
 dvdnav
 dvdread
 fdk-aac (fdk-aac library only)
+flac
 frei0r
 gnutls
 lept (leptonica)
@@ -43,8 +44,6 @@ zvbi-0.2 (libzvbi)
 ## Libraries not using pkg-config
 To recompile these libs, delete `<libname>.a` with the same name in `/local32/lib` or `/local64/lib`:
 ```
-libjpeg (libjpeg-turbo)
-libgnurx
 libxavs
 ```
 
