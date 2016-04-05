@@ -151,7 +151,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ -z "$gnutls_ver" ]] &&
         gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')"
-    [[ $gnutls_ver ]] || gnutls_ver="3.4.10"
+    gnutls_ver="${gnutls_ver:-3.4.10}"
 
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
@@ -174,7 +174,7 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
-    [[ "$libressl_ver" ]] || libressl_ver="2.3.3"
+    libressl_ver="${libressl_ver:-2.3.3}"
 
     if do_pkgConfig "libssl = $libressl_ver"; then
         _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
