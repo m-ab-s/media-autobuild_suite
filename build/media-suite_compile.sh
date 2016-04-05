@@ -53,6 +53,17 @@ cd_safe "$LOCALBUILDDIR"
 
 do_getFFmpegConfig "$license"
 do_getMpvConfig
+
+do_uninstall q j{config,error,morecfg,peglib}.h \
+lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.{,l}a \
+lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio}.{l,}a \
+include/{nettle,ogg,opus,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
+{nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
+{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
+libcdio_{cdda,paranoia}.{{l,}a,pc} \
+share/aclocal/{ogg,vorbis}.m4 \
+twolame.h bin-audio/{twolame,cd-paranoia}.exe
+
 if [[ -n "$alloptions" ]]; then
     {
         echo '#!/bin/bash'
@@ -71,7 +82,6 @@ _check=(libopenjp2.{a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2; then
     do_pacman_remove openjpeg2
-    do_uninstall q j{config,error,morecfg,peglib}.h libjpeg.a
 
     do_uninstall {include,lib}/openjpeg-2.1 libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
     do_cmakeinstall -DBUILD_CODEC=off
@@ -155,7 +165,6 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
 
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
-        do_uninstall q include/nettle libnettle.a nettle.pc
 
         _check=(libgnutls.{,l}a gnutls.pc)
         do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
@@ -323,17 +332,7 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc &&
     do_checkIfExist
 fi
 
-if [[ $flac = y || $sox = y ]] ||
-    enabled_any libtheora libvorbis libspeex; then
-    do_pacman_install libogg
-    do_uninstall q include/ogg share/aclocal/ogg.m4 libogg.{l,}a ogg.pc
-fi
-
-if enabled_any libvorbis libtheora; then
-    do_pacman_install libvorbis
-    do_uninstall q include/vorbis share/aclocal/vorbis.m4 \
-        libvorbis{,enc,file}.{l,}a vorbis{,enc,file}.pc
-fi
+enabled_any libvorbis && do_pacman_install libvorbis
 
 if enabled libopus; then
     if do_pkgConfig "opus = 1.1.2"; then
@@ -348,10 +347,10 @@ if enabled libopus; then
     fi
 
     [[ $sox = y ]] && do_pacman_install opusfile
-    do_uninstall q opus/opusfile.h libopus{file,url}.{l,}a opus{file,url}.pc
 fi
 
 if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
+    do_pacman_install libogg
     _check=(libspeex.{l,}a speex.pc)
     [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
     do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
@@ -367,6 +366,7 @@ fi
 _check=(libFLAC.{l,}a bin-audio/flac.exe flac{,++}.pc)
 if [[ $flac = y ]] &&
     { do_pkgConfig "flac = 1.3.1" || ! files_exist "${_check[@]}"; }; then
+    do_pacman_install libogg
     do_wget -h b9922c9a0378c88d3e901b234f852698 \
         "http://downloads.xiph.org/releases/flac/flac-1.3.1.tar.xz"
     _check+=(bin-audio/metaflac.exe)
@@ -374,13 +374,6 @@ if [[ $flac = y ]] &&
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
-fi
-
-do_uninstall q include/vo-aacenc libvo-aacenc.{l,}a vo-aacenc.pc
-
-if [[ $ffmpeg != "n" ]] && enabled_any libopencore-amr{wb,nb}; then
-    do_pacman_install opencore-amr
-    do_uninstall q include/opencore-amr{nb,wb} libopencore-amr{nb,wb}.{l,}a opencore-amr{nb,wb}.pc
 fi
 
 if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
@@ -502,12 +495,6 @@ if [[ $ffmpeg != "n" ]] && enabled libgme &&
     do_checkIfExist
 fi
 
-if enabled libtwolame; then
-    do_pacman_install twolame
-    do_uninstall q twolame.h bin-audio/twolame.exe libtwolame.{l,}a twolame.pc
-    do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
-fi
-
 if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
     _check=(libbs2b.{{l,}a,pc})
     do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
@@ -591,11 +578,6 @@ if [[ $rtmpdump = "y" ]] ||
         do_checkIfExist
         unset ssl crypto pc req
     fi
-fi
-
-if [[ $ffmpeg != "n" ]] && enabled libtheora; then
-    do_pacman_install libtheora
-    do_uninstall q include/theora libtheora{,enc,dec}.{l,}a theora{,enc,dec}.pc
 fi
 
 _check=(libvpx.a vpx.pc)
@@ -739,12 +721,6 @@ if [[ $ffmpeg != "n" ]] && enabled libvidstab &&
     do_checkIfExist
 fi
 
-if [[ $ffmpeg != "n" ]] && enabled libcaca; then
-    do_pacman_install libcaca
-    do_uninstall q libcaca.{l,}a caca.pc
-    do_addOption --extra-cflags=-DCACA_STATIC
-fi
-
 _check=(libzvbi.{h,{l,}a})
 if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
     { ! files_exist "${_check[@]}" || ! grep -q "0.2.35" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
@@ -828,13 +804,6 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
     [[ -f Makefile ]] && log "distclean" make distclean
     do_separate_confmakeinstall
     do_checkIfExist
-fi
-
-if [[ $ffmpeg != "n" ]] && enabled libcdio; then
-    [[ -d "$LOCALBUILDDIR/libcdio_paranoia-git" ]] &&
-        add_to_remove "$LOCALBUILDDIR/libcdio_paranoia-git"
-    do_uninstall q include/cdio libcdio_{cdda,paranoia}.{{l,}a,pc} bin-audio/cd-paranoia.exe
-    do_pacman_install libcddb libcdio libcdio-paranoia
 fi
 
 _check=(libgpac_static.a)
@@ -1032,8 +1001,17 @@ if [[ $ffmpeg != "n" ]]; then
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
-    [[ -d "$LOCALBUILDDIR/dcadec-git" ]] && add_to_remove "$LOCALBUILDDIR/dcadec-git"
-    do_uninstall q include/libdcadec libdcadec.a dcadec.pc
+    enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
+    enabled libtheora && do_pacman_install libtheora
+    enabled libcdio && do_pacman_install libcdio-paranoia
+    if enabled libtwolame; then
+        do_pacman_install twolame
+        do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
+    fi
+    if enabled libcaca; then
+        do_pacman_install libcaca
+        do_addOption --extra-cflags=-DCACA_STATIC
+    fi
 
     do_hide_all_sharedlibs
 
@@ -1156,9 +1134,6 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    do_uninstall q include/waio libwaio.a && [[ -d $LOCALBUILDDIR/waio-git ]] &&
-        add_to_remove "$LOCALBUILDDIR/waio-git"
-
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua && do_pkgConfig luajit; then
