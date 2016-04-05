@@ -107,14 +107,14 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 
     [[ ! $harfbuzz_ver ]] &&
-        harfbuzz_ver=$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
-            /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"') &&
+        harfbuzz_ver="$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
+                      /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
-    [[ $harfbuzz_ver ]] || harfbuzz_ver="1.2.4"
+    harfbuzz_ver="${harfbuzz_ver:-1.2.5}"
     _deps=({freetype2,fontconfig}.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
-        _check=(libharfbuzz.{l,}a harfbuzz.pc)
+        _check=(libharfbuzz.{,l}a harfbuzz.pc)
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-{icu,glib,gobject}=no
