@@ -371,7 +371,7 @@ if [[ $flac = y ]] && do_vcs "https://git.xiph.org/flac.git"; then
     do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
     do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
-elif [[ $sox = y ]] || enabled_any libvorbis libopus; then
+elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
 fi
 
