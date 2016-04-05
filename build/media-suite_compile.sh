@@ -148,9 +148,10 @@ fi
 
 if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
-    [[ -z "$gnutls_ver" ]] && gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")"
-    [[ -n "$gnutls_ver" ]] &&
-        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')" || gnutls_ver="3.4.10"
+    [[ -z "$gnutls_ver" ]] &&
+        gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")" &&
+        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')"
+    [[ $gnutls_ver ]] || gnutls_ver="3.4.10"
 
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
