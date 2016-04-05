@@ -93,8 +93,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
+    _check=(libfreetype.{l,}a freetype2.pc)
     if do_pkgConfig "freetype2 = 18.3.12" "2.6.3"; then
-        _check=(libfreetype.{l,}a freetype2.pc)
         do_wget -h 0037b25a8c090bc8a1218e867b32beb1 \
             "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.3.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
@@ -103,9 +103,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 
     _deps=(freetype2.pc)
+    _check=(libfontconfig.{l,}a fontconfig.pc)
     if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove python2-lxml
-        _check=(libfontconfig.{l,}a fontconfig.pc)
         [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget -h 479be870c7f83f15f87bac085b61d641 \
             "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
@@ -123,31 +123,31 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
     harfbuzz_ver="${harfbuzz_ver:-1.2.5}"
     _deps=({freetype2,fontconfig}.pc)
+    _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
-        _check=(libharfbuzz.{,l}a harfbuzz.pc)
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-{icu,glib,gobject}=no
         do_checkIfExist
     fi
 
+    _check=(libfribidi.{l,}a fribidi.pc)
+    [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
     if do_pkgConfig "fribidi = 0.19.7"; then
-        _check=(libfribidi.{l,}a fribidi.pc)
-        [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
         do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
             "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-        do_uninstall include/fribidi bin-global/fribidi.exe "${_check[@]}"
+        do_uninstall include/fribidi "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
         do_separate_confmakeinstall global --disable-{deprecated,debug} --with-glib=no
         do_checkIfExist
     fi
 fi
 
+_check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
 if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
     do_pkgConfig "sdl = 1.2.15"; then
     do_pacman_remove SDL
-    _check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
     do_wget -h 9d96df8417572a2afb781a7c4c811a85 \
         "https://www.libsdl.org/release/SDL-1.2.15.tar.gz"
     do_uninstall include/SDL "${_check[@]}"
@@ -163,11 +163,9 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
         gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')"
     gnutls_ver="${gnutls_ver:-3.4.10}"
-
+    _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
-
-        _check=(libgnutls.{,l}a gnutls.pc)
         do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
@@ -185,10 +183,9 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
         libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
     libressl_ver="${libressl_ver:-2.3.3}"
-
+    _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
+    [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_pkgConfig "libssl = $libressl_ver"; then
-        _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
-        [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
         do_wget "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
         do_uninstall etc/ssl include/openssl "${_check[@]}"
         do_patch "libressl-0001-pc-add-platform-specific-libs-to-Libs.private.patch"
@@ -203,8 +200,8 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
 fi
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
+[[ $standalone = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.48.0"; then
-    [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
     do_wget -h d42e0fc34a5cace5739631cc040974fe "https://curl.haxx.se/download/curl-7.48.0.tar.bz2"
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
@@ -214,6 +211,8 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.48.0"; then
 fi
 
 _check=(libwebp{,mux}.{{,l}a,pc})
+[[ $standalone = y ]] && _check+=(libwebp{demux,decoder,extras}.{{,l}a,pc}
+    bin-global/{{c,d}webp,webpmux}.exe)
 if enabled libwebp && do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install libtiff
     do_autoreconf
@@ -221,8 +220,6 @@ if enabled libwebp && do_vcs "https://chromium.googlesource.com/webm/libwebp"; t
     if [[ $standalone = y ]]; then
         extracommands=(--enable-libwebp{demux,decoder,extras}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental)
-        _check+=(libwebp{demux,decoder,extras}.{{,l}a,pc}
-            bin-global/{{c,d}webp,webpmux}.exe)
     else
         extracommands=()
         sed -i 's/ examples man//' Makefile.in
@@ -255,8 +252,8 @@ unset syspath
 if enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
+    _check=(liblept.{,l}a lept.pc)
     if do_pkgConfig "lept = 1.73"; then
-        _check=(liblept.{,l}a lept.pc)
         do_wget -h 092cea2e568cada79fff178820397922 \
             "http://www.leptonica.com/source/leptonica-1.73.tar.gz"
         do_uninstall include/leptonica "${_check[@]}"
@@ -286,9 +283,9 @@ if enabled libtesseract; then
     fi
 fi
 
+_check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1"; then
-    _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
     do_vcs https://github.com/lachs0r/rubberband.git
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
@@ -335,25 +332,21 @@ fi
 
 enabled libvorbis && do_pacman_install libvorbis
 
-if enabled libopus; then
-    _check=(libopus.{,l}a opus.pc opus/opus.h)
-    if do_pkgConfig "opus = 1.1.2"; then
-        do_wget -h 1f08a661bc72930187893a07f3741a91 \
-            "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
-        do_uninstall include/opus "${_check[@]}"
-        # needed to allow building shared FFmpeg with static libopus
-        sed -i 's, __declspec(dllexport),,' include/opus_defines.h
-        do_separate_confmakeinstall --disable-doc --enable-{intrinsics,rtcd}
-        do_checkIfExist
-    fi
-
-    [[ $sox = y ]] && do_pacman_install opusfile
+_check=(libopus.{,l}a opus.pc opus/opus.h)
+if enabled libopus && do_pkgConfig "opus = 1.1.2"; then
+    do_wget -h 1f08a661bc72930187893a07f3741a91 \
+        "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
+    do_uninstall include/opus "${_check[@]}"
+    # needed to allow building shared FFmpeg with static libopus
+    sed -i 's, __declspec(dllexport),,' include/opus_defines.h
+    do_separate_confmakeinstall --disable-doc --enable-{intrinsics,rtcd}
+    do_checkIfExist
 fi
 
+_check=(libspeex.{l,}a speex.pc)
+[[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
 if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
     do_pacman_install libogg
-    _check=(libspeex.{l,}a speex.pc)
-    [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
     do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
         "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
     do_uninstall include/speex "${_check[@]}"
@@ -382,11 +375,11 @@ elif [[ $sox = y ]] || enabled_any libvorbis libopus; then
     do_pacman_install flac
 fi
 
+_check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
 if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     do_wget_sf -h 588205f686adc23532e31fe3646ddcb6 \
         "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
-    _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
     do_uninstall include/vo-amrwbenc "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
@@ -460,8 +453,8 @@ if [[ $standalone = y ]] && enabled libopus &&
     do_checkIfExist
 fi
 
+_check=(soxr.h libsoxr.a soxr.pc)
 if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
-    _check=(soxr.h libsoxr.a soxr.pc)
     do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
@@ -499,8 +492,8 @@ if [[ $ffmpeg != "n" ]] && enabled libgme &&
     do_checkIfExist
 fi
 
+_check=(libbs2b.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
-    _check=(libbs2b.{{l,}a,pc})
     do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
     do_uninstall include/bs2b "${_check[@]}"
     # sndfile check is disabled since we don't compile binaries anyway
@@ -533,7 +526,11 @@ if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     [[ -f Makefile ]] && log "distclean" make distclean
     extracommands=()
     enabled libvorbis || extracommands+=(--without-oggvorbis)
-    enabled libopus || extracommands+=(--without-opus)
+    if enabled libopus; then
+        do_pacman_install opusfile
+    else
+        extracommands+=(--without-opus)
+    fi
     enabled libtwolame || extracommands+=(--without-twolame)
     enabled libmp3lame || extracommands+=(--without-lame)
     do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
@@ -668,8 +665,8 @@ if { [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     do_checkIfExist
 fi
 
+_check=(libxavs.a xavs.{h,pc})
 if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; then
-    _check=(libxavs.a xavs.{h,pc})
     do_vcs "https://github.com/Distrotech/xavs.git"
     [[ -f "libxavs.a" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
@@ -739,8 +736,8 @@ if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
     do_checkIfExist
 fi
 
+_check=(frei0r.{h,pc})
 if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
-    _check=(frei0r.{h,pc})
     do_wget -h 202375d1bcb545c1b6eb8f34e0260ec5 \
         "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
@@ -1136,11 +1133,11 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
+    _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua && do_pkgConfig luajit; then
         do_pacman_remove lua51
-        _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
         do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
         do_uninstall include/luajit-2.0 lib/lua "${_check[@]}"
         rm -rf ./temp
@@ -1287,8 +1284,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 fi
 
 if [[ $bmx = "y" ]]; then
+    _check=(liburiparser.{{,l}a,pc})
     if do_pkgConfig "liburiparser = 0.8.2"; then
-        _check=(liburiparser.{{,l}a,pc})
         do_wget_sf -h c5cf6b3941d887deb7defc2a86c40f1d \
             "uriparser/Sources/0.8.2/uriparser-0.8.2.tar.bz2"
         do_uninstall include/uriparser "${_check[@]}"
