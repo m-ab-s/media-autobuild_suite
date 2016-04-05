@@ -505,8 +505,7 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
 fi
 
 _check=(libsndfile.{l,}a sndfile.{h,pc})
-if [[ $sox = y ]] && enabled_all libvorbis libopus &&
-    do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
+if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
     do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
     [[ -f Makefile ]] && log "distclean" make distclean
