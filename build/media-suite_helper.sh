@@ -520,6 +520,8 @@ do_pkgConfig() {
         do_print_status "${pkg_and_version}" "$orange_color" "Outdated"
     elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
         do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
+    elif [[ -n "${_check[@]}" ]] && ! files_exist "${_check[@]}"; then
+        do_print_status "${pkg_and_version}" "$orange_color" "Files missing"
     else
         do_print_status "${pkg_and_version}" "$green_color" "Up-to-date"
         return 1

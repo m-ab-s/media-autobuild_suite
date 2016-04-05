@@ -57,7 +57,8 @@ do_getMpvConfig
 do_uninstall q j{config,error,morecfg,peglib}.h \
 lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.{,l}a \
 lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio}.{l,}a \
-include/{nettle,ogg,opus,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
+include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
+opus/opusfile.h \
 {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
 {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
 libcdio_{cdda,paranoia}.{{l,}a,pc} \
@@ -335,8 +336,8 @@ fi
 enabled libvorbis && do_pacman_install libvorbis
 
 if enabled libopus; then
+    _check=(libopus.{,l}a opus.pc opus/opus.h)
     if do_pkgConfig "opus = 1.1.2"; then
-        _check=(libopus.{l,}a opus.pc)
         do_wget -h 1f08a661bc72930187893a07f3741a91 \
             "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
         do_uninstall include/opus "${_check[@]}"
