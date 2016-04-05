@@ -418,14 +418,13 @@ fi
 
 if enabled libfaac; then
     _check=(libfaac.a faac{,cfg}.h)
-    _ver="1.28"
-    _hash="c5dde68840cefe46532089c9392d1df0"
     [[ $standalone = y ]] && _check+=(bin-audio/faac.exe)
     if files_exist "${_check[@]}" &&
-        grep -q "$_ver" "$LOCALDESTDIR/lib/libfaac.a"; then
-        do_print_status "faac $_ver" "$green_color" "Up-to-date"
+        grep -q "1.28" "$LOCALDESTDIR/lib/libfaac.a"; then
+        do_print_status "faac 1.28" "$green_color" "Up-to-date"
     else
-        do_wget_sf -h "$_hash" "faac/faac-src/faac-${_ver}/faac-${_ver}.tar.bz2"
+        do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
+            "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
         ./bootstrap 2>/dev/null
         do_uninstall "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
@@ -459,8 +458,7 @@ if [[ $standalone = y ]] && enabled libopus &&
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
     [[ -f Makefile ]] && log distclean make distclean
-    extracommands=()
-    do_separate_confmakeinstall audio "${extracommands[@]}"
+    do_separate_confmakeinstall audio
     do_checkIfExist
 fi
 
@@ -475,13 +473,12 @@ fi
 
 if enabled libmp3lame; then
     _check=(libmp3lame.{l,}a)
-    _ver="3.99.5"
     [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        grep -q "$_ver" "$LOCALDESTDIR/lib/libmp3lame.a"; then
-        do_print_status "lame $_ver" "$green_color" "Up-to-date"
+        grep -q "3.99.5" "$LOCALDESTDIR/lib/libmp3lame.a"; then
+        do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
     else
-        do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-${_ver}.tar.gz"
+        do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
         if grep -q "xmmintrin\.h" configure.in configure; then
             do_patch lame-fixes.patch
             touch recently_updated
@@ -591,7 +588,7 @@ if [[ $rtmpdump = "y" ]] ||
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
             CRYPTO="$crypto" LIB_${crypto}="$($PKG_CONFIG --libs $pc) -lz" VERSION="$_ver"
         do_checkIfExist
-        unset crypto pc req
+        unset ssl crypto pc req
     fi
 fi
 
@@ -748,11 +745,10 @@ if [[ $ffmpeg != "n" ]] && enabled libcaca; then
 fi
 
 _check=(libzvbi.{h,{l,}a})
-_ver="0.2.35"
-_hash="95e53eb208c65ba6667fd4341455fa27"
 if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
-    { ! files_exist "${_check[@]}" || ! grep -q "${_ver}" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
-    do_wget_sf -h "$_hash" "zapping/zvbi/${_ver}/zvbi-${_ver}.tar.bz2"
+    { ! files_exist "${_check[@]}" || ! grep -q "0.2.35" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
+    do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
+        "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
@@ -781,7 +777,6 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
     _hash=(cd04bb1f07f7aec30ba7944a6bae4378
            261f45f4fa8c69f75cbfaab6d8b68e7b
            871cacb23786aba031da0e7a7b505ff2)
-    _ver="10.6.1"
     if files_exist -v "${_check[@]}" &&
         {
             count=0
@@ -791,7 +786,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
             done
             test x"${_check[$count]}" = x""
         }; then
-        do_print_status "DeckLinkAPI $_ver" "$green_color" "Up-to-date"
+        do_print_status "DeckLinkAPI 10.6.1" "$green_color" "Up-to-date"
     else
         mkdir -p "$LOCALBUILDDIR/DeckLinkAPI" &&
             cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
@@ -807,12 +802,11 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled nvenc; then
-    _ver="6"
     _check=(nvEncodeAPI.h)
     _hash=(dcf25c9910a0af2b3aa20e969eb8c8ad)
     if files_exist -v "${_check[@]}" &&
         check_hash "$(file_installed "${_check[0]}")" "${_hash[0]}"; then
-        do_print_status "nvEncodeAPI ${_ver}.0.1" "$green_color" "Up-to-date"
+        do_print_status "nvEncodeAPI 6.0.1" "$green_color" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
@@ -1315,11 +1309,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 fi
 
 if [[ $bmx = "y" ]]; then
-    _ver="0.8.2"
-    _hash="c5cf6b3941d887deb7defc2a86c40f1d"
-    if do_pkgConfig "liburiparser = $_ver"; then
+    if do_pkgConfig "liburiparser = 0.8.2"; then
         _check=(liburiparser.{{,l}a,pc})
-        do_wget_sf "uriparser/Sources/${_ver}/uriparser-${_ver}.tar.bz2"
+        do_wget_sf -h c5cf6b3941d887deb7defc2a86c40f1d \
+            "uriparser/Sources/0.8.2/uriparser-0.8.2.tar.bz2"
         do_uninstall include/uriparser "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         sed -i '/bin_PROGRAMS/ d' Makefile.am

@@ -1079,11 +1079,8 @@ get_last_version() {
     local version="$3"
     local ret
     ret="$(echo "$filelist" | /usr/bin/grep -E "$filter" | sort -V | tail -1)"
-    if [[ -z "$version" ]]; then
-        echo "$ret"
-    else
-        echo "$ret" | /usr/bin/grep -oP "$version"
-    fi
+    [[ -n "$version" ]] && ret="$(echo "$ret" | /usr/bin/grep -oP "$version")"
+    echo "$ret"
 }
 
 create_debug_link() {
