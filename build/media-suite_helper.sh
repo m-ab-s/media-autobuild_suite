@@ -655,7 +655,6 @@ do_changeFFmpegConfig() {
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
         do_removeOptions "--enable-decklink --enable-libgme" y
-        FFMPEG_OPTS_SHARED+=("--extra-ldflags=-static-libgcc")
     fi
 }
 
