@@ -539,11 +539,6 @@ if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     do_checkIfExist
 fi
 
-if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
-    do_pacman_install libmodplug
-    do_addOption --extra-cflags=-DMODPLUG_STATIC
-fi
-
 _check=(libebur128.a ebur128.h)
 if [[ $ffmpeg != n ]] && enabled libebur128 && ! files_exist "${_check[@]}" &&
     do_vcs "https://github.com/jiixyj/libebur128.git"; then
@@ -1022,6 +1017,10 @@ if [[ $ffmpeg != "n" ]]; then
     if enabled libcaca; then
         do_pacman_install libcaca
         do_addOption --extra-cflags=-DCACA_STATIC
+    fi
+    if enabled libmodplug; then
+        do_pacman_install libmodplug
+        do_addOption --extra-cflags=-DMODPLUG_STATIC
     fi
 
     do_hide_all_sharedlibs
