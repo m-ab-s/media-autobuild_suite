@@ -55,15 +55,15 @@ do_getFFmpegConfig "$license"
 do_getMpvConfig
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
-lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,gnurx,regex}.{,l}a \
-lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic}.{l,}a \
-include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
-opus/opusfile.h regex.h magic.h \
-{nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
-{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
-libcdio_{cdda,paranoia}.{{l,}a,pc} \
-share/aclocal/{ogg,vorbis}.m4 \
-twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,gnurx,regex}.{,l}a \
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic}.{l,}a \
+    include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
+    opus/opusfile.h regex.h magic.h \
+    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
+    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
+    libcdio_{cdda,paranoia}.{{l,}a,pc} \
+    share/aclocal/{ogg,vorbis}.m4 \
+    twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe
 
 if [[ -n "$alloptions" ]]; then
     {
@@ -106,7 +106,6 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _check=(libfontconfig.{l,}a fontconfig.pc)
     if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.94"; then
         do_pacman_remove python2-lxml
-        [[ -d fontconfig-2.11.94 && ! -f fontconfig-2.11.94/fc-blanks/fcblanks.h ]] && rm -rf fontconfig-2.11.94
         do_wget -h 479be870c7f83f15f87bac085b61d641 \
             "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.94.tar.gz"
         do_uninstall include/fontconfig "${_check[@]}"
@@ -285,8 +284,8 @@ fi
 
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
-    ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1"; then
-    do_vcs https://github.com/lachs0r/rubberband.git
+    ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1" &&
+    do_vcs https://github.com/lachs0r/rubberband.git; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
@@ -542,12 +541,13 @@ if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
 fi
 
 _check=(libebur128.a ebur128.h)
-if [[ $ffmpeg != n ]] && enabled libebur128 &&
+if [[ $ffmpeg != n ]] && enabled libebur128 && ! files_exist "${_check[@]}" &&
     do_vcs "https://github.com/jiixyj/libebur128.git"; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall -DENABLE_INTERNAL_QUEUE_H=on
     do_uninstall q "$LOCALDESTDIR"/lib/libebur128.dll{,.a}
     do_checkIfExist
+    add_to_remove
 fi
 
 set_title "compiling video tools"
@@ -672,8 +672,8 @@ if { [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
 fi
 
 _check=(libxavs.a xavs.{h,pc})
-if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1"; then
-    do_vcs "https://github.com/Distrotech/xavs.git"
+if [[ $ffmpeg != "n" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" &&
+    do_vcs "https://github.com/Distrotech/xavs.git"; then
     [[ -f "libxavs.a" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
     sed -i 's|"NUL"|"/dev/null"|g' configure
@@ -832,8 +832,10 @@ if [[ $x264 != n ]]; then
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "https://git.videolan.org/git/ffmpeg.git"
-            do_uninstall include/lib{av{codec,device,filter,format,util,resample},{sw{scale,resample},postproc}} \
-                lib{av{device,filter,util,resample},sw{scale,resample},postproc}.{a,pc} "${_check[@]}"
+            do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample}
+                include/lib{sw{scale,resample},postproc}
+                libav{codec,device,filter,format,util,resample}.{a,pc}
+                lib{sw{scale,resample},postproc}.{a,pc}
             [[ -f "config.mak" ]] && log "distclean" make distclean
             do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
             --disable-{programs,devices,filters,encoders,muxers}
@@ -1142,9 +1144,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
-    elif ! mpv_disabled lua && do_pkgConfig luajit; then
+    elif ! mpv_disabled lua && do_pkgConfig luajit &&
+        do_vcs "http://luajit.org/git/luajit-2.0.git" luajit; then
         do_pacman_remove lua51
-        do_vcs "http://luajit.org/git/luajit-2.0.git" luajit
         do_uninstall include/luajit-2.0 lib/lua "${_check[@]}"
         rm -rf ./temp
         [[ -f "src/luajit.exe" ]] && log "clean" make clean
