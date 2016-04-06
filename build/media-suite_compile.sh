@@ -351,7 +351,11 @@ if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
     do_uninstall include/speex "${_check[@]}"
     do_patch speex-mingw-winmm.patch
     extracommands=()
-    [[ $standalone = y ]] || extracommands+=(--disable-binaries)
+    if [[ $standalone = y ]]; then
+        extracommands+=(--enable-binaries)
+    else
+        extracommands+=(--disable-binaries)
+    fi
     do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
     do_checkIfExist
 fi
