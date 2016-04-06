@@ -379,7 +379,7 @@ elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus;
 fi
 
 _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
-if { [[ $ffmpeg != n ]] && enabled libvo-amrwbenc; } &&
+if [[ $ffmpeg != n ]] && enabled libvo-amrwbenc &&
     do_pkgConfig "vo-amrwbenc = 0.1.2"; then
     do_wget_sf -h 588205f686adc23532e31fe3646ddcb6 \
         "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
@@ -457,7 +457,7 @@ if [[ $standalone = y ]] && enabled libopus &&
 fi
 
 _check=(soxr.h libsoxr.a soxr.pc)
-if { [[ $ffmpeg != "n" ]] && enabled libsoxr; } && do_pkgConfig "soxr = 0.1.2"; then
+if [[ $ffmpeg != "n" ]] && enabled libsoxr && do_pkgConfig "soxr = 0.1.2"; then
     do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
     sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
@@ -726,7 +726,7 @@ if [[ $ffmpeg != "n" ]] && enabled libvidstab &&
 fi
 
 _check=(libzvbi.{h,{l,}a})
-if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
+if [[ $ffmpeg != "n" ]] && enabled libzvbi &&
     { ! files_exist "${_check[@]}" || ! grep -q "0.2.35" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
         "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
@@ -742,7 +742,7 @@ if { [[ $ffmpeg != "n" ]] && enabled libzvbi; } &&
 fi
 
 _check=(frei0r.{h,pc})
-if { [[ $ffmpeg != "n" ]] && enabled frei0r; } && do_pkgConfig "frei0r = 1.3.0"; then
+if [[ $ffmpeg != "n" ]] && enabled frei0r && do_pkgConfig "frei0r = 1.3.0"; then
     do_wget -h 202375d1bcb545c1b6eb8f34e0260ec5 \
         "https://files.dyne.org/frei0r/releases/frei0r-plugins-1.4.tar.gz"
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
