@@ -421,6 +421,8 @@ do_checkIfExist() {
 file_installed() {
     local file
     case $1 in
+        /* )
+            file="$1" ;;
         *.pc )
             file="lib/pkgconfig/$1" ;;
         *.a|*.la|*.lib )
@@ -430,7 +432,7 @@ file_installed() {
         * )
             file="$1" ;;
     esac
-    file="$LOCALDESTDIR/$file"
+    [[ ${file::1} != "/" ]] && file="$LOCALDESTDIR/$file"
     echo "$file" && test -e "$file"
 }
 
