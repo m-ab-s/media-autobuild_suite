@@ -860,13 +860,16 @@ strip_ansi() {
 }
 
 zip_logs() {
-    local failed url
+    local failed url files
     failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
     strip_ansi ./*.log
-    7za -mx=9 a logs.zip ./*.stripped.log ./*.ini ./*_options.txt ./last_run ./media-suite_*.sh \
-        ./diagnostics.txt /trunk/media-autobuild_suite.bat -ir!"$failed/*.log" >/dev/null
+    files=(/trunk/media-autobuild_suite.bat)
+    [[ $failed ]] && files+=($(find $failed -name "*.log"))
+    files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
+        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt"))
+    7za -mx=9 a logs.zip "${files[@]}" >/dev/null
     [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
     echo
