@@ -582,8 +582,7 @@ do_getFFmpegConfig() {
 
     # handle WinXP-incompatible libs
     if [[ $xpcomp = "y" ]]; then
-        do_removeOptions --enable-libmfx --enable-decklink --enable-tesseract \
-            --enable-opencl --enable-libcaca
+        do_removeOption "--enable-(lib(mfx|caca)|decklink|tesseract|opencl)"
     fi
 
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec} &&
@@ -654,7 +653,7 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOptions "--enable-decklink --enable-libgme" y
+        do_removeOption "--enable-(decklink|libgme)" y
     fi
 }
 
