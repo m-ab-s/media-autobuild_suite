@@ -541,6 +541,15 @@ if [[ $ffmpeg != "n" ]] && enabled libmodplug; then
     do_addOption --extra-cflags=-DMODPLUG_STATIC
 fi
 
+_check=(libebur128.a ebur128.h)
+if [[ $ffmpeg != n ]] && enabled libebur128 &&
+    do_vcs "https://github.com/jiixyj/libebur128.git"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall -DENABLE_INTERNAL_QUEUE_H=on
+    do_uninstall q "$LOCALDESTDIR"/lib/libebur128.dll{,.a}
+    do_checkIfExist
+fi
+
 set_title "compiling video tools"
 echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
 
