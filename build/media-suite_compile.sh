@@ -1190,7 +1190,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     vsprefix=$(get_vs_prefix)
-    if [[ $bits = 64bit ]] && ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
+    if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
         vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
         if [[ $vsversion -ge 24 ]]; then
             echo -e "${orange_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
@@ -1219,8 +1219,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             for _file in vapoursynth vsscript; do
                 gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
                     sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
-                dlltool -l "lib${_file}.a" -d "${_file}.def" 2>/dev/null
-                rm -f "${_file}.def"
+                dlltool -l "lib${_file}.a" -d "${_file}.def" \
+                    $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
                 [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             done
 
