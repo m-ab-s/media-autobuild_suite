@@ -1190,7 +1190,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     vsprefix=$(get_vs_prefix)
-    if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
+    if [[ $bits = 64bit ]] && ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
         vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
         if [[ $vsversion -ge 24 ]]; then
             echo -e "${orange_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
