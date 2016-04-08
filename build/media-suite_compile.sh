@@ -1248,6 +1248,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             [[ -f vapoursynth-script.pc ]] && do_install vapoursynth-script.pc
 
             do_checkIfExist
+            add_to_remove
         elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
