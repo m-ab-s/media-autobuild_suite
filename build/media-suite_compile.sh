@@ -1287,7 +1287,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
-        log "install" /usr/bin/python waf install -j "${cpuCount:-1}"
+        log install /usr/bin/python waf install -j "${cpuCount:-1}"
 
         unset mpv_ldflags replace withvs
         unhide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz,gnutls}.a
@@ -1329,7 +1329,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
-    _deps=({liburiparser,libMXF{,++}-1.0}.pc)
+    _deps=({liburiparser,libMXF{,++}-1.0,libcurl}.pc)
     if do_vcs http://git.code.sf.net/p/bmxlib/bmx; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
