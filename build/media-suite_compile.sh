@@ -696,7 +696,7 @@ if [[ $mediainfo = "y" ]]; then
     fi
 
     _check=(libmediainfo.{a,pc})
-    _deps=(libzen.pc)
+    _deps=(lib{zen,curl}.pc)
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
