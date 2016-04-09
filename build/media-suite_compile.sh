@@ -120,7 +120,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         harfbuzz_ver="$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
                       /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.2.5}"
+    harfbuzz_ver="${harfbuzz_ver:-1.2.6}"
     _deps=({freetype2,fontconfig}.pc)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
