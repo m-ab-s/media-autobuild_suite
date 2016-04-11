@@ -459,12 +459,15 @@ if [[ $standalone = y ]] && enabled libopus &&
 fi
 
 _check=(soxr.h libsoxr.a)
-if [[ $ffmpeg != "n" ]] && enabled libsoxr && { ! files_exist "${_check[@]}" ||
-    [[ "$(get_api_version soxr.h SOXR_THIS_VERSION_STR)" != "0.1.2" ]]; }; then
-    do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
-    do_uninstall "${_check[@]}"
-    do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off
-    do_checkIfExist
+if [[ $ffmpeg != "n" ]] && enabled libsoxr; then
+    if files_exist "${_check[@]}" && [[ "$(get_api_version soxr.h VERSION_STR)" = "0.1.2" ]]; then
+        do_print_status "libsoxr 0.1.2" "$green_color" "Up-to-date"
+    else
+        do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
+        do_uninstall "${_check[@]}"
+        do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off
+        do_checkIfExist
+    fi
 fi
 
 if enabled libmp3lame; then
