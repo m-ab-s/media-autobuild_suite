@@ -653,7 +653,7 @@ if { { [[ $ffmpeg != "n" ]] && enabled libbluray; } || ! mpv_disabled libbluray;
     [[ -f Makefile ]] && git clean -qxfd -e "/build_successful*" -e "/recently_updated"
     do_autoreconf
     do_uninstall include/libbluray "${_check[@]}"
-    do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc,udf} \
+    do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc} \
         --without-{libxml2,fontconfig,freetype}
     do_checkIfExist
 fi
