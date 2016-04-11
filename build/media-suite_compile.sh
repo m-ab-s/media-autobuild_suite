@@ -468,6 +468,7 @@ if [[ $ffmpeg != "n" ]] && enabled libsoxr; then
         do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off
         do_checkIfExist
     fi
+    do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
 fi
 
 if enabled libmp3lame; then
@@ -1027,7 +1028,6 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install libmodplug
         do_addOption --extra-cflags=-DMODPLUG_STATIC
     fi
-    enabled libsoxr && do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
 
     do_hide_all_sharedlibs
 
