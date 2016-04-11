@@ -458,12 +458,12 @@ if [[ $standalone = y ]] && enabled libopus &&
     do_checkIfExist
 fi
 
-_check=(soxr.h libsoxr.a soxr.pc)
-if [[ $ffmpeg != "n" ]] && enabled libsoxr && do_pkgConfig "soxr = 0.1.2"; then
+_check=(soxr.h libsoxr.a)
+if [[ $ffmpeg != "n" ]] && enabled libsoxr && { ! files_exist "${_check[@]}" ||
+    [[ "$(get_api_version soxr.h SOXR_THIS_VERSION_STR)" != "0.1.2" ]]; }; then
     do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
-    sed -i 's|NOT WIN32|UNIX|g' ./src/CMakeLists.txt
     do_uninstall "${_check[@]}"
-    do_cmakeinstall -DWITH_{OPENMP,LSR_BINDINGS}=off
+    do_cmakeinstall -DWITH_LSR_BINDINGS=off -DHAVE_WORDS_BIGENDIAN_EXITCODE=1
     do_checkIfExist
 fi
 
@@ -1024,6 +1024,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install libmodplug
         do_addOption --extra-cflags=-DMODPLUG_STATIC
     fi
+    enabled libsoxr && do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
 
     do_hide_all_sharedlibs
 

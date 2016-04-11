@@ -29,7 +29,6 @@ lsmash
 luajit
 rubberband
 sndfile
-soxr (sox resampling library only)
 speex
 tesseract
 vidstab
@@ -45,6 +44,7 @@ zvbi-0.2 (libzvbi)
 To recompile these libs, delete `<libname>.a` with the same name in `/local32/lib` or `/local64/lib`:
 ```
 libxavs
+libsoxr (sox resampling library only)
 ```
 
 ## Apps
