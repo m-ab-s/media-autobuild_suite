@@ -847,8 +847,6 @@ if [[ $x264 != n ]]; then
             do_makeinstall
             do_checkIfExist
             cd_safe "$LOCALBUILDDIR"/x264-git
-        else
-            extracommands+=(--disable-{lavf,swscale,ffms})
         fi
 
         if [[ $standalone = y ]]; then
@@ -862,10 +860,6 @@ if [[ $x264 != n ]]; then
                 do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
-            # x264 prefers and only uses lsmash if available
-            extracommands+=(--disable-gpac)
-        else
-            extracommands+=(--disable-lsmash)
         fi
 
         _check=(x264{,_config}.h libx264.a x264.pc)
@@ -874,7 +868,7 @@ if [[ $x264 != n ]]; then
             extracommands+=(--bindir="$LOCALDESTDIR/bin-video")
             _check+=(bin-video/x264.exe)
         else
-            extracommands+=(--disable-{gpac,cli})
+            extracommands+=(--disable-cli)
         fi
         if [[ $standalone = y && $x264 != h ]]; then
             do_print_progress "Building 10-bit x264"
