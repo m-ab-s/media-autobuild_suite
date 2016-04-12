@@ -6,11 +6,6 @@ This source code is also mirrored in [GitLab](https://gitlab.com/RiCON/media-aut
 
 Most git sources in the suite use GitHub, so if it's down, it's probably useless to run the suite at that time.
 
-Known Issues
---------
- - `error: GPGME error: Invalid crypto engine`
-    - probably rare bug with Win7 64-bits, use msys32 instead of msys64
-    - Check #252 for more information
 
 Download
 --------
