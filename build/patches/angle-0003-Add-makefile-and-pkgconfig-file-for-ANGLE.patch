@@ -1,4 +1,4 @@
-From 6219272cccbfda57c7f96c1223a5189bcb04af2b Mon Sep 17 00:00:00 2001
+From 0a763567ff1b60bb26d0f6cd960d8ad85f96c18d Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
@@ -7,21 +7,21 @@ Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
 
-Update to 3477f3a
+Update to 6f6c558
 easy way to check new files: `git diff <last commit>.. src/*.gypi`
 ---
- Makefile     | 405 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 407 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 415 insertions(+)
+ 2 files changed, 417 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..da4e316
+index 0000000..2a761c9
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,405 @@
+@@ -0,0 +1,407 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -59,6 +59,7 @@ index 0000000..da4e316
 +	src/compiler/translator/CallDAG.o \
 +	src/compiler/translator/CodeGen.o \
 +	src/compiler/translator/Compiler.o \
++	src/compiler/translator/DeferGlobalInitializers.o \
 +	src/compiler/translator/Diagnostics.o \
 +	src/compiler/translator/DirectiveHandler.o \
 +	src/compiler/translator/EmulatePrecision.o \
@@ -128,6 +129,7 @@ index 0000000..da4e316
 +	src/compiler/translator/SeparateDeclarations.o \
 +	src/compiler/translator/SeparateExpressionsReturningArrays.o \
 +	src/compiler/translator/StructureHLSL.o \
++	src/compiler/translator/TextureFunctionHLSL.o \
 +	src/compiler/translator/TranslatorHLSL.o \
 +	src/compiler/translator/UnfoldShortCircuitToIf.o \
 +	src/compiler/translator/UniformHLSL.o \
@@ -444,5 +446,5 @@ index 0000000..b9ec3c2
 +Libs.private: -lGLESv2 -ldxguid -ld3d9 -lopengl32 -lgdi32 -lstdc++
 +Cflags: %CFLAGS%
 -- 
-2.8.0
+2.8.1
 
