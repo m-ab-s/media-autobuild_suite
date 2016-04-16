@@ -479,12 +479,8 @@ if enabled libmp3lame; then
         do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
     else
         do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
-        if grep -q "xmmintrin\.h" configure.in configure; then
-            do_patch lame-fixes.patch
-            touch recently_updated
-            do_autoreconf
-        fi
         do_uninstall include/lame "${_check[@]}"
+        sed -i '/xmmintrin\.h/d' configure
         [[ -f Makefile ]] && log distclean make distclean
         extracommands=()
         [[ $standalone = y ]] || extracommands+=(--disable-frontend)
