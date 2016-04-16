@@ -215,7 +215,6 @@ _check=(libwebp{,mux}.{{,l}a,pc})
 if enabled libwebp && do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install libtiff
     do_autoreconf
-    [[ -f Makefile ]] && log distclean make distclean
     if [[ $standalone = y ]]; then
         extracommands=(--enable-libwebp{demux,decoder,extras}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental)
@@ -300,7 +299,6 @@ if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
     if do_vcs "https://github.com/sekrit-twc/zimg.git"; then
         do_uninstall "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         do_autoreconf
         do_separate_confmakeinstall
         do_checkIfExist
@@ -334,7 +332,6 @@ _check=(ilbc.h libilbc.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libilbc &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
     do_autoreconf
-    [[ -f Makefile ]] && log distclean make distclean
     do_uninstall "${_check[@]}"
     do_separate_confmakeinstall
     do_checkIfExist
@@ -395,7 +392,6 @@ if [[ $ffmpeg != n ]] && enabled libvo-amrwbenc &&
     do_wget_sf -h 588205f686adc23532e31fe3646ddcb6 \
         "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
     do_uninstall include/vo-amrwbenc "${_check[@]}"
-    [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
     do_checkIfExist
 fi
@@ -405,7 +401,6 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     if do_vcs "https://github.com/mstorsjo/fdk-aac"; then
         do_autoreconf
         do_uninstall include/fdk-aac "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
         do_checkIfExist
     fi
@@ -415,7 +410,6 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
         do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac; then
         do_autoreconf
         do_uninstall "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
         do_checkIfExist
     else
@@ -446,7 +440,6 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     _check+=(bin-audio/oggdec.exe)
     do_autoreconf
     do_uninstall "${_check[@]}"
-    [[ -f Makefile ]] && log distclean make distclean
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
     do_separate_confmakeinstall audio \
@@ -462,7 +455,6 @@ if [[ $standalone = y ]] && enabled libopus &&
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
-    [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall audio
     do_checkIfExist
 fi
@@ -490,7 +482,6 @@ if enabled libmp3lame; then
         do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
         do_uninstall include/lame "${_check[@]}"
         sed -i '/xmmintrin\.h/d' configure
-        [[ -f Makefile ]] && log distclean make distclean
         extracommands=()
         [[ $standalone = y ]] || extracommands+=(--disable-frontend)
         do_separate_confmakeinstall audio --disable-decoder "${extracommands[@]}"
@@ -513,7 +504,6 @@ if [[ $ffmpeg != "n" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; th
     # sndfile check is disabled since we don't compile binaries anyway
     /usr/bin/grep -q sndfile configure && sed -i '20119,20133d' configure
     sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
-    [[ -f Makefile ]] && log distclean make distclean
     do_separate_confmakeinstall
     do_checkIfExist
 fi
@@ -524,7 +514,6 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
     sed -i 's/EXTERNAL_LIBS/EXTERNAL_XIPH_LIBS/' sndfile.pc.in
     do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
-    [[ -f Makefile ]] && log "distclean" make distclean
     do_separate_confmakeinstall
     do_checkIfExist
 fi
@@ -535,7 +524,6 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
-    [[ -f Makefile ]] && log "distclean" make distclean
     extracommands=()
     enabled libmp3lame || extracommands+=(--without-lame)
     enabled_any libopencore-amr{wb,nb} || extracommands+=(--without-amr{wb,nb})
@@ -632,7 +620,6 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; }
     do_vcs "https://github.com/ultravideo/kvazaar.git"; then
     do_uninstall kvazaar_version.h "${_check[@]}"
     do_autogen
-    [[ -f Makefile ]] && log distclean make distclean
     [[ $standalone = y || $other265 = y ]] ||
         sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     do_separate_confmakeinstall video
@@ -644,7 +631,6 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     if do_vcs "https://git.videolan.org/git/libdvdread.git" dvdread; then
         do_autoreconf
         do_uninstall include/dvdread "${_check[@]}"
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall
         do_checkIfExist
     fi
@@ -655,7 +641,6 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     if do_vcs "https://git.videolan.org/git/libdvdnav.git" dvdnav; then
         do_autoreconf
         do_uninstall include/dvdnav "${_check[@]}"
-        [[ -f Makefile ]] && log "distclean" make distclean
         do_separate_confmakeinstall
         do_checkIfExist
     fi
@@ -664,7 +649,6 @@ fi
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "n" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://git.videolan.org/git/libbluray.git"; then
-    [[ -f Makefile ]] && git clean -qxfd -e "/build_successful*" -e "/recently_updated"
     do_autoreconf
     do_uninstall include/libbluray "${_check[@]}"
     do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc} \
@@ -679,7 +663,6 @@ if { [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     do_vcs "https://github.com/libass/libass.git"; then
     do_autoreconf
     do_uninstall "${_check[@]}"
-    [[ -f Makefile ]] && log "distclean" make distclean
     extracommands=()
     enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
     do_separate_confmakeinstall "${extracommands[@]}"
@@ -749,7 +732,6 @@ if [[ $ffmpeg != "n" ]] && enabled libzvbi &&
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_patch "zvbi-win32.patch"
     do_patch "zvbi-ioctl.patch"
-    [[ -f Makefile ]] && log distclean make distclean
     CFLAGS+=" -DPTW32_STATIC_LIB" do_separate_conf --disable-{dvb,bktr,nls,proxy} \
         --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
@@ -821,7 +803,6 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx; then
     do_autoreconf
     do_uninstall include/mfx "${_check[@]}"
-    [[ -f Makefile ]] && log "distclean" make distclean
     do_separate_confmakeinstall
     do_checkIfExist
 fi
@@ -1305,9 +1286,8 @@ if [[ $bmx = "y" ]]; then
         do_wget_sf -h c5cf6b3941d887deb7defc2a86c40f1d \
             "uriparser/Sources/0.8.2/uriparser-0.8.2.tar.bz2"
         do_uninstall include/uriparser "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         sed -i '/bin_PROGRAMS/ d' Makefile.am
-        do_separate_confmakeinstall --disable-test --disable-doc
+        do_separate_confmakeinstall --disable-{test,doc}
         do_checkIfExist
     fi
 
@@ -1315,7 +1295,6 @@ if [[ $bmx = "y" ]]; then
     if do_vcs http://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0; then
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
         do_checkIfExist
     fi
@@ -1325,7 +1304,6 @@ if [[ $bmx = "y" ]]; then
     if do_vcs http://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0; then
         do_autogen
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video --disable-examples
         do_checkIfExist
     fi
@@ -1336,7 +1314,6 @@ if [[ $bmx = "y" ]]; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
         do_separate_confmakeinstall video
         do_checkIfExist
     fi
