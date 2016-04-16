@@ -529,8 +529,10 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
     do_checkIfExist
 fi
 
-_check=(bin-audio/sox.exe)
-if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
+_check=(bin-audio/sox.exe sox.pc)
+_deps=({sndfile,opus}.pc libmp3lame.a)
+if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
+    do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
     [[ -f Makefile ]] && log "distclean" make distclean
@@ -549,6 +551,7 @@ if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
     do_make
     do_install src/sox.exe bin-audio/
+    do_install sox.pc
     do_checkIfExist
 fi
 
