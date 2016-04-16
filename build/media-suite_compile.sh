@@ -321,6 +321,15 @@ fi
 set_title "compiling audio tools"
 echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
 
+if [[ $ffmpeg != "n" || $sox = y ]]; then
+    enabled libwavpack && do_pacman_install wavpack
+    enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
+    if enabled libtwolame; then
+        do_pacman_install twolame
+        do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
+    fi
+fi
+
 _check=(ilbc.h libilbc.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libilbc &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
@@ -522,19 +531,20 @@ fi
 _check=(bin-audio/sox.exe)
 if [[ $sox = y ]] && do_vcs "http://git.code.sf.net/p/sox/code" sox; then
     do_pacman_install libmad
-    sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure.ac
-    do_autoreconf
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
     [[ -f Makefile ]] && log "distclean" make distclean
     extracommands=()
-    enabled libvorbis || extracommands+=(--without-oggvorbis)
+    enabled libmp3lame || extracommands+=(--without-lame)
+    enabled_any libopencore-amr{wb,nb} || extracommands+=(--without-amr{wb,nb})
     if enabled libopus; then
         do_pacman_install opusfile
     else
         extracommands+=(--without-opus)
     fi
     enabled libtwolame || extracommands+=(--without-twolame)
-    enabled libmp3lame || extracommands+=(--without-lame)
+    enabled libvorbis || extracommands+=(--without-oggvorbis)
+    enabled libwavpack || extracommands+=(--without-wavpack)
+    sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
     do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
     do_make
     do_install src/sox.exe bin-audio/
@@ -989,7 +999,6 @@ if [[ $ffmpeg != "n" ]]; then
     enabled gcrypt && do_pacman_install libgcrypt
     enabled libschroedinger && do_pacman_install schroedinger
     enabled libgsm && do_pacman_install gsm
-    enabled libwavpack && do_pacman_install wavpack
     enabled libsnappy && do_pacman_install snappy
     if enabled libxvid; then
         do_pacman_install xvidcore
@@ -1003,13 +1012,8 @@ if [[ $ffmpeg != "n" ]]; then
         grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
             sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
-    enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     enabled libtheora && do_pacman_install libtheora
     enabled libcdio && do_pacman_install libcdio-paranoia
-    if enabled libtwolame; then
-        do_pacman_install twolame
-        do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
-    fi
     if enabled libcaca; then
         do_pacman_install libcaca
         do_addOption --extra-cflags=-DCACA_STATIC
