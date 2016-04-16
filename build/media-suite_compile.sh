@@ -520,10 +520,11 @@ fi
 
 _check=(libsndfile.{l,}a sndfile.{h,pc})
 if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
+    sed -i 's/ examples regtest tests programs//g' Makefile.am
+    sed -i 's/EXTERNAL_LIBS/EXTERNAL_XIPH_LIBS/' sndfile.pc.in
     do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
     [[ -f Makefile ]] && log "distclean" make distclean
-    sed -i 's/ examples regtest tests programs//g' Makefile.am
     do_separate_confmakeinstall
     do_checkIfExist
 fi
