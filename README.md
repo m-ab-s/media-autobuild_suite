@@ -51,7 +51,7 @@ Included Tools And Libraries
         - libfribidi (0.19.7)
         - libgme (git snapshot)
         - libgsm (mingw)
-        - libilbc (git)
+        - libilbc (git snapshot)
         - libmfx (git)
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
@@ -59,7 +59,7 @@ Included Tools And Libraries
         - librtmp (git)
             - compiled with gnutls or openssl depending on license chosen
         - libschroedinger (mingw)
-        - libsoxr (git)
+        - libsoxr (0.1.2)
         - libspeex (1.2rc2)
         - libtheora (mingw)
         - libtwolame (mingw)

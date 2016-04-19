@@ -329,12 +329,13 @@ if [[ $ffmpeg != "n" || $sox = y ]]; then
 fi
 
 _check=(ilbc.h libilbc.{{l,}a,pc})
-if [[ $ffmpeg != "n" ]] && enabled libilbc &&
+if [[ $ffmpeg != "n" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev" &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
     do_autoreconf
     do_uninstall "${_check[@]}"
     do_separate_confmakeinstall
     do_checkIfExist
+    add_to_remove
 fi
 
 enabled libvorbis && do_pacman_install libvorbis
