@@ -1,4 +1,4 @@
-From 0a763567ff1b60bb26d0f6cd960d8ad85f96c18d Mon Sep 17 00:00:00 2001
+From d2a3e3327f614b1b470eec12e1216ad2769b3d0e Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
@@ -7,21 +7,21 @@ Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
 
-Update to 6f6c558
+Update to b0a5310
 easy way to check new files: `git diff <last commit>.. src/*.gypi`
 ---
- Makefile     | 407 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ Makefile     | 414 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  libEGL.pc.in |  10 ++
- 2 files changed, 417 insertions(+)
+ 2 files changed, 424 insertions(+)
  create mode 100644 Makefile
  create mode 100644 libEGL.pc.in
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..2a761c9
+index 0000000..c7f757d
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,407 @@
+@@ -0,0 +1,414 @@
 +VERSION = 0.0.0
 +CXX ?= g++
 +AR ?= ar
@@ -219,6 +219,7 @@ index 0000000..2a761c9
 +	src/libANGLE/renderer/d3d/loadimage.o \
 +	src/libANGLE/renderer/d3d/loadimageSSE2.o \
 +	src/libANGLE/renderer/d3d/loadimage_etc.o \
++	src/libANGLE/renderer/d3d/NativeWindowD3D.o \
 +	src/libANGLE/renderer/d3d/ProgramD3D.o \
 +	src/libANGLE/renderer/d3d/RenderbufferD3D.o \
 +	src/libANGLE/renderer/d3d/RendererD3D.o \
@@ -240,6 +241,7 @@ index 0000000..2a761c9
 +	src/libANGLE/renderer/d3d/d3d9/Framebuffer9.o \
 +	src/libANGLE/renderer/d3d/d3d9/Image9.o \
 +	src/libANGLE/renderer/d3d/d3d9/IndexBuffer9.o \
++	src/libANGLE/renderer/d3d/d3d9/NativeWindow9.o \
 +	src/libANGLE/renderer/d3d/d3d9/Query9.o \
 +	src/libANGLE/renderer/d3d/d3d9/Renderer9.o \
 +	src/libANGLE/renderer/d3d/d3d9/renderer9_utils.o \
@@ -279,8 +281,13 @@ index 0000000..2a761c9
 +	src/libANGLE/renderer/d3d/d3d11/VertexBuffer11.o \
 +	src/libANGLE/renderer/d3d/d3d11/VertexArray11.o
 +libangle_d3d11_win32_sources = \
-+	src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow.o \
++	src/libANGLE/renderer/d3d/d3d11/win32/NativeWindow11Win32.o \
 +	src/third_party/systeminfo/SystemInfo.o
++libangle_d3d11_winrt_sources = \
++	src/libANGLE/renderer/d3d/d3d11/winrt/CoreWindowNativeWindow.o \
++	src/libANGLE/renderer/d3d/d3d11/winrt/InspectableNativeWindow.o \
++	src/libANGLE/renderer/d3d/d3d11/winrt/NativeWindow11WinRT.o \
++	src/libANGLE/renderer/d3d/d3d11/winrt/SwapChainPanelNativeWindow.o
 +libglesv2_sources = \
 +	src/libGLESv2/entry_points_egl.o \
 +	src/libGLESv2/entry_points_egl_ext.o \
