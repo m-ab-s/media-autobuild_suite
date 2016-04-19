@@ -49,7 +49,7 @@ Included Tools And Libraries
         - libcaca (mingw)
         - libfreetype (2.6.3)
         - libfribidi (0.19.7)
-        - libgme (git)
+        - libgme (git snapshot)
         - libgsm (mingw)
         - libilbc (git)
         - libmfx (git)
