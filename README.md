@@ -32,11 +32,11 @@ Included Tools And Libraries
         - schannel with libgcrypt
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt can be switched by gmp with --enable-gmp
-        - sdl (mingw)
+        - sdl (1.2.15)
             - enabled by default, use --disable-sdl or --disable-ffplay if unwanted
     - Zeranoe-emulating build (in addition to Light)
         - decklink (10.6)
-        - fontconfig (2.11.94)
+        - fontconfig (2.11.95)
         - frei0r (1.4)
         - gnutls (latest release)
         - libressl (latest release)
@@ -97,9 +97,9 @@ Included Tools And Libraries
     - mplayer (svn)
     - mpv (git) including in addition to ffmpeg libs:
         - uchardet
-        - ANGLE (git snapshot)
+        - ANGLE (git)
         - luajit (git)
-        - vapoursynth (if installed)
+        - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (0.1.9)
     - rtmpdump (git)
     - speex (1.2rc2)
