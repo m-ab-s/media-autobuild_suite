@@ -717,11 +717,12 @@ if [[ $mediainfo = "y" ]]; then
 fi
 
 _check=(libvidstab.a vidstab.pc)
-if [[ $ffmpeg != "n" ]] && enabled libvidstab &&
+if [[ $ffmpeg != "n" ]] && enabled libvidstab && do_pkgConfig "vidstab = 1.10" &&
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab; then
     do_uninstall include/vid.stab "${_check[@]}"
     do_cmakeinstall
     do_checkIfExist
+    add_to_remove
 fi
 
 _check=(libzvbi.{h,{l,}a})

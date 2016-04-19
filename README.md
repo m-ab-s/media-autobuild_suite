@@ -63,7 +63,7 @@ Included Tools And Libraries
         - libspeex (1.2rc2)
         - libtheora (mingw)
         - libtwolame (mingw)
-        - libvidstab (git)
+        - libvidstab (git snapshot)
         - libvo-amrwbenc (0.1.2)
         - libwavpack (mingw)
         - libwebp (git)
