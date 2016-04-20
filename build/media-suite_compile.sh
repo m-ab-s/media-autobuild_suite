@@ -117,7 +117,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 
     [[ ! $harfbuzz_ver ]] &&
-        harfbuzz_ver="$(/usr/bin/curl -sl "https://www.freedesktop.org/software/harfbuzz/release/" |
+        harfbuzz_ver="$("${curl_opts[@]}" -l "https://www.freedesktop.org/software/harfbuzz/release/" |
                       /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
     harfbuzz_ver="${harfbuzz_ver:-1.2.6}"
@@ -159,7 +159,7 @@ fi
 if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
     [[ -z "$gnutls_ver" ]] &&
-        gnutls_ver="$(/usr/bin/curl -sl "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")" &&
+        gnutls_ver="$("${curl_opts[@]}" -l "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.4/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.4\.\d+(\.\d+)?')"
     gnutls_ver="${gnutls_ver:-3.4.11}"
     _check=(libgnutls.{,l}a gnutls.pc)
@@ -179,7 +179,7 @@ fi
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ $rtmpdump = y && $license = nonfree ]]; }; then
     [[ ! "$libressl_ver" ]] &&
-        libressl_ver="$(/usr/bin/curl -sl "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
+        libressl_ver="$("${curl_opts[@]}" -l "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
     libressl_ver="${libressl_ver:-2.3.3}"
     _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
@@ -1190,7 +1190,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
             do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
             baseurl="https://github.com/vapoursynth/vapoursynth/raw/"
-            [[ $(curl -sLw "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac") != 404 ]] &&
+            [[ $("${curl_opts[@]}" -w "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac") != 404 ]] &&
                 baseurl+="R${vsversion}" || baseurl+="master"
             mkdir -p "$LOCALBUILDDIR/vapoursynth" && cd_safe "$LOCALBUILDDIR/vapoursynth"
 
@@ -1210,7 +1210,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             done
 
-            /usr/bin/curl -sL "$baseurl/pc/vapoursynth.pc.in" |
+            "${curl_opts[@]}" "$baseurl/pc/vapoursynth.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \
@@ -1219,7 +1219,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 -e '/Libs.private/ d' \
                 > vapoursynth.pc
             [[ -f vapoursynth.pc ]] && do_install vapoursynth.pc
-            /usr/bin/curl -sL "$baseurl/pc/vapoursynth-script.pc.in" |
+            "${curl_opts[@]}" "$baseurl/pc/vapoursynth-script.pc.in" |
             sed -e "s;@prefix@;$LOCALDESTDIR;" \
                 -e 's;@exec_prefix@;${prefix};' \
                 -e 's;@libdir@;${prefix}/lib;' \

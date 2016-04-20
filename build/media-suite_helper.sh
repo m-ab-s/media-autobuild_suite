@@ -6,6 +6,7 @@ if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
     cpuCount="$(($(nproc)/2))"
 fi
 bits="${bits:-64bit}"
+curl_opts=(/usr/bin/curl --connect-timeout 60 --retry 3 --retry-delay 5 --silent --location --insecure --fail)
 
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
@@ -213,6 +214,7 @@ check_hash() {
     fi
 }
 
+
 # get wget download
 do_wget() {
     local nocd norm quiet hash notmodified
@@ -240,7 +242,7 @@ do_wget() {
         [[ ${url#$LOCALBUILDDIR} != "${url}" ]] &&
             url="https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master${url}"
 
-        curlcmds=(/usr/bin/curl --retry 20 --retry-max-time 5 -sLkf)
+        curlcmds=("${curl_opts[@]}")
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
