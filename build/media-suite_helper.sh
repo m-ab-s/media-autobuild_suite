@@ -1122,7 +1122,7 @@ get_vs_prefix() {
         [[ -n "$vsprefix" ]] && vsprefix="$(cygpath -u "$vsprefix/core64")" || vsprefix=""
         [[ -n "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
             echo "$vsprefix"
-    elif regtool -qW check "$regkey"; then
+    elif regtool -qW check "$regkey" && [[ $(regtool -qW list "$regkey") = *Path* ]]; then
         # check in registry for installed VS
         vsprefix="$(regtool -W get "$regkey/path")"
         [[ -n "$vsprefix" ]] && vsprefix=$(cygpath -u "$vsprefix/core${bits:0:2}") || vsprefix=""
