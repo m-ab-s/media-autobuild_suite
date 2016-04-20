@@ -345,9 +345,7 @@ if enabled libopus && do_pkgConfig "opus = 1.1.2"; then
     do_wget -h 1f08a661bc72930187893a07f3741a91 \
         "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
     do_uninstall include/opus "${_check[@]}"
-    # needed to allow building shared FFmpeg with static libopus
-    sed -i 's, __declspec(dllexport),,' include/opus_defines.h
-    do_separate_confmakeinstall --disable-doc --enable-{intrinsics,rtcd}
+    CFLAGS=" -DOPUS_EXPORT=" do_separate_confmakeinstall --disable-doc --enable-{intrinsics,rtcd}
     do_checkIfExist
 fi
 
