@@ -240,7 +240,7 @@ do_wget() {
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
         [[ ${url#$LOCALBUILDDIR} != "${url}" ]] &&
-            url="https://raw.githubusercontent.com/jb-alvarado/media-autobuild_suite/master${url}"
+            url="https://jb-alvarado.github.io/media-autobuild_suite${url#$LOCALBUILDDIR}"
 
         curlcmds=("${curl_opts[@]}")
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
