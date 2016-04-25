@@ -1,0 +1,11 @@
+--- opus-1.1.2/include/opus_defines.h.orig	2016-04-20 17:26:10.689881100 +0100
++++ opus-1.1.2/include/opus_defines.h	2016-04-20 17:26:25.652117100 +0100
+@@ -65,7 +65,7 @@
+ 
+ #ifndef OPUS_EXPORT
+ # if defined(WIN32)
+-#  ifdef OPUS_BUILD
++#  if defined(OPUS_BUILD) && defined(DLL_EXPORT)
+ #   define OPUS_EXPORT __declspec(dllexport)
+ #  else
+ #   define OPUS_EXPORT

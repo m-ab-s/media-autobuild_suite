@@ -1,0 +1,63 @@
+diff --git a/source/cmake/version.cmake b/source/cmake/version.cmake
+index a775834..2333296 100644
+--- a/source/cmake/version.cmake
++++ b/source/cmake/version.cmake
+@@ -52,39 +52,47 @@ elseif(HG_EXECUTABLE AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.hg)
+         )
+     execute_process(
+         COMMAND
+-        ${HG_EXECUTABLE} log -r. --template "{node|short}"
++        ${HG_EXECUTABLE} log -r. --template "{node}"
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+-        OUTPUT_VARIABLE HG_REVISION_ID
++        OUTPUT_VARIABLE X265_REVISION_ID
+         ERROR_QUIET
+         OUTPUT_STRIP_TRAILING_WHITESPACE
+         )
++    string(SUBSTRING "${X265_REVISION_ID}" 0 16 X265_REVISION_ID)
+ 
+     if(X265_LATEST_TAG MATCHES "^r")
+         string(SUBSTRING ${X265_LATEST_TAG} 1 -1 X265_LATEST_TAG)
+     endif()
+-    if(X265_TAG_DISTANCE STREQUAL "0")
+-        set(X265_VERSION "${X265_LATEST_TAG}")
+-    else()
+-        set(X265_VERSION "${X265_LATEST_TAG}+${X265_TAG_DISTANCE}-${HG_REVISION_ID}")
+-    endif()
+ elseif(GIT_EXECUTABLE AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../.git)
+     execute_process(
+         COMMAND
+-        ${GIT_EXECUTABLE} describe --tags --abbrev=0
++        ${GIT_EXECUTABLE} describe --tags --abbrev=0 --first-parent
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+         OUTPUT_VARIABLE X265_LATEST_TAG
+         ERROR_QUIET
+         OUTPUT_STRIP_TRAILING_WHITESPACE
+         )
+-
+     execute_process(
+         COMMAND
+-        ${GIT_EXECUTABLE} describe --tags
++        ${GIT_EXECUTABLE} rev-list ${X265_LATEST_TAG}.. --count --first-parent
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+-        OUTPUT_VARIABLE X265_VERSION
++        OUTPUT_VARIABLE X265_TAG_DISTANCE
+         ERROR_QUIET
+         OUTPUT_STRIP_TRAILING_WHITESPACE
+         )
++    execute_process(
++        COMMAND
++        ${GIT_EXECUTABLE} log -1 --format=g%h
++        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
++        OUTPUT_VARIABLE X265_REVISION_ID
++        ERROR_QUIET
++        OUTPUT_STRIP_TRAILING_WHITESPACE
++        )
++endif()
++if(X265_TAG_DISTANCE STREQUAL "0")
++    set(X265_VERSION "${X265_LATEST_TAG}")
++else()
++    set(X265_VERSION "${X265_LATEST_TAG}+${X265_TAG_DISTANCE}-${X265_REVISION_ID}")
+ endif()
+ 
+ message(STATUS "x265 version ${X265_VERSION}")
