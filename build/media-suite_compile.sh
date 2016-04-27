@@ -117,9 +117,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 
     [[ ! $harfbuzz_ver ]] &&
-        harfbuzz_ver="$("${curl_opts[@]}" -l "https://www.freedesktop.org/software/harfbuzz/release/" |
-                      /usr/bin/grep -Po '(?<=href=)"harfbuzz.*.tar.bz2"')" &&
-        harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "" "1\.\d+\.\d+")"
+        harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
+        harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
     harfbuzz_ver="${harfbuzz_ver:-1.2.6}"
     _deps=({freetype2,fontconfig}.pc)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
