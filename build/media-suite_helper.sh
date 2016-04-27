@@ -1087,6 +1087,12 @@ get_first_subdir() {
     fi
 }
 
+clean_html_index() {
+    local url="$1"
+    local filter="${2:-(?<=href=\")[^\"]+\.tar\.(gz|bz2|xz)}"
+    "${curl_opts[@]}" -l "$url" | grep -ioP "$filter" | sort -uV
+}
+
 get_last_version() {
     local filelist="$1"
     local filter="$2"

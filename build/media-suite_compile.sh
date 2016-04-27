@@ -179,13 +179,13 @@ fi
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ $rtmpdump = y && $license = nonfree ]]; }; then
     [[ ! "$libressl_ver" ]] &&
-        libressl_ver="$("${curl_opts[@]}" -l "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
-        libressl_ver="$(get_last_version "$libressl_ver" "tar.gz$" '2\.\d+\.\d+')"
+        libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
+        libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
     libressl_ver="${libressl_ver:-2.3.3}"
     _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_pkgConfig "libssl = $libressl_ver"; then
-        do_wget "ftp://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
+        do_wget "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
         do_uninstall etc/ssl include/openssl "${_check[@]}"
         do_patch "libressl-0001-pc-add-platform-specific-libs-to-Libs.private.patch"
         _sed="man"
