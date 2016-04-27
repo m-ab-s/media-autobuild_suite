@@ -626,7 +626,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    local nonfree=(nvenc libfaac)
+    local nonfree=(libfaac)
     if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
         do_addOption --enable-nonfree
     else
