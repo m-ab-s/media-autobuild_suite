@@ -1,4 +1,4 @@
-From d2a3e3327f614b1b470eec12e1216ad2769b3d0e Mon Sep 17 00:00:00 2001
+From 8e93ca36ce05ac033198f0328795f758fb4dba80 Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
@@ -7,7 +7,7 @@ Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
 
-Update to b0a5310
+Update to 9670b03
 easy way to check new files: `git diff <last commit>.. src/*.gypi`
 ---
  Makefile     | 414 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -18,7 +18,7 @@ easy way to check new files: `git diff <last commit>.. src/*.gypi`
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..c7f757d
+index 0000000..c7fa3e6
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,414 @@
@@ -163,7 +163,7 @@ index 0000000..c7f757d
 +	src/libANGLE/Compiler.o \
 +	src/libANGLE/Config.o \
 +	src/libANGLE/Context.o \
-+	src/libANGLE/Data.o \
++	src/libANGLE/ContextState.o \
 +	src/libANGLE/Debug.o \
 +	src/libANGLE/Device.o \
 +	src/libANGLE/Display.o \
