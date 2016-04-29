@@ -976,8 +976,11 @@ do_hide_all_sharedlibs() {
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
-    [[ $dryrun = "n" ]] &&
-        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}' '{}.dyn' || printf "%s\n" "${tomove[@]}"
+    if [[ $dryrun = "n" ]]; then
+        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}' '{}.dyn'
+    else
+        printf "%s\n" "${tomove[@]}"
+    fi
 }
 
 do_unhide_all_sharedlibs() {
