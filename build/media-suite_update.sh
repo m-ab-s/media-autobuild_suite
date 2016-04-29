@@ -19,6 +19,7 @@ else
     cd "$(cygpath -w /)../build" || exit 1
 fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
+[[ "$(uname)" = *6.1 ]] && nargs="-n 4"
 
 # --------------------------------------------------
 # update suite
@@ -124,7 +125,8 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             read -r -p "install packs [y/n]? " yn
             case $yn in
                 [Yy]* )
-                    pacman -S --noconfirm --needed --force $install
+                    echo $install | xargs $nargs pacman -Sw --noconfirm --needed
+                    echo $install | xargs $nargs pacman -S --noconfirm --needed
                     pacman -D --asexplicit $install
                     break;;
                 [Nn]* ) exit;;
@@ -180,10 +182,11 @@ if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    pacman --noconfirm -Suu --force --ignore pacman,bash,msys2-runtime
-    sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
     echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
-        touch build/update_core
+        touch build/update_core &&
+        have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
+    echo $have_updates | xargs $nargs pacman -Suu --noconfirm --force
+    sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
 fi
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
     pacman --noconfirm -S --asdeps ca-certificates
