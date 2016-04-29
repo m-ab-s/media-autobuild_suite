@@ -829,9 +829,9 @@ if [[ $x264 != n ]]; then
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "https://git.videolan.org/git/ffmpeg.git"
-            do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample}
-                include/lib{sw{scale,resample},postproc}
-                libav{codec,device,filter,format,util,resample}.{a,pc}
+            do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample} \
+                include/lib{sw{scale,resample},postproc} \
+                libav{codec,device,filter,format,util,resample}.{a,pc} \
                 lib{sw{scale,resample},postproc}.{a,pc}
             [[ -f "config.mak" ]] && log "distclean" make distclean
             do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
