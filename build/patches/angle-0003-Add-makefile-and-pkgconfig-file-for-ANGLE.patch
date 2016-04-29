@@ -1,4 +1,4 @@
-From 8e93ca36ce05ac033198f0328795f758fb4dba80 Mon Sep 17 00:00:00 2001
+From c0e79146f984cf3e73cc63eb22e5120edf03d49a Mon Sep 17 00:00:00 2001
 From: RiCON <RiCON@nowhere>
 Date: Fri, 12 Feb 2016 12:20:26 +0800
 Subject: [PATCH] Add makefile and pkgconfig file for ANGLE
@@ -7,7 +7,7 @@ Custom Makefile originally made by rossy & RiCON in
 https://gist.github.com/rossy/a73d58faa15b8db19b57
 Changes by shinchiro.
 
-Update to 9670b03
+Update to bda7559
 easy way to check new files: `git diff <last commit>.. src/*.gypi`
 ---
  Makefile     | 414 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -18,7 +18,7 @@ easy way to check new files: `git diff <last commit>.. src/*.gypi`
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..c7fa3e6
+index 0000000..8872d50
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,414 @@
@@ -273,7 +273,7 @@ index 0000000..c7fa3e6
 +	src/libANGLE/renderer/d3d/d3d11/RenderTarget11.o \
 +	src/libANGLE/renderer/d3d/d3d11/ShaderExecutable11.o \
 +	src/libANGLE/renderer/d3d/d3d11/StateManager11.o \
-+	src/libANGLE/renderer/d3d/d3d11/Stream11.o \
++	src/libANGLE/renderer/d3d/d3d11/StreamProducerNV12.o \
 +	src/libANGLE/renderer/d3d/d3d11/SwapChain11.o \
 +	src/libANGLE/renderer/d3d/d3d11/TextureStorage11.o \
 +	src/libANGLE/renderer/d3d/d3d11/Trim11.o \
