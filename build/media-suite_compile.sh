@@ -249,7 +249,7 @@ else
 fi
 unset syspath
 
-if enabled libtesseract; then
+if [[ $ffmpeg != n || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
     _check=(liblept.{,l}a lept.pc)
