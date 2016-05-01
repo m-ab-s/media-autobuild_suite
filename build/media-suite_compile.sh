@@ -896,6 +896,7 @@ _check=(x265{,_config}.h libx265.a x265.pc)
 if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265"; then
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     do_patch x265-fix-git-describe.diff
+    do_patch x265-fix-unicode.diff
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
