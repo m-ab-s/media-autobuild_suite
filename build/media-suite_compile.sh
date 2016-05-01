@@ -230,7 +230,7 @@ fi
 
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
-if enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
+if [[ $ffmpeg != n ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     echo -e "${orange_color}FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
     _check=(libOpenCL.a)
     if ! files_exist "${_check[@]}"; then
