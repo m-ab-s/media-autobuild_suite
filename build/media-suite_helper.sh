@@ -94,7 +94,7 @@ vcs_update() {
     elif [[ $vcsType = git ]]; then
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
-        [[ -f .gitmodules ]] && git submodule update --init
+        # [[ -f .gitmodules ]] && git submodule update --init
         git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite

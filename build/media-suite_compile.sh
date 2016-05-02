@@ -649,6 +649,8 @@ fi
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "n" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://git.videolan.org/git/libbluray.git"; then
+    sed -i 's;git://.*;https://git.videolan.org/git/libudfread.git;' .gitmodules
+    [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf
     do_uninstall include/libbluray "${_check[@]}"
     do_separate_confmakeinstall --enable-static --disable-{examples,bdjava,doxygen-doc} \
