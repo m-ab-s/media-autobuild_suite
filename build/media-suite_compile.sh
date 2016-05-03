@@ -119,7 +119,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ ! $harfbuzz_ver ]] &&
         harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.2.6}"
+    harfbuzz_ver="${harfbuzz_ver:-1.2.7}"
     _deps=({freetype2,fontconfig}.pc)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
@@ -180,7 +180,7 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
-    libressl_ver="${libressl_ver:-2.3.3}"
+    libressl_ver="${libressl_ver:-2.3.4}"
     _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_pkgConfig "libssl = $libressl_ver"; then
