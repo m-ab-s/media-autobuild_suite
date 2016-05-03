@@ -1,5 +1,5 @@
 /* -LICENSE-START-
-** Copyright (c) 2015 Blackmagic Design
+** Copyright (c) 2016 Blackmagic Design
 **
 ** Permission is hereby granted, free of charge, to any person or organization
 ** obtaining a copy of the software and accompanying documentation covered by
@@ -220,6 +220,11 @@ typedef interface IDeckLinkMutableVideoFrame IDeckLinkMutableVideoFrame;
 #ifndef __IDeckLinkVideoFrame3DExtensions_FWD_DEFINED__
 #define __IDeckLinkVideoFrame3DExtensions_FWD_DEFINED__
 typedef interface IDeckLinkVideoFrame3DExtensions IDeckLinkVideoFrame3DExtensions;
+#endif
+
+#ifndef __IDeckLinkVideoFrameMetadataExtensions_FWD_DEFINED__
+#define __IDeckLinkVideoFrameMetadataExtensions_FWD_DEFINED__
+typedef interface IDeckLinkVideoFrameMetadataExtensions IDeckLinkVideoFrameMetadataExtensions;
 #endif
 
 #ifndef __IDeckLinkVideoInputFrame_FWD_DEFINED__
@@ -4987,6 +4992,7 @@ typedef enum _BMDPacketType {
 enum _BMDFrameFlags {
     bmdFrameFlagDefault = 0,
     bmdFrameFlagFlipVertical = 1 << 0,
+    bmdFrameContainsHDRMetadata = 1 << 1,
     bmdFrameHasNoInputSource = 1 << 31
 };
 
@@ -5120,6 +5126,21 @@ typedef enum _BMDDeviceInterface {
     bmdDeviceInterfaceUSB = 0x75736220,
     bmdDeviceInterfaceThunderbolt = 0x7468756e
 } BMDDeviceInterface;
+typedef enum _BMDDeckLinkFrameMetadataID {
+    bmdDeckLinkFrameMetadataHDRElectroOpticalTransferFunc = 0x656f7466,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedX = 0x68647278,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedY = 0x68647279,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenX = 0x68646778,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenY = 0x68646779,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueX = 0x68646278,
+    bmdDeckLinkFrameMetadataHDRDisplayPrimariesBlueY = 0x68646279,
+    bmdDeckLinkFrameMetadataHDRWhitePointX = 0x68647778,
+    bmdDeckLinkFrameMetadataHDRWhitePointY = 0x68647779,
+    bmdDeckLinkFrameMetadataHDRMaxDisplayMasteringLuminance = 0x68646d6c,
+    bmdDeckLinkFrameMetadataHDRMinDisplayMasteringLuminance = 0x686d696c,
+    bmdDeckLinkFrameMetadataHDRMaximumContentLightLevel = 0x6d636c6c,
+    bmdDeckLinkFrameMetadataHDRMaximumFrameAverageLightLevel = 0x66616c6c
+} BMDDeckLinkFrameMetadataID;
 typedef enum _BMDDuplexMode {
     bmdDuplexModeFull = 0x66647570,
     bmdDuplexModeHalf = 0x68647570
@@ -5145,6 +5166,7 @@ typedef enum _BMDDeckLinkAttributeID {
     BMDDeckLinkSupportsIdleOutput = 0x69646f75,
     BMDDeckLinkHasLTCTimecodeInput = 0x686c7463,
     BMDDeckLinkSupportsDuplexModeConfiguration = 0x64757078,
+    BMDDeckLinkSupportsHDRMetadata = 0x6864726d,
     BMDDeckLinkMaximumAudioChannels = 0x6d616368,
     BMDDeckLinkMaximumAnalogAudioChannels = 0x61616368,
     BMDDeckLinkNumberOfSubDevices = 0x6e736264,
@@ -5289,6 +5311,11 @@ typedef interface IDeckLinkMutableVideoFrame IDeckLinkMutableVideoFrame;
 #ifndef __IDeckLinkVideoFrame3DExtensions_FWD_DEFINED__
 #define __IDeckLinkVideoFrame3DExtensions_FWD_DEFINED__
 typedef interface IDeckLinkVideoFrame3DExtensions IDeckLinkVideoFrame3DExtensions;
+#endif
+
+#ifndef __IDeckLinkVideoFrameMetadataExtensions_FWD_DEFINED__
+#define __IDeckLinkVideoFrameMetadataExtensions_FWD_DEFINED__
+typedef interface IDeckLinkVideoFrameMetadataExtensions IDeckLinkVideoFrameMetadataExtensions;
 #endif
 
 #ifndef __IDeckLinkVideoInputFrame_FWD_DEFINED__
@@ -8193,6 +8220,159 @@ void __RPC_STUB IDeckLinkVideoFrame3DExtensions_GetFrameForRightEye_Stub(
     DWORD* pdwStubPhase);
 
 #endif  /* __IDeckLinkVideoFrame3DExtensions_INTERFACE_DEFINED__ */
+
+/*****************************************************************************
+ * IDeckLinkVideoFrameMetadataExtensions interface
+ */
+#ifndef __IDeckLinkVideoFrameMetadataExtensions_INTERFACE_DEFINED__
+#define __IDeckLinkVideoFrameMetadataExtensions_INTERFACE_DEFINED__
+
+DEFINE_GUID(IID_IDeckLinkVideoFrameMetadataExtensions, 0xd5973dc9, 0x6432, 0x46d0, 0x8f,0x0b, 0x24,0x96,0xf8,0xa1,0x23,0x8f);
+#if defined(__cplusplus) && !defined(CINTERFACE)
+MIDL_INTERFACE("d5973dc9-6432-46d0-8f0b-2496f8a1238f")
+IDeckLinkVideoFrameMetadataExtensions : public IUnknown
+{
+    virtual HRESULT STDMETHODCALLTYPE GetInt(
+        BMDDeckLinkFrameMetadataID metadataID,
+        LONGLONG *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetFloat(
+        BMDDeckLinkFrameMetadataID metadataID,
+        double *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetFlag(
+        BMDDeckLinkFrameMetadataID metadataID,
+        BOOL *value) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE GetString(
+        BMDDeckLinkFrameMetadataID metadataID,
+        BSTR *value) = 0;
+
+};
+#ifdef __CRT_UUID_DECL
+__CRT_UUID_DECL(IDeckLinkVideoFrameMetadataExtensions, 0xd5973dc9, 0x6432, 0x46d0, 0x8f,0x0b, 0x24,0x96,0xf8,0xa1,0x23,0x8f)
+#endif
+#else
+typedef struct IDeckLinkVideoFrameMetadataExtensionsVtbl {
+    BEGIN_INTERFACE
+
+    /*** IUnknown methods ***/
+    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
+        IDeckLinkVideoFrameMetadataExtensions* This,
+        REFIID riid,
+        void **ppvObject);
+
+    ULONG (STDMETHODCALLTYPE *AddRef)(
+        IDeckLinkVideoFrameMetadataExtensions* This);
+
+    ULONG (STDMETHODCALLTYPE *Release)(
+        IDeckLinkVideoFrameMetadataExtensions* This);
+
+    /*** IDeckLinkVideoFrameMetadataExtensions methods ***/
+    HRESULT (STDMETHODCALLTYPE *GetInt)(
+        IDeckLinkVideoFrameMetadataExtensions* This,
+        BMDDeckLinkFrameMetadataID metadataID,
+        LONGLONG *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetFloat)(
+        IDeckLinkVideoFrameMetadataExtensions* This,
+        BMDDeckLinkFrameMetadataID metadataID,
+        double *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetFlag)(
+        IDeckLinkVideoFrameMetadataExtensions* This,
+        BMDDeckLinkFrameMetadataID metadataID,
+        BOOL *value);
+
+    HRESULT (STDMETHODCALLTYPE *GetString)(
+        IDeckLinkVideoFrameMetadataExtensions* This,
+        BMDDeckLinkFrameMetadataID metadataID,
+        BSTR *value);
+
+    END_INTERFACE
+} IDeckLinkVideoFrameMetadataExtensionsVtbl;
+interface IDeckLinkVideoFrameMetadataExtensions {
+    CONST_VTBL IDeckLinkVideoFrameMetadataExtensionsVtbl* lpVtbl;
+};
+
+#ifdef COBJMACROS
+#ifndef WIDL_C_INLINE_WRAPPERS
+/*** IUnknown methods ***/
+#define IDeckLinkVideoFrameMetadataExtensions_QueryInterface(This,riid,ppvObject) (This)->lpVtbl->QueryInterface(This,riid,ppvObject)
+#define IDeckLinkVideoFrameMetadataExtensions_AddRef(This) (This)->lpVtbl->AddRef(This)
+#define IDeckLinkVideoFrameMetadataExtensions_Release(This) (This)->lpVtbl->Release(This)
+/*** IDeckLinkVideoFrameMetadataExtensions methods ***/
+#define IDeckLinkVideoFrameMetadataExtensions_GetInt(This,metadataID,value) (This)->lpVtbl->GetInt(This,metadataID,value)
+#define IDeckLinkVideoFrameMetadataExtensions_GetFloat(This,metadataID,value) (This)->lpVtbl->GetFloat(This,metadataID,value)
+#define IDeckLinkVideoFrameMetadataExtensions_GetFlag(This,metadataID,value) (This)->lpVtbl->GetFlag(This,metadataID,value)
+#define IDeckLinkVideoFrameMetadataExtensions_GetString(This,metadataID,value) (This)->lpVtbl->GetString(This,metadataID,value)
+#else
+/*** IUnknown methods ***/
+static FORCEINLINE HRESULT IDeckLinkVideoFrameMetadataExtensions_QueryInterface(IDeckLinkVideoFrameMetadataExtensions* This,REFIID riid,void **ppvObject) {
+    return This->lpVtbl->QueryInterface(This,riid,ppvObject);
+}
+static FORCEINLINE ULONG IDeckLinkVideoFrameMetadataExtensions_AddRef(IDeckLinkVideoFrameMetadataExtensions* This) {
+    return This->lpVtbl->AddRef(This);
+}
+static FORCEINLINE ULONG IDeckLinkVideoFrameMetadataExtensions_Release(IDeckLinkVideoFrameMetadataExtensions* This) {
+    return This->lpVtbl->Release(This);
+}
+/*** IDeckLinkVideoFrameMetadataExtensions methods ***/
+static FORCEINLINE HRESULT IDeckLinkVideoFrameMetadataExtensions_GetInt(IDeckLinkVideoFrameMetadataExtensions* This,BMDDeckLinkFrameMetadataID metadataID,LONGLONG *value) {
+    return This->lpVtbl->GetInt(This,metadataID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkVideoFrameMetadataExtensions_GetFloat(IDeckLinkVideoFrameMetadataExtensions* This,BMDDeckLinkFrameMetadataID metadataID,double *value) {
+    return This->lpVtbl->GetFloat(This,metadataID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkVideoFrameMetadataExtensions_GetFlag(IDeckLinkVideoFrameMetadataExtensions* This,BMDDeckLinkFrameMetadataID metadataID,BOOL *value) {
+    return This->lpVtbl->GetFlag(This,metadataID,value);
+}
+static FORCEINLINE HRESULT IDeckLinkVideoFrameMetadataExtensions_GetString(IDeckLinkVideoFrameMetadataExtensions* This,BMDDeckLinkFrameMetadataID metadataID,BSTR *value) {
+    return This->lpVtbl->GetString(This,metadataID,value);
+}
+#endif
+#endif
+
+#endif
+
+HRESULT STDMETHODCALLTYPE IDeckLinkVideoFrameMetadataExtensions_GetInt_Proxy(
+    IDeckLinkVideoFrameMetadataExtensions* This,
+    BMDDeckLinkFrameMetadataID metadataID,
+    LONGLONG *value);
+void __RPC_STUB IDeckLinkVideoFrameMetadataExtensions_GetInt_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkVideoFrameMetadataExtensions_GetFloat_Proxy(
+    IDeckLinkVideoFrameMetadataExtensions* This,
+    BMDDeckLinkFrameMetadataID metadataID,
+    double *value);
+void __RPC_STUB IDeckLinkVideoFrameMetadataExtensions_GetFloat_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkVideoFrameMetadataExtensions_GetFlag_Proxy(
+    IDeckLinkVideoFrameMetadataExtensions* This,
+    BMDDeckLinkFrameMetadataID metadataID,
+    BOOL *value);
+void __RPC_STUB IDeckLinkVideoFrameMetadataExtensions_GetFlag_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IDeckLinkVideoFrameMetadataExtensions_GetString_Proxy(
+    IDeckLinkVideoFrameMetadataExtensions* This,
+    BMDDeckLinkFrameMetadataID metadataID,
+    BSTR *value);
+void __RPC_STUB IDeckLinkVideoFrameMetadataExtensions_GetString_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+
+#endif  /* __IDeckLinkVideoFrameMetadataExtensions_INTERFACE_DEFINED__ */
 
 /*****************************************************************************
  * IDeckLinkVideoInputFrame interface
