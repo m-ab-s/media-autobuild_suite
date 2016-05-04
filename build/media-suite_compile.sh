@@ -1247,9 +1247,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(bin-video/mpv.{exe,com})
     _deps=({libass,libavcodec,vapoursynth}.pc)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
-        # mpv uses libs from pkg-config but randomly uses MinGW's librtmp.a which gets compiled
-        # with GnuTLS. If we didn't compile ours with GnuTLS the build fails on linking.
-        hide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz,gnutls}.a
+        hide_conflicting_libs
 
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
@@ -1277,7 +1275,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log install /usr/bin/python waf install -j "${cpuCount:-1}"
 
         unset mpv_ldflags replace withvs
-        unhide_files "$MINGW_PREFIX"/lib/lib{rtmp,harfbuzz,gnutls}.a
+        hide_conflicting_libs -R
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
         do_checkIfExist

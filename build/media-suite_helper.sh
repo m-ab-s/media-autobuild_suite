@@ -1156,14 +1156,29 @@ get_api_version() {
 }
 
 hide_files() {
-    [[ $1 = "-R" ]] && local reverse=y && shift
+    local reverse=n echo_cmd
+    [[ $1 = "-R" ]] && reverse=y && shift
+    [[ $dryrun = y ]] && echo_cmd="echo"
     for opt; do
-        if [[ -z $reverse ]]; then
-            [[ -f "$opt" ]] && mv -f "$opt" "$opt.bak"
+        if [[ $reverse = n ]]; then
+            [[ -f "$opt" ]] && $echo_cmd mv -f "$opt" "$opt.bak"
         else
-            [[ -f "$opt.bak" ]] && mv -f "$opt.bak" "$opt"
+            [[ -f "$opt.bak" ]] && $echo_cmd mv -f "$opt.bak" "$opt"
         fi
     done
+}
+
+hide_conflicting_libs() {
+    # meant for rude build systems
+    local reverse=n
+    [[ $1 = "-R" ]] && reverse=y && shift
+    local -a installed
+    installed=($(find "$LOCALDESTDIR/lib" -maxdepth 1 -name "*.a"))
+    if [[ $reverse = n ]]; then
+        hide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
+    else
+        unhide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
+    fi
 }
 
 unhide_files() {
