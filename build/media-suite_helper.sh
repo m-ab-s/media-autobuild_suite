@@ -716,6 +716,7 @@ disabled_all() {
 
 do_getMpvConfig() {
     local configfile="$LOCALBUILDDIR"/mpv_options.txt
+    local forced
     if [[ -f $configfile ]]; then
         MPV_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
         echo "Imported mpv options from mpv_options.txt"
@@ -726,6 +727,9 @@ do_getMpvConfig() {
     else
         echo "Using default mpv options"
     fi
+    for forced in vapoursynth-lazy libguess static-build; do
+        MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
+    done
     if [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
         do_addOption MPV_OPTS --enable-vapoursynth
     elif [[ $mpv = "y" ]] && mpv_enabled vapoursynth; then
