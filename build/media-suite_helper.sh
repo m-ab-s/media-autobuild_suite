@@ -737,12 +737,12 @@ do_getMpvConfig() {
 
 mpv_enabled() {
     [[ $mpv = n ]] && return 1
-    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--enable-$1}"
+    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--enable-$1$}"
 }
 
 mpv_disabled() {
     [[ $mpv = n ]] && return 0
-    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--disable-$1}"
+    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--disable-$1$}"
 }
 
 mpv_enabled_all() {
