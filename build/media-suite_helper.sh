@@ -740,22 +740,32 @@ do_getMpvConfig() {
 }
 
 mpv_enabled() {
+    local option
     [[ $mpv = n ]] && return 1
-    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--enable-$1}"
+    for option in "${MPV_OPTS[@]}"; do
+        [[ "$option" =~ "--enable-$1"$ ]] && return
+    done
+    return 1
 }
 
 mpv_disabled() {
+    local option
     [[ $mpv = n ]] && return 0
-    test "${MPV_OPTS[*]}" != "${MPV_OPTS[*]#--disable-$1}"
+    for option in "${MPV_OPTS[@]}"; do
+        [[ "$option" =~ "--disable-$1"$ ]] && return
+    done
+    return 1
 }
 
 mpv_enabled_all() {
+    local opt
     for opt; do
         mpv_enabled $opt || return 1
     done
 }
 
 mpv_disabled_all() {
+    local opt
     for opt; do
         mpv_disabled $opt || return 1
     done
