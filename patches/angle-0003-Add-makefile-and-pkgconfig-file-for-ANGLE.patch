@@ -183,7 +183,7 @@ index 0000000..8872d50
 +	src/libANGLE/Sampler.o \
 +	src/libANGLE/Shader.o \
 +	src/libANGLE/State.o \
-+	src/libAngle/Stream.o \
++	src/libANGLE/Stream.o \
 +	src/libANGLE/Surface.o \
 +	src/libANGLE/Texture.o \
 +	src/libANGLE/TransformFeedback.o \
