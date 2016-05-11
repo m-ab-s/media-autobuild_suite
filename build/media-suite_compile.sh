@@ -56,11 +56,12 @@ do_getMpvConfig
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,gnurx,regex}.{,l}a \
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic}.{l,}a \
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic,EGL,GLESv2}.{l,}a \
     include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
-    opus/opusfile.h regex.h magic.h \
+    include/{EGL,GLES2,GLES3,GLSLANG,KHR,platform} \
+    opus/opusfile.h regex.h magic.h angle_gl.h \
     {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
-    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec}.pc \
+    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
     share/aclocal/{ogg,vorbis}.m4 \
     twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe
@@ -1166,22 +1167,18 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     mpv_enabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
-
-    _check=(libEGL.{a,pc} libGLESv2.a)
-    if ! mpv_disabled egl-angle &&
-        do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        do_patch "angle-0003-Add-makefile-and-pkgconfig-file-for-ANGLE.patch" am
-        log "uninstall" make PREFIX="$LOCALDESTDIR" uninstall
-        [[ -f libEGL.a ]] && log "clean" make clean
-        do_makeinstall PREFIX="$LOCALDESTDIR"
-        do_checkIfExist
+    if ! mpv_disabled egl-angle; then
+        do_pacman_install angleproject-git
+        echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
+        echo -e "${orange_color}but they're not needed if angle backend isn't required.${reset_color}"
     fi
 
     vsprefix=$(get_vs_prefix)
     if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
         vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
         if [[ $vsversion -ge 24 ]]; then
-            echo -e "${orange_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
+            echo -e "${green_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
+            echo -e "${orange_color}mpv will need vapoursynth.dll and vsscript.dll to run!${reset_color}"
         else
             vsprefix=""
             echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
@@ -1259,7 +1256,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         mpv_ldflags=()
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
-        ! mpv_disabled egl-angle && do_patch "mpv-0001-waf-Use-pkgconfig-with-ANGLE.patch" am
         [[ $license = *v3 || $license = nonfree ]] && do_addOption MPV_OPTS "--enable-gpl3"
 
         LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
