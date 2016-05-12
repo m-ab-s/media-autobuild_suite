@@ -24,7 +24,7 @@ Included Tools And Libraries
     - Light build:
         - avisynth
         - libmp3lame (3.99.5)
-        - libopus (1.1.2)
+        - libopus (mingw)
         - libvorbis (mingw)
         - libvpx (git)
         - libx264 (git)

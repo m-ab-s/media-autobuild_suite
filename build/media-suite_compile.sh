@@ -55,12 +55,12 @@ do_getFFmpegConfig "$license"
 do_getMpvConfig
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,gnurx,regex}.{,l}a \
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,gnurx,regex}.{,l}a \
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic,EGL,GLESv2}.{l,}a \
     include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
     include/{EGL,GLES2,GLES3,GLSLANG,KHR,platform} \
-    opus/opusfile.h regex.h magic.h angle_gl.h \
-    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc}.pc \
+    opus/opus{,file}.h regex.h magic.h angle_gl.h \
+    {nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc}.pc \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
     share/aclocal/{ogg,vorbis}.m4 \
@@ -340,16 +340,7 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev"
 fi
 
 enabled libvorbis && do_pacman_install libvorbis
-
-_check=(libopus.{,l}a opus.pc opus/opus.h)
-if enabled libopus && do_pkgConfig "opus = 1.1.2"; then
-    do_wget -h 1f08a661bc72930187893a07f3741a91 \
-        "http://downloads.xiph.org/releases/opus/opus-1.1.2.tar.gz"
-    do_uninstall include/opus "${_check[@]}"
-    do_patch opus-0001-dllexport.patch
-    do_separate_confmakeinstall --disable-doc --enable-{intrinsics,rtcd}
-    do_checkIfExist
-fi
+enabled libopus && do_pacman_install opus
 
 _check=(libspeex.{l,}a speex.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
@@ -451,7 +442,7 @@ fi
 
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
-    test_newer installed opus.pc "${_check[0]}"; then
+    test_newer "$MINGW_PREFIX"/lib/pkgconfig/opus.pc "${_check[0]}"; then
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
@@ -520,7 +511,7 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
 fi
 
 _check=(bin-audio/sox.exe sox.pc)
-_deps=({sndfile,opus}.pc libmp3lame.a)
+_deps=(sndfile.pc libmp3lame.a "$MINGW_PREFIX"/lib/pkgconfig/opus.pc)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
