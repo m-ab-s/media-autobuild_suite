@@ -54,7 +54,7 @@ if not ["%CD:~60,1%"]==[""] (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=asciidoc autoconf automake-wrapper autogen bison curl diffstat dos2unix help2man ^
+set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo upx
 
