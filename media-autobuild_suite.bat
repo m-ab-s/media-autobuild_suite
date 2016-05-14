@@ -842,8 +842,7 @@ if not exist %build%\wget.exe (
         echo.b.SaveToFile(WScript.Arguments(1^)^);
         )>wget.js
 
-    cscript /nologo wget.js ^
-        https://jb-alvarado.github.io/media-autobuild_suite/bin/wget-pack.exe wget-pack.exe
+    cscript /nologo wget.js http://ab.fsbn.eu/bin/wget-pack.exe wget-pack.exe
     %build%\wget-pack.exe x
     )
 if not exist %build%\wget.exe (
@@ -851,7 +850,7 @@ if not exist %build%\wget.exe (
     echo Script to download necessary components failed.
     echo.
     echo Download and extract this manually to inside "%build%":
-    echo https://jb-alvarado.github.io/media-autobuild_suite/bin/wget-pack.exe
+    echo http://ab.fsbn.eu/bin/wget-pack.exe
     echo -------------------------------------------------------------------------------
     pause
     exit
