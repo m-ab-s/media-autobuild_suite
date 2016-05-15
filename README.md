@@ -113,6 +113,15 @@ Included Tools And Libraries
 
 
 --------
+ Requirements
+--------
+
+- Windows 32/64-bits (tested with 7, 8.1 and 10)
+- NTFS drive
+- 8GB+ disk space for a full 32 and 64-bit build
+- 4GB+ RAM
+
+--------
  Information
 --------
 
