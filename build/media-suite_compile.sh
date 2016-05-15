@@ -1239,7 +1239,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
             /usr/bin/python waf distclean >/dev/null 2>&1
-            do_uninstall bin-video/mpv.exe.debug "${_check[@]}"
+            do_uninstall bin-video/mpv{.exe,-1.dll}.debug "${_check[@]}"
         fi
 
         # for purely cosmetic reasons, show the last release version when doing -V
@@ -1258,12 +1258,18 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
-        log install /usr/bin/python waf install -j "${cpuCount:-1}"
+        log build /usr/bin/python waf -j "${cpuCount:-1}"
 
         unset mpv_ldflags replace withvs
         hide_conflicting_libs -R
+        do_install build/mpv.{exe,com} bin-video/
+        if mpv_enabled libmpv-shared; then
+            do_install build/mpv-1.dll bin-video/
+            do_install build/libmpv.dll.a lib/
+            _check+=(bin-video/mpv-1.dll libmpv.dll.a)
+        fi
         ! mpv_disabled debug-build &&
-            create_debug_link "$LOCALDESTDIR"/bin-video/mpv.exe
+            create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
         do_checkIfExist
     fi
 fi

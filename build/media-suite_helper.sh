@@ -1125,7 +1125,11 @@ create_debug_link() {
         if [[ -f "$file" && ! -f "$file".debug ]]; then
             echo "Stripping and creating debug link for ${file##*/}..."
             objcopy --only-keep-debug "$file" "$file".debug
-            strip -s "$file"
+            if [[ ${file: -3} = "dll" ]]; then
+                strip --strip-debug "$file"
+            else
+                strip --strip-all "$file"
+            fi
             objcopy --add-gnu-debuglink="$file".debug "$file"
         fi
     done
