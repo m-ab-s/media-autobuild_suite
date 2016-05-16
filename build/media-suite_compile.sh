@@ -802,14 +802,13 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
     do_checkIfExist
 fi
 
-_check=(libgpac_static.a)
-[[ $standalone = y ]] && _check+=(bin-video/MP4Box.exe)
+_check=(libgpac_static.a bin-video/MP4Box.exe)
 if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_uninstall include/gpac "${_check[@]}"
     do_separate_conf --static-mp4box
     do_make
     log "install" make install-lib
-    [[ $standalone = y ]] && do_install bin/gcc/MP4Box.exe bin-video/
+    do_install bin/gcc/MP4Box.exe bin-video/
     do_checkIfExist
 fi
 
