@@ -73,6 +73,7 @@ Included Tools And Libraries
     - Full build (in addition to Zeranoe)
         - chromaprint (git)
         - libcdio (mingw)
+        - libebur128 (git snapshot)
         - libfaac (1.28)
         - libfdk-aac (git)
         - libkvazaar (git)
