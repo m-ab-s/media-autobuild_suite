@@ -87,6 +87,7 @@ Included Tools And Libraries
 
  - other tools
     - bmx (git)
+    - curl (latest release) with WinSSL/LibreSSL/GnuTLS backend
     - faac (1.28)
     - fdk-aac (git)
     - flac (git)
