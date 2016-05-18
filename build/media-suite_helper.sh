@@ -1206,7 +1206,7 @@ unhide_files() {
 
 add_to_remove() {
     local garbage="$1"
-    [[ ! $garbage ]] && garbage="$(pwd)"
+    [[ ! $garbage ]] && garbage="$LOCALBUILDDIR/$(get_first_subdir)"
     echo "$garbage" >> "$LOCALBUILDDIR/_to_remove"
 }
 
