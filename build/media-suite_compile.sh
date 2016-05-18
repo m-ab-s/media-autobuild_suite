@@ -201,11 +201,24 @@ fi
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.0"; then
+    do_pacman_install nghttp2
     do_wget -h 7416aaff4a9210b43edda7615ffa4169 "https://curl.haxx.se/download/curl-7.49.0.tar.bz2"
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
-    do_separate_confmakeinstall global --without-{ssl,gnutls,nghttp2,ca-bundle,ca-path,random,libidn,libssh2} \
-        --with-{winssl,winidn} --enable-sspi --disable-{debug,manual}
+    extra_opts=()
+    if enabled openssl; then
+        extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
+    elif enabled gnutls; then
+        extra_opts+=(--with-{gnutls} --without-{ssl,nghttp2})
+    else
+        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls,libidn})
+    fi
+    /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
+        { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
+          sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
+    CPPFLAGS+=" -DNGHTTP2_STATICLIB" CFLAGS="${CFLAGS#-I${LOCALDESTDIR}/include }" \
+        do_separate_confmakeinstall global "${extra_opts[@]}" \
+        --without-{libssh2,random,ca-bundle,ca-path} --enable-sspi --disable-{debug,manual}
     do_checkIfExist
 fi
 
