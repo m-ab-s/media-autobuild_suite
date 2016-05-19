@@ -837,7 +837,7 @@ if [[ $x264 != n ]]; then
         extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
-            do_vcs "https://git.videolan.org/git/ffmpeg.git"
+            do_vcs "https://git.ffmpeg.org/ffmpeg.git"
             do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample} \
                 include/lib{sw{scale,resample},postproc} \
                 libav{codec,device,filter,format,util,resample}.{a,pc} \
@@ -1028,7 +1028,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=({libass,x264,x265,vpx}.pc)
-    if do_vcs "https://git.videolan.org/git/ffmpeg.git"; then
+    if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         _patches=0
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
         [[ $_patches -gt 0 ]] &&
@@ -1105,7 +1105,7 @@ if [[ $mplayer = "y" ]] &&
             pushd ffmpeg >/dev/null
             git checkout -qf --no-track -B master origin/HEAD
             popd >/dev/null
-        elif ! git clone "https://git.videolan.org/git/ffmpeg.git" ffmpeg; then
+        elif ! git clone "https://git.ffmpeg.org/ffmpeg.git" ffmpeg; then
             rm -rf ffmpeg
             echo "Failed to get a FFmpeg checkout"
             echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
