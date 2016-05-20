@@ -77,6 +77,7 @@ Included Tools And Libraries
         - libfaac (1.28)
         - libfdk-aac (git)
         - libkvazaar (git)
+        - libopenh264 (git)
         - librubberband (git snapshot)
         - libsnappy (mingw)
         - libssh (mingw)

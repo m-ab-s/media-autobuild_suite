@@ -990,6 +990,15 @@ else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
 
+_check=(libopenh264.a openh264.pc wels/codec_api.h)
+if [[ $ffmpeg != "n" ]] && enabled libopenh264 &&
+    do_vcs https://github.com/cisco/openh264.git; then
+    do_uninstall include/wels "${_check[@]}"
+    create_build_dir
+    do_make -f ../Makefile AR=ar ARCH="${MINGW_CHOST%%-*}" PREFIX="$LOCALDESTDIR" install-static
+    do_checkIfExist
+fi
+
 if [[ $ffmpeg != "n" ]]; then
     enabled gcrypt && do_pacman_install libgcrypt
     enabled libschroedinger && do_pacman_install schroedinger
@@ -1030,6 +1039,8 @@ if [[ $ffmpeg != "n" ]]; then
         _deps=({libass,x264,x265,vpx}.pc)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         _patches=0
+        enabled libopenh264 &&
+            do_patch "ffmpeg-0001-lavc-libopenh264enc-update-to-openh264-1.6.patch" am && let _patches+=1
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
