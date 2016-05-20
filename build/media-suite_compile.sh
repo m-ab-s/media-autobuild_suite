@@ -458,7 +458,7 @@ fi
 
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
-    test_newer "$MINGW_PREFIX"/lib/pkgconfig/opus.pc "${_check[0]}"; then
+    test_newer installed "$MINGW_PREFIX"/lib/pkgconfig/opus.pc "${_check[0]}"; then
     _check+=(bin-audio/opus{dec,info}.exe)
     do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
         "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
