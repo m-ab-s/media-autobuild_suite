@@ -1012,9 +1012,10 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     if enabled libssh; then
         do_pacman_install libssh
-        do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
-        grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
-            sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+        #do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
+        #grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
+        #    sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+        do_removeOption --enable-libssh
     fi
     enabled libtheora && do_pacman_install libtheora
     enabled libcdio && do_pacman_install libcdio-paranoia
