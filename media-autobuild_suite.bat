@@ -1329,6 +1329,7 @@ if %build32%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='32bit'
+            echo.CARCH="i686"
             echo.MINGW_CHOST="i686-w64-mingw32"
             echo.MINGW_PREFIX="/mingw32"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-i686"
@@ -1338,6 +1339,10 @@ if %build32%==yes (
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
             echo.
+            echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
+            echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
+            echo.export CPATH LIBRARY_PATH
+            echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
             echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
@@ -1346,10 +1351,10 @@ if %build32%==yes (
             echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
             echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-            echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
+            echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+            echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
+            echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.LANG=en_US.UTF-8
@@ -1385,6 +1390,7 @@ if %build64%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='64bit'
+            echo.CARCH="x86_64"
             echo.MINGW_CHOST="x86_64-w64-mingw32"
             echo.MINGW_PREFIX="/mingw64"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-x86_64"
@@ -1394,6 +1400,10 @@ if %build64%==yes (
             echo.alias ls='ls --color=auto'
             echo.export CC=gcc
             echo.
+            echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
+            echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
+            echo.export CPATH LIBRARY_PATH
+            echo.
             echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
             echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
             echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
@@ -1402,10 +1412,10 @@ if %build64%==yes (
             echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
             echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
             echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-            echo.CPPFLAGS="-I${LOCALDESTDIR}/include -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-I${LOCALDESTDIR}/include -mthreads -mtune=generic -O2 -pipe"
+            echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+            echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
             echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-L${LOCALDESTDIR}/lib -pipe -static-libgcc -static-libstdc++"
+            echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
             echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
             echo.
             echo.LANG=en_US.UTF-8
