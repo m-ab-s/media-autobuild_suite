@@ -717,10 +717,10 @@ disabled_all() {
 do_getMpvConfig() {
     local configfile="$LOCALBUILDDIR"/mpv_options.txt
     local forced
-    if [[ -f $configfile ]]; then
+    if [[ -f $configfile ]] && [[ $ffmpegChoice = y ]]; then
         MPV_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
         echo "Imported mpv options from mpv_options.txt"
-    elif [[ -f "/trunk/media-autobuild_suite.bat" ]] && [[ $ffmpegChoice != "y" ]]; then
+    elif [[ -f "/trunk/media-autobuild_suite.bat" && x"$ffmpegChoice" != x"y" ]]; then
         MPV_OPTS=($(sed -rne '/mpv_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
             sed -e 's/.*mpv_options=//' -e 's/ ^//g' | tr '\n' ' '))
         echo "Imported default mpv options from .bat"
