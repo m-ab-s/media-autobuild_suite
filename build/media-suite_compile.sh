@@ -904,7 +904,9 @@ _check=(x265{,_config}.h libx265.a x265.pc)
 [[ $standalone = y ]] && _check+=(bin-video/x265.exe)
 if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265"; then
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
+
     do_patch x265-fix-git-describe.diff
+
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
@@ -978,8 +980,12 @@ EOF
     build_x265
     log "install" ninja -j "${cpuCount:=1}" install
     if [[ $standalone = y && $x265 = d ]]; then
+        cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
         do_uninstall bin-video/x265-numa.exe
         do_print_progress "Building NUMA version of binary"
+
+        # do_patch numa-only.patch
+
         xpsupport="" build_x265
         do_install x265.exe bin-video/x265-numa.exe
         _check+=(bin-video/x265-numa.exe)
