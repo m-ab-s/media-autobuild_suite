@@ -1196,9 +1196,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
         do_pacman_uninstall angleproject-git
         do_wget -c -r -q "$LOCALBUILDDIR"/patches/Makefile.angle
-        log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" uninstall
+        log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
         [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
-        do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR"
+        do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
         do_checkIfExist
 
         echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
