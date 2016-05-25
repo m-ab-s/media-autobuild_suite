@@ -58,8 +58,7 @@ do_uninstall q j{config,error,morecfg,peglib}.h \
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,gnurx,regex}.{,l}a \
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic,EGL,GLESv2}.{l,}a \
     include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
-    include/{EGL,GLES2,GLES3,GLSLANG,KHR,platform} \
-    opus/opus{,file}.h regex.h magic.h angle_gl.h \
+    opus/opus{,file}.h regex.h magic.h \
     {nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc}.pc \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
@@ -1191,8 +1190,17 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     mpv_enabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
-    if ! mpv_disabled egl-angle; then
-        do_pacman_install angleproject-git
+
+    _check=(bin-video/lib{GLESv2,EGL}.dll EGL/egl.h)
+    if ! mpv_disabled egl-angle &&
+        do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
+        do_pacman_uninstall angleproject-git
+        do_wget -c -r -q "$LOCALBUILDDIR"/patches/Makefile.angle
+        log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" uninstall
+        [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
+        do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR"
+        do_checkIfExist
+
         echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
         echo -e "${orange_color}but they're not needed if angle backend isn't required.${reset_color}"
     fi

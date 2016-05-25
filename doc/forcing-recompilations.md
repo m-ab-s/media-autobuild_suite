@@ -70,6 +70,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
     ffmpeg (for static and both)
     ffmpegSHARED/ffmpeg (for shared only)
     kvazaar
+    libEGL.dll
     mediainfo
     MP4Box
     mplayer
