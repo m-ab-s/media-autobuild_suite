@@ -83,7 +83,8 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-vapoursynth --disable-libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite
+ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
+angle
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -652,6 +653,35 @@ if %buildmpv%==2 set "mpv=n"
 if %buildmpv%==3 set "mpv=v"
 if %buildmpv% GTR 3 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
+
+:angle
+set "writeANGLE=no"
+if %angleINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Google ANGLE ^(for mpv^)
+    echo. 1 = Just get headers ^(recommended^)
+    echo. 2 = No
+    echo. 3 = Build angle [slower at runtime than VS2015]
+    echo.
+    echo. This will enable inclusion in mpv of Angle backend.
+    echo. It is always DLLs, since that is the only officially supported build.
+    echo.
+    echo. If you just install the headers you need to either compile your own Angle
+    echo. using MS Visual Studio or get the DLLs from Chrome or Firefox to enable the
+    echo. angle backend in mpv.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildangle="Build angle: "
+    ) else set buildangle=%angleINI%
+if %deleteINI%==1 set "writeANGLE=yes"
+
+if %buildangle%==1 set "angle=h"
+if %buildangle%==2 set "angle=n"
+if %buildangle%==3 set "angle=y"
+if %buildangle% GTR 3 GOTO angle
+if %writeANGLE%==yes echo.angle=^%buildangle%>>%ini%
 
 :bmx
 set "writeBmx=no"
@@ -1474,7 +1504,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i 
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone%
+--rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle%
 
 endlocal
 goto:eof

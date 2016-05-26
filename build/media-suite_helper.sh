@@ -730,12 +730,15 @@ do_getMpvConfig() {
     for forced in vapoursynth-lazy libguess static-build; do
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
-    if [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
+    if [[ $mpv = "y" ]]; then
+        mpv_disable vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
+    elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
         do_addOption MPV_OPTS --enable-vapoursynth
-    elif [[ $mpv = "y" ]] && mpv_enabled vapoursynth; then
-        mpv_disable vapoursynth
-    elif [[ $mpv = "y" ]]; then
-        do_addOption MPV_OPTS --disable-vapoursynth
+    fi
+    if [[ $angle = "n" ]]; then
+        mpv_disable egl-angle || do_addOption MPV_OPTS --disable-egl-angle
+    elif ! mpv_disabled egl-angle; then
+        do_addOption MPV_OPTS --enable-egl-angle
     fi
 }
 

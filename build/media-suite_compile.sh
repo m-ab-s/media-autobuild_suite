@@ -33,6 +33,7 @@ while true; do
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
+--angle=* ) angle="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1191,14 +1192,21 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     mpv_enabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
-    _check=(bin-video/lib{GLESv2,EGL}.dll EGL/egl.h)
-    if ! mpv_disabled egl-angle &&
-        do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
+    if ! mpv_disabled egl-angle; then
+        _check=(EGL/egl.h)
         do_pacman_uninstall angleproject-git
-        do_wget -c -r -q "$LOCALBUILDDIR"/patches/Makefile.angle
-        log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
-        [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
-        do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
+        if [[ x"$angle" = x"y" ]]; then
+            _check+=(bin-video/lib{GLESv2,EGL}.dll)
+            if do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
+                do_wget -c -r -q "$LOCALBUILDDIR"/patches/Makefile.angle
+                log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
+                [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
+                do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
+            fi
+        elif do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
+            rm -rf "$LOCALDESTDIR/include/"{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h}
+            cp -rf include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h} "$LOCALDESTDIR/include/"
+        fi
         do_checkIfExist
 
         echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
