@@ -1194,7 +1194,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     if ! mpv_disabled egl-angle; then
         _check=(EGL/egl.h)
-        do_pacman_uninstall angleproject-git
+        do_pacman_remove angleproject-git
         if [[ x"$angle" = x"y" ]]; then
             _check+=(bin-video/lib{GLESv2,EGL}.dll)
             if do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
