@@ -59,6 +59,7 @@ Included Tools And Libraries
         - librtmp (git)
             - compiled with gnutls or openssl depending on license chosen
         - libschroedinger (mingw)
+        - libsnappy (mingw)
         - libsoxr (0.1.2)
         - libspeex (1.2rc2)
         - libtheora (mingw)
@@ -70,6 +71,7 @@ Included Tools And Libraries
         - libxavs (svn snapshot)
         - libxvid (mingw)
         - libzimg (git)
+        - nvenc (6.0.1)
     - Full build (in addition to Zeranoe)
         - chromaprint (git)
         - libcdio (mingw)
@@ -79,11 +81,9 @@ Included Tools And Libraries
         - libkvazaar (git)
         - libopenh264 (git)
         - librubberband (git snapshot)
-        - libsnappy (mingw)
         - libssh (mingw)
         - libtesseract (git)
         - libzvbi (0.2.35)
-        - nvenc (6.0.1)
         - opencl (from system)
         - opengl (from system)
 
