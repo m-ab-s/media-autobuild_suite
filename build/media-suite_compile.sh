@@ -1001,7 +1001,7 @@ if [[ $ffmpeg != "n" ]] && enabled libopenh264 &&
     do_vcs https://github.com/cisco/openh264.git; then
     do_uninstall include/wels "${_check[@]}"
     create_build_dir
-    do_make -f ../Makefile AR=ar ARCH="${MINGW_CHOST%%-*}" PREFIX="$LOCALDESTDIR" install-static
+    do_make -f ../Makefile AR=ar ARCH="${MINGW_CHOST%%-*}" OS=mingw_nt PREFIX="$LOCALDESTDIR" install-static
     do_checkIfExist
 fi
 
