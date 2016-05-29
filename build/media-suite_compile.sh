@@ -1211,11 +1211,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
             fi
+            do_checkIfExist
         elif do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
             rm -rf "$LOCALDESTDIR/include/"{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h}
             cp -rf include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h} "$LOCALDESTDIR/include/"
+            do_checkIfExist
         fi
-        do_checkIfExist
 
         echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
         echo -e "${orange_color}but they're not needed if angle backend isn't required.${reset_color}"
