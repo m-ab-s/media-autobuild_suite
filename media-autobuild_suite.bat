@@ -1283,6 +1283,9 @@ if "%searchRes%"=="oldbuild" set "removefstab=yes"
 for /f "tokens=2 delims=/" %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
 if not "%searchRes%"=="trunk" set "removefstab=yes"
 
+for /f "tokens=1 delims= " %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
+if not "%searchRes%"=="%instdir%\" set "removefstab=yes"
+
 for /f "tokens=2 delims=/" %%a in ('findstr /i local32 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
 if "%searchRes%"=="local32" (
     if "%build32%"=="no" set "removefstab=yes"
@@ -1296,9 +1299,6 @@ if "%searchRes%"=="local64" (
     ) else (
     if "%build64%"=="yes" set "removefstab=yes"
     )
-
-for /f "tokens=1 delims= " %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="%instdir%\" set "removefstab=yes"
 
 if "%removefstab%"=="yes" (
     del %instdir%\%msys2%\etc\fstab.
