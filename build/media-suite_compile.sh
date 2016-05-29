@@ -3,6 +3,16 @@ shopt -s extglob
 
 FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
 alloptions="$*"
+if [[ x"$LOCALBUILDDIR" = "x" ]]; then
+    echo "Something went wrong."
+    echo "MSYSTEM: $MSYSTEM"
+    echo "pwd: $(cygpath -w "$(pwd)")"
+    echo "fstab: "
+    cat /etc/fstab
+    echo "Create a new issue and upload all logs you can find, especially compile.log"
+    read -r -p "Enter to continue" ret
+    exit 1
+fi
 echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
 
 while true; do
@@ -40,8 +50,7 @@ while true; do
   esac
 done
 
-[[ -f "$LOCALBUILDDIR"/media-suite_helper.sh ]] &&
-    source "$LOCALBUILDDIR"/media-suite_helper.sh
+source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 buildProcess() {
 set_title
