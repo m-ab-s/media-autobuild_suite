@@ -155,12 +155,14 @@ fi
 check_profiles() {
     local profilebits="$1"
     local newProfile=""
-    if [[ -f "/${profilebits}/etc/profile.local" ]]; then
-        newProfile=$(sed -n "/# .${profilebits}.etc.profile.local$/,/${profilebits}.etc.profile.local$/p" \
+    [[ -f "/${profilebits}/etc/profile.local" ]] &&
+        rm -f "/${profilebits}/etc/profile.local" && echo "Deleted old profiles"
+    if [[ -f "/${profilebits}/etc/profile2.local" ]]; then
+        newProfile=$(sed -n "/# .${profilebits}.etc.profile2.local$/,/${profilebits}.etc.profile2.local$/p" \
             media-autobuild_suite.bat | head -n -1 | sed "s/^\s*echo\.//")
-        if ! diff <(echo "$newProfile") <(tail -n +2 "/${profilebits}/etc/profile.local") &> /dev/null; then
+        if ! diff <(echo "$newProfile") <(tail -n +2 "/${profilebits}/etc/profile2.local") &> /dev/null; then
             echo "Updating profile in /${profilebits}..."
-            printf "#\n%s\n" "$newProfile" > "/${profilebits}/etc/profile.local"
+            printf "#\n%s\n" "$newProfile" > "/${profilebits}/etc/profile2.local"
         fi
     fi
 }

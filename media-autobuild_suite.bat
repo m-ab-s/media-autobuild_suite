@@ -1339,7 +1339,7 @@ if "%searchRes%"=="local64" (
 
 :writeProfile32
 if %build32%==yes (
-    if exist %instdir%\local32\etc\profile.local GOTO writeProfile64
+    if exist %instdir%\local32\etc\profile2.local GOTO writeProfile64
         echo -------------------------------------------------------------------------------
         echo.
         echo.- write profile for 32 bit compiling
@@ -1347,7 +1347,7 @@ if %build32%==yes (
         echo -------------------------------------------------------------------------------
         (
             echo.#
-            echo.# /local32/etc/profile.local
+            echo.# /local32/etc/profile2.local
             echo.#
             echo.
             echo.MSYSTEM=MINGW32
@@ -1395,12 +1395,12 @@ if %build32%==yes (
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
             echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.cd /trunk
-            )>>%instdir%\local32\etc\profile.local
+            )>>%instdir%\local32\etc\profile2.local
         )
 
 :writeProfile64
 if %build64%==yes (
-    if exist %instdir%\local64\etc\profile.local GOTO loginProfile
+    if exist %instdir%\local64\etc\profile2.local GOTO loginProfile
         echo -------------------------------------------------------------------------------
         echo.
         echo.- write profile for 64 bit compiling
@@ -1408,7 +1408,7 @@ if %build64%==yes (
         echo -------------------------------------------------------------------------------
         (
             echo.#
-            echo.# /local64/etc/profile.local
+            echo.# /local64/etc/profile2.local
             echo.#
             echo.
             echo.MSYSTEM=MINGW64
@@ -1456,40 +1456,24 @@ if %build64%==yes (
             echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
             echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
             echo.cd /trunk
-            )>>%instdir%\local64\etc\profile.local
+            )>>%instdir%\local64\etc\profile2.local
         )
 
 :loginProfile
-if %build64%==yes GOTO loginProfile64
-    %instdir%\%msys2%\usr\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
-        echo -------------------------------------------------------------------------------
+%instdir%\%msys2%\usr\bin\grep -q -e 'profile2.local' %instdir%\%msys2%\etc\profile || (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. - writing default profile
+    echo.
+    echo -------------------------------------------------------------------------------
+    (
         echo.
-        echo.- write default profile [32 bit]
-        echo.
-        echo -------------------------------------------------------------------------------
-        (
-            echo.
-            echo.if [[ -z "$MSYSTEM" ^&^& -f /local32/etc/profile.local ]]; then
-            echo.   source /local32/etc/profile.local
-            echo.fi
-            )>>%instdir%\%msys2%\etc\profile.
-    )
-
-    GOTO compileLocals
-
-:loginProfile64
-    %instdir%\%msys2%\usr\bin\grep -q -e 'profile.local' %instdir%\%msys2%\etc\profile || (
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.- write default profile [64 bit]
-        echo.
-        echo -------------------------------------------------------------------------------
-        (
-            echo.
-            echo.if [[ -z "$MSYSTEM" ^&^& -f /local64/etc/profile.local ]]; then
-            echo.   source /local64/etc/profile.local
-            echo.fi
-            )>>%instdir%\%msys2%\etc\profile.
+        echo.if [[ -f /local64/etc/profile2.local ]]; then
+        echo.   source /local64/etc/profile2.local
+        echo.elif [[ -f /local32/etc/profile2.local ]]; then
+        echo.   source /local32/etc/profile2.local
+        echo.fi
+        )>>%instdir%\%msys2%\etc\profile.
     )
 
 :compileLocals
