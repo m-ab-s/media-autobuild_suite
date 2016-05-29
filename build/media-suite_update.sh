@@ -13,6 +13,7 @@ while true; do
   esac
 done
 
+# start suite update
 if [[ -d "/trunk/build" ]]; then
     cd "/trunk/build" || exit 1
 else
@@ -24,6 +25,7 @@ fi
 # --------------------------------------------------
 # update suite
 # --------------------------------------------------
+
 if [[ "$update" = "yes" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
@@ -56,7 +58,7 @@ if [[ "$update" = "yes" ]]; then
             echo "Suite up-to-date."
             echo "If you had an issue, please report it in GitHub."
         fi
-        sleep 15
+        read -r -t 15 -p '<Enter> to close' ret
     fi
 fi # end suite update
 

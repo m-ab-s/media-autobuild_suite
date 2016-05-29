@@ -1212,7 +1212,7 @@ if %updateSuite%==y (
         echo.# Be sure the suite is not running before using it!
         echo.
         echo.update=yes
-        %instdir%\%msys2%\usr\bin\sed -n '/trunk\/build/,/end suite update/p' ^
+        %instdir%\%msys2%\usr\bin\sed -n '/start suite update/,/end suite update/p' ^
             %build%/media-suite_update.sh
         )>%instdir%\update_suite.sh
     )
