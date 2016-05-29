@@ -1074,7 +1074,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     (
     echo.echo -ne "\033]0;install base system\007"
     echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
-    echo.[[ "$(uname)" = *6.1 ]] ^&^& nargs="-n 4"
+    echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
     echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --needed
     echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --needed
     echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
@@ -1124,7 +1124,7 @@ if %build32%==yes (
     (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
         echo.mingw32compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-i686-&;g' | tr '\n\r' '  ')"
-        echo.[[ "$(uname)" = *6.1 ]] ^&^& nargs="-n 4"
+        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
         echo.echo $mingw32compiler ^| xargs $nargs pacman -Sw --noconfirm --needed --force
         echo.echo $mingw32compiler ^| xargs $nargs pacman -S --noconfirm --needed --force
         echo.sleep ^3
@@ -1157,7 +1157,7 @@ if %build64%==yes (
         (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.mingw64compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-x86_64-&;g' | tr '\n\r' '  ')"
-        echo.[[ "$(uname)" = *6.1 ]] ^&^& nargs="-n 4"
+        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
         echo.echo $mingw64compiler ^| xargs $nargs pacman -Sw --noconfirm --needed --force
         echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --needed --force
         echo.sleep ^3
