@@ -228,7 +228,7 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.1"; then
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" CFLAGS="${CFLAGS#-I${LOCALDESTDIR}/include }" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
         --without-{libssh2,random,ca-bundle,ca-path} --enable-sspi --disable-{debug,manual}
-    make ca-bundle
+    log ca-bundle make ca-bundle
     enabled_any openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
         cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
     do_checkIfExist
