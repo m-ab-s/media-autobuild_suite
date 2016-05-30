@@ -209,9 +209,9 @@ fi
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
-if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.0"; then
+if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.1"; then
     do_pacman_install nghttp2
-    do_wget -h 7416aaff4a9210b43edda7615ffa4169 "https://curl.haxx.se/download/curl-7.49.0.tar.bz2"
+    do_wget -h 6bb1f7af5b58b30e4e6414b8c1abccab "https://curl.haxx.se/download/curl-7.49.1.tar.bz2"
     do_uninstall include/curl bin-global/{curl-config,curl-ca-bundle.crt} "${_check[@]}"
     [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
