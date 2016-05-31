@@ -366,22 +366,18 @@ fi
 
 enabled libvorbis && do_pacman_install libvorbis
 enabled libopus && do_pacman_install opus
+enabled libspeex && do_pacman_install speex
 
-_check=(libspeex.{l,}a speex.pc)
-[[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
-if enabled libspeex && do_pkgConfig "speex = 1.2rc2"; then
-    do_pacman_install libogg
+_check=(bin-audio/speex{enc,dec}.exe)
+if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
+    grep -q '1.2rc2' "$LOCALDESTDIR/bin-audio/speexenc.exe"; }; then
     do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
         "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
-    do_uninstall include/speex "${_check[@]}"
+    do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
     do_patch speex-mingw-winmm.patch
-    extracommands=()
-    if [[ $standalone = y ]]; then
-        extracommands+=(--enable-binaries)
-    else
-        extracommands+=(--disable-binaries)
-    fi
-    do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
+    do_separate_conf audio --enable-vorbis-psy --enable-binaries
+    do_make
+    do_install src/speex{enc,dec}.exe bin-audio/
     do_checkIfExist
 fi
 
