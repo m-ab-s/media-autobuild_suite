@@ -1236,44 +1236,11 @@ echo.---------------------------------------------------------------------------
 call %instdir%\%msys2%\autorebase.bat
 )
 
-:checkdyn
+:createFolders
+if %build32%==yes call :createBaseFolders local32
+if %build64%==yes call :createBaseFolders local64
 
-if %build32%==yes (
-    if not exist %instdir%\local32\share (
-        echo.-------------------------------------------------------------------------------
-        echo.create local32 folders
-        echo.-------------------------------------------------------------------------------
-        mkdir %instdir%\local32
-        mkdir %instdir%\local32\bin
-        mkdir %instdir%\local32\bin-audio
-        mkdir %instdir%\local32\bin-global
-        mkdir %instdir%\local32\bin-video
-        mkdir %instdir%\local32\etc
-        mkdir %instdir%\local32\include
-        mkdir %instdir%\local32\lib
-        mkdir %instdir%\local32\lib\pkgconfig
-        mkdir %instdir%\local32\share
-        )
-    )
-
-if %build64%==yes (
-    if not exist %instdir%\local64\share (
-        echo.-------------------------------------------------------------------------------
-        echo.create local64 folders
-        echo.-------------------------------------------------------------------------------
-        mkdir %instdir%\local64
-        mkdir %instdir%\local64\bin
-        mkdir %instdir%\local64\bin-audio
-        mkdir %instdir%\local64\bin-global
-        mkdir %instdir%\local64\bin-video
-        mkdir %instdir%\local64\etc
-        mkdir %instdir%\local64\include
-        mkdir %instdir%\local64\lib
-        mkdir %instdir%\local64\lib\pkgconfig
-        mkdir %instdir%\local64\share
-        )
-    )
-
+:checkFstab
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
 set "removefstab=no"
 
@@ -1492,3 +1459,20 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i 
 
 endlocal
 goto:eof
+
+:createBaseFolders
+if not exist %instdir%\%1\share (
+    echo.-------------------------------------------------------------------------------
+    echo.create %1 folders
+    echo.-------------------------------------------------------------------------------
+    mkdir %instdir%\%1
+    mkdir %instdir%\%1\bin
+    mkdir %instdir%\%1\bin-audio
+    mkdir %instdir%\%1\bin-global
+    mkdir %instdir%\%1\bin-video
+    mkdir %instdir%\%1\etc
+    mkdir %instdir%\%1\include
+    mkdir %instdir%\%1\lib
+    mkdir %instdir%\%1\lib\pkgconfig
+    mkdir %instdir%\%1\share
+    )
