@@ -1313,7 +1313,6 @@ if %build32%==yes (
         echo.
         echo -------------------------------------------------------------------------------
         (
-            echo.#
             echo.# /local32/etc/profile2.local
             echo.#
             echo.
@@ -1330,39 +1329,8 @@ if %build32%==yes (
             echo.MINGW_CHOST="i686-w64-mingw32"
             echo.MINGW_PREFIX="/mingw32"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-i686"
-            echo.
-            echo.# rest is the same in both profiles
-            echo.alias dir='ls -la --color=auto'
-            echo.alias ls='ls --color=auto'
-            echo.export CC=gcc
-            echo.
-            echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
-            echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
-            echo.export CPATH LIBRARY_PATH
-            echo.
-            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
-            echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
-            echo.
-            echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
-            echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
-            echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
-            echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-            echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
-            echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
-            echo.
-            echo.LANG=en_US.UTF-8
-            echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
-            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-            echo.HOME="/home/${USERNAME}"
-            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
-            echo.cd /trunk
             )>>%instdir%\local32\etc\profile2.local
+        call :writeCommonProfile 32
         )
 
 :writeProfile64
@@ -1374,7 +1342,6 @@ if %build64%==yes (
         echo.
         echo -------------------------------------------------------------------------------
         (
-            echo.#
             echo.# /local64/etc/profile2.local
             echo.#
             echo.
@@ -1391,39 +1358,8 @@ if %build64%==yes (
             echo.MINGW_CHOST="x86_64-w64-mingw32"
             echo.MINGW_PREFIX="/mingw64"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-x86_64"
-            echo.
-            echo.# rest is the same in both profiles
-            echo.alias dir='ls -la --color=auto'
-            echo.alias ls='ls --color=auto'
-            echo.export CC=gcc
-            echo.
-            echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
-            echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
-            echo.export CPATH LIBRARY_PATH
-            echo.
-            echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
-            echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
-            echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
-            echo.
-            echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
-            echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
-            echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
-            echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-            echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-            echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
-            echo.CXXFLAGS="${CFLAGS}"
-            echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
-            echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
-            echo.
-            echo.LANG=en_US.UTF-8
-            echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
-            echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
-            echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
-            echo.HOME="/home/${USERNAME}"
-            echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
-            echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
-            echo.cd /trunk
             )>>%instdir%\local64\etc\profile2.local
+        call :writeCommonProfile 64
         )
 
 :loginProfile
@@ -1458,7 +1394,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i 
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle%
 
 endlocal
-goto:eof
+goto :EOF
 
 :createBaseFolders
 if not exist %instdir%\%1\share (
@@ -1476,3 +1412,41 @@ if not exist %instdir%\%1\share (
     mkdir %instdir%\%1\lib\pkgconfig
     mkdir %instdir%\%1\share
     )
+goto :EOF
+
+:writeCommonProfile
+(
+    echo.
+    echo.# common in both profiles
+    echo.alias dir='ls -la --color=auto'
+    echo.alias ls='ls --color=auto'
+    echo.export CC=gcc
+    echo.
+    echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
+    echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
+    echo.export CPATH LIBRARY_PATH
+    echo.
+    echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+    echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
+    echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
+    echo.
+    echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
+    echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
+    echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkg-config --static"
+    echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
+    echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+    echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
+    echo.CXXFLAGS="${CFLAGS}"
+    echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+    echo.
+    echo.LANG=en_US.UTF-8
+    echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
+    echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
+    echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
+    echo.HOME="/home/${USERNAME}"
+    echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
+    echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
+    echo.cd /trunk
+    )>>%instdir%\local%1\etc\profile2.local
+goto :EOF

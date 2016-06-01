@@ -155,26 +155,35 @@ else
 fi
 
 check_profiles() {
-    local profilebits="$1"
-    local newProfile=""
-    [[ -f "/${profilebits}/etc/profile.local" ]] &&
-        rm -f "/${profilebits}/etc/profile.local" && echo "Deleted old profiles"
-    if [[ -f "/${profilebits}/etc/profile2.local" ]]; then
-        newProfile=$(sed -n "/# .${profilebits}.etc.profile2.local$/,/${profilebits}.etc.profile2.local$/p" \
-            media-autobuild_suite.bat | head -n -1 | sed "s/^\s*echo\.//")
-        if ! diff <(echo "$newProfile") <(tail -n +2 "/${profilebits}/etc/profile2.local") &> /dev/null; then
-            echo "Updating profile in /${profilebits}..."
-            printf "#\n%s\n" "$newProfile" > "/${profilebits}/etc/profile2.local"
+    local profile="/local${1}/etc/profile2.local"
+    local bat="media-autobuild_suite.bat"
+    [[ -f "${bat}" ]] || return 1
+    local new common tmp
+    new="$(sed -n "/# ${profile////.}$/,/${profile////.}$/p" "${bat}" | head -n -1)"
+    common="$(sed -n "/^:writeCommonProfile/,/%instdir%.local%1/p" "${bat}" | head -n -1 | tail -n +3)"
+    tmp="$(printf '%s\n' "$new" "$common" | sed 's,^\s*echo\.,,g')"
+    [[ -f ."${profile//2}" ]] &&
+        rm -f ."${profile//2}" && echo "Deleted old profiles"
+    if [[ -f ."${profile}" ]]; then
+        [[ "$(file ."${profile}")" =~ CRLF ]] && dos2unix -q ."${profile}"
+        if ! diff <(echo "$tmp") ."${profile}" &> /dev/null; then
+            echo "Updating ${profile%/etc*} profile"
+        else
+            echo "${profile%/etc*} profile up-to-date!"
+            return 0
         fi
+    else
+        echo "Creating ${profile%/etc*} profile"
     fi
+    echo "$tmp" > ."${profile}"
 }
 
 if [[ $build32 = "yes" ]]; then
-    check_profiles "local32"
+    check_profiles 32
 fi
 
 if [[ $build64 = "yes" ]]; then
-    check_profiles "local64"
+    check_profiles 64
 fi
 
 # --------------------------------------------------
