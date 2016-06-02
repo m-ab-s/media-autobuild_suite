@@ -1244,38 +1244,35 @@ if %build64%==yes call :createBaseFolders local64
 if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
 set "removefstab=no"
 
-for /f "tokens=2 delims=/" %%b in ('findstr /i build32 %instdir%\%msys2%\etc\fstab.') do set searchRes=oldbuild
-if "%searchRes%"=="oldbuild" set "removefstab=yes"
+set "grep=%instdir%\%msys2%\usr\bin\grep.exe"
+set fstab=%instdir%\%msys2%\etc\fstab
 
-for /f "tokens=2 delims=/" %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="trunk" set "removefstab=yes"
+%grep% -q build32 %fstab% && set "removefstab=yes"
+%grep% -q trunk %fstab% || set "removefstab=yes"
 
-for /f "tokens=1 delims= " %%a in ('findstr /i trunk %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if not "%searchRes%"=="%instdir%\" set "removefstab=yes"
+for /f "tokens=1 delims= " %%a in ('%grep% trunk %fstab%') do set searchRes=%%a
+if not [%searchRes%]==[%instdir%\] set "removefstab=yes"
 
-for /f "tokens=2 delims=/" %%a in ('findstr /i local32 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if "%searchRes%"=="local32" (
-    if "%build32%"=="no" set "removefstab=yes"
+%grep% -q local32 %fstab%
+if not errorlevel 1 (
+    if [%build32%]==[no] set "removefstab=yes"
     ) else (
-    if "%build32%"=="yes" set "removefstab=yes"
+    if [%build32%]==[yes] set "removefstab=yes"
     )
 
-for /f "tokens=2 delims=/" %%a in ('findstr /i local64 %instdir%\%msys2%\etc\fstab.') do set searchRes=%%a
-if "%searchRes%"=="local64" (
-    if "%build64%"=="no" set "removefstab=yes"
+%grep% -q local64 %fstab%
+if not errorlevel 1 (
+    if [%build64%]==[no] set "removefstab=yes"
     ) else (
-    if "%build64%"=="yes" set "removefstab=yes"
+    if [%build64%]==[yes] set "removefstab=yes"
     )
 
-if "%removefstab%"=="yes" (
+if [%removefstab%]==[yes] (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab
-    )
-
-if "%searchRes%"=="local32" GOTO writeProfile32
-if "%searchRes%"=="local64" (
+    ) else (
     GOTO writeProfile32
-    ) else del %instdir%\%msys2%\etc\fstab.
+    )
 
     :writeFstab
     echo -------------------------------------------------------------------------------
@@ -1297,8 +1294,8 @@ if "%searchRes%"=="local64" (
         echo.%instdir%\%msys2%\mingw32\ /mingw32
         echo.%instdir%\%msys2%\mingw64\ /mingw64
         )>>%instdir%\%msys2%\etc\fstab.
-    if exist %instdir%\local32 echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
-    if exist %instdir%\local64 echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
+    if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
+    if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 ::------------------------------------------------------------------
 :: write config profiles:
