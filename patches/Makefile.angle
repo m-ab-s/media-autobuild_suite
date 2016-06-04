@@ -1,4 +1,4 @@
-VERSION = 2.1.9e54b5af8988
+VERSION = 2.1.r5795.ae0c126a7a59
 CXX ?= g++
 AR ?= ar
 RANLIB ?= ranlib
@@ -21,7 +21,7 @@ DEFS := -DUNICODE -D_UNICODE -DANGLE_ENABLE_D3D9 -DANGLE_ENABLE_D3D11 -DANGLE_EN
 		-DEGLAPI= $(DEFS)
 LIBEGL_DEFS = -DLIBEGL_IMPLEMENTATION
 LIBGLESv2_DEFS = -DLIBGLESV2_IMPLEMENTATION
-CPPFLAGS := -Isrc -Iinclude -Isrc/third_party/khronos $(CPPFLAGS)
+CPPFLAGS := -Isrc -Iinclude -Isrc/third_party/khronos -Isrc/common/third_party/numerics $(CPPFLAGS)
 CXXFLAGS := -std=c++11 -fpermissive -msse2 -O2 -Wno-deprecated-declarations \
 			-Wno-conversion-null $(CXXFLAGS)
 DEPFLAGS = -MMD -MP
