@@ -787,7 +787,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
             cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
         count=0
         while [[ x"${_check[$count]}" != x"" ]]; do
-            do_wget -r -c -h "${_hash[$count]}" "$LOCALBUILDDIR/extras/${_check[$count]}"
+            do_wget -r -c -h "${_hash[$count]}" "/extras/${_check[$count]}"
             do_install "${_check[$count]}"
             let count+=1
         done
@@ -808,7 +808,7 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
             {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[0]}"
         mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
-        do_wget -r -c -h "${_hash[0]}" "$LOCALBUILDDIR/extras/${_check[0]}"
+        do_wget -r -c -h "${_hash[0]}" "/extras/${_check[0]}"
         do_install "${_check[0]}"
         do_checkIfExist
     fi
@@ -1196,7 +1196,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if [[ $bits = 64bit && x"$angle" = x"y" ]]; then
             _check+=(bin-video/lib{GLESv2,EGL}.dll)
             if do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
-                do_wget -c -r -q "$LOCALBUILDDIR"/patches/Makefile.angle
+                do_wget -c -r -q /patches/Makefile.angle
                 log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"

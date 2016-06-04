@@ -214,7 +214,6 @@ check_hash() {
     fi
 }
 
-
 # get wget download
 do_wget() {
     local nocd norm quiet hash notmodified
@@ -239,8 +238,8 @@ do_wget() {
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
-        [[ ${url#$LOCALBUILDDIR} != "${url}" ]] &&
-            url="https://jb-alvarado.github.io/media-autobuild_suite${url#$LOCALBUILDDIR}"
+        [[ ${url#/patches} != "$url" || ${url#/extras} != "$url" ]] &&
+            url="https://jb-alvarado.github.io/media-autobuild_suite${url}"
 
         curlcmds=("${curl_opts[@]}")
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
@@ -269,10 +268,6 @@ do_wget() {
             if [[ -f $archive ]]; then
                 echo -e "${orange_color}${archive}${reset_color}"
                 echo -e "\tFile not found online. Using local copy."
-            elif [[ -f $LOCALBUILDDIR/${url#*media-autobuild_suite/master/build/} ]]; then
-                echo -e "${orange_color}${archive}${reset_color}"
-                echo -e "\tFile not found online. Using local copy."
-                cp -f "$LOCALBUILDDIR/${url#*media-autobuild_suite/master/build/}" .
             else
                 do_print_status "└ ${dirName:-$archive}" "$red_color" "Failed"
                 echo "Error $response_code while downloading $url"
@@ -816,7 +811,7 @@ do_patch() {
     local patch=${1%% *}
     local am=$2          # "am" to apply patch with "git am"
     local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
-    do_wget -c -r -q "$LOCALBUILDDIR/patches/$patch"
+    do_wget -c -r -q "/patches/$patch"
     if [[ -f "$patch" ]]; then
         if [[ "$am" = "am" ]]; then
             if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
