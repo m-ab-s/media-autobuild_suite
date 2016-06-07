@@ -1195,7 +1195,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_pacman_remove angleproject-git
         if [[ $bits = 64bit && x"$angle" = x"y" ]]; then
             _check+=(bin-video/lib{GLESv2,EGL}.dll)
-            if do_vcs "https://chromium.googlesource.com/angle/angle#commit=9e54b5af8988" angleproject; then
+            if do_vcs "https://chromium.googlesource.com/angle/angle#commit=149a099948cb" angleproject; then
                 do_wget -c -r -q /patches/Makefile.angle
                 log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
