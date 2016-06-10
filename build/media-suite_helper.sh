@@ -722,7 +722,7 @@ do_getMpvConfig() {
     else
         echo "Using default mpv options"
     fi
-    for forced in vapoursynth-lazy libguess static-build; do
+    for forced in vapoursynth-lazy libguess static-build enable-gpl3; do
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
     if [[ $mpv = "y" ]]; then
