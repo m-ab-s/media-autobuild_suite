@@ -88,6 +88,7 @@ Included Tools And Libraries
         - opengl (from system)
 
  - other tools
+    - aom (git)
     - bmx (git)
     - curl (latest release) with WinSSL/LibreSSL/GnuTLS backend
     - faac (1.28)

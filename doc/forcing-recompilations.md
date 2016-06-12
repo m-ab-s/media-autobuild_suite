@@ -4,6 +4,7 @@ How to force compilation of libs/apps
 ## Libraries using pkg-config
 Most libs use pkg-config files to check if they exist, so for most libs in this list all you have to do is delete the corresponding `<libname>.pc` file in `/local32/lib/pkgconfig/` or `/local64/lib/pkgconfig`:
 ```
+aom
 chromaprint
 dvdnav
 dvdread

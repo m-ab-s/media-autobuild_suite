@@ -44,6 +44,7 @@ while true; do
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
 --angle=* ) angle="${1#*=}"; shift ;;
+--aom=* ) aom="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -624,6 +625,29 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     unset target extracommands _ff
 else
     pc_exists vpx || do_removeOption --enable-libvpx
+fi
+
+_check=(libaom.a aom.pc)
+[[ $standalone = y ]] && _check+=(bin-video/aomenc.exe)
+if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
+    extracommands=()
+    [[ $standalone = y ]] && _check+=(bin-video/aomdec.exe) ||
+        extracommands+=(--disable-examples)
+    do_uninstall include/aom "${_check[@]}"
+    create_build_dir
+    [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
+    log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
+        --disable-{shared,unit-tests,docs,install-bins} \
+        --enable-{static,runtime-cpu-detect,aom-highbitdepth} \
+        "${extracommands[@]}"
+    for _ff in *.mk; do
+        sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
+    done
+    do_make
+    do_makeinstall
+    [[ $standalone = y ]] && do_install aom{enc,dec}.exe bin-video/
+    do_checkIfExist
+    unset target extracommands _ff
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)

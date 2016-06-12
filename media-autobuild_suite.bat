@@ -84,7 +84,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-angle
+angle aom
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -284,6 +284,29 @@ if %buildvpx%==1 set "vpx2=y"
 if %buildvpx%==2 set "vpx2=n"
 if %buildvpx% GTR 2 GOTO vpx
 if %writevpx%==yes echo.vpx2=^%buildvpx%>>%ini%
+
+:aom
+set "writeaom=no"
+if %aomINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build aom [Alliance for Open Media codec]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone=y"
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildaom="Build aom: "
+    ) else set buildaom=%aomINI%
+if %deleteINI%==1 set "writeaom=yes"
+
+if %buildaom%==1 set "aom=y"
+if %buildaom%==2 set "aom=n"
+if %buildaom% GTR 2 GOTO aom
+if %writeaom%==yes echo.aom=^%buildaom%>>%ini%
 
 :x264
 set "writex264=no"
@@ -1387,7 +1410,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i 
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle%
+--rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle% --aom=%aom%
 
 endlocal
 goto :EOF
