@@ -1104,7 +1104,7 @@ get_first_subdir() {
 
 clean_html_index() {
     local url="$1"
-    local filter="${2:-(?<=href=\")[^\"]+\.tar\.(gz|bz2|xz)}"
+    local filter="${2:-(?<=href=\")[^\"]+\.(tar\.(gz|bz2|xz)|7z)}"
     "${curl_opts[@]}" -l "$url" | grep -ioP "$filter" | sort -uV
 }
 
