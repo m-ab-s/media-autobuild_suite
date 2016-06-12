@@ -45,6 +45,7 @@ while true; do
 --bmx=* ) bmx="${1#*=}"; shift ;;
 --angle=* ) angle="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
+--daala=* ) daala="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -659,6 +660,19 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; }
     [[ $standalone = y || $other265 = y ]] ||
         sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     do_separate_confmakeinstall video
+    do_checkIfExist
+fi
+
+_check=(libdaala{base,dec,enc}.{,l}a daala{dec,enc}.pc)
+[[ $standalone = y ]] && _check+=(bin-video/{encoder,player}_example.exe)
+if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
+    do_pacman_install libogg
+    extracommands=()
+    do_uninstall include/daala "${_check[@]}"
+    do_autogen
+    [[ $standalone = y ]] && do_pacman_install SDL2 || extracommands+=(--disable-player)
+    do_separate_confmakeinstall video --disable-{unit-tests,doc} "${extracommands[@]}"
+    [[ $standalone = y ]] && do_install {encoder,player}_example.exe bin-video/
     do_checkIfExist
 fi
 

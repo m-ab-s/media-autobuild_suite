@@ -6,6 +6,7 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
 ```
 aom
 chromaprint
+daalabase
 dvdnav
 dvdread
 fdk-aac (fdk-aac library only)
