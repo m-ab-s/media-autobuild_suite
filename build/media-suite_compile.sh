@@ -190,13 +190,12 @@ if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
-    libressl_ver="${libressl_ver:-2.4.0}"
+    libressl_ver="${libressl_ver:-2.4.1}"
     _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_pkgConfig "libssl = $libressl_ver"; then
         do_wget "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
         do_uninstall etc/ssl include/openssl "${_check[@]}"
-        do_patch "libressl-0001-pc-add-platform-specific-libs-to-Libs.private.patch"
         _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
         sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.in
