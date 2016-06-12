@@ -602,7 +602,7 @@ fi
 
 _check=(libvpx.a vpx.pc)
 [[ $standalone = y ]] && _check+=(bin-video/vpxenc.exe)
-if [[ $vpx != n ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx; then
+if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx; then
     extracommands=()
     [[ -f config.mk ]] && log "distclean" make distclean
     [[ $standalone = y ]] && _check+=(bin-video/vpxdec.exe) ||
@@ -621,7 +621,7 @@ if [[ $vpx != n ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx
     do_makeinstall
     [[ $standalone = y ]] && do_install vpx{enc,dec}.exe bin-video/
     do_checkIfExist
-    unset target extracommands
+    unset target extracommands _ff
 else
     pc_exists vpx || do_removeOption --enable-libvpx
 fi
