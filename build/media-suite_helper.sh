@@ -282,6 +282,7 @@ do_wget() {
     [[ $norm ]] || add_to_remove "$(pwd)/$archive"
     do_extract "$archive" "$dirName"
     [[ ! $norm && $dirName && ! $nocd ]] && add_to_remove
+    [[ -z $response_code || $response_code != "304" ]] && return 0
 }
 
 real_extract() {

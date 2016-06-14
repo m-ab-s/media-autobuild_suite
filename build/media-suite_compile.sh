@@ -1228,10 +1228,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     if ! mpv_disabled egl-angle; then
-        _check=(EGL/egl.h)
+        _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
         do_pacman_remove angleproject-git
-        if [[ $bits = 64bit && x"$angle" = x"y" ]]; then
-            _check+=(bin-video/lib{GLESv2,EGL}.dll)
+        if [[ $bits = 64bit && $angle = y ]]; then
             if do_vcs "https://chromium.googlesource.com/angle/angle#commit=149a099948cb" angleproject; then
                 do_wget -c -r -q /patches/Makefile.angle
                 log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
@@ -1239,10 +1238,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
             fi
             do_checkIfExist
-        elif do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-            rm -rf "$LOCALDESTDIR/include/"{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h}
-            cp -rf include/{EGL,GLES{2,3},GLSLANG,KHR,platform,angle_gl.h} "$LOCALDESTDIR/include/"
+        elif do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
+            do_install lib{EGL,GLESv2}.dll bin-video/
+            cp -rf include/* "$LOCALDESTDIR/include/"
             do_checkIfExist
+            add_to_remove
         fi
 
         echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"

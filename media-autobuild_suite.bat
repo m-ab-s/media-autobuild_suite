@@ -706,16 +706,15 @@ if %angleINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Google ANGLE ^(for mpv^)
-    echo. 1 = Just get headers ^(recommended^)
+    echo. 1 = Install headers and get compiled libs ^(recommended^)
     echo. 2 = No
     echo. 3 = Build angle [slower at runtime than VS2015]
     echo.
     echo. This will enable inclusion in mpv of Angle backend.
     echo. It is always DLLs, since that is the only officially supported build.
     echo.
-    echo. If you just install the headers you need to either compile your own Angle
-    echo. using MS Visual Studio or get the DLLs from Chrome or Firefox to enable the
-    echo. angle backend in mpv.
+    echo. You can replace compiled libs by DLLs from Chrome or Firefox if I stop
+    echo. building them.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildangle="Build angle: "
