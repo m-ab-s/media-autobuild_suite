@@ -754,6 +754,9 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
+        grep -q 'File__Analyze_Element.cpp' Project/CMake/CMakeLists.txt ||
+            sed -i '/File__Analyze_Streams.cpp/ i\  ${MediaInfoLib_SOURCES_PATH}/MediaInfo/File__Analyze_Element.cpp' \
+            Project/CMake/CMakeLists.txt
         do_cmakeinstall Project/CMake
         sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist
