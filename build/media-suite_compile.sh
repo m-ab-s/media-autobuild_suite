@@ -1093,6 +1093,7 @@ if [[ $ffmpeg != "n" ]]; then
         enabled libopenh264 &&
             do_patch "ffmpeg-0001-lavc-libopenh264enc-update-to-openh264-1.6.patch" am && let _patches+=1
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am && let _patches+=1
+        git revert -n 37787f26 && let _patches+=1
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
         do_changeFFmpegConfig "$license"
