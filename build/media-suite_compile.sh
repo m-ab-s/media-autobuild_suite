@@ -754,9 +754,6 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
-        grep -q 'File__Analyze_Element.cpp' Project/CMake/CMakeLists.txt ||
-            sed -i '/File__Analyze_Streams.cpp/ i\  ${MediaInfoLib_SOURCES_PATH}/MediaInfo/File__Analyze_Element.cpp' \
-            Project/CMake/CMakeLists.txt
         do_cmakeinstall Project/CMake
         sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist
@@ -869,9 +866,8 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
 fi
 
 _check=(libgpac_static.a bin-video/MP4Box.exe)
-if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git#commit=878a3f3c"; then
+if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_uninstall include/gpac "${_check[@]}"
-    sed -i 's/\xC2\xA0/ /g' src/terminal/scene.c
     do_separate_conf --static-mp4box
     do_make
     log "install" make install-lib
