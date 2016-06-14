@@ -670,9 +670,14 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     extracommands=()
     do_uninstall include/daala "${_check[@]}"
     do_autogen
-    [[ $standalone = y ]] && do_pacman_install SDL2 || extracommands+=(--disable-player)
-    do_separate_confmakeinstall video --disable-{unit-tests,doc} "${extracommands[@]}"
-    [[ $standalone = y ]] && do_install {encoder,player}_example.exe bin-video/
+    if [[ $standalone = y ]]; then
+        do_pacman_install SDL2
+    else
+        extracommands+=(--disable-player)
+    fi
+    do_separate_conf video --disable-{unit-tests,doc} "${extracommands[@]}"
+    do_make && do_makeinstall
+    [[ $standalone = y ]] && do_install examples/{encoder,player}_example.exe bin-video/
     do_checkIfExist
 fi
 
