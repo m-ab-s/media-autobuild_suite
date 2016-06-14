@@ -654,7 +654,7 @@ fi
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
 [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
 if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; } &&
-    do_vcs "https://github.com/ultravideo/kvazaar.git"; then
+    do_vcs "https://github.com/ultravideo/kvazaar.git#commit=5af6ab32^"; then
     do_uninstall kvazaar_version.h "${_check[@]}"
     do_autogen
     [[ $standalone = y || $other265 = y ]] ||
