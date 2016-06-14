@@ -242,7 +242,7 @@ do_wget() {
             url="https://jb-alvarado.github.io/media-autobuild_suite${url}"
 
         curlcmds=("${curl_opts[@]}")
-        [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive")
+        [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive" -R)
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
             response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
