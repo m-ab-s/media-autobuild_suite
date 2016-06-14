@@ -869,7 +869,7 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
 fi
 
 _check=(libgpac_static.a bin-video/MP4Box.exe)
-if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
+if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git#commit=878a3f3c"; then
     do_uninstall include/gpac "${_check[@]}"
     sed -i 's/\xC2\xA0/ /g' src/terminal/scene.c
     do_separate_conf --static-mp4box
