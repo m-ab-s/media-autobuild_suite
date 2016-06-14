@@ -731,11 +731,6 @@ do_getMpvConfig() {
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
         do_addOption MPV_OPTS --enable-vapoursynth
     fi
-    if [[ $angle = "n" ]]; then
-        mpv_disable egl-angle || do_addOption MPV_OPTS --disable-egl-angle
-    elif ! mpv_disabled egl-angle; then
-        do_addOption MPV_OPTS --enable-egl-angle
-    fi
 }
 
 mpv_enabled() {
