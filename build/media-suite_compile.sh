@@ -671,9 +671,9 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     do_uninstall include/daala "${_check[@]}"
     do_autogen
     if [[ $standalone = y ]]; then
-        do_pacman_install SDL2
+        do_pacman_install SDL2 libjpeg-turbo
     else
-        extracommands+=(--disable-player)
+        extracommands+=(--disable-player --disable-tools)
     fi
     do_separate_conf video --disable-{unit-tests,doc} "${extracommands[@]}"
     do_make && do_makeinstall
