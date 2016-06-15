@@ -116,10 +116,10 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _deps=(freetype2.pc)
     _check=(libfontconfig.{,l}a fontconfig.pc)
-    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.11.95"; then
+    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.12.0"; then
         do_pacman_remove python2-lxml
-        do_wget -h da605e910d9c037f8886d65607b06920 \
-            "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.11.95.tar.gz"
+        do_wget -h f0313daaec6dce8471a2e57ac08c9fda \
+            "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.0.tar.bz2"
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -i Makefile.in \
             -e '/^SUBDIRS/,+2{s/fontconfig.*/fontconfig src/;/fc-/d}' \
