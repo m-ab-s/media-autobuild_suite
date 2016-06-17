@@ -1243,7 +1243,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
             fi
             do_checkIfExist
-        elif do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
+        elif [[ $angle = h ]] && do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
             do_install lib{EGL,GLESv2}.dll bin-video/
             cp -rf include/* "$LOCALDESTDIR/include/"
             do_checkIfExist
