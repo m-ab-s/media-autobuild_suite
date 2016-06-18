@@ -176,7 +176,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
-        do_wget "ftp://sunsite.icm.edu.pl/pub/security/gnupg/gnutls/v3.5/gnutls-${gnutls_ver}.tar.xz"
+        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
             sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
