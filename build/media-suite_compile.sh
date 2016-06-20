@@ -677,7 +677,7 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     fi
     do_separate_conf video --disable-{unit-tests,doc} "${extracommands[@]}"
     do_make && do_makeinstall
-    [[ $standalone = y ]] && do_install examples/{encoder,player}_example.exe bin-video/
+    [[ $standalone = y ]] && do_install examples/{{encoder,player}_example,dump_video}.exe bin-video/
     do_checkIfExist
 fi
 
