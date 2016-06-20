@@ -961,6 +961,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
         mkdir -p {8,10,12}bit
 
     do_x265_cmake() {
+        do_print_progress "Building $1" && shift 1
         log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
@@ -972,13 +973,11 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     if [[ $x265 != o* ]]; then
         cd_safe "$build_root/12bit"
         if [[ $x265 = s ]]; then
-            do_print_progress "Building shared 12-bit lib"
-            do_x265_cmake $assembly -DENABLE_SHARED=ON -DMAIN12=ON
+            do_x265_cmake "shared 12-bit lib" $assembly -DENABLE_SHARED=ON -DMAIN12=ON
             do_install libx265.dll bin-video/libx265_main12.dll
             _check+=(bin-video/libx265_main12.dll)
         else
-            do_print_progress "Building 12-bit lib for multilib"
-            do_x265_cmake $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
+            do_x265_cmake "12-bit lib for multilib" $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
             cp libx265.a ../8bit/libx265_main12.a
         fi
     fi
@@ -986,16 +985,13 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     if [[ $x265 != o8 ]]; then
         cd_safe "$build_root/10bit"
         if [[ $x265 = s ]]; then
-            do_print_progress "Building shared 10-bit lib"
-            do_x265_cmake $assembly -DENABLE_SHARED=ON
+            do_x265_cmake "shared 10-bit lib" $assembly -DENABLE_SHARED=ON
             do_install libx265.dll bin-video/libx265_main10.dll
             _check+=(bin-video/libx265_main10.dll)
         elif [[ $x265 = o10 ]]; then
-            do_print_progress "Building 10-bit lib/bin"
-            do_x265_cmake $assembly $cli
+            do_x265_cmake "10-bit lib/bin" $assembly $cli
         else
-            do_print_progress "Building 10-bit lib for multilib"
-            do_x265_cmake $assembly -DEXPORT_C_API=OFF
+            do_x265_cmake "10-bit lib for multilib" $assembly -DEXPORT_C_API=OFF
             cp libx265.a ../8bit/libx265_main10.a
         fi
     fi
@@ -1003,12 +999,10 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     if [[ $x265 != o10 ]]; then
         cd_safe "$build_root/8bit"
         if [[ $x265 = s || $x265 = o8 ]]; then
-            do_print_progress "Building 8-bit lib/bin"
-            do_x265_cmake $cli -DHIGH_BIT_DEPTH=OFF
+            do_x265_cmake "8-bit lib/bin" $cli -DHIGH_BIT_DEPTH=OFF
         else
-            do_print_progress "Building multilib lib/bin"
-            do_x265_cmake -DEXTRA_LIB="x265_main10.a;x265_main12.a" -DEXTRA_LINK_FLAGS=-L. $cli \
-                -DHIGH_BIT_DEPTH=OFF -DLINKED_10BIT=ON -DLINKED_12BIT=ON
+            do_x265_cmake "multilib lib/bin" -DEXTRA_LIB="x265_main10.a;x265_main12.a" \
+                -DEXTRA_LINK_FLAGS=-L. $cli -DHIGH_BIT_DEPTH=OFF -DLINKED_{10,12}BIT=ON
             mv libx265.a libx265_main.a
             ar -M <<EOF
 CREATE libx265.a
@@ -1096,8 +1090,7 @@ if [[ $ffmpeg != "n" ]]; then
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
             libav{codec,device,filter,format,util,resample}.{a,pc}
-            lib{sw{scale,resample},postproc}.{a,pc}
-            )
+            lib{sw{scale,resample},postproc}.{a,pc})
         _check=()
         sedflags="prefix|bindir|extra-(cflags|libs|ldflags|version)|pkg-config-flags"
 
@@ -1238,12 +1231,14 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if [[ $bits = 64bit && $angle = y ]]; then
             if do_vcs "https://chromium.googlesource.com/angle/angle#commit=149a099948cb" angleproject; then
                 do_wget -c -r -q /patches/Makefile.angle
-                log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video" uninstall
+                log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" \
+                    BINDIR="$LOCALDESTDIR/bin-video" uninstall
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
             fi
             do_checkIfExist
-        elif [[ $angle = h ]] && do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
+        elif [[ $angle = h ]] &&
+            do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
             do_install lib{EGL,GLESv2}.dll bin-video/
             cp -rf include/* "$LOCALDESTDIR/include/"
             do_checkIfExist
@@ -1270,8 +1265,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
             do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
             baseurl="https://github.com/vapoursynth/vapoursynth/raw/"
-            [[ $("${curl_opts[@]}" -w "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac") != 404 ]] &&
-                baseurl+="R${vsversion}" || baseurl+="master"
+            ret="$("${curl_opts[@]}" -w "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac")"
+            if [[ $ret != 404 ]]; then
+                baseurl+="R${vsversion}"
+            else
+                baseurl+="master"
+            fi
             mkdir -p "$LOCALBUILDDIR/vapoursynth" && cd_safe "$LOCALBUILDDIR/vapoursynth"
 
             # headers
@@ -1316,7 +1315,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
-        unset vsprefix vsversion _file baseurl
+        unset vsprefix vsversion _file baseurl ret
     elif ! mpv_disabled vapoursynth; then
         mpv_disable vapoursynth
     fi
