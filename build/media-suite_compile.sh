@@ -683,7 +683,7 @@ fi
 
 if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
     _check=(libdvdread.{l,}a dvdread.pc)
-    if do_vcs "https://git.videolan.org/git/libdvdread.git" dvdread; then
+    if do_vcs "https://code.videolan.org/videolan/libdvdread.git" dvdread; then
         do_autoreconf
         do_uninstall include/dvdread "${_check[@]}"
         do_separate_confmakeinstall
@@ -693,7 +693,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
         sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 
     _check=(libdvdnav.{l,}a dvdnav.pc)
-    if do_vcs "https://git.videolan.org/git/libdvdnav.git" dvdnav; then
+    if do_vcs "https://code.videolan.org/videolan/libdvdnav.git" dvdnav; then
         do_autoreconf
         do_uninstall include/dvdnav "${_check[@]}"
         do_separate_confmakeinstall
