@@ -11,12 +11,12 @@ curl_opts=(/usr/bin/curl --connect-timeout 60 --retry 3 --retry-delay 5 --silent
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test "$ncolors" -ge 8; then
-        bold_color=$(tput bold)
-        blue_color=$(tput setaf 4)
-        orange_color=$(tput setaf 3)
-        green_color=$(tput setaf 2)
-        red_color=$(tput setaf 1)
-        reset_color=$(tput sgr0)
+        bold=$(tput bold)
+        blue=$(tput setaf 4)
+        orange=$(tput setaf 3)
+        green=$(tput setaf 2)
+        red=$(tput setaf 1)
+        reset=$(tput sgr0)
     fi
     ncols=72
 fi
@@ -31,8 +31,8 @@ do_print_status() {
     local pad
     pad=$(printf '%0.1s' "."{1..72})
     local padlen=$((ncols-${#name}-${#status}-3))
-    printf '%s%*.*s [%s]\n' "${bold_color}$name${reset_color}" 0 \
-        "$padlen" "$pad" "${color}${status}${reset_color}"
+    printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
+        "$padlen" "$pad" "${color}${status}${reset}"
 }
 
 do_print_progress() {
@@ -40,7 +40,7 @@ do_print_progress() {
         [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
     else
         set_title "$* in $(get_first_subdir)"
-        echo -e "${bold_color}$* in $(get_first_subdir)${reset_color}"
+        echo -e "${bold}$* in $(get_first_subdir)${reset}"
     fi
 }
 
@@ -180,17 +180,17 @@ do_vcs() {
         echo "$vcsFolder" >> "$LOCALBUILDDIR"/newchangelog
         vcs_log
         echo >> "$LOCALBUILDDIR"/newchangelog
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Updates found"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Recently updated"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
     elif [[ -z "${vcsCheck[@]}" ]] && ! files_exist "$vcsFolder.pc"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Missing pkg-config"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Missing pkg-config"
     elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Files missing"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
     elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange_color" "Newer dependencies"
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
-        do_print_status "${vcsFolder} ${vcsType}" "$green_color" "Up-to-date"
+        do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
         return 1
     fi
     return 0
@@ -249,14 +249,14 @@ do_wget() {
             let tries-=1
 
             if [[ $response_code = "200" || $response_code = "226" ]]; then
-                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "Downloaded"
+                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
                 if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
                     tries=0
                 else
                     rm -f "$archive"
                 fi
             elif [[ $response_code = "304" ]]; then
-                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange_color" "File up-to-date"
+                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
                 if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
                     tries=0
                 else
@@ -266,10 +266,10 @@ do_wget() {
         done
         if [[ $response_code -gt 400 ]]; then
             if [[ -f $archive ]]; then
-                echo -e "${orange_color}${archive}${reset_color}"
+                echo -e "${orange}${archive}${reset}"
                 echo -e "\tFile not found online. Using local copy."
             else
-                do_print_status "└ ${dirName:-$archive}" "$red_color" "Failed"
+                do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
                 echo "Error $response_code while downloading $url"
                 echo "<Ctrl+c> to cancel build or <Enter> to continue"
                 do_prompt "if you're sure nothing depends on it."
@@ -277,7 +277,7 @@ do_wget() {
             fi
         fi
     else
-        [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green_color" "File up-to-date"
+        [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green" "File up-to-date"
     fi
     [[ $norm ]] || add_to_remove "$(pwd)/$archive"
     do_extract "$archive" "$dirName"
@@ -401,13 +401,13 @@ do_checkIfExist() {
         if files_exist -v "${check[@]}"; then
             [[ $stripping = y ]] && do_strip "${check[@]}"
             [[ $packing = y ]] && do_pack "${check[@]}"
-            do_print_status "└ $packetName" "$blue_color" "Updated"
+            do_print_status "└ $packetName" "$blue" "Updated"
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
         else
             [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
-            do_print_status "└ $packetName" "$red_color" "Failed"
+            do_print_status "└ $packetName" "$red" "Failed"
             echo
             echo "Try deleting '$LOCALBUILDDIR/$packetName' and start the script again."
             echo "If you're sure there are no dependencies <Enter> to continue building."
@@ -452,7 +452,7 @@ files_exist() {
     [[ $list ]] && verbose= && soft=y
     for opt; do
         if file=$(file_installed $opt); then
-            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green_color}" "Found"
+            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
@@ -460,7 +460,7 @@ files_exist() {
                 echo -n "$file" && echo -ne "$term"
             fi
         else
-            [[ $verbose ]] && do_print_status "├ $file" "${red_color}" "Not found"
+            [[ $verbose ]] && do_print_status "├ $file" "${red}" "Not found"
             [[ ! $soft ]] && return 1
         fi
     done
@@ -516,15 +516,15 @@ do_pkgConfig() {
     [[ ! "$version" && "$check" ]] && version="${check#*= }"
     [[ "$version" ]] && pkg_and_version="${pkg} ${version}"
     if ! pc_exists "${pkg}"; then
-        do_print_status "${pkg_and_version}" "$red_color" "Not installed"
+        do_print_status "${pkg_and_version}" "$red" "Not installed"
     elif ! pc_exists "${pkg}${check}"; then
-        do_print_status "${pkg_and_version}" "$orange_color" "Outdated"
+        do_print_status "${pkg_and_version}" "$orange" "Outdated"
     elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
-        do_print_status "${pkg_and_version}" "$orange_color" "Newer dependencies"
+        do_print_status "${pkg_and_version}" "$orange" "Newer dependencies"
     elif [[ -n "${_check[@]}" ]] && ! files_exist "${_check[@]}"; then
-        do_print_status "${pkg_and_version}" "$orange_color" "Files missing"
+        do_print_status "${pkg_and_version}" "$orange" "Files missing"
     else
-        do_print_status "${pkg_and_version}" "$green_color" "Up-to-date"
+        do_print_status "${pkg_and_version}" "$green" "Up-to-date"
         return 1
     fi
 }
@@ -812,19 +812,19 @@ do_patch() {
         if [[ "$am" = "am" ]]; then
             if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
                 git am -q --abort
-                echo -e "${orange_color}${patch}${reset_color}"
+                echo -e "${orange}${patch}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
             if patch --dry-run --binary -s -N -p"$strip" -i "$patch" >/dev/null 2>&1; then
                 patch --binary -s -N -p"$strip" -i "$patch"
             else
-                echo -e "${orange_color}${patch}${reset_color}"
+                echo -e "${orange}${patch}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
             fi
         fi
     else
-        echo -e "${orange_color}${patch}${reset_color}"
+        echo -e "${orange}${patch}${reset}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
     fi
 }
@@ -850,13 +850,13 @@ compilation_fail() {
     if [[ $logging = y ]]; then
         echo "Likely error:"
         tail "ab-suite.${operation}.log"
-        echo "${red_color}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset_color}"
+        echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
     fi
     if [[ $_notrequired ]]; then
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        echo "${red_color}This is required for other packages, so this script will exit.${reset_color}"
+        echo "${red}This is required for other packages, so this script will exit.${reset}"
         create_diagnostic
         zip_logs
         echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
@@ -891,10 +891,10 @@ zip_logs() {
     popd >/dev/null
     echo
     if [[ $url ]]; then
-        echo "${green_color}All relevant logs have been anonymously uploaded to $url"
-        echo "${green_color}Copy and paste ${red_color}[logs.zip]($url)${green_color} in the GitHub issue.${reset_color}"
+        echo "${green}All relevant logs have been anonymously uploaded to $url"
+        echo "${green}Copy and paste ${red}[logs.zip]($url)${green} in the GitHub issue.${reset}"
     elif [[ -f "$LOCALBUILDDIR/logs.zip" ]]; then
-        echo "${green_color}Attach $(cygpath -w "$LOCALBUILDDIR/logs.zip") to the GitHub issue.${reset_color}"
+        echo "${green}Attach $(cygpath -w "$LOCALBUILDDIR/logs.zip") to the GitHub issue.${reset}"
     fi
 }
 
@@ -1205,21 +1205,21 @@ add_to_remove() {
 }
 
 clean_suite() {
-    echo -e "\n\t${orange_color}Deleting status files...${reset_color}"
+    echo -e "\n\t${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
         xargs -0 rm -f
 
     if [[ $deleteSource = y ]]; then
-        echo -e "\t${orange_color}Deleting temporary build dirs...${reset_color}"
+        echo -e "\t${orange}Deleting temporary build dirs...${reset}"
         find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
         find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
         find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
             xargs -0 rm -rf
 
         if [[ -f _to_remove ]]; then
-            echo -e "\n\t${orange_color}Deleting source folders...${reset_color}"
+            echo -e "\n\t${orange}Deleting source folders...${reset}"
             grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
                 grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         fi

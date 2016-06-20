@@ -56,7 +56,7 @@ source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 buildProcess() {
 set_title
-echo -e "\n\t${orange_color}Starting $bits compilation of all tools${reset_color}"
+echo -e "\n\t${orange}Starting $bits compilation of all tools${reset}"
 [[ -f "$HOME"/custom_build_options ]] &&
     echo "Imported custom build options (unsupported)" &&
     source "$HOME"/custom_build_options
@@ -89,7 +89,7 @@ if [[ -n "$alloptions" ]]; then
 fi
 
 set_title "compiling global tools"
-echo -e "\n\t${orange_color}Starting $bits compilation of global tools${reset_color}"
+echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
 
 _check=(libopenjp2.{a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
@@ -258,7 +258,7 @@ fi
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
 if [[ $ffmpeg != n ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
-    echo -e "${orange_color}FFmpeg and related apps will depend on OpenCL.dll${reset_color}"
+    echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
     _check=(libOpenCL.a)
     if ! files_exist "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
@@ -344,7 +344,7 @@ if [[ $ffmpeg != n ]] && enabled chromaprint; then
 fi
 
 set_title "compiling audio tools"
-echo -e "\n\t${orange_color}Starting $bits compilation of audio tools${reset_color}"
+echo -e "\n\t${orange}Starting $bits compilation of audio tools${reset}"
 
 if [[ $ffmpeg != "n" || $sox = y ]]; then
     enabled libwavpack && do_pacman_install wavpack
@@ -436,7 +436,7 @@ if enabled libfaac; then
     [[ $standalone = y ]] && _check+=(bin-audio/faac.exe)
     if files_exist "${_check[@]}" &&
         grep -q "1.28" "$LOCALDESTDIR/lib/libfaac.a"; then
-        do_print_status "faac 1.28" "$green_color" "Up-to-date"
+        do_print_status "faac 1.28" "$green" "Up-to-date"
     else
         do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
             "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
@@ -476,7 +476,7 @@ fi
 _check=(soxr.h libsoxr.a)
 if [[ $ffmpeg != "n" ]] && enabled libsoxr; then
     if files_exist "${_check[@]}" && [[ "$(get_api_version soxr.h VERSION_STR)" = "0.1.2" ]]; then
-        do_print_status "libsoxr 0.1.2" "$green_color" "Up-to-date"
+        do_print_status "libsoxr 0.1.2" "$green" "Up-to-date"
     else
         do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
         do_uninstall "${_check[@]}"
@@ -491,7 +491,7 @@ if enabled libmp3lame; then
     [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
         grep -q "3.99.5" "$LOCALDESTDIR/lib/libmp3lame.a"; then
-        do_print_status "lame 3.99.5" "$green_color" "Up-to-date"
+        do_print_status "lame 3.99.5" "$green" "Up-to-date"
     else
         do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
         do_uninstall include/lame "${_check[@]}"
@@ -568,7 +568,7 @@ if [[ $ffmpeg != n ]] && enabled libebur128 && ! files_exist "${_check[@]}" &&
 fi
 
 set_title "compiling video tools"
-echo -e "\n\t${orange_color}Starting $bits compilation of video tools${reset_color}"
+echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
 
 if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "n" ]] && enabled librtmp; }; then
@@ -823,7 +823,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
             done
             test x"${_check[$count]}" = x""
         }; then
-        do_print_status "DeckLinkAPI 10.6.6" "$green_color" "Up-to-date"
+        do_print_status "DeckLinkAPI 10.6.6" "$green" "Up-to-date"
     else
         mkdir -p "$LOCALBUILDDIR/DeckLinkAPI" &&
             cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
@@ -843,7 +843,7 @@ if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     _hash=(dcf25c9910a0af2b3aa20e969eb8c8ad)
     if files_exist -v "${_check[@]}" &&
         check_hash "$(file_installed "${_check[0]}")" "${_hash[0]}"; then
-        do_print_status "nvEncodeAPI 6.0.1" "$green_color" "Up-to-date"
+        do_print_status "nvEncodeAPI 6.0.1" "$green" "Up-to-date"
     else
         do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
             helper_{cuda{,_drvapi},functions,string,timer}.h \
@@ -1096,7 +1096,7 @@ if [[ $ffmpeg != "n" ]]; then
 
         # shared
         if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
-            do_print_progress "Compiling ${bold_color}shared${reset_color} FFmpeg"
+            do_print_progress "Compiling ${bold}shared${reset} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             create_build_dir shared
@@ -1119,7 +1119,7 @@ if [[ $ffmpeg != "n" ]]; then
 
         # static
         if [[ $ffmpeg != "s" ]]; then
-            do_print_progress "Compiling ${bold_color}static${reset_color} FFmpeg"
+            do_print_progress "Compiling ${bold}static${reset} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             if ! disabled_any programs avcodec avformat; then
                 _check+=(libavutil.{a,pc})
@@ -1245,19 +1245,19 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             add_to_remove
         fi
 
-        echo -e "${orange_color}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset_color}"
-        echo -e "${orange_color}but they're not needed if angle backend isn't required.${reset_color}"
+        echo -e "${orange}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset}"
+        echo -e "${orange}but they're not needed if angle backend isn't required.${reset}"
     fi
 
     vsprefix=$(get_vs_prefix)
     if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
         vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
         if [[ $vsversion -ge 24 ]]; then
-            echo -e "${green_color}Compiling mpv with Vapoursynth R${vsversion}${reset_color}"
-            echo -e "${orange_color}mpv will need vapoursynth.dll and vsscript.dll to run!${reset_color}"
+            echo -e "${green}Compiling mpv with Vapoursynth R${vsversion}${reset}"
+            echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to run!${reset}"
         else
             vsprefix=""
-            echo -e "${red_color}Update to at least Vapoursynth R24 to use with mpv${reset_color}"
+            echo -e "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
         fi
         _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
             vapoursynth/{VS{Helper,Script},VapourSynth}.h)
@@ -1401,7 +1401,7 @@ if [[ $bmx = "y" ]]; then
     fi
 fi
 
-echo -e "\n\t${orange_color}Finished $bits compilation of all tools${reset_color}"
+echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"
 }
 
 run_builds() {
@@ -1438,6 +1438,6 @@ done
 
 clean_suite
 
-echo -e "\n\t${green_color}Compilation successful.${reset_color}"
-echo -e "\t${green_color}This window will close automatically in 5 seconds.${reset_color}"
+echo -e "\n\t${green}Compilation successful.${reset}"
+echo -e "\t${green}This window will close automatically in 5 seconds.${reset}"
 sleep 5
