@@ -1244,9 +1244,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             do_checkIfExist
             add_to_remove
         fi
-
-        echo -e "${orange}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend${reset}"
-        echo -e "${orange}but they're not needed if angle backend isn't required.${reset}"
+        if files_exist "EGL/egl.h"; then
+            printf "%s\n" \
+                "${orange}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend" \
+                "but they're not needed if angle backend isn't required.${reset}"
+        fi
     fi
 
     vsprefix=$(get_vs_prefix)
