@@ -1336,6 +1336,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags "$(git rev-list --tags --max-count=1)" | cut -c 2- > VERSION
+        git cherry-pick ..origin/d3d_copy_texture > ab-suite.git.cherry-pick.log 2>&1
         mpv_ldflags=()
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
