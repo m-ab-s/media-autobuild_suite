@@ -1352,12 +1352,13 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         log build /usr/bin/python waf -j "${cpuCount:-1}"
 
-        unset mpv_ldflags replace withvs
+        unset mpv_ldflags replace
         hide_conflicting_libs -R
         do_install build/mpv.{exe,com} bin-video/
         if mpv_enabled libmpv-shared; then
             do_install build/mpv-1.dll bin-video/
             do_install build/libmpv.dll.a lib/
+            do_install libmpv/{{client,opengl_cb}.h,qthelper.hpp} include/
             _check+=(bin-video/mpv-1.dll libmpv.dll.a)
         fi
         ! mpv_disabled debug-build &&
