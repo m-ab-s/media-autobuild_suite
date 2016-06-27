@@ -1079,8 +1079,7 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=({libass,x264,x265,vpx}.pc)
-    if { enabled decklink && do_vcs "https://git.ffmpeg.org/ffmpeg.git#commit=8f9fa49^"; } ||
-        do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+    if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         _patches=0
         enabled libopenh264 &&
             do_patch "ffmpeg-0001-lavc-libopenh264enc-update-to-openh264-1.6.patch" am && let _patches+=1
