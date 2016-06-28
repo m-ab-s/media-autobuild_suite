@@ -549,11 +549,13 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     enabled libtwolame || extracommands+=(--without-twolame)
     enabled libvorbis || extracommands+=(--without-oggvorbis)
     enabled libwavpack || extracommands+=(--without-wavpack)
+    hide_conflicting_libs
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
     do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
     do_make
     do_install src/sox.exe bin-audio/
     do_install sox.pc
+    hide_conflicting_libs -R
     do_checkIfExist
 fi
 
