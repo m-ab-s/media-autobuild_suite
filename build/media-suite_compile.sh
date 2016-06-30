@@ -612,10 +612,6 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     [[ $standalone = y ]] && _check+=(bin-video/vpxdec.exe) ||
         extracommands+=(--disable-examples)
     do_uninstall include/vpx "${_check[@]}"
-    if [[ $bits = 64bit && $standalone = y ]] &&
-        ! grep "VERSION 1602" third_party/libyuv/include/libyuv/version.h; then
-        sed -i '14 a\#ifdef(_M_X64);6269 a\#endif' third_party/libyuv/source/row_win.cc
-    fi
     create_build_dir
     [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
     log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
