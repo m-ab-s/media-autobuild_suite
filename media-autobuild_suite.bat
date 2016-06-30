@@ -980,6 +980,7 @@ if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.- make a first run
     echo -------------------------------------------------------------------------------
+    if exist %build%\firstrun.log del %build%\firstrun.log
     %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login -c exit
 
     echo.-------------------------------------------------------------------------------
@@ -992,6 +993,7 @@ if not exist %instdir%\mintty.lnk (
         echo.sleep ^4
         echo.exit
         )>%build%\firstUpdate.sh
+    if exist %build%\firstUpdate.log del %build%\firstUpdate.log
     %mintty% --log 2>&1 %build%\firstUpdate.log /usr/bin/bash --login %build%\firstUpdate.sh
     del %build%\firstUpdate.sh
 
@@ -1008,6 +1010,7 @@ if not exist %instdir%\mintty.lnk (
         echo.pacman --noconfirm -Syu --force --asdeps
         echo.exit
         )>%build%\secondUpdate.sh
+    if exist %build%\secondUpdate.log del %build%\secondUpdate.log
     %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
     del %build%\secondUpdate.sh
 
@@ -1125,6 +1128,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.sleep ^3
     echo.exit
         )>%build%\pacman.sh
+    if exist %build%\pacman.log del %build%\pacman.log
     %mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
     del %build%\pacman.sh
 
@@ -1135,6 +1139,7 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
                 echo.sleep ^3
                 echo.exit
                 )>%build%\cert.sh
+            if exist %build%\cert.log del %build%\cert.log
             %mintty% --log 2>&1 %build%\cert.log /usr/bin/bash --login %build%\cert.sh
             del %build%\cert.sh
             )
@@ -1174,6 +1179,7 @@ if %build32%==yes (
         echo.sleep ^3
         echo.exit
         )>%build%\mingw32.sh
+    if exist %build%\mingw32.log del %build%\mingw32.log
     %mintty% --log 2>&1 %build%\mingw32.log /usr/bin/bash --login %build%\mingw32.sh
     del %build%\mingw32.sh
     
@@ -1207,6 +1213,7 @@ if %build64%==yes (
         echo.sleep ^3
         echo.exit
             )>%build%\mingw64.sh
+    if exist %build%\mingw64.log del %build%\mingw64.log
     %mintty% --log 2>&1 %build%\mingw64.log /usr/bin/bash --login %build%\mingw64.sh
     del %build%\mingw64.sh
 
@@ -1261,6 +1268,7 @@ if %updateSuite%==y (
         )>%instdir%\update_suite.sh
     )
 
+if exist %build%\update.log del %build%\update.log
 %mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
 --build32=%build32% --build64=%build64%
 
@@ -1427,6 +1435,7 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
+if exist %build%\compile.log del %build%\compile.log
 start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login ^
 %build%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
