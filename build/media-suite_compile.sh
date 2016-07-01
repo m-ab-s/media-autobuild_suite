@@ -1187,8 +1187,8 @@ if [[ $mplayer = "y" ]] &&
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
     --disable-{gif,cddb} "${faac[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
-    do_makeinstall &&
-    do_checkIfExist
+        { grep HAVE_VSX config.h || sed -i '/HAVE_AVX / i\#define HAVE_VSX 0' config.h; } &&
+        do_makeinstall && do_checkIfExist
     unset _notrequired
 fi
 
