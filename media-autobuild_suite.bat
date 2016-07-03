@@ -341,7 +341,7 @@ if %x2642INI%==0 (
     echo. 1 = 8-bit lib/binary and 10-bit binary
     echo. 2 = No
     echo. 3 = 10-bit lib/binary
-    echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat
+    echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat and ffms2
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.

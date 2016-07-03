@@ -884,7 +884,7 @@ if [[ $x264 != n ]]; then
     if do_vcs "https://git.videolan.org/git/x264.git" ||
         [[ $x264 != h && "$(get_api_version x264_config.h BIT_DEPTH)" = "10" ]] ||
         [[ $x264  = h && "$(get_api_version x264_config.h BIT_DEPTH)" = "8" ]]; then
-        extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR" --enable-static)
+        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --enable-static)
         if [[ $standalone = y && $x264 = f ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
@@ -894,9 +894,18 @@ if [[ $x264 != n ]]; then
                 lib{sw{scale,resample},postproc}.{a,pc}
             [[ -f "config.mak" ]] && log "distclean" make distclean
             do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
-            --disable-{programs,devices,filters,encoders,muxers}
+                --disable-{programs,devices,filters,encoders,muxers} \
+                --enable-{gpl,avresample}
             do_makeinstall
             do_checkIfExist
+
+            _check=(ffms{,compat}.h libffms2.{,l}a ffms2.pc bin-video/ffmsindex.exe)
+            if do_vcs https://github.com/FFMS/ffms2.git; then
+                do_uninstall "${_check[@]}"
+                do_separate_confmakeinstall video
+                do_checkIfExist
+                sed -i 's/Cflags.*/& -DFFMS_STATIC/' "$LOCALDESTDIR"/lib/pkgconfig/ffms2.pc
+            fi
             cd_safe "$LOCALBUILDDIR"/x264-git
         fi
 

@@ -113,7 +113,7 @@ Included Tools And Libraries
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
     - webp tools (git)
-    - x264 (8 and 10 bit, with l-smash [mp4 output]) (git)
+    - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
 
 

@@ -10,6 +10,7 @@ daalabase
 dvdnav
 dvdread
 fdk-aac (fdk-aac library only)
+ffms2
 flac
 frei0r
 gnutls
