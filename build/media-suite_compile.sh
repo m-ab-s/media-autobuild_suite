@@ -893,18 +893,18 @@ if [[ $x264 != n ]]; then
                 libav{codec,device,filter,format,util,resample}.{a,pc} \
                 lib{sw{scale,resample},postproc}.{a,pc}
             [[ -f "config.mak" ]] && log "distclean" make distclean
-            do_configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
-                --disable-{programs,devices,filters,encoders,muxers} \
-                --enable-{gpl,avresample}
+            create_build_dir light
+            log configure ../configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
+                --disable-{programs,devices,filters,encoders,muxers} --enable-gpl
             do_makeinstall
             do_checkIfExist
 
             _check=(ffms{,compat}.h libffms2.{,l}a ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs https://github.com/FFMS/ffms2.git; then
                 do_uninstall "${_check[@]}"
+                sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
                 do_separate_confmakeinstall video
                 do_checkIfExist
-                sed -i 's/Cflags.*/& -DFFMS_STATIC/' "$LOCALDESTDIR"/lib/pkgconfig/ffms2.pc
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
         fi
