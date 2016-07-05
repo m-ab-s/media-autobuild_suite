@@ -1,4 +1,4 @@
-VERSION = 2.1.r5802.149a099948cb
+VERSION = 2.1.r5890.7e1200b43cb6
 CXX ?= g++
 AR ?= ar
 RANLIB ?= ranlib
@@ -149,9 +149,11 @@ libangle_sources = \
 	src/libANGLE/Framebuffer.o \
 	src/libANGLE/FramebufferAttachment.o \
 	src/libANGLE/HandleAllocator.o \
+	src/libANGLE/HandleRangeAllocator.o \
 	src/libANGLE/Image.o \
 	src/libANGLE/ImageIndex.o \
 	src/libANGLE/IndexRangeCache.o \
+	src/libANGLE/Path.o \
 	src/libANGLE/Platform.o \
 	src/libANGLE/Program.o \
 	src/libANGLE/Query.o \
@@ -159,6 +161,7 @@ libangle_sources = \
 	src/libANGLE/ResourceManager.o \
 	src/libANGLE/Sampler.o \
 	src/libANGLE/Shader.o \
+	src/libANGLE/signal_utils.o \
 	src/libANGLE/State.o \
 	src/libANGLE/Stream.o \
 	src/libANGLE/Surface.o \
@@ -174,6 +177,7 @@ libangle_sources = \
 	src/libANGLE/renderer/DeviceImpl.o \
 	src/libANGLE/renderer/DisplayImpl.o \
 	src/libANGLE/renderer/SurfaceImpl.o \
+	src/libANGLE/renderer/renderer_utils.o \
 	src/libANGLE/validationEGL.o \
 	src/libANGLE/validationES.o \
 	src/libANGLE/validationES2.o \
@@ -182,20 +186,15 @@ libangle_sources = \
 libangle_d3d_shared_sources = \
 	src/libANGLE/renderer/d3d/BufferD3D.o \
 	src/libANGLE/renderer/d3d/CompilerD3D.o \
-	src/libANGLE/renderer/d3d/copyimage.o \
 	src/libANGLE/renderer/d3d/DeviceD3D.o \
 	src/libANGLE/renderer/d3d/DisplayD3D.o \
 	src/libANGLE/renderer/d3d/DynamicHLSL.o \
 	src/libANGLE/renderer/d3d/EGLImageD3D.o \
-	src/libANGLE/renderer/d3d/formatutilsD3D.o \
 	src/libANGLE/renderer/d3d/FramebufferD3D.o \
 	src/libANGLE/renderer/d3d/HLSLCompiler.o \
 	src/libANGLE/renderer/d3d/ImageD3D.o \
 	src/libANGLE/renderer/d3d/IndexBuffer.o \
 	src/libANGLE/renderer/d3d/IndexDataManager.o \
-	src/libANGLE/renderer/d3d/loadimage.o \
-	src/libANGLE/renderer/d3d/loadimageSSE2.o \
-	src/libANGLE/renderer/d3d/loadimage_etc.o \
 	src/libANGLE/renderer/d3d/NativeWindowD3D.o \
 	src/libANGLE/renderer/d3d/ProgramD3D.o \
 	src/libANGLE/renderer/d3d/RenderbufferD3D.o \
@@ -285,6 +284,7 @@ libangle_gl_sources = \
 	src/libANGLE/renderer/gl/FenceSyncGL.o \
 	src/libANGLE/renderer/gl/FramebufferGL.o \
 	src/libANGLE/renderer/gl/FunctionsGL.o \
+	src/libANGLE/renderer/gl/PathGL.o \
 	src/libANGLE/renderer/gl/ProgramGL.o \
 	src/libANGLE/renderer/gl/QueryGL.o \
 	src/libANGLE/renderer/gl/RenderbufferGL.o \
@@ -325,6 +325,12 @@ libangle_vulkan_sources = \
 	src/libANGLE/renderer/vulkan/TextureVk.o \
 	src/libANGLE/renderer/vulkan/TransformFeedbackVk.o \
 	src/libANGLE/renderer/vulkan/VertexArrayVk.o
+libangle_image_util_sources = \
+	src/image_util/copyimage.o \
+	src/image_util/imageformats.o \
+	src/image_util/loadimage.o \
+	src/image_util/loadimage_etc.o \
+	src/image_util/loadimage_sse2.o
 
 LIBGLESv2_OBJ = \
 	src/compiler/translator/ShaderLang.o \
@@ -335,6 +341,7 @@ LIBGLESv2_OBJ = \
 	$(angle_translator_lib_hlsl_sources) \
 	$(angle_preprocessor_sources) \
 	$(libangle_common_sources) \
+	$(libangle_image_util_sources) \
 	$(libangle_sources) \
 	$(libangle_d3d_shared_sources) \
 	$(libangle_d3d9_sources) \
