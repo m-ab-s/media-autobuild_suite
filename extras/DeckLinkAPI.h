@@ -832,7 +832,8 @@ typedef enum _BMDPixelFormat {
     bmdFormat12BitRGBLE = 0x5231324c,
     bmdFormat10BitRGBXLE = 0x5231306c,
     bmdFormat10BitRGBX = 0x52313062,
-    bmdFormatH265 = 0x68657631
+    bmdFormatH265 = 0x68657631,
+    bmdFormatDNxHR = 0x41566468
 } BMDPixelFormat;
 enum _BMDDisplayModeFlags {
     bmdDisplayModeSupports3D = 1 << 0,
@@ -5184,6 +5185,7 @@ typedef enum _BMDDeckLinkStatusID {
     bmdDeckLinkStatusPCIExpressLinkSpeed = 0x706c6e6b,
     bmdDeckLinkStatusLastVideoOutputPixelFormat = 0x6f706978,
     bmdDeckLinkStatusReferenceSignalMode = 0x7265666d,
+    bmdDeckLinkStatusReferenceSignalFlags = 0x72656666,
     bmdDeckLinkStatusDuplexMode = 0x64757078,
     bmdDeckLinkStatusBusy = 0x62757379,
     bmdDeckLinkStatusVideoInputSignalLocked = 0x7669736c,
