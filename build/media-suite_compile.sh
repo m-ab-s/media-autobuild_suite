@@ -606,7 +606,7 @@ fi
 
 _check=(libvpx.a vpx.pc)
 [[ $standalone = y ]] && _check+=(bin-video/vpxenc.exe)
-if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx; then
+if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx#commit=88e69514^" vpx; then
     extracommands=()
     [[ -f config.mk ]] && log "distclean" make distclean
     [[ $standalone = y ]] && _check+=(bin-video/vpxdec.exe) ||
