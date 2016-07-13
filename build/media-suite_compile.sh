@@ -616,7 +616,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx#commi
     [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
     log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
-        --enable-{static,postproc,vp9-postproc,runtime-cpu-detect,vp9-highbitdepth} \
+        --enable-{vp9-postproc,vp9-highbitdepth} \
         "${extracommands[@]}"
     for _ff in *.mk; do
         sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
