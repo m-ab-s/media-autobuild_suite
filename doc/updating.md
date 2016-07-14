@@ -1,10 +1,31 @@
 Updating the suite
 ====
 
-There are two methods for keeping the suite updated, neither are
+There are three methods for keeping the suite updated, neither are
 fully automated but one is maybe easier to do.
 Either one you use, it's highly recommended you do them *before*
 running the suite since issues are probably fixed in newer versions.
+
+## Using update_suite.sh
+
+
+A semi-automated way of doing the third method. Uses git too and exports user changes
+to a .diff file containing the user changes (and changes before the last commit). There's no
+way to know exactly what version of the suite the user has before using git.
+
+### How
+ - 1. Make sure you selected the option to update the suite when running the .bat.
+    - If you didn't, open `build\media-autobuild_suite.ini` in notepad and change `updateSuite=2` to `1`
+ - 2. If there isn't a file called `update_suite.sh` in the root of the suite, run the .bat until the file is there.
+ - 3. Close the .bat using Ctrl+C or just closing the window if it's running.
+      **Never run update_suite.sh while the suite is running! You shouldn't change or replace files being executed.**
+ - 4. Run `update_suite.sh` by dragging it to the `mintty` shortcut also in the root of the suite
+ - 5. Wait until it closes and the suite has been updated.
+ - 6. Unless something failed or Github is down, you can be sure you're on the latest version of the suite.
+
+If you had previously changed the suite files you can check the .diff file inside `build` and try to reproduce them.
+Changing the suites files isn't supported, obviously. It's troublesome already to keep up with bugs in upstream
+packages.
 
 ## Using snapshots from Github
 
