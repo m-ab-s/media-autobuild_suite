@@ -920,8 +920,11 @@ log() {
 create_build_dir() {
     local extra
     [[ $1 ]] && extra="-$1"
-    [[ -d build${extra}-$bits ]] && rm -rf "build${extra}-$bits"
-    mkdir "build${extra}-$bits" && cd_safe "build${extra}-$bits"
+    if [[ -d build${extra}-$bits ]] && ! rm -rf "build${extra}-$bits"; then
+        cd_safe "build${extra}-$bits" && rm -rf ./*
+    else
+        mkdir "build${extra}-$bits" && cd_safe "build${extra}-$bits"
+    fi
 }
 
 do_separate_conf() {
