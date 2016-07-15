@@ -60,7 +60,7 @@ gperf winpty texinfo upx
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config
 
-set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
+set ffmpeg_options=--enable-avisynth --enable-gmp --enable-libmp3lame ^
 --enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265
 
 set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontconfig ^

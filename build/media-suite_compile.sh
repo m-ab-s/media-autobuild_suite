@@ -1053,7 +1053,6 @@ if [[ $ffmpeg != "n" ]] && enabled libopenh264 &&
 fi
 
 if [[ $ffmpeg != "n" ]]; then
-    enabled gcrypt && do_pacman_install libgcrypt
     enabled libschroedinger && do_pacman_install schroedinger
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy

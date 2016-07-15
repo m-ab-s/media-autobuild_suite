@@ -29,9 +29,9 @@ Included Tools And Libraries
         - libvpx (git)
         - libx264 (git)
         - libx265 (hg)
-        - schannel with libgcrypt
+        - schannel with gmp
             - enabled by default if openssl or gnutls aren't enabled
-            - libgcrypt can be switched by gmp with --enable-gmp
+            - libgcrypt is broken as of 1.7.2
         - sdl (1.2.15)
             - enabled by default, use --disable-sdl or --disable-ffplay if unwanted
     - Zeranoe-emulating build (in addition to Light)
