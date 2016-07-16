@@ -219,7 +219,7 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.1"; then
     if enabled openssl; then
         extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
     elif enabled gnutls; then
-        extra_opts+=(--with-{gnutls} --without-{ssl,nghttp2})
+        extra_opts+=(--with-gnutls --without-{ssl,nghttp2})
     else
         extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls,libidn})
     fi
