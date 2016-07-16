@@ -829,6 +829,14 @@ do_patch() {
     fi
 }
 
+do_custom_patches() {
+    local patch
+    for patch in "$@"; do
+        [[ "${patch##*.}" = "patch" ]] && do_patch "$patch" am
+        [[ "${patch##*.}" = "diff" ]] && do_patch "$patch"
+    done
+}
+
 do_cmake() {
     local root=".."
     local PKG_CONFIG=pkg-config
