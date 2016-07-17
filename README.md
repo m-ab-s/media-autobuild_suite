@@ -80,6 +80,7 @@ Included Tools And Libraries
         - libfdk-aac (git)
         - libkvazaar (git)
         - libopenh264 (git)
+        - libopenmpt (0.2.6611)
         - librubberband (git snapshot)
         - libssh (mingw)
         - libtesseract (git)

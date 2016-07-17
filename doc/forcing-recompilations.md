@@ -25,6 +25,7 @@ libilbc
 libmediainfo
 libmfx (intel quick sync hw accelerator)
 libopenjp2 (openjpeg 2)
+libopenmpt
 librtmp
 libwebp
 libzen
