@@ -1374,8 +1374,8 @@ if %build32%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='32bit'
+            echo.arch="x86"
             echo.CARCH="i686"
-            echo.MINGW_CHOST="i686-w64-mingw32"
             echo.MINGW_PREFIX="/mingw32"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-i686"
             )>>%instdir%\local32\etc\profile2.local
@@ -1403,8 +1403,8 @@ if %build64%==yes (
             echo.export LOCALBUILDDIR LOCALDESTDIR
             echo.
             echo.bits='64bit'
+            echo.arch="x86_64"
             echo.CARCH="x86_64"
-            echo.MINGW_CHOST="x86_64-w64-mingw32"
             echo.MINGW_PREFIX="/mingw64"
             echo.MINGW_PACKAGE_PREFIX="mingw-w64-x86_64"
             )>>%instdir%\local64\etc\profile2.local
@@ -1472,6 +1472,7 @@ goto :EOF
     echo.alias ls='ls --color=auto'
     echo.export CC=gcc
     echo.
+    echo.MINGW_CHOST="$CARCH-w64-mingw32"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
     echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
     echo.export CPATH LIBRARY_PATH

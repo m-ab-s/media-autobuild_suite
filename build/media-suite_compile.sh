@@ -626,8 +626,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
         extracommands+=(--disable-examples)
     do_uninstall include/vpx "${_check[@]}"
     create_build_dir
-    [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-    log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
+    log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
         --enable-{vp9-postproc,vp9-highbitdepth} \
         "${extracommands[@]}"
@@ -638,7 +637,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     do_makeinstall
     [[ $standalone = y ]] && do_install vpx{enc,dec}.exe bin-video/
     do_checkIfExist
-    unset target extracommands _ff
+    unset extracommands _ff
 else
     pc_exists vpx || do_removeOption --enable-libvpx
 fi
@@ -651,8 +650,7 @@ if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
         extracommands+=(--disable-examples)
     do_uninstall include/aom "${_check[@]}"
     create_build_dir
-    [[ $bits = "32bit" ]] && target="x86-win32" || target="x86_64-win64"
-    log "configure" ../configure --target="${target}-gcc" --prefix="$LOCALDESTDIR" \
+    log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
         --enable-{static,runtime-cpu-detect,aom-highbitdepth} \
         "${extracommands[@]}"
@@ -663,7 +661,7 @@ if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
     do_makeinstall
     [[ $standalone = y ]] && do_install aom{enc,dec}.exe bin-video/
     do_checkIfExist
-    unset target extracommands _ff
+    unset extracommands _ff
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
