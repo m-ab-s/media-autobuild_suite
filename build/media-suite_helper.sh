@@ -1219,7 +1219,7 @@ clean_suite() {
     echo -e "\n\t${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
-    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\)?\$" -print0 |
+    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\|_light\)?\$" -print0 |
         xargs -0 rm -f
 
     if [[ $deleteSource = y ]]; then

@@ -911,7 +911,7 @@ if [[ $x264 != n ]]; then
             log configure ../configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
                 --disable-{programs,devices,filters,encoders,muxers} --enable-gpl
             do_makeinstall
-            do_checkIfExist
+            files_exist "${_check[@]}" && touch "build_successful${bits}_light"
 
             _check=(ffms{,compat}.h libffms2.{,l}a ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs https://github.com/FFMS/ffms2.git; then
