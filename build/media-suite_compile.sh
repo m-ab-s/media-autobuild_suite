@@ -1069,7 +1069,7 @@ fi
 if [[ $ffmpeg != "n" ]]; then
     enabled libschroedinger && do_pacman_install schroedinger
     enabled libgsm && do_pacman_install gsm
-    enabled libsnappy && do_pacman_install snappy
+    enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
     if enabled libxvid; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
