@@ -586,8 +586,8 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(lib(mfx|caca)|decklink|tesseract|opencl)"
     fi
 
-    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec} gcrypt &&
-        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec)|gcrypt)" &&
+    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,rubberband} gcrypt &&
+        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec)|gcrypt|rubberband)" &&
         sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec)|gcrypt);;g' "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
@@ -723,7 +723,7 @@ do_getMpvConfig() {
     else
         echo "Using default mpv options"
     fi
-    for forced in vapoursynth-lazy libguess static-build enable-gpl3; do
+    for forced in vapoursynth-lazy libguess static-build enable-gpl3 rubberband; do
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
     if [[ $mpv = "y" ]]; then
@@ -731,6 +731,7 @@ do_getMpvConfig() {
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
         do_addOption MPV_OPTS --enable-vapoursynth
     fi
+    do_addOption MPV_OPTS --disable-rubberband
 }
 
 mpv_enabled() {
