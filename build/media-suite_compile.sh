@@ -313,7 +313,8 @@ fi
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } && { do_pkgConfig "rubberband = 1.8.1" ||
-    test_newer installed "$(find "$MINGW_PREFIX/lib/" -name libstdc++.a)" rubberband.pc; } &&
+    { test_newer installed "$(find "$MINGW_PREFIX/lib/" -name libstdc++.a)" rubberband.pc &&
+    do_uninstall rubberband.pc; }; } &&
     do_vcs https://github.com/lachs0r/rubberband.git; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
