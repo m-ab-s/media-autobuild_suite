@@ -577,9 +577,10 @@ if [[ $ffmpeg != n ]] && enabled libopenmpt && do_pkgConfig "libopenmpt = 0.2.66
         "https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.2.6611-beta18.tar.gz" \
         "libopenmpt-0.2.6611.tar.gz"
     do_uninstall include/libopenmpt "${_check[@]}"
-    log clean make clean OS=
-    do_makeinstall CONFIG=mingw64-win${bits%bit} AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0 OS= \
-        TEST=0 PREFIX="$LOCALDESTDIR"
+    extracommands=(CONFIG="mingw64-win${bits%bit}" AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0
+        TEST=0 OS=)
+    log clean make clean "${extracommands[@]}"
+    do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
     sed -i 's/Libs.private.*/& -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
     do_checkIfExist
 fi
