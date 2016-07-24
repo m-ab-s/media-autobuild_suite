@@ -724,6 +724,7 @@ do_getMpvConfig() {
             sed -e 's/.*mpv_options=//' -e 's/ ^//g' | tr '\n' ' '))
         echo "Imported default mpv options from .bat"
     else
+        MPV_OPTS=()
         echo "Using default mpv options"
     fi
     for forced in vapoursynth-lazy libguess static-build enable-gpl3 rubberband; do
