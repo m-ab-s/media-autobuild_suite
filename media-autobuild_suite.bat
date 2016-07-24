@@ -1498,6 +1498,7 @@ goto :EOF
     echo.HOME="/home/${USERNAME}"
     echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
     echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
+    echo.stty susp undef
     echo.cd /trunk
     )>>%instdir%\local%1\etc\profile2.local
 goto :EOF
