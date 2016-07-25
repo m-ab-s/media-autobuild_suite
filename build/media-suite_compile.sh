@@ -84,7 +84,10 @@ do_uninstall q j{config,error,morecfg,peglib}.h \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
     share/aclocal/{ogg,vorbis}.m4 \
-    twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe
+    twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe \
+    {cudaModuleMgr,drvapi_error_string,exception}.h \
+    helper_{cuda{,_drvapi},functions,string,timer}.h \
+    {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h
 
 if [[ -n "$alloptions" ]]; then
     {
@@ -865,14 +868,12 @@ fi
 
 if [[ $ffmpeg != "n" ]] && enabled nvenc; then
     _check=(nvEncodeAPI.h)
-    _hash=(dcf25c9910a0af2b3aa20e969eb8c8ad)
+    _hash=(66b0e35de3f1ca9c626ce04e28ba7be2)
     if files_exist -v "${_check[@]}" &&
         check_hash "$(file_installed "${_check[0]}")" "${_hash[0]}"; then
-        do_print_status "nvEncodeAPI 6.0.1" "$green" "Up-to-date"
+        do_print_status "nvEncodeAPI 7.0.1" "$green" "Up-to-date"
     else
-        do_uninstall {cudaModuleMgr,drvapi_error_string,exception}.h \
-            helper_{cuda{,_drvapi},functions,string,timer}.h \
-            {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h "${_check[0]}"
+        do_uninstall "${_check[0]}"
         mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
             cd_safe "$LOCALBUILDDIR/NvEncAPI"
         do_wget -r -c -h "${_hash[0]}" "/extras/${_check[0]}"
