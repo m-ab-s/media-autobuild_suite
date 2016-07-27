@@ -622,7 +622,7 @@ if [[ $rtmpdump = "y" ]] ||
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
         _ver="$(printf '%s-%s-%s_%s-%s-static' "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
                 "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" "$ssl" \
-                "$(pkg-config --modversion "$pc")" "${MINGW_CHOST%%-*}")"
+                "$(pkg-config --modversion "$pc")" "$CARCH")"
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
@@ -1071,7 +1071,7 @@ if [[ $ffmpeg != "n" ]] && enabled libopenh264 &&
     do_vcs https://github.com/cisco/openh264.git; then
     do_uninstall include/wels "${_check[@]}"
     create_build_dir
-    do_make -f ../Makefile AR=ar ARCH="${MINGW_CHOST%%-*}" OS=mingw_nt PREFIX="$LOCALDESTDIR" install-static
+    do_make -f ../Makefile AR=ar ARCH="$CARCH" OS=mingw_nt PREFIX="$LOCALDESTDIR" install-static
     do_checkIfExist
 fi
 
