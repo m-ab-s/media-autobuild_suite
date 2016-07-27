@@ -1113,7 +1113,6 @@ if [[ $ffmpeg != "n" ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=({libass,x264,x265,vpx}.pc)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
-        do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_custom_patches "${ffmpeg_patches[@]}"
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
