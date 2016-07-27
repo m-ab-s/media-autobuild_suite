@@ -385,15 +385,15 @@ enabled libspeex && do_pacman_install speex
 
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
-    grep -q '1.2rc2' "$LOCALDESTDIR/bin-audio/speexenc.exe"; }; then
-    do_wget -h 6ae7db3bab01e1d4b86bacfa8ca33e81 \
-        "http://downloads.xiph.org/releases/speex/speex-1.2rc2.tar.gz"
+    grep -q '1.2rc2' "$LOCALDESTDIR/bin-audio/speexenc.exe"; } &&
+    do_vcs "https://git.xiph.org/speex.git"; then
     do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
-    do_patch speex-mingw-winmm.patch
-    do_separate_conf audio --enable-vorbis-psy --enable-binaries
+    do_autoreconf
+    do_separate_conf --enable-vorbis-psy --enable-binaries
     do_make
     do_install src/speex{enc,dec}.exe bin-audio/
     do_checkIfExist
+    add_to_remove
 fi
 
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
