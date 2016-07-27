@@ -1113,8 +1113,6 @@ if [[ $ffmpeg != "n" ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=({libass,x264,x265,vpx}.pc)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
-        enabled libopenh264 &&
-            do_patch "ffmpeg-0001-lavc-libopenh264enc-support-openh264-1.6.patch" am
         do_patch "ffmpeg-0002-add-openhevc-intrinsics.patch" am
         do_custom_patches "${ffmpeg_patches[@]}"
         _patches="$(git rev-list origin/master.. --count)"
