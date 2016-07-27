@@ -1,0 +1,7 @@
+$*/
+msys32/
+msys64/
+local32/
+local64/
+build/
+mintty.lnk
