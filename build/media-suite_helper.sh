@@ -938,16 +938,22 @@ create_build_dir() {
 
 do_separate_conf() {
     local bindir=""
+    local last config_path
     case "$1" in
-    global) bindir="--bindir=$LOCALDESTDIR/bin-global" ;;
-    audio) bindir="--bindir=$LOCALDESTDIR/bin-audio" ;;
-    video) bindir="--bindir=$LOCALDESTDIR/bin-video" ;;
+    global|audio|video)
+        bindir="--bindir=$LOCALDESTDIR/bin-$1" ;;
     *) bindir="$1" ;;
     esac
     shift 1
-    create_build_dir
-    log configure ../configure --build="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
-        --disable-shared "$bindir" "$@"
+    for last; do true; done
+    if test -x "${last}/configure"; then
+        config_path="$last"
+    else
+        config_path=".."
+        create_build_dir
+    fi
+    log configure ${config_path}/configure --{host,build,target}="$MINGW_CHOST" \
+        --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
 }
 
 do_separate_confmakeinstall() {
