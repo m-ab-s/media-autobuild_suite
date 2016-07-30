@@ -465,6 +465,7 @@ if enabled libfaac; then
 fi
 
 _check=(bin-audio/oggenc.exe)
+_deps=("$MINGW_PREFIX"/lib/pkgconfig/vorbis.pc)
 if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools; then
     _check+=(bin-audio/oggdec.exe)
@@ -472,8 +473,9 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_uninstall "${_check[@]}"
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
-    do_separate_confmakeinstall audio \
-        --disable-{ogg123,vorbiscomment,vcut,ogginfo} "${extracommands[@]}"
+    do_separate_conf --disable-{ogg123,vorbiscomment,vcut,ogginfo} "${extracommands[@]}"
+    do_make
+    do_install ogg{enc,dec}/ogg{enc,dec}.exe bin-audio/
     do_checkIfExist
     add_to_remove
 fi
