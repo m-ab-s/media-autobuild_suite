@@ -238,8 +238,10 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = 7.49.1"; then
     /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
         { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
           sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
+    hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" CFLAGS="${CFLAGS#-I${LOCALDESTDIR}/include }" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
+    hide_conflicting_libs -R
         --without-{libssh2,random,ca-bundle,ca-path} --enable-sspi --disable-{debug,manual}
     log ca-bundle make ca-bundle
     enabled_any openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
