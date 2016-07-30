@@ -51,6 +51,11 @@ if not ["%CD:~60,1%"]==[""] (
     pause
     )
 
+set _bitness=64
+if %PROCESSOR_ARCHITECTURE%==x86 (
+    IF NOT DEFINED PROCESSOR_ARCHITEW6432 set _bitness=32
+    )
+
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
@@ -92,25 +97,10 @@ set msys2ArchINI=0
 if exist %ini% GOTO checkINI
 :selectmsys2Arch
     set deleteIni=1
-    if %msys2ArchINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Select the msys2 system:
-    echo. 1 = 32 bit msys2
-    echo. 2 = 64 bit msys2 [recommended]
-    echo.
-    echo. Choose the same as your operating system.
-    echo.
-    echo. If you make a mistake, delete the media-autobuild_suite.ini file
-    echo. and re-run this file.
-    echo.
-    echo. These questions should only be asked once.
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P msys2Arch="msys2 system: " ) else set msys2Arch=%msys2ArchINI%
-    if %msys2Arch% GTR 2 GOTO selectmsys2Arch
+
+    if %_bitness%==64 (
+        set msys2Arch=2
+        ) else set msys2Arch=1
 
     echo.[compiler list]>%ini%
     echo.msys2Arch=^%msys2Arch%>>%ini%
