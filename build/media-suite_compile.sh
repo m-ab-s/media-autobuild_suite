@@ -369,6 +369,7 @@ if [[ $ffmpeg != "n" || $sox = y ]]; then
         do_pacman_install twolame
         do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
     fi
+    enabled libmp3lame && do_pacman_install lame
 fi
 
 _check=(ilbc.h libilbc.{{l,}a,pc})
@@ -504,19 +505,18 @@ if [[ $ffmpeg != "n" ]] && enabled libsoxr; then
     do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
 fi
 
-if enabled libmp3lame; then
-    _check=(libmp3lame.{l,}a)
-    [[ $standalone = y ]] && _check+=(bin-audio/lame.exe)
+if [[ $standalone = y ]] && enabled libmp3lame; then
+    _check=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        grep -q "3.99.5" "$LOCALDESTDIR/lib/libmp3lame.a"; then
+        grep -q "3.99.5" "$LOCALDESTDIR/bin-audio/lame.exe"; then
         do_print_status "lame 3.99.5" "$green" "Up-to-date"
     else
         do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
-        do_uninstall include/lame "${_check[@]}"
+        do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
         sed -i '/xmmintrin\.h/d' configure
-        extracommands=()
-        [[ $standalone = y ]] || extracommands+=(--disable-frontend)
-        do_separate_confmakeinstall audio --disable-decoder "${extracommands[@]}"
+        do_separate_conf --disable-decoder "${extracommands[@]}"
+        do_make
+        do_install frontend/lame.exe bin-audio/
         do_checkIfExist
     fi
 fi
