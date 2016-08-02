@@ -143,7 +143,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ ! $harfbuzz_ver ]] &&
         harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.2.7}"
+    harfbuzz_ver="${harfbuzz_ver:-1.3.0}"
     _deps=({freetype2,fontconfig}.pc)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
@@ -184,7 +184,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ -z "$gnutls_ver" ]] &&
         gnutls_ver="$("${curl_opts[@]}" -l "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.5\.\d+(\.\d+)?')"
-    gnutls_ver="${gnutls_ver:-3.5.1}"
+    gnutls_ver="${gnutls_ver:-3.5.2}"
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
