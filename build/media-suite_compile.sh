@@ -448,21 +448,18 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     fi
 fi
 
-if enabled libfaac; then
-    _check=(libfaac.a faac{,cfg}.h)
-    [[ $standalone = y ]] && _check+=(bin-audio/faac.exe)
-    if files_exist "${_check[@]}" &&
-        grep -q "1.28" "$LOCALDESTDIR/lib/libfaac.a"; then
-        do_print_status "faac 1.28" "$green" "Up-to-date"
-    else
-        do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
-            "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
-        ./bootstrap 2>/dev/null
-        do_uninstall "${_check[@]}"
-        [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
-        do_separate_confmakeinstall audio --without-mp4v2
-        do_checkIfExist
-    fi
+enabled libfaac && do_pacman_install faac
+_check=(bin-audio/faac.exe)
+if [[ $standalone = y ]] && enabled libfaac && ! files_exist "${_check[@]}"; then
+    do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
+        "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
+    ./bootstrap 2>/dev/null
+    do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
+    [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
+    do_separate_conf --without-mp4v2
+    do_make
+    do_install frontend/faac.exe bin-audio/
+    do_checkIfExist
 fi
 
 _check=(bin-audio/oggenc.exe)
