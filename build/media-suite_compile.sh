@@ -693,7 +693,7 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "n" ]] && enabled libkvazaar; }; }
 fi
 
 _check=(libdaala{base,dec,enc}.{,l}a daala{dec,enc}.pc)
-[[ $standalone = y ]] && _check+=(bin-video/{encoder,player}_example.exe)
+[[ $standalone = y ]] && _check+=(bin-video/{{encoder,player}_example,dump_video}.exe)
 if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     do_pacman_install libogg
     extracommands=()
