@@ -118,9 +118,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
     _check=(libfreetype.{l,}a freetype2.pc)
-    if do_pkgConfig "freetype2 = 18.4.12" "2.6.4"; then
-        do_wget -h 9c3b2258757a19cdba46d34ed1b0852a \
-            "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.4.tar.bz2"
+    if do_pkgConfig "freetype2 = 18.5.12" "2.6.5"; then
+        do_wget -h 6a386964e18ba28cb93370e57a19031b \
+            "http://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
         do_separate_confmakeinstall global --with-harfbuzz=no
         do_checkIfExist
