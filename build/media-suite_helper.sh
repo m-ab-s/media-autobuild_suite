@@ -483,6 +483,7 @@ do_install() {
     local dest="${files[-1]}"
     [[ ${dest::1} != "/" ]] && dest="$(file_installed "$dest")"
     [[ ${#files[@]} -gt 1 ]] && unset files[-1]
+    [[ ${dest: -1:1} = "/" ]] && mkdir -p "$dest"
     if [[ -n $dryrun ]]; then
         echo install -D "${files[@]}" "$dest"
     else
