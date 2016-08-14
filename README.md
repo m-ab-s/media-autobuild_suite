@@ -76,7 +76,6 @@ Included Tools And Libraries
         - chromaprint (git)
         - libcdio (mingw)
         - libebur128 (git snapshot)
-        - libfaac (mingw)
         - libfdk-aac (git)
         - libkvazaar (git)
         - libopenh264 (git)

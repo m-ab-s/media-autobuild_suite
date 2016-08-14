@@ -46,6 +46,7 @@ while true; do
 --angle=* ) angle="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
 --daala=* ) daala="${1#*=}"; shift ;;
+--faac=* ) faac="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -452,9 +453,9 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     fi
 fi
 
-enabled libfaac && do_pacman_install faac
+[[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac.exe)
-if [[ $standalone = y ]] && enabled libfaac && ! files_exist "${_check[@]}"; then
+if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}"; then
     do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
         "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
     ./bootstrap 2>/dev/null
@@ -1186,7 +1187,7 @@ fi
 _check=(bin-video/m{player,encoder}.exe)
 if [[ $mplayer = "y" ]] &&
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer; then
-    [[ $license != "nonfree" ]] && faac=(--disable-faac --disable-faac-lavc)
+    [[ $license != "nonfree" || $faac = n ]] && faac_opts=(--disable-faac --disable-faac-lavc)
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
     if [[ ! -d ffmpeg ]]; then
@@ -1221,10 +1222,10 @@ if [[ $mplayer = "y" ]] &&
     --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
     --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
-    --disable-{gif,cddb} "${faac[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
+    --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
         do_makeinstall && do_checkIfExist
-    unset _notrequired
+    unset _notrequired faac_opts
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then

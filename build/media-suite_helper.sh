@@ -587,9 +587,10 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(lib(mfx|caca)|decklink|tesseract|opencl)"
     fi
 
-    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec} gcrypt &&
-        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec)|gcrypt)" &&
-        sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec)|gcrypt);;g' "$LOCALBUILDDIR/ffmpeg_options.txt"
+    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac} gcrypt &&
+        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac)|gcrypt)" &&
+        sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac)|gcrypt);;g' \
+        "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
 do_changeFFmpegConfig() {
@@ -623,7 +624,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    local nonfree=(libfaac)
+    local nonfree=()
     if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
         do_addOption --enable-nonfree
     else

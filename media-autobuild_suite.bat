@@ -79,7 +79,7 @@ set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontc
 --enable-openssl --enable-libsnappy --enable-gpl --enable-nvenc
 
 set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
---enable-libfaac --enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
+--enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
 --enable-libssh --enable-libtesseract --enable-libzvbi ^
 --enable-chromaprint --enable-libebur128 --enable-libopenh264 --enable-libopenmpt
 
@@ -89,7 +89,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-angle aom daala
+angle aom daala faac
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -447,6 +447,27 @@ if %buildfdkaac%==1 set "fdkaac=y"
 if %buildfdkaac%==2 set "fdkaac=n"
 if %buildfdkaac% GTR 2 GOTO fdkaac
 if %writefdkaac%==yes echo.fdkaac=^%buildfdkaac%>>%ini%
+
+:faac
+set "writefaac=no"
+if %faacINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build FAAC library and binary? [old, low-quality and nonfree AAC-LC codec]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildfaac="Build faac: "
+    ) else set buildfaac=%faacINI%
+if %deleteINI%==1 set "writefaac=yes"
+
+if %buildfaac%==1 set "faac=y"
+if %buildfaac%==2 set "faac=n"
+if %buildfaac% GTR 2 GOTO faac
+if %writefaac%==yes echo.faac=^%buildfaac%>>%ini%
 
 :mediainfo
 set "writemediainfo=no"
@@ -1431,7 +1452,8 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i 
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle% --aom=%aom% --daala=%daala%
+--rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle% --aom=%aom% ^
+--daala=%daala% --faac=%faac%
 
 endlocal
 goto :EOF
