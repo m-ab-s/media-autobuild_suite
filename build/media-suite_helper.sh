@@ -624,12 +624,12 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    local nonfree=()
-    if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
-        do_addOption --enable-nonfree
-    else
-        do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
-    fi
+    # local nonfree=()
+    # if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
+    #     do_addOption --enable-nonfree
+    # else
+    #     do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
+    # fi
 
     # handle gpl-incompatible libs
     local nonfreegpl=(libfdk-aac openssl)
