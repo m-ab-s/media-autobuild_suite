@@ -1090,6 +1090,7 @@ if [[ $ffmpeg != "n" ]]; then
     if enabled libxvid; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
+        [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/xvidcore.dll.a{,.dyn}
     fi
     if enabled libssh; then
         do_pacman_install libssh
