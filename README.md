@@ -29,7 +29,7 @@ Included Tools And Libraries
         - libvpx (git)
         - libx264 (git)
         - libx265 (hg)
-        - schannel with gmp
+        - schannel with gmp (mingw)
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt is broken as of 1.7.2
         - sdl (1.2.15)
@@ -61,7 +61,7 @@ Included Tools And Libraries
         - libschroedinger (mingw)
         - libsnappy (mingw)
         - libsoxr (0.1.2)
-        - libspeex (git)
+        - libspeex (mingw)
         - libtheora (mingw)
         - libtwolame (mingw)
         - libvidstab (git snapshot)
@@ -101,14 +101,14 @@ Included Tools And Libraries
     - mp4box (git)
     - mplayer (svn)
     - mpv (git) including in addition to ffmpeg libs:
-        - uchardet
+        - uchardet (git)
         - ANGLE (git snapshot)
         - luajit (git)
         - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (0.1.9)
     - rtmpdump (git)
     - speex (git)
-    - sox (git)
+    - sox (14.4.2)
     - tesseract (git)
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
