@@ -1106,6 +1106,10 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install libmodplug
         do_addOption --extra-cflags=-DMODPLUG_STATIC
     fi
+    if enabled netcdf; then
+        do_pacman_install netcdf
+        sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
+    fi
 
     do_hide_all_sharedlibs
 

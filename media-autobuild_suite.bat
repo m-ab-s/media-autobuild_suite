@@ -81,7 +81,8 @@ set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontc
 set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
 --enable-libssh --enable-libtesseract --enable-libzvbi ^
---enable-chromaprint --enable-libebur128 --enable-libopenh264 --enable-libopenmpt
+--enable-chromaprint --enable-libebur128 --enable-libopenh264 --enable-libopenmpt ^
+--enable-netcdf
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^

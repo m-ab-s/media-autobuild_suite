@@ -84,6 +84,7 @@ Included Tools And Libraries
         - libssh (mingw)
         - libtesseract (git)
         - libzvbi (0.2.35)
+        - netcdf (mingw)
         - opencl (from system)
         - opengl (from system)
 
