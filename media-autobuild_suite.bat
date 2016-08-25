@@ -1280,26 +1280,6 @@ if %updateSuite%==y (
         )>%instdir%\update_suite.sh
     )
 
-if not exist %build%\last_run if exist %build%\update.log del %build%\update.log
-%mintty% -t "update autobuild suite" %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\update.log ^
--c '/usr/bin/bash --login build/media-suite_update.sh --build32=%build32% --build64=%build64%'
-
-if exist "%build%\update_core" (
-    echo.-------------------------------------------------------------------------------
-    echo.critical updates
-    echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime"
-    del "%build%\update_core"
-    )
-
-:rebase2
-if %msys2%==msys32 (
-echo.-------------------------------------------------------------------------------
-echo.second rebase %msys2% system
-echo.-------------------------------------------------------------------------------
-call %instdir%\%msys2%\autorebase.bat
-)
-
 :createFolders
 if %build32%==yes call :createBaseFolders local32
 if %build64%==yes call :createBaseFolders local64
@@ -1335,7 +1315,7 @@ if [%removefstab%]==[yes] (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab
     ) else (
-    GOTO writeProfile32
+    GOTO update
     )
 
     :writeFstab
@@ -1360,6 +1340,26 @@ if [%removefstab%]==[yes] (
         )>>%instdir%\%msys2%\etc\fstab.
     if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
     if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
+
+:update
+if not exist %build%\last_run if exist %build%\update.log del %build%\update.log
+%mintty% -t "update autobuild suite" %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\update.log ^
+-c '/usr/bin/bash --login /build/media-suite_update.sh --build32=%build32% --build64=%build64%'
+
+if exist "%build%\update_core" (
+    echo.-------------------------------------------------------------------------------
+    echo.critical updates
+    echo.-------------------------------------------------------------------------------
+    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --asdeps bash pacman msys2-runtime"
+    del "%build%\update_core"
+    )
+
+if %msys2%==msys32 (
+    echo.-------------------------------------------------------------------------------
+    echo.second rebase %msys2% system
+    echo.-------------------------------------------------------------------------------
+    call %instdir%\%msys2%\autorebase.bat
+    )
 
 ::------------------------------------------------------------------
 :: write config profiles:
