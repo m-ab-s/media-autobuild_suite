@@ -1216,7 +1216,7 @@ if %build64%==yes (
     echo.-------------------------------------------------------------------------------
     echo.install 64 bit compiler
     echo.-------------------------------------------------------------------------------
-        (
+    (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.mingw64compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-x86_64-&;g' | tr '\n\r' '  ')"
         echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
@@ -1224,7 +1224,7 @@ if %build64%==yes (
         echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --needed --force
         echo.sleep ^3
         echo.exit
-            )>%build%\mingw64.sh
+        )>%build%\mingw64.sh
     if exist %build%\mingw64.log del %build%\mingw64.log
     %mintty% --log 2>&1 %build%\mingw64.log /usr/bin/bash --login %build%\mingw64.sh
     del %build%\mingw64.sh
@@ -1280,9 +1280,9 @@ if %updateSuite%==y (
         )>%instdir%\update_suite.sh
     )
 
-if exist %build%\update.log del %build%\update.log
-%mintty% --log 2>&1 %build%\update.log /usr/bin/bash --login %build%\media-suite_update.sh ^
---build32=%build32% --build64=%build64%
+if not exist %build%\last_run if exist %build%\update.log del %build%\update.log
+%mintty% -t "update autobuild suite" %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\update.log ^
+-c '/usr/bin/bash --login build/media-suite_update.sh --build32=%build32% --build64=%build64%'
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
@@ -1447,14 +1447,15 @@ IF ERRORLEVEL == 1 (
     pause
   )
 
-if exist %build%\compile.log del %build%\compile.log
-start /I %instdir%\%msys2%\usr\bin\mintty.exe --log 2>&1 %build%\compile.log -i /msys2.ico /usr/bin/bash --login ^
-%build%\media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
+if not exist %build%\last_run if exist %build%\compile.log del %build%\compile.log
+start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+%instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\compile.log -c '/usr/bin/bash --login ^
+/build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle% --aom=%aom% ^
---daala=%daala% --faac=%faac%
+--daala=%daala% --faac=%faac%'
 
 endlocal
 goto :EOF

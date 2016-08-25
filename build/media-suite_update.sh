@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo -ne "\033]0;update autobuild suite\007"
-
 while true; do
   case $1 in
 --build32=* ) build32="${1#*=}"; shift ;;
