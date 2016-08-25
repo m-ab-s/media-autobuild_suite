@@ -1424,6 +1424,8 @@ if %build64%==yes (
         )
 
 :loginProfile
+if exist %instdir%\%msys2%\etc\profile.pacnew ^
+move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
 %instdir%\%msys2%\usr\bin\grep -q -e 'profile2.local' %instdir%\%msys2%\etc\profile || (
     echo -------------------------------------------------------------------------------
     echo.
@@ -1431,13 +1433,12 @@ if %build64%==yes (
     echo.
     echo -------------------------------------------------------------------------------
     (
-        echo.
         echo.if [[ -f /local64/etc/profile2.local ]]; then
         echo.   source /local64/etc/profile2.local
         echo.elif [[ -f /local32/etc/profile2.local ]]; then
         echo.   source /local32/etc/profile2.local
         echo.fi
-        )>>%instdir%\%msys2%\etc\profile.
+        )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
     )
 
 :compileLocals
