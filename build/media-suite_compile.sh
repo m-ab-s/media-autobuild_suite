@@ -76,6 +76,13 @@ if [[ $bits = 64bit && "$(pacman -Qe "$MINGW_PACKAGE_PREFIX-gcc")" = *"6.1.0-1" 
     do_hide_all_sharedlibs
 fi
 
+# in case the root was moved, this fixes windows abspaths
+screwed_prefixes=($(/usr/bin/grep -E -l "(prefix|libdir|includedir)=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig/*.pc))
+[[ -n "${screwed_prefixes[@]}" ]] &&
+    /usr/bin/sed -ri \
+        "s;(prefix|libdir|includedir)=.*${LOCALDESTDIR};\1=$(cygpath -m /trunk)${LOCALDESTDIR};g" \
+        "${screwed_prefixes[@]}"
+
 do_uninstall q j{config,error,morecfg,peglib}.h \
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,gnurx,regex}.{,l}a \
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic,EGL,GLESv2}.{l,}a \
