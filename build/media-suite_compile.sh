@@ -1363,7 +1363,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     _check=(bin-video/mpv.{exe,com})
-    _deps=({libass,libavcodec,vapoursynth}.pc)
+    _deps=({libass,libavcodec,uchardet,vapoursynth}.pc)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
 
