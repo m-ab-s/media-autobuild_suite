@@ -1,0 +1,38 @@
+From e48e082c3ba0036dd1d5631bc0720c2eafd4f76c Mon Sep 17 00:00:00 2001
+From: Ricardo Constantino <wiiaboo@gmail.com>
+Date: Thu, 25 Aug 2016 21:17:24 +0100
+Subject: [PATCH] Fix non-existent pseudo AOTs with libfdk-aac 0.1.5
+
+---
+ src/aacenc.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/aacenc.c b/src/aacenc.c
+index 8df8afd..0dd47bb 100644
+--- a/src/aacenc.c
++++ b/src/aacenc.c
+@@ -34,8 +34,7 @@ int aacenc_is_sbr_ratio_available()
+ int aacenc_is_sbr_active(const aacenc_param_t *params)
+ {
+     switch (params->profile) {
+-    case AOT_SBR: case AOT_PS: case AOT_MP2_SBR: case AOT_MP2_PS:
+-    case AOT_DABPLUS_SBR: case AOT_DABPLUS_PS:
++    case AOT_SBR: case AOT_PS:
+     case AOT_DRM_SBR: case AOT_DRM_MPEG_PS:
+         return 1;
+     }
+@@ -46,9 +45,9 @@ int aacenc_is_sbr_active(const aacenc_param_t *params)
+ 
+ int aacenc_is_dual_rate_sbr(const aacenc_param_t *params)
+ {
+-    if (params->profile == AOT_PS || params->profile == AOT_MP2_PS)
++    if (params->profile == AOT_PS)
+         return 1;
+-    else if (params->profile == AOT_SBR || params->profile == AOT_MP2_SBR)
++    else if (params->profile == AOT_SBR)
+         return params->sbr_ratio == 0 || params->sbr_ratio == 2;
+     else if (params->profile == AOT_ER_AAC_ELD && params->lowdelay_sbr)
+         return params->sbr_ratio == 2;
+-- 
+2.9.1
+
