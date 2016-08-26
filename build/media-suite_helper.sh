@@ -6,7 +6,8 @@ if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
     cpuCount="$(($(nproc)/2))"
 fi
 bits="${bits:-64bit}"
-curl_opts=(/usr/bin/curl --connect-timeout 60 --retry 3 --retry-delay 5 --silent --location --insecure --fail)
+curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
+    --retry-delay 5 --silent --location --insecure --fail)
 
 if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
@@ -264,7 +265,7 @@ do_wget() {
                 fi
             fi
         done
-        if [[ $response_code -gt 400 ]]; then
+        if [[ $response_code -gt 400 || $response_code = "000" ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange}${archive}${reset}"
                 echo -e "\tFile not found online. Using local copy."
