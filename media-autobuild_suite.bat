@@ -1388,8 +1388,6 @@ if %build32%==yes (
             echo.bits='32bit'
             echo.arch="x86"
             echo.CARCH="i686"
-            echo.MINGW_PREFIX="/mingw32"
-            echo.MINGW_PACKAGE_PREFIX="mingw-w64-i686"
             )>>%instdir%\local32\etc\profile2.local
         call :writeCommonProfile 32
         )
@@ -1417,8 +1415,6 @@ if %build64%==yes (
             echo.bits='64bit'
             echo.arch="x86_64"
             echo.CARCH="x86_64"
-            echo.MINGW_PREFIX="/mingw64"
-            echo.MINGW_PACKAGE_PREFIX="mingw-w64-x86_64"
             )>>%instdir%\local64\etc\profile2.local
         call :writeCommonProfile 64
         )
@@ -1487,12 +1483,11 @@ goto :EOF
     echo.alias ls='ls --color=auto'
     echo.export CC=gcc
     echo.
-    echo.MINGW_CHOST="$CARCH-w64-mingw32"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
     echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
     echo.export CPATH LIBRARY_PATH
     echo.
-    echo.MSYS2_PATH="/usr/local/bin:/usr/bin"
+    echo.source '/etc/msystem'
     echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
     echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
     echo.
@@ -1507,7 +1502,7 @@ goto :EOF
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.LANG=en_US.UTF-8
-    echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${MSYS2_PATH}:${INFOPATH}:${PATH}"
+    echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
