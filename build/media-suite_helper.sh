@@ -1255,7 +1255,7 @@ clean_suite() {
 }
 
 create_diagnostic() {
-    local cmd cmds=("uname -a" "pacman -Qe" "pacman -Qd")
+    local cmd cmds=("env | grep -E '^(MINGW|MSYS)'" "uname -a" "pacman -Qe" "pacman -Qd")
     do_print_progress "  Creating diagnostics file"
     [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
     rm -f "$LOCALBUILDDIR/diagnostics.txt"
