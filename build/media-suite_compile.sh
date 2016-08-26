@@ -451,8 +451,6 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     _deps=(fdk-aac.pc)
     if [[ $standalone = y ]] &&
         do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac; then
-        grep -q AOT_MP2_PS src/aacenc.c && do_patch \
-            "bin-fdk-aac-0001-Fix-non-existent-pseudo-AOTs-with-libfdk-aac-0.1.5.patch" am
         do_autoreconf
         do_uninstall "${_check[@]}"
         CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
