@@ -205,6 +205,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
             --without-{p11-kit,idn,tpm} --enable-local-libopts
         do_checkIfExist
     fi
+    sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
