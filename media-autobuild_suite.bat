@@ -919,7 +919,7 @@ cd build
 if exist %build%\msys2-base.tar.xz GOTO unpack
 if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
 if not exist %build%\wget.exe (
-    del wget-pack.exe
+    if exist wget-pack.exe del wget-pack.exe
     (
         echo./*from http://superuser.com/a/536400*/
         echo.var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1"^);
