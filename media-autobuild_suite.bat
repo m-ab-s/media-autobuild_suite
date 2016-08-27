@@ -1498,7 +1498,7 @@ goto :EOF
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
     echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+    echo.LDFLAGS="-L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib -pipe -static-libgcc -static-libstdc++"
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.LANG=en_US.UTF-8

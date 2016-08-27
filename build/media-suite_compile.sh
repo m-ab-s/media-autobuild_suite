@@ -202,8 +202,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
             sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,rpath,libdane,guile} \
-            --without-{p11-kit,idn,tpm} --enable-local-libopts \
-            LDFLAGS="-L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib"
+            --without-{p11-kit,idn,tpm} --enable-local-libopts
         do_checkIfExist
     fi
 fi
