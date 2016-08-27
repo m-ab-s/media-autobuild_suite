@@ -1029,12 +1029,12 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
         echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
-        echo.link.Arguments = "-i /msys2.ico /usr/bin/bash --login"
+        echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
-        echo.link.TargetPath = "%instdir%\%msys2%\usr\bin\mintty.exe"
+        echo.link.TargetPath = "%instdir%\%msys2%\msys_shell.cmd"
         echo.link.WindowStyle = ^1
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
-        echo.link.WorkingDirectory = "%instdir%\%msys2%\usr\bin"
+        echo.link.WorkingDirectory = "%instdir%\%msys2%"
         echo.link.Save
         )>%build%\setlink.vbs
     cscript /nologo %build%\setlink.vbs
