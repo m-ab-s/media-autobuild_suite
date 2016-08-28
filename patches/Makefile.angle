@@ -1,4 +1,4 @@
-VERSION = 2.1.r5890.7e1200b43cb6
+VERSION = 2.1.r6046.11e43ecee238
 CXX ?= g++
 AR ?= ar
 RANLIB ?= ranlib
@@ -39,7 +39,9 @@ angle_translator_lib_sources = \
 	src/compiler/translator/DeferGlobalInitializers.o \
 	src/compiler/translator/Diagnostics.o \
 	src/compiler/translator/DirectiveHandler.o \
+	src/compiler/translator/EmulateGLFragColorBroadcast.o \
 	src/compiler/translator/EmulatePrecision.o \
+	src/compiler/translator/ExpandIntegerPowExpressions.o \
 	src/compiler/translator/FlagStd140Structs.o \
 	src/compiler/translator/ForLoopUnroll.o \
 	src/compiler/translator/InfoSink.o \
@@ -59,6 +61,7 @@ angle_translator_lib_sources = \
 	src/compiler/translator/RegenerateStructNames.o \
 	src/compiler/translator/RemovePow.o \
 	src/compiler/translator/RewriteDoWhile.o \
+	src/compiler/translator/RewriteTexelFetchOffset.o \
 	src/compiler/translator/ScalarizeVecAndMatConstructorArgs.o \
 	src/compiler/translator/SearchSymbol.o \
 	src/compiler/translator/SymbolTable.o \
@@ -94,10 +97,12 @@ angle_translator_lib_glsl_sources = \
 	src/compiler/translator/TranslatorGLSL.o \
 	src/compiler/translator/VersionGLSL.o
 angle_translator_lib_hlsl_sources = \
+	src/compiler/translator/AddDefaultReturnStatements.o \
 	src/compiler/translator/ArrayReturnValueToOutParameter.o \
 	src/compiler/translator/ASTMetadataHLSL.o \
 	src/compiler/translator/blocklayoutHLSL.o \
 	src/compiler/translator/BuiltInFunctionEmulatorHLSL.o \
+	src/compiler/translator/IntermNodePatternMatcher.o \
 	src/compiler/translator/OutputHLSL.o \
 	src/compiler/translator/RemoveDynamicIndexing.o \
 	src/compiler/translator/RemoveSwitchFallThrough.o \
@@ -105,6 +110,8 @@ angle_translator_lib_hlsl_sources = \
 	src/compiler/translator/SeparateArrayInitialization.o \
 	src/compiler/translator/SeparateDeclarations.o \
 	src/compiler/translator/SeparateExpressionsReturningArrays.o \
+	src/compiler/translator/SimplifyLoopConditions.o \
+	src/compiler/translator/SplitSequenceOperator.o \
 	src/compiler/translator/StructureHLSL.o \
 	src/compiler/translator/TextureFunctionHLSL.o \
 	src/compiler/translator/TranslatorHLSL.o \
@@ -176,12 +183,17 @@ libangle_sources = \
 	src/libANGLE/renderer/ContextImpl.o \
 	src/libANGLE/renderer/DeviceImpl.o \
 	src/libANGLE/renderer/DisplayImpl.o \
+	src/libANGLE/renderer/Format_autogen.o \
+	src/libANGLE/renderer/Format.o \
 	src/libANGLE/renderer/SurfaceImpl.o \
+	src/libANGLE/renderer/TextureImpl.o \
+	src/libANGLE/renderer/load_functions_table_autogen.o \
 	src/libANGLE/renderer/renderer_utils.o \
 	src/libANGLE/validationEGL.o \
 	src/libANGLE/validationES.o \
 	src/libANGLE/validationES2.o \
 	src/libANGLE/validationES3.o \
+	src/libANGLE/validationES31.o \
 	src/third_party/murmurhash/MurmurHash3.o
 libangle_d3d_shared_sources = \
 	src/libANGLE/renderer/d3d/BufferD3D.o \
@@ -204,7 +216,6 @@ libangle_d3d_shared_sources = \
 	src/libANGLE/renderer/d3d/ShaderExecutableD3D.o \
 	src/libANGLE/renderer/d3d/SurfaceD3D.o \
 	src/libANGLE/renderer/d3d/TextureD3D.o \
-	src/libANGLE/renderer/d3d/TransformFeedbackD3D.o \
 	src/libANGLE/renderer/d3d/VaryingPacking.o \
 	src/libANGLE/renderer/d3d/VertexBuffer.o \
 	src/libANGLE/renderer/d3d/VertexDataManager.o
@@ -242,7 +253,6 @@ libangle_d3d11_sources = \
 	src/libANGLE/renderer/d3d/d3d11/Image11.o \
 	src/libANGLE/renderer/d3d/d3d11/IndexBuffer11.o \
 	src/libANGLE/renderer/d3d/d3d11/InputLayoutCache.o \
-	src/libANGLE/renderer/d3d/d3d11/load_functions_table_autogen.o \
 	src/libANGLE/renderer/d3d/d3d11/PixelTransfer11.o \
 	src/libANGLE/renderer/d3d/d3d11/Query11.o \
 	src/libANGLE/renderer/d3d/d3d11/Renderer11.o \
@@ -254,8 +264,10 @@ libangle_d3d11_sources = \
 	src/libANGLE/renderer/d3d/d3d11/StreamProducerNV12.o \
 	src/libANGLE/renderer/d3d/d3d11/SwapChain11.o \
 	src/libANGLE/renderer/d3d/d3d11/TextureStorage11.o \
+	src/libANGLE/renderer/d3d/d3d11/TransformFeedback11.o \
 	src/libANGLE/renderer/d3d/d3d11/Trim11.o \
 	src/libANGLE/renderer/d3d/d3d11/texture_format_table_autogen.o \
+	src/libANGLE/renderer/d3d/d3d11/texture_format_table.o \
 	src/libANGLE/renderer/d3d/d3d11/VertexBuffer11.o \
 	src/libANGLE/renderer/d3d/d3d11/VertexArray11.o
 libangle_d3d11_win32_sources = \
@@ -272,6 +284,7 @@ libglesv2_sources = \
 	src/libGLESv2/entry_points_gles_2_0.o \
 	src/libGLESv2/entry_points_gles_2_0_ext.o \
 	src/libGLESv2/entry_points_gles_3_0.o \
+	src/libGLESv2/entry_points_gles_3_1.o \
 	src/libGLESv2/global_state.o \
 	src/libGLESv2/libGLESv2.o
 libangle_gl_sources = \
@@ -329,8 +342,7 @@ libangle_image_util_sources = \
 	src/image_util/copyimage.o \
 	src/image_util/imageformats.o \
 	src/image_util/loadimage.o \
-	src/image_util/loadimage_etc.o \
-	src/image_util/loadimage_sse2.o
+	src/image_util/loadimage_etc.o
 
 LIBGLESv2_OBJ = \
 	src/compiler/translator/ShaderLang.o \
