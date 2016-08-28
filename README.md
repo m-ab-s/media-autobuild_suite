@@ -22,13 +22,14 @@ Included Tools And Libraries
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
-        - avisynth
+        - avisynth (built-in)
         - libmp3lame (mingw)
         - libopus (mingw)
         - libvorbis (mingw)
         - libvpx (git)
         - libx264 (git)
         - libx265 (hg)
+        - nvenc (built-in)
         - schannel with gmp (mingw)
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt is broken as of 1.7.2
@@ -71,7 +72,6 @@ Included Tools And Libraries
         - libxavs (svn snapshot)
         - libxvid (mingw)
         - libzimg (git)
-        - nvenc (7.0.1)
     - Full build (in addition to Zeranoe)
         - chromaprint (git)
         - libcdio (mingw)

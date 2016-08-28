@@ -879,22 +879,6 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
     unset count
 fi
 
-if [[ $ffmpeg != "n" ]] && enabled nvenc; then
-    _check=(nvEncodeAPI.h)
-    _hash=(66b0e35de3f1ca9c626ce04e28ba7be2)
-    if files_exist -v "${_check[@]}" &&
-        check_hash "$(file_installed "${_check[0]}")" "${_hash[0]}"; then
-        do_print_status "nvEncodeAPI 7.0.1" "$green" "Up-to-date"
-    else
-        do_uninstall "${_check[0]}"
-        mkdir -p "$LOCALBUILDDIR/NvEncAPI" &&
-            cd_safe "$LOCALBUILDDIR/NvEncAPI"
-        do_wget -r -c -h "${_hash[0]}" "/extras/${_check[0]}"
-        do_install "${_check[0]}"
-        do_checkIfExist
-    fi
-fi
-
 _check=(libmfx.{{l,}a,pc})
 if [[ $ffmpeg != "n" ]] && enabled libmfx &&
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx; then
