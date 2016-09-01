@@ -1373,7 +1373,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         # for purely cosmetic reasons, show the last release version when doing -V
         git describe --tags "$(git rev-list --tags --max-count=1)" | cut -c 2- > VERSION
-        mpv_ldflags=()
+        mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
 
