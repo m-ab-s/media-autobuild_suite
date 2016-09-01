@@ -134,7 +134,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_checkIfExist
     fi
 
-    _deps=(freetype2.pc)
+    _deps=(libfreetype.a)
     _check=(libfontconfig.{,l}a fontconfig.pc)
     if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.12.0"; then
         do_pacman_remove python2-lxml
@@ -152,7 +152,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
     harfbuzz_ver="${harfbuzz_ver:-1.3.0}"
-    _deps=({freetype2,fontconfig}.pc)
+    _deps=(lib{freetype,fontconfig}.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
@@ -451,7 +451,7 @@ if { [[ $ffmpeg != n ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
         do_checkIfExist
     fi
     _check=(bin-audio/fdkaac.exe)
-    _deps=(fdk-aac.pc)
+    _deps=(libfdk-aac.a)
     if [[ $standalone = y ]] &&
         do_vcs "https://github.com/nu774/fdkaac" bin-fdk-aac; then
         do_autoreconf
@@ -478,7 +478,7 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}"; then
 fi
 
 _check=(bin-audio/oggenc.exe)
-_deps=("$MINGW_PREFIX"/lib/pkgconfig/vorbis.pc)
+_deps=("$MINGW_PREFIX"/lib/libvorbis.a)
 if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools; then
     _check+=(bin-audio/oggdec.exe)
@@ -563,7 +563,7 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
 fi
 
 _check=(bin-audio/sox.exe sox.pc)
-_deps=(sndfile.pc libmp3lame.a "$MINGW_PREFIX"/lib/pkgconfig/opus.pc)
+_deps=(lib{sndfile,mp3lame}.a "$MINGW_PREFIX"/lib/libopus.a)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
@@ -757,7 +757,7 @@ if { { [[ $ffmpeg != "n" ]] && enabled libbluray; } || ! mpv_disabled libbluray;
 fi
 
 _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
-_deps=({freetype2,fontconfig,harfbuzz,fribidi}.pc)
+_deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
 if { [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled libass; }; } &&
     do_vcs "https://github.com/libass/libass.git"; then
@@ -793,7 +793,7 @@ if [[ $mediainfo = "y" ]]; then
     fi
 
     _check=(libmediainfo.{a,pc})
-    _deps=(lib{zen,curl}.pc)
+    _deps=(lib{zen,curl}.a)
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
@@ -803,7 +803,7 @@ if [[ $mediainfo = "y" ]]; then
     fi
 
     _check=(bin-video/mediainfo.exe)
-    _deps=(libmediainfo.pc)
+    _deps=(libmediainfo.a)
     if do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo; then
         cd_safe Project/GNU/CLI
         do_autogen
@@ -1116,7 +1116,7 @@ if [[ $ffmpeg != "n" ]]; then
         disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
     fi
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
-        _deps=({libass,x264,x265,vpx}.pc)
+        _deps=(lib{ass,x264,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         do_custom_patches "${ffmpeg_patches[@]}"
         _patches="$(git rev-list origin/master.. --count)"
@@ -1361,7 +1361,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     _check=(bin-video/mpv.{exe,com})
-    _deps=({libass,libavcodec,uchardet,vapoursynth}.pc)
+    _deps=(lib{ass,avcodec,uchardet,vapoursynth}.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
 
@@ -1424,7 +1424,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(libMXF++-1.0.{{,l}a,pc})
-    _deps=(libMXF-1.0.pc)
+    _deps=(libMXF-1.0.a)
     if do_vcs http://git.code.sf.net/p/bmxlib/libmxfpp libMXF++-1.0; then
         do_autogen
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
@@ -1433,7 +1433,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
-    _deps=({liburiparser,libMXF{,++}-1.0,libcurl}.pc)
+    _deps=(lib{uriparser,MXF{,++}-1.0,curl}.a)
     if do_vcs http://git.code.sf.net/p/bmxlib/bmx; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
