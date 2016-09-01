@@ -206,7 +206,8 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
     fi
-    sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
+    grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
+        sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { { [[ $ffmpeg != n ]] && enabled openssl; } ||
