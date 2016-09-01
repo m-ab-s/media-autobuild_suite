@@ -1451,7 +1451,7 @@ if [%build64%]==[y] (
 if not exist %build%\last_run if exist %build%\compile.log del %build%\compile.log
 start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
 %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\compile.log -c '^
-MSYS2_PATH_TYPE=inherit MSYS=winsymlinks:nativestrict MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
+MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 /build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
