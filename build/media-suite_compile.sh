@@ -77,11 +77,11 @@ if [[ $bits = 64bit && "$(pacman -Qe "$MINGW_PACKAGE_PREFIX-gcc")" = *"6.1.0-1" 
 fi
 
 # in case the root was moved, this fixes windows abspaths
-screwed_prefixes=($(/usr/bin/grep -E -l "(prefix|libdir|includedir)=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig/*.pc))
-[[ -n "${screwed_prefixes[@]}" ]] &&
-    /usr/bin/sed -ri \
-        "s;(prefix|libdir|includedir)=.*${LOCALDESTDIR};\1=$(cygpath -m /trunk)${LOCALDESTDIR};g" \
-        "${screwed_prefixes[@]}"
+screwed_prefixes=($(grep -E -l "(prefix|libdir|includedir)=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig/*.pc))
+[[ -n "${screwed_prefixes[@]}" ]] && screwed_prefixes=($(grep -qL "$(cygpath -m "$LOCALDESTDIR")" "${screwed_prefixes[@]}"))
+[[ -n "${screwed_prefixes[@]}" ]] && sed -ri \
+    "s;(prefix|libdir|includedir)=.*${LOCALDESTDIR};\1=$(cygpath -m /trunk)${LOCALDESTDIR};g" \
+    "${screwed_prefixes[@]}"
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,gnurx,regex}.{,l}a \
