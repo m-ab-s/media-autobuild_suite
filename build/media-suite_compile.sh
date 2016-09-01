@@ -918,7 +918,8 @@ if [[ $x264 != n ]]; then
                 lib{sw{scale,resample},postproc}.{a,pc}
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
-            log configure ../configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
+            LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
+                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
                 --disable-{programs,devices,filters,encoders,muxers} --enable-gpl
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
@@ -1136,7 +1137,8 @@ if [[ $ffmpeg != "n" ]]; then
             [[ -f config.mak ]] && log "distclean" make distclean
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             create_build_dir shared
-            log configure ../configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
+            LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
+                log configure ../configure --prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED" \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
@@ -1167,7 +1169,8 @@ if [[ $ffmpeg != "n" ]]; then
             fi
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
-            log configure ../configure --prefix="$LOCALDESTDIR" \
+            LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
+                log configure ../configure --prefix="$LOCALDESTDIR" \
                 --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
