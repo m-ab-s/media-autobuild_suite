@@ -1,4 +1,4 @@
-VERSION = 2.1.r6046.11e43ecee238
+VERSION = 2.1.r6065.29639857121
 CXX ?= g++
 AR ?= ar
 RANLIB ?= ranlib
@@ -57,6 +57,7 @@ angle_translator_lib_sources = \
 	src/compiler/translator/ParseContext.o \
 	src/compiler/translator/PoolAlloc.o \
 	src/compiler/translator/PruneEmptyDeclarations.o \
+	src/compiler/translator/QualifierTypes.o \
 	src/compiler/translator/RecordConstantPrecision.o \
 	src/compiler/translator/RegenerateStructNames.o \
 	src/compiler/translator/RemovePow.o \
