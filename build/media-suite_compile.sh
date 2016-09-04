@@ -486,7 +486,8 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_uninstall "${_check[@]}"
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
-    do_separate_conf --disable-{ogg123,vorbiscomment,vcut,ogginfo} "${extracommands[@]}"
+    do_separate_conf --disable-{ogg123,vorbiscomment,vcut,ogginfo} \
+        --with-lib{iconv,intl}-prefix="$MINGW_PREFIX" "${extracommands[@]}"
     do_make
     do_install ogg{enc,dec}/ogg{enc,dec}.exe bin-audio/
     do_checkIfExist
