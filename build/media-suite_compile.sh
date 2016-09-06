@@ -1379,7 +1379,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
         # for purely cosmetic reasons, show the last release version when doing -V
-        git describe --tags "$(git rev-list --tags --max-count=1)" | cut -c 2- > VERSION
+        git tag -l --sort=version:refname | tail -1 | cut -c 2- > VERSION
 
         LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
