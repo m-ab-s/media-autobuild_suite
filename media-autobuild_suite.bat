@@ -1388,6 +1388,7 @@ if %build32%==yes (
             echo.bits='32bit'
             echo.arch="x86"
             echo.CARCH="i686"
+            echo.x86ldflags="-L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
             )>>%instdir%\local32\etc\profile2.local
         call :writeCommonProfile 32
         )
@@ -1415,6 +1416,7 @@ if %build64%==yes (
             echo.bits='64bit'
             echo.arch="x86_64"
             echo.CARCH="x86_64"
+            echo.x86ldflags=''
             )>>%instdir%\local64\etc\profile2.local
         call :writeCommonProfile 64
         )
@@ -1503,7 +1505,7 @@ goto :EOF
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
     echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+    echo.LDFLAGS="$x86ldflags -pipe -static-libgcc -static-libstdc++"
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.LANG=en_US.UTF-8
