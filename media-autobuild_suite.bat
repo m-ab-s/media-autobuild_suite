@@ -1388,7 +1388,6 @@ if %build32%==yes (
             echo.bits='32bit'
             echo.arch="x86"
             echo.CARCH="i686"
-            echo.x86ldflags="-L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
             )>>%instdir%\local32\etc\profile2.local
         call :writeCommonProfile 32
         )
@@ -1416,7 +1415,6 @@ if %build64%==yes (
             echo.bits='64bit'
             echo.arch="x86_64"
             echo.CARCH="x86_64"
-            echo.x86ldflags=''
             )>>%instdir%\local64\etc\profile2.local
         call :writeCommonProfile 64
         )
@@ -1489,12 +1487,12 @@ goto :EOF
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
     echo.export CC=gcc
+    echo.source '/etc/msystem'
     echo.
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
     echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
     echo.export CPATH LIBRARY_PATH
     echo.
-    echo.source '/etc/msystem'
     echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
     echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
     echo.
@@ -1505,7 +1503,7 @@ goto :EOF
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
     echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="$x86ldflags -pipe -static-libgcc -static-libstdc++"
+    echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.LANG=en_US.UTF-8
