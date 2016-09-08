@@ -100,7 +100,7 @@ Included Tools And Libraries
     - lame (3.99.5)
     - mediainfo cli (git)
     - mp4box (git)
-    - mplayer (svn)
+    - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - uchardet (git)
         - ANGLE (git snapshot)
