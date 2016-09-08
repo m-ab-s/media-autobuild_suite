@@ -489,7 +489,7 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_separate_conf --disable-{ogg123,vorbiscomment,vcut,ogginfo} \
         --with-lib{iconv,intl}-prefix="$MINGW_PREFIX" "${extracommands[@]}"
     do_make
-    do_install ogg{enc,dec}/ogg{enc,dec}.exe bin-audio/
+    do_install oggenc/oggenc.exe oggdec/oggdec.exe bin-audio/
     do_checkIfExist
     add_to_remove
 fi
