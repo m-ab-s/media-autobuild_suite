@@ -1256,7 +1256,8 @@ clean_suite() {
 
 create_diagnostic() {
     local cmd cmds=("uname -a" "pacman -Qe" "pacman -Qd")
-    local _env envs=(MINGW_{PACKAGE_PREFIX,CHOST,PREFIX} MSYSTEM)
+    local _env envs=(MINGW_{PACKAGE_PREFIX,CHOST,PREFIX} MSYSTEM CPATH
+        LIBRARY_PATH {LD,C,CPP,CXX}FLAGS)
     do_print_progress "  Creating diagnostics file"
     [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
     rm -f "$LOCALBUILDDIR/diagnostics.txt"
