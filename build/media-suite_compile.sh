@@ -1119,7 +1119,9 @@ if [[ $ffmpeg != "n" ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
         _deps=(lib{ass,x264,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
-        do_custom_patches "${ffmpeg_patches[@]}"
+
+        [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
+
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
