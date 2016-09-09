@@ -1373,6 +1373,14 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
 
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
+        if enabled_any cuda cuvid libnpp; then
+            mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
+            if [[ $bits = 64bit ]]; then
+                mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
+            else
+                mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/Win32")
+            fi
+        fi
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
 
@@ -1381,7 +1389,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         # for purely cosmetic reasons, show the last release version when doing -V
         git tag -l --sort=version:refname | tail -1 | cut -c 2- > VERSION
 
-        LDFLAGS+=" ${mpv_ldflags[*]}" log configure /usr/bin/python waf configure \
+        CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
+            log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
             "--libdir=$LOCALDESTDIR/lib" --disable-{libguess,vapoursynth-lazy} "${MPV_OPTS[@]}"
 

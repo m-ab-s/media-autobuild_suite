@@ -625,12 +625,12 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    # local nonfree=()
-    # if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
-    #     do_addOption --enable-nonfree
-    # else
-    #     do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
-    # fi
+    local nonfree=(cuda cuvid libnpp)
+    if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}"; then
+        do_addOption --enable-nonfree
+    else
+        do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
+    fi
 
     # handle gpl-incompatible libs
     local nonfreegpl=(libfdk-aac openssl)
@@ -653,6 +653,21 @@ do_changeFFmpegConfig() {
     fi
 
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
+
+    if enabled_any cuda cuvid libnpp; then
+        if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]]; then
+            fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            do_addOption --extra-cflags=-I$fixed_CUDA_PATH/include
+            if [[ $bits = 64bit ]]; then
+                do_addOption --extra-ldflags=-L$fixed_CUDA_PATH/lib/x64
+            else
+                do_addOption --extra-ldflags=-L$fixed_CUDA_PATH/lib/Win32
+            fi
+            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
+        else
+            do_removeOption "--enable-(cuda|cuvid|libnpp)"
+        fi
+    fi
 
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
