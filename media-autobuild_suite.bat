@@ -720,7 +720,7 @@ if %angleINI%==0 (
     echo. Google ANGLE ^(for mpv^)
     echo. 1 = Install headers and get compiled libs ^(recommended^)
     echo. 2 = No
-    echo. 3 = Build angle [slower at runtime than VS2015]
+    echo. 3 = Build angle [64-bit only] [slower at runtime than VS2015]
     echo.
     echo. This will enable inclusion in mpv of Angle backend.
     echo. It is always DLLs, since that is the only officially supported build.

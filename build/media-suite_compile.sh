@@ -1272,15 +1272,19 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if ! mpv_disabled egl-angle; then
         _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
         do_pacman_remove angleproject-git
-        if [[ $bits = 64bit && $angle = y ]]; then
-            if do_vcs "https://chromium.googlesource.com/angle/angle#commit=2963985" angleproject; then
+        if [[ $angle = y ]]; then
+            if [[ $bits = 64bit ]] &&
+                do_vcs "https://chromium.googlesource.com/angle/angle#commit=2963985" angleproject; then
                 do_wget -c -r -q /patches/Makefile.angle
                 log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" \
                     BINDIR="$LOCALDESTDIR/bin-video" uninstall
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
                 do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
+                do_checkIfExist
+            elif [[ $bits = 32bit ]]; then
+                echo -e "${green}Change to angle=1 if you need angle in 32-bits.${reset}"
+                mpv_disable egl-angle
             fi
-            do_checkIfExist
         elif [[ $angle = h ]] &&
             do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
             do_install lib{EGL,GLESv2}.dll bin-video/
