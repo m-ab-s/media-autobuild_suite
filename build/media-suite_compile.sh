@@ -1011,19 +1011,21 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     }
     [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
-    if [[ $x265 != o* ]]; then
+    if [[ $x265 =~ (o12|s|d|y) ]]; then
         cd_safe "$build_root/12bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 12-bit lib" $assembly -DENABLE_SHARED=ON -DMAIN12=ON
             do_install libx265.dll bin-video/libx265_main12.dll
             _check+=(bin-video/libx265_main12.dll)
+        elif [[ $x265 = o12 ]]; then
+            do_x265_cmake "12-bit lib/bin" $assembly $cli -DMAIN12=ON
         else
             do_x265_cmake "12-bit lib for multilib" $assembly -DEXPORT_C_API=OFF -DMAIN12=ON
             cp libx265.a ../8bit/libx265_main12.a
         fi
     fi
 
-    if [[ $x265 != o8 ]]; then
+    if [[ $x265 =~ (o10|s|d|y) ]]; then
         cd_safe "$build_root/10bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 10-bit lib" $assembly -DENABLE_SHARED=ON
@@ -1037,7 +1039,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
         fi
     fi
 
-    if [[ $x265 != o10 ]]; then
+    if [[ $x265 =~ (o8|s|d|y) ]]; then
         cd_safe "$build_root/8bit"
         if [[ $x265 = s || $x265 = o8 ]]; then
             do_x265_cmake "8-bit lib/bin" $cli -DHIGH_BIT_DEPTH=OFF

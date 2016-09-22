@@ -362,6 +362,7 @@ if %x2652INI%==0 (
     echo. 4 = Lib/binary with Main only
     echo. 5 = Lib/binary with Main, shared libs with Main10 and Main12
     echo. 6 = Same as 1 with addition of non-XP compatible x265-numa.exe
+    echo. 7 = Lib/binary with Main12 only
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
@@ -377,7 +378,8 @@ if %buildx265%==3 set "x2652=o10"
 if %buildx265%==4 set "x2652=o8"
 if %buildx265%==5 set "x2652=s"
 if %buildx265%==6 set "x2652=d"
-if %buildx265% GTR 6 GOTO x265
+if %buildx265%==7 set "x2652=o12"
+if %buildx265% GTR 7 GOTO x265
 if %writex265%==yes echo.x2652=^%buildx265%>>%ini%
 
 :other265
