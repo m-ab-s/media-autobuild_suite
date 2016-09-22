@@ -71,8 +71,8 @@ if [[ $bits = 64bit && "$(pacman -Qe "$MINGW_PACKAGE_PREFIX-gcc" | awk '{print $
     -f "$MINGW_PREFIX/lib/gcc/$MINGW_CHOST"/6.2.0/libgcc_s.a ]]; then
     do_unhide_all_sharedlibs
     "${curl_opts[@]}" -O "https://i.fsbn.eu/mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
-    pacman -U --noconfirm "https://i.fsbn.eu/mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
-    add_to_remove "https://i.fsbn.eu/mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
+    pacman -U --noconfirm "mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
+    add_to_remove "mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
     do_hide_all_sharedlibs
 fi
 
