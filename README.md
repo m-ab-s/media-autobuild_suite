@@ -33,8 +33,8 @@ Included Tools And Libraries
         - schannel with gmp (mingw)
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt is broken as of 1.7.2
-        - sdl (1.2.15)
-            - enabled by default, use --disable-sdl or --disable-ffplay if unwanted
+        - sdl2 (mingw)
+            - enabled by default, use --disable-sdl2 or --disable-ffplay if unwanted
     - Zeranoe-emulating build (in addition to Light)
         - decklink (10.7)
         - fontconfig (2.12.0)

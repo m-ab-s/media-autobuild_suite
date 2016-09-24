@@ -87,18 +87,17 @@ if [[ -n "$_pkg_config_files" ]]; then
 fi
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,gnurx,regex}.{,l}a \
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,waio,magic,EGL,GLESv2}.{l,}a \
-    include/{nettle,ogg,vo-aacenc,opencore-amr{nb,wb},theora,cdio,libdcadec,waio} \
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},gnurx,regex}.{,l}a \
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2}.{l,}a \
+    libSDL{,main}.{l,}a \
+    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL} \
     opus/opus{,file}.h regex.h magic.h \
-    {nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc}.pc \
+    {nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,sdl}.pc \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
     share/aclocal/{ogg,vorbis}.m4 \
-    twolame.h bin-audio/{twolame,cd-paranoia}.exe bin-global/file.exe \
-    {cudaModuleMgr,drvapi_error_string,exception}.h \
-    helper_{cuda{,_drvapi},functions,string,timer}.h \
-    {nv{CPUOPSys,FileIO,Utils},NvHWEncoder}.h
+    twolame.h bin-audio/{twolame,cd-paranoia}.exe \
+    bin-global/{file.exe,sdl-config}
 
 if [[ -n "$alloptions" ]]; then
     {
@@ -175,19 +174,6 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_separate_confmakeinstall global --disable-{deprecated,debug} --with-glib=no
         do_checkIfExist
     fi
-fi
-
-_check=(bin-global/sdl-config libSDL{,main}.{l,}a sdl.pc)
-if { [[ $ffmpeg != "n" ]] && ! disabled_any sdl ffplay; } &&
-    do_pkgConfig "sdl = 1.2.15"; then
-    do_pacman_remove SDL
-    do_wget -h 9d96df8417572a2afb781a7c4c811a85 \
-        "https://www.libsdl.org/release/SDL-1.2.15.tar.gz"
-    do_uninstall include/SDL "${_check[@]}"
-    CFLAGS="-DDECLSPEC=" do_separate_confmakeinstall global
-    sed -i "s/-mwindows//" "$LOCALDESTDIR/bin-global/sdl-config"
-    sed -i "s/-mwindows//" "$LOCALDESTDIR/lib/pkgconfig/sdl.pc"
-    do_checkIfExist
 fi
 
 if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
@@ -1112,6 +1098,9 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install netcdf
         sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
     fi
+    if ! disabled_any sdl2 ffplay; then
+        do_pacman_install SDL2
+    fi
 
     do_hide_all_sharedlibs
 
@@ -1155,7 +1144,7 @@ if [[ $ffmpeg != "n" ]]; then
                 _check+=(bin-video/ffmpegSHARED)
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpegSHARED/bin/ffmpeg.exe)
-                    disabled_any sdl ffplay || _check+=(bin-video/ffmpegSHARED/bin/ffplay.exe)
+                    disabled_any sdl2 ffplay || _check+=(bin-video/ffmpegSHARED/bin/ffplay.exe)
                 fi
                 disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
             fi
@@ -1171,7 +1160,7 @@ if [[ $ffmpeg != "n" ]]; then
                 _check+=(libavutil.{a,pc})
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
-                    disabled_any sdl ffplay || _check+=(bin-video/ffplay.exe)
+                    disabled_any sdl2 ffplay || _check+=(bin-video/ffplay.exe)
                 fi
                 disabled ffprobe || _check+=(bin-video/ffprobe.exe)
             fi
@@ -1393,7 +1382,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             fi
         fi
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-        enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        { enabled libssh || ! disabled_any sdl2 ffplay; } && mpv_ldflags+=("-Wl,--allow-multiple-definition")
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 

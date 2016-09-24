@@ -66,9 +66,6 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
     opusenc (Opus encoder)
     sox
 
-/bin-global
-    file
-
 /bin-video
     bmxtranswrap
     ffmpeg (for static and both)
