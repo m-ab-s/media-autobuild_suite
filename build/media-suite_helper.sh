@@ -1286,4 +1286,12 @@ create_diagnostic() {
     done
 }
 
+create_winpty_exe() {
+    local exename="$1" && shift
+    local extraline="$@"
+    echo "#!/usr/bin/env bash"
+    [[ -n "$extraline" ]] && printf '%s\n' "$@"
+    echo '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'${exename}'.exe" "$@"'
+}
+
 ((extglob_set)) && shopt -u extglob
