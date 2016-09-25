@@ -1166,6 +1166,8 @@ if [[ $ffmpeg != "n" ]]; then
             enabled debug &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
             cd_safe ..
+            disabled_any avfilter ffmpeg ||
+                create_winpty_exe ffmpeg > "$LOCALDESTDIR"/bin-video/ffmpeg
         fi
         do_checkIfExist
     fi
@@ -1408,6 +1410,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
+        create_winpty_exe mpv > "$LOCALDESTDIR"/bin-video/mpv "export _started_from_console=yes"
         do_checkIfExist
     fi
 fi
