@@ -1241,7 +1241,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     do_pacman_remove uchardet-git
     _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
     [[ $standalone = y ]] && _check+=(bin-global/uchardet.exe)
-    if ! mpv_disabled uchardet && do_vcs "https://github.com/BYVoid/uchardet.git"; then
+    if ! mpv_disabled uchardet &&
+        do_vcs "https://anongit.freedesktop.org/git/uchardet/uchardet.git"; then
         do_uninstall "${_check[@]}"
         do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
             $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
