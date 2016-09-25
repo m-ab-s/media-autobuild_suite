@@ -67,15 +67,6 @@ cd_safe "$LOCALBUILDDIR"
 do_getFFmpegConfig "$license"
 do_getMpvConfig
 
-if [[ $bits = 64bit && "$(pacman -Qe "$MINGW_PACKAGE_PREFIX-gcc" | awk '{print $2}')" = "6.2.0-1" &&
-    -f "$MINGW_PREFIX/lib/gcc/$MINGW_CHOST"/6.2.0/libgcc_s.a ]]; then
-    do_unhide_all_sharedlibs
-    "${curl_opts[@]}" -O "https://i.fsbn.eu/mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
-    pacman -U --noconfirm "mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
-    add_to_remove "mingw-w64-x86_64-gcc-6.2.0-1-any.pkg.tar.xz"
-    do_hide_all_sharedlibs
-fi
-
 # in case the root was moved, this fixes windows abspaths
 _pkg_config_files=$(find "$LOCALDESTDIR/lib/pkgconfig/" -name "*.pc")
 if [[ -n "$_pkg_config_files" ]]; then
