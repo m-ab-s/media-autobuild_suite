@@ -1219,10 +1219,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
-    elif ! mpv_disabled lua && do_pkgConfig luajit &&
-        do_vcs "http://luajit.org/git/luajit-2.0.git" luajit; then
+    elif ! mpv_disabled lua && do_vcs "http://luajit.org/git/luajit-2.0.git" luajit; then
         do_pacman_remove lua51
-        do_uninstall include/luajit-2.0 lib/lua "${_check[@]}"
+        do_uninstall bin-global/luajit{,-2.0.4.exe} include/luajit-2.0 lib/lua "${_check[@]}"
         rm -rf ./temp
         [[ -f "src/luajit.exe" ]] && log "clean" make clean
         do_make BUILDMODE=static amalg
@@ -1234,8 +1233,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         # luajit comes with a broken .pc file
         sed -r -i "s/(Libs.private:).*/\1 -liconv/" lib/pkgconfig/luajit.pc
         do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
+        if [[ $standalone = y ]]; then
+            do_install bin/luajit-2.0.4.exe bin-global/
+            create_winpty_exe luajit-2.0.4 > "$LOCALDESTDIR/bin-global/luajit"
+        fi
         do_checkIfExist
-        add_to_remove
     fi
 
     do_pacman_remove uchardet-git
