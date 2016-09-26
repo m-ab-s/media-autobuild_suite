@@ -1287,8 +1287,9 @@ create_diagnostic() {
 }
 
 create_winpty_exe() {
-    local exename="$1" && shift
-    local installdir="$2" && shift
+    local exename="$1"
+    local installdir="$2"
+    shift 2
     local extraline="$@"
     [[ -f "${installdir}/${exename}".exe ]] && mv "${installdir}/${exename}"{.,_}exe
     printf '%s\n' "#!/usr/bin/env bash" "$@" \

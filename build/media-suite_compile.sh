@@ -1410,7 +1410,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
-        create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/mpv "export _started_from_console=yes"
+        create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
         do_checkIfExist
     fi
 fi
