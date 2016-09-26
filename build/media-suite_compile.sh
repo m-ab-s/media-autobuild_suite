@@ -1167,7 +1167,7 @@ if [[ $ffmpeg != "n" ]]; then
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
             cd_safe ..
             disabled_any avfilter ffmpeg ||
-                create_winpty_exe ffmpeg > "$LOCALDESTDIR"/bin-video/ffmpeg
+                create_winpty_exe ffmpeg "$LOCALDESTDIR"/bin-video/
         fi
         do_checkIfExist
     fi
@@ -1237,7 +1237,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
         if [[ $standalone = y ]]; then
             do_install bin/luajit-2.0.4.exe bin-global/
-            create_winpty_exe luajit-2.0.4 > "$LOCALDESTDIR/bin-global/luajit"
+            create_winpty_exe luajit-2.0.4 "$LOCALDESTDIR"/bin-global/
         fi
         do_checkIfExist
     fi
@@ -1410,7 +1410,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
-        create_winpty_exe mpv > "$LOCALDESTDIR"/bin-video/mpv "export _started_from_console=yes"
+        create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/mpv "export _started_from_console=yes"
         do_checkIfExist
     fi
 fi

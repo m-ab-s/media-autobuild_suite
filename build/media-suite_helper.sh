@@ -1288,10 +1288,13 @@ create_diagnostic() {
 
 create_winpty_exe() {
     local exename="$1" && shift
+    local installdir="$2" && shift
     local extraline="$@"
-    echo "#!/usr/bin/env bash"
-    [[ -n "$extraline" ]] && printf '%s\n' "$@"
-    echo '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'${exename}'.exe" "$@"'
+    [[ -f "${installdir}/${exename}".exe ]] && mv "${installdir}/${exename}"{.,_}exe
+    printf '%s\n' "#!/usr/bin/env bash" "$@" \
+        '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'${exename}'.exe" "$@"' \
+        > "${installdir}/${exename}"
+    [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
 
 ((extglob_set)) && shopt -u extglob
