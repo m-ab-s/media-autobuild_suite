@@ -4989,6 +4989,7 @@ enum _BMDDetectedVideoInputFormatFlags {
 };
 
 enum _BMDDeckLinkCapturePassthroughMode {
+    bmdDeckLinkCapturePassthroughModeDisabled = 0x70646973,
     bmdDeckLinkCapturePassthroughModeDirect = 0x70646972,
     bmdDeckLinkCapturePassthroughModeCleanSwitch = 0x70636c6e
 };
