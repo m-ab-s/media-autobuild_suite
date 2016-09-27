@@ -589,10 +589,8 @@ if [[ $ffmpeg != n ]] && enabled libebur128 && ! files_exist "${_check[@]}" &&
 fi
 
 _check=(libopenmpt.{a,pc})
-if [[ $ffmpeg != n ]] && enabled libopenmpt && do_pkgConfig "libopenmpt = 0.2.6611"; then
-    do_wget -h d906c4b9e8083fcd3ba420496f393fc4 \
-        "https://lib.openmpt.org/files/libopenmpt/src/libopenmpt-0.2.6611-beta18.tar.gz" \
-        "libopenmpt-0.2.6611.tar.gz"
+if [[ $ffmpeg != n ]] && enabled libopenmpt &&
+    do_vcs "svn::https://source.openmpt.org/svn/openmpt/trunk/OpenMPT/" openmpt; then
     do_uninstall include/libopenmpt "${_check[@]}"
     extracommands=(CONFIG="mingw64-win${bits%bit}" AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0
         TEST=0 OS=)
