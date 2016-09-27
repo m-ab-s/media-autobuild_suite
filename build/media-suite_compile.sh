@@ -476,11 +476,10 @@ fi
 
 _check=(bin-audio/opusenc.exe)
 if [[ $standalone = y ]] && enabled libopus &&
-    test_newer installed "$MINGW_PREFIX"/lib/pkgconfig/opus.pc "${_check[0]}"; then
+    do_vcs "https://github.com/xiph/opus-tools.git" opus-tools; then
     _check+=(bin-audio/opus{dec,info}.exe)
-    do_wget -h 20682e4d8d1ae9ec5af3cf43e808b8cb \
-        "http://downloads.xiph.org/releases/opus/opus-tools-0.1.9.tar.gz"
     do_uninstall "${_check[@]}"
+    do_autogen
     do_separate_confmakeinstall audio
     do_checkIfExist
 fi
