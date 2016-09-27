@@ -822,13 +822,11 @@ if [[ $ffmpeg != "n" ]] && enabled libzvbi &&
 fi
 
 _check=(frei0r.{h,pc})
-if [[ $ffmpeg != "n" ]] && enabled frei0r && do_pkgConfig "frei0r = 1.5.0" &&
-    do_vcs https://github.com/dyne/frei0r.git; then
+if [[ $ffmpeg != "n" ]] && enabled frei0r && do_vcs https://github.com/dyne/frei0r.git; then
     sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
     do_uninstall lib/frei0r-1 "${_check[@]}"
     do_cmakeinstall
     do_checkIfExist
-    add_to_remove
 fi
 
 if [[ $ffmpeg != "n" ]] && enabled decklink; then
