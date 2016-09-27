@@ -672,8 +672,9 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOption "--enable-(decklink|libgme|chromaprint)" y
+        do_removeOption "--enable-(decklink|libgme|chromaprint|sdl2)" y
         do_removeOptions "--extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lfftw3" y
+        do_addOption FFMPEG_OPTS_SHARED --disable-sdl2
     fi
 }
 
