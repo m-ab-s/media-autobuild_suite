@@ -215,6 +215,9 @@ fi
     curl_ver="$(get_last_version "$curl_ver" bz2 "7\.\d+\.\d")"
 curl_ver="${curl_ver:-7.50.1}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
+_deps=()
+enabled openssl && _deps+=(libssl.a)
+enabled gnutls && _deps+=(libgnutls.a)
 [[ $standalone = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     do_pacman_install nghttp2
