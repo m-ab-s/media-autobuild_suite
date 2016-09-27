@@ -78,12 +78,12 @@ if [[ -n "$_pkg_config_files" ]]; then
 fi
 
 do_uninstall q j{config,error,morecfg,peglib}.h \
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{,file,url},gnurx,regex}.{,l}a \
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a \
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2}.{l,}a \
     libSDL{,main}.{l,}a \
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL} \
-    opus/opus{,file}.h regex.h magic.h \
-    {nettle,ogg,vorbis{,enc,file},opus{,file,url},vo-aacenc,sdl}.pc \
+    opus/opusfile.h regex.h magic.h \
+    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl}.pc \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
     libcdio_{cdda,paranoia}.{{l,}a,pc} \
     share/aclocal/{ogg,vorbis}.m4 \
@@ -378,7 +378,6 @@ if [[ $ffmpeg != "n" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev"
 fi
 
 enabled libvorbis && do_pacman_install libvorbis
-enabled libopus && do_pacman_install opus
 enabled libspeex && do_pacman_install speex
 
 _check=(bin-audio/speex{enc,dec}.exe)
@@ -474,7 +473,17 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     add_to_remove
 fi
 
+_check=(libopus.{,l}a opus.pc opus/opus.h)
+if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
+    do_pacman_remove opus
+    do_uninstall include/opus "${_check[@]}"
+    do_autogen
+    do_separate_confmakeinstall
+    do_checkIfExist
+fi
+
 _check=(bin-audio/opusenc.exe)
+_deps=(libopus.a)
 if [[ $standalone = y ]] && enabled libopus &&
     do_vcs "https://github.com/xiph/opus-tools.git" opus-tools; then
     _check+=(bin-audio/opus{dec,info}.exe)
@@ -543,7 +552,7 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
 fi
 
 _check=(bin-audio/sox.exe sox.pc)
-_deps=(lib{sndfile,mp3lame}.a "$MINGW_PREFIX"/lib/libopus.a)
+_deps=(lib{sndfile,mp3lame,opus}.a)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
