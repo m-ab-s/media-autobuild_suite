@@ -1141,7 +1141,6 @@ if [[ $ffmpeg != "n" ]]; then
                 _check+=(bin-video/ffmpegSHARED)
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpegSHARED/bin/ffmpeg.exe)
-                    disabled_any sdl2 ffplay || _check+=(bin-video/ffmpegSHARED/bin/ffplay.exe)
                 fi
                 disabled ffprobe || _check+=(bin-video/ffmpegSHARED/bin/ffprobe.exe)
             fi
