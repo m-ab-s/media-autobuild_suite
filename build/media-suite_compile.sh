@@ -104,14 +104,15 @@ fi
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
 
-_check=(libopenjp2.{a,pc})
+_check=(libopenjp2.{a,pc} openjpeg-2.1/openjpeg.h)
 if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
     do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2; then
     do_pacman_remove openjpeg2
 
-    do_uninstall {include,lib}/openjpeg-2.1 libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
+    do_uninstall {include,lib}/openjpeg-2.{1,2} libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
     do_cmakeinstall -DBUILD_CODEC=off
     do_checkIfExist
+    cp -rf "$LOCALDESTDIR"/include/openjpeg-2.{2,1}
 fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
