@@ -1383,7 +1383,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             fi
         fi
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-        { enabled libssh || ! disabled_any sdl2 ffplay; } && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
