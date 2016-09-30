@@ -111,8 +111,8 @@ if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
 
     do_uninstall {include,lib}/openjpeg-2.{1,2} libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
     do_cmakeinstall -DBUILD_CODEC=off
-    do_checkIfExist
     cp -rf "$LOCALDESTDIR"/include/openjpeg-2.{2,1}
+    do_checkIfExist
 fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
