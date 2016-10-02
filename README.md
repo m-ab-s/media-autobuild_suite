@@ -30,9 +30,9 @@ Included Tools And Libraries
         - libx264 (git)
         - libx265 (hg)
         - nvenc (built-in)
-        - schannel with gmp (mingw)
+        - schannel with gcrypt (1.7.3)
             - enabled by default if openssl or gnutls aren't enabled
-            - libgcrypt is broken as of 1.7.2
+            - libgcrypt can be switched by gmp with --enable-gmp
         - sdl2 (mingw)
             - enabled by default, use --disable-sdl2 or --disable-ffplay if unwanted
     - Zeranoe-emulating build (in addition to Light)

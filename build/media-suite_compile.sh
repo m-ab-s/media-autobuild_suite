@@ -167,6 +167,29 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 fi
 
+_check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
+_ver="1.7.3"
+if [[ $ffmpeg != n ]] && enabled gcrypt; then
+    do_pacman_install libgpg-error
+    do_pacman_remove libgcrypt
+    if files_exist "${_check[@]}" && [[ "$(libgcrypt-config --version)" = "$_ver" ]]; then
+        do_print_status "libgcrypt $_ver" "$green" "Up-to-date"
+    else
+        do_wget -h c869e542cc13a1c28d8055487bf7f5c4 \
+            "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$_ver.tar.bz2"
+        do_uninstall "${_check[@]}"
+        [[ $bits = 64bit ]] && do_patch 64bits-relocation.patch
+        [[ $standalone = y ]] || sed -ri "s|(^bin_PROGRAMS = ).*|\1\\\|" src/Makefile.in
+        sed -ri "s;(^SUBDIRS .*) tests;\1;" Makefile.in
+        do_separate_confmakeinstall global --disable-{padlock-support,doc,asm} \
+            --enable-ciphers=aes,des,rfc2268,arcfour \
+            --enable-digests=sha1,md5,rmd160,sha256,sha512 \
+            --enable-pubkey-ciphers=dsa,rsa,ecc \
+            --with-gpg-error-prefix="$MINGW_PREFIX"
+        do_checkIfExist
+    fi
+fi
+
 if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
     [[ -z "$gnutls_ver" ]] &&
