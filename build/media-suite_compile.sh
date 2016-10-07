@@ -1434,7 +1434,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if mpv_enabled libmpv-shared; then
             do_install build/mpv-1.dll bin-video/
             do_install build/libmpv.dll.a lib/
-            do_install libmpv/{{client,opengl_cb}.h,qthelper.hpp} include/
+            do_install libmpv/{{client,opengl_cb,stream_cb}.h,qthelper.hpp} include/mpv/
             _check+=(bin-video/mpv-1.dll libmpv.dll.a)
         fi
         ! mpv_disabled debug-build &&
