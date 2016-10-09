@@ -36,7 +36,7 @@ Included Tools And Libraries
         - sdl2 (mingw)
             - enabled by default, use --disable-sdl2 or --disable-ffplay if unwanted
     - Zeranoe-emulating build (in addition to Light)
-        - decklink (10.7)
+        - decklink (10.8)
         - fontconfig (2.12.1)
         - frei0r (git)
         - gnutls (latest release)
