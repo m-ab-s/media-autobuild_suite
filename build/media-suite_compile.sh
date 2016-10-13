@@ -80,8 +80,8 @@ fi
 do_uninstall q j{config,error,morecfg,peglib}.h \
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a \
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2}.{l,}a \
-    libSDL{,main}.{l,}a \
-    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL} \
+    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} \
+    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2}} \
     opus/opusfile.h regex.h magic.h \
     {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl}.pc \
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
@@ -103,17 +103,6 @@ fi
 
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
-
-_check=(libopenjp2.{a,pc} openjpeg-2.1/openjpeg.h)
-if [[ $ffmpeg != "n" ]] && enabled libopenjpeg &&
-    do_vcs "https://github.com/uclouvain/openjpeg.git" libopenjp2; then
-    do_pacman_remove openjpeg2
-
-    do_uninstall {include,lib}/openjpeg-2.{1,2} libopen{jpwl,mj2}.{a,pc} "${_check[@]}"
-    do_cmakeinstall -DBUILD_CODEC=off
-    cp -rf "$LOCALDESTDIR"/include/openjpeg-2.{2,1}
-    do_checkIfExist
-fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "n" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
@@ -1122,6 +1111,7 @@ if [[ $ffmpeg != "n" ]]; then
     if ! disabled_any sdl2 ffplay; then
         do_pacman_install SDL2
     fi
+    enabled libopenjpeg && do_pacman_install openjpeg2
 
     do_hide_all_sharedlibs
 
