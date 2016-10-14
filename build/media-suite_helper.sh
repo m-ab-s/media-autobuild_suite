@@ -63,7 +63,7 @@ test_newer() {
     local files=("$@")
     local cmp="${files[-1]}"
     [[ $installed ]] && cmp="$(file_installed "$cmp")"
-    [[ ${#files[@]} -gt 1 ]] && unset files[-1]
+    [[ ${#files[@]} -gt 1 ]] && unset 'files[-1]'
     [[ -f $cmp ]] || return 0
     for file in "${files[@]}"; do
         [[ $installed ]] && file="$(file_installed "$file")"
@@ -349,8 +349,10 @@ do_strip() {
     [[ "$@" =~ \.($exts)$ ]] &&
         [[ ! "$@" =~ ($nostrip)\.exe$ ]] && do_print_progress Stripping
     for file; do
-        file="$(file_installed $file)"
-        [[ $? = 0 ]] || continue
+        local orig_file="$file"
+        if ! file="$(file_installed $orig_file)"; then
+            continue
+        fi
         if [[ $file =~ \.(exe|com)$ ]] &&
             [[ ! $file =~ ($nostrip)\.exe$ ]]; then
             cmd+=(--strip-all)
@@ -378,8 +380,10 @@ do_pack() {
     [[ "$@" =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]] &&
         do_print_progress Packing with UPX
     for file; do
-        file="$(file_installed $file)"
-        [[ $? = 0 ]] || continue
+        local orig_file="$file"
+        if ! file="$(file_installed $orig_file)"; then
+            continue
+        fi
         if [[ $file =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]]; then
             [[ $stripping = y ]] && cmd+=(--strip-relocs=0)
         else
@@ -470,11 +474,11 @@ files_exist() {
 
 pc_exists() {
     for opt; do
-        local pkg=${opt%% *}
-        local check=${opt#$pkg}
-        [[ $pkg = "$check" ]] && check=""
-        [[ $pkg = *.pc ]] || pkg="${LOCALDESTDIR}/lib/pkgconfig/${pkg}.pc"
-        pkg-config --exists --silence-errors "${pkg}${check}" || return
+        local _pkg=${opt%% *}
+        local _check=${opt#$pkg}
+        [[ $_pkg = "$_check" ]] && _check=""
+        [[ $_pkg = *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
+        pkg-config --exists --silence-errors "${_pkg}${_check}" || return
     done
 }
 
@@ -483,7 +487,7 @@ do_install() {
     local files=("$@")
     local dest="${files[-1]}"
     [[ ${dest::1} != "/" ]] && dest="$(file_installed "$dest")"
-    [[ ${#files[@]} -gt 1 ]] && unset files[-1]
+    [[ ${#files[@]} -gt 1 ]] && unset 'files[-1]'
     [[ ${dest: -1:1} = "/" ]] && mkdir -p "$dest"
     if [[ -n $dryrun ]]; then
         echo install -D "${files[@]}" "$dest"
@@ -510,16 +514,16 @@ do_uninstall() {
 
 do_pkgConfig() {
     local pkg="${1%% *}"
-    local check="${1#$pkg}"
+    local pc_check="${1#$pkg}"
     local pkg_and_version="$pkg"
-    [[ $pkg = "$check" ]] && check=""
+    [[ $pkg = "$pc_check" ]] && pc_check=""
     local version=$2
     local deps=("${_deps[@]}") && unset _deps
-    [[ ! "$version" && "$check" ]] && version="${check#*= }"
+    [[ ! "$version" && "$pc_check" ]] && version="${pc_check#*= }"
     [[ "$version" ]] && pkg_and_version="${pkg} ${version}"
     if ! pc_exists "${pkg}"; then
         do_print_status "${pkg_and_version}" "$red" "Not installed"
-    elif ! pc_exists "${pkg}${check}"; then
+    elif ! pc_exists "${pkg}${pc_check}"; then
         do_print_status "${pkg_and_version}" "$orange" "Outdated"
     elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
         do_print_status "${pkg_and_version}" "$orange" "Newer dependencies"
@@ -658,11 +662,11 @@ do_changeFFmpegConfig() {
     if enabled_any cuda cuvid libnpp; then
         if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]]; then
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            do_addOption --extra-cflags=-I$fixed_CUDA_PATH/include
+            do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             if [[ $bits = 64bit ]]; then
-                do_addOption --extra-ldflags=-L$fixed_CUDA_PATH/lib/x64
+                do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             else
-                do_addOption --extra-ldflags=-L$fixed_CUDA_PATH/lib/Win32
+                do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/Win32"
             fi
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
         else
@@ -912,7 +916,7 @@ zip_logs() {
     rm -f logs.zip
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
-    [[ $failed ]] && files+=($(find $failed -name "*.log"))
+    [[ $failed ]] && files+=($(find "$failed" -name "*.log"))
     files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
         -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
@@ -930,18 +934,18 @@ zip_logs() {
 log() {
     [[ $1 = quiet ]] && local quiet=y && shift
     local name="${1// /.}"
-    local cmd="$2"
+    local _cmd="$2"
     shift 2
     local extra
     [[ $quiet ]] || do_print_progress Running "$name"
-    [[ $cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
+    [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging != "n" ]]; then
-        echo "$cmd $*" > "ab-suite.$name.log"
-        $cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
-            { [[ $extra ]] && $cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
+        echo "$_cmd $*" > "ab-suite.$name.log"
+        $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
+            { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
             compilation_fail "$name"
     else
-        $cmd $extra "$@" || { [[ $extra ]] && $cmd -j1 "$@"; } ||
+        $_cmd $extra "$@" || { [[ $extra ]] && $_cmd -j1 "$@"; } ||
             compilation_fail "$name"
     fi
 }
@@ -1292,10 +1296,9 @@ create_winpty_exe() {
     local exename="$1"
     local installdir="$2"
     shift 2
-    local extraline="$@"
     [[ -f "${installdir}/${exename}".exe ]] && mv "${installdir}/${exename}"{.,_}exe
     printf '%s\n' "#!/usr/bin/env bash" "$@" \
-        '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'${exename}'.exe" "$@"' \
+        '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"' \
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }

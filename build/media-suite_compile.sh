@@ -71,7 +71,8 @@ do_getMpvConfig
 _pkg_config_files=$(find "$LOCALDESTDIR/lib/pkgconfig/" -name "*.pc")
 if [[ -n "$_pkg_config_files" ]]; then
     screwed_prefixes=($(grep -E -l "(prefix|libdir|includedir)=[^/$].*" $_pkg_config_files))
-    [[ -n "${screwed_prefixes[@]}" ]] && screwed_prefixes=($(grep -qL "$(cygpath -m "$LOCALDESTDIR")" "${screwed_prefixes[@]}"))
+    [[ -n "${screwed_prefixes[@]}" ]] &&
+        screwed_prefixes=($(grep -qL "$(cygpath -m "$LOCALDESTDIR")" "${screwed_prefixes[@]}"))
     [[ -n "${screwed_prefixes[@]}" ]] && sed -ri \
         "s;(prefix|libdir|includedir)=.*${LOCALDESTDIR};\1=$(cygpath -m /trunk)${LOCALDESTDIR};g" \
         "${screwed_prefixes[@]}"
@@ -1228,7 +1229,7 @@ if [[ $mplayer = "y" ]] &&
     _notrequired="true"
     do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
     --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
-    --extra-libs='-llzma -lfreetype -lz -lbz2 -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm -ldl' \
+    --extra-libs='-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' \
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
     --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
@@ -1279,13 +1280,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
         do_pacman_remove angleproject-git
         if [[ $angle = y ]]; then
-            if [[ $bits = 64bit ]] &&
-                do_vcs "https://chromium.googlesource.com/angle/angle#commit=2963985" angleproject; then
+            if [[ $bits = 64bit ]] && do_vcs \
+                "https://chromium.googlesource.com/angle/angle#commit=2963985" \
+                angleproject; then
                 do_wget -c -r -q /patches/Makefile.angle
                 log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" \
                     BINDIR="$LOCALDESTDIR/bin-video" uninstall
                 [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
-                do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" BINDIR="$LOCALDESTDIR/bin-video"
+                do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" \
+                    BINDIR="$LOCALDESTDIR/bin-video"
                 do_checkIfExist
             elif [[ $bits = 32bit ]]; then
                 echo -e "${green}Change to angle=1 if you need angle in 32-bits.${reset}"
