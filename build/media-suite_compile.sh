@@ -1323,22 +1323,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if [[ x"$vsprefix" != x ]] &&
             { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
             do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
-            baseurl="https://github.com/vapoursynth/vapoursynth/raw/"
-            ret="$("${curl_opts[@]}" -w "%{response_code}" -o /dev/null "${baseurl}/R${vsversion}/configure.ac")"
-            if [[ $ret != 404 ]]; then
-                baseurl+="R${vsversion}"
+            do_vcs "https://github.com/vapoursynth/vapoursynth.git"
+            if git show-ref -q "R${vsversion}"; then
+                git reset -q --hard "R${vsversion}"
             else
-                baseurl+="master"
+                git reset -q --hard origin/master
             fi
-            mkdir -p "$LOCALBUILDDIR/vapoursynth" && cd_safe "$LOCALBUILDDIR/vapoursynth"
 
-            # headers
-            for _file in {VS{Helper,Script},VapourSynth}.h; do
-                do_wget -r -c -q "${baseurl}/include/${_file}"
-                [[ -f $_file ]] && do_install "$_file" "vapoursynth/$_file"
-            done
+            do_install include/*.h include/vapoursynth/
 
-            # import libs
             create_build_dir
             for _file in vapoursynth vsscript; do
                 gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
@@ -1348,33 +1341,25 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             done
 
-            "${curl_opts[@]}" "$baseurl/pc/vapoursynth.pc.in" |
-            sed -e "s;@prefix@;$LOCALDESTDIR;" \
-                -e 's;@exec_prefix@;${prefix};' \
-                -e 's;@libdir@;${prefix}/lib;' \
-                -e 's;@includedir@;${prefix}/include;' \
-                -e "s;@VERSION@;$vsversion;" \
-                -e '/Libs.private/ d' \
-                > vapoursynth.pc
-            [[ -f vapoursynth.pc ]] && do_install vapoursynth.pc
-            "${curl_opts[@]}" "$baseurl/pc/vapoursynth-script.pc.in" |
-            sed -e "s;@prefix@;$LOCALDESTDIR;" \
-                -e 's;@exec_prefix@;${prefix};' \
-                -e 's;@libdir@;${prefix}/lib;' \
-                -e 's;@includedir@;${prefix}/include;' \
-                -e "s;@VERSION@;$vsversion;" \
-                -e '/Requires.private/ d' \
-                -e 's;lvapoursynth-script;lvsscript;' \
-                -e '/Libs.private/ d' \
-                > vapoursynth-script.pc
-            [[ -f vapoursynth-script.pc ]] && do_install vapoursynth-script.pc
+            for _file in vapoursynth{,-script}.pc; do
+                sed -e "s;@prefix@;$LOCALDESTDIR;" \
+                    -e 's;@exec_prefix@;${prefix};' \
+                    -e 's;@libdir@;${prefix}/lib;' \
+                    -e 's;@includedir@;${prefix}/include;' \
+                    -e "s;@VERSION@;$vsversion;" \
+                    -e '/Libs.private/ d' \
+                    -e '/Requires.private/ d' \
+                    -e 's;lvapoursynth-script;lvsscript;' \
+                    "../pc/$_file.in" > "$_file"
+                    do_install "$_file"
+            done
 
             do_checkIfExist
             add_to_remove
         elif [[ -z "$vsprefix" ]]; then
             mpv_disable vapoursynth
         fi
-        unset vsprefix vsversion _file baseurl ret
+        unset vsprefix vsversion _file
     elif ! mpv_disabled vapoursynth; then
         mpv_disable vapoursynth
     fi
