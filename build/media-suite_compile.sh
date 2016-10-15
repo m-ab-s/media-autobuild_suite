@@ -892,7 +892,7 @@ if [[ $ffmpeg != "n" ]] && enabled libmfx &&
 fi
 
 _check=(libgpac_static.a bin-video/MP4Box.exe)
-if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
+if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git#commit=ca22280"; then
     do_uninstall include/gpac "${_check[@]}"
     git grep -PIl "\xC2\xA0" | xargs -r sed -i 's/\xC2\xA0/ /g'
     LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
