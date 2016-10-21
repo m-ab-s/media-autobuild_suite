@@ -104,7 +104,7 @@ Included Tools And Libraries
     - mp4box (git)
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
-        - uchardet (git)
+        - uchardet (mingw)
         - ANGLE (git snapshot)
         - luajit (mingw)
         - vapoursynth (if installed or standalone inside /local(32|64))

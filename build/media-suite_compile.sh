@@ -80,16 +80,16 @@ fi
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2,luajit-5.1}.{l,}a
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2,luajit-5.1,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
-    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0}
+    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet}
     opus/opusfile.h regex.h magic.h
-    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl,luajit}.pc
+    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl,luajit,uchardet}.pc
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
     share/aclocal/{ogg,vorbis}.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
-    bin-global/{file.exe,sdl-config,luajit{,-2.0.4.exe}}
+    bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -1249,16 +1249,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     do_pacman_remove uchardet-git
-    _check=(uchardet/uchardet.h uchardet.pc libuchardet.a)
-    [[ $standalone = y ]] && _check+=(bin-global/uchardet.exe)
-    if ! mpv_disabled uchardet &&
-        do_vcs "https://anongit.freedesktop.org/git/uchardet/uchardet.git"; then
-        do_uninstall "${_check[@]}"
-        do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
-            $([[ $standalone = y ]] || echo -DBUILD_BINARY=off)
-        do_checkIfExist
-    fi
-
+    ! mpv_disabled uchardet && do_pacman_install uchardet
     mpv_enabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
