@@ -106,7 +106,7 @@ Included Tools And Libraries
     - mpv (git) including in addition to ffmpeg libs:
         - uchardet (git)
         - ANGLE (git snapshot)
-        - luajit (git)
+        - luajit (mingw)
         - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)
     - rtmpdump (git)

@@ -78,18 +78,22 @@ if [[ -n "$_pkg_config_files" ]]; then
         "${screwed_prefixes[@]}"
 fi
 
-do_uninstall q j{config,error,morecfg,peglib}.h \
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a \
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2}.{l,}a \
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} \
-    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2}} \
-    opus/opusfile.h regex.h magic.h \
-    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl}.pc \
-    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc \
-    libcdio_{cdda,paranoia}.{{l,}a,pc} \
-    share/aclocal/{ogg,vorbis}.m4 \
-    twolame.h bin-audio/{twolame,cd-paranoia}.exe \
-    bin-global/{file.exe,sdl-config}
+_clean_old_builds=(j{config,error,morecfg,peglib}.h
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2,luajit-5.1}.{l,}a
+    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
+    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0}
+    opus/opusfile.h regex.h magic.h
+    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl,luajit}.pc
+    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc
+    libcdio_{cdda,paranoia}.{{l,}a,pc}
+    share/aclocal/{ogg,vorbis}.m4
+    twolame.h bin-audio/{twolame,cd-paranoia}.exe
+    bin-global/{file.exe,sdl-config,luajit{,-2.0.4.exe}}
+)
+
+do_uninstall q "${_clean_old_builds[@]}"
+unset _clean_old_builds
 
 if [[ -n "$alloptions" ]]; then
     {
@@ -1238,28 +1242,10 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    _check=(libluajit-5.1.a luajit.pc luajit-2.0/luajit.h)
     if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
         do_pacman_install lua51
-    elif ! mpv_disabled lua && do_vcs "http://luajit.org/git/luajit-2.0.git" luajit; then
-        do_pacman_remove lua51
-        do_uninstall bin-global/luajit{,-2.0.4.exe} include/luajit-2.0 lib/lua "${_check[@]}"
-        rm -rf ./temp
-        [[ -f "src/luajit.exe" ]] && log "clean" make clean
-        do_make BUILDMODE=static amalg
-        do_makeinstall BUILDMODE=static PREFIX="$LOCALDESTDIR" DESTDIR="$(pwd)/temp"
-        cd_safe "temp${LOCALDESTDIR}"
-        mkdir -p "$LOCALDESTDIR/include/luajit-2.0"
-        do_install include/luajit-2.0/*.h include/luajit-2.0/
-        do_install lib/libluajit-5.1.a lib/
-        # luajit comes with a broken .pc file
-        sed -r -i "s/(Libs.private:).*/\1 -liconv/" lib/pkgconfig/luajit.pc
-        do_install lib/pkgconfig/luajit.pc lib/pkgconfig/
-        if [[ $standalone = y ]]; then
-            do_install bin/luajit-2.0.4.exe bin-global/
-            create_winpty_exe luajit-2.0.4 "$LOCALDESTDIR"/bin-global/
-        fi
-        do_checkIfExist
+    elif ! mpv_disabled lua; then
+        do_pacman_install luajit-git
     fi
 
     do_pacman_remove uchardet-git

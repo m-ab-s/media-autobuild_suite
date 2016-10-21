@@ -30,7 +30,6 @@ librtmp
 libwebp
 libzen
 lsmash
-luajit
 openh264
 rubberband
 sndfile
