@@ -475,7 +475,7 @@ files_exist() {
 pc_exists() {
     for opt; do
         local _pkg=${opt%% *}
-        local _check=${opt#$pkg}
+        local _check=${opt#$_pkg}
         [[ $_pkg = "$_check" ]] && _check=""
         [[ $_pkg = *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
         pkg-config --exists --silence-errors "${_pkg}${_check}" || return
