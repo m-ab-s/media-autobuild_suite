@@ -659,7 +659,7 @@ do_changeFFmpegConfig() {
 
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
 
-    if enabled_any cuda cuvid libnpp; then
+    if enabled libnpp; then
         if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]]; then
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
@@ -670,7 +670,7 @@ do_changeFFmpegConfig() {
             fi
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
         else
-            do_removeOption "--enable-(cuda|cuvid|libnpp)"
+            do_removeOption "--enable-libnpp"
         fi
     fi
 
