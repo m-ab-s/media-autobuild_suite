@@ -1,14 +1,14 @@
-From 974956f4ee2a79dfad9964745b2f208a0b8c0d3f Mon Sep 17 00:00:00 2001
+From f5c6fd2cb0069b8ca4f8dbaece249e5dbf2368ff Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:29 +0200
+Date: Mon, 10 Oct 2016 12:47:15 +0200
 Subject: [PATCH 1/8] compat/cuda: add dynamic loader
 
 ---
- compat/cuda/dynlink_cuda.h     |  88 +++++
+ compat/cuda/dynlink_cuda.h     |  97 +++++
  compat/cuda/dynlink_cuviddec.h | 808 +++++++++++++++++++++++++++++++++++++++++
- compat/cuda/dynlink_loader.h   | 254 +++++++++++++
- compat/cuda/dynlink_nvcuvid.h  | 314 ++++++++++++++++
- 4 files changed, 1464 insertions(+)
+ compat/cuda/dynlink_loader.h   | 263 ++++++++++++++
+ compat/cuda/dynlink_nvcuvid.h  | 316 ++++++++++++++++
+ 4 files changed, 1484 insertions(+)
  create mode 100644 compat/cuda/dynlink_cuda.h
  create mode 100644 compat/cuda/dynlink_cuviddec.h
  create mode 100644 compat/cuda/dynlink_loader.h
@@ -16,26 +16,35 @@ Subject: [PATCH 1/8] compat/cuda: add dynamic loader
 
 diff --git a/compat/cuda/dynlink_cuda.h b/compat/cuda/dynlink_cuda.h
 new file mode 100644
-index 0000000..908f12d
+index 0000000..418bbd0
 --- /dev/null
 +++ b/compat/cuda/dynlink_cuda.h
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,97 @@
 +/*
-+ * This file is part of FFmpeg.
++ * This copyright notice applies to this header file only:
 + *
-+ * FFmpeg is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ * Copyright (c) 2016
 + *
-+ * FFmpeg is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * Permission is hereby granted, free of charge, to any person
++ * obtaining a copy of this software and associated documentation
++ * files (the "Software"), to deal in the Software without
++ * restriction, including without limitation the rights to use,
++ * copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the software, and to permit persons to whom the
++ * software is furnished to do so, subject to the following
++ * conditions:
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with FFmpeg; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ * OTHER DEALINGS IN THE SOFTWARE.
 + */
 +
 +#if !defined(AV_COMPAT_DYNLINK_CUDA_H) && !defined(CUDA_VERSION)
@@ -924,26 +933,35 @@ index 0000000..17207bc
 +#endif // __CUDA_VIDEO_H__
 diff --git a/compat/cuda/dynlink_loader.h b/compat/cuda/dynlink_loader.h
 new file mode 100644
-index 0000000..6275664
+index 0000000..9c4809d
 --- /dev/null
 +++ b/compat/cuda/dynlink_loader.h
-@@ -0,0 +1,254 @@
+@@ -0,0 +1,263 @@
 +/*
-+ * This file is part of FFmpeg.
++ * This copyright notice applies to this header file only:
 + *
-+ * FFmpeg is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
++ * Copyright (c) 2016
 + *
-+ * FFmpeg is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
++ * Permission is hereby granted, free of charge, to any person
++ * obtaining a copy of this software and associated documentation
++ * files (the "Software"), to deal in the Software without
++ * restriction, including without limitation the rights to use,
++ * copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the software, and to permit persons to whom the
++ * software is furnished to do so, subject to the following
++ * conditions:
 + *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with FFmpeg; if not, write to the Free Software
-+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ * The above copyright notice and this permission notice shall be
++ * included in all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
++ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
++ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
++ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
++ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
++ * OTHER DEALINGS IN THE SOFTWARE.
 + */
 +
 +#ifndef AV_COMPAT_CUDA_DYNLINK_LOADER_H
@@ -1185,10 +1203,10 @@ index 0000000..6275664
 \ No newline at end of file
 diff --git a/compat/cuda/dynlink_nvcuvid.h b/compat/cuda/dynlink_nvcuvid.h
 new file mode 100644
-index 0000000..d39792d
+index 0000000..6c197e0
 --- /dev/null
 +++ b/compat/cuda/dynlink_nvcuvid.h
-@@ -0,0 +1,314 @@
+@@ -0,0 +1,316 @@
 +/*
 + * This copyright notice applies to this header file only:
 + *
@@ -1503,28 +1521,30 @@ index 0000000..d39792d
 +#endif /* __cplusplus */
 +
 +#endif // __NVCUVID_H__
++
++
 -- 
-2.9.1
+2.10.1
 
 
-From 692b99303d2e071bd7f43ac9de3c60091e597c60 Mon Sep 17 00:00:00 2001
+From a7b47ca20f6226bcf537f9897b329a56de99a8e9 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:30 +0200
+Date: Mon, 10 Oct 2016 12:52:40 +0200
 Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
 
 ---
  configure                           |  2 +
  libavutil/hwcontext_cuda.c          | 99 ++++++++++++++++++++++++++++---------
  libavutil/hwcontext_cuda.h          |  5 ++
- libavutil/hwcontext_cuda_internal.h | 36 ++++++++++++++
- 4 files changed, 118 insertions(+), 24 deletions(-)
+ libavutil/hwcontext_cuda_internal.h | 37 ++++++++++++++
+ 4 files changed, 119 insertions(+), 24 deletions(-)
  create mode 100644 libavutil/hwcontext_cuda_internal.h
 
 diff --git a/configure b/configure
-index 481f692..db47e76 100755
+index d2ab550..94d3ad1 100755
 --- a/configure
 +++ b/configure
-@@ -2536,6 +2536,7 @@ audiotoolbox_extralibs="-framework CoreFoundation -framework AudioToolbox -frame
+@@ -2539,6 +2539,7 @@ audiotoolbox_extralibs="-framework CoreFoundation -framework AudioToolbox -frame
  
  # hardware accelerators
  crystalhd_deps="libcrystalhd_libcrystalhd_if_h"
@@ -1810,10 +1830,10 @@ index 23a77ce..12dae84 100644
  /**
 diff --git a/libavutil/hwcontext_cuda_internal.h b/libavutil/hwcontext_cuda_internal.h
 new file mode 100644
-index 0000000..557fb95
+index 0000000..e1bc6ff
 --- /dev/null
 +++ b/libavutil/hwcontext_cuda_internal.h
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,37 @@
 +/*
 + * This file is part of FFmpeg.
 + *
@@ -1850,21 +1870,22 @@ index 0000000..557fb95
 +};
 +
 +#endif /* AVUTIL_HWCONTEXT_CUDA_INTERNAL_H */
++
 -- 
-2.9.1
+2.10.1
 
 
-From 1d75b482e9422c8c81fcbd6bed162119b8930484 Mon Sep 17 00:00:00 2001
+From 3318eda00df965d1db758adf377f0c9350507d88 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:31 +0200
+Date: Mon, 10 Oct 2016 12:53:49 +0200
 Subject: [PATCH 3/8] avcodec/cuvid: use dynamically loaded CUDA/CUVID
 
 And remove the now obsolete compat headers.
 ---
  compat/cuda/cuviddec.h | 827 -------------------------------------------------
  compat/cuda/nvcuvid.h  | 321 -------------------
- libavcodec/cuvid.c     |  78 +++--
- 3 files changed, 47 insertions(+), 1179 deletions(-)
+ libavcodec/cuvid.c     |  80 +++--
+ 3 files changed, 48 insertions(+), 1180 deletions(-)
  delete mode 100644 compat/cuda/cuviddec.h
  delete mode 100644 compat/cuda/nvcuvid.h
 
@@ -3029,7 +3050,7 @@ index 738d8e3..0000000
 -
 -
 diff --git a/libavcodec/cuvid.c b/libavcodec/cuvid.c
-index 27a4c30..17da924 100644
+index eafce0a..c3e831a 100644
 --- a/libavcodec/cuvid.c
 +++ b/libavcodec/cuvid.c
 @@ -19,10 +19,12 @@
@@ -3084,7 +3105,16 @@ index 27a4c30..17da924 100644
  
      av_log(avctx, AV_LOG_ERROR, "%s failed", func);
      if (err_name && err_string)
-@@ -197,7 +201,7 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
+@@ -142,7 +146,7 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
+ 
+     if (ctx->cudecoder) {
+         av_log(avctx, AV_LOG_TRACE, "Re-initializing decoder\n");
+-        ctx->internal_error = CHECK_CU(cuvidDestroyDecoder(ctx->cudecoder));
++        ctx->internal_error = CHECK_CU(ctx->cvdl->cuvidDestroyDecoder(ctx->cudecoder));
+         if (ctx->internal_error < 0)
+             return 0;
+         ctx->cudecoder = NULL;
+@@ -199,7 +203,7 @@ static int CUDAAPI cuvid_handle_video_sequence(void *opaque, CUVIDEOFORMAT* form
      if (ctx->deint_mode != cudaVideoDeinterlaceMode_Weave)
          avctx->framerate = av_mul_q(avctx->framerate, (AVRational){2, 1});
  
@@ -3093,7 +3123,7 @@ index 27a4c30..17da924 100644
      if (ctx->internal_error < 0)
          return 0;
  
-@@ -223,7 +227,7 @@ static int CUDAAPI cuvid_handle_picture_decode(void *opaque, CUVIDPICPARAMS* pic
+@@ -225,7 +229,7 @@ static int CUDAAPI cuvid_handle_picture_decode(void *opaque, CUVIDPICPARAMS* pic
  
      av_log(avctx, AV_LOG_TRACE, "pfnDecodePicture\n");
  
@@ -3102,7 +3132,7 @@ index 27a4c30..17da924 100644
      if (ctx->internal_error < 0)
          return 0;
  
-@@ -289,7 +293,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
+@@ -291,7 +295,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
          avpkt = &filtered_packet;
      }
  
@@ -3111,7 +3141,7 @@ index 27a4c30..17da924 100644
      if (ret < 0) {
          av_packet_unref(&filtered_packet);
          return ret;
-@@ -313,7 +317,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
+@@ -315,7 +319,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
          ctx->decoder_flushing = 1;
      }
  
@@ -3120,7 +3150,7 @@ index 27a4c30..17da924 100644
  
      av_packet_unref(&filtered_packet);
  
-@@ -328,7 +332,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
+@@ -330,7 +334,7 @@ static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
      }
  
  error:
@@ -3129,7 +3159,7 @@ index 27a4c30..17da924 100644
  
      if (eret < 0)
          return eret;
-@@ -357,7 +361,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
+@@ -359,7 +363,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
              return ret;
      }
  
@@ -3138,7 +3168,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          return ret;
  
-@@ -375,7 +379,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
+@@ -377,7 +381,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
          params.second_field = parsed_frame.second_field;
          params.top_field_first = parsed_frame.dispinfo.top_field_first;
  
@@ -3147,7 +3177,7 @@ index 27a4c30..17da924 100644
          if (ret < 0)
              goto error;
  
-@@ -405,7 +409,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
+@@ -407,7 +411,7 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
                      .Height        = avctx->height >> (i ? 1 : 0),
                  };
  
@@ -3156,7 +3186,7 @@ index 27a4c30..17da924 100644
                  if (ret < 0)
                      goto error;
  
-@@ -490,9 +494,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
+@@ -492,9 +496,9 @@ FF_ENABLE_DEPRECATION_WARNINGS
  
  error:
      if (mapped_frame)
@@ -3168,7 +3198,7 @@ index 27a4c30..17da924 100644
  
      if (eret < 0)
          return eret;
-@@ -541,19 +545,24 @@ static av_cold int cuvid_decode_end(AVCodecContext *avctx)
+@@ -543,19 +547,24 @@ static av_cold int cuvid_decode_end(AVCodecContext *avctx)
          av_bsf_free(&ctx->bsf);
  
      if (ctx->cuparser)
@@ -3195,7 +3225,7 @@ index 27a4c30..17da924 100644
      CUVIDDECODECREATEINFO cuinfo;
      CUvideodecoder cudec = 0;
      int ret = 0;
-@@ -581,11 +590,11 @@ static int cuvid_test_dummy_decoder(AVCodecContext *avctx, CUVIDPARSERPARAMS *cu
+@@ -583,11 +592,11 @@ static int cuvid_test_dummy_decoder(AVCodecContext *avctx, CUVIDPARSERPARAMS *cu
  
      cuinfo.DeinterlaceMode = cudaVideoDeinterlaceMode_Weave;
  
@@ -3209,7 +3239,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          return ret;
  
-@@ -613,6 +622,13 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -615,6 +624,13 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
          av_log(avctx, AV_LOG_ERROR, "ff_get_format failed: %d\n", ret);
          return ret;
      }
@@ -3223,7 +3253,7 @@ index 27a4c30..17da924 100644
  
      ctx->frame_queue = av_fifo_alloc(MAX_FRAME_COUNT * sizeof(CuvidParsedFrame));
      if (!ctx->frame_queue) {
-@@ -620,8 +636,6 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -622,8 +638,6 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
          goto error;
      }
  
@@ -3232,7 +3262,7 @@ index 27a4c30..17da924 100644
      if (avctx->hw_frames_ctx) {
          ctx->hwframe = av_buffer_ref(avctx->hw_frames_ctx);
          if (!ctx->hwframe) {
-@@ -653,7 +667,9 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -655,7 +669,9 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
  
      device_ctx = hwframe_ctx->device_ctx;
      device_hwctx = device_ctx->hwctx;
@@ -3242,7 +3272,7 @@ index 27a4c30..17da924 100644
  
      memset(&ctx->cuparseinfo, 0, sizeof(ctx->cuparseinfo));
      memset(&ctx->cuparse_ext, 0, sizeof(ctx->cuparse_ext));
-@@ -753,7 +769,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -750,7 +766,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
      ctx->cuparseinfo.pfnDecodePicture = cuvid_handle_picture_decode;
      ctx->cuparseinfo.pfnDisplayPicture = cuvid_handle_picture_display;
  
@@ -3251,7 +3281,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          goto error;
  
-@@ -761,7 +777,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -758,7 +774,7 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
      if (ret < 0)
          goto error;
  
@@ -3260,7 +3290,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          goto error;
  
-@@ -769,12 +785,12 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
+@@ -766,12 +782,12 @@ static av_cold int cuvid_decode_init(AVCodecContext *avctx)
      seq_pkt.payload_size = ctx->cuparse_ext.format.seqhdr_data_length;
  
      if (seq_pkt.payload && seq_pkt.payload_size) {
@@ -3275,7 +3305,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          goto error;
  
-@@ -799,7 +815,7 @@ static void cuvid_flush(AVCodecContext *avctx)
+@@ -796,7 +812,7 @@ static void cuvid_flush(AVCodecContext *avctx)
      CUVIDSOURCEDATAPACKET seq_pkt = { 0 };
      int ret;
  
@@ -3284,7 +3314,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          goto error;
  
-@@ -812,16 +828,16 @@ static void cuvid_flush(AVCodecContext *avctx)
+@@ -809,16 +825,16 @@ static void cuvid_flush(AVCodecContext *avctx)
      }
  
      if (ctx->cudecoder) {
@@ -3304,7 +3334,7 @@ index 27a4c30..17da924 100644
      if (ret < 0)
          goto error;
  
-@@ -829,12 +845,12 @@ static void cuvid_flush(AVCodecContext *avctx)
+@@ -826,12 +842,12 @@ static void cuvid_flush(AVCodecContext *avctx)
      seq_pkt.payload_size = ctx->cuparse_ext.format.seqhdr_data_length;
  
      if (seq_pkt.payload && seq_pkt.payload_size) {
@@ -3320,12 +3350,12 @@ index 27a4c30..17da924 100644
          goto error;
  
 -- 
-2.9.1
+2.10.1
 
 
-From a0376b7b569fbfba4724d69fa1974bf7022d5f55 Mon Sep 17 00:00:00 2001
+From 97ce3aacb1b1e8e66e00df9751c6863f854f3239 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:32 +0200
+Date: Mon, 10 Oct 2016 12:54:42 +0200
 Subject: [PATCH 4/8] avfilter/vf_scale_npp: use dynamically loaded CUDA
 
 ---
@@ -3333,7 +3363,7 @@ Subject: [PATCH 4/8] avfilter/vf_scale_npp: use dynamically loaded CUDA
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/libavfilter/vf_scale_npp.c b/libavfilter/vf_scale_npp.c
-index 35abe39..c84282f 100644
+index 8eafdc8..78f541e 100644
 --- a/libavfilter/vf_scale_npp.c
 +++ b/libavfilter/vf_scale_npp.c
 @@ -29,7 +29,7 @@
@@ -3364,12 +3394,12 @@ index 35abe39..c84282f 100644
          goto fail;
  
 -- 
-2.9.1
+2.10.1
 
 
-From 215f1d58fda141adcbee5ab6a15aa6524e69ae61 Mon Sep 17 00:00:00 2001
+From 2879cd86c5e79d889b114cbacd65e79df40b19f4 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:33 +0200
+Date: Mon, 10 Oct 2016 12:55:59 +0200
 Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
 
 ---
@@ -3379,17 +3409,17 @@ Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
  3 files changed, 26 insertions(+), 150 deletions(-)
 
 diff --git a/configure b/configure
-index db47e76..ef3adbd 100755
+index 94d3ad1..bfea032 100755
 --- a/configure
 +++ b/configure
-@@ -2692,6 +2692,7 @@ vaapi_encode_deps="vaapi"
+@@ -2694,6 +2694,7 @@ vaapi_encode_deps="vaapi"
  hwupload_cuda_filter_deps="cuda"
  scale_npp_filter_deps="cuda libnpp"
  
 +nvenc_deps="cuda"
  nvenc_deps_any="dlopen LoadLibrary"
  nvenc_encoder_deps="nvenc"
- h263_cuvid_decoder_deps="cuda cuvid"
+ h264_cuvid_decoder_deps="cuda cuvid"
 diff --git a/libavcodec/nvenc.c b/libavcodec/nvenc.c
 index 2505c3d..d71a445 100644
 --- a/libavcodec/nvenc.c
@@ -3713,12 +3743,12 @@ index bad659a..5bc0cba 100644
      NV_ENCODE_API_FUNCTION_LIST nvenc_funcs;
      int nvenc_device_count;
 -- 
-2.9.1
+2.10.1
 
 
-From 111a469e33965e7477b62e709bb6eeac64b426dc Mon Sep 17 00:00:00 2001
+From 9f4ef48782a96452c140da1a7853c49192cfe2e3 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:34 +0200
+Date: Mon, 10 Oct 2016 12:56:55 +0200
 Subject: [PATCH 6/8] avfilter/vf_hwupload_cuda: use new hwdevice allocation
  API
 
@@ -3814,12 +3844,12 @@ index c22221c..dba496f 100644
      ret = av_hwframe_ctx_init(s->hwframe);
      if (ret < 0)
 -- 
-2.9.1
+2.10.1
 
 
-From c5f4d0815f9cfd038e404423e139ed74e9c8d953 Mon Sep 17 00:00:00 2001
+From 456f4425475092bcc42182539e5f1d2a44eb154b Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:35 +0200
+Date: Mon, 10 Oct 2016 12:57:29 +0200
 Subject: [PATCH 7/8] avfilter/vf_hwupload_cuda: check ff_formats_ref for
  errors
 
@@ -3857,12 +3887,12 @@ index dba496f..14688df 100644
      return 0;
  }
 -- 
-2.9.1
+2.10.1
 
 
-From 4c5c118c6c36a93f6ee1fb7af07aa8fc42754ca7 Mon Sep 17 00:00:00 2001
+From 3603d507f633092a2170021e41aa25d78fc0b641 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
-Date: Wed, 19 Oct 2016 14:00:36 +0200
+Date: Mon, 10 Oct 2016 12:58:26 +0200
 Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
  autodetect by default
 
@@ -3871,10 +3901,10 @@ Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
  1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/configure b/configure
-index ef3adbd..d9ffec0 100755
+index bfea032..cee51f3 100755
 --- a/configure
 +++ b/configure
-@@ -299,8 +299,8 @@ External library support:
+@@ -298,8 +298,8 @@ External library support:
  
    The following libraries provide various hardware acceleration features:
    --disable-audiotoolbox   disable Apple AudioToolbox code [autodetect]
@@ -3944,5 +3974,5 @@ index ef3adbd..d9ffec0 100755
  
  enabled nvenc &&
 -- 
-2.9.1
+2.10.1
 
