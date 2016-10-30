@@ -393,6 +393,16 @@ do_pack() {
     done
 }
 
+do_zipman() {
+    local file
+    local man_dirs=(/local{32,64}/share/man)
+    local files=$(find ${man_dirs[@]} -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2>/dev/null)
+    for file in $files; do
+        gzip -9 -n -f "$file"
+        rm -f "$file"
+    done
+}
+
 # check if compiled file exist
 do_checkIfExist() {
     local packetName
@@ -1252,6 +1262,8 @@ clean_suite() {
     find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\|_light\)?\$" -print0 |
         xargs -0 rm -f
+    echo -e "\n\t${green}Zipping man files...${reset}"
+    do_zipman
 
     if [[ $deleteSource = y ]]; then
         echo -e "\t${orange}Deleting temporary build dirs...${reset}"
