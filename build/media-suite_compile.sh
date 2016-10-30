@@ -1386,6 +1386,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         hide_conflicting_libs -R
         do_install build/mpv.{exe,com} bin-video/
         ! mpv_disabled manpage-build && [[ -f build/DOCS/man/mpv.1 ]] &&
+            dos2unix -q build/DOCS/man/mpv.1 &&
             do_install build/DOCS/man/mpv.1 share/man/man1/
         if mpv_enabled libmpv-shared; then
             do_install build/mpv-1.dll bin-video/
