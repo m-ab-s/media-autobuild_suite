@@ -1381,17 +1381,14 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
         log build /usr/bin/python waf -j "${cpuCount:-1}"
+        log install /usr/bin/python waf -j "${cpuCount:-1}" install
 
         unset mpv_ldflags replace
         hide_conflicting_libs -R
-        do_install build/mpv.{exe,com} bin-video/
-        ! mpv_disabled manpage-build && [[ -f build/DOCS/man/mpv.1 ]] &&
-            dos2unix -q build/DOCS/man/mpv.1 &&
-            do_install build/DOCS/man/mpv.1 share/man/man1/
+        files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         if mpv_enabled libmpv-shared; then
-            do_install build/mpv-1.dll bin-video/
-            do_install build/libmpv.dll.a lib/
-            do_install libmpv/{{client,opengl_cb,stream_cb}.h,qthelper.hpp} include/mpv/
+            mv -f $LOCALDESTDIR/{bin-video,lib}/libmpv.dll.a
+            mv -f $LOCALDESTDIR/{bin-video,lib}/pkgconfig
             _check+=(bin-video/mpv-1.dll libmpv.dll.a)
         fi
         ! mpv_disabled debug-build &&
