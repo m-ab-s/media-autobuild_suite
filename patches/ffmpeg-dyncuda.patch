@@ -1,4 +1,4 @@
-From f5c6fd2cb0069b8ca4f8dbaece249e5dbf2368ff Mon Sep 17 00:00:00 2001
+From 0579214ce3c64f1188b710a31082c5f9bc9b4b25 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:47:15 +0200
 Subject: [PATCH 1/8] compat/cuda: add dynamic loader
@@ -1527,7 +1527,7 @@ index 0000000..6c197e0
 2.10.1
 
 
-From a7b47ca20f6226bcf537f9897b329a56de99a8e9 Mon Sep 17 00:00:00 2001
+From aabd8588f22f72c18e8f62bc31b95d2b8806894a Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:52:40 +0200
 Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
@@ -1541,7 +1541,7 @@ Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
  create mode 100644 libavutil/hwcontext_cuda_internal.h
 
 diff --git a/configure b/configure
-index d2ab550..94d3ad1 100755
+index 87b06f1..06cb5d2 100755
 --- a/configure
 +++ b/configure
 @@ -2539,6 +2539,7 @@ audiotoolbox_extralibs="-framework CoreFoundation -framework AudioToolbox -frame
@@ -1552,10 +1552,10 @@ index d2ab550..94d3ad1 100755
  cuvid_deps="cuda"
  d3d11va_deps="d3d11_h dxva_h ID3D11VideoDecoder ID3D11VideoContext"
  dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode"
-@@ -5414,6 +5415,7 @@ elif check_func dlopen -ldl && check_func dlsym -ldl; then
-     ldl=-ldl
+@@ -5416,6 +5417,7 @@ elif check_func dlopen -ldl && check_func dlsym -ldl; then
  fi
  
+ avisynth_demuxer_extralibs='$ldl'
 +cuda_extralibs='$ldl'
  decklink_outdev_extralibs="$decklink_outdev_extralibs $ldl"
  decklink_indev_extralibs="$decklink_indev_extralibs $ldl"
@@ -1875,7 +1875,7 @@ index 0000000..e1bc6ff
 2.10.1
 
 
-From 3318eda00df965d1db758adf377f0c9350507d88 Mon Sep 17 00:00:00 2001
+From cdd6492eba7d4674918338e2f5a897bd26fff67f Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:53:49 +0200
 Subject: [PATCH 3/8] avcodec/cuvid: use dynamically loaded CUDA/CUVID
@@ -3353,7 +3353,7 @@ index eafce0a..c3e831a 100644
 2.10.1
 
 
-From 97ce3aacb1b1e8e66e00df9751c6863f854f3239 Mon Sep 17 00:00:00 2001
+From 0ee0b6cf51877bb70758ace5ed28a4987256e1ee Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:54:42 +0200
 Subject: [PATCH 4/8] avfilter/vf_scale_npp: use dynamically loaded CUDA
@@ -3397,19 +3397,19 @@ index 8eafdc8..78f541e 100644
 2.10.1
 
 
-From 2879cd86c5e79d889b114cbacd65e79df40b19f4 Mon Sep 17 00:00:00 2001
+From 2687833ef83040ad5b883fcab5fcf8336f8c15ad Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:55:59 +0200
 Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
 
 ---
  configure          |   1 +
- libavcodec/nvenc.c | 129 +++++++++--------------------------------------------
- libavcodec/nvenc.h |  46 ++-----------------
- 3 files changed, 26 insertions(+), 150 deletions(-)
+ libavcodec/nvenc.c | 125 ++++++++++-------------------------------------------
+ libavcodec/nvenc.h |  46 ++------------------
+ 3 files changed, 26 insertions(+), 146 deletions(-)
 
 diff --git a/configure b/configure
-index 94d3ad1..bfea032 100755
+index 06cb5d2..9fe054a 100755
 --- a/configure
 +++ b/configure
 @@ -2694,6 +2694,7 @@ vaapi_encode_deps="vaapi"
@@ -3421,10 +3421,10 @@ index 94d3ad1..bfea032 100755
  nvenc_encoder_deps="nvenc"
  h264_cuvid_decoder_deps="cuda cuvid"
 diff --git a/libavcodec/nvenc.c b/libavcodec/nvenc.c
-index 2505c3d..d71a445 100644
+index a3a2ef5..d71a445 100644
 --- a/libavcodec/nvenc.c
 +++ b/libavcodec/nvenc.c
-@@ -21,60 +21,20 @@
+@@ -21,56 +21,20 @@
  
  #include "config.h"
  
@@ -3441,11 +3441,7 @@ index 2505c3d..d71a445 100644
 -#endif
 -
 -#if defined(_WIN32)
--#include <windows.h>
--
--#define dlopen(filename, flags) LoadLibrary(TEXT(filename))
--#define dlsym(handle, symbol)   GetProcAddress(handle, symbol)
--#define dlclose(handle)         FreeLibrary(handle)
+-#include "compat/w32dlfcn.h"
 -#else
 -#include <dlfcn.h>
 -#endif
@@ -3487,7 +3483,7 @@ index 2505c3d..d71a445 100644
  const enum AVPixelFormat ff_nvenc_pix_fmts[] = {
      AV_PIX_FMT_YUV420P,
      AV_PIX_FMT_NV12,
-@@ -83,9 +43,7 @@ const enum AVPixelFormat ff_nvenc_pix_fmts[] = {
+@@ -79,9 +43,7 @@ const enum AVPixelFormat ff_nvenc_pix_fmts[] = {
      AV_PIX_FMT_YUV444P16,
      AV_PIX_FMT_0RGB32,
      AV_PIX_FMT_0BGR32,
@@ -3497,7 +3493,7 @@ index 2505c3d..d71a445 100644
      AV_PIX_FMT_NONE
  };
  
-@@ -157,42 +115,19 @@ static av_cold int nvenc_load_libraries(AVCodecContext *avctx)
+@@ -153,42 +115,19 @@ static av_cold int nvenc_load_libraries(AVCodecContext *avctx)
  {
      NvencContext *ctx = avctx->priv_data;
      NvencDynLoadFunctions *dl_fn = &ctx->nvenc_dload_funcs;
@@ -3548,7 +3544,7 @@ index 2505c3d..d71a445 100644
      if (err != NV_ENC_SUCCESS)
          return nvenc_print_error(avctx, err, "Failed to query nvenc max version");
  
-@@ -208,7 +143,7 @@ static av_cold int nvenc_load_libraries(AVCodecContext *avctx)
+@@ -204,7 +143,7 @@ static av_cold int nvenc_load_libraries(AVCodecContext *avctx)
  
      dl_fn->nvenc_funcs.version = NV_ENCODE_API_FUNCTION_LIST_VER;
  
@@ -3557,7 +3553,7 @@ index 2505c3d..d71a445 100644
      if (err != NV_ENC_SUCCESS)
          return nvenc_print_error(avctx, err, "Failed to create nvenc instance");
  
-@@ -380,7 +315,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
+@@ -376,7 +315,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
      if (ctx->device == LIST_DEVICES)
          loglevel = AV_LOG_INFO;
  
@@ -3566,7 +3562,7 @@ index 2505c3d..d71a445 100644
      if (cu_res != CUDA_SUCCESS) {
          av_log(avctx, AV_LOG_ERROR,
                 "Cannot access the CUDA device %d\n",
-@@ -388,11 +323,11 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
+@@ -384,11 +323,11 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
          return -1;
      }
  
@@ -3580,7 +3576,7 @@ index 2505c3d..d71a445 100644
      if (cu_res != CUDA_SUCCESS)
          return -1;
  
-@@ -402,7 +337,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
+@@ -398,7 +337,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
          goto fail;
      }
  
@@ -3589,7 +3585,7 @@ index 2505c3d..d71a445 100644
      if (cu_res != CUDA_SUCCESS) {
          av_log(avctx, AV_LOG_FATAL, "Failed creating CUDA context for NVENC: 0x%x\n", (int)cu_res);
          goto fail;
-@@ -410,7 +345,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
+@@ -406,7 +345,7 @@ static av_cold int nvenc_check_device(AVCodecContext *avctx, int idx)
  
      ctx->cu_context = ctx->cu_context_internal;
  
@@ -3598,7 +3594,7 @@ index 2505c3d..d71a445 100644
      if (cu_res != CUDA_SUCCESS) {
          av_log(avctx, AV_LOG_FATAL, "Failed popping CUDA context: 0x%x\n", (int)cu_res);
          goto fail2;
-@@ -434,7 +369,7 @@ fail3:
+@@ -430,7 +369,7 @@ fail3:
      ctx->nvencoder = NULL;
  
  fail2:
@@ -3607,7 +3603,7 @@ index 2505c3d..d71a445 100644
      ctx->cu_context_internal = NULL;
  
  fail:
-@@ -458,7 +393,6 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
+@@ -454,7 +393,6 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
      }
  
      if (avctx->pix_fmt == AV_PIX_FMT_CUDA) {
@@ -3615,7 +3611,7 @@ index 2505c3d..d71a445 100644
          AVHWFramesContext   *frames_ctx;
          AVCUDADeviceContext *device_hwctx;
          int ret;
-@@ -480,19 +414,16 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
+@@ -476,19 +414,16 @@ static av_cold int nvenc_setup_device(AVCodecContext *avctx)
              av_log(avctx, AV_LOG_FATAL, "Provided device doesn't support required NVENC features\n");
              return ret;
          }
@@ -3637,7 +3633,7 @@ index 2505c3d..d71a445 100644
              av_log(avctx, AV_LOG_ERROR,
                     "Cannot enumerate the CUDA devices\n");
              return AVERROR_UNKNOWN;
-@@ -1269,30 +1200,14 @@ av_cold int ff_nvenc_encode_close(AVCodecContext *avctx)
+@@ -1265,30 +1200,14 @@ av_cold int ff_nvenc_encode_close(AVCodecContext *avctx)
      ctx->nvencoder = NULL;
  
      if (ctx->cu_context_internal)
@@ -3746,7 +3742,7 @@ index bad659a..5bc0cba 100644
 2.10.1
 
 
-From 9f4ef48782a96452c140da1a7853c49192cfe2e3 Mon Sep 17 00:00:00 2001
+From c5a54aba8f588af345243344972ba186bb7a621c Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:56:55 +0200
 Subject: [PATCH 6/8] avfilter/vf_hwupload_cuda: use new hwdevice allocation
@@ -3847,7 +3843,7 @@ index c22221c..dba496f 100644
 2.10.1
 
 
-From 456f4425475092bcc42182539e5f1d2a44eb154b Mon Sep 17 00:00:00 2001
+From 463886b1c3121fa3019cbab661c4e37254bca78b Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:57:29 +0200
 Subject: [PATCH 7/8] avfilter/vf_hwupload_cuda: check ff_formats_ref for
@@ -3890,7 +3886,7 @@ index dba496f..14688df 100644
 2.10.1
 
 
-From 3603d507f633092a2170021e41aa25d78fc0b641 Mon Sep 17 00:00:00 2001
+From 985620a2d9057f29cae48d147f4aebd1d7e619ad Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:58:26 +0200
 Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
@@ -3901,7 +3897,7 @@ Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
  1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/configure b/configure
-index bfea032..cee51f3 100755
+index 9fe054a..4a48a52 100755
 --- a/configure
 +++ b/configure
 @@ -298,8 +298,8 @@ External library support:
@@ -3915,7 +3911,7 @@ index bfea032..cee51f3 100755
    --disable-d3d11va        disable Microsoft Direct3D 11 video acceleration code [autodetect]
    --disable-dxva2          disable Microsoft DirectX 9 video acceleration code [autodetect]
    --enable-libmfx          enable Intel MediaSDK (AKA Quick Sync Video) code via libmfx [no]
-@@ -3231,7 +3231,7 @@ enable audiotoolbox
+@@ -3232,7 +3232,7 @@ enable audiotoolbox
  enable d3d11va dxva2 vaapi vda vdpau videotoolbox_hwaccel xvmc
  enable xlib
  
@@ -3924,7 +3920,7 @@ index bfea032..cee51f3 100755
  
  # build settings
  SHFLAGS='-shared -Wl,-soname,$$(@F)'
-@@ -5082,8 +5082,6 @@ die_license_disabled gpl libxavs
+@@ -5083,8 +5083,6 @@ die_license_disabled gpl libxavs
  die_license_disabled gpl libxvid
  die_license_disabled gpl x11grab
  
@@ -3933,7 +3929,7 @@ index bfea032..cee51f3 100755
  die_license_disabled nonfree libnpp
  enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
  enabled gpl && die_license_disabled_gpl nonfree openssl
-@@ -5655,11 +5653,6 @@ for func in $COMPLEX_FUNCS; do
+@@ -5657,21 +5655,11 @@ for func in $COMPLEX_FUNCS; do
      eval check_complexfunc $func \${${func}_args:-1}
  done
  
@@ -3945,10 +3941,7 @@ index bfea032..cee51f3 100755
  # these are off by default, so fail if requested and not available
  enabled avfoundation_indev && { check_header_objcc AVFoundation/AVFoundation.h || disable avfoundation_indev; }
  enabled avfoundation_indev && { check_lib2 CoreGraphics/CoreGraphics.h CGGetActiveDisplayList -framework CoreGraphics ||
-@@ -5667,12 +5660,7 @@ enabled avfoundation_indev && { check_lib2 CoreGraphics/CoreGraphics.h CGGetActi
- enabled avisynth          && { { check_lib2 "windows.h" LoadLibrary; } ||
-                                { check_lib2 "dlfcn.h" dlopen -ldl; } ||
-                                die "ERROR: LoadLibrary/dlopen not found for avisynth"; }
+                                 check_lib2 ApplicationServices/ApplicationServices.h CGGetActiveDisplayList -framework ApplicationServices; }
 -enabled cuda              && { check_lib cuda.h cuInit -lcuda ||
 -                               die "ERROR: CUDA not found"; }
 -enabled cuvid             && { add_cflags -I$source_path;
@@ -3959,7 +3952,7 @@ index bfea032..cee51f3 100755
                                 die "ERROR: CUVID requires CUDA"; }
  enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_version -lchromaprint
  enabled coreimage_filter  && { check_header_objcc QuartzCore/CoreImage.h || disable coreimage_filter; }
-@@ -6025,11 +6013,11 @@ if enabled x86; then
+@@ -6024,11 +6012,11 @@ if enabled x86; then
          mingw32*|mingw64*|win32|win64|linux|cygwin*)
              ;;
          *)
