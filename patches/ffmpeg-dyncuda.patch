@@ -1,4 +1,4 @@
-From 0579214ce3c64f1188b710a31082c5f9bc9b4b25 Mon Sep 17 00:00:00 2001
+From 74aca44fdfeebf75edc6e23338554c66b48dc124 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:47:15 +0200
 Subject: [PATCH 1/8] compat/cuda: add dynamic loader
@@ -6,9 +6,9 @@ Subject: [PATCH 1/8] compat/cuda: add dynamic loader
 ---
  compat/cuda/dynlink_cuda.h     |  97 +++++
  compat/cuda/dynlink_cuviddec.h | 808 +++++++++++++++++++++++++++++++++++++++++
- compat/cuda/dynlink_loader.h   | 263 ++++++++++++++
+ compat/cuda/dynlink_loader.h   | 254 +++++++++++++
  compat/cuda/dynlink_nvcuvid.h  | 316 ++++++++++++++++
- 4 files changed, 1484 insertions(+)
+ 4 files changed, 1475 insertions(+)
  create mode 100644 compat/cuda/dynlink_cuda.h
  create mode 100644 compat/cuda/dynlink_cuviddec.h
  create mode 100644 compat/cuda/dynlink_loader.h
@@ -933,10 +933,10 @@ index 0000000..17207bc
 +#endif // __CUDA_VIDEO_H__
 diff --git a/compat/cuda/dynlink_loader.h b/compat/cuda/dynlink_loader.h
 new file mode 100644
-index 0000000..9c4809d
+index 0000000..33f23af
 --- /dev/null
 +++ b/compat/cuda/dynlink_loader.h
-@@ -0,0 +1,263 @@
+@@ -0,0 +1,254 @@
 +/*
 + * This copyright notice applies to this header file only:
 + *
@@ -970,18 +970,14 @@ index 0000000..9c4809d
 +#include "compat/cuda/dynlink_cuda.h"
 +#include "compat/cuda/dynlink_nvcuvid.h"
 +#include "compat/nvenc/nvEncodeAPI.h"
++#include "compat/w32dlfcn.h"
 +
 +#include "libavutil/log.h"
 +#include "libavutil/error.h"
 +
 +#if defined(_WIN32)
-+# include <windows.h>
-+# define dlopen(filename, flags) LoadLibrary(TEXT(filename))
-+# define dlsym(handle, symbol) GetProcAddress(handle, symbol)
-+# define dlclose(handle) FreeLibrary(handle)
 +# define LIB_HANDLE HMODULE
 +#else
-+# include <dlfcn.h>
 +# define LIB_HANDLE void*
 +#endif
 +
@@ -1193,14 +1189,8 @@ index 0000000..9c4809d
 +#undef NVENC_LIBNAME
 +#undef LIB_HANDLE
 +
-+#if defined(_WIN32)
-+#undef dlopen
-+#undef dlsym
-+#undef dlclose
 +#endif
 +
-+#endif
-\ No newline at end of file
 diff --git a/compat/cuda/dynlink_nvcuvid.h b/compat/cuda/dynlink_nvcuvid.h
 new file mode 100644
 index 0000000..6c197e0
@@ -1527,7 +1517,7 @@ index 0000000..6c197e0
 2.10.1
 
 
-From aabd8588f22f72c18e8f62bc31b95d2b8806894a Mon Sep 17 00:00:00 2001
+From c051034f82a416ff98c11f0e9378d0cdb7bf4608 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:52:40 +0200
 Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
@@ -1875,7 +1865,7 @@ index 0000000..e1bc6ff
 2.10.1
 
 
-From cdd6492eba7d4674918338e2f5a897bd26fff67f Mon Sep 17 00:00:00 2001
+From 176b126dab0bee037e12bc605ffe410d83e703c1 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:53:49 +0200
 Subject: [PATCH 3/8] avcodec/cuvid: use dynamically loaded CUDA/CUVID
@@ -3353,7 +3343,7 @@ index eafce0a..c3e831a 100644
 2.10.1
 
 
-From 0ee0b6cf51877bb70758ace5ed28a4987256e1ee Mon Sep 17 00:00:00 2001
+From 83fd5aa09f5ee246e63bdd4e7e6913b9e1ae973f Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:54:42 +0200
 Subject: [PATCH 4/8] avfilter/vf_scale_npp: use dynamically loaded CUDA
@@ -3397,7 +3387,7 @@ index 8eafdc8..78f541e 100644
 2.10.1
 
 
-From 2687833ef83040ad5b883fcab5fcf8336f8c15ad Mon Sep 17 00:00:00 2001
+From cbb5595833b643355166dd157b42896d4cc0dd1e Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:55:59 +0200
 Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
@@ -3742,7 +3732,7 @@ index bad659a..5bc0cba 100644
 2.10.1
 
 
-From c5a54aba8f588af345243344972ba186bb7a621c Mon Sep 17 00:00:00 2001
+From 4897c8b5c86d456b74b8c69d594e97675b14bad8 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:56:55 +0200
 Subject: [PATCH 6/8] avfilter/vf_hwupload_cuda: use new hwdevice allocation
@@ -3843,7 +3833,7 @@ index c22221c..dba496f 100644
 2.10.1
 
 
-From 463886b1c3121fa3019cbab661c4e37254bca78b Mon Sep 17 00:00:00 2001
+From ac9e9b6853f101caf273813751894b0e5aff0049 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:57:29 +0200
 Subject: [PATCH 7/8] avfilter/vf_hwupload_cuda: check ff_formats_ref for
@@ -3886,7 +3876,7 @@ index dba496f..14688df 100644
 2.10.1
 
 
-From 985620a2d9057f29cae48d147f4aebd1d7e619ad Mon Sep 17 00:00:00 2001
+From 77c1e8bec7b63857dadef57e325f30ad380b47c4 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:58:26 +0200
 Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
