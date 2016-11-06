@@ -794,7 +794,7 @@ if [[ $mediainfo = "y" ]]; then
     _check=(libzen.{a,pc})
     if do_vcs "https://github.com/MediaArea/ZenLib" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
-        sed -i -e 's|SIZE_T_SIZE EQUAL LONG_SIZE|false|' -e 's|NOT WIN32|NOT MSVC|' Project/CMake/CMakeLists.txt
+        sed -i 's|NOT WIN32|NOT MSVC|' Project/CMake/CMakeLists.txt
         do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
