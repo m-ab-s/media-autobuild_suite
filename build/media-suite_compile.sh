@@ -1146,7 +1146,8 @@ if [[ $ffmpeg != "n" ]]; then
         sedflags="prefix|bindir|extra-(cflags|libs|ldflags|version)|pkg-config-flags"
 
         # shared
-        if [[ $ffmpeg != "y" ]] && [[ ! -f build_successful${bits}_shared ]]; then
+        if [[ $ffmpeg != "y" ]] && _check+=(bin-video/ffmpegSHARED) &&
+            [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold}shared${reset} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
@@ -1158,7 +1159,6 @@ if [[ $ffmpeg != "n" ]]; then
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
             if ! disabled_any programs avcodec avformat; then
-                _check+=(bin-video/ffmpegSHARED)
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpegSHARED/bin/ffmpeg.exe)
                 fi
@@ -1169,11 +1169,10 @@ if [[ $ffmpeg != "n" ]]; then
         fi
 
         # static
-        if [[ $ffmpeg != "s" ]]; then
+        if [[ $ffmpeg != "s" ]] && _check+=(libavutil.{a,pc}); then
             do_print_progress "Compiling ${bold}static${reset} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             if ! disabled_any programs avcodec avformat; then
-                _check+=(libavutil.{a,pc})
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
                     disabled_any sdl2 ffplay || _check+=(bin-video/ffplay.exe)
