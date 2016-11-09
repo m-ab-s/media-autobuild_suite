@@ -1426,7 +1426,7 @@ if [[ $bmx = "y" ]]; then
         do_checkIfExist
     fi
 
-    _check=(bin-video/{bmxtranswrap,{h264,mov}dump,mxf2raw,raw2bmx}.exe)
+    _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
     _deps=(lib{uriparser,MXF{,++}-1.0,curl}.a)
     if do_vcs http://git.code.sf.net/p/bmxlib/bmx; then
         do_autogen
