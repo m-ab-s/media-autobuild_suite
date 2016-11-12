@@ -603,8 +603,8 @@ do_getFFmpegConfig() {
     fi
 
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac} &&
-        do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac)" &&
-        sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac);;g' \
+        do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)" &&
+        sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128);;g' \
         "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 

@@ -90,6 +90,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     share/aclocal/{ogg,vorbis}.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
     bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
+    libebur128.a ebur128.h
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -596,16 +597,6 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_install sox.pc
     hide_conflicting_libs -R
     do_checkIfExist
-fi
-
-_check=(libebur128.a ebur128.h)
-if [[ $ffmpeg != n ]] && enabled libebur128 && ! files_exist "${_check[@]}" &&
-    do_vcs "https://github.com/jiixyj/libebur128.git"; then
-    do_uninstall "${_check[@]}"
-    do_cmakeinstall -DENABLE_INTERNAL_QUEUE_H=on
-    do_uninstall q "$LOCALDESTDIR"/lib/libebur128.dll{,.a}
-    do_checkIfExist
-    add_to_remove
 fi
 
 _check=(libopenmpt.{a,pc})

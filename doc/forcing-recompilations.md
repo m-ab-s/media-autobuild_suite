@@ -47,7 +47,6 @@ zvbi-0.2 (libzvbi)
 ## Libraries not using pkg-config
 To recompile these libs, delete `<libname>.a` with the same name in `/local32/lib` or `/local64/lib`:
 ```
-libebur128
 libxavs
 libsoxr (sox resampling library only)
 ```

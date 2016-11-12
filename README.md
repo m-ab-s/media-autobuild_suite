@@ -76,7 +76,6 @@ Included Tools And Libraries
         - chromaprint (git)
         - cuda/cuvid (needs CUDA SDK)
         - libcdio (mingw)
-        - libebur128 (git snapshot)
         - libfdk-aac (git)
         - libkvazaar (git)
         - libnpp (needs CUDA SDK)
