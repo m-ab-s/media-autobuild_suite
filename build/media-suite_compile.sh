@@ -1124,7 +1124,8 @@ if [[ $ffmpeg != "n" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
-        enabled cuda && do_patch ffmpeg-dyncuda.patch am
+        enabled cuda && { do_patch ffmpeg-dyncuda.patch am ||
+            do_removeOption '--enable-(cuda|cuvid)'; }
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
