@@ -1,4 +1,4 @@
-From 74aca44fdfeebf75edc6e23338554c66b48dc124 Mon Sep 17 00:00:00 2001
+From 6108b5ab4f688afb77f0c66322c46f675cf965f7 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:47:15 +0200
 Subject: [PATCH 1/8] compat/cuda: add dynamic loader
@@ -1517,7 +1517,7 @@ index 0000000..6c197e0
 2.10.1
 
 
-From c051034f82a416ff98c11f0e9378d0cdb7bf4608 Mon Sep 17 00:00:00 2001
+From 388798f7a7220fbac37bdd35d73e7357d76413c5 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:52:40 +0200
 Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
@@ -1531,10 +1531,10 @@ Subject: [PATCH 2/8] avutil/hwcontext_cuda: use dynamically loaded CUDA
  create mode 100644 libavutil/hwcontext_cuda_internal.h
 
 diff --git a/configure b/configure
-index 87b06f1..06cb5d2 100755
+index c00c591..bbde5e1 100755
 --- a/configure
 +++ b/configure
-@@ -2539,6 +2539,7 @@ audiotoolbox_extralibs="-framework CoreFoundation -framework AudioToolbox -frame
+@@ -2536,6 +2536,7 @@ audiotoolbox_extralibs="-framework CoreFoundation -framework AudioToolbox -frame
  
  # hardware accelerators
  crystalhd_deps="libcrystalhd_libcrystalhd_if_h"
@@ -1542,7 +1542,7 @@ index 87b06f1..06cb5d2 100755
  cuvid_deps="cuda"
  d3d11va_deps="d3d11_h dxva_h ID3D11VideoDecoder ID3D11VideoContext"
  dxva2_deps="dxva2api_h DXVA2_ConfigPictureDecode"
-@@ -5416,6 +5417,7 @@ elif check_func dlopen -ldl && check_func dlsym -ldl; then
+@@ -5412,6 +5413,7 @@ elif check_func dlopen -ldl && check_func dlsym -ldl; then
  fi
  
  avisynth_demuxer_extralibs='$ldl'
@@ -1865,7 +1865,7 @@ index 0000000..e1bc6ff
 2.10.1
 
 
-From 176b126dab0bee037e12bc605ffe410d83e703c1 Mon Sep 17 00:00:00 2001
+From 0491af28d32aebfa6bf79e0586070c673eb4d6f4 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:53:49 +0200
 Subject: [PATCH 3/8] avcodec/cuvid: use dynamically loaded CUDA/CUVID
@@ -3343,7 +3343,7 @@ index eafce0a..c3e831a 100644
 2.10.1
 
 
-From 83fd5aa09f5ee246e63bdd4e7e6913b9e1ae973f Mon Sep 17 00:00:00 2001
+From e998d692f9cd380ecd52b41dc281eff0df634ba0 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:54:42 +0200
 Subject: [PATCH 4/8] avfilter/vf_scale_npp: use dynamically loaded CUDA
@@ -3387,7 +3387,7 @@ index 8eafdc8..78f541e 100644
 2.10.1
 
 
-From cbb5595833b643355166dd157b42896d4cc0dd1e Mon Sep 17 00:00:00 2001
+From 69bacaba759d5e046204435161aa4525ee4010fa Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:55:59 +0200
 Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
@@ -3399,10 +3399,10 @@ Subject: [PATCH 5/8] avcodec/nvenc: use dynamically loaded CUDA
  3 files changed, 26 insertions(+), 146 deletions(-)
 
 diff --git a/configure b/configure
-index 06cb5d2..9fe054a 100755
+index bbde5e1..05da8cd 100755
 --- a/configure
 +++ b/configure
-@@ -2694,6 +2694,7 @@ vaapi_encode_deps="vaapi"
+@@ -2691,6 +2691,7 @@ vaapi_encode_deps="vaapi"
  hwupload_cuda_filter_deps="cuda"
  scale_npp_filter_deps="cuda libnpp"
  
@@ -3732,7 +3732,7 @@ index bad659a..5bc0cba 100644
 2.10.1
 
 
-From 4897c8b5c86d456b74b8c69d594e97675b14bad8 Mon Sep 17 00:00:00 2001
+From 010fcc0683bbb7483734087de83fd234fd7b6cca Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:56:55 +0200
 Subject: [PATCH 6/8] avfilter/vf_hwupload_cuda: use new hwdevice allocation
@@ -3833,7 +3833,7 @@ index c22221c..dba496f 100644
 2.10.1
 
 
-From ac9e9b6853f101caf273813751894b0e5aff0049 Mon Sep 17 00:00:00 2001
+From ac2dd4b2c3d49027c35b0347c10b765491419509 Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:57:29 +0200
 Subject: [PATCH 7/8] avfilter/vf_hwupload_cuda: check ff_formats_ref for
@@ -3876,7 +3876,7 @@ index dba496f..14688df 100644
 2.10.1
 
 
-From 77c1e8bec7b63857dadef57e325f30ad380b47c4 Mon Sep 17 00:00:00 2001
+From e5525cd010dc03693493afd47d7d706df3e0d54b Mon Sep 17 00:00:00 2001
 From: Timo Rothenpieler <timo@rothenpieler.org>
 Date: Mon, 10 Oct 2016 12:58:26 +0200
 Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
@@ -3887,10 +3887,10 @@ Subject: [PATCH 8/8] configure: cuda is no longer nonfree, enable and
  1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/configure b/configure
-index 9fe054a..4a48a52 100755
+index 05da8cd..2be7361 100755
 --- a/configure
 +++ b/configure
-@@ -298,8 +298,8 @@ External library support:
+@@ -296,8 +296,8 @@ External library support:
  
    The following libraries provide various hardware acceleration features:
    --disable-audiotoolbox   disable Apple AudioToolbox code [autodetect]
@@ -3901,7 +3901,7 @@ index 9fe054a..4a48a52 100755
    --disable-d3d11va        disable Microsoft Direct3D 11 video acceleration code [autodetect]
    --disable-dxva2          disable Microsoft DirectX 9 video acceleration code [autodetect]
    --enable-libmfx          enable Intel MediaSDK (AKA Quick Sync Video) code via libmfx [no]
-@@ -3232,7 +3232,7 @@ enable audiotoolbox
+@@ -3228,7 +3228,7 @@ enable audiotoolbox
  enable d3d11va dxva2 vaapi vda vdpau videotoolbox_hwaccel xvmc
  enable xlib
  
@@ -3910,7 +3910,7 @@ index 9fe054a..4a48a52 100755
  
  # build settings
  SHFLAGS='-shared -Wl,-soname,$$(@F)'
-@@ -5083,8 +5083,6 @@ die_license_disabled gpl libxavs
+@@ -5079,8 +5079,6 @@ die_license_disabled gpl libxavs
  die_license_disabled gpl libxvid
  die_license_disabled gpl x11grab
  
@@ -3919,7 +3919,7 @@ index 9fe054a..4a48a52 100755
  die_license_disabled nonfree libnpp
  enabled gpl && die_license_disabled_gpl nonfree libfdk_aac
  enabled gpl && die_license_disabled_gpl nonfree openssl
-@@ -5657,21 +5655,11 @@ for func in $COMPLEX_FUNCS; do
+@@ -5653,21 +5651,11 @@ for func in $COMPLEX_FUNCS; do
      eval check_complexfunc $func \${${func}_args:-1}
  done
  
@@ -3932,17 +3932,17 @@ index 9fe054a..4a48a52 100755
  enabled avfoundation_indev && { check_header_objcc AVFoundation/AVFoundation.h || disable avfoundation_indev; }
  enabled avfoundation_indev && { check_lib2 CoreGraphics/CoreGraphics.h CGGetActiveDisplayList -framework CoreGraphics ||
                                  check_lib2 ApplicationServices/ApplicationServices.h CGGetActiveDisplayList -framework ApplicationServices; }
--enabled cuda              && { check_lib cuda.h cuInit -lcuda ||
+-enabled cuda              && { check_lib2 cuda.h cuInit -lcuda ||
 -                               die "ERROR: CUDA not found"; }
 -enabled cuvid             && { add_cflags -I$source_path;
--                               check_lib "compat/cuda/cuviddec.h" cuvidCreateDecoder -lnvcuvid ||
+-                               check_lib2 "compat/cuda/cuviddec.h" cuvidCreateDecoder -lnvcuvid ||
 -                               die "ERROR: CUVID not found"; } &&
 -                             { enabled cuda ||
 +enabled cuvid             && { enabled cuda ||
                                 die "ERROR: CUVID requires CUDA"; }
  enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_version -lchromaprint
  enabled coreimage_filter  && { check_header_objcc QuartzCore/CoreImage.h || disable coreimage_filter; }
-@@ -6024,11 +6012,11 @@ if enabled x86; then
+@@ -6019,11 +6007,11 @@ if enabled x86; then
          mingw32*|mingw64*|win32|win64|linux|cygwin*)
              ;;
          *)
