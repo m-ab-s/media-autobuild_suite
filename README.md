@@ -56,7 +56,7 @@ Included Tools And Libraries
         - libmfx (git)
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
-        - libopenjpeg2 (git)
+        - libopenjpeg2 (mingw)
         - librtmp (git)
             - compiled with gnutls or openssl depending on license chosen
         - libschroedinger (mingw)
@@ -104,7 +104,7 @@ Included Tools And Libraries
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - uchardet (mingw)
-        - ANGLE (git snapshot)
+        - ANGLE (pre-built libs/git snapshot)
         - luajit (mingw)
         - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)
