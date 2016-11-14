@@ -79,7 +79,7 @@ Included Tools And Libraries
         - libfdk-aac (git)
         - libkvazaar (git)
         - libnpp (needs CUDA SDK)
-        - libopenh264 (git)
+        - libopenh264 (mingw)
         - libopenmpt (git)
         - librubberband (git snapshot)
         - libssh (mingw)

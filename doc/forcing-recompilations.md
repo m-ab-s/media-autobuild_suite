@@ -30,7 +30,6 @@ librtmp
 libwebp
 libzen
 lsmash
-openh264
 rubberband
 sndfile
 speex

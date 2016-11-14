@@ -82,15 +82,16 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2,luajit-5.1,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
-    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet}
+    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     opus/opusfile.h regex.h magic.h
     {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl,luajit,uchardet}.pc
-    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc
+    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
     share/aclocal/{ogg,vorbis}.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
     bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
     libebur128.a ebur128.h
+    libopenh264.a
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -1066,15 +1067,6 @@ else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
 
-_check=(libopenh264.a openh264.pc wels/codec_api.h)
-if [[ $ffmpeg != "n" ]] && enabled libopenh264 &&
-    do_vcs https://github.com/cisco/openh264.git; then
-    do_uninstall include/wels "${_check[@]}"
-    create_build_dir
-    do_make -f ../Makefile AR=ar ARCH="$CARCH" OS=mingw_nt PREFIX="$LOCALDESTDIR" install-static
-    do_checkIfExist
-fi
-
 if [[ $ffmpeg != "n" ]]; then
     enabled libschroedinger && do_pacman_install schroedinger
     enabled libgsm && do_pacman_install gsm
@@ -1108,6 +1100,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install SDL2
     fi
     enabled libopenjpeg && do_pacman_install openjpeg2
+    enabled libopenh264 && do_pacman_install openh264
 
     do_hide_all_sharedlibs
 
