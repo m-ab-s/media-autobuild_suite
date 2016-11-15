@@ -602,7 +602,7 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(lib(mfx|caca)|decklink|tesseract|opencl)"
     fi
 
-    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac} &&
+    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128} &&
         do_removeOption "--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)" &&
         sed -ri 's;--enable-lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128);;g' \
         "$LOCALBUILDDIR/ffmpeg_options.txt"
