@@ -366,7 +366,7 @@ fi
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
 if { { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     { ! pc_exists zimg && ! mpv_disabled vapoursynth; }; } &&
-    do_vcs "https://github.com/sekrit-twc/zimg.git" then
+    do_vcs "https://github.com/sekrit-twc/zimg.git"; then
     do_uninstall "${_check[@]}"
     do_autoreconf
     do_separate_confmakeinstall
