@@ -161,6 +161,17 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_separate_confmakeinstall global --disable-{deprecated,debug} --with-glib=no
         do_checkIfExist
     fi
+
+    _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
+    _deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
+    if do_vcs "https://github.com/libass/libass.git"; then
+        do_autoreconf
+        do_uninstall "${_check[@]}"
+        extracommands=()
+        enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
+        do_separate_confmakeinstall "${extracommands[@]}"
+        do_checkIfExist
+    fi
 fi
 
 _check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
@@ -343,9 +354,7 @@ fi
 
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
-    ! mpv_disabled rubberband; } && { do_pkgConfig "rubberband = 1.8.1" ||
-    { test_newer installed "$(find "$MINGW_PREFIX/lib/" -name libstdc++.a)" rubberband.pc &&
-    do_uninstall rubberband.pc; }; } &&
+    ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1" &&
     do_vcs https://github.com/lachs0r/rubberband.git; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
@@ -354,15 +363,14 @@ if { { [[ $ffmpeg != "n" ]] && enabled librubberband; } ||
     add_to_remove
 fi
 
-if { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
-    { ! pc_exists zimg && ! mpv_disabled vapoursynth; } then
-    _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
-    if do_vcs "https://github.com/sekrit-twc/zimg.git"; then
-        do_uninstall "${_check[@]}"
-        do_autoreconf
-        do_separate_confmakeinstall
-        do_checkIfExist
-    fi
+_check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
+if { { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
+    { ! pc_exists zimg && ! mpv_disabled vapoursynth; }; } &&
+    do_vcs "https://github.com/sekrit-twc/zimg.git" then
+    do_uninstall "${_check[@]}"
+    do_autoreconf
+    do_separate_confmakeinstall
+    do_checkIfExist
 fi
 
 if [[ $ffmpeg != n ]] && enabled chromaprint; then
@@ -752,19 +760,6 @@ if { { [[ $ffmpeg != "n" ]] && enabled libbluray; } || ! mpv_disabled libbluray;
     do_uninstall include/libbluray "${_check[@]}"
     do_separate_confmakeinstall --disable-{examples,bdjava,doxygen-doc} \
         --without-{libxml2,fontconfig,freetype}
-    do_checkIfExist
-fi
-
-_check=(ass/ass{,_types}.h libass.{{,l}a,pc})
-_deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
-if { [[ $mplayer = "y" ]] || ! mpv_disabled libass ||
-    { [[ $ffmpeg != "n" ]] && enabled libass; }; } &&
-    do_vcs "https://github.com/libass/libass.git"; then
-    do_autoreconf
-    do_uninstall "${_check[@]}"
-    extracommands=()
-    enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
-    do_separate_confmakeinstall "${extracommands[@]}"
     do_checkIfExist
 fi
 
