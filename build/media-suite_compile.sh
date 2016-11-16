@@ -1366,10 +1366,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         if mpv_enabled libmpv-shared; then
-            mv -f "$LOCALDESTDIR"/{bin-video,lib}/libmpv.dll.a
-            sed 's|libdir=.*|libdir=${prefix}/lib|' \
-                "$LOCALDESTDIR"/bin-video/pkgconfig/mpv.pc > "$(file_installed mpv.pc)"
-            rm -rf "$LOCALDESTDIR"/bin-video/pkgconfig
+            mv -f "$LOCALDESTDIR"/{lib,bin-video}/mpv-1.dll
             _check+=(bin-video/mpv-1.dll libmpv.dll.a)
         fi
         ! mpv_disabled debug-build &&
