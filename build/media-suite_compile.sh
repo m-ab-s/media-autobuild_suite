@@ -846,8 +846,8 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
     _check=(DeckLinkAPI.h
            DeckLinkAPIVersion.h
            DeckLinkAPI_i.c)
-    _hash=(b2537bbf87571a6ebd12973bf5243421
-           2fa98001b64b21491fbb1a48e9feec5e
+    _hash=(83cf46b09bdc42e6e1a09b83f218f470
+           bc611e634da1eceb713dabe1512c40df
            966cc3e59970f6052bfb5a6fba31fb3d)
     if files_exist -v "${_check[@]}" &&
         {
@@ -858,7 +858,7 @@ if [[ $ffmpeg != "n" ]] && enabled decklink; then
             done
             test x"${_check[$count]}" = x""
         }; then
-        do_print_status "DeckLinkAPI 10.8" "$green" "Up-to-date"
+        do_print_status "DeckLinkAPI 10.8.3" "$green" "Up-to-date"
     else
         mkdir -p "$LOCALBUILDDIR/DeckLinkAPI" &&
             cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
