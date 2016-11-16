@@ -578,7 +578,8 @@ typedef enum _BMDTimecodeFlags BMDTimecodeFlags;
 enum _BMDTimecodeFlags {
     bmdTimecodeFlagDefault = 0,
     bmdTimecodeIsDropFrame = 1 << 0,
-    bmdTimecodeFieldMark = 1 << 1
+    bmdTimecodeFieldMark = 1 << 1,
+    bmdTimecodeColorFrame = 1 << 2
 };
 
 typedef enum _BMDVideoConnection {
