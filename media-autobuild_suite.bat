@@ -66,7 +66,8 @@ gperf winpty texinfo upx
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config lz4
 
 set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
---enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265
+--enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 ^
+--enable-cuda --enable-cuvid --enable-schannel --enable-sdl2
 
 set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontconfig ^
 --enable-frei0r --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b ^
@@ -82,7 +83,7 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
 --enable-libssh --enable-libtesseract --enable-libzvbi ^
 --enable-chromaprint --enable-libopenh264 --enable-libopenmpt ^
---enable-netcdf --enable-cuda --enable-cuvid --enable-libnpp
+--enable-netcdf --enable-libnpp
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^

@@ -23,6 +23,8 @@ Included Tools And Libraries
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
         - avisynth (built-in)
+        - cuda (built-in)
+        - cuvid (built-in)
         - libmp3lame (mingw)
         - libopus (git)
         - libvorbis (mingw)
@@ -74,7 +76,6 @@ Included Tools And Libraries
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (git)
-        - cuda/cuvid (needs CUDA SDK)
         - libcdio (mingw)
         - libfdk-aac (git)
         - libkvazaar (git)

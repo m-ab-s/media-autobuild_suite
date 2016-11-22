@@ -639,7 +639,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle non-free libs
-    local nonfree=(cuda cuvid libnpp)
+    local nonfree=(libnpp)
     if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}" &&
         [[ $bits = 64bit ]]; then
         do_addOption --enable-nonfree

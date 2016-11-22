@@ -1112,8 +1112,6 @@ if [[ $ffmpeg != "n" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
-        enabled cuda && { do_patch ffmpeg-dyncuda.patch am ||
-            do_removeOption '--enable-(cuda|cuvid)'; }
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
@@ -1333,7 +1331,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
 
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
-        if enabled cuda && [[ -n "$CUDA_PATH" ]]; then
+        if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
             mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
             if [[ $bits = 64bit ]]; then
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
