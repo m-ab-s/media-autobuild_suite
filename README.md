@@ -105,7 +105,7 @@ Included Tools And Libraries
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - uchardet (mingw)
-        - ANGLE (pre-built libs/git snapshot)
+        - ANGLE (git)
         - luajit (mingw)
         - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)

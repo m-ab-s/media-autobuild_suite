@@ -801,11 +801,27 @@ mpv_disabled_all() {
 }
 
 mpv_enable() {
-    mpv_disabled "$1" && MPV_OPTS=(${MPV_OPTS[@]//--disable-$1/--enable-$1})
+    local opt newopts=()
+    mpv_disabled "$1" && for opt in "${MPV_OPTS[@]}"; do
+        if [[ "$opt" =~ "--disable-$1"$ ]]; then
+            newopts+=("--enable-$1")
+        else
+            newopts+=("$opt")
+        fi
+    done
+    MPV_OPTS=("${newopts[@]}")
 }
 
 mpv_disable() {
-    mpv_enabled "$1" && MPV_OPTS=(${MPV_OPTS[@]//--enable-$1/--disable-$1})
+    local opt newopts=()
+    mpv_enabled "$1" && for opt in "${MPV_OPTS[@]}"; do
+        if [[ "$opt" =~ "--enable-$1"$ ]]; then
+            newopts+=("--disable-$1")
+        else
+            newopts+=("$opt")
+        fi
+    done
+    MPV_OPTS=("${newopts[@]}")
 }
 
 do_addOption() {

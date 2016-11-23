@@ -43,7 +43,6 @@ while true; do
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
---angle=* ) angle="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
 --daala=* ) daala="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
@@ -1231,36 +1230,25 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     mpv_enabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
-    if ! mpv_disabled egl-angle; then
-        _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
-        do_pacman_remove angleproject-git
-        if [[ $angle = y ]]; then
-            if [[ $bits = 64bit ]] && do_vcs \
-                "https://chromium.googlesource.com/angle/angle#commit=2963985" \
-                angleproject; then
-                do_wget -c -r -q /patches/Makefile.angle
-                log "uninstall" make -f Makefile.angle PREFIX="$LOCALDESTDIR" \
-                    BINDIR="$LOCALDESTDIR/bin-video" uninstall
-                [[ -f libEGL.dll ]] && log "clean" make -f Makefile.angle clean
-                do_makeinstall -f Makefile.angle PREFIX="$LOCALDESTDIR" \
-                    BINDIR="$LOCALDESTDIR/bin-video"
-                do_checkIfExist
-            elif [[ $bits = 32bit ]]; then
-                echo -e "${green}Change to angle=1 if you need angle in 32-bits.${reset}"
-                mpv_disable egl-angle
-            fi
-        elif [[ $angle = h ]] &&
-            do_wget -r -z https://i.fsbn.eu/pub/angle/angle-latest-win"${bits%bit}".7z; then
-            do_install lib{EGL,GLESv2}.dll bin-video/
-            cp -rf include/* "$LOCALDESTDIR/include/"
-            do_checkIfExist
-            add_to_remove
-        fi
-        if files_exist "EGL/egl.h"; then
-            printf "%s\n" \
-                "${orange}mpv will depend on libEGL.dll and libGLESv2.dll for angle backend" \
-                "but they're not needed if angle backend isn't required.${reset}"
-        fi
+    do_pacman_remove angleproject-git
+    _check=(EGL/egl.h lib{GLESv2,EGL}.a)
+    if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
+        do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
+        do_patch angle-0001-Cross-compile-hacks-for-mpv.patch am
+        log "uninstall" make PREFIX="$LOCALDESTDIR" \
+            BINDIR="$LOCALDESTDIR/bin-video" uninstall
+        [[ -f libEGL.a ]] && log "clean" make clean
+        rm -rf ./generated
+        log configure gyp -Duse_ozone=0 -DOS=win \
+            -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
+            --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
+            --generator-output=generated
+        log commit_id make -C generated/ commit_id &&
+            cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
+        do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
+        log movelibs sh move-libs.sh
+        do_makeinstall PREFIX="$LOCALDESTDIR"
+        do_checkIfExist
     fi
 
     vsprefix=$(get_vs_prefix)

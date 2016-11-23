@@ -86,12 +86,12 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-netcdf --enable-libnpp
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
---enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --enable-egl-angle --disable-debug-build ^
---enable-vapoursynth --disable-libmpv-shared
+--enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-debug-build ^
+--enable-vapoursynth --disable-libmpv-shared --enable-egl-angle-lib
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-angle aom daala faac
+aom daala faac
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -713,34 +713,6 @@ if %buildmpv%==2 set "mpv=n"
 if %buildmpv%==3 set "mpv=v"
 if %buildmpv% GTR 3 GOTO mpv
 if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
-
-:angle
-set "writeANGLE=no"
-if %angleINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Google ANGLE ^(for mpv^)
-    echo. 1 = Install headers and get compiled libs ^(recommended^)
-    echo. 2 = No
-    echo. 3 = Build angle [64-bit only] [slower at runtime than VS2015]
-    echo.
-    echo. This will enable inclusion in mpv of Angle backend.
-    echo. It is always DLLs, since that is the only officially supported build.
-    echo.
-    echo. You can replace compiled libs by DLLs from Chrome or Firefox if I stop
-    echo. building them.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildangle="Build angle: "
-    ) else set buildangle=%angleINI%
-if %deleteINI%==1 set "writeANGLE=yes"
-
-if %buildangle%==1 set "angle=h"
-if %buildangle%==2 set "angle=n"
-if %buildangle%==3 set "angle=y"
-if %buildangle% GTR 3 GOTO angle
-if %writeANGLE%==yes echo.angle=^%buildangle%>>%ini%
 
 :bmx
 set "writeBmx=no"
@@ -1459,7 +1431,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --angle=%angle% --aom=%aom% ^
+--rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --daala=%daala% --faac=%faac%'
 
 endlocal
