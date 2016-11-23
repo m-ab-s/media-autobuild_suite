@@ -1,4 +1,4 @@
-From cede39d9cbb592434626bcfdf1a016de17fd5fbc Mon Sep 17 00:00:00 2001
+From f92cb17abc03388589a83c28df4231e003f31378 Mon Sep 17 00:00:00 2001
 From: Ricardo Constantino <wiiaboo@gmail.com>
 Date: Wed, 23 Nov 2016 14:56:44 +0000
 Subject: [PATCH] Cross compile hacks for mpv
@@ -7,10 +7,9 @@ Subject: [PATCH] Cross compile hacks for mpv
  Makefile                | 40 ++++++++++++++++++++++++++++++++++++++++
  gyp/common_defines.gypi | 11 +++++++++++
  move-libs.sh            | 23 +++++++++++++++++++++++
- src/angle.gyp           | 41 +----------------------------------------
+ src/angle.gyp           | 39 ---------------------------------------
  src/commit_id.py        |  4 ++--
- src/libGLESv2.gypi      |  8 --------
- 6 files changed, 77 insertions(+), 50 deletions(-)
+ 5 files changed, 76 insertions(+), 41 deletions(-)
  create mode 100644 Makefile
  create mode 100644 move-libs.sh
 
@@ -112,18 +111,9 @@ index 0000000..3aa2fab
 +mv libGLESv2_main.a $SCRIPT_DIR_PATH/libGLESv2.a
 +mv libEGL.a $SCRIPT_DIR_PATH/libEGL.a
 diff --git a/src/angle.gyp b/src/angle.gyp
-index e4e8ba9..4ef37d1 100644
+index e4e8ba9..50c4c50 100644
 --- a/src/angle.gyp
 +++ b/src/angle.gyp
-@@ -179,7 +179,7 @@
-             [
-                 {
-                     'destination': '<(angle_gen_path)',
--                    'files': [ 'copy_compiler_dll.bat', '<(angle_id_script_base)' ],
-+                    'files': [ '<(angle_id_script_base)' ],
-                 },
-             ],
-             'conditions':
 @@ -267,44 +267,5 @@
                  }
              ]
@@ -184,32 +174,6 @@ index bbdb810..875996c 100644
  except:
      commit_id = 'invalid-hash'
      commit_date = 'invalid-date'
-diff --git a/src/libGLESv2.gypi b/src/libGLESv2.gypi
-index 50dda37..2b3b168 100644
---- a/src/libGLESv2.gypi
-+++ b/src/libGLESv2.gypi
-@@ -742,7 +742,6 @@
-                 'defines':
-                 [
-                     'GL_GLEXT_PROTOTYPES',
--                    'ANGLE_PRELOADED_D3DCOMPILER_MODULE_NAMES={ "d3dcompiler_47.dll", "d3dcompiler_46.dll", "d3dcompiler_43.dll" }',
-                 ],
-                 'conditions':
-                 [
-@@ -1022,13 +1021,6 @@
-                         'ANGLE_ENABLE_NULL',
-                     ],
-                 }],
--                ['angle_build_winrt==0 and OS=="win"',
--                {
--                    'dependencies':
--                    [
--                        'copy_compiler_dll'
--                    ],
--                }],
-                 ['angle_build_winrt==1',
-                 {
-                     'msvs_requires_importlibrary' : 'true',
 -- 
 2.10.2
 
