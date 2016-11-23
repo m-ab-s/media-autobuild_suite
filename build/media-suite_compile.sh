@@ -1234,7 +1234,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
     if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
+        git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch am
+        sed -i -e '/ANGLE_PRELOADED/d' -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
+        sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
         log "uninstall" make PREFIX="$LOCALDESTDIR" \
             BINDIR="$LOCALDESTDIR/bin-video" uninstall
         [[ -f libEGL.a ]] && log "clean" make clean
