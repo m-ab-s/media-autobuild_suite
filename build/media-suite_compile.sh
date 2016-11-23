@@ -1232,7 +1232,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
-    if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
+    if [[ $bits = 64bit ]] && ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch am
@@ -1252,6 +1252,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log movelibs sh move-libs.sh
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
+    elif ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib; then
+        echo -e "${green}angle in 32-bits with GCC 6 doesn't work."
+        mpv_disable egl-angle-lib
     fi
 
     vsprefix=$(get_vs_prefix)
