@@ -1,0 +1,215 @@
+From cede39d9cbb592434626bcfdf1a016de17fd5fbc Mon Sep 17 00:00:00 2001
+From: Ricardo Constantino <wiiaboo@gmail.com>
+Date: Wed, 23 Nov 2016 14:56:44 +0000
+Subject: [PATCH] Cross compile hacks for mpv
+
+---
+ Makefile                | 40 ++++++++++++++++++++++++++++++++++++++++
+ gyp/common_defines.gypi | 11 +++++++++++
+ move-libs.sh            | 23 +++++++++++++++++++++++
+ src/angle.gyp           | 41 +----------------------------------------
+ src/commit_id.py        |  4 ++--
+ src/libGLESv2.gypi      |  8 --------
+ 6 files changed, 77 insertions(+), 50 deletions(-)
+ create mode 100644 Makefile
+ create mode 100644 move-libs.sh
+
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..b682119
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,40 @@
++VERSION = 0.0.0
++INSTALL ?= install
++SHELL ?= /bin/bash
++PREFIX ?= /usr/local
++BINDIR ?= $(PREFIX)/bin
++LIBDIR ?= $(PREFIX)/lib
++INCLUDEDIR ?= $(PREFIX)/include
++
++all: $(TARGET)
++.PHONY: all
++
++clean:
++	-rm -f $(LIBGLESv2_OBJ) $(LIBGLESv2_DEP) $(LIBEGL_OBJ) $(LIBEGL_DEP)
++	-rm -f libGLESv2.dll libEGL.dll libGLESv2.dll.a libEGL.dll.a libGLESv2.a libEGL.a
++	-rm -f src/id/commit.h
++	-rmdir src/id
++.PHONY: clean
++
++install: $(TARGET)
++	$(INSTALL) -d $(INCLUDEDIR)/{EGL,GLES{2,3},GLSLANG,KHR,platform}
++	$(INSTALL) -d $(BINDIR)
++	$(INSTALL) -d $(LIBDIR)
++	$(INSTALL) -d $(LIBDIR)/pkgconfig
++	$(INSTALL) -m 644 include/EGL/*.h $(INCLUDEDIR)/EGL
++	$(INSTALL) -m 644 include/GLES2/*.h $(INCLUDEDIR)/GLES2
++	$(INSTALL) -m 644 include/GLES3/*.h $(INCLUDEDIR)/GLES3
++	$(INSTALL) -m 644 include/GLSLANG/*.h $(INCLUDEDIR)/GLSLANG
++	$(INSTALL) -m 644 include/KHR/*.h $(INCLUDEDIR)/KHR
++	$(INSTALL) -m 644 include/platform/Platform.h $(INCLUDEDIR)/platform
++	$(INSTALL) -m 644 include/angle_gl.h $(INCLUDEDIR)
++	$(INSTALL) -m 644 libEGL.a libGLESv2.a $(LIBDIR)
++
++uninstall:
++	-rm -f $(BINDIR)/lib{EGL,GLESv2}.dll
++	-rm -f $(LIBDIR)/lib{EGL,GLESv2}.dll.a
++	-rm -f $(LIBDIR)/lib{EGL,GLESv2}.a
++	-rm -rf $(INCLUDEDIR)/{EGL,GLES{2,3},GLSLANG,KHR}
++	-rm -f $(INCLUDEDIR)/platform/Platform.h
++	-rm -f $(INCLUDEDIR)/angle_gl.h
++.PHONY: uninstall
+diff --git a/gyp/common_defines.gypi b/gyp/common_defines.gypi
+index bce49c4..72cc852 100644
+--- a/gyp/common_defines.gypi
++++ b/gyp/common_defines.gypi
+@@ -34,6 +34,17 @@
+     'defines':
+     [
+         'ANGLE_STANDALONE_BUILD',
++        'LIBGLESV2_EXPORT_H_',
++        'ANGLE_EXPORT=',
++    ],
++    'cflags_cc':
++    [
++        '-std=c++11',
++        '-fpermissive',
++        '-msse2',
++        '-O2',
++        '-Wno-deprecated-declarations',
++        '-Wno-conversion-null',
+     ],
+     'msvs_disabled_warnings':
+     [
+diff --git a/move-libs.sh b/move-libs.sh
+new file mode 100644
+index 0000000..3aa2fab
+--- /dev/null
++++ b/move-libs.sh
+@@ -0,0 +1,23 @@
++#!/bin/sh
++
++FILE_PATH=$(realpath $0)
++SCRIPT_DIR_PATH=$(dirname $FILE_PATH)
++
++cd $SCRIPT_DIR_PATH/generated/out/Release/obj.target/src
++
++ar -M <<EOF
++CREATE libGLESv2_main.a
++ADDLIB libangle_common.a
++ADDLIB libangle_image_util.a
++ADDLIB libpreprocessor.a
++ADDLIB libtranslator.a
++ADDLIB libANGLE.a
++ADDLIB libGLESv2.a
++SAVE
++END
++EOF
++
++ranlib libEGL.a
++ranlib libGLESv2_main.a
++mv libGLESv2_main.a $SCRIPT_DIR_PATH/libGLESv2.a
++mv libEGL.a $SCRIPT_DIR_PATH/libEGL.a
+diff --git a/src/angle.gyp b/src/angle.gyp
+index e4e8ba9..4ef37d1 100644
+--- a/src/angle.gyp
++++ b/src/angle.gyp
+@@ -179,7 +179,7 @@
+             [
+                 {
+                     'destination': '<(angle_gen_path)',
+-                    'files': [ 'copy_compiler_dll.bat', '<(angle_id_script_base)' ],
++                    'files': [ '<(angle_id_script_base)' ],
+                 },
+             ],
+             'conditions':
+@@ -267,44 +267,5 @@
+                 }
+             ]
+         }],
+-        ['OS=="win"',
+-        {
+-            'targets':
+-            [
+-                {
+-                    'target_name': 'copy_compiler_dll',
+-                    'type': 'none',
+-                    'dependencies': [ 'copy_scripts', ],
+-                    'includes': [ '../gyp/common_defines.gypi', ],
+-                    'conditions':
+-                    [
+-                        ['angle_build_winrt==0',
+-                        {
+-                            'actions':
+-                            [
+-                                {
+-                                    'action_name': 'copy_dll',
+-                                    'message': 'Copying D3D Compiler DLL...',
+-                                    'msvs_cygwin_shell': 0,
+-                                    'inputs': [ 'copy_compiler_dll.bat' ],
+-                                    'outputs': [ '<(PRODUCT_DIR)/d3dcompiler_47.dll' ],
+-                                    'action':
+-                                    [
+-                                        "<(angle_gen_path)/copy_compiler_dll.bat",
+-                                        "$(PlatformName)",
+-                                        "<(windows_sdk_path)",
+-                                        "<(PRODUCT_DIR)"
+-                                    ],
+-                                },
+-                            ], #actions
+-                        }],
+-                        ['angle_build_winrt==1',
+-                        {
+-                            'type' : 'shared_library',
+-                        }],
+-                    ]
+-                },
+-            ], # targets
+-        }],
+     ] # conditions
+ }
+diff --git a/src/commit_id.py b/src/commit_id.py
+index bbdb810..875996c 100644
+--- a/src/commit_id.py
++++ b/src/commit_id.py
+@@ -27,8 +27,8 @@ output_file = sys.argv[3]
+ commit_id_size = 12
+ 
+ try:
+-    commit_id = grab_output('git rev-parse --short=%d HEAD' % commit_id_size, cwd)
+-    commit_date = grab_output('git show -s --format=%ci HEAD', cwd)
++    commit_id = grab_output('git rev-parse --short=%d HEAD~1' % commit_id_size, cwd)
++    commit_date = grab_output('git show -s --format=%ci HEAD~1', cwd)
+ except:
+     commit_id = 'invalid-hash'
+     commit_date = 'invalid-date'
+diff --git a/src/libGLESv2.gypi b/src/libGLESv2.gypi
+index 50dda37..2b3b168 100644
+--- a/src/libGLESv2.gypi
++++ b/src/libGLESv2.gypi
+@@ -742,7 +742,6 @@
+                 'defines':
+                 [
+                     'GL_GLEXT_PROTOTYPES',
+-                    'ANGLE_PRELOADED_D3DCOMPILER_MODULE_NAMES={ "d3dcompiler_47.dll", "d3dcompiler_46.dll", "d3dcompiler_43.dll" }',
+                 ],
+                 'conditions':
+                 [
+@@ -1022,13 +1021,6 @@
+                         'ANGLE_ENABLE_NULL',
+                     ],
+                 }],
+-                ['angle_build_winrt==0 and OS=="win"',
+-                {
+-                    'dependencies':
+-                    [
+-                        'copy_compiler_dll'
+-                    ],
+-                }],
+                 ['angle_build_winrt==1',
+                 {
+                     'msvs_requires_importlibrary' : 'true',
+-- 
+2.10.2
+
