@@ -375,7 +375,7 @@ fi
 if [[ $ffmpeg != n ]] && enabled chromaprint; then
     do_pacman_install fftw
     _check=(libchromaprint.{a,pc} chromaprint.h)
-    if do_vcs "https://bitbucket.org/acoustid/chromaprint.git" libchromaprint; then
+    if do_vcs "https://bitbucket.org/acoustid/chromaprint.git#commit=40de979" libchromaprint; then
         do_uninstall "${_check[@]}"
         do_cmakeinstall -DWITH_FFTW3=on
         do_checkIfExist
