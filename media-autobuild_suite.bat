@@ -61,7 +61,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty texinfo upx
+gperf winpty texinfo upx gyp-git
 
 set mingwpackages=cmake dlfcn doxygen libpng gcc nasm pcre tools-git yasm ninja pkg-config lz4
 
