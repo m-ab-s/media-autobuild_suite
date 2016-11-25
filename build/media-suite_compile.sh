@@ -1253,7 +1253,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log movelibs sh move-libs.sh
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
-    elif ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib; then
+    elif [[ $bits = 32bit ]] && ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib; then
         echo -e "${green}angle in 32-bits with GCC 6 doesn't work."
         mpv_disable egl-angle-lib
     fi
