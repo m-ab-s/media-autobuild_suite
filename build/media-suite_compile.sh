@@ -1060,6 +1060,7 @@ EOF
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
+pc_exists x265 && sed -i 's|-lmingwex||' "$(file_installed x265.pc)"
 
 if [[ $ffmpeg != "n" ]]; then
     enabled libschroedinger && do_pacman_install schroedinger
