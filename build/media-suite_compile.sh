@@ -266,9 +266,9 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
         { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
           sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
     hide_conflicting_libs
-    CPPFLAGS+=" -DNGHTTP2_STATICLIB" CFLAGS="${CFLAGS#-I${LOCALDESTDIR}/include }" \
+    CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path} --enable-sspi --disable-{debug,manual}
+        --without-{libssh2,random,ca-bundle,ca-path,librtmp} --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     _notrequired=yes
     PATH=/usr/bin log ca-bundle make ca-bundle
