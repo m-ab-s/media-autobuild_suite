@@ -981,6 +981,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
+    sed -i 's|REMOVE_ITEM PLIBLIST.*|& "-lmingwex")|' source/CMakeLists.txt
 
     build_x265() {
         create_build_dir
@@ -1060,7 +1061,7 @@ EOF
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
-pc_exists x265 && sed -i 's|-lmingwex||' "$(file_installed x265.pc)"
+pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
 if [[ $ffmpeg != "n" ]]; then
     enabled libschroedinger && do_pacman_install schroedinger
