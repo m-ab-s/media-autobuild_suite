@@ -981,7 +981,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
-    sed -i 's|REMOVE_ITEM PLIBLIST.*|& "-lmingwex")|' source/CMakeLists.txt
+    sed -ri 's|("-lc") ("-lpthread")|\1 "-lmingwex" \2|' source/CMakeLists.txt
 
     build_x265() {
         create_build_dir
