@@ -252,7 +252,7 @@ enabled gnutls && _deps+=(libgnutls.a)
 if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     do_pacman_install nghttp2
     do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"
-    do_uninstall include/curl bin-global/{curl-config,curl-ca-bundle.crt} "${_check[@]}"
+    do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
     if enabled openssl; then
@@ -270,7 +270,9 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
         do_separate_confmakeinstall global "${extra_opts[@]}" \
         --without-{libssh2,random,ca-bundle,ca-path} --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
-    log ca-bundle make ca-bundle
+    _notrequired=yes
+    PATH=/usr/bin log ca-bundle make ca-bundle
+    unset _notrequired
     enabled_any openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
         cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
     do_checkIfExist
