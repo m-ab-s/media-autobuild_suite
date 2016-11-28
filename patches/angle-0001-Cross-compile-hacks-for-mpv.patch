@@ -1,6 +1,6 @@
-From f92cb17abc03388589a83c28df4231e003f31378 Mon Sep 17 00:00:00 2001
+From 1766bbcdf126b8ae00a02779d36245217cda7c84 Mon Sep 17 00:00:00 2001
 From: Ricardo Constantino <wiiaboo@gmail.com>
-Date: Wed, 23 Nov 2016 14:56:44 +0000
+Date: Mon, 28 Nov 2016 00:19:46 +0000
 Subject: [PATCH] Cross compile hacks for mpv
 
 ---
@@ -8,14 +8,13 @@ Subject: [PATCH] Cross compile hacks for mpv
  gyp/common_defines.gypi | 11 +++++++++++
  move-libs.sh            | 23 +++++++++++++++++++++++
  src/angle.gyp           | 39 ---------------------------------------
- src/commit_id.py        |  4 ++--
- 5 files changed, 76 insertions(+), 41 deletions(-)
+ 4 files changed, 74 insertions(+), 39 deletions(-)
  create mode 100644 Makefile
  create mode 100644 move-libs.sh
 
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..b682119
+index 0000000..eb3de62
 --- /dev/null
 +++ b/Makefile
 @@ -0,0 +1,40 @@
@@ -31,7 +30,7 @@ index 0000000..b682119
 +.PHONY: all
 +
 +clean:
-+	-rm -f $(LIBGLESv2_OBJ) $(LIBGLESv2_DEP) $(LIBEGL_OBJ) $(LIBEGL_DEP)
++	-rm -rf generated
 +	-rm -f libGLESv2.dll libEGL.dll libGLESv2.dll.a libEGL.dll.a libGLESv2.a libEGL.a
 +	-rm -f src/id/commit.h
 +	-rmdir src/id
@@ -159,21 +158,6 @@ index e4e8ba9..50c4c50 100644
 -        }],
      ] # conditions
  }
-diff --git a/src/commit_id.py b/src/commit_id.py
-index bbdb810..875996c 100644
---- a/src/commit_id.py
-+++ b/src/commit_id.py
-@@ -27,8 +27,8 @@ output_file = sys.argv[3]
- commit_id_size = 12
- 
- try:
--    commit_id = grab_output('git rev-parse --short=%d HEAD' % commit_id_size, cwd)
--    commit_date = grab_output('git show -s --format=%ci HEAD', cwd)
-+    commit_id = grab_output('git rev-parse --short=%d HEAD~1' % commit_id_size, cwd)
-+    commit_date = grab_output('git show -s --format=%ci HEAD~1', cwd)
- except:
-     commit_id = 'invalid-hash'
-     commit_date = 'invalid-date'
 -- 
 2.10.2
 
