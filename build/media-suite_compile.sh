@@ -444,9 +444,9 @@ fi
 
 _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
 if [[ $ffmpeg != n ]] && enabled libvo-amrwbenc &&
-    do_pkgConfig "vo-amrwbenc = 0.1.2"; then
-    do_wget_sf -h 588205f686adc23532e31fe3646ddcb6 \
-        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.2.tar.gz"
+    do_pkgConfig "vo-amrwbenc = 0.1.3"; then
+    do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
+        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"
     do_uninstall include/vo-amrwbenc "${_check[@]}"
     do_separate_confmakeinstall
     do_checkIfExist

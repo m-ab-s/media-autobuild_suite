@@ -68,7 +68,7 @@ Included Tools And Libraries
         - libtheora (mingw)
         - libtwolame (mingw)
         - libvidstab (git snapshot)
-        - libvo-amrwbenc (0.1.2)
+        - libvo-amrwbenc (0.1.3)
         - libwavpack (mingw)
         - libwebp (git)
         - libxavs (svn snapshot)
