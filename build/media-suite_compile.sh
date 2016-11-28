@@ -1236,16 +1236,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
-    if [[ $bits = 64bit ]] && ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
+    if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
+        if [[ $bits = 64bit ]]; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
         sed -i -e '/ANGLE_PRELOADED/d' -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
         sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
-        log "uninstall" make PREFIX="$LOCALDESTDIR" \
+        log uninstall make PREFIX="$LOCALDESTDIR" \
             BINDIR="$LOCALDESTDIR/bin-video" uninstall
-        [[ -f libEGL.a ]] && log "clean" make clean
-        rm -rf ./generated
         log configure gyp -Duse_ozone=0 -DOS=win \
             -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
             --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
@@ -1256,9 +1255,11 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log movelibs sh move-libs.sh
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
-    elif [[ $bits = 32bit ]] && ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib; then
-        echo -e "${green}angle in 32-bits with GCC 6 doesn't work."
-        mpv_disable egl-angle-lib
+        else
+            echo -e "${green}angle in 32-bits with GCC 6 doesn't work."
+            mpv_disable egl-angle-lib
+            touch build_successful32bit
+        fi
     fi
 
     vsprefix=$(get_vs_prefix)
