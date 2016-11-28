@@ -139,7 +139,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ ! $harfbuzz_ver ]] &&
         harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.3.2}"
+    harfbuzz_ver="${harfbuzz_ver:-1.3.3}"
     _deps=(lib{freetype,fontconfig}.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
@@ -201,7 +201,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
     [[ -z "$gnutls_ver" ]] &&
         gnutls_ver="$("${curl_opts[@]}" -l "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.5\.\d+(\.\d+)?')"
-    gnutls_ver="${gnutls_ver:-3.5.4}"
+    gnutls_ver="${gnutls_ver:-3.5.6}"
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
@@ -243,7 +243,7 @@ fi
 [[ ! "$curl_ver" ]] &&
     curl_ver="$(clean_html_index https://curl.haxx.se/download/)" &&
     curl_ver="$(get_last_version "$curl_ver" bz2 "7\.\d+\.\d")"
-curl_ver="${curl_ver:-7.50.3}"
+curl_ver="${curl_ver:-7.51.0}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 enabled openssl && _deps+=(libssl.a)
@@ -524,12 +524,9 @@ if [[ $standalone = y ]] && enabled libopus &&
     do_checkIfExist
 fi
 
-_check=(soxr.h libsoxr.a)
 if [[ $ffmpeg != "n" ]] && enabled libsoxr; then
-    if files_exist "${_check[@]}" && [[ "$(get_api_version soxr.h VERSION_STR)" = "0.1.2" ]]; then
-        do_print_status "libsoxr 0.1.2" "$green" "Up-to-date"
-    else
-        do_wget_sf -h 0866fc4320e26f47152798ac000de1c0 "soxr/soxr-0.1.2-Source.tar.xz"
+    _check=(soxr.h libsoxr.a)
+    if do_vcs git://git.code.sf.net/p/soxr/code libsoxr; then
         do_uninstall "${_check[@]}"
         do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off
         do_checkIfExist

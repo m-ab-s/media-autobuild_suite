@@ -63,7 +63,7 @@ Included Tools And Libraries
             - compiled with gnutls or openssl depending on license chosen
         - libschroedinger (mingw)
         - libsnappy (mingw)
-        - libsoxr (0.1.2)
+        - libsoxr (git)
         - libspeex (mingw)
         - libtheora (mingw)
         - libtwolame (mingw)
