@@ -284,14 +284,14 @@ _check=(libwebp{,mux}.{{,l}a,pc})
 if [[ $ffmpeg != n || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install libtiff
-    do_autoreconf
     if [[ $standalone = y ]]; then
-        extracommands=(--enable-libwebp{demux,decoder,extras}
-            LIBS="$($PKG_CONFIG --libs libpng libtiff-4)" --enable-experimental)
+        extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
+            LIBS="$($PKG_CONFIG --libs libpng libtiff-4)")
     else
         extracommands=()
-        sed -i 's/ examples man//' Makefile.in
+        sed -i -e '/examples/d' -e 's/ man//' Makefile.am
     fi
+    do_autoreconf
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     do_separate_confmakeinstall global --enable-{swap-16bit-csp,libwebpmux} \
         "${extracommands[@]}"
