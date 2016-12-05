@@ -280,7 +280,7 @@ fi
 
 _check=(libwebp{,mux}.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
-    bin-global/{{c,d}webp,webpmux}.exe)
+    bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != n || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install libtiff
