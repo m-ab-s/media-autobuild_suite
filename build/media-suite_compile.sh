@@ -92,6 +92,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     libebur128.a ebur128.h
     libopenh264.a
     liburiparser.{{,l}a,pc}
+    libchromaprint.{a,pc} chromaprint.h
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -376,16 +377,6 @@ if { { [[ $ffmpeg != "n" ]] && enabled libzimg; } ||
     do_checkIfExist
 fi
 
-if [[ $ffmpeg != n ]] && enabled chromaprint; then
-    do_pacman_install fftw
-    _check=(libchromaprint.{a,pc} chromaprint.h)
-    if do_vcs "https://bitbucket.org/acoustid/chromaprint.git#commit=40de979" libchromaprint; then
-        do_uninstall "${_check[@]}"
-        do_cmakeinstall -DWITH_FFTW3=on
-        do_checkIfExist
-    fi
-    do_addOption --extra-libs=-lfftw3 --extra-libs=-lstdc++ --extra-cflags=-DCHROMAPRINT_NODLL
-fi
 
 set_title "compiling audio tools"
 echo -e "\n\t${orange}Starting $bits compilation of audio tools${reset}"
@@ -1081,23 +1072,15 @@ if [[ $ffmpeg != "n" ]]; then
     fi
     enabled libtheora && do_pacman_install libtheora
     enabled libcdio && do_pacman_install libcdio-paranoia
-    if enabled libcaca; then
-        do_pacman_install libcaca
-        do_addOption --extra-cflags=-DCACA_STATIC
-    fi
-    if enabled libmodplug; then
-        do_pacman_install libmodplug
-        do_addOption --extra-cflags=-DMODPLUG_STATIC
-    fi
-    if enabled netcdf; then
-        do_pacman_install netcdf
-        sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
-    fi
-    if ! disabled_any sdl2 ffplay; then
-        do_pacman_install SDL2
-    fi
+    enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
+    enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
+    enabled netcdf && sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' \
+        "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc && do_pacman_install netcdf
+    ! disabled_any sdl2 ffplay && do_pacman_install SDL2
     enabled libopenjpeg && do_pacman_install openjpeg2
     enabled libopenh264 && do_pacman_install openh264
+    enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
+        do_pacman_remove fftw && do_pacman_install chromaprint
 
     do_hide_all_sharedlibs
 
