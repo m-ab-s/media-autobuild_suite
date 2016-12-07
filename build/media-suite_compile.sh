@@ -1253,7 +1253,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
         else
-            echo -e "${green}angle in 32-bits with GCC 6 doesn't work."
+            echo -e "${green}angle in 32-bits with GCC 6 doesn't work.${reset}"
             mpv_disable egl-angle-lib
             touch build_successful32bit
         fi
