@@ -921,7 +921,7 @@ if not exist %build%\wget.exe (
     )
 
 :checkmsys2
-if exist "%instdir%\%msys2%\msys2_shell.bat" GOTO getMintty
+if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download and install msys2 basic system
@@ -1006,7 +1006,7 @@ if not exist %instdir%\mintty.lnk (
         echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
         echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
-        echo.link.TargetPath = "%instdir%\%msys2%\msys_shell.cmd"
+        echo.link.TargetPath = "%instdir%\%msys2%\msys2_shell.cmd"
         echo.link.WindowStyle = ^1
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%"
