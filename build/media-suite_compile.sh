@@ -1346,7 +1346,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
-            --disable-{libguess,vapoursynth-lazy} "${MPV_OPTS[@]}"
+            --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
