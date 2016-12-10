@@ -212,6 +212,7 @@ if { { [[ $ffmpeg != n ]] && enabled gnutls; } ||
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,rpath,libdane,guile} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
+            --with-included-unistring \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
     fi
