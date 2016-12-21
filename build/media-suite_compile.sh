@@ -1246,7 +1246,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log configure gyp -Duse_ozone=0 -DOS=win \
             -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
             --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
-            --generator-output=generated
+            --generator-output=generated -Dangle_enable_vulkan=0
         log commit_id make -C generated/ commit_id &&
             cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
         do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
