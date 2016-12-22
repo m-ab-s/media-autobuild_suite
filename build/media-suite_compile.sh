@@ -1221,7 +1221,7 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=lua51}" ]]; then
+    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=51}" ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
         do_pacman_install luajit-git
