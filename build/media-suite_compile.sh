@@ -1237,6 +1237,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
         if [[ $bits = 64bit ]]; then
+        stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
+            grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
+        git reset -q --hard "$stablebranch"
         git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
         sed -i -e '/ANGLE_PRELOADED/d' -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
