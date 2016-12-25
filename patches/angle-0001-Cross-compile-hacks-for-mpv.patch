@@ -71,7 +71,7 @@ index bce49c4..72cc852 100644
 +    ],
 +    'cflags_cc':
 +    [
-+        '-std=c++11',
++        '-std=c++14',
 +        '-fpermissive',
 +        '-msse2',
 +        '-O2',
