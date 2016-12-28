@@ -152,7 +152,6 @@ do_vcs() {
     fi
     [[ ! "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
 
-    echo
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
@@ -169,6 +168,15 @@ do_vcs() {
     else
         cd_safe "$vcsFolder-$vcsType"
     fi
+
+    if [[ $ffmpegUpdate = onlyFFmpeg ]] &&
+        [[ $vcsFolder != ffmpeg ]] && [[ $vcsFolder != mpv ]] &&
+        { { [[ -z "${vcsCheck[@]}" ]] && files_exist "$vcsFolder.pc"; } ||
+          { [[ -n "${vcsCheck[@]}" ]] && files_exist "${vcsCheck[@]}"; }; }; then
+        do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
+        return 1
+    fi
+
     do_print_progress "  Running $vcsType update for $vcsFolder"
     log quiet "$vcsType.update" vcs_update
     if [[ "$oldHead" != "$newHead" ]]; then

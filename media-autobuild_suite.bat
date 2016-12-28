@@ -551,6 +551,7 @@ if %ffmpegUpdateINI%==0 (
     echo. Always build FFmpeg when libraries have been updated?
     echo. 1 = Yes
     echo. 2 = No
+    echo. 3 = Only build FFmpeg and missing dependencies
     echo.
     echo. FFmpeg is updated a lot so you only need to select this if you
     echo. absolutely need updated external libraries in FFmpeg.
@@ -563,7 +564,8 @@ if %deleteINI%==1 set "writeFFU=yes"
 
 if %buildffmpegUp%==1 set "ffmpegUpdate=y"
 if %buildffmpegUp%==2 set "ffmpegUpdate=n"
-if %buildffmpegUp% GTR 2 GOTO ffmpegUp
+if %buildffmpegUp%==3 set "ffmpegUpdate=onlyFFmpeg"
+if %buildffmpegUp% GTR 3 GOTO ffmpegUp
 if %writeFFU%==yes echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
 :ffmpegChoice
