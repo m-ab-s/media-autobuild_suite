@@ -69,7 +69,7 @@ set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
 --enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 ^
 --enable-cuda --enable-cuvid --enable-schannel --enable-sdl2
 
-set ffmpeg_options_zeranoe=--disable-w32threads --enable-decklink --enable-fontconfig ^
+set ffmpeg_options_zeranoe=--enable-decklink --enable-fontconfig ^
 --enable-frei0r --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b ^
 --enable-libcaca --enable-libfreetype --enable-libfribidi ^
 --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug ^
@@ -551,7 +551,7 @@ if %ffmpegUpdateINI%==0 (
     echo. Always build FFmpeg when libraries have been updated?
     echo. 1 = Yes
     echo. 2 = No
-    echo. 3 = Only build FFmpeg and missing dependencies
+    echo. 3 = Only build FFmpeg/mpv and missing dependencies
     echo.
     echo. FFmpeg is updated a lot so you only need to select this if you
     echo. absolutely need updated external libraries in FFmpeg.
