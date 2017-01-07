@@ -146,7 +146,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_pacman_install ragel
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
-        do_separate_confmakeinstall --with-{icu,glib,gobject}=no
+        do_separate_confmakeinstall --with-{icu,glib,gobject,cairo,fontconfig}=no
         do_checkIfExist
     fi
 
