@@ -79,7 +79,7 @@ fi
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,EGL,GLESv2,luajit-5.1,uchardet}.{l,}a
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,luajit-5.1,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     opus/opusfile.h regex.h magic.h
@@ -1236,14 +1236,17 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
     if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        if [[ $bits = 64bit ]]; then
         stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
             grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
-        git reset -q --hard "$stablebranch"
+        if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
+            [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
+        log stable-checkout git checkout -B stable "$stablebranch"
         git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
-        sed -i -e '/ANGLE_PRELOADED/d' -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
+        sed -i "s;'libGLESv2;'libANGLE' ,&;" src/libEGL.gypi
+        sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
         sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
+        sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
         log uninstall make PREFIX="$LOCALDESTDIR" \
             BINDIR="$LOCALDESTDIR/bin-video" uninstall
         log configure gyp -Duse_ozone=0 -DOS=win \
@@ -1256,11 +1259,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log movelibs sh move-libs.sh
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
-        else
+        elif [[ $bits = 32bit ]]; then
             echo -e "${green}angle in 32-bits with GCC 6 doesn't work.${reset}"
             mpv_disable egl-angle-lib
             touch build_successful32bit
+        else
+            echo -e "${green}Angle already compiled to latest stable version.${reset}"
+            touch build_successful64bit
         fi
+        unset stablebranch
     fi
 
     vsprefix=$(get_vs_prefix)
