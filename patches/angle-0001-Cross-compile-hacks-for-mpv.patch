@@ -1,14 +1,13 @@
-From 1766bbcdf126b8ae00a02779d36245217cda7c84 Mon Sep 17 00:00:00 2001
+From 1cb12fb49f5d22e70abd58df224d63a8104e370a Mon Sep 17 00:00:00 2001
 From: Ricardo Constantino <wiiaboo@gmail.com>
 Date: Mon, 28 Nov 2016 00:19:46 +0000
 Subject: [PATCH] Cross compile hacks for mpv
 
 ---
  Makefile                | 40 ++++++++++++++++++++++++++++++++++++++++
- gyp/common_defines.gypi | 11 +++++++++++
+ gyp/common_defines.gypi |  9 +++++++++
  move-libs.sh            | 23 +++++++++++++++++++++++
- src/angle.gyp           | 39 ---------------------------------------
- 4 files changed, 74 insertions(+), 39 deletions(-)
+ 3 files changed, 72 insertions(+)
  create mode 100644 Makefile
  create mode 100644 move-libs.sh
 
@@ -59,16 +58,13 @@ index 0000000..eb3de62
 +	-rm -f $(INCLUDEDIR)/angle_gl.h
 +.PHONY: uninstall
 diff --git a/gyp/common_defines.gypi b/gyp/common_defines.gypi
-index bce49c4..72cc852 100644
+index bce49c4..abd3752 100644
 --- a/gyp/common_defines.gypi
 +++ b/gyp/common_defines.gypi
-@@ -34,6 +34,17 @@
-     'defines':
+@@ -35,6 +35,15 @@
      [
          'ANGLE_STANDALONE_BUILD',
-+        'LIBGLESV2_EXPORT_H_',
-+        'ANGLE_EXPORT=',
-+    ],
+     ],
 +    'cflags_cc':
 +    [
 +        '-std=c++14',
@@ -77,9 +73,10 @@ index bce49c4..72cc852 100644
 +        '-O2',
 +        '-Wno-deprecated-declarations',
 +        '-Wno-conversion-null',
-     ],
++    ],
      'msvs_disabled_warnings':
      [
+         4100, # Unreferenced formal parameter. Not interesting.
 diff --git a/move-libs.sh b/move-libs.sh
 new file mode 100644
 index 0000000..3aa2fab
@@ -109,55 +106,6 @@ index 0000000..3aa2fab
 +ranlib libGLESv2_main.a
 +mv libGLESv2_main.a $SCRIPT_DIR_PATH/libGLESv2.a
 +mv libEGL.a $SCRIPT_DIR_PATH/libEGL.a
-diff --git a/src/angle.gyp b/src/angle.gyp
-index e4e8ba9..50c4c50 100644
---- a/src/angle.gyp
-+++ b/src/angle.gyp
-@@ -267,44 +267,5 @@
-                 }
-             ]
-         }],
--        ['OS=="win"',
--        {
--            'targets':
--            [
--                {
--                    'target_name': 'copy_compiler_dll',
--                    'type': 'none',
--                    'dependencies': [ 'copy_scripts', ],
--                    'includes': [ '../gyp/common_defines.gypi', ],
--                    'conditions':
--                    [
--                        ['angle_build_winrt==0',
--                        {
--                            'actions':
--                            [
--                                {
--                                    'action_name': 'copy_dll',
--                                    'message': 'Copying D3D Compiler DLL...',
--                                    'msvs_cygwin_shell': 0,
--                                    'inputs': [ 'copy_compiler_dll.bat' ],
--                                    'outputs': [ '<(PRODUCT_DIR)/d3dcompiler_47.dll' ],
--                                    'action':
--                                    [
--                                        "<(angle_gen_path)/copy_compiler_dll.bat",
--                                        "$(PlatformName)",
--                                        "<(windows_sdk_path)",
--                                        "<(PRODUCT_DIR)"
--                                    ],
--                                },
--                            ], #actions
--                        }],
--                        ['angle_build_winrt==1',
--                        {
--                            'type' : 'shared_library',
--                        }],
--                    ]
--                },
--            ], # targets
--        }],
-     ] # conditions
- }
 -- 
 2.10.2
 
