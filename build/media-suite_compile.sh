@@ -91,6 +91,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
     libebur128.a ebur128.h
     libopenh264.a
+    liburiparser.{{,l}a,pc}
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -1385,15 +1386,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 fi
 
 if [[ $bmx = "y" ]]; then
-    _check=(liburiparser.{{,l}a,pc})
-    if do_pkgConfig "liburiparser = 0.8.2"; then
-        do_wget_sf -h c5cf6b3941d887deb7defc2a86c40f1d \
-            "uriparser/Sources/0.8.2/uriparser-0.8.2.tar.bz2"
-        do_uninstall include/uriparser "${_check[@]}"
-        sed -i '/bin_PROGRAMS/ d' Makefile.am
-        do_separate_confmakeinstall --disable-{test,doc}
-        do_checkIfExist
-    fi
+    do_pacman_install uriparser
 
     _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
     if do_vcs http://git.code.sf.net/p/bmxlib/libmxf libMXF-1.0; then
@@ -1413,7 +1406,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
-    _deps=(lib{uriparser,MXF{,++}-1.0,curl}.a)
+    _deps=("$MINGW_PREFIX"/lib/liburiparser.a,lib{MXF{,++}-1.0,curl}.a)
     if do_vcs http://git.code.sf.net/p/bmxlib/bmx; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
