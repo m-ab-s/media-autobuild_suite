@@ -304,11 +304,11 @@ syspath=$(cygpath -S)
 if [[ $ffmpeg != n ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
     echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
     _check=(libOpenCL.a)
+    do_pacman_install opencl-headers
     if ! files_exist "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         [[ -d opencl ]] && rm -rf opencl
         mkdir -p opencl && cd_safe opencl
-        do_pacman_install opencl-headers
         create_build_dir
         gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -y libOpenCL.a -d OpenCL.def -k -A
