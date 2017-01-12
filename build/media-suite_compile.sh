@@ -311,7 +311,7 @@ if [[ $ffmpeg != n ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
         do_pacman_install opencl-headers
         create_build_dir
         gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
-        [[ -f OpenCL.def ]] && dlltool -l libOpenCL.a -d OpenCL.def -k -A
+        [[ -f OpenCL.def ]] && dlltool -y libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && do_install libOpenCL.a
         do_checkIfExist
     fi
