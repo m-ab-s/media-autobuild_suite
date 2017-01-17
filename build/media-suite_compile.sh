@@ -1074,8 +1074,8 @@ if [[ $ffmpeg != "n" ]]; then
     enabled libcdio && do_pacman_install libcdio-paranoia
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
-    enabled netcdf && sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' \
-        "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc && do_pacman_install netcdf
+    enabled netcdf && do_pacman_install netcdf &&
+        sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
     ! disabled_any sdl2 ffplay && do_pacman_install SDL2
     enabled libopenjpeg && do_pacman_install openjpeg2
     enabled libopenh264 && do_pacman_install openh264
