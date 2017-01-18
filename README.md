@@ -75,7 +75,7 @@ Included Tools And Libraries
         - libxvid (mingw)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
-        - chromaprint (git)
+        - chromaprint (mingw)
         - libcdio (mingw)
         - libfdk-aac (git)
         - libkvazaar (git)

@@ -1266,13 +1266,8 @@ hide_conflicting_libs() {
     if [[ $reverse = n ]]; then
         hide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     else
-        unhide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
+        hide_files -R "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     fi
-}
-
-unhide_files() {
-    local dryrun
-    hide_files -R "$@"
 }
 
 add_to_remove() {
