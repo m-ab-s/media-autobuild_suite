@@ -1221,7 +1221,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
-    if ! mpv_disabled egl-angle && mpv_enabled egl-angle-lib &&
+    if ! mpv_disabled egl-angle && ! mpv_disabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
         stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
             grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
