@@ -1335,6 +1335,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
         [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        if ! mpv_disabled manpage-build || mpv_enabled html-build || mpv_enabled pdf-build; then
+            do_pacman_install python3-docutils
+        fi
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
@@ -1342,6 +1345,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         git tag -l --sort=version:refname | tail -1 | cut -c 2- > VERSION
 
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
+            RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
+            RST2HTML="${MINGW_PREFIX}/bin/rst2html3" \
+            RST2PDF="${MINGW_PREFIX}/bin/rst2pdf3" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" --enable-static-build \
             --disable-vapoursynth-lazy "${MPV_OPTS[@]}"

@@ -87,7 +87,8 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-debug-build ^
---enable-vapoursynth --disable-libmpv-shared --enable-egl-angle-lib
+--enable-vapoursynth --disable-libmpv-shared --enable-egl-angle-lib --enable-html-build ^
+--enable-pdf-build --enable-manpage-build
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
