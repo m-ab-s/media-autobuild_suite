@@ -263,7 +263,7 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     elif enabled gnutls; then
         extra_opts+=(--with-gnutls --without-{ssl,nghttp2})
     else
-        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls,libidn})
+        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls})
     fi
     /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
         { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
@@ -271,7 +271,8 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path,librtmp} --enable-sspi --disable-{debug,manual}
+        --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn} \
+        --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     _notrequired=yes
     PATH=/usr/bin log ca-bundle make ca-bundle
