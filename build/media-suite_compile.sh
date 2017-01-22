@@ -1223,8 +1223,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
     if ! mpv_disabled egl-angle && ! mpv_disabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
-            grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
+        # stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
+        #     grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
+        stablebranch="78d13744895a12b62aab2fc1f5464967892cfabb"
         if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
             [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
         log stable-checkout git checkout -fB stable "$stablebranch"
