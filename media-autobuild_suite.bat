@@ -1402,14 +1402,12 @@ if exist %instdir%\%msys2%\etc\profile.pacnew ^
 move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
 %instdir%\%msys2%\usr\bin\grep -q -e 'profile2.local' %instdir%\%msys2%\etc\profile || (
     echo -------------------------------------------------------------------------------
-    echo.
-    echo. - writing default profile
-    echo.
+    echo.writing default profile
     echo -------------------------------------------------------------------------------
     (
-        echo.if [[ -f /local64/etc/profile2.local ]]; then
+        echo.if [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW64 ]]; then
         echo.   source /local64/etc/profile2.local
-        echo.elif [[ -f /local32/etc/profile2.local ]]; then
+        echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
         echo.   source /local32/etc/profile2.local
         echo.fi
         )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
@@ -1417,12 +1415,8 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
 
 :compileLocals
 cd %instdir%
-IF ERRORLEVEL == 1 (
-    ECHO Something goes wrong...
-    pause
-  )
 
-if [%build64%]==[y] (
+if [%build64%]==[yes] (
     set MSYSTEM=MINGW64
     ) else set MSYSTEM=MINGW32
 
