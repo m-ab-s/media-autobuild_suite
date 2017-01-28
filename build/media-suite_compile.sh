@@ -566,10 +566,9 @@ fi
 
 _check=(libsndfile.{l,}a sndfile.{h,pc})
 if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
-    sed -i 's/ examples regtest tests programs//g' Makefile.am
     do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
-    do_separate_confmakeinstall
+    do_separate_confmakeinstall --disable-full-suite
     do_checkIfExist
 fi
 
