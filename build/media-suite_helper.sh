@@ -923,8 +923,6 @@ compilation_fail() {
         return 1
     else
         echo "${red}This is required for other packages, so this script will exit.${reset}"
-        echo "Press anything to pack a zip with relevant logs and upload it automatically"
-        do_prompt "or Ctrl+C/close the window to exit immediately."
         create_diagnostic
         zip_logs
         echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
