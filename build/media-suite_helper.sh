@@ -1295,6 +1295,10 @@ clean_suite() {
             grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
                 grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         fi
+        if [[ $(du -s /var/cache/pacman/pkg/ | awk '{print $1}') -gt 1000000 ]]; then
+            echo -e "\t${orange}Deleting unneeded Pacman packages...${reset}"
+            pacman -Sc --noconfirm
+        fi
     fi
 
     rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
