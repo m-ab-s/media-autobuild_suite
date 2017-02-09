@@ -639,7 +639,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle (l)gplv3 libs
-    local version3=(libopencore-amr{wb,nb} libvo-amrwbenc gmp)
+    local version3=(libopencore-amr{wb,nb} libvo-amrwbenc gmp libcdio)
     if [[ $license = *v3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
