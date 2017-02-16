@@ -553,21 +553,33 @@ do_pkgConfig() {
     fi
 }
 
+do_readlines() {
+    local filename="$1"
+    local varname="$2"
+    if [[ -f "$filename" ]]; then
+        IFS=$'\n' read -d '' -r -a "$varname" < <(cat "$filename" | dos2unix | sed "s;#.*$;;g")
+    else
+        echo -e "${red}Tried opening non-existent file: ${filename}${reset}"
+        exit 1
+    fi
+}
+
 do_getFFmpegConfig() {
     local license="${1:-nonfree}"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice = y ]]; then
-        FFMPEG_DEFAULT_OPTS=($(sed -e 's:\\::g' -e 's/#.*//' "$configfile" | tr '\n' ' '))
+        do_readlines "$configfile" FFMPEG_DEFAULT_OPTS
         echo "Imported FFmpeg options from ffmpeg_options.txt"
     elif [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice && $ffmpegChoice != y ]]; then
-        FFMPEG_DEFAULT_OPTS=($(sed -rne '/ffmpeg_options=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
-            sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g' | tr '\n' ' '))
+        do_readlines /trunk/media-autobuild_suite.bat bat
+        FFMPEG_DEFAULT_OPTS=($(printf '%s\n' "${bat[@]}" | \
+            sed -rne '/ffmpeg_options=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g'))
         [[ $ffmpegChoice = z || $ffmpegChoice = f ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(sed -rne '/ffmpeg_options_zeranoe=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
-                sed -e 's/.*ffmpeg_options_zeranoe=//' -e 's/ ^//g' | tr '\n' ' '))
+            FFMPEG_DEFAULT_OPTS+=($(printf '%s\n' "${bat[@]}" | \
+                sed -rne '/ffmpeg_options_zeranoe=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options_zeranoe=//' -e 's/ ^//g'))
         [[ $ffmpegChoice = f ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(sed -rne '/ffmpeg_options_full=/,/[^^]$/p' /trunk/media-autobuild_suite.bat | \
-                sed -e 's/.*ffmpeg_options_full=//' -e 's/ ^//g' | tr '\n' ' '))
+            FFMPEG_DEFAULT_OPTS+=($(printf '%s\n' "${bat[@]}" | \
+                sed -rne '/ffmpeg_options_full=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options_full=//' -e 's/ ^//g'))
         echo "Imported default FFmpeg options from .bat"
     else
         echo "Using default FFmpeg options"
