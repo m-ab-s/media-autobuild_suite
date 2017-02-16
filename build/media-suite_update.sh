@@ -80,9 +80,9 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     old=$(pacman -Qqe | sort)
-    new=$(cat /etc/pac-base.pk)
-    newmingw=$(cat /etc/pac-mingw.pk)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(cat /etc/pac-mingw-extra.pk)")
+    new=$(cat /etc/pac-base.pk | dos2unix)
+    newmingw=$(cat /etc/pac-mingw.pk | dos2unix)
+    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(cat /etc/pac-mingw-extra.pk | dos2unix)")
     [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
     [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
     diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
@@ -157,8 +157,8 @@ check_profiles() {
     local bat="media-autobuild_suite.bat"
     [[ -f "${bat}" ]] || return 1
     local new common tmp
-    new="$(sed -n "/# ${profile////.}$/,/${profile////.}$/p" "${bat}" | head -n -1)"
-    common="$(sed -n "/^:writeCommonProfile/,/%instdir%.local%1/p" "${bat}" | head -n -1 | tail -n +3)"
+    new="$(sed -n "/# ${profile////.}$/,/${profile////.}$/p" < <(dos2unix < "${bat}") | head -n -1)"
+    common="$(sed -n "/^:writeCommonProfile/,/%instdir%.local%1/p" < <(dos2unix < "${bat}") | head -n -1 | tail -n +3)"
     tmp="$(printf '%s\n' "$new" "$common" | sed 's,^\s*echo\.,,g')"
     [[ -f ."${profile//2}" ]] &&
         rm -f ."${profile//2}" && echo "Deleted old profiles"
