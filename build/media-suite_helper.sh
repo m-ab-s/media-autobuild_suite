@@ -680,7 +680,7 @@ do_changeFFmpegConfig() {
 
     enabled frei0r && do_addOption --enable-filter=frei0r
 
-    if enabled debug; then
+    if enabled_any debug "debug=gdb"; then
         # fix issue with ffprobe not working with debug and strip
         do_addOption --disable-stripping
     else

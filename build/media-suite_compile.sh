@@ -1147,17 +1147,21 @@ if [[ $ffmpeg != "n" ]]; then
             fi
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
+            enabled_any debug "debug=gdb" &&
+                ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
+            CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
                 log configure ../configure --prefix="$LOCALDESTDIR" \
                 --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
-            enabled debug &&
+            enabled_any debug "debug=gdb" &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
             cd_safe ..
             disabled_any avfilter ffmpeg ||
                 create_winpty_exe ffmpeg "$LOCALDESTDIR"/bin-video/
+            unset ffmpeg_cflags
         fi
         do_checkIfExist
     fi
