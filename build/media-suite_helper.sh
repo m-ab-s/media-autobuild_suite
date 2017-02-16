@@ -844,13 +844,17 @@ do_addOption() {
 }
 
 do_removeOption() {
-    local option=$1
-    local shared=$2
-    if [[ $shared = "y" ]]; then
-        FFMPEG_OPTS_SHARED=($(echo "${FFMPEG_OPTS_SHARED[*]}" | sed -r "s/ *$option//g"))
-    else
-        FFMPEG_OPTS=($(echo "${FFMPEG_OPTS[*]}" | sed -r "s/ *$option//g"))
-    fi
+    local option="$1"
+    local arrayname="FFMPEG_OPTS" basearray opt temp=()
+    [[ "$2" = "y" ]] && arrayname="FFMPEG_OPTS_SHARED"
+    basearray="${arrayname}[@]"
+
+    for opt in "${!basearray}"; do
+        if [[ ! "$opt" =~ ^${option}$ ]]; then
+            temp+=("$opt")
+        fi
+    done
+    eval "$arrayname"=\("\${temp[@]}"\)
 }
 
 do_removeOptions() {
