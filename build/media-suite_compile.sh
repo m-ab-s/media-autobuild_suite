@@ -974,7 +974,8 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
-    sed -ri 's|("-lc") ("-lpthread")|\1 "-lmingwex" \2|' source/CMakeLists.txt
+    implicitlibs="$(printf '"%s" ' -lmingwex -lmingwthrd -lmingw32 -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32)"
+    sed -ri "s|(\"-lc\").*(\"-lpthread\")|\1 ${implicitlibs} \2|" source/CMakeLists.txt
 
     build_x265() {
         create_build_dir
@@ -1079,7 +1080,7 @@ if [[ $ffmpeg != "n" ]]; then
         do_pacman_install netcdf
         sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
     fi
-    ! disabled_any sdl2 ffplay && do_pacman_install SDL2
+    disabled_any sdl2 ffplay || do_pacman_install SDL2
     enabled libopenjpeg && do_pacman_install openjpeg2
     enabled libopenh264 && do_pacman_install openh264
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&

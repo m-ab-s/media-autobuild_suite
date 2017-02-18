@@ -704,10 +704,13 @@ do_changeFFmpegConfig() {
         fi
     fi
 
+    # fuck sdl2, broken PoS
+    enabled_any sdl2 ffplay || do_addOption --disable-sdl2
+
     # remove libs that don't work with shared
     if [[ $ffmpeg = "s" || $ffmpeg = "b" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOption "--enable-(decklink|libgme|sdl2)" y
+        do_removeOption "--enable-(decklink|libgme|sdl2|ffplay)" y
         do_addOption FFMPEG_OPTS_SHARED --disable-sdl2
     fi
 }
@@ -990,7 +993,8 @@ log() {
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging != "n" ]]; then
-        echo "$_cmd $*" > "ab-suite.$name.log"
+        echo -e "CFLAGS: $CFLAGS\nLDFLAGS: $LDFLAGS" > "ab-suite.$name.log"
+        echo "$_cmd $*" >> "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
             { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
             compilation_fail "$name"
