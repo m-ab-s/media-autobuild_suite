@@ -536,10 +536,10 @@ if %ffmpegBINI%==0 (
     ) else set buildffmpeg=%ffmpegBINI%
 if %deleteINI%==1 set "writeFF=yes"
 
-if %buildffmpeg%==1 set "ffmpeg=y"
-if %buildffmpeg%==2 set "ffmpeg=n"
-if %buildffmpeg%==3 set "ffmpeg=s"
-if %buildffmpeg%==4 set "ffmpeg=b"
+if %buildffmpeg%==1 set "ffmpeg=static"
+if %buildffmpeg%==2 set "ffmpeg=no"
+if %buildffmpeg%==3 set "ffmpeg=shared"
+if %buildffmpeg%==4 set "ffmpeg=both"
 if %buildffmpeg% GTR 4 GOTO ffmpeg
 if %writeFF%==yes echo.ffmpegB=^%buildffmpeg%>>%ini%
 
