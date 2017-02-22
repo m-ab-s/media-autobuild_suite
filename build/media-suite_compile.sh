@@ -246,7 +246,7 @@ fi
 [[ ! "$curl_ver" ]] &&
     curl_ver="$(clean_html_index https://curl.haxx.se/download/)" &&
     curl_ver="$(get_last_version "$curl_ver" bz2 "7\.\d+\.\d")"
-curl_ver="${curl_ver:-7.51.0}"
+curl_ver="${curl_ver:-7.53.0}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 enabled openssl && _deps+=(libssl.a)
@@ -257,6 +257,7 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
+    do_patch curl-fixbuild-sspi.patch
     extra_opts=()
     if enabled openssl; then
         extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
@@ -271,7 +272,7 @@ if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn} \
+        --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn2} \
         --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     _notrequired=yes
