@@ -109,6 +109,10 @@ if [[ -n "$alloptions" ]]; then
     unset alloptions
 fi
 
+# In case a build was interrupted before reversing hide_conflicting_libs
+hide_conflicting_libs -R
+do_hide_all_sharedlibs
+
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
 
