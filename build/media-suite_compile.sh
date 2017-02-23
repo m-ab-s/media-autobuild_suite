@@ -1120,6 +1120,8 @@ if [[ $ffmpeg != "no" ]]; then
             "$LOCALDESTDIR"/lib/sw{scale,resample}-*.def
             "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}-*.dll
             "$LOCALDESTDIR"/bin-video/sw{scale,resample}-*.dll
+            "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}.lib
+            "$LOCALDESTDIR"/bin-video/sw{scale,resample}.lib
             )
         _check=()
         sedflags="prefix|bindir|extra-version|pkg-config-flags"
