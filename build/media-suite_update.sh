@@ -18,7 +18,6 @@ else
     cd "$(cygpath -w /)../build" || exit 1
 fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
-[[ "$(uname)" = *6.1* ]] && nargs="-n 4"
 
 # --------------------------------------------------
 # update suite
