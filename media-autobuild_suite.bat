@@ -528,8 +528,6 @@ if %ffmpegBINI%==0 (
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
     echo.
-    echo. Note: mpv needs FFmpeg static libraries.
-    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpeg="Build FFmpeg: "
