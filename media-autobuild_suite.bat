@@ -92,7 +92,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-aom daala faac
+aom daala faac ffmbc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -735,6 +735,33 @@ if %buildbmx%==1 set "bmx=y"
 if %buildbmx%==2 set "bmx=n"
 if %buildbmx% GTR 2 GOTO bmx
 if %writeBmx%==yes echo.bmx=^%buildbmx%>>%ini%
+
+:ffmbc
+set "writeFFmbc=no"
+if %ffmbcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build FFMedia Broadcast binary?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note: this is a fork of FFmpeg 0.10. As such, it's very likely to fail
+    echo. to build, work, might burn your computer, kill your children, like mplayer.
+    echo. Only enable it if you absolutely need it. If it breaks, complain first to
+    echo. the author in #ffmbc in Freenode IRC.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildffmbc="Build ffmbc: "
+    ) else set buildffmbc=%ffmbcINI%
+if %deleteINI%==1 set "writeFFmbc=yes"
+
+if %buildffmbc%==1 set "ffmbc=y"
+if %buildffmbc%==2 set "ffmbc=n"
+if %buildffmbc% GTR 2 GOTO ffmbc
+if %writeFFmbc%==yes echo.ffmbc=^%buildffmbc%>>%ini%
+
 
 :numCores
 set "writeCores=no"
@@ -1427,7 +1454,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---daala=%daala% --faac=%faac%'
+--daala=%daala% --faac=%faac% --ffmbc=%ffmbc%'
 
 endlocal
 goto :EOF

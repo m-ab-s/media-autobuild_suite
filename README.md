@@ -96,6 +96,7 @@ Included Tools And Libraries
     - daala (git)
     - faac (1.28)
     - fdk-aac (git)
+    - ffmbc (git) (unsupported)
     - flac (git)
     - kvazaar (git)
     - lame (3.99.5)

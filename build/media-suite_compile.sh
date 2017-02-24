@@ -46,6 +46,7 @@ while true; do
 --aom=* ) aom="${1#*=}"; shift ;;
 --daala=* ) daala="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
+--ffmbc=* ) ffmbc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1431,6 +1432,17 @@ if [[ $bmx = "y" ]]; then
         do_separate_confmakeinstall video
         do_checkIfExist
     fi
+fi
+
+_check=(bin-video/ffmbc.exe)
+if [[ $ffmbc = y ]] && do_vcs https://github.com/bcoudurier/FFmbc.git; then
+    _notrequired=yes
+    sed -i '/strncpy/d' libavutil/internal.h
+    create_build_dir
+    log configure ../configure --target-os=mingw32 --enable-gpl \
+        --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
+    do_make && do_install ffmbc.exe bin-video/ && do_checkIfExist
+    unset _notrequired
 fi
 
 echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"
