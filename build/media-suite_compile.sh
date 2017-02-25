@@ -673,6 +673,10 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
         extracommands+=(--disable-examples)
     do_uninstall include/vpx "${_check[@]}"
     create_build_dir
+    for _c in vp8 vp9; do
+        disabled "encoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-encoder")
+        disabled "decoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-decoder")
+    done
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
         --enable-{vp9-postproc,vp9-highbitdepth} \
@@ -684,7 +688,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     do_makeinstall
     [[ $standalone = y ]] && do_install vpx{enc,dec}.exe bin-video/
     do_checkIfExist
-    unset extracommands _ff
+    unset extracommands _ff _c
 else
     pc_exists vpx || do_removeOption --enable-libvpx
 fi
