@@ -122,12 +122,16 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
     _check=(libfreetype.{l,}a freetype2.pc)
+    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
     if do_pkgConfig "freetype2 = 19.0.13" "2.7.1"; then
         do_wget -h d41d8cd98f00b204e9800998ecf8427e \
             "http://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.bz2"
-        do_uninstall include/freetype2 bin-global/freetype-config "${_check[@]}"
+        do_uninstall include/freetype2 bin-global/freetype-config \
+            bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
         extracommands=(--with-{harfbuzz,png,bzip2}=no)
+        [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
+        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
         do_checkIfExist
     fi
 
@@ -150,7 +154,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     harfbuzz_ver="${harfbuzz_ver:-1.3.3}"
     _deps=(lib{freetype,fontconfig}.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
-    if do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
+    if [[ $ffmpeg != "shared" ]] && do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
@@ -160,23 +164,30 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _check=(libfribidi.{l,}a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
+    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_pkgConfig "fribidi = 0.19.7"; then
         do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
             "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-        do_uninstall include/fribidi "${_check[@]}"
+        do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
-        do_separate_confmakeinstall global --disable-{deprecated,debug} --with-glib=no
+        extracommands=(--disable-{deprecated,debug} --with-glib=no)
+        [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
+        do_separate_confmakeinstall global "${extracommands[@]}"
+        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
     fi
 
     _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
     _deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
+    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libass-9.dll libass.dll.a)
     if do_vcs "https://github.com/libass/libass.git"; then
         do_autoreconf
-        do_uninstall "${_check[@]}"
+        do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
         extracommands=()
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
+        [[ $ffmpeg = "shared" ]] && extracommands+=(--disable-harfbuzz --enable-shared)
         do_separate_confmakeinstall "${extracommands[@]}"
+        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
     fi
 fi
