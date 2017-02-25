@@ -670,16 +670,16 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     extracommands=()
     [[ -f config.mk ]] && log "distclean" make distclean
     [[ $standalone = y ]] && _check+=(bin-video/vpxdec.exe) ||
-        extracommands+=(--disable-examples)
+        extracommands+=(--disable-{examples,webm-io,libyuv,postproc})
     do_uninstall include/vpx "${_check[@]}"
     create_build_dir
     for _c in vp8 vp9; do
         disabled "encoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-encoder")
         disabled "decoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-decoder")
     done
+    [[ $ffmpeg = "shared" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
-        --enable-{vp9-postproc,vp9-highbitdepth} \
         "${extracommands[@]}"
     for _ff in *.mk; do
         sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
