@@ -910,7 +910,7 @@ if [[ $x264 != n ]]; then
                 "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}-*.dll \
                 "$LOCALDESTDIR"/bin-video/sw{scale,resample}-*.dll \
                 "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}.lib \
-                "$LOCALDESTDIR"/bin-video/sw{scale,resample}.lib \
+                "$LOCALDESTDIR"/bin-video/sw{scale,resample}.lib
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
