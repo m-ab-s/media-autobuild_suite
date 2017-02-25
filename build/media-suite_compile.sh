@@ -168,7 +168,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     if do_pkgConfig "fribidi = 0.19.7"; then
         do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
             "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
-        do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a "${_check[@]}"
+        do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
+            bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
         extracommands=(--disable-{deprecated,debug} --with-glib=no)
         [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
