@@ -923,11 +923,11 @@ if [[ $x264 != n ]]; then
                 libav{codec,device,filter,format,util,resample}.{dll.a,a,pc} \
                 lib{sw{scale,resample},postproc}.{dll.a,a,pc} \
                 "$LOCALDESTDIR"/lib/av{codec,device,filter,format,util}-*.def \
-                "$LOCALDESTDIR"/lib/sw{scale,resample}-*.def \
+                "$LOCALDESTDIR"/lib/{sw{scale,resample},postproc}-*.def \
                 "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}-*.dll \
-                "$LOCALDESTDIR"/bin-video/sw{scale,resample}-*.dll \
+                "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}-*.dll \
                 "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}.lib \
-                "$LOCALDESTDIR"/bin-video/sw{scale,resample}.lib
+                "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}.lib
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
@@ -1140,11 +1140,11 @@ if [[ $ffmpeg != "no" ]]; then
             libav{codec,device,filter,format,util,resample}.{dll.a,a,pc}
             lib{sw{scale,resample},postproc}.{dll.a,a,pc}
             "$LOCALDESTDIR"/lib/av{codec,device,filter,format,util}-*.def
-            "$LOCALDESTDIR"/lib/sw{scale,resample}-*.def
+            "$LOCALDESTDIR"/lib/{sw{scale,resample},postproc}-*.def
             "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}-*.dll
-            "$LOCALDESTDIR"/bin-video/sw{scale,resample}-*.dll
+            "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}-*.dll
             "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}.lib
-            "$LOCALDESTDIR"/bin-video/sw{scale,resample}.lib
+            "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}.lib
             )
         _check=()
         sedflags="prefix|bindir|extra-version|pkg-config-flags"
