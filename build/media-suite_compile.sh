@@ -171,6 +171,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
+        [[ $ffmpeg = "shared" ]] &&
+            sed -i 's/$(am__append_1) $(am__append_2)/-export-symbols-regex "^fribidi_.*"/' lib/Makefile.in
         extracommands=(--disable-{deprecated,debug} --with-glib=no)
         [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
