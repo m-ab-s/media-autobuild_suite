@@ -186,7 +186,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
         extracommands=()
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
-        [[ $ffmpeg = "shared" ]] && extracommands+=(--disable-harfbuzz --enable-shared)
+        [[ $ffmpeg = "shared" ]] && extracommands+=(--disable-{harfbuzz,fontconfig} --enable-shared)
         do_separate_confmakeinstall "${extracommands[@]}"
         [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
