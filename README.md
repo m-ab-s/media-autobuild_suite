@@ -83,6 +83,7 @@ Included Tools And Libraries
         - librubberband (git snapshot)
         - libssh (mingw)
         - libtesseract (git)
+        - libzmq (mingw)
         - libzvbi (0.2.35)
         - netcdf (mingw)
         - opencl (from system)

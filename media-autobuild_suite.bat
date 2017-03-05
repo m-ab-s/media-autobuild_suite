@@ -83,7 +83,7 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
 --enable-libssh --enable-libtesseract --enable-libzvbi ^
 --enable-chromaprint --enable-libopenh264 --enable-libopenmpt ^
---enable-netcdf --enable-libnpp --enable-sdl2
+--enable-netcdf --enable-libnpp --enable-sdl2 --enable-libzmq
 
 set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libass --enable-rubberband ^
 --enable-lua --enable-uchardet --enable-libarchive --enable-lcms2 --disable-debug-build ^

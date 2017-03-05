@@ -1115,6 +1115,12 @@ if [[ $ffmpeg != "no" ]]; then
     enabled libopenh264 && do_pacman_install openh264
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
         do_pacman_remove fftw && do_pacman_install chromaprint
+    if enabled libzmq; then
+        do_pacman_install zeromq
+        grep -q ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc ||
+            sed -i 's/-lsodium/& -lws2_32 -liphlpapi' "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc
+        do_addOption --extra-cflags=-DZMG_STATIC
+    fi
 
     do_hide_all_sharedlibs
 
