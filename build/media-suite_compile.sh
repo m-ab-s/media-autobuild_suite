@@ -195,6 +195,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
     fi
+    if [[ $ffmpeg != "sharedlibs" ]]; then
+        find "$LOCALDESTDIR/lib" -name "*.dll.a" -exec rm -f '{}' \;
+    fi
 fi
 
 _check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
