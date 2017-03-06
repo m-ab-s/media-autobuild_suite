@@ -708,7 +708,7 @@ do_changeFFmpegConfig() {
     enabled_any sdl2 ffplay || do_addOption --disable-sdl2
 
     # remove libs that don't work with shared
-    if [[ $ffmpeg = "shared" || $ffmpeg = "both" ]]; then
+    if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
         do_removeOption "--enable-(decklink|libgme|sdl2|ffplay)" y
         do_addOption FFMPEG_OPTS_SHARED --disable-sdl2

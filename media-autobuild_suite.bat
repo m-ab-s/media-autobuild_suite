@@ -90,7 +90,7 @@ set mpv_options=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-lib
 --enable-vapoursynth --disable-libmpv-shared --enable-egl-angle-lib --enable-html-build ^
 --enable-pdf-build --enable-manpage-build
 
-set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB ffmpegUpdate ^
+set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
 aom daala faac ffmbc
 
@@ -518,7 +518,7 @@ if %writesox%==yes echo.soxB=^%buildsox%>>%ini%
 
 :ffmpeg
 set "writeFF=no"
-if %ffmpegBINI%==0 (
+if %ffmpegB2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -527,19 +527,25 @@ if %ffmpegBINI%==0 (
     echo. 2 = No
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
+    echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
+    echo.
+    echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
+    echo. compiled shared so they take less space. This one isn't tested a lot and
+    echo. will fail with fontconfig enabled.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpeg="Build FFmpeg: "
-    ) else set buildffmpeg=%ffmpegBINI%
+    ) else set buildffmpeg=%ffmpegB2INI%
 if %deleteINI%==1 set "writeFF=yes"
 
 if %buildffmpeg%==1 set "ffmpeg=static"
 if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
 if %buildffmpeg%==4 set "ffmpeg=both"
-if %buildffmpeg% GTR 4 GOTO ffmpeg
-if %writeFF%==yes echo.ffmpegB=^%buildffmpeg%>>%ini%
+if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
+if %buildffmpeg% GTR 5 GOTO ffmpeg
+if %writeFF%==yes echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
 set "writeFFU=no"

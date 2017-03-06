@@ -122,21 +122,23 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
     _check=(libfreetype.{l,}a freetype2.pc)
-    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
+    [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
     if do_pkgConfig "freetype2 = 19.0.13" "2.7.1"; then
         do_wget -h b3230110e0cab777e0df7631837ac36e \
             "http://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
         extracommands=(--with-{harfbuzz,png,bzip2}=no)
-        [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
+        [[ $ffmpeg = "sharedlibs" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
+        [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
         do_checkIfExist
     fi
 
     _deps=(libfreetype.a)
     _check=(libfontconfig.{,l}a fontconfig.pc)
+    [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
+        do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.12.1"; then
         do_wget -h b5af5a423ee3b5cfc34846838963c058 \
             "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.1.tar.bz2"
@@ -154,7 +156,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     harfbuzz_ver="${harfbuzz_ver:-1.3.3}"
     _deps=(lib{freetype,fontconfig}.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
-    if [[ $ffmpeg != "shared" ]] && do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
+    if [[ $ffmpeg != "sharedlibs" ]] && do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
         do_pacman_install ragel
         do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
         do_uninstall include/harfbuzz "${_check[@]}"
@@ -164,33 +166,33 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _check=(libfribidi.{l,}a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
-    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
+    [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_pkgConfig "fribidi = 0.19.7"; then
         do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
             "http://fribidi.org/download/fribidi-0.19.7.tar.bz2"
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
-        [[ $ffmpeg = "shared" ]] &&
+        [[ $ffmpeg = "sharedlibs" ]] &&
             sed -i 's/$(am__append_1) $(am__append_2)/-export-symbols-regex "^fribidi_.*"/' lib/Makefile.in
         extracommands=(--disable-{deprecated,debug} --with-glib=no)
-        [[ $ffmpeg = "shared" ]] && extracommands+=(--enable-shared)
+        [[ $ffmpeg = "sharedlibs" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
+        [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
     fi
 
     _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
     _deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
-    [[ $ffmpeg = "shared" ]] && _check+=(bin-video/libass-9.dll libass.dll.a)
+    [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libass-9.dll libass.dll.a)
     if do_vcs "https://github.com/libass/libass.git"; then
         do_autoreconf
         do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
         extracommands=()
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
-        [[ $ffmpeg = "shared" ]] && extracommands+=(--disable-{harfbuzz,fontconfig} --enable-shared)
+        [[ $ffmpeg = "sharedlibs" ]] && extracommands+=(--disable-{harfbuzz,fontconfig} --enable-shared)
         do_separate_confmakeinstall "${extracommands[@]}"
-        [[ $ffmpeg = "shared" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
+        [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
     fi
 fi
@@ -680,7 +682,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
         disabled "encoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-encoder")
         disabled "decoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-decoder")
     done
-    [[ $ffmpeg = "shared" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
+    [[ $ffmpeg = "sharedlibs" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
         "${extracommands[@]}"
@@ -1126,7 +1128,7 @@ if [[ $ffmpeg != "no" ]]; then
 
     _check=(libavutil.pc)
     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
-    if [[ $ffmpeg = "shared" ]]; then
+    if [[ $ffmpeg =~ "shared" ]]; then
         _check+=(libavutil.dll.a)
     else
         _check+=(libavutil.a)
@@ -1160,7 +1162,7 @@ if [[ $ffmpeg != "no" ]]; then
         if [[ $ffmpeg = "both" ]]; then
             _check+=(bin-video/ffmpegSHARED/lib/libavutil.dll.a)
             FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED")
-        elif [[ $ffmpeg = "shared" ]]; then
+        elif [[ $ffmpeg =~ "shared" ]]; then
             _check+=(libavutil.{dll.a,pc})
             FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR"
                 --bindir="$LOCALDESTDIR/bin-video"
@@ -1187,7 +1189,7 @@ if [[ $ffmpeg != "no" ]]; then
         fi
 
         # static
-        if [[ $ffmpeg != "shared" ]] && _check=(libavutil.{a,pc}); then
+        if [[ ! $ffmpeg =~ "shared" ]] && _check=(libavutil.{a,pc}); then
             do_print_progress "Compiling ${bold}static${reset} FFmpeg"
             [[ -f config.mak ]] && log "distclean" make distclean
             if ! disabled_any programs avcodec avformat; then
