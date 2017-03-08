@@ -1005,12 +1005,13 @@ log() {
 }
 
 create_build_dir() {
-    local extra
-    [[ $1 ]] && extra="-$1"
-    if [[ -d build${extra}-$bits ]] && ! rm -rf "build${extra}-$bits"; then
-        cd_safe "build${extra}-$bits" && rm -rf ./*
+    local build_dir="build${1:+-$1}-$bits"
+    if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
+        rm -rf ./*
+    elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
+        cd_safe "$build_dir" && rm -rf ./*
     else
-        mkdir "build${extra}-$bits" && cd_safe "build${extra}-$bits"
+        mkdir "$build_dir" && cd_safe "$build_dir"
     fi
 }
 
