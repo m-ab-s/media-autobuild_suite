@@ -1,6 +1,4 @@
 #!/bin/bash
-shopt -q extglob; extglob_set=$?
-((extglob_set)) && shopt -s extglob
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
     cpuCount="$(($(nproc)/2))"
@@ -171,8 +169,8 @@ do_vcs() {
 
     if [[ $ffmpegUpdate = onlyFFmpeg ]] &&
         [[ $vcsFolder != ffmpeg ]] && [[ $vcsFolder != mpv ]] &&
-        { { [[ -z "${vcsCheck[@]}" ]] && files_exist "$vcsFolder.pc"; } ||
-          { [[ -n "${vcsCheck[@]}" ]] && files_exist "${vcsCheck[@]}"; }; }; then
+        { { [[ -z "${vcsCheck[*]}" ]] && files_exist "$vcsFolder.pc"; } ||
+          { [[ -n "${vcsCheck[*]}" ]] && files_exist "${vcsCheck[@]}"; }; }; then
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
         return 1
     fi
@@ -192,11 +190,11 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
     elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
-    elif [[ -z "${vcsCheck[@]}" ]] && ! files_exist "$vcsFolder.pc"; then
+    elif [[ -z "${vcsCheck[*]}" ]] && ! files_exist "$vcsFolder.pc"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Missing pkg-config"
-    elif [[ -n "${vcsCheck[@]}" ]] && ! files_exist "${vcsCheck[@]}"; then
+    elif [[ -n "${vcsCheck[*]}" ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
-    elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
+    elif [[ -n "${deps[*]}" ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
@@ -349,13 +347,17 @@ do_wget_sf() {
 }
 
 do_strip() {
-    local cmd exts nostrip file
+    local cmd exts nostrip file val
     local cmd=(strip)
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
     local exts="exe|dll|com|a"
     [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
-    [[ "$@" =~ \.($exts)$ ]] &&
-        [[ ! "$@" =~ ($nostrip)\.exe$ ]] && do_print_progress Stripping
+    for file; do
+        if [[ "$file" =~ \.($exts)$ && ! "$file" =~ ($nostrip)\.exe$ ]]; then
+            do_print_progress Stripping
+            break
+        fi
+    done
     for file; do
         local orig_file="$file"
         if ! file="$(file_installed $orig_file)"; then
@@ -385,14 +387,19 @@ do_pack() {
     local nopack=""
     local exts="exe|dll"
     [[ $bits = 64bit ]] && enabled openssl && nopack="ffmpeg|mplayer|mpv"
-    [[ "$@" =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]] &&
-        do_print_progress Packing with UPX
+    for file; do
+        if [[ "$file" =~ \.($exts)$ && ! "$file" =~ ($nopack)\.exe$ ]]; then
+            do_print_progress Packing with UPX
+            break
+        fi
+    done
     for file; do
         local orig_file="$file"
         if ! file="$(file_installed $orig_file)"; then
             continue
         fi
-        if [[ $file =~ \.($exts)$ ]] && ! [[ $nopack && "$@" =~ ($nopack)\.exe$ ]]; then
+        if [[ $file =~ \.($exts)$ ]] &&
+            ! [[ -n "$nopack" && $file =~ ($nopack)\.exe$ ]]; then
             [[ $stripping = y ]] && cmd+=(--strip-relocs=0)
         else
             file=""
@@ -417,7 +424,7 @@ do_checkIfExist() {
     packetName="$(get_first_subdir)"
     local dry="${dry:-n}"
     local check=("${_check[@]}")
-    [[ -z ${check[@]} ]] && echo "No files to check" && exit 1
+    [[ -z ${check[*]} ]] && echo "No files to check" && exit 1
     if [[ $dry = y ]]; then
         files_exist -v -s "${check[@]}"
     else
@@ -520,7 +527,7 @@ do_uninstall() {
     [[ $1 = q ]] && quiet=y && shift
     [[ $1 = all ]] && all=y && shift
     [[ $all ]] && files=($(files_exist -l "$@")) || files=($(files_exist -l -b "$@"))
-    if [[ -n ${files[@]} ]]; then
+    if [[ -n "${files[*]}" ]]; then
         [[ ! $quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
             echo "rm -rf ${files[*]}"
@@ -543,9 +550,9 @@ do_pkgConfig() {
         do_print_status "${pkg_and_version}" "$red" "Not installed"
     elif ! pc_exists "${pkg}${pc_check}"; then
         do_print_status "${pkg_and_version}" "$orange" "Outdated"
-    elif [[ ${deps[@]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
+    elif [[ -n "${deps[*]}" ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
         do_print_status "${pkg_and_version}" "$orange" "Newer dependencies"
-    elif [[ -n "${_check[@]}" ]] && ! files_exist "${_check[@]}"; then
+    elif [[ -n "${_check[*]}" ]] && ! files_exist "${_check[@]}"; then
         do_print_status "${pkg_and_version}" "$orange" "Files missing"
     else
         do_print_status "${pkg_and_version}" "$green" "Up-to-date"
@@ -1358,5 +1365,3 @@ create_winpty_exe() {
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
-
-((extglob_set)) && shopt -u extglob
