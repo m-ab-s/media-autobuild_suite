@@ -179,7 +179,7 @@ do_vcs() {
     log quiet "$vcsType.update" vcs_update
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
-        rm -f build_successful{32,64}bit
+        rm -f build_successful{32,64}bit{,_shared}
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$vcsFolder]"
