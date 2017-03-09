@@ -870,7 +870,7 @@ do_addOption() {
         array="FFMPEG_OPTS"
     fi
     for opt; do
-        ! opt_exists "$array" "$opt" && declare -ag "$array+=('$opt')"
+        ! opt_exists "$array" "$opt" && declare -ag "$array+=(\"$opt\")"
     done
 }
 
