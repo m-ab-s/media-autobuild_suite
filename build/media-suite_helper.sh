@@ -705,7 +705,7 @@ do_changeFFmpegConfig() {
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
 
     if enabled libnpp; then
-        if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]]; then
+        if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/nppi.h" ]]; then
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             if [[ $bits = 64bit ]]; then
