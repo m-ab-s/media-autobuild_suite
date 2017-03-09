@@ -560,11 +560,19 @@ do_pkgConfig() {
     fi
 }
 
-do_readlines() {
+do_readoptionsfile() {
     local filename="$1"
     local varname="$2"
     if [[ -f "$filename" ]]; then
-        IFS=$'\n' read -d '' -r -a "$varname" < <(cat "$filename" | dos2unix | sed "s;#.*$;;g")
+        IFS=$'\n' read -d '' -r -a "$varname" < <(< $filename dos2unix |
+            sed -r '# remove commented text
+                    s/#.*//
+                    # delete empty lines
+                    /^\s*$/d
+                    # remove leading/trailing whitespace
+                    s/(^\s+|\s+$)//
+                    # move each option to each line
+                    s/\s+(--\w+)/\n\1/g')
     else
         echo -e "${red}Tried opening non-existent file: ${filename}${reset}"
         exit 1
@@ -575,10 +583,10 @@ do_getFFmpegConfig() {
     local license="${1:-nonfree}"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
     if [[ -f "$configfile" ]] && [[ $ffmpegChoice = y ]]; then
-        do_readlines "$configfile" FFMPEG_DEFAULT_OPTS
+        do_readoptionsfile "$configfile" FFMPEG_DEFAULT_OPTS
         echo "Imported FFmpeg options from ffmpeg_options.txt"
     elif [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice && $ffmpegChoice != y ]]; then
-        do_readlines /trunk/media-autobuild_suite.bat bat
+        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         FFMPEG_DEFAULT_OPTS=($(printf '%s\n' "${bat[@]}" | \
             sed -rne '/ffmpeg_options=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g'))
         [[ $ffmpegChoice = z || $ffmpegChoice = f ]] &&
@@ -777,10 +785,10 @@ do_getMpvConfig() {
     local configfile="$LOCALBUILDDIR"/mpv_options.txt
     local forced
     if [[ -f $configfile ]] && [[ $ffmpegChoice = y ]]; then
-        do_readlines "$configfile" MPV_OPTS
+        do_readoptionsfile "$configfile" MPV_OPTS
         echo "Imported mpv options from mpv_options.txt"
     elif [[ -f "/trunk/media-autobuild_suite.bat" && x"$ffmpegChoice" != x"y" ]]; then
-        [[ -z "$bat" ]] && do_readlines /trunk/media-autobuild_suite.bat bat
+        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         MPV_OPTS=($(printf '%s\n' "${bat[@]}" | \
             sed -rne '/mpv_options=/,/[^^]$/p' | sed -e 's/.*mpv_options=//' -e 's/ ^//g'))
         echo "Imported default mpv options from .bat"
