@@ -673,13 +673,16 @@ do_changeFFmpegConfig() {
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    # handle non-free libs
-    local nonfree=(libnpp)
-    if [[ $license = "nonfree" ]] && enabled_any "${nonfree[@]}" &&
-        [[ $bits = 64bit ]]; then
-        do_addOption --enable-nonfree
+    # libnpp is the only true nonfree external lib
+    if [[ $license = "nonfree" && $bits = 64bit ]] && enabled libnpp &&
+        [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/nppi.h" ]] &&
+        [[ -f "$CUDA_PATH/lib/x64/nppi.lib" ]]; then
+            local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
+            do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
+            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
     else
-        do_removeOptions "${nonfree[*]/#/--enable-} --enable-nonfree"
+        do_removeOptions "--enable-libnpp --enable-nonfree"
     fi
 
     # handle gpl-incompatible libs
@@ -703,21 +706,6 @@ do_changeFFmpegConfig() {
     fi
 
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
-
-    if enabled libnpp; then
-        if [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/nppi.h" ]]; then
-            fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
-            if [[ $bits = 64bit ]]; then
-                do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
-            else
-                do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/Win32"
-            fi
-            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
-        else
-            do_removeOption "--enable-libnpp"
-        fi
-    fi
 
     # fuck sdl2, broken PoS
     enabled_any sdl2 ffplay || do_addOption --disable-sdl2
