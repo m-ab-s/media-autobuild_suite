@@ -1384,15 +1384,13 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         fi
 
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
-        if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
-            mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
-            if [[ $bits = 64bit ]]; then
+        if [[ $bits = "64bit" ]]; then
+            mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
+            if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
+                mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
-            else
-                mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/Win32")
             fi
         fi
-        [[ $bits = "64bit" ]] && mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python3-docutils
