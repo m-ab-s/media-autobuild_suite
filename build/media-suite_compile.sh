@@ -919,10 +919,11 @@ if [[ $x264 != n ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     if do_vcs "https://git.videolan.org/git/x264.git" ||
-        [[ $x264 != h && "$(get_api_version x264_config.h BIT_DEPTH)" = "10" ]] ||
-        [[ $x264  = h && "$(get_api_version x264_config.h BIT_DEPTH)" = "8" ]]; then
-        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --enable-static)
-        if [[ $standalone = y && $x264 = f ]]; then
+        [[ $x264 != high && "$(get_api_version x264_config.h BIT_DEPTH)" = "10" ]] ||
+        [[ $x264  = high && "$(get_api_version x264_config.h BIT_DEPTH)" = "8" ]]; then
+        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --enable-static
+            --bindir="$LOCALDESTDIR/bin-video")
+        if [[ $standalone = y && $x264 = full ]]; then
             _check=(libav{codec,format}.{a,pc})
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
             do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample} \
@@ -966,27 +967,46 @@ if [[ $x264 != n ]]; then
             cd_safe "$LOCALBUILDDIR"/x264-git
         fi
 
-        _check=(x264{,_config}.h libx264.a x264.pc)
+        _check=(x264{,_config}.h x264.pc)
         [[ -f "config.h" ]] && log "distclean" make distclean
+        do_uninstall "${_check[@]}" libx264{,.dll}.a \
+            bin-video/libx264-"${x264_build}"{,-10bits}.dll
+
         if [[ $standalone = y ]]; then
-            extracommands+=(--bindir="$LOCALDESTDIR/bin-video")
             _check+=(bin-video/x264.exe)
         else
             extracommands+=(--disable-cli)
         fi
-        if [[ $standalone = y && $x264 != h ]]; then
+
+        x264_build="$(grep X264_BUILD x264.h | awk '{ print $3 }' | head -1)"
+        if [[ $x264 = shared ]]; then
+            extracommands+=(--enable-shared)
+            _check+=(libx264{,.dll}.a bin-video/libx264-"${x264_build}"-10bits.dll
+                bin-video/libx264-"${x264_build}".dll)
+        else
+            extracommands+=(--disable-shared)
+            _check+=(libx264.a)
+        fi
+
+        if [[ $standalone = y && $x264 =~ (yes|full) ]]; then
             do_print_progress "Building 10-bit x264"
             _check+=(bin-video/x264-10bit.exe)
-            do_uninstall "${_check[@]}"
             create_build_dir
             CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 "${extracommands[@]}"
             do_make
             do_install x264.exe bin-video/x264-10bit.exe
             cd_safe ..
             do_print_progress "Building 8-bit x264"
+        elif [[ $x264 = shared ]]; then
+            do_print_progress "Building 10-bit x264 shared lib"
+            create_build_dir
+            CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 --disable-cli "${extracommands[@]}"
+            do_make
+            do_install libx264-"${x264_build}".dll bin-video/libx264-"${x264_build}"-10bits.dll
+            cd_safe ..
+            do_print_progress "Building 8-bit x264 shared lib"
         else
-            do_uninstall "${_check[@]}"
-            if [[ $x264 = h ]]; then
+            if [[ $x264 = high ]]; then
                 extracommands+=(--bit-depth=10) && do_print_progress "Building 10-bit x264"
             else
                 do_print_progress "Building 8-bit x264"
@@ -997,7 +1017,7 @@ if [[ $x264 != n ]]; then
         do_make
         do_makeinstall
         do_checkIfExist
-        unset extracommands
+        unset extracommands x264_build
     fi
 else
     pc_exists x264 || do_removeOption --enable-libx264

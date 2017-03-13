@@ -335,8 +335,14 @@ if %x2642INI%==0 (
     echo. 2 = No
     echo. 3 = 10-bit lib/binary
     echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat and ffms2
+    echo. 5 = 8-bit and 10-bit shared lib
     echo.
     echo. Binaries being built depends on "standalone=y"
+    echo.
+    echo. Option 5 allows switching between 8 and 10-bit by renaming the .dll
+    echo. accordingly. There will be a libx264-xxx.dll and libx264-xxx-10bits.dll.
+    echo. If you need 10-bit x264, you rename the -10.dll to the other and vice-versa.
+    echo. FFmpeg will depend on that .dll to run.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -344,11 +350,12 @@ if %x2642INI%==0 (
     ) else set buildx264=%x2642INI%
 if %deleteINI%==1 set "writex264=yes"
 
-if %buildx264%==1 set "x2642=y"
-if %buildx264%==2 set "x2642=n"
-if %buildx264%==3 set "x2642=h"
-if %buildx264%==4 set "x2642=f"
-if %buildx264% GTR 4 GOTO x264
+if %buildx264%==1 set "x2642=yes"
+if %buildx264%==2 set "x2642=no"
+if %buildx264%==3 set "x2642=high"
+if %buildx264%==4 set "x2642=full"
+if %buildx264%==5 set "x2642=shared"
+if %buildx264% GTR 5 GOTO x264
 if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
 
 :x265
