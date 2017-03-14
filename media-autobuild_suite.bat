@@ -707,11 +707,12 @@ if %mpvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build static mpv binary?
+    echo. Build mpv?
     echo. 1 = Yes
     echo. 2 = No
     echo. 3 = compile with Vapoursynth, if installed [see Warning]
     echo.
+    echo. Note: when built with shared-only FFmpeg, mpv is also shared.
     echo. Note: Requires at least Windows Vista.
     echo. Warning: the third option isn't completely static. There's no way to include
     echo. a library dependant on Python statically. All users of the compiled binary
