@@ -791,10 +791,10 @@ do_getMpvConfig() {
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
     if ! mpv_enabled debug-build; then
-        do_addOption --disable-debug-build
+        do_addOption MPV_OPTS --disable-debug-build
     fi
     if [[ $mpv = "y" ]]; then
-        mpv_disable vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
+        mpv_disabled vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
         do_addOption MPV_OPTS --enable-vapoursynth
     fi
