@@ -753,7 +753,7 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     do_checkIfExist
 fi
 
-if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
+if [[ $mplayer = "y" ]] || mpv_enabled_all dvdread dvdnav; then
     _check=(libdvdread.{l,}a dvdread.pc)
     if do_vcs "https://code.videolan.org/videolan/libdvdread.git" dvdread; then
         do_autoreconf
@@ -774,7 +774,7 @@ if [[ $mplayer = "y" ]] || ! mpv_disabled_all dvdread dvdnav; then
 fi
 
 _check=(libbluray.{{l,}a,pc})
-if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
+if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || mpv_enabled libbluray; } &&
     do_vcs "https://git.videolan.org/git/libbluray.git"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf
@@ -1287,7 +1287,7 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    if ! mpv_disabled lua && [[ ${MPV_OPTS[@]} != "${MPV_OPTS[@]#--lua=51}" ]]; then
+    if ! mpv_disabled lua && ! opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
         do_pacman_install luajit-git

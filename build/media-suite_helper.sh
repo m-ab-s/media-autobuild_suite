@@ -779,6 +779,9 @@ do_getMpvConfig() {
         IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         MPV_OPTS=($(printf '%s\n' "${bat[@]}" | \
             sed -rne '/mpv_options=/,/[^^]$/p' | sed -e 's/.*mpv_options=//' -e 's/ ^//g'))
+        [[ $ffmpegChoice = f ]] &&
+            MPV_OPTS+=($(printf '%s\n' "${bat[@]}" | \
+                sed -rne '/mpv_options_full=/,/[^^]$/p' | sed -e 's/.*mpv_options_full=//' -e 's/ ^//g'))
         echo "Imported default mpv options from .bat"
     else
         MPV_OPTS=()
@@ -787,6 +790,9 @@ do_getMpvConfig() {
     for forced in vapoursynth-lazy libguess static-build enable-gpl3; do
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
+    if ! mpv_enabled debug-build; then
+        do_addOption --disable-debug-build
+    fi
     if [[ $mpv = "y" ]]; then
         mpv_disable vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
