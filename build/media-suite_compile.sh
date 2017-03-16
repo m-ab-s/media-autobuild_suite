@@ -394,8 +394,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled librubberband; } ||
 fi
 
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
-if { { [[ $ffmpeg != "no" ]] && enabled libzimg; } ||
-    { ! pc_exists zimg && ! mpv_disabled vapoursynth; }; } &&
+if [[ $ffmpeg != "no" ]] && enabled libzimg &&
     do_vcs "https://github.com/sekrit-twc/zimg.git"; then
     do_uninstall "${_check[@]}"
     do_autoreconf
