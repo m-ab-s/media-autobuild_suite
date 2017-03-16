@@ -915,7 +915,7 @@ if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_checkIfExist
 fi
 
-if [[ $x264 != n ]]; then
+if [[ $x264 != no ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     if do_vcs "https://git.videolan.org/git/x264.git" ||
@@ -1287,7 +1287,7 @@ if [[ $mplayer = "y" ]] &&
 fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    if ! mpv_disabled lua && ! opt_exists MPV_OPTS "--lua=5.1"; then
+    if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
         do_pacman_install luajit-git
