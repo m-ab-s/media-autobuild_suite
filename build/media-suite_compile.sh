@@ -1325,8 +1325,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
         elif [[ $bits = 32bit ]]; then
-            echo -e "${green}angle in 32-bits with GCC 6 doesn't work.${reset}"
+            echo -e "${yellow}Angle can't be built with 32-bit GCC 6.${reset}"
+            echo -e "${yellow}Only headers will be installed. Use DLLs from somewhere else.${reset}"
             mpv_disable egl-angle-lib
+            cp -rf include/* "$LOCALDESTDIR"/include/
             touch build_successful32bit
         else
             echo -e "${green}Angle already compiled to latest stable version.${reset}"
