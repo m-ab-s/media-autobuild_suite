@@ -337,7 +337,7 @@ do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
     local hash
     [[ $1 = "-h" ]] && hash="$2" && shift 2
-    local url="http://download.sourceforge.net/$1"
+    local url="https://download.sourceforge.net/$1"
     shift 1
     if [[ -n $hash ]]; then
         do_wget -h "$hash" "$url" "$@"
