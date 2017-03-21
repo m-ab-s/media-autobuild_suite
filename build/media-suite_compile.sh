@@ -923,43 +923,36 @@ if [[ $x264 != no ]]; then
         extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --enable-static
             --bindir="$LOCALDESTDIR/bin-video")
         if [[ $standalone = y && $x264 = full ]]; then
-            _check=(libav{codec,format}.{a,pc})
+            _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
-            do_uninstall "${_check[@]}" include/libav{codec,device,filter,format,util,resample} \
-                include/lib{sw{scale,resample},postproc} \
-                libav{codec,device,filter,format,util,resample}.{dll.a,a,pc} \
-                lib{sw{scale,resample},postproc}.{dll.a,a,pc} \
-                "$LOCALDESTDIR"/lib/av{codec,device,filter,format,util}-*.def \
-                "$LOCALDESTDIR"/lib/{sw{scale,resample},postproc}-*.def \
-                "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}-*.dll \
-                "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}-*.dll \
-                "$LOCALDESTDIR"/bin-video/av{codec,device,filter,format,util}.lib \
-                "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}.lib
+            do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
-            LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
-                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" --prefix="$LOCALDESTDIR" \
+            LDFLAGS+=" -L$MINGW_PREFIX/lib" \
+                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
                 --disable-{programs,devices,filters,encoders,muxers} --enable-gpl
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
 
-            _check=(ffms{,compat}.h libffms2.{,l}a ffms2.pc bin-video/ffmsindex.exe)
+            _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs https://github.com/FFMS/ffms2.git; then
                 do_uninstall "${_check[@]}"
                 sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
-                do_separate_confmakeinstall video
+                PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig" \
+                    do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg"
                 do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
         fi
 
         if [[ $standalone = y ]]; then
-            _check=(lsmash.h liblsmash.{a,pc})
+            _check=("$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig/liblsmash.pc")
             if do_vcs "https://github.com/l-smash/l-smash.git" liblsmash; then
                 [[ -f "config.mak" ]] && log "distclean" make distclean
                 do_uninstall "${_check[@]}"
                 create_build_dir
-                log configure ../configure --prefix="$LOCALDESTDIR"
+                log configure ../configure --prefix="$LOCALDESTDIR/opt/lightffmpeg"
                 do_make install-lib
                 do_checkIfExist
             fi
@@ -991,6 +984,7 @@ if [[ $x264 != no ]]; then
             do_print_progress "Building 10-bit x264"
             _check+=(bin-video/x264-10bit.exe)
             create_build_dir
+            PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig" \
             CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 "${extracommands[@]}"
             do_make
             do_install x264.exe bin-video/x264-10bit.exe
@@ -999,6 +993,7 @@ if [[ $x264 != no ]]; then
         elif [[ $x264 = shared ]]; then
             do_print_progress "Building 10-bit x264 shared lib"
             create_build_dir
+            PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig" \
             CFLAGS="${CFLAGS// -O2 / }" log configure ../configure --bit-depth=10 --disable-cli "${extracommands[@]}"
             do_make
             do_install libx264-"${x264_build}".dll bin-video/libx264-"${x264_build}"-10bits.dll
@@ -1012,6 +1007,7 @@ if [[ $x264 != no ]]; then
             fi
         fi
         create_build_dir
+        PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig" \
         CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
         do_make
         do_makeinstall
