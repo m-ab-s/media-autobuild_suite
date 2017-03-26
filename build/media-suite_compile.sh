@@ -931,7 +931,7 @@ if [[ $x264 != no ]]; then
             LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                 log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
-                --disable-{programs,devices,filters,encoders,muxers} --enable-gpl
+                --disable-{programs,devices,filters,encoders,muxers,debug,sdl2} --enable-gpl
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
 
