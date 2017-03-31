@@ -752,28 +752,28 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     do_checkIfExist
 fi
 
-if [[ $mplayer = "y" ]] || mpv_enabled_all dvdread dvdnav; then
-    _check=(libdvdread.{l,}a dvdread.pc)
-    if do_vcs "https://code.videolan.org/videolan/libdvdread.git" dvdread; then
-        do_autoreconf
-        do_uninstall include/dvdread "${_check[@]}"
-        do_separate_confmakeinstall
-        do_checkIfExist
-    fi
+_check=(libdvdread.{l,}a dvdread.pc)
+if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
+    do_vcs "https://code.videolan.org/videolan/libdvdread.git" dvdread; then
+    do_autoreconf
+    do_uninstall include/dvdread "${_check[@]}"
+    do_separate_confmakeinstall
+    do_checkIfExist
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
         sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
+fi
 
-    _check=(libdvdnav.{l,}a dvdnav.pc)
-    if do_vcs "https://code.videolan.org/videolan/libdvdnav.git" dvdnav; then
-        do_autoreconf
-        do_uninstall include/dvdnav "${_check[@]}"
-        do_separate_confmakeinstall
-        do_checkIfExist
-    fi
+_check=(libdvdnav.{l,}a dvdnav.pc)
+if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
+    do_vcs "https://code.videolan.org/videolan/libdvdnav.git" dvdnav; then
+    do_autoreconf
+    do_uninstall include/dvdnav "${_check[@]}"
+    do_separate_confmakeinstall
+    do_checkIfExist
 fi
 
 _check=(libbluray.{{l,}a,pc})
-if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || mpv_enabled libbluray; } &&
+if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://git.videolan.org/git/libbluray.git"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf

@@ -105,10 +105,20 @@ Included Tools And Libraries
     - mp4box (git)
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
-        - uchardet (mingw)
-        - ANGLE (git)
-        - luajit (mingw)
-        - vapoursynth (if installed or standalone inside /local(32|64))
+        - Base build (ffmpegChoice=2 or 3)
+            - ANGLE (git branch used in at least 3 chrome versions)
+            - lcms2 (mingw)
+            - libass (git)
+            - libbluray (git)
+            - luajit (mingw)
+            - rubberband (git snapshot)
+            - uchardet (mingw)
+        - Full build (ffmpegChoice=4)
+            - dvdread (git)
+            - dvdnav (git)
+            - libarchive (mingw)
+            - shared libmpv
+            - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)
     - rtmpdump (git)
     - speex (git)
@@ -184,23 +194,23 @@ If there's some error during compilation follow these steps:
 What The Individual Files Do
 --------
 
-media-autobuild_suite.bat
+`media-autobuild_suite.bat`
  - This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
 
-/build/media-autobuild_suite.ini
+`/build/media-autobuild_suite.ini`
  - This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
 
-/build/media-suite_compile.sh
+`/build/media-suite_compile.sh`
  - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
 
-/build/media-suite_update.sh
+`/build/media-suite_update.sh`
  - This script runs every time you run the batch file. It checks for updates to the MinGW environment.
 
-/build/media-suite_helper.sh
+`/build/media-suite_helper.sh`
  - This script contains helper functions used by compile and update that can also be `source`'d by the user if desired.
 
-/build/ffmpeg_options.txt
- - If you select the option to choose your own FFmpeg optional libraries, this file will contain options that get sent to FFmpeg's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg without features you don't need or with additional features not compiled by default, if supported.
+`/build/ffmpeg_options.txt` & `/build/mpv_options.txt`
+ - If you select the option to choose your own FFmpeg/mpv optional libraries, this file will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg/mpv without features you don't need or with additional features not compiled by default, if supported.
 
 
 References

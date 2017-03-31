@@ -86,9 +86,10 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-netcdf --enable-libnpp --enable-sdl2 --enable-libzmq
 
 set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua=luajit ^
---enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle --enable-egl-angle-lib
+--enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle --enable-egl-angle-lib ^
+--enable-libbluray
 
-set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libbluray --enable-libarchive ^
+set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
