@@ -658,7 +658,8 @@ do_changeFFmpegConfig() {
     enabled libkvazaar && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
 
     # handle gpl libs
-    local gpl=(frei0r lib{cdio,rubberband,vidstab,x264,x265,xavs,xvid} postproc gpl)
+    local gpl=(frei0r lib{cdio,rubberband,vidstab,x264,x265,xavs,xvid}
+               postproc avisynth gpl)
     if [[ $license = gpl* || $license = nonfree ]] && enabled_any "${gpl[@]}"; then
         do_addOption --enable-gpl
     else
