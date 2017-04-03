@@ -945,6 +945,8 @@ if [[ $x264 != no ]]; then
                 do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
+        else
+            extracommands+=(--disable-lavf --disable-ffms)
         fi
 
         if [[ $standalone = y ]]; then
@@ -958,18 +960,15 @@ if [[ $x264 != no ]]; then
                 do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
-        fi
-
-        _check=(x264{,_config}.h x264.pc)
-        [[ -f "config.h" ]] && log "distclean" make distclean
-        do_uninstall "${_check[@]}" libx264{,.dll}.a \
-            bin-video/libx264-"${x264_build}"{,-10bits}.dll
-
-        if [[ $standalone = y ]]; then
-            _check+=(bin-video/x264.exe)
         else
             extracommands+=(--disable-cli)
         fi
+
+        _check=(x264{,_config}.h x264.pc)
+        [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
+        [[ -f "config.h" ]] && log "distclean" make distclean
+        do_uninstall "${_check[@]}" libx264{,.dll}.a \
+            bin-video/libx264-"${x264_build}"{,-10bits}.dll
 
         x264_build="$(grep X264_BUILD x264.h | awk '{ print $3 }' | head -1)"
         if [[ $x264 = shared ]]; then
