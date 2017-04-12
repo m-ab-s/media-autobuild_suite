@@ -36,7 +36,6 @@ Included Tools And Libraries
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt can be switched by gmp with --enable-gmp
     - Zeranoe-emulating build (in addition to Light)
-        - decklink (10.8.3)
         - fontconfig (2.12.1)
         - frei0r (git)
         - gnutls (latest release)
@@ -74,6 +73,8 @@ Included Tools And Libraries
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
+        - decklink (10.8.3)
+            - needs non-free license
         - libcdio (mingw)
         - libfdk-aac (git)
         - libkvazaar (git)

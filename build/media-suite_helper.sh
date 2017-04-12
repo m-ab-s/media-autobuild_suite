@@ -674,7 +674,12 @@ do_changeFFmpegConfig() {
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    # libnpp is the only true nonfree external lib
+    if [[ $license = "nonfree" ]] && enabled_any libnpp decklink; then
+        do_addOption --enable-nonfree
+    else
+        do_removeOptions "--enable-nonfree --enable-decklink --enable-libnpp"
+    fi
+
     if [[ $license = "nonfree" && $bits = 64bit ]] && enabled libnpp &&
         [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/nppi.h" ]] &&
         [[ -f "$CUDA_PATH/lib/x64/nppi.lib" ]]; then
@@ -683,7 +688,7 @@ do_changeFFmpegConfig() {
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
     else
-        do_removeOptions "--enable-libnpp --enable-nonfree"
+        do_removeOptions "--enable-libnpp"
     fi
 
     # handle gpl-incompatible libs
