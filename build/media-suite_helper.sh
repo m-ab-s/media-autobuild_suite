@@ -647,8 +647,7 @@ do_changeFFmpegConfig() {
     local license="${1:-nonfree}"
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
-    # decklink depends on pthreads
-    if disabled w32threads || enabled_any pthreads decklink; then
+    if disabled w32threads; then
         do_removeOption --enable-w32threads
         do_addOption --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lpthread --extra-libs=-lwsock32
@@ -677,7 +676,7 @@ do_changeFFmpegConfig() {
     if [[ $license = "nonfree" ]] && enabled_any libnpp decklink; then
         do_addOption --enable-nonfree
     else
-        do_removeOptions "--enable-nonfree --enable-decklink --enable-libnpp"
+        do_removeOption "--enable-(nonfree|decklink|libnpp)"
     fi
 
     if [[ $license = "nonfree" && $bits = 64bit ]] && enabled libnpp &&
@@ -719,7 +718,7 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOption "--enable-(decklink|libgme|sdl2|ffplay)" y
+        do_removeOption "--enable-(libgme|sdl2|ffplay)" y
         do_addOption FFMPEG_OPTS_SHARED --disable-sdl2
     fi
 }
