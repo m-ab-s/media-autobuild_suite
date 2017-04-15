@@ -647,7 +647,8 @@ do_changeFFmpegConfig() {
     local license="${1:-nonfree}"
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
-    if disabled w32threads; then
+    # decklink includes zvbi, which requires pthreads
+    if disabled w32threads || enabled pthreads || enabled_all decklink libzvbi; then
         do_removeOption --enable-w32threads
         do_addOption --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lpthread --extra-libs=-lwsock32
