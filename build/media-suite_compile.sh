@@ -1139,6 +1139,7 @@ if [[ $ffmpeg != "no" ]]; then
             sed -i 's/-lsodium/& -lws2_32 -liphlpapi/' "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
+    enabled libzvbi && do_addOption --extra-libs=-lpng
 
     do_hide_all_sharedlibs
 
