@@ -1417,8 +1417,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
-        # for purely cosmetic reasons, show the last release version when doing -V
-        git tag -l --sort=version:refname | tail -1 | cut -c 2- > VERSION
         files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
