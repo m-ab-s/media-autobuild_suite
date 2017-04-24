@@ -1440,10 +1440,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         unset mpv_ldflags replace
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
-        if mpv_enabled libmpv-shared; then
-            mv -f "$LOCALDESTDIR"/{lib,bin-video}/mpv-1.dll
-            _check+=(bin-video/mpv-1.dll libmpv.dll.a)
-        fi
         ! mpv_disabled debug-build &&
             create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
         create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
