@@ -5191,6 +5191,7 @@ typedef enum _BMDDeckLinkStatusID {
     bmdDeckLinkStatusReferenceSignalFlags = 0x72656666,
     bmdDeckLinkStatusDuplexMode = 0x64757078,
     bmdDeckLinkStatusBusy = 0x62757379,
+    bmdDeckLinkStatusInterchangeablePanelType = 0x69637074,
     bmdDeckLinkStatusVideoInputSignalLocked = 0x7669736c,
     bmdDeckLinkStatusReferenceSignalLocked = 0x7265666c
 } BMDDeckLinkStatusID;
@@ -5204,6 +5205,10 @@ typedef enum _BMDDuplexStatus {
     bmdDuplexStatusSimplex = 0x73706c78,
     bmdDuplexStatusInactive = 0x696e6163
 } BMDDuplexStatus;
+typedef enum _BMDPanelType {
+    bmdPanelNotDetected = 0x6e706e6c,
+    bmdPanelTeranexMiniSmartPanel = 0x746d736d
+} BMDPanelType;
 enum _BMDDeviceBusyState {
     bmdDeviceCaptureBusy = 1 << 0,
     bmdDevicePlaybackBusy = 1 << 1,
