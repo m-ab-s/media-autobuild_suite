@@ -45,6 +45,8 @@ Included Tools And Libraries
             - by default with DirectWrite backend
             - if --enable-fontconfig or XP support required, fontconfig backend included
         - libbluray (git)
+            - BD-J support requires installation of Java JDK
+            - BD-J support after compilation probably only requires JRE (untested)
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libfreetype (2.7.1)
@@ -112,6 +114,8 @@ Included Tools And Libraries
             - lcms2 (mingw)
             - libass (git)
             - libbluray (git)
+                - BD-J support requires installation of Java JDK
+                - BD-J support after compilation probably only requires JRE (untested)
             - luajit (mingw)
             - rubberband (git snapshot)
             - uchardet (mingw)

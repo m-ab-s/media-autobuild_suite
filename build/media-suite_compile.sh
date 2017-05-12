@@ -774,13 +774,30 @@ fi
 
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
-    do_vcs "https://git.videolan.org/git/libbluray.git#commit=415da3663^"; then
+    do_vcs "https://git.videolan.org/git/libbluray.git"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf
-    do_uninstall include/libbluray "${_check[@]}"
-    do_separate_confmakeinstall --disable-{examples,bdjava,doxygen-doc} \
-        --without-{libxml2,fontconfig,freetype}
+    do_uninstall include/libbluray share/java "${_check[@]}"
+    extracommands=()
+    JDK_HOME="$(get_java_home)"
+    OLD_PATH="$PATH"
+    if [[ -n "$JDK_HOME" ]]; then
+        if [[ ! -f /opt/apache-ant/bin/ant ]]; then
+            do_wget -r -c -h 0a4530999b71f92bf17ae823ed3b0b2d \
+                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip" \
+                apache-ant.zip
+            mv apache-ant/apache-ant* /opt/apache-ant
+        fi
+        PATH="/opt/apache-ant/bin:$JDK_HOME/bin:$PATH"
+        log ant-diagnostics ant -diagnostics
+    else
+        extracommands+=(--disable-bdjava-jar)
+    fi
+    do_separate_confmakeinstall --disable-{examples,doxygen-doc} \
+        --without-{libxml2,fontconfig,freetype} "${extracommands[@]}"
     do_checkIfExist
+    PATH="$OLD_PATH"
+    unset extracommands JDK_HOME OLD_PATH
 fi
 
 _check=(libxavs.a xavs.{h,pc})

@@ -1279,6 +1279,21 @@ get_vs_prefix() {
     fi
 }
 
+get_java_home() {
+    local javahome
+    local regkey="/HKLM/software/javasoft/java development kit"
+    local version
+    if ! regtool -q check "$regkey"; then
+        echo "$javahome"
+    else
+        version="$(regtool -q get "$regkey/CurrentVersion")"
+        javahome="$(regtool -q get "$regkey/$version/JavaHome")"
+        javahome="$(cygpath -u "$javahome")"
+        [[ -f "$javahome/bin/java.exe" ]] &&
+            export JAVA_HOME="$javahome" && echo "$javahome"
+    fi
+}
+
 get_api_version() {
     local header="$1"
     [[ -n $(file_installed "$header") ]] && header="$(file_installed "$header")"
