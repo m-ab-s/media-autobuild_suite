@@ -774,7 +774,7 @@ fi
 
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
-    do_vcs "https://git.videolan.org/git/libbluray.git"; then
+    do_vcs "https://git.videolan.org/git/libbluray.git#commit=415da3663^"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf
     do_uninstall include/libbluray "${_check[@]}"
