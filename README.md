@@ -83,7 +83,7 @@ Included Tools And Libraries
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (mingw)
-        - libopenmpt (git)
+        - libopenmpt (svn from beta release)
         - librubberband (git snapshot)
         - libssh (mingw)
         - libtesseract (git)
