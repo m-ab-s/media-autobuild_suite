@@ -1055,11 +1055,11 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
 
     do_x265_cmake() {
         do_print_progress "Building $1" && shift 1
-        log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
+        log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G "Unix Makefiles" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
         -DENABLE_DYNAMIC_HDR10=ON $xpsupport "$@"
-        log "ninja" ninja -j "${cpuCount:-1}"
+        do_make
     }
     [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
@@ -1111,7 +1111,7 @@ EOF
     fi
     }
     build_x265
-    log "install" ninja -j "${cpuCount:=1}" install
+    do_makeinstall
     if [[ $standalone = y && $x265 = d ]]; then
         cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
         do_uninstall bin-video/x265-numa.exe
