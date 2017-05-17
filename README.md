@@ -35,6 +35,8 @@ Included Tools And Libraries
         - schannel with gcrypt (1.7.3)
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt can be switched by gmp with --enable-gmp
+        - sdl2 (2.0.5) (needed for ffplay)
+            - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - fontconfig (2.12.1)
         - frei0r (git)
@@ -92,7 +94,6 @@ Included Tools And Libraries
         - netcdf (mingw)
         - opencl (from system)
         - opengl (from system)
-        - sdl2 (mingw) (needed for ffplay)
 
  - other tools
     - aom (git)

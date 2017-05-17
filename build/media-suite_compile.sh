@@ -739,6 +739,19 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "no" ]] && enabled libkvazaar; }; 
     do_checkIfExist
 fi
 
+_check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
+if { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
+    { [[ $mpv != "no" ]] && mpv_enabled sdl2; } || [[ $daala = y ]] &&
+    do_pkgConfig "sdl2 = 2.0.5"; then
+    do_wget -h d4055424d556b4a908aa76fad63abd3c \
+        "http://libsdl.org/release/SDL2-2.0.5.tar.gz"
+    do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
+    do_patch sdl2-0001-remove-conflicting-xinput-structs.patch
+    sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
+    do_separate_confmakeinstall
+    do_checkIfExist
+fi
+
 _check=(libdaala{base,dec,enc}.{,l}a daala{dec,enc}.pc)
 [[ $standalone = y ]] && _check+=(bin-video/{{encoder,player}_example,dump_video}.exe)
 if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
@@ -747,7 +760,7 @@ if [[ $daala = y ]] && do_vcs "https://git.xiph.org/daala.git"; then
     do_uninstall include/daala "${_check[@]}"
     do_autogen
     if [[ $standalone = y ]]; then
-        do_pacman_install SDL2 libjpeg-turbo
+        do_pacman_install libjpeg-turbo
     else
         extracommands+=(--disable-player --disable-tools)
     fi
@@ -1151,7 +1164,6 @@ if [[ $ffmpeg != "no" ]]; then
         do_pacman_install netcdf
         sed -i 's/-lhdf5 -lz/-lhdf5 -lszip -lz/' "$MINGW_PREFIX"/lib/pkgconfig/netcdf.pc
     fi
-    disabled_any sdl2 ffplay || do_pacman_install SDL2
     enabled libopenjpeg && do_pacman_install openjpeg2
     enabled libopenh264 && do_pacman_install openh264
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
