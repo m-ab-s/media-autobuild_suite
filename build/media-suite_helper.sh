@@ -719,7 +719,7 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOption "--enable-(libgme|sdl2|ffplay|libbluray)" y
+        do_removeOption "--enable-(libgme|sdl2|ffplay)" y
         do_addOption FFMPEG_OPTS_SHARED --disable-sdl2
     fi
 }

@@ -783,6 +783,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
     do_autoreconf
     do_uninstall include/libbluray share/java "${_check[@]}"
+    sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
     extracommands=()
     JDK_HOME="$(get_java_home)"
     OLD_PATH="$PATH"
