@@ -716,7 +716,6 @@ do_changeFFmpegConfig() {
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        do_removeOption "--enable-libgme" y
     fi
 }
 
