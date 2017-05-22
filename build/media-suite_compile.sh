@@ -954,7 +954,7 @@ fi
 if [[ $x264 != no ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
-    if do_vcs "https://git.videolan.org/git/x264.git" ||
+    if do_vcs "https://git.videolan.org/git/x264.git#commit=d2b5f4873e^" ||
         [[ $x264 != high && "$(get_api_version x264_config.h BIT_DEPTH)" = "10" ]] ||
         [[ $x264  = high && "$(get_api_version x264_config.h BIT_DEPTH)" = "8" ]]; then
         extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --enable-static
