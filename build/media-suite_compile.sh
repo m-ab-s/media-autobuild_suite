@@ -1343,6 +1343,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
         sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
         sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
+        grep -q renderer11_utils src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h ||
+            sed -ri "/libANGLE\/Error.h/ a\#include \"libANGLE/renderer/d3d/d3d11/renderer11_utils.h\"" \
+            src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
         log uninstall make PREFIX="$LOCALDESTDIR" \
             BINDIR="$LOCALDESTDIR/bin-video" uninstall
         log configure gyp -Duse_ozone=0 -DOS=win \
