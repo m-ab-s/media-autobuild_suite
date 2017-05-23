@@ -32,7 +32,7 @@ Included Tools And Libraries
         - libx264 (git)
         - libx265 (hg)
         - nvenc (built-in)
-        - schannel with gcrypt (1.7.3)
+        - schannel with gcrypt (1.7.6)
             - enabled by default if openssl or gnutls aren't enabled
             - libgcrypt can be switched by gmp with --enable-gmp
         - sdl2 (2.0.5) (needed for ffplay)
@@ -51,7 +51,7 @@ Included Tools And Libraries
             - BD-J support after compilation probably only requires JRE (untested)
         - libbs2b (3.1.0)
         - libcaca (mingw)
-        - libfreetype (2.7.1)
+        - libfreetype (2.8)
         - libfribidi (0.19.7)
         - libgme (git snapshot)
         - libgsm (mingw)
