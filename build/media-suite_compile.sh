@@ -153,7 +153,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ ! $harfbuzz_ver ]] &&
         harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
         harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.3.3}"
+    harfbuzz_ver="${harfbuzz_ver:-1.4.6}"
     _deps=(lib{freetype,fontconfig}.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if [[ $ffmpeg != "sharedlibs" ]] && do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
@@ -228,7 +228,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
     [[ -z "$gnutls_ver" ]] &&
         gnutls_ver="$("${curl_opts[@]}" -l "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.5\.\d+(\.\d+)?')"
-    gnutls_ver="${gnutls_ver:-3.5.6}"
+    gnutls_ver="${gnutls_ver:-3.5.12}"
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
@@ -273,7 +273,7 @@ fi
 [[ ! "$curl_ver" ]] &&
     curl_ver="$(clean_html_index https://curl.haxx.se/download/)" &&
     curl_ver="$(get_last_version "$curl_ver" bz2 "7\.\d+\.\d")"
-curl_ver="${curl_ver:-7.53.1}"
+curl_ver="${curl_ver:-7.54.0}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 enabled openssl && _deps+=(libssl.a)
