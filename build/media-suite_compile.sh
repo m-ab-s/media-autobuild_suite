@@ -201,14 +201,14 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 fi
 
 _check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
-_ver="1.7.3"
+_ver="1.7.6"
 if [[ $ffmpeg != "no" ]] && enabled gcrypt; then
     do_pacman_install libgpg-error
     do_pacman_remove libgcrypt
     if files_exist "${_check[@]}" && [[ "$(libgcrypt-config --version)" = "$_ver" ]]; then
         do_print_status "libgcrypt $_ver" "$green" "Up-to-date"
     else
-        do_wget -h c869e542cc13a1c28d8055487bf7f5c4 \
+        do_wget -h 626aafee84af9d2ce253d2c143dc1c0902dda045780cc241f39970fc60be05bc \
             "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$_ver.tar.bz2"
         do_uninstall "${_check[@]}"
         [[ $bits = 64bit ]] && do_patch 64bits-relocation.patch
