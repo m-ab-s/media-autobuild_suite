@@ -123,9 +123,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _check=(libfreetype.{l,}a freetype2.pc)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
-    if do_pkgConfig "freetype2 = 19.0.13" "2.7.1"; then
-        do_wget_sf -h b3230110e0cab777e0df7631837ac36e \
-            "freetype/freetype2/2.7.1/freetype-2.7.1.tar.bz2"
+    if do_pkgConfig "freetype2 = 20.0.14" "2.8.0"; then
+        do_wget_sf -h a3c603ed84c3c2495f9c9331fe6bba3bb0ee65e06ec331e0a0fb52158291b40b \
+            "freetype/freetype2/2.8/freetype-2.8.tar.bz2"
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
         extracommands=(--with-{harfbuzz,png,bzip2}=no)
