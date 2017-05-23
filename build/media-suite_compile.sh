@@ -261,7 +261,6 @@ if { { [[ $ffmpeg != "no" ]] && enabled openssl; } ||
         _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
         sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.in
-        sed -i 's;DESTDIR)/\$;DESTDIR)$;g' apps/openssl/Makefile.in
         do_separate_confmakeinstall global
         do_checkIfExist
         unset _sed
