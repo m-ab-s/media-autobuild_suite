@@ -94,7 +94,7 @@ set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-aom daala faac ffmbc
+aom daala faac ffmbc curl
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -751,6 +751,31 @@ if %buildbmx%==1 set "bmx=y"
 if %buildbmx%==2 set "bmx=n"
 if %buildbmx% GTR 2 GOTO bmx
 if %writeBmx%==yes echo.bmx=^%buildbmx%>>%ini%
+
+:curl
+set "writeCurl=no"
+if %curlINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build static curl?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Use ffmpeg_options.txt to select whether you want SChannel, GnuTLS, or
+    echo. LibreSSL backends. A curl-ca-bundle.crt will be created to be used as trusted
+    echo. certificate store.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildcurl="Build curl: "
+    ) else set buildcurl=%curlINI%
+if %deleteINI%==1 set "writeCurl=yes"
+
+if %buildcurl%==1 set "curl=y"
+if %buildcurl%==2 set "curl=n"
+if %buildcurl% GTR 2 GOTO curl
+if %writeCurl%==yes echo.curl=^%buildcurl%>>%ini%
 
 :ffmbc
 set "writeFFmbc=no"
@@ -1470,7 +1495,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---daala=%daala% --faac=%faac% --ffmbc=%ffmbc%'
+--daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl%'
 
 endlocal
 goto :EOF

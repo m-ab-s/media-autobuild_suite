@@ -47,6 +47,7 @@ while true; do
 --daala=* ) daala="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
+--curl=* ) curl="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -278,12 +279,14 @@ _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 enabled openssl && _deps+=(libssl.a)
 enabled gnutls && _deps+=(libgnutls.a)
-[[ $standalone = y ]] && _check+=(bin-global/curl.exe)
-if [[ $mediainfo = y || $bmx = y ]] && do_pkgConfig "libcurl = $curl_ver"; then
+[[ $standalone = y || $curl = y ]] && _check+=(bin-global/curl.exe)
+if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
+    do_pkgConfig "libcurl = $curl_ver"; then
     do_pacman_install nghttp2
     do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
-    [[ $standalone = y ]] || sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
+    [[ $standalone = y || $curl = y ]] ||
+        sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
     if enabled openssl; then
         extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
