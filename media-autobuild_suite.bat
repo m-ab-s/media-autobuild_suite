@@ -74,7 +74,7 @@ set ffmpeg_options_zeranoe=--enable-decklink --enable-fontconfig ^
 --enable-libcaca --enable-libfreetype --enable-libfribidi ^
 --enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
---enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex ^
+--enable-librtmp --enable-libsoxr --enable-libspeex ^
 --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc ^
 --enable-libwavpack --enable-libwebp --enable-libxavs --enable-libxvid --enable-libzimg ^
 --enable-openssl --enable-libsnappy --enable-gpl

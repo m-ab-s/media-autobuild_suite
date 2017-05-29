@@ -62,7 +62,6 @@ Included Tools And Libraries
         - libopenjpeg2 (mingw)
         - librtmp (git)
             - compiled with gnutls or openssl depending on license chosen
-        - libschroedinger (mingw)
         - libsnappy (mingw)
         - libsoxr (git)
         - libspeex (mingw)

@@ -1149,7 +1149,6 @@ fi
 pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
 if [[ $ffmpeg != "no" ]]; then
-    enabled libschroedinger && do_pacman_install schroedinger
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
     if enabled libxvid; then
