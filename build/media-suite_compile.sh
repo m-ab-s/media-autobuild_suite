@@ -1235,6 +1235,11 @@ if [[ $ffmpeg != "no" ]]; then
         enabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
+        # remove redundant -L and -l flags from extralibs
+        sed -i "/cat > ffbuild\/config.mak/ i\
+extralibs=\"-L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib \$(printf '%s\\\n' \$extralibs | grep -v '^-L' | tac | awk '\!x[\$0]++' \\\
+| tac | tr '\\\n' ' ')\"" configure
+
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold}shared${reset} FFmpeg"
