@@ -547,6 +547,7 @@ if [[ $standalone = y ]] && enabled libopus &&
     do_separate_confmakeinstall audio
     do_checkIfExist
 fi
+unset _deps
 
 if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     _check=(soxr.h libsoxr.a)
