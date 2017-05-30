@@ -165,7 +165,7 @@ do_vcs() {
         log quiet "$vcsType.clone" vcs_clone
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
-            touch recently_updated
+            touch recently_updated recently_checked
         else
             echo "$vcsFolder $vcsType seems to be down"
             echo "Try again later or <Enter> to continue"
@@ -185,9 +185,10 @@ do_vcs() {
     fi
 
     log quiet "$vcsType.reset" vcs_reset "$ref"
-    if ! [[ -f recently_updated && recently_updated -nt "$LOCALBUILDDIR"/last_run ]]; then
+    if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
         log quiet "$vcsType.update" vcs_update "$ref"
+        touch recently_checked
     else
         newHead="$oldHead"
     fi
@@ -1347,7 +1348,7 @@ add_to_remove() {
 clean_suite() {
     echo -e "\n\t${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
-    find . -maxdepth 2 -name recently_updated -print0 | xargs -0 rm -f
+    find . -maxdepth 2 -name recently_updated -o -name recently_checked -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\|_light\)?\$" -print0 |
         xargs -0 rm -f
     echo -e "\n\t${green}Zipping man files...${reset}"
