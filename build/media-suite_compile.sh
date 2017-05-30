@@ -790,7 +790,7 @@ if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
 fi
 [[ -f "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ]] &&
     ! grep -q 'psapi' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc &&
-    sed -ri "s;(Libs.private: .+);\1 -lpsapi" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
+    sed -ri "s;(Libs.private: .+);\1 -lpsapi;" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 
 _check=(libdvdnav.{l,}a dvdnav.pc)
 _deps=(libdvdread.a)
