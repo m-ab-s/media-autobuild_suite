@@ -38,11 +38,11 @@ if not exist %instdir% (
     exit
     )
 
-if not ["%CD:~60,1%"]==[""] (
+if not ["%CD:~25,1%"]==[""] (
     echo -------------------------------------------------------------------------------
-    echo. The total filepath to the suite seems too large (larger than 67 characters^):
+    echo. The total filepath to the suite seems too large (larger than 25 characters^):
     echo. %CD%
-    echo. Some packages will fail building because of it.
+    echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
     echo. rename the suite directory to a smaller name. Examples:
     echo. Avoid:  C:\Users\Administrator\Desktop\testing\media-autobuild_suite-master
