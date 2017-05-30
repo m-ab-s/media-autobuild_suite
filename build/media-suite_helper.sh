@@ -79,28 +79,37 @@ vcs_clone() {
     fi
 }
 
-vcs_update() {
+vcs_reset() {
+    local ref="$1"
     if [[ $vcsType = svn ]]; then
+        svn revert --recursive .
         oldHead=$(svnversion)
-        svn update -r "$ref"
-        newHead=$(svnversion)
     elif [[ $vcsType = hg ]]; then
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
+    elif [[ $vcsType = git ]]; then
+        git remote set-url origin "$vcsURL"
+        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+        [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
+        git checkout ab-suite
+        git reset --hard "$ref"
+        oldHead=$(git rev-parse HEAD)
+    fi
+}
+
+vcs_update() {
+    local ref="$1"
+    if [[ $vcsType = svn ]]; then
+        svn update -r "$ref"
+        newHead=$(svnversion)
+    elif [[ $vcsType = hg ]]; then
         hg pull
         hg update -C -r "$ref"
         newHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
-        # [[ -f .gitmodules ]] && git submodule update --init
-        git remote set-url origin "$vcsURL"
-        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-        [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
-        git checkout ab-suite
-        git reset --hard "$ref"
         git fetch -t $unshallow origin
-        oldHead=$(git rev-parse HEAD)
         git reset --hard "$ref"
         newHead=$(git rev-parse HEAD)
     fi
@@ -175,8 +184,13 @@ do_vcs() {
         return 1
     fi
 
-    do_print_progress "  Running $vcsType update for $vcsFolder"
-    log quiet "$vcsType.update" vcs_update
+    log quiet "$vcsType.reset" vcs_reset "$ref"
+    if ! [[ -f recently_updated && recently_updated -nt "$LOCALBUILDDIR"/last_run ]]; then
+        do_print_progress "  Running $vcsType update for $vcsFolder"
+        log quiet "$vcsType.update" vcs_update "$ref"
+    else
+        newHead="$oldHead"
+    fi
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f build_successful{32,64}bit{,_shared}

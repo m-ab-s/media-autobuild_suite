@@ -2,7 +2,6 @@
 shopt -s extglob
 
 FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
-alloptions="$*"
 if [[ x"$LOCALBUILDDIR" = "x" ]]; then
     echo "Something went wrong."
     echo "MSYSTEM: $MSYSTEM"
@@ -14,6 +13,11 @@ if [[ x"$LOCALBUILDDIR" = "x" ]]; then
     exit 1
 fi
 echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
+
+{
+    echo '#!/bin/bash'
+    echo "bash $LOCALBUILDDIR/media-suite_compile.sh $*"
+} > "$LOCALBUILDDIR/last_run"
 
 while true; do
   case $1 in
@@ -99,17 +103,6 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
 
 do_uninstall q "${_clean_old_builds[@]}"
 unset _clean_old_builds
-
-if [[ -n "$alloptions" ]]; then
-    {
-        echo '#!/bin/bash'
-        echo 'FFMPEG_DEFAULT_OPTS=('
-        printf '\t"%s"\n' "${FFMPEG_DEFAULT_OPTS[@]}"
-        echo ')'
-        echo "bash $LOCALBUILDDIR/media-suite_compile.sh $alloptions"
-    } > "$LOCALBUILDDIR/last_run"
-    unset alloptions
-fi
 
 # In case a build was interrupted before reversing hide_conflicting_libs
 hide_conflicting_libs -R
