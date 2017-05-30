@@ -786,10 +786,14 @@ if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
     do_separate_confmakeinstall
     do_checkIfExist
     grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
-        sed -i "/Libs:.*/ a\Libs.private: -ldl" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
+        sed -i "/Libs:.*/ a\Libs.private: -ldl -lpsapi" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 fi
+[[ -f "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ]] &&
+    ! grep -q 'psapi' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc &&
+    sed -ri "s;(Libs.private: .+);\1 -lpsapi" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 
 _check=(libdvdnav.{l,}a dvdnav.pc)
+_deps=(libdvdread.a)
 if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
     do_vcs "https://code.videolan.org/videolan/libdvdnav.git" dvdnav; then
     do_autoreconf
@@ -797,6 +801,7 @@ if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
     do_separate_confmakeinstall
     do_checkIfExist
 fi
+unset _deps
 
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
