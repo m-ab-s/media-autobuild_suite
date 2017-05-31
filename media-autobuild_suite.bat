@@ -1468,9 +1468,6 @@ if not exist %instdir%\%1\share (
 goto :EOF
 
 :writeProfile
-echo -------------------------------------------------------------------------------
-echo.writing profile for %1-bit compilation
-echo -------------------------------------------------------------------------------
 (
     echo.MSYSTEM=MINGW%1
     echo.source /etc/msystem
@@ -1516,4 +1513,5 @@ echo ---------------------------------------------------------------------------
     echo.stty susp undef
     echo.cd /trunk
     )>%instdir%\local%1\etc\profile2.local
+%instdir%\%msys2%\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
 goto :EOF

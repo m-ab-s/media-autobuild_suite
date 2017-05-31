@@ -136,52 +136,10 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     rm -f /etc/pac-{base,mingw}.pk
 fi
 
-# --------------------------------------------------
-# check profiles
-# --------------------------------------------------
-
-echo "-------------------------------------------------------------------------------"
-echo "Checking profiles..."
-echo "-------------------------------------------------------------------------------"
-echo
-
 if [[ -d "/trunk" ]]; then
     cd "/trunk" || exit 1
 else
     cd_safe "$(cygpath -w /).."
-fi
-
-check_profiles() {
-    local profile="/local${1}/etc/profile2.local"
-    local bat="media-autobuild_suite.bat"
-    local bitness="$1"
-    [[ -f "$bat" ]] || return 1
-    local new
-    new="$(dos2unix < "$bat")"
-    new="$(echo "$new" | sed -n "/MSYSTEM=MINGW%1/,/cd \/trunk/{s,^\s*echo\.,,gp}")"
-    new="${new//%1/$bitness}"
-    [[ -f ."${profile//2}" ]] &&
-        rm -f ."${profile//2}" && echo "Deleted old profiles"
-    if [[ -f ."${profile}" ]]; then
-        [[ "$(file ."${profile}")" =~ CRLF ]] && dos2unix -q ."${profile}"
-        if ! diff  ."${profile}" <(echo "$new") &> /dev/null; then
-            echo "Updating ${bitness}-bit profile"
-        else
-            echo "${bitness}-bit profile up-to-date!"
-            return 0
-        fi
-    else
-        echo "Creating ${bitness}-bit profile"
-    fi
-    echo "$new" > ."${profile}"
-}
-
-if [[ $build32 = "yes" ]]; then
-    check_profiles 32
-fi
-
-if [[ $build64 = "yes" ]]; then
-    check_profiles 64
 fi
 
 # --------------------------------------------------
