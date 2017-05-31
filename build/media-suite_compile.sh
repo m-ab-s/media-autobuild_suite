@@ -141,7 +141,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             -e '/^SUBDIRS=/,+2{s;fontconfig.*;fontconfig fc-blanks src;g;/fc-/d}' \
             -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
         do_autogen --noconf
-        do_separate_confmakeinstall global --disable-docs
+        PYTHON="$MINGW_PREFIX/bin/python2" do_separate_confmakeinstall global --disable-docs
         do_checkIfExist
     fi
 
