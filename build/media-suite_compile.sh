@@ -135,7 +135,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
         do_vcs "https://anongit.freedesktop.org/git/fontconfig"; then
-        do_pacman_install python2-lxml
+        do_pacman_install python2-lxml python2-six
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -ri Makefile.am \
             -e '/^SUBDIRS=/,+2{s;fontconfig.*;fontconfig fc-blanks src;g;/fc-/d}' \
