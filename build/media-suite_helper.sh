@@ -1204,7 +1204,7 @@ do_autoreconf() {
     if { [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
-        log "autoreconf" autoreconf -fiv
+        log "autoreconf" autoreconf -fiv $*
     fi
 }
 
@@ -1215,7 +1215,7 @@ do_autogen() {
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated"
-        log "autogen" ./autogen.sh
+        log "autogen" ./autogen.sh $*
     fi
 }
 

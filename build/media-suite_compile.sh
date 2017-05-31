@@ -133,14 +133,15 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _check=(libfontconfig.{,l}a fontconfig.pc)
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
-    if enabled_any {lib,}fontconfig && do_pkgConfig "fontconfig = 2.12.1"; then
-        do_wget -h b5af5a423ee3b5cfc34846838963c058 \
-            "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.12.1.tar.bz2"
+    if enabled_any {lib,}fontconfig &&
+        do_vcs "https://anongit.freedesktop.org/git/fontconfig"; then
+        do_pacman_install python2-lxml
         do_uninstall include/fontconfig "${_check[@]}"
-        [[ $standalone = y ]] || sed -i Makefile.in \
-            -e '/^SUBDIRS/,+2{s/fontconfig.*/fontconfig src/;/fc-/d}' \
-            -e 's/CROSS_COMPILING_TRUE/CROSS_COMPILING_FALSE/'
-        do_separate_confmakeinstall global
+        [[ $standalone = y ]] || sed -ri Makefile.am \
+            -e '/^SUBDIRS=/,+2{s;fontconfig.*;fontconfig fc-blanks src;g;/fc-/d}' \
+            -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
+        do_autogen --noconf
+        do_separate_confmakeinstall global --disable-docs
         do_checkIfExist
     fi
 

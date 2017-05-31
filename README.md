@@ -38,7 +38,7 @@ Included Tools And Libraries
         - sdl2 (2.0.5) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
-        - fontconfig (2.12.1)
+        - fontconfig (git)
         - frei0r (git)
         - gnutls (latest release)
         - libressl (latest release)
