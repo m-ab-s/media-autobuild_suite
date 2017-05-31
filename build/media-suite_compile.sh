@@ -692,6 +692,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
         disabled "encoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-encoder")
         disabled "decoder=libvpx_${_c}" && extracommands+=("--disable-${_c}-decoder")
     done
+    [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
     [[ $ffmpeg = "sharedlibs" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins} \
