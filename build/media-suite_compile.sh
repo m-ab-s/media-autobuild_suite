@@ -1528,7 +1528,6 @@ fi
 _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs https://github.com/bcoudurier/FFmbc.git; then
     _notrequired=yes
-    sed -i '/strncpy/d' libavutil/internal.h
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
