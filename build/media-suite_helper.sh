@@ -618,13 +618,6 @@ do_getFFmpegConfig() {
     echo "License: $license"
     FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
 
-    if [[ $bits = "32bit" ]]; then
-        arch=x86
-    else
-        arch=x86_64
-    fi
-    export arch
-
     # we set these accordingly for static or shared
     do_removeOption "--(en|dis)able-(shared|static)"
 

@@ -154,25 +154,26 @@ fi
 check_profiles() {
     local profile="/local${1}/etc/profile2.local"
     local bat="media-autobuild_suite.bat"
-    [[ -f "${bat}" ]] || return 1
-    local new common tmp
-    new="$(sed -n "/# ${profile////.}$/,/${profile////.}$/p" < <(dos2unix < "${bat}") | head -n -1)"
-    common="$(sed -n "/^:writeCommonProfile/,/%instdir%.local%1/p" < <(dos2unix < "${bat}") | head -n -1 | tail -n +3)"
-    tmp="$(printf '%s\n' "$new" "$common" | sed 's,^\s*echo\.,,g')"
+    local bitness="$1"
+    [[ -f "$bat" ]] || return 1
+    local new
+    new="$(dos2unix < "$bat")"
+    new="$(echo "$new" | sed -n "/MSYSTEM=MINGW%1/,/cd \/trunk/{s,^\s*echo\.,,gp}")"
+    new="${new//%1/$bitness}"
     [[ -f ."${profile//2}" ]] &&
         rm -f ."${profile//2}" && echo "Deleted old profiles"
     if [[ -f ."${profile}" ]]; then
         [[ "$(file ."${profile}")" =~ CRLF ]] && dos2unix -q ."${profile}"
-        if ! diff <(echo "$tmp") ."${profile}" &> /dev/null; then
-            echo "Updating ${profile%/etc*} profile"
+        if ! diff  ."${profile}" <(echo "$new") &> /dev/null; then
+            echo "Updating ${bitness}-bit profile"
         else
-            echo "${profile%/etc*} profile up-to-date!"
+            echo "${bitness}-bit profile up-to-date!"
             return 0
         fi
     else
-        echo "Creating ${profile%/etc*} profile"
+        echo "Creating ${bitness}-bit profile"
     fi
-    echo "$tmp" > ."${profile}"
+    echo "$new" > ."${profile}"
 }
 
 if [[ $build32 = "yes" ]]; then

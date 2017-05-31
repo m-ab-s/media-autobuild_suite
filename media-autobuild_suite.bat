@@ -1409,59 +1409,8 @@ if %msys2%==msys32 (
 :: write config profiles:
 ::------------------------------------------------------------------
 
-:writeProfile32
-if %build32%==yes (
-    if exist %instdir%\local32\etc\profile2.local GOTO writeProfile64
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.- write profile for 32 bit compiling
-        echo.
-        echo -------------------------------------------------------------------------------
-        (
-            echo.# /local32/etc/profile2.local
-            echo.#
-            echo.
-            echo.MSYSTEM=MINGW32
-            echo.
-            echo.# package build directory
-            echo.LOCALBUILDDIR=/build
-            echo.# package installation prefix
-            echo.LOCALDESTDIR=/local32
-            echo.export LOCALBUILDDIR LOCALDESTDIR
-            echo.
-            echo.bits='32bit'
-            echo.arch="x86"
-            echo.CARCH="i686"
-            )>>%instdir%\local32\etc\profile2.local
-        call :writeCommonProfile 32
-        )
-
-:writeProfile64
-if %build64%==yes (
-    if exist %instdir%\local64\etc\profile2.local GOTO loginProfile
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.- write profile for 64 bit compiling
-        echo.
-        echo -------------------------------------------------------------------------------
-        (
-            echo.# /local64/etc/profile2.local
-            echo.#
-            echo.
-            echo.MSYSTEM=MINGW64
-            echo.
-            echo.# package build directory
-            echo.LOCALBUILDDIR=/build
-            echo.# package installation prefix
-            echo.LOCALDESTDIR=/local64
-            echo.export LOCALBUILDDIR LOCALDESTDIR
-            echo.
-            echo.bits='64bit'
-            echo.arch="x86_64"
-            echo.CARCH="x86_64"
-            )>>%instdir%\local64\etc\profile2.local
-        call :writeCommonProfile 64
-        )
+if %build32%==yes call :writeProfile 32
+if %build64%==yes call :writeProfile 64
 
 :loginProfile
 if exist %instdir%\%msys2%\etc\profile.pacnew ^
@@ -1503,7 +1452,7 @@ goto :EOF
 :createBaseFolders
 if not exist %instdir%\%1\share (
     echo.-------------------------------------------------------------------------------
-    echo.create %1 folders
+    echo.creating %1-bit install folders
     echo.-------------------------------------------------------------------------------
     mkdir %instdir%\%1
     mkdir %instdir%\%1\bin
@@ -1518,15 +1467,27 @@ if not exist %instdir%\%1\share (
     )
 goto :EOF
 
-:writeCommonProfile
+:writeProfile
+echo -------------------------------------------------------------------------------
+echo.writing profile for %1-bit compilation
+echo -------------------------------------------------------------------------------
 (
+    echo.MSYSTEM=MINGW%1
+    echo.source /etc/msystem
     echo.
-    echo.# common in both profiles
+    echo.# package build directory
+    echo.LOCALBUILDDIR=/build
+    echo.# package installation prefix
+    echo.LOCALDESTDIR=/local%1
+    echo.export LOCALBUILDDIR LOCALDESTDIR
+    echo.
+    echo.bits='%1bit'
+    echo.
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
     echo.export CC=gcc
-    echo.source '/etc/msystem'
     echo.
+    echo.CARCH="${MINGW_CHOST%%-*}"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
     echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
     echo.export CPATH LIBRARY_PATH
@@ -1545,13 +1506,14 @@ goto :EOF
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.LANG=en_US.UTF-8
-    echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${PATH}"
+    echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
+    echo.source '/etc/profile.d/perlbin.sh'
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
     echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
     echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
     echo.stty susp undef
     echo.cd /trunk
-    )>>%instdir%\local%1\etc\profile2.local
+    )>%instdir%\local%1\etc\profile2.local
 goto :EOF
