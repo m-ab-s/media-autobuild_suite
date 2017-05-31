@@ -521,6 +521,7 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_checkIfExist
     add_to_remove
 fi
+unset _deps
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
 if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
