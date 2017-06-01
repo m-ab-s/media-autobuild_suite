@@ -1232,9 +1232,7 @@ if [[ $ffmpeg != "no" ]]; then
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
         # remove redundant -L and -l flags from extralibs
-        sed -i "/cat > ffbuild\/config.mak/ i\
-extralibs=\"-L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib \$(printf '%s\\\n' \$extralibs | grep -v '^-L' | tac | awk '\!x[\$0]++' \\\
-| tac | tr '\\\n' ' ')\"" configure
+        do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
