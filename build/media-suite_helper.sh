@@ -1291,6 +1291,7 @@ get_java_home() {
         echo "$javahome"
     else
         version="$(regtool -q get "$regkey/CurrentVersion")"
+        [[ $(vercmp "$version" 1.8) = -1 ]] && return
         javahome="$(regtool -q get "$regkey/$version/JavaHome")"
         javahome="$(cygpath -u "$javahome")"
         [[ -f "$javahome/bin/java.exe" ]] &&
