@@ -344,6 +344,33 @@ typedef struct CDeckLinkDiscovery CDeckLinkDiscovery;
 #endif /* defined __cplusplus */
 #endif /* defined __CDeckLinkDiscovery_FWD_DEFINED__ */
 
+#ifndef __CBMDStreamingDiscovery_v10_8_FWD_DEFINED__
+#define __CBMDStreamingDiscovery_v10_8_FWD_DEFINED__
+#ifdef __cplusplus
+typedef class CBMDStreamingDiscovery_v10_8 CBMDStreamingDiscovery_v10_8;
+#else
+typedef struct CBMDStreamingDiscovery_v10_8 CBMDStreamingDiscovery_v10_8;
+#endif /* defined __cplusplus */
+#endif /* defined __CBMDStreamingDiscovery_v10_8_FWD_DEFINED__ */
+
+#ifndef __CDeckLinkIterator_v10_8_FWD_DEFINED__
+#define __CDeckLinkIterator_v10_8_FWD_DEFINED__
+#ifdef __cplusplus
+typedef class CDeckLinkIterator_v10_8 CDeckLinkIterator_v10_8;
+#else
+typedef struct CDeckLinkIterator_v10_8 CDeckLinkIterator_v10_8;
+#endif /* defined __cplusplus */
+#endif /* defined __CDeckLinkIterator_v10_8_FWD_DEFINED__ */
+
+#ifndef __CDeckLinkDiscovery_v10_8_FWD_DEFINED__
+#define __CDeckLinkDiscovery_v10_8_FWD_DEFINED__
+#ifdef __cplusplus
+typedef class CDeckLinkDiscovery_v10_8 CDeckLinkDiscovery_v10_8;
+#else
+typedef struct CDeckLinkDiscovery_v10_8 CDeckLinkDiscovery_v10_8;
+#endif /* defined __cplusplus */
+#endif /* defined __CDeckLinkDiscovery_v10_8_FWD_DEFINED__ */
+
 #ifndef __IDeckLinkEncoderConfiguration_v10_5_FWD_DEFINED__
 #define __IDeckLinkEncoderConfiguration_v10_5_FWD_DEFINED__
 typedef interface IDeckLinkEncoderConfiguration_v10_5 IDeckLinkEncoderConfiguration_v10_5;
@@ -4915,12 +4942,12 @@ void __RPC_STUB IBMDStreamingH264NALParser_GetProfileAndLevelFromSPS_Stub(
  * CBMDStreamingDiscovery coclass
  */
 
-DEFINE_GUID(CLSID_CBMDStreamingDiscovery, 0x0caa31f6, 0x8a26, 0x40b0, 0x86,0xa4, 0xbf,0x58,0xdc,0xca,0x71,0x0c);
+DEFINE_GUID(CLSID_CBMDStreamingDiscovery, 0x23a4edf5, 0xa0e5, 0x432c, 0x94,0xef, 0x3b,0xab,0xb5,0xf8,0x1c,0x82);
 
 #ifdef __cplusplus
-class DECLSPEC_UUID("0caa31f6-8a26-40b0-86a4-bf58dcca710c") CBMDStreamingDiscovery;
+class DECLSPEC_UUID("23a4edf5-a0e5-432c-94ef-3babb5f81c82") CBMDStreamingDiscovery;
 #ifdef __CRT_UUID_DECL
-__CRT_UUID_DECL(CBMDStreamingDiscovery, 0x0caa31f6, 0x8a26, 0x40b0, 0x86,0xa4, 0xbf,0x58,0xdc,0xca,0x71,0x0c)
+__CRT_UUID_DECL(CBMDStreamingDiscovery, 0x23a4edf5, 0xa0e5, 0x432c, 0x94,0xef, 0x3b,0xab,0xb5,0xf8,0x1c,0x82)
 #endif
 #endif
 
@@ -4968,6 +4995,7 @@ enum _BMDFrameFlags {
     bmdFrameFlagDefault = 0,
     bmdFrameFlagFlipVertical = 1 << 0,
     bmdFrameContainsHDRMetadata = 1 << 1,
+    bmdFrameContainsCintelMetadata = 1 << 2,
     bmdFrameHasNoInputSource = 1 << 31
 };
 
@@ -5103,6 +5131,32 @@ typedef enum _BMDDeviceInterface {
 } BMDDeviceInterface;
 typedef enum _BMDDeckLinkFrameMetadataID {
     bmdDeckLinkFrameMetadataHDRElectroOpticalTransferFunc = 0x656f7466,
+    bmdDeckLinkFrameMetadataCintelFilmType = 0x63667479,
+    bmdDeckLinkFrameMetadataCintelFilmGauge = 0x63666761,
+    bmdDeckLinkFrameMetadataCintelOffsetDetectedHorizontal = 0x6f646668,
+    bmdDeckLinkFrameMetadataCintelOffsetDetectedVertical = 0x6f646676,
+    bmdDeckLinkFrameMetadataCintelOffsetAppliedHorizontal = 0x6f646168,
+    bmdDeckLinkFrameMetadataCintelOffsetAppliedVertical = 0x6f646176,
+    bmdDeckLinkFrameMetadataCintelKeykodeLow = 0x636b6b6c,
+    bmdDeckLinkFrameMetadataCintelKeykodeHigh = 0x636b6b68,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingRedInRed = 0x6d726972,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingGreenInRed = 0x6d676972,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingBlueInRed = 0x6d626972,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingRedInGreen = 0x6d726967,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingGreenInGreen = 0x6d676967,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingBlueInGreen = 0x6d626967,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingRedInBlue = 0x6d726962,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingGreenInBlue = 0x6d676962,
+    bmdDeckLinkFrameMetadataCintelLinearMaskingBlueInBlue = 0x6d626962,
+    bmdDeckLinkFrameMetadataCintelLogMaskingRedInRed = 0x6d6c7272,
+    bmdDeckLinkFrameMetadataCintelLogMaskingGreenInRed = 0x6d6c6772,
+    bmdDeckLinkFrameMetadataCintelLogMaskingBlueInRed = 0x6d6c6272,
+    bmdDeckLinkFrameMetadataCintelLogMaskingRedInGreen = 0x6d6c7267,
+    bmdDeckLinkFrameMetadataCintelLogMaskingGreenInGreen = 0x6d6c6767,
+    bmdDeckLinkFrameMetadataCintelLogMaskingBlueInGreen = 0x6d6c6267,
+    bmdDeckLinkFrameMetadataCintelLogMaskingRedInBlue = 0x6d6c7262,
+    bmdDeckLinkFrameMetadataCintelLogMaskingGreenInBlue = 0x6d6c6762,
+    bmdDeckLinkFrameMetadataCintelLogMaskingBlueInBlue = 0x6d6c6262,
     bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedX = 0x68647278,
     bmdDeckLinkFrameMetadataHDRDisplayPrimariesRedY = 0x68647279,
     bmdDeckLinkFrameMetadataHDRDisplayPrimariesGreenX = 0x68646778,
@@ -5114,7 +5168,12 @@ typedef enum _BMDDeckLinkFrameMetadataID {
     bmdDeckLinkFrameMetadataHDRMaxDisplayMasteringLuminance = 0x68646d6c,
     bmdDeckLinkFrameMetadataHDRMinDisplayMasteringLuminance = 0x686d696c,
     bmdDeckLinkFrameMetadataHDRMaximumContentLightLevel = 0x6d636c6c,
-    bmdDeckLinkFrameMetadataHDRMaximumFrameAverageLightLevel = 0x66616c6c
+    bmdDeckLinkFrameMetadataHDRMaximumFrameAverageLightLevel = 0x66616c6c,
+    bmdDeckLinkFrameMetadataCintel16mmCropRequired = 0x63313663,
+    bmdDeckLinkFrameMetadataCintelInversionRequired = 0x63696e76,
+    bmdDeckLinkFrameMetadataCintelFlipRequired = 0x63666c72,
+    bmdDeckLinkFrameMetadataCintelFocusAssistEnabled = 0x63666165,
+    bmdDeckLinkFrameMetadataCintelKeykodeIsInterpolated = 0x6b6b6969
 } BMDDeckLinkFrameMetadataID;
 typedef enum _BMDDuplexMode {
     bmdDuplexModeFull = 0x66647570,
@@ -5193,7 +5252,8 @@ typedef enum _BMDDeckLinkStatusID {
     bmdDeckLinkStatusBusy = 0x62757379,
     bmdDeckLinkStatusInterchangeablePanelType = 0x69637074,
     bmdDeckLinkStatusVideoInputSignalLocked = 0x7669736c,
-    bmdDeckLinkStatusReferenceSignalLocked = 0x7265666c
+    bmdDeckLinkStatusReferenceSignalLocked = 0x7265666c,
+    bmdDeckLinkStatusReceivedEDID = 0x65646964
 } BMDDeckLinkStatusID;
 typedef enum _BMDDeckLinkVideoStatusFlags {
     bmdDeckLinkVideoStatusPsF = 1 << 0,
@@ -10725,12 +10785,12 @@ void __RPC_STUB IDeckLinkDiscovery_UninstallDeviceNotifications_Stub(
  * CDeckLinkIterator coclass
  */
 
-DEFINE_GUID(CLSID_CDeckLinkIterator, 0x1f2e109a, 0x8f4f, 0x49e4, 0x92,0x03, 0x13,0x55,0x95,0xcb,0x6f,0xa5);
+DEFINE_GUID(CLSID_CDeckLinkIterator, 0x87d2693f, 0x8d4a, 0x45c7, 0xb4,0x3f, 0x10,0xac,0xba,0x25,0xe6,0x8f);
 
 #ifdef __cplusplus
-class DECLSPEC_UUID("1f2e109a-8f4f-49e4-9203-135595cb6fa5") CDeckLinkIterator;
+class DECLSPEC_UUID("87d2693f-8d4a-45c7-b43f-10acba25e68f") CDeckLinkIterator;
 #ifdef __CRT_UUID_DECL
-__CRT_UUID_DECL(CDeckLinkIterator, 0x1f2e109a, 0x8f4f, 0x49e4, 0x92,0x03, 0x13,0x55,0x95,0xcb,0x6f,0xa5)
+__CRT_UUID_DECL(CDeckLinkIterator, 0x87d2693f, 0x8d4a, 0x45c7, 0xb4,0x3f, 0x10,0xac,0xba,0x25,0xe6,0x8f)
 #endif
 #endif
 
@@ -10790,12 +10850,51 @@ __CRT_UUID_DECL(CDeckLinkVideoConversion, 0x7dbbbb11, 0x5b7b, 0x467d, 0xae,0xa4,
  * CDeckLinkDiscovery coclass
  */
 
-DEFINE_GUID(CLSID_CDeckLinkDiscovery, 0x1073a05c, 0xd885, 0x47e9, 0xb3,0xc6, 0x12,0x9b,0x3f,0x9f,0x64,0x8b);
+DEFINE_GUID(CLSID_CDeckLinkDiscovery, 0x652615d4, 0x26cd, 0x4514, 0xb1,0x61, 0x2f,0xd5,0x07,0x2e,0xd0,0x08);
 
 #ifdef __cplusplus
-class DECLSPEC_UUID("1073a05c-d885-47e9-b3c6-129b3f9f648b") CDeckLinkDiscovery;
+class DECLSPEC_UUID("652615d4-26cd-4514-b161-2fd5072ed008") CDeckLinkDiscovery;
 #ifdef __CRT_UUID_DECL
-__CRT_UUID_DECL(CDeckLinkDiscovery, 0x1073a05c, 0xd885, 0x47e9, 0xb3,0xc6, 0x12,0x9b,0x3f,0x9f,0x64,0x8b)
+__CRT_UUID_DECL(CDeckLinkDiscovery, 0x652615d4, 0x26cd, 0x4514, 0xb1,0x61, 0x2f,0xd5,0x07,0x2e,0xd0,0x08)
+#endif
+#endif
+
+/*****************************************************************************
+ * CBMDStreamingDiscovery_v10_8 coclass
+ */
+
+DEFINE_GUID(CLSID_CBMDStreamingDiscovery_v10_8, 0x0caa31f6, 0x8a26, 0x40b0, 0x86,0xa4, 0xbf,0x58,0xdc,0xca,0x71,0x0c);
+
+#ifdef __cplusplus
+class DECLSPEC_UUID("0caa31f6-8a26-40b0-86a4-bf58dcca710c") CBMDStreamingDiscovery_v10_8;
+#ifdef __CRT_UUID_DECL
+__CRT_UUID_DECL(CBMDStreamingDiscovery_v10_8, 0x0caa31f6, 0x8a26, 0x40b0, 0x86,0xa4, 0xbf,0x58,0xdc,0xca,0x71,0x0c)
+#endif
+#endif
+
+/*****************************************************************************
+ * CDeckLinkIterator_v10_8 coclass
+ */
+
+DEFINE_GUID(CLSID_CDeckLinkIterator_v10_8, 0x1f2e109a, 0x8f4f, 0x49e4, 0x92,0x03, 0x13,0x55,0x95,0xcb,0x6f,0xa5);
+
+#ifdef __cplusplus
+class DECLSPEC_UUID("1f2e109a-8f4f-49e4-9203-135595cb6fa5") CDeckLinkIterator_v10_8;
+#ifdef __CRT_UUID_DECL
+__CRT_UUID_DECL(CDeckLinkIterator_v10_8, 0x1f2e109a, 0x8f4f, 0x49e4, 0x92,0x03, 0x13,0x55,0x95,0xcb,0x6f,0xa5)
+#endif
+#endif
+
+/*****************************************************************************
+ * CDeckLinkDiscovery_v10_8 coclass
+ */
+
+DEFINE_GUID(CLSID_CDeckLinkDiscovery_v10_8, 0x1073a05c, 0xd885, 0x47e9, 0xb3,0xc6, 0x12,0x9b,0x3f,0x9f,0x64,0x8b);
+
+#ifdef __cplusplus
+class DECLSPEC_UUID("1073a05c-d885-47e9-b3c6-129b3f9f648b") CDeckLinkDiscovery_v10_8;
+#ifdef __CRT_UUID_DECL
+__CRT_UUID_DECL(CDeckLinkDiscovery_v10_8, 0x1073a05c, 0xd885, 0x47e9, 0xb3,0xc6, 0x12,0x9b,0x3f,0x9f,0x64,0x8b)
 #endif
 #endif
 
