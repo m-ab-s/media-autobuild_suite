@@ -76,7 +76,7 @@ Included Tools And Libraries
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
-        - decklink (10.9)
+        - decklink (10.9.3)
             - needs non-free license
         - libcdio (mingw)
         - libfdk-aac (git)
