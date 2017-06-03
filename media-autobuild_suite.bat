@@ -1088,37 +1088,8 @@ if not exist %instdir%\mintty.lnk (
     if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
     if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
         (
-            echo.BoldAsFont=yes
-            echo.BackgroundColour=39,40,34
-            echo.ForegroundColour=248,248,242
-            echo.Transparency=off
-            echo.FontHeight=^9
-            echo.FontSmoothing=default
-            echo.AllowBlinking=yes
-            echo.Font=Consolas
-            echo.Columns=120
-            echo.Rows=30
-            echo.Term=xterm-256color
-            echo.CursorType=block
-            echo.ClicksPlaceCursor=yes
             echo.Locale=en_US
             echo.Charset=UTF-8
-            echo.Black=39,40,34
-            echo.Red=249,38,114
-            echo.Green=166,226,46
-            echo.Yellow=244,191,117
-            echo.Blue=102,217,239
-            echo.Magenta=174,129,255
-            echo.Cyan=161,239,228
-            echo.White=248,248,242
-            echo.BoldBlack=117,113,94
-            echo.BoldRed=204,6,78
-            echo.BoldGreen=122,172,24
-            echo.BoldYellow=240,169,69
-            echo.BoldBlue=33,199,233
-            echo.BoldMagenta=126,51,255
-            echo.BoldCyan=95,227,210
-            echo.BoldWhite=249,248,245
             )>>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 
 :hgsettings
