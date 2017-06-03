@@ -752,8 +752,8 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "no" ]] && enabled libkvazaar; }; 
 fi
 
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
-if { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
-    { [[ $mpv != "no" ]] && mpv_enabled sdl2; } || [[ $daala = y ]] &&
+if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
+    mpv_enabled sdl2 || [[ $daala = y ]]; } &&
     do_pkgConfig "sdl2 = 2.0.5"; then
     do_wget -h d4055424d556b4a908aa76fad63abd3c \
         "http://libsdl.org/release/SDL2-2.0.5.tar.gz"
