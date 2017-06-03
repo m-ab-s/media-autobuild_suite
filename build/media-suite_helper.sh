@@ -947,13 +947,14 @@ do_cmake() {
     local PKG_CONFIG=pkg-config
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
-    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release "$@"
+    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
+         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on -DCMAKE_BUILD_TYPE=Release "$@"
 }
 
 do_cmakeinstall() {
     do_cmake "$@"
-    log "install" ninja install
+    DESTDIR=/trunk log "install" ninja install
 }
 
 compilation_fail() {
