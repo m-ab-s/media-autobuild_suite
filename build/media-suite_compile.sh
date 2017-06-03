@@ -644,6 +644,14 @@ if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
     do_checkIfExist
 fi
 
+_check=(libmysofa.a, mysofa.h)
+if [[ $ffmpeg != "no" ]] && enabled mysofa &&
+    do_vcs "https://github.com/hoene/libmysofa.git"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall -DBUILD_TESTS=no
+    do_checkIfExist
+fi
+
 set_title "compiling video tools"
 echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
 
