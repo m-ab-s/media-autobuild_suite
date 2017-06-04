@@ -1343,7 +1343,7 @@ add_to_remove() {
 clean_suite() {
     echo -e "\n\t${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
-    find . -maxdepth 2 -name recently_updated -o -name recently_checked -print0 | xargs -0 rm -f
+    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_shared\|_light\)?\$" -print0 |
         xargs -0 rm -f
     echo -e "\n\t${green}Zipping man files...${reset}"
