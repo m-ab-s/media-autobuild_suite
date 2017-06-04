@@ -1350,8 +1350,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
     if ! mpv_disabled egl-angle && ! mpv_disabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        stablebranch=$(git rev-parse "$(git branch -r -v | uniq -cdf1 | \
-            grep -E '^\s*[3-9]' | tail | awk '{ print $2 }' | tail -1)")
+        betaversion="$(curl -s http://feeds.feedburner.com/GoogleChromeReleases |\
+            grep -oP "(?<=Beta channel has been updated to )\d+\.\d+\.\d+\.\d+" |\
+            tr '.' ' ' | awk '{print $3}' | head -1)"
+        stablebranch=$(git rev-parse "origin/chromium/$betaversion")
         if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
             [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
         log stable_checkout git checkout -fB stable "$stablebranch"
@@ -1361,9 +1363,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
         sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
         sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
-        grep -q renderer11_utils src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h ||
-            sed -ri "/libANGLE\/Error.h/ a\#include \"libANGLE/renderer/d3d/d3d11/renderer11_utils.h\"" \
-            src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
         log uninstall make PREFIX="$LOCALDESTDIR" \
             BINDIR="$LOCALDESTDIR/bin-video" uninstall
         log configure gyp -Duse_ozone=0 -DOS=win \
