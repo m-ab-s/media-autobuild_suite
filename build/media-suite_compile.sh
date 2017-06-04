@@ -1357,7 +1357,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
             [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
         log stable_checkout git checkout -fB stable "$stablebranch"
-        git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch"
+        git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch" -e "*.log"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
         sed -i "s;'libGLESv2;'libANGLE' ,&;" src/libEGL.gypi
         sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
