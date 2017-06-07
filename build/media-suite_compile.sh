@@ -732,9 +732,11 @@ if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
         extracommands+=(--disable-examples)
     do_uninstall include/aom "${_check[@]}"
     create_build_dir
-    log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
-        --disable-{shared,unit-tests,docs,install-bins} \
-        --enable-{static,runtime-cpu-detect,aom-highbitdepth} \
+    [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
+    log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" \
+        --prefix="$LOCALDESTDIR" \
+        --disable-{docs,install-bins} \
+        --enable-runtime-cpu-detect \
         "${extracommands[@]}"
     for _ff in *.mk; do
         sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
