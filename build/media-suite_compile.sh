@@ -111,6 +111,13 @@ do_hide_all_sharedlibs
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
 
+if [[ $packing = y ]] &&
+    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.94" ]]; then
+    do_wget -h 74308db1183436576d011bfcc3e7c99c836fb052de7b7eb0539026366453d6e8 \
+        "https://github.com/upx/upx/releases/download/v3.94/upx394w.zip"
+    do_install upx.exe /opt/bin/upx.exe
+fi
+
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi

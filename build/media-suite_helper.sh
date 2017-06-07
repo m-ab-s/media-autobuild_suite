@@ -399,7 +399,7 @@ do_strip() {
 
 do_pack() {
     local file
-    local cmd=(/usr/bin/upx -9 -qq)
+    local cmd=(/opt/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
     [[ $bits = 64bit ]] && enabled openssl && nopack="ffmpeg|mplayer|mpv"
