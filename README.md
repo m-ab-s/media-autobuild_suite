@@ -81,6 +81,8 @@ Included Tools And Libraries
         - libcdio (mingw)
         - libfdk-aac (git)
         - libkvazaar (git)
+        - libmysofa (git)
+            - needed for sofalizer filter
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (mingw)
@@ -90,7 +92,6 @@ Included Tools And Libraries
         - libtesseract (git)
         - libzmq (mingw)
         - libzvbi (0.2.35)
-        - netcdf (mingw)
         - opencl (from system)
         - opengl (from system)
 
