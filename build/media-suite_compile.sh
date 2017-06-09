@@ -651,7 +651,7 @@ if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
     do_checkIfExist
 fi
 
-_check=(libmysofa.a, mysofa.h)
+_check=(libmysofa.a mysofa.h)
 if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
     do_vcs "https://github.com/hoene/libmysofa.git"; then
     do_uninstall "${_check[@]}"
