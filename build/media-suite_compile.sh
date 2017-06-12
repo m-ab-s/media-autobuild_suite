@@ -52,6 +52,7 @@ while true; do
 --faac=* ) faac="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --curl=* ) curl="${1#*=}"; shift ;;
+--cyanrip=* ) cyanrip="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -106,6 +107,7 @@ unset _clean_old_builds
 
 # In case a build was interrupted before reversing hide_conflicting_libs
 hide_conflicting_libs -R
+hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
 do_hide_all_sharedlibs
 
 set_title "compiling global tools"
@@ -1535,6 +1537,101 @@ if [[ $bmx = "y" ]]; then
             include/bmx-0.1 "${_check[@]}"
         do_separate_confmakeinstall video
         do_checkIfExist
+    fi
+fi
+
+if [[ $cyanrip != no ]]; then
+    do_pacman_install libxml2
+
+    _check=(neon/ne_utils.h libneon.a neon.pc)
+    if do_pkgConfig "neon = 0.30.2"; then
+        do_wget -h db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca \
+            "http://www.webdav.org/neon/neon-0.30.2.tar.gz"
+        do_uninstall include/neon "${_check[@]}"
+        extracommands=()
+        if enabled gnutls; then
+            extracommands+=(--with-ssl=gnutls)
+        elif enabled openssl; then
+            extracommands+=(-with-ssl=openssl)
+        fi
+        do_separate_confmakeinstall --disable-{nls,debug,webdav} "${extracommands[@]}"
+        unset extracommands
+        do_checkIfExist
+    fi
+
+    _check=(discid/discid.h libdiscid.{a,pc})
+    if do_vcs "https://github.com/wiiaboo/libdiscid.git"; then
+        do_uninstall "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _deps=(libneon.a "$MINGW_PREFIX"/lib/libxml2.a)
+    _check=(musicbrainz5/mb5_c.h libmusicbrainz5{,cc}.{a,pc})
+    if do_vcs "https://github.com/wiiaboo/libmusicbrainz.git"; then
+        do_uninstall "${_check[@]}" include/musicbrainz5
+        sed -i "/Libs:.*/ a\Libs.private: -lstdc++" libmusicbrainz5cc.pc.cmake
+        do_cmake -G "MSYS Makefiles"
+        do_makeinstall
+        do_checkIfExist
+    fi
+
+    _deps=(libdiscid.a libmusicbrainz5.a)
+    _check=(bin-audio/cyanrip.exe)
+    if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
+
+        old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+        if [[ $cyanrip = small ]]; then
+            _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
+            if [[ ! -f "$LOCALBUILDDIR/ffmpeg-git/build_successful${bits}_cyan" ]] &&
+                do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+                do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
+                [[ -f "config.mak" ]] && log "distclean" make distclean
+                create_build_dir cyan
+                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                    --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
+                    --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
+                    --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
+                    --disable-{avdevice,avfilter,dxva2,d3d11va,cuda,cuvid,nvenc,schannel,sdl2} \
+                    --enable-protocol=file \
+                    --enable-encoder=flac,tta,aac,wavpack,alac \
+                    --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
+                    --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
+                    --enable-demuxer=image2,png_pipe,bmp_pipe \
+                    $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
+                    $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
+                        echo '--enable-encoder=vorbis') \
+                    $(enabled libopus && echo '--enable-libopus --enable-encoder=libopus' ||
+                        echo '--enable-encoder=opus')
+                do_makeinstall
+                files_exist "${_check[@]}" && touch "build_successful${bits}_cyan"
+            fi
+            PKG_CONFIG_PATH="$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
+        fi
+
+        cd_safe "$LOCALBUILDDIR"/cyanrip-git
+        _check=(bin-audio/cyanrip.exe)
+        [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
+        if [[ $cyanrip = small ]]; then
+            hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
+        else
+            hide_conflicting_libs
+        fi
+        CFLAGS+=" -DLIBXML_STATIC" LDFLAGS+=" -lws2_32" \
+        PKGCONFIG="/mingw64/bin/pkg-config --static" \
+        log configure /usr/bin/python waf configure --no-debug --bindir="$LOCALDESTDIR"/bin-audio
+        _notrequired=yes
+        log build /usr/bin/python waf -j "${cpuCount:-1}"
+        log install /usr/bin/python waf -j1 install ||
+            log install /usr/bin/python waf -j1 install
+        unset _notrequired
+        if [[ $cyanrip = small ]]; then
+            hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
+        else
+            hide_conflicting_libs -R
+        fi
+        do_checkIfExist
+        PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
     fi
 fi
 

@@ -94,7 +94,7 @@ set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
-aom daala faac ffmbc curl
+aom daala faac ffmbc curl cyanrip
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -803,6 +803,29 @@ if %buildffmbc%==2 set "ffmbc=n"
 if %buildffmbc% GTR 2 GOTO ffmbc
 if %writeFFmbc%==yes echo.ffmbc=^%buildffmbc%>>%ini%
 
+:cyanrip
+set "writecyanrip=no"
+if %cyanripINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build cyanrip ^(CLI CD ripper^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo. 3 = Yes with FFmpeg with only needed components
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildcyanrip="Build cyanrip: "
+    ) else set buildcyanrip=%cyanripINI%
+if %deleteINI%==1 set "writecyanrip=yes"
+
+if %buildcyanrip%==1 set "cyanrip=yes"
+if %buildcyanrip%==2 set "cyanrip=no"
+if %buildcyanrip%==3 set "cyanrip=small"
+if %buildcyanrip% GTR 3 GOTO cyanrip
+if %writecyanrip%==yes echo.cyanrip=^%buildcyanrip%>>%ini%
+
 
 :numCores
 set "writeCores=no"
@@ -1415,7 +1438,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl%'
+--daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip%'
 
 endlocal
 goto :EOF

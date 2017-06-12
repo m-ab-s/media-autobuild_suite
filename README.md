@@ -99,6 +99,7 @@ Included Tools And Libraries
     - aom (git)
     - bmx (git)
     - curl (latest release) with WinSSL/LibreSSL/GnuTLS backend
+    - cyanrip (git)
     - daala (git)
     - faac (1.28)
     - fdk-aac (git)

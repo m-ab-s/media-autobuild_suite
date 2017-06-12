@@ -1324,12 +1324,22 @@ hide_conflicting_libs() {
     # meant for rude build systems
     local reverse=n
     [[ $1 = "-R" ]] && reverse=y && shift
+    local priority_prefix
     local -a installed
     installed=($(find "$LOCALDESTDIR/lib" -maxdepth 1 -name "*.a"))
     if [[ $reverse = n ]]; then
         hide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     else
         hide_files -R "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
+    fi
+    if [[ -n "$1" ]]; then
+        priority_prefix="$1"
+        installed=($(find "$priority_prefix/lib" -maxdepth 1 -name "*.a"))
+        if [[ $reverse = n ]]; then
+            hide_files "${installed[@]//$1/$LOCALDESTDIR}"
+        else
+            hide_files -R "${installed[@]//$1/$LOCALDESTDIR}"
+        fi
     fi
 }
 

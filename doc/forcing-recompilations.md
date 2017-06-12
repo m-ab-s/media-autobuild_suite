@@ -56,6 +56,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
 
 ```
 /bin-audio
+    cyanrip
     faac
     fdkaac (fdk-aac encoder)
     flac
