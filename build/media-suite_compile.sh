@@ -1343,8 +1343,10 @@ fi
 
 if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
+        do_pacman_remove luajit-git
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
+        do_pacman_remove lua51
         do_pacman_install luajit-git
     fi
 
@@ -1357,32 +1359,41 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _check=(EGL/egl.h lib{GLESv2,EGL}.a)
     if ! mpv_disabled egl-angle && ! mpv_disabled egl-angle-lib &&
         do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        betaversion="$(curl -s http://feeds.feedburner.com/GoogleChromeReleases |\
-            grep -oP "(?<=Beta channel has been updated to )\d+\.\d+\.\d+\.\d+" |\
-            tr '.' ' ' | awk '{print $3}' | head -1)"
-        stablebranch=$(git rev-parse "origin/chromium/$betaversion")
-        if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
-            [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
-        log stable_checkout git checkout -fB stable "$stablebranch"
-        git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch" -e "*.log"
-        do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
-        sed -i "s;'libGLESv2;'libANGLE' ,&;" src/libEGL.gypi
-        sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
-        sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
-        sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
-        log uninstall make PREFIX="$LOCALDESTDIR" \
-            BINDIR="$LOCALDESTDIR/bin-video" uninstall
-        log configure gyp -Duse_ozone=0 -DOS=win \
+        rm -f __ver.txt
+        curl http://omahaproxy.appspot.com/all?os=win64 -o __ver.txt
+        dos2unix -q __ver.txt
+		betaversion="$(sed -rne '/^win64,(stable|beta)/p' __ver.txt | \
+                    sed -re 's;^win64.*,([^,]+),[^,]+$;\1;' | \
+                    grep -E -e '^[3,4][0-9]+$' - | sort -uV | tail -1)"
+		rm -f __ver.txt
+        [[ "$betaversion" =~ ^[3,4][0-9]+$ ]] && 
+            stablebranch=$(git rev-parse "origin/chromium/$betaversion")
+        if [[ $bits = 64bit && "$betaversion" =~ ^[3,4][0-9]+$ ]] &&
+           { ! files_exist "${_check[@]}" || \
+           [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
+            log stable_checkout git checkout -fB stable "$stablebranch"
+            git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch" -e "*.log"
+            do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
+            sed -i "s;'libGLESv2;'libANGLE' ,&;" src/libEGL.gypi
+            sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
+            sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
+            sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
+            grep -q renderer11_utils src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h || \
+			sed -ri "/libANGLE\/Error.h/ a\#include \"libANGLE/renderer/d3d/d3d11/renderer11_utils.h\"" \
+			src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
+            log uninstall make PREFIX="$LOCALDESTDIR" \
+                BINDIR="$LOCALDESTDIR/bin-video" uninstall
+            log configure gyp -Duse_ozone=0 -DOS=win \
             -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
             --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
             --generator-output=generated -Dangle_enable_vulkan=0
-        log commit_id make -C generated/ commit_id &&
-            cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
-        do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
-        log movelibs sh move-libs.sh
-        do_makeinstall PREFIX="$LOCALDESTDIR"
-        do_checkIfExist
-        elif [[ $bits = 32bit ]]; then
+            log commit_id make -C generated/ commit_id &&
+                cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
+            do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
+            log movelibs sh move-libs.sh
+            do_makeinstall PREFIX="$LOCALDESTDIR"
+            do_checkIfExist
+        elif [[ $bits = 32bit && "$betaversion" =~ ^[3,4][0-9]+$ ]]; then
             echo -e "${yellow}Angle can't be built with 32-bit GCC 6.${reset}"
             echo -e "${yellow}Only headers will be installed. Use DLLs from somewhere else.${reset}"
             mpv_disable egl-angle-lib
