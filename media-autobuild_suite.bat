@@ -87,7 +87,7 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 
 set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua=luajit ^
 --enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle --enable-egl-angle-lib ^
---enable-libbluray
+--enable-libbluray --enable-javascript
 
 set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared

@@ -119,6 +119,7 @@ Included Tools And Libraries
                 - BD-J support requires installation of Java JDK
                 - BD-J support after compilation probably only requires JRE (untested)
             - luajit (mingw)
+            - mujs (git)
             - rubberband (git snapshot)
             - uchardet (mingw)
         - Full build (ffmpegChoice=4)

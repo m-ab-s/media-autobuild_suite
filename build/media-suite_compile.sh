@@ -1451,6 +1451,14 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         mpv_disable vapoursynth
     fi
 
+    _check=(mujs.h libmujs.a)
+    if ! mpv_disabled javascript &&
+        do_vcs https://github.com/ccxvii/mujs.git; then
+        do_uninstall bin-global/mujs.exe "$_{check[@]}"
+        do_makeinstall prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
+        do_checkIfExist
+    fi
+
     _check=(bin-video/mpv.{exe,com})
     _deps=(lib{ass,avcodec,uchardet,vapoursynth}.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
