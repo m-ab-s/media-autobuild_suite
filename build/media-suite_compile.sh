@@ -1578,7 +1578,6 @@ if [[ $cyanrip != no ]]; then
     _check=(musicbrainz5/mb5_c.h libmusicbrainz5{,cc}.{a,pc})
     if do_vcs "https://github.com/wiiaboo/libmusicbrainz.git"; then
         do_uninstall "${_check[@]}" include/musicbrainz5
-        sed -i "/Libs:.*/ a\Libs.private: -lstdc++" libmusicbrainz5cc.pc.cmake
         do_cmake -G "MSYS Makefiles"
         do_makeinstall
         do_checkIfExist
