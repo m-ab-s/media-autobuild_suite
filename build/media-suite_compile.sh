@@ -1362,12 +1362,12 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         rm -f __ver.txt
         curl http://omahaproxy.appspot.com/all?os=win64 -o __ver.txt
         dos2unix -q __ver.txt
-		betaversion="$(sed -rne '/^win64,(stable|beta)/p' __ver.txt | \
-                    sed -re 's;^win64.*,([^,]+),[^,]+$;\1;' | \
-                    grep -E -e '^[3,4][0-9]+$' - | sort -uV | tail -1)"
+	betaversion="$(sed -rne '/^win64,(stable|beta)/p' __ver.txt | \
+        	sed -re 's;^win64.*,([^,]+),[^,]+$;\1;' | \
+        	grep -E -e '^[3,4][0-9]+$' - | sort -uV | tail -1)"
 		rm -f __ver.txt
         [[ "$betaversion" =~ ^[3,4][0-9]+$ ]] && 
-            stablebranch=$(git rev-parse "origin/chromium/$betaversion")
+	stablebranch=$(git rev-parse "origin/chromium/$betaversion")
         if [[ $bits = 64bit && "$betaversion" =~ ^[3,4][0-9]+$ ]] &&
            { ! files_exist "${_check[@]}" || \
            [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
@@ -1379,10 +1379,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
             sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
             grep -q renderer11_utils src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h || \
-			sed -ri "/libANGLE\/Error.h/ a\#include \"libANGLE/renderer/d3d/d3d11/renderer11_utils.h\"" \
-			src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
+		sed -ri "/libANGLE\/Error.h/ a\#include \"libANGLE/renderer/d3d/d3d11/renderer11_utils.h\"" \
+		src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
             log uninstall make PREFIX="$LOCALDESTDIR" \
-                BINDIR="$LOCALDESTDIR/bin-video" uninstall
+	    BINDIR="$LOCALDESTDIR/bin-video" uninstall
             log configure gyp -Duse_ozone=0 -DOS=win \
             -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
             --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
