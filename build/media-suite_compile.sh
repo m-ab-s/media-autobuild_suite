@@ -1595,6 +1595,7 @@ if [[ $cyanrip != no ]]; then
         else
             hide_conflicting_libs
         fi
+        [[ -d build ]] && /usr/bin/python waf distclean >/dev/null 2>&1
         CFLAGS+=" -DLIBXML_STATIC" LDFLAGS+=" -lws2_32" \
         PKGCONFIG="$MINGW_PREFIX/bin/pkg-config --static" \
         log configure /usr/bin/python waf configure --no-debug --bindir="$LOCALDESTDIR"/bin-audio
