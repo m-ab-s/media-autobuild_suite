@@ -1356,47 +1356,18 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     do_pacman_remove angleproject-git
-    _check=(EGL/egl.h lib{GLESv2,EGL}.a)
-    if ! mpv_disabled egl-angle && ! mpv_disabled egl-angle-lib &&
-        do_vcs "https://chromium.googlesource.com/angle/angle" angleproject; then
-        betaversion="$(curl -s http://feeds.feedburner.com/GoogleChromeReleases |\
-            grep -oP "(?<=Beta channel has been updated to )\d+\.\d+\.\d+\.\d+" |\
-            tr '.' ' ' | awk '{print $3}' | head -1)"
-        stablebranch=$(git rev-parse "origin/chromium/$betaversion")
-        if { ! files_exist "${_check[@]}" ||
-            [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
-        log stable_checkout git checkout -fB stable "$stablebranch"
-        git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch" -e "*.log"
-        do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
-        do_patch angle-0003-add-option-for-targeting-cpu-architecture.patch
-        do_patch angle-0004-forward-declare-function.patch
-        sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
-        sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
-        sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
-        log uninstall make PREFIX="$LOCALDESTDIR" \
-            BINDIR="$LOCALDESTDIR/bin-video" uninstall
-        log configure gyp -Duse_ozone=0 -DOS=win \
-            -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
-            --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
-            --generator-output=generated -Dangle_enable_vulkan=0 \
-            -Dtarget_cpu="$CARCH"
-        log commit_id make -C generated/ commit_id &&
-            cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
-        do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
-        log movelibs sh move-libs.sh
-        do_makeinstall PREFIX="$LOCALDESTDIR"
-        do_checkIfExist
-        # elif [[ $bits = 32bit ]]; then
-        #     echo -e "${yellow}Angle can't be built with 32-bit GCC 6.${reset}"
-        #     echo -e "${yellow}Only headers will be installed. Use DLLs from somewhere else.${reset}"
-        #     mpv_disable egl-angle-lib
-        #     cp -rf include/* "$LOCALDESTDIR"/include/
-        #     touch build_successful32bit
-        else
-            echo -e "${green}Angle already compiled to latest stable version.${reset}"
-            touch "build_successful$bits"
+    _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
+    if ! mpv_disabled egl-angle &&
+        do_wget -z "https://i.fsbn.eu/pub/angle/angle-latest-win${bits%bit}.7z"; then
+        do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
+            lib{GLESv2,EGL}.a "${_check[@]}"
+        do_install lib{GLESv2,EGL}.dll bin-video/
+        cp -rf include/* "$LOCALDESTDIR/include/"
+        if ! [[ -f "$LOCALDESTDIR/bin-video/d3dcompiler_47.dll" ]]; then
+            do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"
+            do_install d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll bin-video/
         fi
-        unset stablebranch
+        do_checkIfExist
     fi
 
     vsprefix=$(get_vs_prefix)

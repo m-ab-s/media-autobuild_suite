@@ -112,7 +112,7 @@ Included Tools And Libraries
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - Base build (ffmpegChoice=2 or 3)
-            - ANGLE (git branch used in at least 3 chrome versions)
+            - ANGLE (from https://i.fsbn.eu/pub/angle/)
             - lcms2 (mingw)
             - libass (git)
             - libbluray (git)

@@ -797,7 +797,7 @@ do_getMpvConfig() {
         MPV_OPTS=()
         echo "Using default mpv options"
     fi
-    for forced in vapoursynth-lazy libguess static-build enable-gpl3; do
+    for forced in vapoursynth-lazy libguess static-build enable-gpl3 egl-angle-lib; do
         MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
     done
     if ! mpv_enabled debug-build; then
