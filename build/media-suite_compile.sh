@@ -1477,11 +1477,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
 
-        _notrequired=yes
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
-        unset _notrequired
 
         unset mpv_ldflags replace
         hide_conflicting_libs -R
@@ -1599,11 +1597,9 @@ if [[ $cyanrip != no ]]; then
         CFLAGS+=" -DLIBXML_STATIC" LDFLAGS+=" -lws2_32" \
         PKGCONFIG="$MINGW_PREFIX/bin/pkg-config --static" \
         log configure /usr/bin/python waf configure --no-debug --bindir="$LOCALDESTDIR"/bin-audio
-        _notrequired=yes
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
-        unset _notrequired
         if [[ $cyanrip = small ]]; then
             hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
         else
