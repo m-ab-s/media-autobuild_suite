@@ -106,8 +106,9 @@ do_uninstall q "${_clean_old_builds[@]}"
 unset _clean_old_builds
 
 # In case a build was interrupted before reversing hide_conflicting_libs
+[[ -d "$LOCALDESTDIR/opt/cyanffmpeg" ]] &&
+    hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
 hide_conflicting_libs -R
-hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
 do_hide_all_sharedlibs
 
 set_title "compiling global tools"
