@@ -1478,7 +1478,7 @@ goto :EOF
     echo.alias ls='ls --color=auto'
     echo.export CC=gcc
     echo.
-    echo.CARCH="${MINGW_CHOST%%-*}"
+    echo.CARCH="${MINGW_CHOST%%%%-*}"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
     echo.LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`"
     echo.export CPATH LIBRARY_PATH

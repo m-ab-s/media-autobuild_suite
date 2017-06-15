@@ -1363,12 +1363,13 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             grep -oP "(?<=Beta channel has been updated to )\d+\.\d+\.\d+\.\d+" |\
             tr '.' ' ' | awk '{print $3}' | head -1)"
         stablebranch=$(git rev-parse "origin/chromium/$betaversion")
-        if [[ $bits = 64bit ]] && { ! files_exist "${_check[@]}" ||
+        if { ! files_exist "${_check[@]}" ||
             [[ "$(git rev-parse -q --verify stable)" != "$stablebranch" ]]; }; then
         log stable_checkout git checkout -fB stable "$stablebranch"
         git clean -qxfd -e "/build_successful*" -e "/recently_updated" -e "*.patch" -e "*.log"
         do_patch angle-0001-Cross-compile-hacks-for-mpv.patch
-        sed -i "s;'libGLESv2;'libANGLE' ,&;" src/libEGL.gypi
+        do_patch angle-0003-add-option-for-targeting-cpu-architecture.patch
+        do_patch angle-0004-forward-declare-function.patch
         sed -i -e '/and OS=="win"/,/}]/d' src/libGLESv2.gypi
         sed -i -e "s|'copy_compiler_dll.bat', ||" src/angle.gyp
         sed -r -i "/^\s{8}\[.OS==.win./,$(($(cat src/angle.gyp|wc -l)-2))d" src/angle.gyp
@@ -1377,22 +1378,23 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         log configure gyp -Duse_ozone=0 -DOS=win \
             -Dangle_gl_library_type=static_library -Dangle_use_commit_id=1 \
             --depth . -I gyp/common.gypi src/angle.gyp --no-parallel --format=make \
-            --generator-output=generated -Dangle_enable_vulkan=0
+            --generator-output=generated -Dangle_enable_vulkan=0 \
+            -Dtarget_cpu="$CARCH"
         log commit_id make -C generated/ commit_id &&
             cmake -E copy generated/out/Debug/obj/gen/angle/id/commit.h src/id/commit.h
         do_make -C generated CXX=g++ AR=ar RANLIB=ranlib BUILDTYPE=Release
         log movelibs sh move-libs.sh
         do_makeinstall PREFIX="$LOCALDESTDIR"
         do_checkIfExist
-        elif [[ $bits = 32bit ]]; then
-            echo -e "${yellow}Angle can't be built with 32-bit GCC 6.${reset}"
-            echo -e "${yellow}Only headers will be installed. Use DLLs from somewhere else.${reset}"
-            mpv_disable egl-angle-lib
-            cp -rf include/* "$LOCALDESTDIR"/include/
-            touch build_successful32bit
+        # elif [[ $bits = 32bit ]]; then
+        #     echo -e "${yellow}Angle can't be built with 32-bit GCC 6.${reset}"
+        #     echo -e "${yellow}Only headers will be installed. Use DLLs from somewhere else.${reset}"
+        #     mpv_disable egl-angle-lib
+        #     cp -rf include/* "$LOCALDESTDIR"/include/
+        #     touch build_successful32bit
         else
             echo -e "${green}Angle already compiled to latest stable version.${reset}"
-            touch build_successful64bit
+            touch "build_successful$bits"
         fi
         unset stablebranch
     fi
