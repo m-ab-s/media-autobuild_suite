@@ -1622,7 +1622,7 @@ if [[ $cyanrip != no ]]; then
             hide_conflicting_libs
         fi
         CFLAGS+=" -DLIBXML_STATIC" LDFLAGS+=" -lws2_32" \
-        PKGCONFIG="/mingw64/bin/pkg-config --static" \
+        PKGCONFIG="$MINGW_PREFIX/bin/pkg-config --static" \
         log configure /usr/bin/python waf configure --no-debug --bindir="$LOCALDESTDIR"/bin-audio
         _notrequired=yes
         log build /usr/bin/python waf -j "${cpuCount:-1}"
