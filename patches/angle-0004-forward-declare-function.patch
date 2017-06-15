@@ -1,0 +1,24 @@
+From 42066aa9244a924c2c4473d03300b8c3fc439004 Mon Sep 17 00:00:00 2001
+From: shinchiro <shinchiro@users.noreply.github.com>
+Date: Sat, 3 Jun 2017 08:54:44 +0800
+Subject: [PATCH] forward declare function
+
+---
+ src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h b/src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
+index bd1949c8..20284743 100644
+--- a/src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
++++ b/src/libANGLE/renderer/d3d/d3d11/ResourceManager11.h
+@@ -24,6 +24,7 @@ class ResourceManager11;
+ template <typename T>
+ class SharedResource11;
+ class TextureHelper11;
++namespace d3d11 { HRESULT SetDebugName(ID3D11DeviceChild *resource, const char *name); }
+ 
+ using InputElementArray = WrappedArray<D3D11_INPUT_ELEMENT_DESC>;
+ using ShaderData        = WrappedArray<uint8_t>;
+-- 
+2.13.0
+

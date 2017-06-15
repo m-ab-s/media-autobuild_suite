@@ -1,23 +1,9 @@
-From 1cb12fb49f5d22e70abd58df224d63a8104e370a Mon Sep 17 00:00:00 2001
-From: Ricardo Constantino <wiiaboo@gmail.com>
-Date: Mon, 28 Nov 2016 00:19:46 +0000
-Subject: [PATCH] Cross compile hacks for mpv
-
----
- Makefile                | 40 ++++++++++++++++++++++++++++++++++++++++
- gyp/common_defines.gypi |  9 +++++++++
- move-libs.sh            | 23 +++++++++++++++++++++++
- 3 files changed, 72 insertions(+)
- create mode 100644 Makefile
- create mode 100644 move-libs.sh
-
 diff --git a/Makefile b/Makefile
 new file mode 100644
-index 0000000..eb3de62
+index 000000000..0da8d93b8
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,40 @@
-+VERSION = 0.0.0
+@@ -0,0 +1,39 @@
 +INSTALL ?= install
 +SHELL ?= /bin/bash
 +PREFIX ?= /usr/local
@@ -58,7 +44,7 @@ index 0000000..eb3de62
 +	-rm -f $(INCLUDEDIR)/angle_gl.h
 +.PHONY: uninstall
 diff --git a/gyp/common_defines.gypi b/gyp/common_defines.gypi
-index bce49c4..abd3752 100644
+index bce49c4c2..68c32d763 100644
 --- a/gyp/common_defines.gypi
 +++ b/gyp/common_defines.gypi
 @@ -35,6 +35,15 @@
@@ -69,7 +55,7 @@ index bce49c4..abd3752 100644
 +    [
 +        '-std=c++14',
 +        '-fpermissive',
-+        '-msse2',
++        '-msse2', '-msse3',
 +        '-O2',
 +        '-Wno-deprecated-declarations',
 +        '-Wno-conversion-null',
@@ -79,7 +65,7 @@ index bce49c4..abd3752 100644
          4100, # Unreferenced formal parameter. Not interesting.
 diff --git a/move-libs.sh b/move-libs.sh
 new file mode 100644
-index 0000000..3aa2fab
+index 000000000..3aa2fab93
 --- /dev/null
 +++ b/move-libs.sh
 @@ -0,0 +1,23 @@
@@ -106,6 +92,33 @@ index 0000000..3aa2fab
 +ranlib libGLESv2_main.a
 +mv libGLESv2_main.a $SCRIPT_DIR_PATH/libGLESv2.a
 +mv libEGL.a $SCRIPT_DIR_PATH/libEGL.a
--- 
-2.10.2
-
+diff --git a/src/libEGL.gypi b/src/libEGL.gypi
+index fdce4ba2b..82a73cc6d 100644
+--- a/src/libEGL.gypi
++++ b/src/libEGL.gypi
+@@ -12,6 +12,7 @@
+             'type': '<(angle_gl_library_type)',
+             'dependencies':
+             [
++                'libANGLE',
+                 'libGLESv2',
+             ],
+             'includes':
+diff --git a/src/libGLESv2.gypi b/src/libGLESv2.gypi
+index 62e764c67..dd6bf4593 100644
+--- a/src/libGLESv2.gypi
++++ b/src/libGLESv2.gypi
+@@ -1144,13 +1144,6 @@
+                         '<@(libangle_null_sources)',
+                     ],
+                 }],
+-                ['angle_build_winrt==0 and OS=="win"',
+-                {
+-                    'dependencies':
+-                    [
+-                        'copy_compiler_dll'
+-                    ],
+-                }],
+                 ['angle_build_winrt==1',
+                 {
+                     'msvs_requires_importlibrary' : 'true',
