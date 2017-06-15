@@ -11,8 +11,8 @@ if which tput >/dev/null 2>&1; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test "$ncolors" -ge 8; then
         bold=$(tput bold)
-        blue=$(tput setaf 4)
-        orange=$(tput setaf 3)
+        blue=$(tput setaf 12)
+        orange=$(tput setaf 11)
         green=$(tput setaf 2)
         red=$(tput setaf 1)
         reset=$(tput sgr0)
