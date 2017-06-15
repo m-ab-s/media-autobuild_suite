@@ -1557,11 +1557,6 @@ if [[ $cyanrip != no ]]; then
             "http://www.webdav.org/neon/neon-0.30.2.tar.gz"
         do_uninstall include/neon "${_check[@]}"
         extracommands=()
-        if enabled gnutls; then
-            extracommands+=(--with-ssl=gnutls)
-        elif enabled openssl; then
-            extracommands+=(-with-ssl=openssl)
-        fi
         do_separate_confmakeinstall --disable-{nls,debug,webdav} "${extracommands[@]}"
         unset extracommands
         do_checkIfExist
