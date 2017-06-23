@@ -1140,16 +1140,10 @@ do_unhide_all_sharedlibs() {
 do_pacman_install() {
     local installed
     local pkg
-    local noop
     installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
     for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        if /usr/bin/grep -q "^${pkg}$" <(echo "$installed"); then
-            [[ -z $noop ]] && noop=y
-            continue
-        else
-            noop=n
-        fi
+        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
         echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
@@ -1161,7 +1155,6 @@ do_pacman_install() {
         fi
     done
     do_hide_all_sharedlibs
-    [[ $noop = y ]] && return 1
 }
 
 do_pacman_remove() {
