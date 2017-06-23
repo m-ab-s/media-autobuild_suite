@@ -100,6 +100,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     libopenh264.a
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
+    libopus.{,l}a opus.pc include/opus
 )
 
 do_uninstall q "${_clean_old_builds[@]}"
@@ -438,6 +439,7 @@ fi
 
 enabled libvorbis && do_pacman_install libvorbis
 enabled libspeex && do_pacman_install speex
+enabled libopus && do_pacman_install opus
 
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
@@ -533,17 +535,8 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
 fi
 unset _deps
 
-_check=(libopus.{,l}a opus.pc opus/opus.h)
-if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
-    do_pacman_remove opus
-    do_uninstall include/opus "${_check[@]}"
-    do_autogen
-    do_separate_confmakeinstall
-    do_checkIfExist
-fi
-
 _check=(bin-audio/opusenc.exe)
-_deps=(libopus.a)
+_deps=("$MINGW_PREFIX"/lib/libopus.a)
 if [[ $standalone = y ]] && enabled libopus &&
     do_vcs "https://github.com/xiph/opus-tools.git" opus-tools; then
     _check+=(bin-audio/opus{dec,info}.exe)
@@ -611,7 +604,7 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
 fi
 
 _check=(bin-audio/sox.exe sox.pc)
-_deps=(lib{sndfile,mp3lame,opus}.a)
+_deps=(libsndfile.a "$MINGW_PREFIX"/lib/lib{opus,mp3lame}.a)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
     do_pacman_install libmad
