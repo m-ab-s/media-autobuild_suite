@@ -1429,7 +1429,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     fi
 
     _check=(bin-video/mpv.{exe,com})
-    _deps=(lib{ass,avcodec,uchardet,vapoursynth}.a)
+    _deps=(lib{ass,avcodec,vapoursynth}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
         create_ab_pkgconfig
@@ -1507,7 +1507,7 @@ if [[ $bmx = "y" ]]; then
     fi
 
     _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
-    _deps=("$MINGW_PREFIX"/lib/liburiparser.a,lib{MXF{,++}-1.0,curl}.a)
+    _deps=("$MINGW_PREFIX"/lib/liburiparser.a lib{MXF{,++}-1.0,curl}.a)
     if do_vcs https://notabug.org/RiCON/bmx.git; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
