@@ -1411,3 +1411,50 @@ create_winpty_exe() {
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
+
+_define(){ IFS='\n' read -r -d '' ${1} || true; }
+create_ab_pkgconfig() {
+    # from https://stackoverflow.com/a/8088167
+    local script_file
+    _define script_file <<'EOF'
+#!/bin/sh
+
+while true; do
+case $1 in
+    --libs|--libs-*) libs_args+=" $1"; shift ;;
+    --static) static="--static"; shift ;;
+    --* ) base_args+=" $1"; shift ;;
+    * ) break ;;
+esac
+done
+
+run_pkgcfg() {
+    "$MINGW_PREFIX/bin/pkg-config" "$@"
+}
+
+deduplicateLibs() {
+    otherflags="$(run_pkgcfg $static $base_args "$@")"
+    unordered="$(run_pkgcfg $static $libs_args "$@")"
+    libdirs="$(printf '%s\n' $unordered | grep '^-L' | tr '\n' ' ')"
+    unordered="${unordered//$libdirs}"
+    ord_libdirs=""
+    for libdir in $libdirs; do
+        libdir="$(cygpath -m ${libdir#-L})"
+        ord_libdirs+=" -L$libdir"
+    done
+    ord_libdirs="$(printf '%s\n' $ord_libdirs | awk '!x[$0]++' | tr '\n' ' ')"
+    ord_libs="$(printf '%s\n' $unordered | tac | awk '!x[$0]++' | tac | tr '\n' ' ')"
+    printf '%s ' $otherflags $ord_libdirs $ord_libs
+    echo
+}
+
+if [[ -n $libs_args ]]; then
+    deduplicateLibs "$@"
+else
+    run_pkgcfg $static $base_args $libs_args "$@"
+fi
+EOF
+    [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config ]] &&
+        diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config >/dev/null ||
+        printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
+}

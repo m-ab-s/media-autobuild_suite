@@ -1439,6 +1439,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     _deps=(lib{ass,avcodec,uchardet,vapoursynth}.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
+        create_ab_pkgconfig
 
         [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
         if [[ -d build ]]; then
@@ -1468,6 +1469,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html3" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf" \
+            PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
@@ -1555,7 +1557,7 @@ if [[ $cyanrip != no ]]; then
     _deps=(libdiscid.a libmusicbrainz5.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
-
+        create_ab_pkgconfig
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         if [[ $cyanrip = small ]]; then
             _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
@@ -1594,9 +1596,9 @@ if [[ $cyanrip != no ]]; then
             hide_conflicting_libs
         fi
         [[ -d build ]] && /usr/bin/python waf distclean >/dev/null 2>&1
-        CFLAGS+=" -DLIBXML_STATIC" LDFLAGS+=" -lws2_32" \
-        PKGCONFIG="$MINGW_PREFIX/bin/pkg-config --static" \
-        log configure /usr/bin/python waf configure --no-debug --bindir="$LOCALDESTDIR"/bin-audio
+        CFLAGS+=" -DLIBXML_STATIC" PKGCONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+            log configure /usr/bin/python waf configure --no-debug \
+            --static-build --bindir="$LOCALDESTDIR"/bin-audio
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
