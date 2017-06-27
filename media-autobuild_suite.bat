@@ -93,7 +93,7 @@ set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
+ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
 aom daala faac ffmbc curl cyanrip
 
 set previousOptions=0
@@ -684,18 +684,24 @@ if %writertmpdump%==yes echo.rtmpdump=^%buildrtmpdump%>>%ini%
 
 :mplayer
 set "writeMPlayer=no"
-if %mplayerINI%==0 (
+if %mplayer2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
+    echo.
+    echo ######### UNSUPPORTED, IF IT BREAKS, IT BREAKS ################################
     echo.
     echo. Build static mplayer/mencoder binary?
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Don't bother opening issues about this if it breaks, I don't fucking care
+    echo. about ancient unmaintained shit code. One more issue open about this that
+    echo. isn't the suite's fault and mplayer goes fucking out.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmplayer="Build mplayer: "
-    ) else set buildmplayer=%mplayerINI%
+    ) else set buildmplayer=%mplayer2INI%
 if %deleteINI%==1 set "writeMPlayer=yes"
 
 if %buildmplayer%==1 set "mplayer=y"
@@ -782,6 +788,8 @@ set "writeFFmbc=no"
 if %ffmbcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
+    echo.
+    echo ######### UNSUPPORTED, IF IT BREAKS, IT BREAKS ################################
     echo.
     echo. Build FFMedia Broadcast binary?
     echo. 1 = Yes
