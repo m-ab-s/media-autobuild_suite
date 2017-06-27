@@ -988,10 +988,21 @@ if [[ $x264 != no ]]; then
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
+            lightffmpeg_non_video_codec=''
+            if where -Q ffmpeg ;then 
+                for i in $(ffmpeg -decoders | grep -P '^ *[^V][\.FSXBD]{5,5}' | grep -v '=' | awk '{print $2}'); do 
+                    lightffmpeg_non_video_codec+="${i},"
+                done
+                lightffmpeg_non_video_codec="${lightffmpeg_non_video_codec::-1}"
+            else
+                lightffmpeg_non_video_codec="8svx_exp,8svx_fib,aac,aac_fixed,libfdk_aac,aac_latm,ac3,ac3_fixed,adpcm_4xm,adpcm_adx,adpcm_afc,adpcm_aica,adpcm_ct,adpcm_dtk,adpcm_ea,adpcm_ea_maxis_xa,adpcm_ea_r1,adpcm_ea_r2,adpcm_ea_r3,adpcm_ea_xas,g722,g726,g726le,adpcm_ima_amv,adpcm_ima_apc,adpcm_ima_dat4,adpcm_ima_dk3,adpcm_ima_dk4,adpcm_ima_ea_eacs,adpcm_ima_ea_sead,adpcm_ima_iss,adpcm_ima_oki,adpcm_ima_qt,adpcm_ima_rad,adpcm_ima_smjpeg,adpcm_ima_wav,adpcm_ima_ws,adpcm_ms,adpcm_mtaf,adpcm_psx,adpcm_sbpro_2,adpcm_sbpro_3,adpcm_sbpro_4,adpcm_swf,adpcm_thp,adpcm_thp_le,adpcm_vima,adpcm_xa,adpcm_yamaha,alac,amrnb,libopencore_amrnb,amrwb,libopencore_amrwb,ape,atrac1,atrac3,atrac3al,atrac3plus,atrac3plusal,on2avc,binkaudio_dct,binkaudio_rdft,bmv_audio,comfortnoise,cook,dsd_lsbf,dsd_lsbf_planar,dsd_msbf,dsd_msbf_planar,dsicinaudio,dss_sp,dst,dca,dvaudio,eac3,evrc,flac,g723_1,g729,gremlin_dpcm,gsm,libgsm,gsm_ms,libgsm_ms,iac,libilbc,imc,interplay_dpcm,interplayacm,mace3,mace6,metasound,mlp,mp1,mp1float,mp2,mp2float,mp3,mp3float,mp3adu,mp3adufloat,mp3on4,mp3on4float,als,mpc7,mpc8,nellymoser,opus,libopus,paf_audio,pcm_alaw,pcm_bluray,pcm_dvd,pcm_f16le,pcm_f24le,pcm_f32be,pcm_f32le,pcm_f64be,pcm_f64le,pcm_lxf,pcm_mulaw,pcm_s16be,pcm_s16be_planar,pcm_s16le,pcm_s16le_planar,pcm_s24be,pcm_s24daud,pcm_s24le,pcm_s24le_planar,pcm_s32be,pcm_s32le,pcm_s32le_planar,pcm_s64be,pcm_s64le,pcm_s8,pcm_s8_planar,pcm_u16be,pcm_u16le,pcm_u24be,pcm_u24le,pcm_u32be,pcm_u32le,pcm_u8,pcm_zork,qcelp,qdm2,qdmc,real_144,real_288,ralf,roq_dpcm,s302m,sdx2_dpcm,shorten,sipr,smackaud,sol_dpcm,sonic,libspeex,tak,truehd,truespeech,tta,twinvq,vmdaudio,vorbis,libvorbis,wavesynth,wavpack,ws_snd1,wmalossless,wmapro,wmav1,wmav2,wmavoice,xan_dpcm,xma1,xma2,ssa,ass,dvbsub,libzvbi_teletextdec,dvdsub,cc_dec,pgssub,jacosub,microdvd,mov_text,mpl2,pjs,realtext,sami,stl,srt,subrip,subviewer,subviewer1,text,vplayer,webvtt,xsub"
+            fi
             LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                 log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
-                --disable-{programs,devices,filters,encoders,muxers,debug,sdl2} --enable-gpl
+                --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
+                --disable-decoder="${lightffmpeg_non_video_codec}"  --enable-gpl \
+                --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
 
