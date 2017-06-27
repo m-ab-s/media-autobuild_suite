@@ -338,6 +338,7 @@ if %x2642INI%==0 (
     echo. 3 = 10-bit lib/binary
     echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat and ffms2
     echo. 5 = 8-bit and 10-bit shared lib
+    echo. 6 = Same as 4 with video codecs only (can reduce size by ~3MB)
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
@@ -357,7 +358,8 @@ if %buildx264%==2 set "x2642=no"
 if %buildx264%==3 set "x2642=high"
 if %buildx264%==4 set "x2642=full"
 if %buildx264%==5 set "x2642=shared"
-if %buildx264% GTR 5 GOTO x264
+if %buildx264%==6 set "x2642=fullv"
+if %buildx264% GTR 6 GOTO x264
 if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
 
 :x265
