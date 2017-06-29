@@ -1121,7 +1121,9 @@ if not exist %instdir%\mintty.lnk (
         (
             echo.Locale=en_US
             echo.Charset=UTF-8
-            echo.Font=Courier New
+            echo.Font=Consolas
+            echo.Columns=120
+            echo.Rows=30
             )>>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 
 :hgsettings
