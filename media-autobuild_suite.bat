@@ -707,7 +707,7 @@ if %deleteINI%==1 set "writeMPlayer=yes"
 if %buildmplayer%==1 set "mplayer=y"
 if %buildmplayer%==2 set "mplayer=n"
 if %buildmplayer% GTR 2 GOTO mplayer
-if %writeMPlayer%==yes echo.mplayer=^%buildmplayer%>>%ini%
+if %writeMPlayer%==yes echo.mplayer2=^%buildmplayer%>>%ini%
 
 :mpv
 set "writeMPV=no"
