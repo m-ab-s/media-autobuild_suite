@@ -1402,7 +1402,7 @@ create_winpty_exe() {
     printf '%s\n' "#!/usr/bin/env bash" "$@" \
         'if [[ -t 1 ]]; then' \
         '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"' \
-        'else "$( dirname ${BASH_SOURCE[0]} )'"${exename}"'.exe" "$@"; fi' \
+        'else "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"; fi' \
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
