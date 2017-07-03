@@ -1116,15 +1116,15 @@ if not exist %instdir%\mintty.lnk (
     del %build%\setlink.vbs
     )
 
-    if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
     if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
-        (
-            echo.Locale=en_US
-            echo.Charset=UTF-8
-            echo.Font=Consolas
-            echo.Columns=120
-            echo.Rows=30
-            )>>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
+
+    if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
+    (
+        echo.printf '%s\n' Locale=en_US Charset=UTF-8 ^
+        Font=Consolas Columns=120 Rows=30 ^> /home/%USERNAME%/.minttyrc
+        )>%build%\mintty.sh
+    %mintty% /usr/bin/bash --login %build%\mintty.sh
+    del %build%\mintty.sh
 
 :hgsettings
 if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
