@@ -1031,7 +1031,7 @@ if [[ $x264 != no ]]; then
             _check+=(libx264.a)
         fi
 
-        if [[ $standalone = y && $x264 =~ (yes|full) ]]; then
+        if [[ $standalone = y && $x264 =~ (yes|full|fullv) ]]; then
             do_print_progress "Building 10-bit x264"
             _check+=(bin-video/x264-10bit.exe)
             create_build_dir
