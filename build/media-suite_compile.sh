@@ -848,10 +848,7 @@ if [[ $mediainfo = "y" ]]; then
     _deps=(lib{zen,curl}.a)
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
-        sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
-        CXXFLAGS+=" -DUNICODE" \
         do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
-        sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist
     fi
 
@@ -862,9 +859,8 @@ if [[ $mediainfo = "y" ]]; then
         do_autogen
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        CXXFLAGS+=" -DUNICODE" \
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
-            --enable-staticlibs LIBS="$($PKG_CONFIG --libs libmediainfo)"
+            --enable-staticlibs
         do_makeinstall
         do_checkIfExist
     fi
