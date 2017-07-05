@@ -860,7 +860,7 @@ if [[ $mediainfo = "y" ]]; then
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
-            --enable-staticlibs LIBS="$($PKG_CONFIG --libs libmediainfo)"
+            --enable-staticlibs
         do_makeinstall
         do_checkIfExist
     fi
