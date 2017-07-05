@@ -465,6 +465,8 @@ do_checkIfExist() {
 
 file_installed() {
     local file
+    local silent
+    [[ "$1" = "-s" ]] && silent=y
     case $1 in
         /* )
             file="$1" ;;
@@ -478,7 +480,8 @@ file_installed() {
             file="$1" ;;
     esac
     [[ ${file::1} != "/" ]] && file="$LOCALDESTDIR/$file"
-    echo "$file" && test -e "$file"
+    [[ -z $silent ]] && echo "$file"
+    test -e "$file"
 }
 
 files_exist() {
@@ -531,9 +534,9 @@ do_install() {
     [[ ${#files[@]} -gt 1 ]] && unset 'files[-1]'
     [[ ${dest: -1:1} = "/" ]] && mkdir -p "$dest"
     if [[ -n $dryrun ]]; then
-        echo install -D "${files[@]}" "$dest"
+        echo install -D -p "${files[@]}" "$dest"
     else
-        install -D "${files[@]}" "$dest"
+        install -D -p "${files[@]}" "$dest"
     fi
 }
 
