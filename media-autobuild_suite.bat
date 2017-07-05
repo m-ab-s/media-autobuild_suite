@@ -359,7 +359,7 @@ if %buildx264%==3 set "x2642=high"
 if %buildx264%==4 set "x2642=full"
 if %buildx264%==5 set "x2642=shared"
 if %buildx264%==6 set "x2642=fullv"
-if %buildx264% GTR 5 GOTO x264
+if %buildx264% GTR 6 GOTO x264
 if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
 
 :x265

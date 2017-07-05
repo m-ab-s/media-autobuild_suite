@@ -964,7 +964,7 @@ if [[ $x264 != no ]]; then
             --bindir="$LOCALDESTDIR/bin-video")
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig"
-        if [[ $standalone = y && ( $x264 = full ||  $x264 = fullv ) ]]; then
+        if [[ $standalone = y && $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
