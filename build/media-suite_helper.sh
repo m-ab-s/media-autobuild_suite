@@ -947,13 +947,13 @@ do_cmake() {
     local PKG_CONFIG=pkg-config
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
-    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
+    log "cmake" cmake "$root" -G "MSYS Makefiles" -DBUILD_SHARED_LIBS=off -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
         -DCMAKE_BUILD_TYPE=Release "$@"
 }
 
 do_cmakeinstall() {
     do_cmake "$@"
-    log "install" ninja install
+    log "install" make install
 }
 
 compilation_fail() {
@@ -1400,7 +1400,9 @@ create_winpty_exe() {
     shift 2
     [[ -f "${installdir}/${exename}".exe ]] && mv "${installdir}/${exename}"{.,_}exe
     printf '%s\n' "#!/usr/bin/env bash" "$@" \
+        'if [[ -t 1 ]]; then' \
         '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"' \
+        'else "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"; fi' \
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }

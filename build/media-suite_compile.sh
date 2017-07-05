@@ -101,9 +101,11 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
     libopus.{,l}a opus.pc include/opus
+    bin-global/libgcrypt-config libgcrypt.{,l}a gcrypt.h lib/libgcrypt.def
+    bin-global/{dumpsexp,hmac256,mpicalc}.exe
 )
 
-do_uninstall q "${_clean_old_builds[@]}"
+do_uninstall q all "${_clean_old_builds[@]}"
 unset _clean_old_builds
 
 # In case a build was interrupted before reversing hide_conflicting_libs
@@ -206,28 +208,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 fi
 
-_check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
-_ver="1.7.6"
-if [[ $ffmpeg != "no" ]] && enabled gcrypt; then
-    do_pacman_install libgpg-error
-    do_pacman_remove libgcrypt
-    if files_exist "${_check[@]}" && [[ "$(libgcrypt-config --version)" = "$_ver" ]]; then
-        do_print_status "libgcrypt $_ver" "$green" "Up-to-date"
-    else
-        do_wget -h 626aafee84af9d2ce253d2c143dc1c0902dda045780cc241f39970fc60be05bc \
-            "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$_ver.tar.bz2"
-        do_uninstall "${_check[@]}"
-        [[ $bits = 64bit ]] && do_patch 64bits-relocation.patch
-        [[ $standalone = y ]] || sed -ri "s|(^bin_PROGRAMS = ).*|\1\\\|" src/Makefile.in
-        sed -ri "s;(^SUBDIRS .*) tests;\1;" Makefile.in
-        do_separate_confmakeinstall global --disable-{padlock-support,doc,asm} \
-            --enable-ciphers=aes,des,rfc2268,arcfour \
-            --enable-digests=sha1,md5,rmd160,sha256,sha512 \
-            --enable-pubkey-ciphers=dsa,rsa,ecc \
-            --with-gpg-error-prefix="$MINGW_PREFIX"
-        do_checkIfExist
-    fi
-fi
+[[ $ffmpeg != "no" ]] && enabled gcrypt && do_pacman_install libgcrypt
 
 if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
@@ -649,7 +630,7 @@ fi
 
 _check=(libmysofa.a mysofa.h)
 if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
-    do_vcs "https://github.com/hoene/libmysofa.git"; then
+    do_vcs "https://github.com/hoene/libmysofa.git#tag=v0.5"; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall -DBUILD_TESTS=no
     do_checkIfExist
@@ -859,7 +840,6 @@ if [[ $mediainfo = "y" ]]; then
     _check=(libzen.{a,pc})
     if do_vcs "https://github.com/MediaArea/ZenLib" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
-        sed -i 's|NOT WIN32|NOT MSVC|' Project/CMake/CMakeLists.txt
         do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
@@ -869,7 +849,8 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
         sed -i 's|NOT WIN32|UNIX|g' Project/CMake/CMakeLists.txt
-        do_cmakeinstall Project/CMake
+        CXXFLAGS+=" -DUNICODE" \
+        do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
         sed -i 's|libzen|libcurl libzen|' "$LOCALDESTDIR/lib/pkgconfig/libmediainfo.pc"
         do_checkIfExist
     fi
@@ -881,6 +862,7 @@ if [[ $mediainfo = "y" ]]; then
         do_autogen
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
+        CXXFLAGS+=" -DUNICODE" \
         do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
             --enable-staticlibs LIBS="$($PKG_CONFIG --libs libmediainfo)"
         do_makeinstall
