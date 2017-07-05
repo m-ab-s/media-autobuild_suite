@@ -964,24 +964,30 @@ if [[ $x264 != no ]]; then
             --bindir="$LOCALDESTDIR/bin-video")
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig"
-        if [[ $standalone = y && $x264 = full ]]; then
+        if [[ $standalone = y && ( $x264 = full ||  $x264 = fullv ) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
-            lightffmpeg_non_video_codec="$(sed -n '/audio codecs/,/subtitles/p' libavcodec/allcodecs.c | \
-                grep -P 'REGISTER_(ENCDEC|DECODER)' | \
-                grep -oP "[a-z0-9_]+(?=\);)" | tr '\n' ',' | head -c -1)"
-            LDFLAGS+=" -L$MINGW_PREFIX/lib" \
-                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
-                --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
-                --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
-                --disable-decoder="${lightffmpeg_non_video_codec}"  --enable-gpl \
-                --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress
+            if [[ $x264 = fullv ]]; then
+                lightffmpeg_non_video_codec="$(sed -n '/audio codecs/,/subtitles/p' libavcodec/allcodecs.c | \
+                    grep -P 'REGISTER_(ENCDEC|DECODER)' | \
+                    grep -oP "[a-z0-9_]+(?=\);)" | tr '\n' ',' | head -c -1)"
+                LDFLAGS+=" -L$MINGW_PREFIX/lib" \
+                    log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                    --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
+                    --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
+                    --disable-decoder="${lightffmpeg_non_video_codec}"  --enable-gpl \
+                    --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress
+            else
+                LDFLAGS+=" -L$MINGW_PREFIX/lib" \
+                    log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                    --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
+                    --disable-{programs,devices,filters,encoders,muxers,debug,sdl2} --enable-gpl
+            fi
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
-
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs https://github.com/FFMS/ffms2.git; then
                 do_uninstall "${_check[@]}"
