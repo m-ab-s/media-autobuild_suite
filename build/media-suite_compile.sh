@@ -158,17 +158,14 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_checkIfExist
     fi
 
-    [[ ! $harfbuzz_ver ]] &&
-        harfbuzz_ver="$(clean_html_index "https://www.freedesktop.org/software/harfbuzz/release/")" &&
-        harfbuzz_ver="$(get_last_version "$harfbuzz_ver" "harfbuzz" "1\.\d+\.\d+")"
-    harfbuzz_ver="${harfbuzz_ver:-1.4.6}"
-    _deps=(lib{freetype,fontconfig}.a)
+    _deps=(libfreetype.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
-    if [[ $ffmpeg != "sharedlibs" ]] && do_pkgConfig "harfbuzz = ${harfbuzz_ver}"; then
+    if [[ $ffmpeg != "sharedlibs" ]] && do_vcs "https://github.com/behdad/harfbuzz.git"; then
         do_pacman_install ragel
-        do_wget "https://www.freedesktop.org/software/harfbuzz/release/harfbuzz-${harfbuzz_ver}.tar.bz2"
+        NOCONFIGURE=y do_autogen
         do_uninstall include/harfbuzz "${_check[@]}"
         do_separate_confmakeinstall --with-{icu,glib,gobject,cairo,fontconfig}=no
+        # directwrite shaper doesn't work with mingw headers, maybe too old
         do_checkIfExist
     fi
 
