@@ -26,15 +26,15 @@ Included Tools And Libraries
         - cuda (built-in)
         - cuvid (built-in)
         - libmp3lame (mingw)
-        - libopus (git)
+        - libopus (mingw)
         - libvorbis (mingw)
         - libvpx (git)
         - libx264 (git)
         - libx265 (hg)
         - nvenc (built-in)
-        - schannel with gcrypt (1.7.6)
+        - schannel with gcrypt (mingw)
             - enabled by default if openssl or gnutls aren't enabled
-            - libgcrypt can be switched by gmp with --enable-gmp
+            - libgcrypt can be switched by gmp (mingw) with --enable-gmp
         - sdl2 (2.0.5) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
@@ -46,6 +46,7 @@ Included Tools And Libraries
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig or XP support required, fontconfig backend included
+            - with harfbuzz (git)
         - libbluray (git)
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
@@ -80,6 +81,7 @@ Included Tools And Libraries
             - needs non-free license
         - libcdio (mingw)
         - libfdk-aac (git)
+            - needs non-free license
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
