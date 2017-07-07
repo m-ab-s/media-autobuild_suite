@@ -960,6 +960,7 @@ do_cmakeinstall() {
 }
 
 compilation_fail() {
+    [[ -z $build32 || -z $build64 ]] && return 1
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
