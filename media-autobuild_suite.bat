@@ -93,7 +93,7 @@ set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
+ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack xpcomp verbose bmx standalone updateSuite ^
 aom daala faac ffmbc curl cyanrip
 
 set previousOptions=0
@@ -934,29 +934,29 @@ if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
 if %writePack%==yes echo.pack=^%packF%>>%ini%
 
-:logging
-set "writeLogging=no"
-if %loggingINI%==0 (
+:verbose
+set "writeVerbose=no"
+if %verboseINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Write logs of compilation commands?
-    echo. 1 = Yes [recommended]
+    echo. Be verbose about compilation progress?
+    echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo Note: Setting this to yes will also hide output from these commands.
-    echo On successful compilation, these logs are deleted since they aren't needed.
+    echo Note: Setting this to no will hide output from compilation.
+    echo Logs are always saved.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P loggingF="Write logs: "
-    ) else set loggingF=%loggingINI%
-if %deleteINI%==1 set "writeLogging=yes"
+    set /P verboseF="Write logs: "
+    ) else set verboseF=%verboseINI%
+if %deleteINI%==1 set "writeVerbose=yes"
 
-if %loggingF%==1 set "logging=y"
-if %loggingF%==2 set "logging=n"
-if %loggingF% GTR 2 GOTO logging
-if %writeLogging%==yes echo.logging=^%loggingF%>>%ini%
+if %verboseF%==1 set "verbose=y"
+if %verboseF%==2 set "verbose=n"
+if %verboseF% GTR 2 GOTO verbose
+if %writeVerbose%==yes echo.verbose=^%verboseF%>>%ini%
 
 :updateSuite
 set "writeUpdateSuite=no"
@@ -1450,7 +1450,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
+--rtmpdump=%rtmpdump% --verbose=%verbose% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip%'
 
 endlocal

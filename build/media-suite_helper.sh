@@ -35,7 +35,7 @@ do_print_status() {
 }
 
 do_print_progress() {
-    if [[ $logging != n ]]; then
+    if [[ $verbose = n ]]; then
         [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
     else
         set_title "$* in $(get_first_subdir)"
@@ -963,8 +963,8 @@ compilation_fail() {
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
-    if [[ $logging = y ]]; then
-        echo "Likely error:"
+    if [[ $verbose = n ]]; then
+        echo "Tail of the log:"
         tail "ab-suite.${operation}.log"
         echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
     fi
@@ -982,22 +982,23 @@ compilation_fail() {
 }
 
 strip_ansi() {
-    local txtfile newfile
-    for txtfile; do
-        [[ $txtfile != "${txtfile//stripped/}" ]] && continue
-        local name="${txtfile%.*}"
-        local ext="${txtfile##*.}"
-        [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
-        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile" > "${newfile}"
-    done
+    # https://unix.stackexchange.com/a/111936
+    sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"
 }
 
 zip_logs() {
-    local failed url files
+    local failed url files txtfile
     failed="$(get_first_subdir)"
     pushd "$LOCALBUILDDIR" >/dev/null
     rm -f logs.zip
     strip_ansi ./*.log
+    for txtfile in ./*.log; do
+        [[ $txtfile != "${txtfile//stripped/}" ]] && continue
+        local name="${txtfile%.*}"
+        local ext="${txtfile##*.}"
+        [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
+        cat "$txtfile" | strip_ansi > "${newfile}"
+    done
     files=(/trunk/media-autobuild_suite.bat)
     [[ $failed ]] && files+=($(find "$failed" -name "*.log"))
     files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
@@ -1022,14 +1023,18 @@ log() {
     local extra
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
-    if [[ $logging != "n" ]]; then
-        echo -e "CFLAGS: $CFLAGS\nLDFLAGS: $LDFLAGS" > "ab-suite.$name.log"
-        echo "$_cmd $*" >> "ab-suite.$name.log"
-        $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
-            { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
+    echo -e "CFLAGS=$CFLAGS \\\nLDFLAGS=$LDFLAGS \\" > "ab-suite.$name.log"
+    printf '"%s" ' "$_cmd" "$@" >> "ab-suite.$name.log"
+    echo >> "ab-suite.$name.log"
+    if [[ $verbose = n ]]; then
+        $_cmd $extra "$@" 2>&1 | strip_ansi >> "ab-suite.$name.log" ||
+            { [[ $extra ]] &&
+                $_cmd -j1 "$@" 2>&1 | strip_ansi >> "ab-suite.$name.log"; } ||
             compilation_fail "$name"
     else
-        $_cmd $extra "$@" || { [[ $extra ]] && $_cmd -j1 "$@"; } ||
+        $_cmd $extra "$@" 2>&1 | tee -a >(strip_ansi >> "ab-suite.$name.log") ||
+            { [[ $extra ]] &&
+                $_cmd -j1 "$@" 2>&1 | tee -a >(strip_ansi >> "ab-suite.$name.log"); } ||
             compilation_fail "$name"
     fi
 }
