@@ -1372,7 +1372,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"
                 do_install d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll bin-video/
             fi
-            do_checkIfExist
+            stripping=n do_checkIfExist
         else
             do_print_status "└ $(get_first_subdir)}" "$green" "Files up-to-date"
         fi
