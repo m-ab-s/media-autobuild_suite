@@ -1362,8 +1362,8 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
     if ! mpv_disabled egl-angle &&
-        do_wget -z -r "https://i.fsbn.eu/pub/angle/angle-latest-win${bits%bit}.7z"; then
-        if test_newer installed bin-video/libGLESv2.dll "$(pwd)/libGLESv2.dll"; then
+        do_wget -z -r "https://i.fsbn.eu/pub/angle/angle-latest-win${bits%bit}.7z" &&
+        test_newer installed bin-video/libGLESv2.dll "$(pwd)/libGLESv2.dll"; then
             do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
                 lib{GLESv2,EGL}.a "${_check[@]}"
             do_install lib{GLESv2,EGL}.dll bin-video/
@@ -1373,9 +1373,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
                 do_install d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll bin-video/
             fi
             stripping=n do_checkIfExist
-        else
-            do_print_status "└ $(get_first_subdir)}" "$green" "Files up-to-date"
-        fi
+    elif ! mpv_disabled egl-angle &&
+        ! test_newer installed bin-video/libGLESv2.dll "$(pwd)/libGLESv2.dll"; then
+        do_print_status "└ $(get_first_subdir)" "$green" "Files up-to-date"
     fi
 
     vsprefix=$(get_vs_prefix)
