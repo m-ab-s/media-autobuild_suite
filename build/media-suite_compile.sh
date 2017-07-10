@@ -45,7 +45,7 @@ while true; do
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
 --xpcomp=* ) xpcomp="${1#*=}"; shift ;;
---verbose=* ) verbose="${1#*=}"; shift ;;
+--logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
 --daala=* ) daala="${1#*=}"; shift ;;
