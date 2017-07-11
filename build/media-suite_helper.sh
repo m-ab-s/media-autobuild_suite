@@ -468,7 +468,7 @@ file_installed() {
     local silent
     [[ "$1" = "-s" ]] && silent=y
     case $1 in
-        /* )
+        /*|./* )
             file="$1" ;;
         *.pc )
             file="lib/pkgconfig/$1" ;;
