@@ -1535,6 +1535,7 @@ fi
 
 if [[ $cyanrip != no ]]; then
     do_pacman_install libxml2
+    do_pacman_install libcdio-paranoia
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
     if do_pkgConfig "neon = 0.30.2"; then
