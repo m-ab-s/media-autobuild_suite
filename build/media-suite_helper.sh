@@ -1428,7 +1428,7 @@ esac
 done
 
 run_pkgcfg() {
-    "$MINGW_PREFIX/bin/pkg-config" "$@"
+    "$MINGW_PREFIX/bin/pkg-config" "$@" || exit 1
 }
 
 deduplicateLibs() {
