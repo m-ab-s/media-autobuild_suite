@@ -407,7 +407,7 @@ fi
 
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
 if [[ $ffmpeg != "no" ]] && enabled libzimg &&
-    do_vcs "https://github.com/sekrit-twc/zimg.git#commit=a80e8acd0c^"; then
+    do_vcs "https://github.com/sekrit-twc/zimg.git"; then
     do_uninstall "${_check[@]}"
     do_autoreconf
     do_separate_confmakeinstall
