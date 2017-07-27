@@ -832,6 +832,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
         fi
         PATH="/opt/apache-ant/bin:$JDK_HOME/bin:$PATH"
         log ant-diagnostics ant -diagnostics
+        export JDK_HOME="$(cygpath -sm "$JDK_HOME")"
     else
         extracommands+=(--disable-bdjava-jar)
     fi
