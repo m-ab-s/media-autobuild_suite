@@ -821,18 +821,19 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     do_uninstall include/libbluray share/java "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
     extracommands=()
-    JDK_HOME="$(get_java_home)"
+    JAVA_HOME="$(get_java_home)"
     OLD_PATH="$PATH"
-    if [[ -n "$JDK_HOME" ]]; then
+    if [[ -n "$JAVA_HOME" ]]; then
         if [[ ! -f /opt/apache-ant/bin/ant ]]; then
             do_wget -r -c -h 0a4530999b71f92bf17ae823ed3b0b2d \
                 "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip" \
                 apache-ant.zip
             mv apache-ant/apache-ant* /opt/apache-ant
         fi
-        PATH="/opt/apache-ant/bin:$JDK_HOME/bin:$PATH"
+        PATH="/opt/apache-ant/bin:$JAVA_HOME/bin:$PATH"
         log ant-diagnostics ant -diagnostics
-        export JDK_HOME="$(cygpath -sm "$JDK_HOME")"
+        export JDK_HOME=""
+        export JAVA_HOME
     else
         extracommands+=(--disable-bdjava-jar)
     fi
@@ -840,7 +841,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
         --without-{libxml2,fontconfig,freetype} "${extracommands[@]}"
     do_checkIfExist
     PATH="$OLD_PATH"
-    unset extracommands JDK_HOME OLD_PATH
+    unset extracommands JDK_HOME JAVA_HOME OLD_PATH
 fi
 
 _check=(libxavs.a xavs.{h,pc})
