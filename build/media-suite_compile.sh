@@ -1470,8 +1470,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             do_pacman_install python3-docutils
         fi
         do_pacman_remove python3-rst2pdf
-        mpv_enabled pdf-build && do_pacman_install python2-rst2pdf &&
-            pip -q install olefile
+        mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
