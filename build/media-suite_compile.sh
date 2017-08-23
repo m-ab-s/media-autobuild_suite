@@ -1108,7 +1108,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
         log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
-        -DENABLE_DYNAMIC_HDR10=ON $xpsupport "$@"
+        -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
         log "ninja" ninja -j "${cpuCount:-1}"
     }
     [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
