@@ -148,6 +148,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_vcs "https://anongit.freedesktop.org/git/fontconfig"; then
         do_pacman_install python2-lxml python2-six
         do_uninstall include/fontconfig "${_check[@]}"
+        do_patch "fontconfig-0001-fix-fc-blank.h-generation-if-unicode.org-is-disabled.patch" am
         [[ $standalone = y ]] || sed -ri Makefile.am \
             -e '/^SUBDIRS=/,+2{s;fontconfig.*;fontconfig fc-blanks src;g;/fc-[^b]/d}' \
             -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
