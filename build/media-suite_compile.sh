@@ -1206,6 +1206,7 @@ if [[ $ffmpeg != "no" ]]; then
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
     enabled libzvbi && do_addOption --extra-libs=-lpng
+    enabled frei0r && do_addOption --extra-libs=-lpsapi
 
     do_hide_all_sharedlibs
 
