@@ -686,21 +686,26 @@ do_changeFFmpegConfig() {
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    if [[ $license = "nonfree" ]] && enabled_any libnpp decklink; then
+    if [[ $license = "nonfree" ]] && enabled_any libnpp decklink cuda-sdk; then
         do_addOption --enable-nonfree
     else
-        do_removeOption "--enable-(nonfree|decklink|libnpp)"
+        do_removeOption "--enable-(nonfree|decklink|libnpp|cuda-sdk)"
     fi
 
-    if [[ $license = "nonfree" && $bits = 64bit ]] && enabled libnpp &&
-        [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/nppi.h" ]] &&
-        [[ -f "$CUDA_PATH/lib/x64/nppi.lib" ]]; then
+    if [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk &&
+        [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]] &&
+        [[ -f "$CUDA_PATH/lib/x64/cuda.lib" ]]; then
+            if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
+                do_removeOption "--enable-libnpp"
+            elif enabled libnpp; then
+                echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
+            fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
-            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
+            echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
     else
-        do_removeOptions "--enable-libnpp"
+        do_removeOption "--enable-(libnpp|cuda-sdk)"
     fi
 
     # handle gpl-incompatible libs

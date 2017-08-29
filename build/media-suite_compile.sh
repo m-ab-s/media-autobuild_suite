@@ -1461,7 +1461,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
         if [[ $bits = "64bit" ]]; then
             mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-            if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
+            if enabled_any libnpp cuda-sdk && [[ -n "$CUDA_PATH" ]]; then
                 mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
             fi
