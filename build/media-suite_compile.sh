@@ -1255,6 +1255,11 @@ if [[ $ffmpeg != "no" ]]; then
         enabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
+        # support sdk9 npp
+        enabled libnpp && { curl -s https://patchwork.ffmpeg.org/patch/4876/mbox/ | git am || git am --abort; }
+        # strip CR from nvcc output
+        enabled cuda-sdk && { curl -s https://patchwork.ffmpeg.org/patch/4871/mbox/ | git am || git am --abort; }
+
         # remove redundant -L and -l flags from extralibs
         do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
 
