@@ -77,11 +77,14 @@ Included Tools And Libraries
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
+        - scale_cuda (needs CUDA SDK and MSVC 2015 installed and cl.exe in PATH)
+            - needs non-free license
         - decklink (10.9.3)
             - needs non-free license
         - libcdio (mingw)
         - libfdk-aac (git)
-            - needs non-free license
+            - needs non-free license if not LGPL
+        - libflite (git)
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
