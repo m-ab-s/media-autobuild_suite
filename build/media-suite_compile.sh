@@ -656,6 +656,18 @@ if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
     do_checkIfExist
 fi
 
+_check=(libflite.a flite/flite.h)
+if enabled libflite && do_vcs "https://github.com/kubo/flite.git"; then
+    do_uninstall libflite_cmu_{grapheme,indic}_{lang,lex}.a \
+        libflite_cmu_us_{awb,kal,kal16,rms,slt}.a \
+        libflite_{cmulex,usenglish,cmu_time_awb}.a "${_check[@]}" include/flite
+    log clean make clean
+    do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-audio --disable-shared \
+        --with-audio=none
+    do_make && do_makeinstall
+    do_checkIfExist
+fi
+
 set_title "compiling video tools"
 echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
 
