@@ -166,6 +166,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         # directwrite shaper doesn't work with mingw headers, maybe too old
         do_checkIfExist
     fi
+    unset _deps
 
     _check=(libfribidi.{l,}a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
@@ -317,6 +318,7 @@ if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
         cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
     do_checkIfExist
 fi
+unset _deps
 
 _check=(libwebp{,mux}.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
@@ -502,6 +504,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     else
         ! disabled libfdk-aac && do_addOption --enable-libfdk-aac
     fi
+    unset _deps
 fi
 
 [[ $faac = y ]] && do_pacman_install faac
@@ -630,6 +633,7 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
     hide_conflicting_libs -R
     do_checkIfExist
 fi
+unset _deps
 
 _check=(libopenmpt.{a,pc})
 [[ ! $openmpt_rev ]] &&
@@ -701,6 +705,7 @@ if [[ $rtmpdump = "y" ]] ||
         do_checkIfExist
         unset ssl crypto pc req
     fi
+    unset _deps
 fi
 
 _check=(libvpx.a vpx.pc)
