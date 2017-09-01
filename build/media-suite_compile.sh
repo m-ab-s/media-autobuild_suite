@@ -929,12 +929,25 @@ if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
     do_checkIfExist
 fi
 
-_check=(frei0r.{h,pc})
-if [[ $ffmpeg != "no" ]] && enabled frei0r && do_vcs https://github.com/dyne/frei0r.git; then
-    sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
-    do_uninstall lib/frei0r-1 "${_check[@]}"
-    do_cmakeinstall
-    do_checkIfExist
+
+if [[ $ffmpeg != "no" ]] && enabled frei0r; then
+    _check=(libdl.a dlfcn.h)
+    if do_vcs https://github.com/dlfcn-win32/dlfcn-win32.git; then
+        do_uninstall "${_check[@]}"
+        [[ -f config.mak ]] && log clean make distclean
+        sed -i 's|__declspec(dllexport)||g' dlfcn.h
+        do_configure --prefix="$LOCALDESTDIR" --disable-shared
+        do_make && do_makeinstall
+        do_checkIfExist
+    fi
+
+    _check=(frei0r.{h,pc})
+    if do_vcs https://github.com/dyne/frei0r.git; then
+        sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
+        do_uninstall lib/frei0r-1 "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
 fi
 
 if [[ $ffmpeg != "no" ]] && enabled decklink; then
