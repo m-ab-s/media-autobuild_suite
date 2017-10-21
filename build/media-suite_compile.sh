@@ -916,7 +916,7 @@ fi
 
 _check=(libzvbi.{h,{l,}a})
 if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
-    { ! files_exist "${_check[@]}" || ! grep -q "0.2.35" "$LOCALDESTDIR/lib/libzvbi.a"; }; then
+    do_pkgConfig "ZVBI = 0.2.35"; then
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
         "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     do_uninstall "${_check[@]}" zvbi-0.2.pc
@@ -926,6 +926,7 @@ if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
         --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
+    log pkgconfig make -C .. install-pkgconfigDATA
     do_checkIfExist
 fi
 
