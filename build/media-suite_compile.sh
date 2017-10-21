@@ -1219,8 +1219,8 @@ if [[ $ffmpeg != "no" ]]; then
     if enabled libssh; then
         do_pacman_install libssh
         do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
-        grep -q "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
-            sed -i "/Libs:/ i\Requires.private: libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+        grep -q "Requires.private: zlib" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
+            sed -i "/Libs:/ i\Requires.private: zlib libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
     enabled libtheora && do_pacman_install libtheora
     enabled libcdio && do_pacman_install libcdio-paranoia
@@ -1236,7 +1236,6 @@ if [[ $ffmpeg != "no" ]]; then
             sed -i 's/-lsodium/& -lws2_32 -liphlpapi/' "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
-    enabled libzvbi && do_addOption --extra-libs=-lpng
     enabled frei0r && do_addOption --extra-libs=-lpsapi
 
     do_hide_all_sharedlibs
