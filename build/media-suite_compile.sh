@@ -1223,7 +1223,10 @@ if [[ $ffmpeg != "no" ]]; then
             sed -i "/Libs:/ i\Requires.private: zlib libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
     fi
     enabled libtheora && do_pacman_install libtheora
-    enabled libcdio && do_pacman_install libcdio-paranoia
+    if enabled libcdio; then
+        do_pacman_install libcdio-paranoia
+        grep -ZlER -- "-R/mingw\S+" "$MINGW_PREFIX"/lib/pkgconfig/* | xargs -0 sed -ri 's;-R/mingw\S+;;g'
+    fi
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
