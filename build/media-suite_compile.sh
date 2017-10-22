@@ -1225,7 +1225,7 @@ if [[ $ffmpeg != "no" ]]; then
     enabled libtheora && do_pacman_install libtheora
     if enabled libcdio; then
         do_pacman_install libcdio-paranoia
-        grep -ZlER -- "-R/mingw\S+" "$MINGW_PREFIX"/lib/pkgconfig/* | xargs -0 sed -ri 's;-R/mingw\S+;;g'
+        grep -ZlER -- "-R/mingw\S+" "$MINGW_PREFIX"/lib/pkgconfig/* | xargs -r -0 sed -ri 's;-R/mingw\S+;;g'
     fi
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
