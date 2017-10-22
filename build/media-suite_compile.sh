@@ -555,10 +555,9 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     _check=(soxr.h libsoxr.a)
     if do_vcs https://notabug.org/RiCON/soxr.git libsoxr; then
         do_uninstall "${_check[@]}"
-        do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off
+        do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off -DWITH_OPENMP=off
         do_checkIfExist
     fi
-    do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
 fi
 
 if [[ $standalone = y ]] && enabled libmp3lame; then
