@@ -162,7 +162,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_pacman_install ragel
         NOCONFIGURE=y do_autogen
         do_uninstall include/harfbuzz "${_check[@]}"
-        do_separate_confmakeinstall --with-{icu,glib,gobject,cairo,fontconfig}=no
+        do_separate_confmakeinstall --with-{icu,glib,gobject,cairo,fontconfig,uniscribe}=no
         # directwrite shaper doesn't work with mingw headers, maybe too old
         do_checkIfExist
     fi
