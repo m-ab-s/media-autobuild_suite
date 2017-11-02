@@ -637,11 +637,13 @@ do_getFFmpegConfig() {
 
     if enabled openssl && [[ $license != gpl* ]]; then
         # prefer openssl if both are in options and not gpl
-        do_removeOption --enable-gnutls
-    elif enabled openssl; then
+        do_removeOption "--enable-(gnutls|schannel)"
+    elif enabled gnutls; then
         # prefer gnutls if both are in options and gpl
-        do_removeOption --enable-openssl
+        do_removeOption "--enable-(openssl|schannel)"
         do_addOption --enable-gnutls
+    else
+        do_removeOption --enable-openssl
     fi
 
     # handle WinXP-incompatible libs
