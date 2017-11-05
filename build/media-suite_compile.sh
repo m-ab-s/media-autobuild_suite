@@ -1574,7 +1574,7 @@ if [[ $cyanrip != no ]]; then
     _check=(neon/ne_utils.h libneon.a neon.pc)
     if do_pkgConfig "neon = 0.30.2"; then
         do_wget -h db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca \
-            "http://www.webdav.org/neon/neon-0.30.2.tar.gz"
+            "http://download.openpkg.org/components/cache/neon/neon-0.30.2.tar.gz"
         do_uninstall include/neon "${_check[@]}"
         extracommands=()
         do_separate_confmakeinstall --disable-{nls,debug,webdav} "${extracommands[@]}"
