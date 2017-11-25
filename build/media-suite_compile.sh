@@ -1289,6 +1289,9 @@ if [[ $ffmpeg != "no" ]]; then
 
         # remove redundant -L and -l flags from extralibs
         do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
+        sed -ri "s;(#define LIBAVCODEC_VERSION_MINOR\s+)3;\14;" libavcodec/version.h
+        grep -q "vp9_superframe_split" libavcodec/vp9.c ||
+            sed -ri "/\.profiles/ a\    .bsfs = \"vp9_superframe_split\"," libavcodec/vp9.c
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
@@ -1515,7 +1518,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
-            --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
+            --disable-vapoursynth-lazy --enable-ffmpeg-upstream "${MPV_OPTS[@]}"
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
