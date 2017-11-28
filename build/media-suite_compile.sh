@@ -234,13 +234,13 @@ fi
 if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
     [[ $rtmpdump = y && $license != nonfree ]]; }; then
     [[ -z "$gnutls_ver" ]] &&
-        gnutls_ver="$("${curl_opts[@]}" -l "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/")" &&
-        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.5\.\d+(\.\d+)?')"
-    gnutls_ver="${gnutls_ver:-3.5.12}"
+        gnutls_ver="$("${curl_opts[@]}" -l "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/")" &&
+        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.6\.\d+(\.\d+)?')"
+    gnutls_ver="${gnutls_ver:-3.6.1}"
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_pkgConfig "gnutls = $gnutls_ver"; then
         do_pacman_install nettle
-        do_wget "ftp://ftp.gnutls.org/gcrypt/gnutls/v3.5/gnutls-${gnutls_ver}.tar.xz"
+        do_wget "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
             sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
