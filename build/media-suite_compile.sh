@@ -1127,7 +1127,6 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
     implicitlibs="$(printf '"%s" ' -lmingwex -lmingwthrd -lmingw32 -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32)"
     sed -ri "s|(\"-lc\").*(\"-lpthread\")|\1 ${implicitlibs} \2|" source/CMakeLists.txt
-    sed -i 's|__declspec(dllexport)||g' source/x265-extras.h
 
     build_x265() {
         create_build_dir
