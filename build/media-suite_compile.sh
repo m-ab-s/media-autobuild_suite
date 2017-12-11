@@ -563,13 +563,19 @@ fi
 if [[ $standalone = y ]] && enabled libmp3lame; then
     _check=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        grep -q "3.99.5" "$LOCALDESTDIR/bin-audio/lame.exe"; then
-        do_print_status "lame 3.99.5" "$green" "Up-to-date"
+        grep -q "3.100" "$LOCALDESTDIR/bin-audio/lame.exe"; then
+        do_print_status "lame 3.100" "$green" "Up-to-date"
     else
-        do_wget_sf -h 84835b313d4a8b68f5349816d33e07ce "lame/lame/3.99/lame-3.99.5.tar.gz"
+        do_wget_sf \
+            -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
+            "lame/lame/3.100/lame-3.100.tar.gz"
         do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
-        sed -i '/xmmintrin\.h/d' configure
-        do_separate_conf --disable-decoder "${extracommands[@]}"
+        do_patch 0002-07-field-width-fix.all.patch
+        do_patch 0005-no-gtk.all.patch
+        do_patch 0006-dont-use-outdated-symbol-list.patch
+        do_patch 0007-revert-posix-code.patch
+        do_patch 0008-skip-termcap.patch
+        do_separate_conf --disable-decoder --enable-nasm
         do_make
         do_install frontend/lame.exe bin-audio/
         do_checkIfExist
