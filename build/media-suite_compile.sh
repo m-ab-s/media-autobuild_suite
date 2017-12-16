@@ -1525,7 +1525,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
-            --disable-vapoursynth-lazy --enable-ffmpeg-upstream "${MPV_OPTS[@]}"
+            --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
 
         # Windows(?) has a lower argument limit than *nix so
         # we replace tons of repeated -L flags with just two
