@@ -77,6 +77,7 @@ Included Tools And Libraries
         - libwavpack (mingw)
         - libwebp (git)
         - libxavs (svn snapshot)
+        - libxml2 (mingw)
         - libxvid (mingw)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
