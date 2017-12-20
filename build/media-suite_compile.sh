@@ -1245,14 +1245,14 @@ _check=(xvid.h libxvidcore.a bin-video/xvid{_encraw.exe,core.dll})
 if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     grep -q '1.3.5' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; }; then
     do_pacman_remove xvidcore
-    do_wget -h 7c20f279f9d8e89042e85465d2bcb1b3130ceb1ecec33d5448c4589d78f010b4 \
+    do_wget -h 165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894cf0 \
         "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz" xvidcore.tar.gz
     do_uninstall "${_check[@]}"
     cd_safe build/generic
     do_configure --prefix="$LOCALDESTDIR" --{build,host}="$MINGW_CHOST"
     do_make
     do_install ../../src/xvid.h include/
-    do_install \=build/xvidcore.a lib/libxvidcore.a
+    do_install \=build/xvidcore.a libxvidcore.a
     do_install \=build/xvidcore.dll bin-video/
     cd_safe ../../examples
     sed -ri "s;(#define MAX_ZONES\s*) \S.*$;\1 8192;" xvid_encraw.c
