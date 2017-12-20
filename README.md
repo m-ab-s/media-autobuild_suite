@@ -22,6 +22,7 @@ Included Tools And Libraries
 
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
+        - amd amf encoders (built-in)
         - avisynth (built-in)
         - cuda (built-in)
         - cuvid (built-in)

@@ -996,6 +996,16 @@ if [[ $ffmpeg != "no" ]] && enabled libmfx &&
     do_checkIfExist
 fi
 
+_check=(AMF/core/Version.h)
+if [[ $ffmpeg != no ]] && ! disabled_any autodetect amf &&
+    do_vcs "https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git"; then
+    do_uninstall include/AMF
+    cd_safe amf/public/include
+    install -D -p -t "$LOCALDESTDIR/include/AMF/core" core/*.h
+    install -D -p -t "$LOCALDESTDIR/include/AMF/components" components/*.h
+    do_checkIfExist
+fi
+
 _check=(libgpac_static.a bin-video/MP4Box.exe)
 if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_uninstall include/gpac "${_check[@]}"
