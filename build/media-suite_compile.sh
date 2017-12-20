@@ -349,16 +349,21 @@ fi
 
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
-if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; then
+if files_exist "$LOCALDESTDIR/bin-video/OpenCL.dll"; then
+    opencldll="$LOCALDESTDIR/bin-video/OpenCL.dll"
+else
+    opencldll="$syspath/OpenCL.dll"
+fi
+if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$opencldll" ]]; then
     echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
     _check=(libOpenCL.a)
     do_pacman_install opencl-headers
-    if ! files_exist "${_check[@]}"; then
+    if ! test_newer "$opencldll" "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         [[ -d opencl ]] && rm -rf opencl
         mkdir -p opencl && cd_safe opencl
         create_build_dir
-        gendef "$syspath/OpenCL.dll" >/dev/null 2>&1
+        gendef "$opencldll" >/dev/null 2>&1
         [[ -f OpenCL.def ]] && dlltool -y libOpenCL.a -d OpenCL.def -k -A
         [[ -f libOpenCL.a ]] && do_install libOpenCL.a
         do_checkIfExist
@@ -366,7 +371,7 @@ if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$syspath/OpenCL.dll" ]]; th
 else
     do_removeOption --enable-opencl
 fi
-unset syspath
+unset syspath opencldll
 
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
