@@ -703,7 +703,7 @@ if [[ $rtmpdump = "y" ]] ||
     elif enabled openssl; then
         ssl=OpenSSL
         crypto=OPENSSL
-        pc="$MINGW_PREFIX/lib/libssl"
+        pc="$MINGW_PREFIX/lib/pkgconfig/libssl"
     else
         ssl=LibreSSL
         crypto=OPENSSL
