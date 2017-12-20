@@ -1,7 +1,8 @@
-::-------------------------------------------------------------------------------------
-:: LICENSE -------------------------------------------------------------------------
-::-------------------------------------------------------------------------------------
-::  This Windows Batchscript is for setup a compiler environment for building ffmpeg and other media tools under Windows.
+::-----------------------------------------------------------------------------
+:: LICENSE --------------------------------------------------------------------
+::-----------------------------------------------------------------------------
+::  This Windows Batchscript is for setup a compiler environment for building
+::  ffmpeg and other media tools under Windows.
 ::
 ::    Copyright (C) 2013  jb_alvarado
 ::
@@ -17,7 +18,7 @@
 ::
 ::    You should have received a copy of the GNU General Public License
 ::    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-::-------------------------------------------------------------------------------------
+::-----------------------------------------------------------------------------
 
 @echo off
 color 80
@@ -28,7 +29,7 @@ set instdir=%CD%
 set "ini=build\media-autobuild_suite.ini"
 
 if not exist %instdir% (
-    echo -------------------------------------------------------------------------------
+    echo ----------------------------------------------------------------------
     echo. You have probably run the script in a path with spaces.
     echo. This is not supported.
     echo. Please move the script to use a path without spaces. Example:
