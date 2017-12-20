@@ -41,9 +41,12 @@ Included Tools And Libraries
     - Zeranoe-emulating build (in addition to Light)
         - fontconfig (git)
         - frei0r (git)
-        - gnutls (latest release)
-        - libressl (latest release)
-            - preferred instead of gnutls if both are in options and license is not GPL
+        - only one of these TLS libs (including schannel) can be enabled at once:
+            - gnutls (latest release)
+            - libtls (libressl) (latest release)
+                - needs non-GPL license
+            - openssl (mingw)
+                - preferred instead of gnutls if both are in options and license is not GPL
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig or XP support required, fontconfig backend included

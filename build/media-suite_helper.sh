@@ -402,7 +402,7 @@ do_pack() {
     local cmd=(/opt/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
-    [[ $bits = 64bit ]] && enabled openssl && nopack="ffmpeg|mplayer|mpv"
+    [[ $bits = 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mplayer|mpv"
     for file; do
         if [[ "$file" =~ \.($exts)$ && ! "$file" =~ ($nopack)\.exe$ ]]; then
             do_print_progress Packing with UPX
@@ -625,8 +625,8 @@ do_getFFmpegConfig() {
     do_removeOption "--(en|dis)able-(shared|static)"
 
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
-    # If nonfree will use SChannel if neither openssl or gnutls are in the options
-    if ! enabled_any openssl gnutls && enabled librtmp; then
+    # If nonfree will use SChannel if neither openssl/libtls or gnutls are in the options
+    if ! enabled_any libtls openssl gnutls && enabled librtmp; then
         if [[ $license = gpl* ]]; then
             do_addOption --enable-gnutls
         else
@@ -635,15 +635,23 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(gmp|gcrypt)"
     fi
 
-    if enabled openssl && [[ $license != gpl* ]]; then
-        # prefer openssl if both are in options and not gpl
-        do_removeOption "--enable-(gnutls|schannel)"
+    if enabled_any libtls openssl && [[ $license != gpl* ]]; then
+        # prefer openssl/libtls if both are in options and not gpl
+
+        # prefer openssl over libtls if both enabled
+        local _remove=openssl
+        if enabled openssl; then
+            _remove=libtls
+        fi
+
+        do_removeOption "--enable-(gnutls|schannel|$_remove)"
+
     elif enabled gnutls; then
         # prefer gnutls if both are in options and gpl
-        do_removeOption "--enable-(openssl|schannel)"
+        do_removeOption "--enable-(openssl|libtls|schannel)"
         do_addOption --enable-gnutls
     else
-        do_removeOption --enable-openssl
+        do_removeOption "--enable-(openssl|libtls)"
     fi
 
     # handle WinXP-incompatible libs
@@ -711,7 +719,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=(libfdk-aac openssl)
+    local nonfreegpl=(libfdk-aac openssl libtls)
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]]; then
             do_addOption --enable-nonfree

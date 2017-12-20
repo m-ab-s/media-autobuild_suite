@@ -255,13 +255,14 @@ if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
         sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
-if { { [[ $ffmpeg != "no" ]] && enabled openssl; } ||
+_libressl_check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
+if { { [[ $ffmpeg != "no" ]] && enabled libtls; } ||
     [[ $rtmpdump = y && $license = nonfree ]]; }; then
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
-    libressl_ver="${libressl_ver:-2.5.4}"
-    _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
+    libressl_ver="${libressl_ver:-2.6.4}"
+    _check=("${_libressl_check[@]}")
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_pkgConfig "libssl = $libressl_ver"; then
         sha256sum="$(curl -s http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256 | \
@@ -276,7 +277,12 @@ if { { [[ $ffmpeg != "no" ]] && enabled openssl; } ||
         do_checkIfExist
         unset _sed sha256sum
     fi
+elif { { [[ $ffmpeg != "no" ]] && enabled openssl; } ||
+    [[ $rtmpdump = y && $license = nonfree ]]; }; then
+    do_uninstall etc/ssl include/openssl bin-global/openssl.exe "${_libressl_check[@]}"
+    do_pacman_install openssl
 fi
+unset _libressl_check
 
 [[ ! "$curl_ver" ]] &&
     curl_ver="$(clean_html_index https://curl.haxx.se/download/)" &&
@@ -284,7 +290,8 @@ fi
 curl_ver="${curl_ver:-7.54.0}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
-enabled openssl && _deps+=(libssl.a)
+enabled libtls && _deps+=(libssl.a)
+enabled openssl && _deps+=("$MINGW_PREFIX/lib/libssl.a")
 enabled gnutls && _deps+=(libgnutls.a)
 [[ $standalone = y || $curl = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
@@ -295,7 +302,7 @@ if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
     [[ $standalone = y || $curl = y ]] ||
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
-    if enabled openssl; then
+    if enabled_any libtls openssl; then
         extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
     elif enabled gnutls; then
         extra_opts+=(--with-gnutls --without-{ssl,nghttp2})
@@ -314,7 +321,7 @@ if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
     _notrequired=yes
     PATH=/usr/bin log ca-bundle make ca-bundle
     unset _notrequired
-    enabled_any openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
+    enabled_any libtls openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
         cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
     do_checkIfExist
 fi
@@ -688,6 +695,10 @@ if [[ $rtmpdump = "y" ]] ||
         ssl=GnuTLS
         crypto=GNUTLS
         pc=gnutls
+    elif enabled openssl; then
+        ssl=OpenSSL
+        crypto=OPENSSL
+        pc="$MINGW_PREFIX/lib/libssl"
     else
         ssl=LibreSSL
         crypto=OPENSSL
