@@ -712,17 +712,17 @@ if [[ $rtmpdump = "y" ]] ||
     _check=(librtmp.{a,pc})
     _deps=("${pc}.pc")
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
-    if do_vcs "http://repo.or.cz/rtmpdump.git" librtmp || [[ $req != *$pc* ]]; then
+    if do_vcs "http://repo.or.cz/rtmpdump.git" librtmp || [[ $req != *${pc##*/}* ]]; then
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
         do_uninstall include/librtmp "${_check[@]}"
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
         _ver="$(printf '%s-%s-%s_%s-%s-static' "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
                 "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" "$ssl" \
-                "$(pkg-config --modversion "$pc")" "$CARCH")"
+                "$(pkg-config --modversion "${pc##*/}")" "$CARCH")"
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
-            CRYPTO="$crypto" LIB_${crypto}="$($PKG_CONFIG --libs $pc) -lz" VERSION="$_ver"
+            CRYPTO="$crypto" LIB_${crypto}="$($PKG_CONFIG --libs ${pc##*/}) -lz" VERSION="$_ver"
         do_checkIfExist
         unset ssl crypto pc req
     fi
