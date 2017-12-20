@@ -149,7 +149,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_pacman_install python2-lxml python2-six
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -ri Makefile.am \
-            -e '/^SUBDIRS=/,+2{s;fontconfig.*;fontconfig src;g;/fc-[^b]/d}' \
+            -e '/^SUBDIRS=/,+2{s/(fontconfig( [a-z-]+){2}).*/\1 src/;/^\s+fc-[^b]/d}' \
             -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
         do_autogen --noconf
         PYTHON="$MINGW_PREFIX/bin/python2" do_separate_confmakeinstall global --disable-docs
