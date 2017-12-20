@@ -1236,10 +1236,30 @@ else
 fi
 pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
+_check=(xvid.h libxvidcore.a bin-video/xvid{_encraw.exe,core.dll})
+if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
+    grep -q '1.3.5' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; }; then
+    do_pacman_remove xvidcore
+    do_wget -h 7c20f279f9d8e89042e85465d2bcb1b3130ceb1ecec33d5448c4589d78f010b4 \
+        "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz" xvidcore.tar.gz
+    do_uninstall "${_check[@]}"
+    cd_safe build/generic
+    do_configure --prefix="$LOCALDESTDIR" --{build,host}="$MINGW_CHOST"
+    do_make
+    do_install ../../src/xvid.h include/
+    do_install \=build/xvidcore.a lib/libxvidcore.a
+    do_install \=build/xvidcore.dll bin-video/
+    cd_safe ../../examples
+    sed -ri "s;(#define MAX_ZONES\s*) \S.*$;\1 8192;" xvid_encraw.c
+    do_make xvid_encraw
+    do_install xvid_encraw.exe bin-video/
+    do_checkIfExist
+fi
+
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
-    if enabled libxvid; then
+    if enabled libxvid && [[ $standalone = n ]]; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
         [[ -f $MINGW_PREFIX/lib/xvidcore.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/xvidcore.dll.a{,.dyn}

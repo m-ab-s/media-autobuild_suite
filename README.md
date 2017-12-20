@@ -148,6 +148,7 @@ Included Tools And Libraries
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
+    - xvid (1.3.5)
 
 
 --------
