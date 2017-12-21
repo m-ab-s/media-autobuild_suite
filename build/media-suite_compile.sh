@@ -349,16 +349,15 @@ fi
 
 syspath=$(cygpath -S)
 [[ $bits = "32bit" && -d "$syspath/../SysWOW64" ]] && syspath="$syspath/../SysWOW64"
+opencldll="$syspath/OpenCL.dll"
 if files_exist "$LOCALDESTDIR/bin-video/OpenCL.dll"; then
     opencldll="$LOCALDESTDIR/bin-video/OpenCL.dll"
-else
-    opencldll="$syspath/OpenCL.dll"
 fi
 if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$opencldll" ]]; then
     echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
     _check=(libOpenCL.a)
     do_pacman_install opencl-headers
-    if ! test_newer "$opencldll" "${_check[@]}"; then
+    if test_newer installed "$opencldll" "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         [[ -d opencl ]] && rm -rf opencl
         mkdir -p opencl && cd_safe opencl
