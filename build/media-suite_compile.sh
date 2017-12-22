@@ -73,6 +73,10 @@ cd_safe "$LOCALBUILDDIR"
 do_getFFmpegConfig "$license"
 do_getMpvConfig
 
+if [[ ! -d "$LOCALDESTDIR/lib/pkgconfig" ]]; then
+    mkdir -p "$LOCALDESTDIR/lib/pkgconfig"
+fi
+
 # in case the root was moved, this fixes windows abspaths
 _pkg_config_files=$(find "$LOCALDESTDIR/lib/pkgconfig/" -name "*.pc")
 if [[ -n "$_pkg_config_files" ]]; then
@@ -85,12 +89,12 @@ if [[ -n "$_pkg_config_files" ]]; then
 fi
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},opus{file,url},gnurx,regex}.{,l}a
+    lib{jpeg,nettle,ogg,vorbis{,enc,file},gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,luajit-5.1,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
-    opus/opusfile.h regex.h magic.h
-    {nettle,ogg,vorbis{,enc,file},opus{file,url},vo-aacenc,sdl,luajit,uchardet}.pc
+    regex.h magic.h
+    {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,luajit,uchardet}.pc
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
     share/aclocal/{ogg,vorbis}.m4
@@ -100,7 +104,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     libopenh264.a
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
-    libopus.{,l}a opus.pc include/opus
+    libopus.{,l}a opus.pc
 )
 
 do_uninstall q all "${_clean_old_builds[@]}"
