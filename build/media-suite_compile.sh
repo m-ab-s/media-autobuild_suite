@@ -1561,6 +1561,63 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_checkIfExist
     fi
 
+    _check=(vulkan/vulkan.h libvulkan.a vulkan.pc)
+    if ! mpv_disabled vulkan &&
+        do_vcs "https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers.git" vulkan; then
+        do_uninstall "${_check[@]}" include/vulkan
+        do_patch vulkan-0001-cross-compile-static-linking-hacks.patch
+        do_patch vulkan-0002-ignore-generating-spirv_tools_commit_id.h.patch
+        CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
+            CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
+            CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
+            do_cmake -DBUILD_{ICD,DEMOS,TESTS,LAYERS,VKJSON}=no -DCMAKE_SYSTEM_NAME=Windows \
+            -DCMAKE_ASM-ATT_COMPILER=$(which nasm.exe)
+        do_make
+        cmake -E copy_directory ../include/vulkan "$LOCALDESTDIR/include/vulkan"
+        do_install loader/libvulkan.a lib/
+        do_install loader/vulkan.pc lib/pkgconfig/
+        do_checkIfExist
+    fi
+
+    _check=(shaderc/shaderc.h libshaderc_shared.a)
+    if ! mpv_disabled shaderc &&
+        do_vcs "https://github.com/google/shaderc"; then
+        do_uninstall "${_check[@]}" include/shaderc
+
+        function add_third_party() {
+            local repo="$1"
+            local name="$2"
+            [[ ! "$name" ]] && name="${repo##*/}" && name="${name%.*}"
+            local dest="third_party/$name"
+
+            if [[ -d "$dest/.git" ]]; then
+                log "$name-reset" git -C "$dest" reset --hard @{u}
+                log "$name-pull" git -C "$dest" pull
+            else
+                log "$name-clone" git clone --depth 1 "$repo" "$dest"
+            fi
+        }
+
+        add_third_party "https://github.com/google/glslang.git"
+        add_third_party "https://github.com/KhronosGroup/SPIRV-Tools.git" spirv-tools
+        add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
+        CXXFLAGS+=" -fno-rtti" do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
+        log make ninja
+        cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
+        do_install libshaderc/libshaderc_combined.a lib/
+        do_checkIfExist
+        unset add_third_party
+    fi
+
+    _check=(crossc.{h,pc} libcrossc.a)
+    if ! mpv_disabled crossc &&
+        do_vcs "https://github.com/rossy/crossc"; then
+        do_uninstall "${_check[@]}"
+        log submodule git submodule update --init
+        do_make install-static prefix="$LOCALDESTDIR"
+        do_checkIfExist
+    fi
+
     _check=(bin-video/mpv.{exe,com})
     _deps=(lib{ass,avcodec,vapoursynth}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
@@ -1589,6 +1646,9 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
+
+        ! mpv_disabled shaderc &&
+            sed -ri "s;'shaderc_shared';['shaderc_combined', 'stdc++'];" wscript
 
         files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
