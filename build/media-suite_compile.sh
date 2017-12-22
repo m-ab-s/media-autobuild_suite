@@ -550,17 +550,39 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
 fi
 unset _deps
 
-_check=(bin-audio/opusenc.exe)
-_deps=("$MINGW_PREFIX"/lib/libopus.a)
-if [[ $standalone = y ]] && enabled libopus &&
-    do_vcs "https://github.com/xiph/opus-tools.git" opus-tools; then
-    _check+=(bin-audio/opus{dec,info}.exe)
-    do_uninstall "${_check[@]}"
-    do_autogen
-    do_separate_confmakeinstall audio
-    do_checkIfExist
+if [[ $standalone = y ]] && enabled libopus; then
+    do_install openssl
+    _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
+    _deps=("$MINGW_PREFIX"/lib/pkgconfig/{opus,libssl}.pc)
+    if do_vcs "https://github.com/xiph/opusfile.git"; then
+        do_uninstall "${_check[@]}"
+        do_autogen
+        do_separate_confmakeinstall --disable-{examples,doc}
+        do_checkIfExist
+    fi
+
+    _check=(opus/opusenc.h libopusenc.{pc,{,l}a})
+    _deps=("$MINGW_PREFIX"/lib/pkgconfig/opus.pc)
+    if do_vcs "https://github.com/xiph/libopusenc.git"; then
+        do_uninstall "${_check[@]}"
+        do_autogen
+        do_separate_confmakeinstall --disable-{examples,doc}
+        do_checkIfExist
+    fi
+
+    _check=(bin-audio/opusenc.exe)
+    _deps=(opusfile.pc libopusenc.pc)
+    if do_vcs "https://github.com/xiph/opus-tools.git#branch=test"; then
+        _check+=(bin-audio/opus{dec,info}.exe)
+        do_uninstall "${_check[@]}"
+        do_autogen
+        LDFLAGS+=" -Wl,--allow-multiple-definition" do_separate_conf audio
+        do_make
+        do_install dry opus{enc,dec,info}.exe bin-audio/
+        do_checkIfExist
+    fi
+    unset _deps
 fi
-unset _deps
 
 if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     _check=(soxr.h libsoxr.a)
