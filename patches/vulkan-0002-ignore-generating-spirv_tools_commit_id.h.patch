@@ -1,0 +1,26 @@
+From 22924e9e14a68925da07be4210d99eadce4600f3 Mon Sep 17 00:00:00 2001
+From: shinchiro <shinchiro@users.noreply.github.com>
+Date: Wed, 29 Nov 2017 15:25:54 +0800
+Subject: [PATCH] loader: ignore generating spirv_tools_commit_id.h
+
+spirv_tools_commit_id.h only needed when building layer component.
+Since we only care building the loader, this can be safely ignored.
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 574f11f..3f66a28 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -335,7 +335,6 @@ add_custom_target(generate_helper_files DEPENDS
+     vk_dispatch_table_helper.h
+     vk_extension_helper.h
+     vk_typemap_helper.h
+-    spirv_tools_commit_id.h
+     )
+ 
+ # Rules to build generated helper files
+-- 
+2.15.0
+
