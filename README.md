@@ -33,14 +33,13 @@ Included Tools And Libraries
         - libx264 (git)
         - libx265 (hg)
         - nvenc (built-in)
-        - schannel with gcrypt (mingw)
+        - schannel with gmp (mingw)
             - enabled by default if openssl, libtls or gnutls aren't enabled
-            - libgcrypt can be switched by gmp (mingw) with --enable-gmp
+            - gmp can be switched by gcrypt (mingw) with --enable-gcrypt
         - sdl2 (2.0.5) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - fontconfig (git)
-        - frei0r (git)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw)
                 - preferred to gnutls and to libtls if all three are in options
@@ -55,19 +54,11 @@ Included Tools And Libraries
         - libbluray (git)
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
-        - libbs2b (3.1.0)
-        - libcaca (mingw)
         - libfreetype (2.8)
-        - libfribidi (0.19.7)
-        - libgme (git snapshot)
-        - libgsm (mingw)
-        - libilbc (git snapshot)
         - libmfx (git)
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
         - libopenjpeg2 (mingw)
-        - librtmp (git)
-            - compiled with gnutls or openssl depending on license chosen
         - libsnappy (mingw)
         - libsoxr (git)
         - libspeex (mingw)
@@ -77,20 +68,23 @@ Included Tools And Libraries
         - libvo-amrwbenc (0.1.3)
         - libwavpack (mingw)
         - libwebp (git)
-        - libxavs (svn snapshot)
         - libxml2 (mingw)
-        - libxvid (mingw)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
-        - scale_cuda (needs CUDA SDK and MSVC 2015 installed and cl.exe in PATH)
-            - needs non-free license
         - decklink (10.9.3)
             - needs non-free license
+        - frei0r (git)
+        - libbs2b (3.1.0)
+        - libcaca (mingw)
         - libcdio (mingw)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
+        - libfribidi (0.19.7)
+        - libgme (git snapshot)
+        - libgsm (mingw)
+        - libilbc (git snapshot)
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
@@ -98,13 +92,19 @@ Included Tools And Libraries
             - needs non-free license
         - libopenh264 (mingw)
         - libopenmpt (svn from beta release)
+        - librtmp (git)
         - librubberband (git snapshot)
         - libssh (mingw)
         - libtesseract (git)
+        - libxavs (svn snapshot)
+        - libxvid (mingw)
+            - compiled with gnutls or openssl depending on license chosen
         - libzmq (mingw)
         - libzvbi (0.2.35)
         - opencl (from system)
         - opengl (from system)
+        - scale_cuda (needs CUDA SDK and MSVC 2015 installed and cl.exe in PATH)
+            - needs non-free license and --enable-cuda-sdk
 
  - other tools
     - aom (git)
@@ -133,6 +133,7 @@ Included Tools And Libraries
             - mujs (git)
             - rubberband (git snapshot)
             - uchardet (mingw)
+            - vulkan, shaderc, crossc (git)
         - Full build (ffmpegChoice=4)
             - dvdread (git)
             - dvdnav (git)

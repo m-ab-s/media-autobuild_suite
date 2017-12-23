@@ -66,26 +66,30 @@ gperf winpty texinfo gyp-git doxygen autoconf-archive itstool
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config lz4
 
-set ffmpeg_options=--enable-avisynth --enable-gcrypt --enable-libmp3lame ^
---enable-libopus --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 ^
---enable-cuda --enable-cuvid --enable-schannel
+:: built-ins and common external libs
+set ffmpeg_options=--enable-amf --enable-avisynth --enable-bzlib --enable-cuda ^
+--enable-cuvid --enable-d3d11va --enable-dxva2 --enable-iconv --enable-lzma ^
+--enable-nvenc --enable-schannel --enable-sdl2 --enable-zlib ^
+--enable-gmp --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx ^
+--enable-libx264 --enable-libx265
 
-set ffmpeg_options_zeranoe=--enable-decklink --enable-fontconfig ^
---enable-frei0r --enable-gnutls --enable-libass --enable-libbluray --enable-libbs2b ^
---enable-libcaca --enable-libfreetype --enable-libfribidi ^
---enable-libgme --enable-libgsm --enable-libilbc --enable-libmfx --enable-libmodplug ^
+:: options used in zeranoe builds and not present above
+set ffmpeg_options_zeranoe=--enable-fontconfig --enable-gnutls --enable-libass ^
+--enable-libbluray --enable-libfreetype --enable-libmfx --enable-libmysofa ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
---enable-librtmp --enable-libsoxr --enable-libspeex ^
---enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc ^
---enable-libwavpack --enable-libwebp --enable-libxavs --enable-libxvid --enable-libzimg ^
---enable-libsnappy --enable-gpl --enable-openssl --enable-libtls --enable-libxml2
+--enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora ^
+--enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libwavpack ^
+--enable-libwebp --enable-libxml2 --enable-libzimg ^
+--enable-gpl --enable-openssl --enable-libtls
 
-set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
---enable-libfdk-aac --enable-libkvazaar --enable-librubberband ^
---enable-libssh --enable-libtesseract --enable-libzvbi ^
---enable-chromaprint --enable-libopenh264 --enable-libopenmpt ^
---enable-libnpp --enable-libzmq --enable-libmysofa ^
---enable-cuda-sdk --enable-libflite
+:: options also available with the suite
+set ffmpeg_options_full=--enable-chromaprint --enable-cuda-sdk --enable-decklink ^
+--enable-frei0r --enable-libbs2b --enable-libcaca --enable-libcdio ^
+--enable-libfdk-aac --enable-libflite --enable-libfribidi --enable-libgme ^
+--enable-libgsm --enable-libilbc --enable-libkvazaar --enable-libmodplug ^
+--enable-libnpp --enable-libopenh264 --enable-libopenmpt --enable-librtmp ^
+--enable-librubberband --enable-libssh --enable-libtesseract --enable-libxavs ^
+--enable-libxvid --enable-libzmq --enable-libzvbi --enable-opencl --enable-opengl
 
 set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua^=luajit ^
 --enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle ^
@@ -596,6 +600,9 @@ if %ffmpegChoiceINI%==0 (
     echo. 2 = No ^(Light build^)
     echo. 3 = No ^(Mimic Zeranoe^)
     echo. 4 = No ^(All available external libs^)
+    echo.
+    echo. Avoid the last one unless you're really want useless libraries you'll never use.
+    echo. Just because you can include a shitty codec no one uses doesn't mean you should.
     echo.
     echo. If you select yes, we will create files with the default options
     echo. we use with FFmpeg and mpv. You can remove any that you don't need or prefix
