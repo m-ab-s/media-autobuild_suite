@@ -1383,11 +1383,10 @@ if [[ $ffmpeg != "no" ]]; then
         enabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
-        # remove redundant -L and -l flags from extralibs
-        do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
-        sed -ri "s;(#define LIBAVCODEC_VERSION_MINOR\s+)3;\14;" libavcodec/version.h
-        grep -q "vp9_superframe_split" libavcodec/vp9.c ||
-            sed -ri "/\.profiles/ a\    .bsfs = \"vp9_superframe_split\"," libavcodec/vp9.c
+        if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
+            # remove redundant -L and -l flags from extralibs
+            do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
+        fi
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
