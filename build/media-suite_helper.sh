@@ -1079,7 +1079,7 @@ do_separate_conf() {
         config_path=".."
         create_build_dir
     fi
-    log configure ${config_path}/configure --{host,build,target}="$MINGW_CHOST" \
+    log configure ${config_path}/configure --{build,host,target}="$MINGW_CHOST" \
         --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
 }
 
