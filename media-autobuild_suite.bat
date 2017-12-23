@@ -79,7 +79,7 @@ set ffmpeg_options_zeranoe=--enable-fontconfig --enable-gnutls --enable-libass ^
 --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
 --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora ^
 --enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libwavpack ^
---enable-libwebp --enable-libxml2 --enable-libzimg ^
+--enable-libwebp --enable-libxml2 --enable-libzimg --enable-libshine ^
 --enable-gpl --enable-openssl --enable-libtls
 
 :: options also available with the suite
