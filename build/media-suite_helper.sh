@@ -35,7 +35,7 @@ do_print_status() {
 }
 
 do_print_progress() {
-    if [[ $logging != n ]]; then
+    if [[ $logging = y ]]; then
         [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
     else
         set_title "$* in $(get_first_subdir)"
@@ -1038,7 +1038,7 @@ log() {
     local extra
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
-    if [[ $logging != "n" ]]; then
+    if [[ $logging = "y" ]]; then
         echo -e "CFLAGS: $CFLAGS\nLDFLAGS: $LDFLAGS" > "ab-suite.$name.log"
         echo "$_cmd $*" >> "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
