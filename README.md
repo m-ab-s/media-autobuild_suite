@@ -34,7 +34,7 @@ Included Tools And Libraries
         - libx265 (hg)
         - nvenc (built-in)
         - schannel with gcrypt (mingw)
-            - enabled by default if openssl or gnutls aren't enabled
+            - enabled by default if openssl, libtls or gnutls aren't enabled
             - libgcrypt can be switched by gmp (mingw) with --enable-gmp
         - sdl2 (2.0.5) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
@@ -42,11 +42,12 @@ Included Tools And Libraries
         - fontconfig (git)
         - frei0r (git)
         - only one of these TLS libs (including schannel) can be enabled at once:
-            - gnutls (latest release)
-            - libtls (libressl) (latest release)
-                - needs non-GPL license
             - openssl (mingw)
-                - preferred instead of gnutls if both are in options and license is not GPL
+                - preferred to gnutls and to libtls if all three are in options
+                - needs non-GPL license
+            - gnutls (latest release)
+            - libtls (from libressl) (latest release)
+                - needs non-GPL license
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig or XP support required, fontconfig backend included
@@ -108,7 +109,7 @@ Included Tools And Libraries
  - other tools
     - aom (git)
     - bmx (git)
-    - curl (latest release) with WinSSL/LibreSSL/GnuTLS backend
+    - curl (latest release) with WinSSL/LibreSSL/OpenSSL/GnuTLS backend
     - cyanrip (git)
     - daala (git)
     - faac (1.28)
