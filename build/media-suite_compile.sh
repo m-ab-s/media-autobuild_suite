@@ -581,7 +581,7 @@ if [[ $standalone = y ]] && enabled libopus; then
         do_autogen
         LDFLAGS+=" -Wl,--allow-multiple-definition" do_separate_conf audio
         do_make
-        do_install dry opus{enc,dec,info}.exe bin-audio/
+        do_install opus{enc,dec,info}.exe bin-audio/
         do_checkIfExist
     fi
     unset _deps
