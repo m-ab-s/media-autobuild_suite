@@ -1594,7 +1594,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_checkIfExist
     fi
 
-    _check=(shaderc/shaderc.h libshaderc_shared.a)
+    _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc"; then
         do_uninstall "${_check[@]}" include/shaderc
