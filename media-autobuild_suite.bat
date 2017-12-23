@@ -87,7 +87,7 @@ set ffmpeg_options_full=--enable-opencl --enable-opengl --enable-libcdio ^
 --enable-libnpp --enable-libzmq --enable-libmysofa ^
 --enable-cuda-sdk --enable-libflite
 
-set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua=luajit ^
+set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua^=luajit ^
 --enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle ^
 --enable-libbluray --enable-javascript
 
