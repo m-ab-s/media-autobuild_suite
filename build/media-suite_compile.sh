@@ -260,11 +260,10 @@ if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
 fi
 
 _libressl_check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
-if { { [[ $ffmpeg != "no" ]] && enabled openssl; } ||
-    [[ $rtmpdump = y && $license = nonfree ]]; }; then
+if [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; then
     do_uninstall etc/ssl include/openssl bin-global/openssl.exe "${_libressl_check[@]}"
     do_pacman_install openssl
-elif [[ $ffmpeg != "no" ]] && enabled libtls; then
+elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
     [[ ! "$libressl_ver" ]] &&
         libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
         libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
