@@ -553,7 +553,7 @@ fi
 unset _deps
 
 if [[ $standalone = y ]] && enabled libopus; then
-    do_install openssl
+    do_pacman_install openssl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=("$MINGW_PREFIX"/lib/pkgconfig/{opus,libssl}.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
