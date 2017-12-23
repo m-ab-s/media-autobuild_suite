@@ -1617,6 +1617,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         add_third_party "https://github.com/google/glslang.git"
         add_third_party "https://github.com/KhronosGroup/SPIRV-Tools.git" spirv-tools
         add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
+
+        # fix python indentation errors from non-existant code review
+        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -0 -n1 sed -i 's;\t;    ;g'
+
         CXXFLAGS+=" -fno-rtti" do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
         log make ninja
         cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
