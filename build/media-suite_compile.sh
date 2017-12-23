@@ -1334,7 +1334,7 @@ if [[ $ffmpeg != "no" ]]; then
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
-    enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
+    enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC && do_pacman_install libxml2
 
     do_hide_all_sharedlibs
 
