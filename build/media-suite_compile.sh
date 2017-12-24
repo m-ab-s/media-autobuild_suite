@@ -1633,6 +1633,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_vcs "https://github.com/rossy/crossc"; then
         do_uninstall "${_check[@]}"
         log submodule git submodule update --init
+        log clean make clean
         do_make install-static prefix="$LOCALDESTDIR"
         do_checkIfExist
     fi
