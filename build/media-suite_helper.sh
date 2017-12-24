@@ -808,10 +808,10 @@ do_getMpvConfig() {
     elif [[ -f "/trunk/media-autobuild_suite.bat" && x"$ffmpegChoice" != x"y" ]]; then
         IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         MPV_OPTS=($(printf '%s\n' "${bat[@]}" | \
-            sed -rne '/mpv_options=/,/[^^]$/p' | sed -e 's/.*mpv_options=//' -e 's/ ?^//g'))
+            sed -rne '/mpv_options=/,/[^^]$/p' | sed -e 's/.*mpv_options=//' -e 's/ ^//g'))
         [[ $ffmpegChoice = f ]] &&
             MPV_OPTS+=($(printf '%s\n' "${bat[@]}" | \
-                sed -rne '/mpv_options_full=/,/[^^]$/p' | sed -e 's/.*mpv_options_full=//' -e 's/ ?^//g'))
+                sed -rne '/mpv_options_full=/,/[^^]$/p' | sed -e 's/.*mpv_options_full=//' -e 's/ ^//g'))
         echo "Imported default mpv options from .bat"
     else
         MPV_OPTS=()

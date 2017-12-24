@@ -91,7 +91,7 @@ set ffmpeg_options_full=--enable-chromaprint --enable-cuda-sdk --enable-decklink
 --enable-librubberband --enable-libssh --enable-libtesseract --enable-libxavs ^
 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-opencl --enable-opengl
 
-set mpv_options=--enable-libass --enable-rubberband --enable-lua --lua^=luajit ^
+set mpv_options=--enable-libass --enable-rubberband --enable-lua "--lua=luajit" ^
 --enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle ^
 --enable-libbluray --enable-javascript
 
@@ -634,7 +634,7 @@ if %buildffmpegChoice%==1 (
         pause
         )
     if not exist %build%\mpv_options.txt (
-        for %%i in (%mpv_options%) do echo.%%i>>%build%\mpv_options.txt
+        for %%i in (%mpv_options%) do echo.%%~i>>%build%\mpv_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default mpv options has been created in
         echo. %build%\mpv_options.txt
