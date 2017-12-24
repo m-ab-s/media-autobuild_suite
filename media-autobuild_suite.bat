@@ -634,7 +634,11 @@ if %buildffmpegChoice%==1 (
         pause
         )
     if not exist %build%\mpv_options.txt (
-        for %%i in (%mpv_options%) do echo.%%~i>>%build%\mpv_options.txt
+        (
+            for %%i in (%mpv_options%) do echo.%%~i
+            echo.# Full
+            for %%i in (%mpv_options_full%) do echo.#%%i
+            )>>%build%\mpv_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default mpv options has been created in
         echo. %build%\mpv_options.txt
