@@ -98,7 +98,7 @@ set mpv_options=--enable-libass --enable-rubberband --enable-lua "--lua=luajit" 
 set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
 
-set iniOptions=msys2Arch arch license2 vpx2 x2642 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
+set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
 aom daala faac ffmbc curl cyanrip
 
@@ -334,39 +334,36 @@ if %writedaala%==yes echo.daala=^%builddaala%>>%ini%
 
 :x264
 set "writex264=no"
-if %x2642INI%==0 (
+if %x2643INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build x264 [H.264 encoder]?
-    echo. 1 = 8-bit lib/binary and 10-bit binary
+    echo. 1 = Lib/binary with 8 and 10-bit
     echo. 2 = No
-    echo. 3 = 10-bit lib/binary
-    echo. 4 = 8-bit lib/binary and 10-bit binary with libavformat and ffms2
-    echo. 5 = 8-bit and 10-bit shared lib
+    echo. 3 = Lib/binary with only 10-bit
+    echo. 4 = Lib/binary with 8 and 10-bit, and libavformat and ffms2
+    echo. 5 = Shared lib/binary with 8 and 10-bit
     echo. 6 = Same as 4 with video codecs only ^(can reduce size by ~3MB^)
+    echo. 7 = Lib/binary with only 8-bit
     echo.
-    echo. Binaries being built depends on "standalone=y"
-    echo.
-    echo. Option 5 allows switching between 8 and 10-bit by renaming the .dll
-    echo. accordingly. There will be a libx264-xxx.dll and libx264-xxx-10bits.dll.
-    echo. If you need 10-bit x264, you rename the -10.dll to the other and vice-versa.
-    echo. FFmpeg will depend on that .dll to run.
+    echo. Binaries being built depends on "standalone=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx264="Build x264: "
-    ) else set buildx264=%x2642INI%
+    ) else set buildx264=%x2643INI%
 if %deleteINI%==1 set "writex264=yes"
 
-if %buildx264%==1 set "x2642=yes"
-if %buildx264%==2 set "x2642=no"
-if %buildx264%==3 set "x2642=high"
-if %buildx264%==4 set "x2642=full"
-if %buildx264%==5 set "x2642=shared"
-if %buildx264%==6 set "x2642=fullv"
-if %buildx264% GTR 6 GOTO x264
-if %writex264%==yes echo.x2642=^%buildx264%>>%ini%
+if %buildx264%==1 set "x2643=yes"
+if %buildx264%==2 set "x2643=no"
+if %buildx264%==3 set "x2643=high"
+if %buildx264%==4 set "x2643=full"
+if %buildx264%==5 set "x2643=shared"
+if %buildx264%==6 set "x2643=fullv"
+if %buildx264%==7 set "x2643=o8"
+if %buildx264% GTR 7 GOTO x264
+if %writex264%==yes echo.x2643=^%buildx264%>>%ini%
 
 :x265
 set "writex265=no"
@@ -1459,7 +1456,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\compile.log -c '^
 MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 /build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
---mp4box=%mp4box% --vpx=%vpx2% --x264=%x2642% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
+--mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
