@@ -1594,7 +1594,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_checkIfExist
     fi
 
-    _check=(shaderc/shaderc.h libshaderc_combined.a)
+    _check=(shaderc/shaderc.h libshaderc_combined.a libglslang.a libSPIRV-Tools.a libSPIRV-Tools-opt.a)
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc"; then
         do_uninstall "${_check[@]}" include/shaderc
@@ -1618,12 +1618,15 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
 
         # fix python indentation errors from non-existant code review
-        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -0 -n1 sed -i 's;\t;    ;g'
+        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
 
         CXXFLAGS+=" -fno-rtti" do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
         log make ninja
         cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
         do_install libshaderc/libshaderc_combined.a lib/
+        do_install third_party/glslang/glslang/libglslang.a lib/
+        do_install third_party/spirv-tools/source/libSPIRV-Tools.a lib/
+        do_install third_party/spirv-tools/source/opt/libSPIRV-Tools-opt.a lib/
         do_checkIfExist
         unset add_third_party
     fi
@@ -1666,9 +1669,6 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
-
-        ! mpv_disabled shaderc &&
-            sed -ri "s;'shaderc_shared';['shaderc_combined', 'stdc++'];" wscript
 
         files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
