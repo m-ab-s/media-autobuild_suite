@@ -1594,7 +1594,7 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         do_checkIfExist
     fi
 
-    _check=(shaderc/shaderc.h libshaderc_combined.a libglslang.a libSPIRV-Tools.a libSPIRV-Tools-opt.a)
+    _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc"; then
         do_uninstall "${_check[@]}" include/shaderc
@@ -1620,13 +1620,10 @@ if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libsws
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
 
-        CXXFLAGS+=" -fno-rtti" do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
+        do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
         log make ninja
         cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
         do_install libshaderc/libshaderc_combined.a lib/
-        do_install third_party/glslang/glslang/libglslang.a lib/
-        do_install third_party/spirv-tools/source/libSPIRV-Tools.a lib/
-        do_install third_party/spirv-tools/source/opt/libSPIRV-Tools-opt.a lib/
         do_checkIfExist
         unset add_third_party
     fi
