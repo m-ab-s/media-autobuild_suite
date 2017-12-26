@@ -99,7 +99,7 @@ set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
 --enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack xpcomp logging bmx standalone updateSuite ^
+ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
 aom daala faac ffmbc curl cyanrip
 
 set previousOptions=0
@@ -217,29 +217,6 @@ if %ffmpegLicense%==4 set "license2=lgplv3"
 if %ffmpegLicense%==5 set "license2=lgpl"
 if %ffmpegLicense% GTR 5 GOTO ffmpeglicense
 if %writeLicense%==yes echo.license2=^%ffmpegLicense%>>%ini%
-
-:xpcomp
-set "writexpcomp=no"
-if %xpcompINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build libraries/binaries compatible with Windows XP when possible?
-    echo. 1 = Yes
-    echo. 2 = No [recommended]
-    echo.
-    echo. Examples: x265, disabled QuickSync and mpv, etc.
-    echo. This usually causes worse performance in all systems.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildxpcomp="Build with XP compatibility: "
-    ) else set buildxpcomp=%xpcompINI%
-if %deleteINI%==1 set "writexpcomp=yes"
-
-if %buildxpcomp%==1 set "xpcomp=y"
-if %buildxpcomp%==2 set "xpcomp=n"
-if %buildxpcomp% GTR 2 GOTO xpcomp
-if %writexpcomp%==yes echo.xpcomp=^%buildxpcomp%>>%ini%
 
 :standalone
 set "writestandalone=no"
@@ -377,7 +354,7 @@ if %x2652INI%==0 (
     echo. 3 = Lib/binary with Main10 only
     echo. 4 = Lib/binary with Main only
     echo. 5 = Lib/binary with Main, shared libs with Main10 and Main12
-    echo. 6 = Same as 1 with addition of non-XP compatible x265-numa.exe
+    echo. 6 = Same as 1 with XP support and non-XP compatible x265-numa.exe
     echo. 7 = Lib/binary with Main12 only
     echo.
     echo. Binaries being built depends on "standalone=y"
@@ -1458,7 +1435,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 /build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
---mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --xpcomp=%xpcomp% ^
+--mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip%'
 

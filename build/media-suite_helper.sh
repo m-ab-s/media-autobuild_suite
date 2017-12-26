@@ -656,11 +656,6 @@ do_getFFmpegConfig() {
         do_removeOption "--enable-(openssl|libtls)"
     fi
 
-    # handle WinXP-incompatible libs
-    if [[ $xpcomp = "y" ]]; then
-        do_removeOption "--enable-(lib(mfx|caca)|decklink|tesseract|opencl)"
-    fi
-
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128} netcdf &&
         do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)|netcdf)" &&
         sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)|netcdf);;g' \

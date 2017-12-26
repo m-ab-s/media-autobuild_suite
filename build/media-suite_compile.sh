@@ -44,7 +44,6 @@ while true; do
 --standalone=* ) standalone="${1#*=}"; shift ;;
 --stripping* ) stripping="${1#*=}"; shift ;;
 --packing* ) packing="${1#*=}"; shift ;;
---xpcomp=* ) xpcomp="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
@@ -1182,7 +1181,8 @@ _check=(x265{,_config}.h libx265.a x265.pc)
 if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265"; then
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
-    [[ $xpcomp = "y" ]] && xpsupport="-DWINXP_SUPPORT=ON"
+    [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
+
     implicitlibs="$(printf '"%s" ' -lmingwex -lmingwthrd -lmingw32 -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32)"
     sed -ri "s|(\"-lc\").*(\"-lpthread\")|\1 ${implicitlibs} \2|" source/CMakeLists.txt
 
@@ -1464,7 +1464,7 @@ if [[ $mplayer = "y" ]] &&
     unset _notrequired faac_opts
 fi
 
-if [[ $xpcomp = "n" && $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
+if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then

@@ -49,7 +49,7 @@ Included Tools And Libraries
                 - needs non-GPL license
         - libass (git)
             - by default with DirectWrite backend
-            - if --enable-fontconfig or XP support required, fontconfig backend included
+            - if --enable-fontconfig, fontconfig backend included
             - with harfbuzz (git)
         - libbluray (git)
             - BD-J support requires installation of Java JDK
@@ -157,7 +157,7 @@ Included Tools And Libraries
  Requirements
 --------
 
-- Windows 32/64-bits (tested with 7, 8.1 and 10)
+- Windows 32/64-bits (tested with Win10 64-bits; 32-bits is not tested at all by anyone, avoid)
 - NTFS drive
 - 8GB+ disk space for a full 32 and 64-bit build
 - 4GB+ RAM
