@@ -628,7 +628,7 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
         do_patch 0006-dont-use-outdated-symbol-list.patch
         do_patch 0007-revert-posix-code.patch
         do_patch 0008-skip-termcap.patch
-        do_separate_conf --disable-decoder --enable-nasm
+        do_separate_conf --enable-nasm
         do_make
         do_install frontend/lame.exe bin-audio/
         do_checkIfExist
