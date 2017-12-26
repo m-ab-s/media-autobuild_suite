@@ -552,7 +552,25 @@ fi
 unset _deps
 
 if [[ $standalone = y ]] && enabled libopus; then
+    function hide_libressl() {
+        local _hide_files=(include/openssl/*.h
+            lib/lib{crypto,ssl,tls}.{,l}a
+            lib/pkgconfig/openssl.pc
+            lib/pkgconfig/lib{crypto,ssl,tls}.pc)
+        local reverse=n
+        [[ $1 = "-R" ]] && reverse=y && shift
+        for opt; do
+            opt="$LOCALDESTDIR/$opt"
+            if [[ $reverse = n ]]; then
+                [[ -f "$opt" ]] && mv -f "$opt" "$opt.bak"
+            else
+                [[ -f "$opt.bak" ]] && mv -f "$opt.bak" "$opt"
+            fi
+        done
+    }
+
     do_pacman_install openssl
+    hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=("$MINGW_PREFIX"/lib/pkgconfig/{opus,libssl}.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
@@ -582,7 +600,8 @@ if [[ $standalone = y ]] && enabled libopus; then
         do_install opus{enc,dec,info}.exe bin-audio/
         do_checkIfExist
     fi
-    unset _deps
+    hide_libressl -R
+    unset _deps hide_libressl
 fi
 
 if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
