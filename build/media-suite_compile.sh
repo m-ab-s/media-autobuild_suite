@@ -1166,7 +1166,7 @@ if [[ $x264 != no ]]; then
         do_uninstall "${_check[@]}"
 
         create_build_dir
-        CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
+        PKGCONFIG="${PKG_CONFIG}" CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
         do_make
         do_makeinstall
         do_checkIfExist
