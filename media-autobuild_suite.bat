@@ -977,22 +977,12 @@ echo.
 echo - Download wget
 echo.
 echo -------------------------------------------------------------
-if exist %build%\install-wget.js del %build%\install-wget.js
 cd build
 if exist %build%\msys2-base.tar.xz GOTO unpack
 if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
 if not exist %build%\wget.exe (
-    if exist wget-pack.exe del wget-pack.exe
-    (
-        echo./*from http://superuser.com/a/536400*/
-        echo.var r=new ActiveXObject("WinHttp.WinHttpRequest.5.1"^);
-        echo.r.Open("GET",WScript.Arguments(0^),false^);r.Send(^);
-        echo.b=new ActiveXObject("ADODB.Stream"^);
-        echo.b.Type=1;b.Open(^);b.Write(r.ResponseBody^);
-        echo.b.SaveToFile(WScript.Arguments(1^)^);
-        )>wget.js
-
-    cscript /nologo wget.js https://i.fsbn.eu/pub/wget-pack.exe wget-pack.exe
+    powershell -noprofile -command ^
+    "(new-object System.Net.WebClient).DownloadFile('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe')"
     %build%\wget-pack.exe x
     )
 if not exist %build%\wget.exe (
@@ -1005,7 +995,7 @@ if not exist %build%\wget.exe (
     pause
     exit
     ) else (
-    del wget.js wget-pack.exe 2>nul
+    del wget-pack.exe 2>nul
     )
 
 :checkmsys2
