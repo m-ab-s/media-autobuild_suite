@@ -1579,6 +1579,16 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_checkIfExist
     fi
 
+    _check=(mruby.h libmruby{,_core}.a)
+    if mpv_enabled mruby && do_vcs "https://github.com/mruby/mruby.git"; then
+        do_uninstall "${_check[@]}" include/mruby mrbconf.h
+        log clean make clean
+        log make ./minirake "$(pwd)/build/host/lib/libmruby.a"
+        do_install build/host/lib/*.a lib/
+        cmake -E copy_directory include "$LOCALDESTDIR/include"
+        do_checkIfExist
+    fi
+
     _check=(vulkan/vulkan.h libvulkan.a vulkan.pc)
     if ! mpv_disabled vulkan &&
         do_vcs "https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers.git" vulkan; then
@@ -1671,6 +1681,10 @@ mpv-winbuild-cmake/master/packages/vulkan-0002-ignore-generating-spirv_tools_com
         mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
+
+        mpv_enabled mruby &&
+            { git merge --no-edit --no-gpg-sign origin/mruby ||
+              git merge --abort && mpv_disable mruby; }
 
         files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
