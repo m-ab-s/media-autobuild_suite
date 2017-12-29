@@ -595,7 +595,7 @@ if [[ $standalone = y ]] && enabled libopus; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
-        LDFLAGS+=" -Wl,--allow-multiple-definition" do_separate_conf audio
+        do_separate_conf audio
         do_make
         do_install opus{enc,dec,info}.exe bin-audio/
         do_checkIfExist
