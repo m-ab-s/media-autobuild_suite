@@ -930,6 +930,7 @@ do_patch() {
     [[ $patch = ${patch##*/} ]] &&
         patch="/patches/$patch"
     do_wget -c -r -q "$patch"
+    [[ ! -f "$patch" ]] && patch=${patch##*/}
     if [[ -f "$patch" ]]; then
         if [[ "$am" = "am" ]]; then
             if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
