@@ -927,10 +927,9 @@ do_patch() {
     local patch=${1%% *}
     local am=$2          # "am" to apply patch with "git am"
     local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
-    local url="$patch"
-    [[ $url = ${url##*/} ]] &&
-        url="/patches/$url"
-    do_wget -c -r -q "$url"
+    [[ $patch = ${patch##*/} ]] &&
+        patch="/patches/$patch"
+    do_wget -c -r -q "$patch"
     if [[ -f "$patch" ]]; then
         if [[ "$am" = "am" ]]; then
             if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
