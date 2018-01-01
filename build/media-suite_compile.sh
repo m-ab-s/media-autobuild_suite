@@ -596,7 +596,7 @@ if [[ $standalone = y ]] && enabled libopus; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
-        do_separate_conf audio
+        do_separate_conf audio OPUSFILE_LIBS="$(pkg-config --static --libs opusurl opusfile)"
         do_make
         do_install opus{enc,dec,info}.exe bin-audio/
         do_checkIfExist
