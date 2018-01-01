@@ -558,13 +558,14 @@ if [[ $standalone = y ]] && enabled libopus; then
             lib/pkgconfig/openssl.pc
             lib/pkgconfig/lib{crypto,ssl,tls}.pc)
         local reverse=n
+        local _f
         [[ $1 = "-R" ]] && reverse=y && shift
-        for opt; do
-            opt="$LOCALDESTDIR/$opt"
+        for _f in ${_hide_files[*]}; do
+            _f="$LOCALDESTDIR/$_f"
             if [[ $reverse = n ]]; then
-                [[ -f "$opt" ]] && mv -f "$opt" "$opt.bak"
+                [[ -f "$_f" ]] && mv -f "$_f" "$_f.bak"
             else
-                [[ -f "$opt.bak" ]] && mv -f "$opt.bak" "$opt"
+                [[ -f "$_f.bak" ]] && mv -f "$_f.bak" "$_f"
             fi
         done
     }
