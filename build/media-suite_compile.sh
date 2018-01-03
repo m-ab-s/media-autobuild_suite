@@ -1332,7 +1332,7 @@ if [[ $ffmpeg != "no" ]]; then
         do_pacman_install openh264
         [[ -f $MINGW_PREFIX/lib/libopenh264.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.a{,.bak}
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.dll.a{.dyn,}
-        if [[ ! -f $LOCALDESTDIR/bin-video/openh264.dll ]]; then
+        if [[ ! -f $LOCALDESTDIR/bin-video/libopenh264.dll ]]; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
             do_wget -c -r -q "http://ciscobinary.openh264.org/openh264-1.7.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
