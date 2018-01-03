@@ -1355,6 +1355,24 @@ hide_conflicting_libs() {
     fi
 }
 
+function hide_libressl() {
+    local _hide_files=(include/openssl/*.h
+        lib/lib{crypto,ssl,tls}.{,l}a
+        lib/pkgconfig/openssl.pc
+        lib/pkgconfig/lib{crypto,ssl,tls}.pc)
+    local reverse=n
+    local _f
+    [[ $1 = "-R" ]] && reverse=y && shift
+    for _f in ${_hide_files[*]}; do
+        _f="$LOCALDESTDIR/$_f"
+        if [[ $reverse = n ]]; then
+            [[ -f "$_f" ]] && mv -f "$_f" "$_f.bak"
+        else
+            [[ -f "$_f.bak" ]] && mv -f "$_f.bak" "$_f"
+        fi
+    done
+}
+
 add_to_remove() {
     local garbage="$1"
     [[ ! $garbage ]] && garbage="$LOCALBUILDDIR/$(get_first_subdir)"

@@ -258,6 +258,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
         sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
+hide_libressl -R
 _libressl_check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
 if [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; then
     do_uninstall etc/ssl include/openssl bin-global/openssl.exe "${_libressl_check[@]}"
@@ -552,24 +553,6 @@ fi
 unset _deps
 
 if [[ $standalone = y ]] && enabled libopus; then
-    function hide_libressl() {
-        local _hide_files=(include/openssl/*.h
-            lib/lib{crypto,ssl,tls}.{,l}a
-            lib/pkgconfig/openssl.pc
-            lib/pkgconfig/lib{crypto,ssl,tls}.pc)
-        local reverse=n
-        local _f
-        [[ $1 = "-R" ]] && reverse=y && shift
-        for _f in ${_hide_files[*]}; do
-            _f="$LOCALDESTDIR/$_f"
-            if [[ $reverse = n ]]; then
-                [[ -f "$_f" ]] && mv -f "$_f" "$_f.bak"
-            else
-                [[ -f "$_f.bak" ]] && mv -f "$_f.bak" "$_f"
-            fi
-        done
-    }
-
     do_pacman_install openssl
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
@@ -602,7 +585,7 @@ if [[ $standalone = y ]] && enabled libopus; then
         do_checkIfExist
     fi
     hide_libressl -R
-    unset _deps hide_libressl
+    unset _deps
 fi
 
 if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
