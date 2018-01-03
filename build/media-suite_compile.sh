@@ -592,11 +592,11 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(bin-audio/opusenc.exe)
     _deps=(opusfile.pc libopusenc.pc)
-    if do_vcs "https://github.com/xiph/opus-tools.git#branch=test"; then
+    if do_vcs "https://github.com/xiph/opus-tools.git#branch=test3"; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
-        do_separate_conf audio OPUSFILE_LIBS="$(pkg-config --static --libs opusurl opusfile)"
+        do_separate_conf audio
         do_make
         do_install opus{enc,dec,info}.exe bin-audio/
         do_checkIfExist
