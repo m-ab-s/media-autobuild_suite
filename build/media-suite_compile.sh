@@ -1328,7 +1328,18 @@ if [[ $ffmpeg != "no" ]]; then
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
-    enabled libopenh264 && do_pacman_install openh264
+    if enabled libopenh264; then
+        do_pacman_install openh264
+        [[ -f $MINGW_PREFIX/lib/libopenh264.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.a{,.bak}
+        [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.dll.a{.dyn,}
+        if [[ ! -f $LOCALDESTDIR/bin-video/openh264.dll ]]; then
+            pushd $LOCALDESTDIR/bin-video >/dev/null
+            do_wget -c -r -q "http://ciscobinary.openh264.org/openh264-1.7.0-win${bits%bit}.dll.bz2" \
+                libopenh264.dll.bz2
+            [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
+            popd >/dev/null
+        fi
+    fi
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
         do_pacman_remove fftw && do_pacman_install chromaprint
     if enabled libzmq; then
