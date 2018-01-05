@@ -234,8 +234,7 @@ if [[ $ffmpeg != "no" ]] && enabled gcrypt; then
     fi
 fi
 
-if { { [[ $ffmpeg != "no" ]] && enabled gnutls; } ||
-    [[ $rtmpdump = y && $license != nonfree ]]; }; then
+if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
     [[ -z "$gnutls_ver" ]] &&
         gnutls_ver="$("${curl_opts[@]}" -l "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/")" &&
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.6\.\d+(\.\d+)?')"
