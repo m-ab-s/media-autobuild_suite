@@ -1312,8 +1312,11 @@ if [[ $ffmpeg != "no" ]]; then
     enabled libopenjpeg && do_pacman_install openjpeg2
     if enabled libopenh264; then
         do_pacman_install openh264
-        [[ -f $MINGW_PREFIX/lib/libopenh264.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.a{,.bak}
-        [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.dll.a{.dyn,}
+        if [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]]; then
+            mv -f "$MINGW_PREFIX"/lib/libopenh264.a{,.bak}
+            mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
+        fi
+        [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
         if [[ ! -f $LOCALDESTDIR/bin-video/libopenh264.dll ]]; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
             do_wget -c -r -q "http://ciscobinary.openh264.org/openh264-1.7.0-win${bits%bit}.dll.bz2" \
