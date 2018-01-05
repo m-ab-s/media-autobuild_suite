@@ -619,13 +619,13 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
 fi
 
 _check=(libgme.{a,pc})
-if [[ $ffmpeg != "no" ]] && enabled libgme && do_pkgConfig "libgme = 0.6.1" &&
-    do_vcs "https://bitbucket.org/mpyne/game-music-emu.git" libgme; then
+if [[ $ffmpeg != "no" ]] && enabled libgme && do_pkgConfig "libgme = 0.6.2"; then
+    do_wget -h 5046cb471d422dbe948b5f5dd4e5552aaef52a0899c4b2688e5a68a556af7342 \
+        "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.2.tar.xz"
     do_uninstall include/gme "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' gme/blargg_source.h
-    do_cmakeinstall -DENABLE_UBSAN=off
+    do_cmakeinstall
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(libbs2b.{{l,}a,pc})
