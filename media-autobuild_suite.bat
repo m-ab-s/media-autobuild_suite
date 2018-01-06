@@ -66,37 +66,36 @@ gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config lz4
 
-:: built-ins and common external libs
-set ffmpeg_options=--enable-amf --enable-avisynth --enable-bzlib --enable-cuda ^
---enable-cuvid --enable-d3d11va --enable-dxva2 --enable-iconv --enable-lzma ^
---enable-nvenc --enable-schannel --enable-sdl2 --enable-zlib ^
---enable-gmp --enable-libmp3lame --enable-libopus --enable-libvorbis --enable-libvpx ^
---enable-libx264 --enable-libx265
+:: built-ins
+set ffmpeg_options_builtin=#amf #avisynth #bzlib #cuda #cuvid #d3d11va #dxva2 ^
+#iconv #lzma #nvenc #schannel #zlib #sdl2
+
+:: common external libs
+set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265
 
 :: options used in zeranoe builds and not present above
-set ffmpeg_options_zeranoe=--enable-fontconfig --enable-gnutls --enable-libass ^
---enable-libbluray --enable-libfreetype --enable-libmfx --enable-libmysofa ^
---enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg ^
---enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora ^
---enable-libtwolame --enable-libvidstab --enable-libvo-amrwbenc --enable-libwavpack ^
---enable-libwebp --enable-libxml2 --enable-libzimg --enable-libshine ^
---enable-gpl --enable-openssl --enable-libtls
+set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
+libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
+libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
+libwebp libxml2 libzimg libshine gpl openssl libtls
 
 :: options also available with the suite
-set ffmpeg_options_full=--enable-chromaprint --enable-cuda-sdk --enable-decklink ^
---enable-frei0r --enable-libbs2b --enable-libcaca --enable-libcdio ^
---enable-libfdk-aac --enable-libflite --enable-libfribidi --enable-libgme ^
---enable-libgsm --enable-libilbc --enable-libkvazaar --enable-libmodplug ^
---enable-libnpp --enable-libopenh264 --enable-libopenmpt --enable-librtmp ^
---enable-librubberband --enable-libssh --enable-libtesseract --enable-libxavs ^
---enable-libxvid --enable-libzmq --enable-libzvbi --enable-opencl --enable-opengl
+set ffmpeg_options_full=chromaprint cuda-sdk decklink frei0r libbs2b libcaca ^
+libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
+libmodplug libnpp libopenh264 libopenmpt librtmp librubberband libssh ^
+libtesseract libxavs libxvid libzmq libzvbi opencl opengl
 
-set mpv_options=--enable-libass --enable-rubberband --enable-lua "--lua=luajit" ^
---enable-uchardet --enable-lcms2 --enable-manpage-build --enable-egl-angle ^
---enable-libbluray --enable-javascript
+:: built-ins
+set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
+#encoding #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
+#shaderc #crossc #d3d11 #jpeg
 
-set mpv_options_full=--enable-dvdread --enable-dvdnav --enable-libarchive ^
---enable-vapoursynth --enable-html-build --enable-pdf-build --enable-libmpv-shared
+:: overriden defaults
+set mpv_options_basic=--disable-debug-build "--lua=luajit"
+
+:: all supported options
+set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
+pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
@@ -593,12 +592,19 @@ if %buildffmpegChoice%==1 (
     if not exist %build%\ffmpeg_options.txt (
         (
             echo.# Lines starting with this character are ignored
-            for %%i in (%ffmpeg_options%) do echo.%%i
+            echo.
+            echo.# Built-in options, use --disable- to disable them
+            call :writeOption %ffmpeg_options_builtin%
+            echo.
+            echo.# Common options
+            call :writeOption %ffmpeg_options_basic%
+            echo.
             echo.# Zeranoe
-            for %%i in (%ffmpeg_options_zeranoe%) do echo.#%%i
+            call :writeOption %ffmpeg_options_zeranoe%
+            echo.
             echo.# Full
-            for %%i in (%ffmpeg_options_full%) do echo.#%%i
-            )>>%build%\ffmpeg_options.txt
+            call :writeOption %ffmpeg_options_full%
+            )>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default FFmpeg options has been created in
         echo. %build%\ffmpeg_options.txt
@@ -609,10 +615,17 @@ if %buildffmpegChoice%==1 (
         )
     if not exist %build%\mpv_options.txt (
         (
-            for %%i in (%mpv_options%) do echo.%%~i
+            echo.# Lines starting with this character are ignored
+            echo.
+            echo.# Built-in options, use --disable- to disable them
+            call :writeOption %mpv_options_builtin%
+            echo.
+            echo.# Common options or overriden defaults
+            call :writeOption %mpv_options_basic%
+            echo.
             echo.# Full
-            for %%i in (%mpv_options_full%) do echo.#%%i
-            )>>%build%\mpv_options.txt
+            call :writeOption %mpv_options_full%
+            )>%build%\mpv_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default mpv options has been created in
         echo. %build%\mpv_options.txt
@@ -1497,4 +1510,21 @@ goto :EOF
     echo.cd /trunk
     )>%instdir%\local%1\etc\profile2.local
 %instdir%\%msys2%\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
+goto :EOF
+
+:writeOption
+setlocal enabledelayedexpansion
+for %%i in (%*) do (
+    set _opt=%%~i
+    if ["!_opt:~0,2!"]==["--"] (
+            echo !_opt!
+        ) else if ["!_opt:~0,3!"]==["#--"] (
+            echo !_opt!
+        ) else if ["!_opt:~0,1!"]==["#"] (
+            echo #--enable-!_opt:~1!
+        ) else (
+            echo --enable-!_opt!
+        )
+    )
+setlocal
 goto :EOF

@@ -597,23 +597,29 @@ do_readoptionsfile() {
     fi
 }
 
+do_readbatoptions() {
+    local varname="$1"
+    printf '%s\n' "${bat[@]}" | \
+        sed -rne "/set ${varname}=/,/[^^]$/p" | \
+        sed -re '/^:/d' -e "s/(set ${varname}=| \^|\")//g" | tr ' ' '\n' | \
+        sed -re '/^#/d' -e '/^[^-]/{s/^/--enable-/g}'
+}
+
 do_getFFmpegConfig() {
     local license="${1:-nonfree}"
     local configfile="$LOCALBUILDDIR"/ffmpeg_options.txt
-    if [[ -f "$configfile" ]] && [[ $ffmpegChoice = y ]]; then
+
+    if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
+        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
+        FFMPEG_DEFAULT_OPTS=($(do_readbatoptions "ffmpeg_options_(builtin|basic)"))
+        [[ $ffmpegChoice != n ]] &&
+            FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_zeranoe"))
+        [[ $ffmpegChoice = f ]] &&
+            FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_full"))
+        echo "Imported default FFmpeg options from .bat"
+    elif [[ -f "$configfile" ]]; then
         do_readoptionsfile "$configfile" FFMPEG_DEFAULT_OPTS
         echo "Imported FFmpeg options from ffmpeg_options.txt"
-    elif [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice && $ffmpegChoice != y ]]; then
-        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
-        FFMPEG_DEFAULT_OPTS=($(printf '%s\n' "${bat[@]}" | \
-            sed -rne '/ffmpeg_options=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options=//' -e 's/ ^//g'))
-        [[ $ffmpegChoice = z || $ffmpegChoice = f ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(printf '%s\n' "${bat[@]}" | \
-                sed -rne '/ffmpeg_options_zeranoe=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options_zeranoe=//' -e 's/ ^//g'))
-        [[ $ffmpegChoice = f ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(printf '%s\n' "${bat[@]}" | \
-                sed -rne '/ffmpeg_options_full=/,/[^^]$/p' | sed -e 's/.*ffmpeg_options_full=//' -e 's/ ^//g'))
-        echo "Imported default FFmpeg options from .bat"
     else
         echo "Using default FFmpeg options"
     fi
@@ -796,17 +802,15 @@ disabled_all() {
 do_getMpvConfig() {
     local configfile="$LOCALBUILDDIR"/mpv_options.txt
     local forced
-    if [[ -f $configfile ]] && [[ $ffmpegChoice = y ]]; then
+    if [[ -f "/trunk/media-autobuild_suite.bat" && "$ffmpegChoice" =~ (n|z|f) ]]; then
+        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
+        MPV_OPTS=($(do_readbatoptions "mpv_options_(builtin|basic)"))
+        [[ $ffmpegChoice = f ]] &&
+            MPV_OPTS+=($(do_readbatoptions "mpv_options_full"))
+        echo "Imported default mpv options from .bat"
+    elif [[ -f $configfile ]]; then
         do_readoptionsfile "$configfile" MPV_OPTS
         echo "Imported mpv options from mpv_options.txt"
-    elif [[ -f "/trunk/media-autobuild_suite.bat" && x"$ffmpegChoice" != x"y" ]]; then
-        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
-        MPV_OPTS=($(printf '%s\n' "${bat[@]}" | \
-            sed -rne '/mpv_options=/,/[^^]$/p' | sed -e 's/.*mpv_options=//' -e 's/ ^//g' | tr -d '"'))
-        [[ $ffmpegChoice = f ]] &&
-            MPV_OPTS+=($(printf '%s\n' "${bat[@]}" | \
-                sed -rne '/mpv_options_full=/,/[^^]$/p' | sed -e 's/.*mpv_options_full=//' -e 's/ ^//g'))
-        echo "Imported default mpv options from .bat"
     else
         MPV_OPTS=()
         echo "Using default mpv options"
