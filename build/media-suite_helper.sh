@@ -590,8 +590,7 @@ do_readoptionsfile() {
                     /^\s*$/d
                     # remove leading/trailing whitespace
                     s/(^\s+|\s+$)//
-                    # move each option to each line
-                    s/\s+(--\w+)/\n\1/g')
+                    ')
     else
         echo -e "${red}Tried opening non-existent file: ${filename}${reset}"
         exit 1
@@ -812,9 +811,8 @@ do_getMpvConfig() {
         MPV_OPTS=()
         echo "Using default mpv options"
     fi
-    for forced in vapoursynth-lazy libguess static-build enable-gpl3 egl-angle-lib; do
-        MPV_OPTS=(${MPV_OPTS[@]//--*$forced})
-    done
+    do_removeOption MPV_OPTS \
+        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib)"
     if ! mpv_enabled debug-build; then
         do_addOption MPV_OPTS --disable-debug-build
     fi
@@ -902,24 +900,32 @@ do_addOption() {
 }
 
 do_removeOption() {
-    local option="$1"
-    local arrayname="FFMPEG_OPTS" basearray opt temp=()
-    [[ "$2" = "y" ]] && arrayname="FFMPEG_OPTS_SHARED"
-    basearray="${arrayname}[@]"
+    local varname="$1"
+    local arrayname
+    if [[ -v $varname ]]; then
+        arrayname="$varname" && shift 1
+    else
+        arrayname="FFMPEG_OPTS"
+    fi
 
-    for opt in "${!basearray}"; do
-        if [[ ! "$opt" =~ ^${option}$ ]]; then
-            temp+=("$opt")
+    local option="$1"
+    local basearray opt temp=()
+    basearray="${arrayname}[@]"
+    local orig=("${!basearray}")
+
+    for ((i = 0; i < ${#orig[@]}; i++)); do
+        if [[ ! "${orig[$i]}" =~ ^${option}$ ]]; then
+            temp+=("${orig[$i]}")
         fi
     done
-    eval "$arrayname"=\("\${temp[@]}"\)
+    eval "$arrayname"=\(\"\${temp[@]}\"\)
 }
 
 do_removeOptions() {
     local option
     local shared=$2
     for option in $1; do
-        do_removeOption "$option" "$shared"
+        do_removeOption "$option" $shared
     done
 }
 
