@@ -23,7 +23,6 @@ Included Tools And Libraries
  - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
         - amd amf encoders (built-in)
-        - avisynth (built-in)
         - cuda (built-in)
         - cuvid (built-in)
         - libmp3lame (mingw)
@@ -39,6 +38,7 @@ Included Tools And Libraries
         - sdl2 (2.0.5) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
+        - avisynth (needs avisynth dll installed)
         - fontconfig (git)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw)
