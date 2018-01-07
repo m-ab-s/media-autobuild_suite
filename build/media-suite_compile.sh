@@ -840,11 +840,10 @@ fi
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
     mpv_enabled sdl2 || [[ $daala = y ]]; } &&
-    do_pkgConfig "sdl2 = 2.0.5"; then
-    do_wget -h d4055424d556b4a908aa76fad63abd3c \
-        "http://libsdl.org/release/SDL2-2.0.5.tar.gz"
+    do_pkgConfig "sdl2 = 2.0.7"; then
+    do_wget -h ee35c74c4313e2eda104b14b1b86f7db84a04eeab9430d56e001cea268bf4d5e \
+        "http://libsdl.org/release/SDL2-2.0.7.tar.gz"
     do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
-    do_patch sdl2-0001-remove-conflicting-xinput-structs.patch
     sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
     do_separate_confmakeinstall
     do_checkIfExist
