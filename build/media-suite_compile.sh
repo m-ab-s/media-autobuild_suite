@@ -1693,11 +1693,6 @@ mpv-winbuild-cmake/master/packages/vulkan-0002-ignore-generating-spirv_tools_com
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
 
-        # Windows(?) has a lower argument limit than *nix so
-        # we replace tons of repeated -L flags with just two
-        replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
-        sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py
-
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
