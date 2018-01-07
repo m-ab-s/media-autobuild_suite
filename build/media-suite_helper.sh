@@ -893,7 +893,7 @@ mpv_disable() {
 
 do_addOption() {
     local varname="$1" array opt
-    if [[ -v $varname ]]; then
+    if [[ ${varname#--} = $varname ]]; then
         array="$varname" && shift 1
     else
         array="FFMPEG_OPTS"
@@ -906,7 +906,7 @@ do_addOption() {
 do_removeOption() {
     local varname="$1"
     local arrayname
-    if [[ -v $varname ]]; then
+    if [[ ${varname#--} = $varname ]]; then
         arrayname="$varname" && shift 1
     else
         arrayname="FFMPEG_OPTS"
