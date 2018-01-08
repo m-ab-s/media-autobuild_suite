@@ -104,6 +104,8 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
     libopus.{,l}a opus.pc
+    bin-global/libgcrypt-config libgcrypt.a gcrypt.h
+    lib/libgcrypt.def bin-global/{dumpsexp,hmac256,mpicalc}.exe
 )
 
 do_uninstall q all "${_clean_old_builds[@]}"
@@ -207,27 +209,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
 fi
 
-_check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
-_ver="1.8.2"
-if [[ $ffmpeg != "no" ]] && enabled gcrypt; then
-    do_pacman_install libgpg-error
-    do_pacman_remove libgcrypt
-    if files_exist "${_check[@]}" && [[ "$(libgcrypt-config --version)" = "$_ver" ]]; then
-        do_print_status "libgcrypt $_ver" "$green" "Up-to-date"
-    else
-        do_wget -h c8064cae7558144b13ef0eb87093412380efa16c4ee30ad12ecb54886a524c07 \
-            "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$_ver.tar.bz2"
-        do_uninstall "${_check[@]}"
-        extracommands=()
-        [[ $standalone = y ]] || sed -ri "s|(^bin_PROGRAMS = ).*|\1\\\|" src/Makefile.in
-        sed -ri "s;(^SUBDIRS .*) tests;\1;" Makefile.in
-        do_separate_confmakeinstall global --disable-doc \
-            --with-gpg-error-prefix="$MINGW_PREFIX" \
-            "${extracommands[@]}"
-        do_checkIfExist
-        unset extracommands
-    fi
-fi
+[[ $ffmpeg != "no" ]] && enabled gcrypt && do_pacman_install libgcrypt
 
 if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
     [[ -z "$gnutls_ver" ]] &&
