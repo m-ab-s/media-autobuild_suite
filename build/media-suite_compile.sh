@@ -208,25 +208,20 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 fi
 
 _check=(bin-global/libgcrypt-config libgcrypt.a gcrypt.h)
-_ver="1.7.8"
+_ver="1.8.2"
 if [[ $ffmpeg != "no" ]] && enabled gcrypt; then
     do_pacman_install libgpg-error
     do_pacman_remove libgcrypt
     if files_exist "${_check[@]}" && [[ "$(libgcrypt-config --version)" = "$_ver" ]]; then
         do_print_status "libgcrypt $_ver" "$green" "Up-to-date"
     else
-        do_wget -h 948276ea47e6ba0244f36a17b51dcdd52cfd1e664b0a1ac3bc82134fb6cec199 \
+        do_wget -h c8064cae7558144b13ef0eb87093412380efa16c4ee30ad12ecb54886a524c07 \
             "https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-$_ver.tar.bz2"
         do_uninstall "${_check[@]}"
         extracommands=()
-        [[ $bits = 64bit ]] && sed -ri 's;movq;movabs;g' cipher/rijndael.c &&
-            extracommands+=(--disable-{padlock-support,asm})
         [[ $standalone = y ]] || sed -ri "s|(^bin_PROGRAMS = ).*|\1\\\|" src/Makefile.in
         sed -ri "s;(^SUBDIRS .*) tests;\1;" Makefile.in
         do_separate_confmakeinstall global --disable-doc \
-            --enable-ciphers=aes,des,rfc2268,arcfour \
-            --enable-digests=sha1,md5,rmd160,sha256,sha512 \
-            --enable-pubkey-ciphers=dsa,rsa,ecc \
             --with-gpg-error-prefix="$MINGW_PREFIX" \
             "${extracommands[@]}"
         do_checkIfExist
