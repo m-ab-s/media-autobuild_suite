@@ -1308,19 +1308,23 @@ get_vs_prefix() {
 }
 
 get_java_home() {
-    local javahome
-    local regkey="/HKLM/software/javasoft/java development kit"
-    local version
+    local javahome version
+    local javabasereg="/HKLM/software/javasoft"
+    local regkey="$javabasereg/java development kit"
+    export JAVA_HOME=
+    export JDK_HOME=""
     if ! regtool -q check "$regkey"; then
-        echo "$javahome"
-    else
-        version="$(regtool -q get "$regkey/CurrentVersion")"
-        [[ $(vercmp "$version" 1.8) = -1 ]] && return
-        javahome="$(regtool -q get "$regkey/$version/JavaHome")"
-        javahome="$(cygpath -u "$javahome")"
-        [[ -f "$javahome/bin/java.exe" ]] &&
-            export JAVA_HOME="$javahome" && echo "$javahome"
+        echo "no version of JDK found"
+        return
     fi
+
+    version="$(regtool -q get "$regkey/CurrentVersion")"
+    [[ $(vercmp "$version" 1.8) != 0 ]] &&
+        echo "JDK 1.8 required, 9 doesn't work" && return
+    javahome="$(regtool -q get "$regkey/$version/JavaHome")"
+    javahome="$(cygpath -u "$javahome")"
+    [[ -f "$javahome/bin/java.exe" ]] &&
+        export JAVA_HOME="$javahome"
 }
 
 get_api_version() {

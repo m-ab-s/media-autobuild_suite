@@ -869,6 +869,33 @@ if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
 fi
 unset _deps
 
+if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; }; then
+    _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
+    if do_vcs "git://git.videolan.org/libaacs.git"; then
+        sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
+        do_autoreconf
+        do_uninstall "${_check[@]}" include/libaacs
+        do_separate_conf video --enable-shared
+        do_make
+        do_makeinstall
+        mv -f "$LOCALDESTDIR/bin/libaacs-0.dll" "$LOCALDESTDIR/bin-video/libaacs.dll"
+        rm -f "$LOCALDESTDIR/bin-video/${MINGW_CHOST}-aacs_info.exe"
+        do_checkIfExist
+    fi
+
+    _check=(bin-video/libbdplus.dll libbdplus.{{,l}a,pc} libbdplus/bdplus.h)
+    if do_vcs "git://git.videolan.org/libbdplus.git"; then
+        sed -ri 's;noinst_PROGRAMS.*;noinst_PROGRAMS = ;' Makefile.am
+        do_autoreconf
+        do_uninstall "${_check[@]}" include/libbdplus
+        do_separate_conf video --enable-shared
+        do_make
+        do_makeinstall
+        mv -f "$LOCALDESTDIR/bin/libbdplus-0.dll" "$LOCALDESTDIR/bin-video/libbdplus.dll"
+        do_checkIfExist
+    fi
+fi
+
 _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://git.videolan.org/git/libbluray.git"; then
@@ -877,7 +904,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     do_uninstall include/libbluray share/java "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
     extracommands=()
-    JAVA_HOME="$(get_java_home)"
+    log javahome get_java_home
     OLD_PATH="$PATH"
     if [[ -n "$JAVA_HOME" ]]; then
         if [[ ! -f /opt/apache-ant/bin/ant ]]; then
@@ -893,8 +920,15 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     else
         extracommands+=(--disable-bdjava-jar)
     fi
-    do_separate_confmakeinstall --disable-{examples,doxygen-doc} \
-        --without-{libxml2,fontconfig,freetype} "${extracommands[@]}"
+    if enabled libxml2; then
+        do_pacman_install libxml2
+        sed -ri 's;(Cflags.*);\1 -DLIBXML_STATIC;' src/libbluray.pc.in
+    else
+        extracommands+=(--without-libxml2)
+    fi
+    LDFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)" \
+        do_separate_confmakeinstall --disable-{examples,doxygen-doc} \
+        --without-{fontconfig,freetype} "${extracommands[@]}"
     do_checkIfExist
     PATH="$OLD_PATH"
     unset extracommands JDK_HOME JAVA_HOME OLD_PATH
