@@ -49,10 +49,17 @@ set_title() {
     echo -ne "\e]0;$title\a"
 }
 
+do_exit_prompt() {
+    if [[ -n $build32 || -n $build64 ]]; then
+        create_diagnostic
+        zip_logs
+    fi
+    do_prompt "$*"
+    [[ -n $build32 || -n $build64 ]] && exit 1
+}
+
 cd_safe() {
-    cd "$1" ||
-        { create_diagnostic && zip_logs &&
-            do_prompt "Failed changing to directory $1." && exit 1; }
+    cd "$1" || do_exit_prompt "Failed changing to directory $1."
 }
 
 test_newer() {
@@ -76,6 +83,8 @@ vcs_clone() {
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
+        [[ -d "$vcsFolder-$vcsType"/.git ]] ||
+            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
     fi
 }
 
@@ -88,6 +97,7 @@ vcs_reset() {
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
+        [[ -d .git ]] || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
         git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
@@ -107,6 +117,7 @@ vcs_update() {
         hg update -C -r "$ref"
         newHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
+        [[ -d .git ]] || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
@@ -127,7 +138,7 @@ vcs_log() {
 
 # get source from VCS
 # example:
-#   do_vcs "url#branch|revision|tag|commit=NAME" "folder" "lib/libname.a"
+#   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
 do_vcs() {
     local vcsType="${1%::*}"
     local vcsURL="${1#*::}"
