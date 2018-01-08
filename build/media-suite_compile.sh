@@ -176,18 +176,19 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _check=(libfribidi.{l,}a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
-    if do_pkgConfig "fribidi = 0.19.7"; then
-        do_wget -h 6c7e7cfdd39c908f7ac619351c1c5c23 \
-            "http://pkgs.fedoraproject.org/repo/pkgs/fribidi/fribidi-0.19.7.tar.bz2/6c7e7cfdd39c908f7ac619351c1c5c23/fribidi-0.19.7.tar.bz2"
+    if do_vcs "https://github.com/fribidi/fribidi.git"; then
+        extracommands=(--disable-{deprecated,debug} --with-glib=no)
+        [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.am
+        if [[ $ffmpeg = "sharedlibs" ]]; then
+            sed -i 's/OS_WIN32/false/g' lib/Makefile.am
+            extracommands+=(--enable-shared)
+        fi
+        do_autogen --no-conf --no-make
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
-        [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.in
-        [[ $ffmpeg = "sharedlibs" ]] &&
-            sed -i 's/$(am__append_1) $(am__append_2)/-export-symbols-regex "^fribidi_.*"/' lib/Makefile.in
-        extracommands=(--disable-{deprecated,debug} --with-glib=no)
-        [[ $ffmpeg = "sharedlibs" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
+        [[ $ffmpeg = "sharedlibs" ]] &&
+            do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
     fi
 
@@ -205,7 +206,13 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_checkIfExist
     fi
     if [[ $ffmpeg != "sharedlibs" ]]; then
-        find "$LOCALDESTDIR/lib" -name "*.dll.a" -exec rm -f '{}' \;
+        _libs=(lib{freetype,fribidi,ass}.dll.a
+            libav{codec,device,filter,format,util,resample}.dll.a}
+            lib{sw{scale,resample},postproc}.dll.a)
+        for _lib in "${_libs[@]}"; do
+            rm -f "$LOCALDESTDIR/lib/$_lib"
+        done
+        unset _lib _libs
     fi
 fi
 
