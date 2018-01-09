@@ -186,7 +186,10 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         log bootstrap ./bootstrap --no-conf --no-make
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
-        do_separate_confmakeinstall global "${extracommands[@]}"
+        [[ -f Makefile ]] && log distclean make distclean
+        do_configure --bindir="$LOCALDESTDIR/bin-global" "${extracommands[@]}"
+        do_make
+        do_makeinstall
         [[ $ffmpeg = "sharedlibs" ]] &&
             do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
