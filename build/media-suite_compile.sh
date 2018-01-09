@@ -876,7 +876,7 @@ if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
 fi
 unset _deps
 
-if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; }; then
+if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "git://git.videolan.org/libaacs.git"; then
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
