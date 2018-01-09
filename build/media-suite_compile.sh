@@ -176,24 +176,31 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git"; then
-        extracommands=(--disable-{deprecated,debug} --with-glib=no --enable-static)
-        [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.am
+        extracommands=(--disable-{deprecated,debug} --without-glib)
+
+        # fix out-of-root build
+        sed -ri 's;([^/])(unidata/);\1$(srcdir)/\2;g' gen.tab/Makefile.am
+
+        # don't compile docs and tests, or bin if standalone=n
+        _sed="doc test"
+        [[ $standalone = n ]] && _sed="bin ${_sed}"
+        sed -i "s|${_sed}||" Makefile.am
+
+        # .def is broken, just export all fribidi_ symbols
+        sed -i 's/OS_WIN32/FALSE/g' lib/Makefile.am
+
         if [[ $ffmpeg = "sharedlibs" ]]; then
-            sed -i 's/OS_WIN32/false/g' lib/Makefile.am
             extracommands+=(--enable-shared)
         fi
-        sed -i '/fribidi_log2vis_get_embedding_levels/d' lib/fribidi.def
         log bootstrap ./bootstrap --no-conf --no-make
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR/bin-global" \
-            "${extracommands[@]}"
-        do_make
-        do_makeinstall
+        do_separate_confmakeinstall global "${extracommands[@]}"
         [[ $ffmpeg = "sharedlibs" ]] &&
             do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
+        unset _sed
     fi
 
     _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
