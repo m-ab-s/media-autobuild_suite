@@ -183,6 +183,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
             sed -i 's/OS_WIN32/false/g' lib/Makefile.am
             extracommands+=(--enable-shared)
         fi
+        sed -i '/fribidi_log2vis_get_embedding_levels/d' lib/fribidi.def
         log bootstrap ./bootstrap --no-conf --no-make
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
