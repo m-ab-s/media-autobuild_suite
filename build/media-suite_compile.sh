@@ -133,9 +133,8 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _check=(libfreetype.{l,}a freetype2.pc)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
-    if do_pkgConfig "freetype2 = 21.0.15" "2.8.1"; then
-        do_wget_sf -h e5435f02e02d2b87bb8e4efdcaa14b1f78c9cf3ab1ed80f94b6382fb6acc7d78 \
-            "freetype/freetype2/2.8.1/freetype-2.8.1.tar.bz2"
+    if do_vcs "https://git.savannah.gnu.org/git/freetype/freetype2.git"; then
+        do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
         extracommands=(--with-{harfbuzz,png,bzip2}=no)
