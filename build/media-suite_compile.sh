@@ -176,7 +176,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git"; then
-        extracommands=(--disable-{deprecated,debug} --with-glib=no)
+        extracommands=(--disable-{deprecated,debug} --with-glib=no --enable-static)
         [[ $standalone = y ]] || sed -i 's|bin doc test||' Makefile.am
         if [[ $ffmpeg = "sharedlibs" ]]; then
             sed -i 's/OS_WIN32/false/g' lib/Makefile.am
