@@ -83,8 +83,7 @@ vcs_clone() {
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
-        [[ -d "$vcsFolder-$vcsType"/.git ]] ||
-            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        [[ -d "$vcsFolder-$vcsType"/.git ]] || return 1
     fi
 }
 
@@ -97,7 +96,7 @@ vcs_reset() {
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
-        [[ -d .git ]] || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
+        [[ -d .git ]] || return 1
         git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
@@ -117,7 +116,7 @@ vcs_update() {
         hg update -C -r "$ref"
         newHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
-        [[ -d .git ]] || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
+        [[ -d .git ]] || return 1
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
@@ -173,7 +172,7 @@ do_vcs() {
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        log quiet "$vcsType.clone" vcs_clone
+        log quiet "$vcsType.clone" vcs_clone || do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
             touch recently_updated recently_checked
@@ -195,10 +194,10 @@ do_vcs() {
         return 1
     fi
 
-    log quiet "$vcsType.reset" vcs_reset "$ref"
+    log quiet "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
-        log quiet "$vcsType.update" vcs_update "$ref"
+        log quiet "$vcsType.update" vcs_update "$ref" || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
         touch recently_checked
     else
         newHead="$oldHead"
