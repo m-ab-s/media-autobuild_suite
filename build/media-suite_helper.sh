@@ -679,7 +679,7 @@ do_changeFFmpegConfig() {
     do_print_progress Changing options to comply to "$license"
     # if w32threads is disabled, pthreads is used and needs this cflag
     # decklink includes zvbi, which requires pthreads
-    if disabled w32threads || enabled pthreads || enabled_all decklink libzvbi libvmaf; then
+    if disabled w32threads || enabled pthreads || enabled_all decklink libzvbi || enabled libvmaf; then
         do_removeOption --enable-w32threads
         do_addOption --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
             --extra-libs=-lwsock32
@@ -689,11 +689,13 @@ do_changeFFmpegConfig() {
     enabled libkvazaar && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
 
     # get libs restricted by license
-    [[ -f configure ]] || do_exit_prompt "There's no configure script to retrieve libs from"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' configure)"
-    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' configure)"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' configure)"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' configure)"
+    local config_script=configure
+    [[ $(get_first_subdir) != "ffmpeg-git" ]] && config_script="$LOCALBUILDDIR/ffmpeg-git/configure"
+    [[ -f "$config_script" ]] || do_exit_prompt "There's no configure script to retrieve libs from"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' "$config_script")"
+    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script")"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script")"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script")"
 
     # handle gpl libs
     local gpl=($EXTERNAL_LIBRARY_GPL_LIST gpl)
@@ -739,7 +741,7 @@ do_changeFFmpegConfig() {
     # handle gpl-incompatible libs
     local nonfreegpl=($EXTERNAL_LIBRARY_NONFREE_LIST)
     if enabled_any "${nonfreegpl[@]}"; then
-        if [[ $license = "nonfree" ]]; then
+        if [[ $license = "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
         elif [[ $license = gpl* ]]; then
             do_removeOptions "${nonfreegpl[*]/#/--enable-}"
