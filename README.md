@@ -54,7 +54,7 @@ Included Tools And Libraries
         - libbluray (git)
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
-        - libfreetype (2.8)
+        - libfreetype (git)
         - libmfx (git)
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
@@ -81,7 +81,7 @@ Included Tools And Libraries
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
-        - libfribidi (0.19.7)
+        - libfribidi (git)
         - libgme (git snapshot)
         - libgsm (mingw)
         - libilbc (git snapshot)
@@ -119,6 +119,8 @@ Included Tools And Libraries
     - flac (git)
     - kvazaar (git)
     - lame (3.99.5)
+    - libaacs (git) (shared)
+    - libbdplus (git) (shared)
     - mediainfo cli (git)
     - mp4box (git)
     - mplayer (svn) (unsupported)
