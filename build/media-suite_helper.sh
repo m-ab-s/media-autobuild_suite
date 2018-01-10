@@ -689,29 +689,38 @@ do_changeFFmpegConfig() {
     # add options for static kvazaar
     enabled libkvazaar && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
 
+    # get libs restricted by license
+    [[ -f configure ]] || do_exit_prompt "There's no configure script to retrieve libs from"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' configure)"
+    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' configure)"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' configure)"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' configure)"
+
     # handle gpl libs
-    local gpl=(frei0r lib{cdio,rubberband,vidstab,x264,x265,xavs,xvid}
-               postproc avisynth gpl)
-    if [[ $license = gpl* || $license = nonfree ]] && enabled_any "${gpl[@]}"; then
+    local gpl=($EXTERNAL_LIBRARY_GPL_LIST gpl)
+    if [[ $license = gpl* || $license = nonfree ]] &&
+        { enabled_any "${gpl[@]}" || ! disabled postproc; }; then
         do_addOption --enable-gpl
     else
-        do_removeOptions "${gpl[*]/#/--enable-} --enable-gpl"
+        do_removeOptions "${gpl[*]/#/--enable-} --enable-postproc --enable-gpl"
     fi
 
     # handle (l)gplv3 libs
-    local version3=(libopencore-amr{wb,nb} libvo-amrwbenc gmp libcdio)
-    if [[ $license = *v3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
+    local version3=($EXTERNAL_LIBRARY_VERSION3_LIST)
+    if [[ $license =~ (l|)gplv3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    if [[ $license = "nonfree" ]] && enabled_any libnpp decklink cuda-sdk; then
+    local nonfreehwaccel=($HWACCEL_LIBRARY_NONFREE_LIST)
+    if [[ $license = "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
-        do_removeOption "--enable-(nonfree|decklink|libnpp|cuda-sdk)"
+        do_removeOptions "${nonfreehwaccel[*]/#/--enable-} --enable-nonfree"
     fi
 
+    # cuda-only workarounds
     if [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk &&
         [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]] &&
         [[ -f "$CUDA_PATH/lib/x64/cuda.lib" ]]; then
@@ -729,7 +738,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=(libfdk-aac openssl libtls)
+    local nonfreegpl=($EXTERNAL_LIBRARY_NONFREE_LIST)
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]]; then
             do_addOption --enable-nonfree
@@ -738,8 +747,6 @@ do_changeFFmpegConfig() {
         fi
         # no lgpl here because they are accepted with it
     fi
-
-    enabled frei0r && do_addOption --enable-filter=frei0r
 
     if enabled_any debug "debug=gdb"; then
         # fix issue with ffprobe not working with debug and strip
