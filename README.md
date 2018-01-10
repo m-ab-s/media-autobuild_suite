@@ -96,6 +96,7 @@ Included Tools And Libraries
         - librubberband (git snapshot)
         - libssh (mingw)
         - libtesseract (git)
+        - libvmaf (git)
         - libxavs (svn snapshot)
         - libxvid (mingw)
             - compiled with gnutls or openssl depending on license chosen

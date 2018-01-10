@@ -27,6 +27,7 @@ libmfx (intel quick sync hw accelerator)
 libopenjp2 (openjpeg 2)
 libopenmpt
 librtmp
+libvmaf
 libwebp
 libzen
 lsmash
