@@ -597,19 +597,21 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
         grep -q "3.100" "$LOCALDESTDIR/bin-audio/lame.exe"; then
         do_print_status "lame 3.100" "$green" "Up-to-date"
     else
+        _mingw_patches="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master"
         do_wget_sf \
             -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
             "lame/lame/3.100/lame-3.100.tar.gz"
         do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
-        do_patch 0002-07-field-width-fix.all.patch
-        do_patch 0005-no-gtk.all.patch
-        do_patch 0006-dont-use-outdated-symbol-list.patch
-        do_patch 0007-revert-posix-code.patch
-        do_patch 0008-skip-termcap.patch
+        do_patch "$_mingw_patches/mingw-w64-lame/0002-07-field-width-fix.all.patch"
+        do_patch "$_mingw_patches/mingw-w64-lame/0005-no-gtk.all.patch"
+        do_patch "$_mingw_patches/mingw-w64-lame/0006-dont-use-outdated-symbol-list.patch"
+        do_patch "$_mingw_patches/mingw-w64-lame/0007-revert-posix-code.patch"
+        do_patch "$_mingw_patches/mingw-w64-lame/0008-skip-termcap.patch"
         do_separate_conf --enable-nasm
         do_make
         do_install frontend/lame.exe bin-audio/
         do_checkIfExist
+        unset _mingw_patches
     fi
 fi
 
@@ -1011,14 +1013,16 @@ if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
         "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
     do_uninstall "${_check[@]}" zvbi-0.2.pc
-    do_patch "zvbi-win32.patch"
-    do_patch "zvbi-ioctl.patch"
+    _vlc_zvbi_patches="https://raw.githubusercontent.com/videolan/vlc/master/contrib/src/zvbi"
+    do_patch "$_vlc_zvbi_patches/zvbi-win32.patch"
+    do_patch "$_vlc_zvbi_patches/zvbi-ioctl.patch"
     CFLAGS+=" -DPTW32_STATIC_LIB" do_separate_conf --disable-{dvb,bktr,nls,proxy} \
         --without-doxygen LIBS="$LIBS -lpng"
     cd_safe src
     do_makeinstall
     log pkgconfig make -C .. install-pkgconfigDATA
     do_checkIfExist
+    unset _vlc_zvbi_patches
 fi
 
 
@@ -1627,11 +1631,10 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     _check=(vulkan/vulkan.h libvulkan.a vulkan.pc)
     if ! mpv_disabled vulkan &&
         do_vcs "https://github.com/KhronosGroup/Vulkan-LoaderAndValidationLayers.git" vulkan; then
+        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
         do_uninstall "${_check[@]}" include/vulkan
-        do_patch "https://raw.githubusercontent.com/shinchiro/\
-mpv-winbuild-cmake/master/packages/vulkan-0001-cross-compile-static-linking-hacks.patch"
-        do_patch "https://raw.githubusercontent.com/shinchiro/\
-mpv-winbuild-cmake/master/packages/vulkan-0002-ignore-generating-spirv_tools_commit_id.h.patch"
+        do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
+        do_patch "$_shinchiro_patches/vulkan-0002-ignore-generating-spirv_tools_commit_id.h.patch"
         CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
@@ -1642,6 +1645,7 @@ mpv-winbuild-cmake/master/packages/vulkan-0002-ignore-generating-spirv_tools_com
         do_install loader/libvulkan.a lib/
         do_install loader/vulkan.pc lib/pkgconfig/
         do_checkIfExist
+        unset _shinchiro_patches
     fi
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
