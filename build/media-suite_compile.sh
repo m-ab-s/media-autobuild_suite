@@ -1046,35 +1046,11 @@ if [[ $ffmpeg != "no" ]] && enabled frei0r; then
     fi
 fi
 
-if [[ $ffmpeg != "no" ]] && enabled decklink; then
-    _check=(DeckLinkAPI.h
-           DeckLinkAPIVersion.h
-           DeckLinkAPI_i.c)
-    _hash=(e197cd6b828a008972da3dc86a53508c0d33ccff1437a702745fdd2b54f560bd
-           01e09d87f41e3e0a1c15fdfa4750ebd82455787d54e3f8c4e58b7e85eee809a6
-           c201e18620de4440bd79aab880ea6bf6fa71676b1c9172e1f71c8b10f1564268)
-    if files_exist -v "${_check[@]}" &&
-        {
-            count=0
-            while [[ x"${_check[$count]}" != x"" ]]; do
-                check_hash "$(file_installed "${_check[$count]}")" "${_hash[$count]}" || break
-                let count+=1
-            done
-            test x"${_check[$count]}" = x""
-        }; then
-        do_print_status "DeckLinkAPI 10.9.5" "$green" "Up-to-date"
-    else
-        mkdir -p "$LOCALBUILDDIR/DeckLinkAPI" &&
-            cd_safe "$LOCALBUILDDIR/DeckLinkAPI"
-        count=0
-        while [[ x"${_check[$count]}" != x"" ]]; do
-            do_wget -r -c -h "${_hash[$count]}" "/extras/${_check[$count]}"
-            do_install "${_check[$count]}"
-            let count+=1
-        done
-        do_checkIfExist
-    fi
-    unset count
+_check=(DeckLinkAPI.h DeckLinkAPIVersion.h DeckLinkAPI_i.c)
+if [[ $ffmpeg != "no" ]] && enabled decklink &&
+    do_vcs "https://notabug.org/RiCON/decklink-headers.git"; then
+    do_makeinstall PREFIX="$LOCALDESTDIR"
+    do_checkIfExist
 fi
 
 _check=(libmfx.{{l,}a,pc})
