@@ -83,7 +83,8 @@ vcs_clone() {
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
-        [[ -d "$vcsFolder-$vcsType"/.git ]] || return 1
+        [[ "$vcsType" = "git" && ! -d "$vcsFolder-$vcsType"/.git ]] && return 1
+        [[ "$vcsType" = "hg" && ! -d "$vcsFolder-$vcsType"/.hg ]] && return 1
     fi
 }
 
@@ -93,6 +94,7 @@ vcs_reset() {
         svn revert --recursive .
         oldHead=$(svnversion)
     elif [[ $vcsType = hg ]]; then
+        [[ -d .hg ]] || return 1
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
@@ -112,6 +114,7 @@ vcs_update() {
         svn update -r "$ref"
         newHead=$(svnversion)
     elif [[ $vcsType = hg ]]; then
+        [[ -d .hg ]] || return 1
         hg pull
         hg update -C -r "$ref"
         newHead=$(hg id --id)
