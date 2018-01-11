@@ -944,7 +944,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     else
         extracommands+=(--without-libxml2)
     fi
-    LDFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)" \
+    CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)" \
         do_separate_confmakeinstall --disable-{examples,doxygen-doc} \
         --without-{fontconfig,freetype} "${extracommands[@]}"
     do_checkIfExist
