@@ -78,27 +78,33 @@ test_newer() {
     return 1
 }
 
+check_valid_vcs() {
+    local root="${1:-.}"
+    local _type="${vcsType:-git}"
+    [[ "$_type" = "git" && -d "$root"/.git ]] ||
+    [[ "$_type" = "hg" && -d "$root"/.hg ]] ||
+    [[ "$_type" = "svn" && -d "$root"/.svn ]]
+}
+
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
-        [[ "$vcsType" = "git" && ! -d "$vcsFolder-$vcsType"/.git ]] && return 1
-        [[ "$vcsType" = "hg" && ! -d "$vcsFolder-$vcsType"/.hg ]] && return 1
     fi
+    check_valid_vcs "$vcsFolder-$vcsType"
 }
 
 vcs_reset() {
     local ref="$1"
+    check_valid_vcs
     if [[ $vcsType = svn ]]; then
         svn revert --recursive .
         oldHead=$(svnversion)
     elif [[ $vcsType = hg ]]; then
-        [[ -d .hg ]] || return 1
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
-        [[ -d .git ]] || return 1
         git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
@@ -110,16 +116,15 @@ vcs_reset() {
 
 vcs_update() {
     local ref="$1"
+    check_valid_vcs
     if [[ $vcsType = svn ]]; then
         svn update -r "$ref"
         newHead=$(svnversion)
     elif [[ $vcsType = hg ]]; then
-        [[ -d .hg ]] || return 1
         hg pull
         hg update -C -r "$ref"
         newHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
-        [[ -d .git ]] || return 1
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
@@ -129,6 +134,7 @@ vcs_update() {
 }
 
 vcs_log() {
+    check_valid_vcs
     if [[ "$vcsType" = "git" ]]; then
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
