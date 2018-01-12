@@ -690,8 +690,7 @@ do_changeFFmpegConfig() {
     # decklink includes zvbi, which requires pthreads
     if disabled w32threads || enabled pthreads || enabled_all decklink libzvbi || enabled libvmaf; then
         do_removeOption --enable-w32threads
-        do_addOption --disable-w32threads --extra-cflags=-DPTW32_STATIC_LIB \
-            --extra-libs=-lwsock32
+        do_addOption --disable-w32threads
     fi
 
     # add options for static kvazaar
