@@ -706,7 +706,7 @@ do_changeFFmpegConfig() {
     eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script")"
 
     # handle gpl libs
-    local gpl=($EXTERNAL_LIBRARY_GPL_LIST gpl)
+    local gpl=(${EXTERNAL_LIBRARY_GPL_LIST//_/-} gpl)
     if [[ $license = gpl* || $license = nonfree ]] &&
         { enabled_any "${gpl[@]}" || ! disabled postproc; }; then
         do_addOption --enable-gpl
@@ -715,14 +715,14 @@ do_changeFFmpegConfig() {
     fi
 
     # handle (l)gplv3 libs
-    local version3=($EXTERNAL_LIBRARY_VERSION3_LIST)
+    local version3=(${EXTERNAL_LIBRARY_VERSION3_LIST//_/-})
     if [[ $license =~ (l|)gplv3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    local nonfreehwaccel=($HWACCEL_LIBRARY_NONFREE_LIST)
+    local nonfreehwaccel=(${HWACCEL_LIBRARY_NONFREE_LIST//_/-})
     if [[ $license = "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
@@ -747,7 +747,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=($EXTERNAL_LIBRARY_NONFREE_LIST)
+    local nonfreegpl=(${EXTERNAL_LIBRARY_NONFREE_LIST//_/-})
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
