@@ -993,14 +993,15 @@ do_cmake() {
     local PKG_CONFIG=pkg-config
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
-    log "cmake" cmake "$root" -G "MSYS Makefiles" -DBUILD_SHARED_LIBS=off \
+    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
         -DCMAKE_BUILD_TYPE=Release "$@"
 }
 
 do_cmakeinstall() {
     do_cmake "$@"
-    log "install" make install
+    log build ninja
+    cpuCount=1 log install ninja install
 }
 
 compilation_fail() {

@@ -1251,7 +1251,7 @@ EOF
     fi
     }
     build_x265
-    log "install" ninja -j "${cpuCount:=1}" install
+    log "install" ninja -j1 install
     if [[ $standalone = y && $x265 = d ]]; then
         cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
         do_uninstall bin-video/x265-numa.exe
