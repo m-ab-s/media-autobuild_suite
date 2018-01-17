@@ -178,13 +178,10 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     if do_vcs "https://github.com/fribidi/fribidi.git"; then
         extracommands=(--disable-{deprecated,debug} --without-glib)
 
-        # fix out-of-root build
-        sed -ri 's;([^/])(unidata/);\1$(srcdir)/\2;g' gen.tab/Makefile.am
-
         # don't compile docs and tests, or bin if standalone=n
         _sed="doc test"
         [[ $standalone = n ]] && _sed="bin ${_sed}"
-        sed -i "s|${_sed}||" Makefile.am
+        sed -i "s| ${_sed} | |" Makefile.am
 
         # .def is broken, just export all fribidi_ symbols
         sed -i 's/OS_WIN32/FALSE/g' lib/Makefile.am
@@ -196,7 +193,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_separate_confmakeinstall global "${extracommands[@]}"
+        do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR/bin-global" \
+            --enable-static "${extracommands[@]}"
+        do_make && do_makeinstall
         [[ $ffmpeg = "sharedlibs" ]] &&
             do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
         do_checkIfExist
