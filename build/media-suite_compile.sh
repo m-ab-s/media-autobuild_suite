@@ -802,23 +802,14 @@ _check=(libaom.a aom.pc)
 if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
     extracommands=()
     [[ $standalone = y ]] && _check+=(bin-video/aomdec.exe) ||
-        extracommands+=(--disable-examples)
+        extracommands+=(-DENABLE_EXAMPLES=off)
     do_uninstall include/aom "${_check[@]}"
-    create_build_dir
-    [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
-    log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" \
-        --prefix="$LOCALDESTDIR" \
-        --disable-{docs,install-bins} \
-        --enable-runtime-cpu-detect \
-        "${extracommands[@]}"
-    for _ff in *.mk; do
-        sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
-    done
-    do_make
-    do_makeinstall
-    [[ $standalone = y ]] && do_install aom{enc,dec}.exe bin-video/
+    do_cmakeinstall -DENABLE_{DOCS,TOOLS}=off -DENABLE_NASM=on \
+        -DCONFIG_UNIT_TESTS=0 "${extracommands[@]}"
+    [[ $standalone = y ]] && mv -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe \
+        "$LOCALDESTDIR"/bin-video/
     do_checkIfExist
-    unset extracommands _ff
+    unset extracommands
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
