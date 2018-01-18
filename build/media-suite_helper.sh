@@ -144,6 +144,16 @@ vcs_log() {
     fi
 }
 
+vcs_getlatesttag() {
+    local ref="$1"
+    if [[ -n "$vcsType" && "$vcsType" != git ]] || [[ "$ref" != "LATEST" ]]; then
+        echo "$ref"
+        return
+    fi
+    local tag="$(git describe --abbrev=0 --tags)"
+    echo "${tag:-${ref}}"
+}
+
 # get source from VCS
 # example:
 #   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
@@ -203,6 +213,7 @@ do_vcs() {
         return 1
     fi
 
+    ref="$(vcs_getlatesttag "$ref")"
     log quiet "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"

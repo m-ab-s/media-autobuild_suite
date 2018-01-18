@@ -133,7 +133,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _check=(libfreetype.{l,}a freetype2.pc)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
-    if do_vcs "https://git.savannah.gnu.org/git/freetype/freetype2.git"; then
+    if do_vcs "https://git.savannah.gnu.org/git/freetype/freetype2.git#tag=LATEST"; then
         do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
@@ -162,7 +162,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
 
     _deps=(libfreetype.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
-    if [[ $ffmpeg != "sharedlibs" ]] && do_vcs "https://github.com/behdad/harfbuzz.git"; then
+    if [[ $ffmpeg != "sharedlibs" ]] && do_vcs "https://github.com/behdad/harfbuzz.git#tag=LATEST"; then
         do_pacman_install ragel
         NOCONFIGURE=y do_autogen
         do_uninstall include/harfbuzz "${_check[@]}"
@@ -229,19 +229,15 @@ fi
 [[ $ffmpeg != "no" ]] && enabled gcrypt && do_pacman_install libgcrypt
 
 if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
-    [[ -z "$gnutls_ver" ]] &&
-        gnutls_ver="$("${curl_opts[@]}" -l "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/")" &&
-        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.6\.\d+(\.\d+)?')"
-    gnutls_ver="${gnutls_ver:-3.6.1}"
     _check=(libgnutls.{,l}a gnutls.pc)
-    if do_pkgConfig "gnutls = $gnutls_ver" &&
-        do_wget "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-${gnutls_ver}.tar.xz"; then
+    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=LATEST"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
             sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
+        do_autoreconf
         do_separate_confmakeinstall \
-            --disable-{cxx,doc,tools,tests,rpath,libdane,guile} \
+            --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
             --with-included-unistring \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
@@ -257,24 +253,17 @@ if [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; then
     do_uninstall etc/ssl include/openssl bin-global/openssl.exe "${_libressl_check[@]}"
     do_pacman_install openssl
 elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
-    [[ ! "$libressl_ver" ]] &&
-        libressl_ver="$(clean_html_index "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/")" &&
-        libressl_ver="$(get_last_version "$libressl_ver" "" '2\.\d+\.\d+')"
-    libressl_ver="${libressl_ver:-2.6.4}"
     _check=("${_libressl_check[@]}")
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
-    sha256sum="$(curl -s http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256 | \
-        grep "libressl-${libressl_ver}.tar.gz" | awk '{print $4}')"
-    if do_pkgConfig "libssl = $libressl_ver" &&
-        do_wget -h "$sha256sum" \
-            "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"; then
+    if do_vcs "https://github.com/libressl-portable/portable.git#tag=LATEST" libressl; then
         do_uninstall etc/ssl include/openssl "${_check[@]}"
         _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
-        sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.in
+        sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.am
+        do_autogen
         do_separate_confmakeinstall global
         do_checkIfExist
-        unset _sed sha256sum
+        unset _sed
     fi
 fi
 unset _libressl_check
