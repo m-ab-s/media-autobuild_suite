@@ -1609,7 +1609,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
             do_cmake -DBUILD_{ICD,DEMOS,TESTS,LAYERS,VKJSON}=no -DCMAKE_SYSTEM_NAME=Windows \
             -DCMAKE_ASM-ATT_COMPILER=$(which nasm.exe)
-        do_make
+        log make ninja
         cmake -E copy_directory ../include/vulkan "$LOCALDESTDIR/include/vulkan"
         do_install loader/libvulkan.a lib/
         do_install loader/vulkan.pc lib/pkgconfig/
