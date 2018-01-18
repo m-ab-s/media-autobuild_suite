@@ -121,9 +121,9 @@ set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
 
 if [[ $packing = y ]] &&
-    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.94" ]]; then
+    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.94" ]] &&
     do_wget -h 74308db1183436576d011bfcc3e7c99c836fb052de7b7eb0539026366453d6e8 \
-        "https://github.com/upx/upx/releases/download/v3.94/upx394w.zip"
+        "https://github.com/upx/upx/releases/download/v3.94/upx394w.zip"; then
     do_install upx.exe /opt/bin/upx.exe
 fi
 
@@ -234,9 +234,9 @@ if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
         gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.6\.\d+(\.\d+)?')"
     gnutls_ver="${gnutls_ver:-3.6.1}"
     _check=(libgnutls.{,l}a gnutls.pc)
-    if do_pkgConfig "gnutls = $gnutls_ver"; then
+    if do_pkgConfig "gnutls = $gnutls_ver" &&
+        do_wget "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-${gnutls_ver}.tar.xz"; then
         do_pacman_install nettle
-        do_wget "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-${gnutls_ver}.tar.xz"
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
             sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
@@ -263,11 +263,11 @@ elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
     libressl_ver="${libressl_ver:-2.6.4}"
     _check=("${_libressl_check[@]}")
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
-    if do_pkgConfig "libssl = $libressl_ver"; then
-        sha256sum="$(curl -s http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256 | \
-            grep "libressl-${libressl_ver}.tar.gz" | awk '{print $4}')"
+    sha256sum="$(curl -s http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/SHA256 | \
+        grep "libressl-${libressl_ver}.tar.gz" | awk '{print $4}')"
+    if do_pkgConfig "libssl = $libressl_ver" &&
         do_wget -h "$sha256sum" \
-            "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"
+            "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${libressl_ver}.tar.gz"; then
         do_uninstall etc/ssl include/openssl "${_check[@]}"
         _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
@@ -290,9 +290,9 @@ enabled openssl && _deps+=("$MINGW_PREFIX/lib/libssl.a")
 enabled gnutls && _deps+=(libgnutls.a)
 [[ $standalone = y || $curl = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
-    do_pkgConfig "libcurl = $curl_ver"; then
+    do_pkgConfig "libcurl = $curl_ver" &&
+    do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"; then
     do_pacman_install nghttp2
-    do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y || $curl = y ]] ||
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
@@ -371,9 +371,9 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
     _check=(liblept.{,l}a lept.pc)
-    if do_pkgConfig "lept = 1.74.4"; then
+    if do_pkgConfig "lept = 1.74.4" &&
         do_wget -h 29c35426a416bf454413c6fec24c24a0b633e26144a17e98351b6dffaa4a833b \
-            "http://www.leptonica.com/source/leptonica-1.74.4.tar.gz"
+            "http://www.leptonica.com/source/leptonica-1.74.4.tar.gz"; then
         do_uninstall include/leptonica "${_check[@]}"
         do_separate_confmakeinstall --disable-programs --without-{lib{openjpeg,webp},giflib}
         do_checkIfExist
@@ -483,9 +483,9 @@ fi
 
 _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
 if [[ $ffmpeg != "no" ]] && enabled libvo-amrwbenc &&
-    do_pkgConfig "vo-amrwbenc = 0.1.3"; then
+    do_pkgConfig "vo-amrwbenc = 0.1.3" &&
     do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
-        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"
+        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"; then
     do_uninstall include/vo-amrwbenc "${_check[@]}"
     do_separate_confmakeinstall
     do_checkIfExist
@@ -515,9 +515,9 @@ fi
 
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac.exe)
-if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}"; then
+if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
-        "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"
+        "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"; then
     ./bootstrap 2>/dev/null
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
@@ -595,11 +595,10 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
     if files_exist "${_check[@]}" &&
         grep -q "3.100" "$LOCALDESTDIR/bin-audio/lame.exe"; then
         do_print_status "lame 3.100" "$green" "Up-to-date"
-    else
-        _mingw_patches="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master"
-        do_wget_sf \
+    elif do_wget_sf \
             -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
-            "lame/lame/3.100/lame-3.100.tar.gz"
+            "lame/lame/3.100/lame-3.100.tar.gz"; then
+        _mingw_patches="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master"
         do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
         do_patch "$_mingw_patches/mingw-w64-lame/0002-07-field-width-fix.all.patch"
         do_patch "$_mingw_patches/mingw-w64-lame/0005-no-gtk.all.patch"
@@ -615,9 +614,9 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
 fi
 
 _check=(libgme.{a,pc})
-if [[ $ffmpeg != "no" ]] && enabled libgme && do_pkgConfig "libgme = 0.6.2"; then
+if [[ $ffmpeg != "no" ]] && enabled libgme && do_pkgConfig "libgme = 0.6.2" &&
     do_wget -h 5046cb471d422dbe948b5f5dd4e5552aaef52a0899c4b2688e5a68a556af7342 \
-        "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.2.tar.xz"
+        "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.2.tar.xz"; then
     do_uninstall include/gme "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' gme/blargg_source.h
     do_cmakeinstall
@@ -625,8 +624,8 @@ if [[ $ffmpeg != "no" ]] && enabled libgme && do_pkgConfig "libgme = 0.6.2"; the
 fi
 
 _check=(libbs2b.{{l,}a,pc})
-if [[ $ffmpeg != "no" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0"; then
-    do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"
+if [[ $ffmpeg != "no" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
+    do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"; then
     do_uninstall include/bs2b "${_check[@]}"
     # sndfile check is disabled since we don't compile binaries anyway
     /usr/bin/grep -q sndfile configure && sed -i '20119,20133d' configure
@@ -646,8 +645,8 @@ fi
 
 _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a "$MINGW_PREFIX"/lib/lib{opus,mp3lame}.a)
-if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2"; then
-    do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"
+if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
+    do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"; then
     do_pacman_install libmad
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
     extracommands=()
@@ -827,9 +826,9 @@ fi
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
     mpv_enabled sdl2 || [[ $daala = y ]]; } &&
-    do_pkgConfig "sdl2 = 2.0.7"; then
+    do_pkgConfig "sdl2 = 2.0.7" &&
     do_wget -h ee35c74c4313e2eda104b14b1b86f7db84a04eeab9430d56e001cea268bf4d5e \
-        "http://libsdl.org/release/SDL2-2.0.7.tar.gz"
+        "http://libsdl.org/release/SDL2-2.0.7.tar.gz"; then
     do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
     do_separate_confmakeinstall
@@ -917,10 +916,10 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     log javahome get_java_home
     OLD_PATH="$PATH"
     if [[ -n "$JAVA_HOME" ]]; then
-        if [[ ! -f /opt/apache-ant/bin/ant ]]; then
+        if [[ ! -f /opt/apache-ant/bin/ant ]] &&
             do_wget -r -c -h 0a4530999b71f92bf17ae823ed3b0b2d \
                 "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip" \
-                apache-ant.zip
+                apache-ant.zip; then
             mv apache-ant/apache-ant* /opt/apache-ant
         fi
         PATH="/opt/apache-ant/bin:$JAVA_HOME/bin:$PATH"
@@ -999,9 +998,9 @@ fi
 
 _check=(libzvbi.{h,{l,}a})
 if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
-    do_pkgConfig "zvbi-0.2 = 0.2.35"; then
+    do_pkgConfig "zvbi-0.2 = 0.2.35" &&
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
-        "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"
+        "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"; then
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     _vlc_zvbi_patches="https://raw.githubusercontent.com/videolan/vlc/master/contrib/src/zvbi"
     do_patch "$_vlc_zvbi_patches/zvbi-win32.patch"
@@ -1269,10 +1268,10 @@ pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
 _check=(xvid.h libxvidcore.a bin-video/xvid{_encraw.exe,core.dll})
 if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
-    grep -q '1.3.5' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; }; then
-    do_pacman_remove xvidcore
+    grep -q '1.3.5' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; } &&
     do_wget -h 165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894cf0 \
-        "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz" xvidcore.tar.gz
+        "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz" "xvidcore.tar.gz"; then
+    do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
     cd_safe build/generic
     do_configure --prefix="$LOCALDESTDIR" --{build,host}="$MINGW_CHOST"
@@ -1512,8 +1511,8 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
                 lib{GLESv2,EGL}.a "${_check[@]}"
             do_install lib{GLESv2,EGL}.dll bin-video/
             cp -rf include/* "$LOCALDESTDIR/include/"
-            if ! [[ -f "$LOCALDESTDIR/bin-video/d3dcompiler_47.dll" ]]; then
-                do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"
+            if ! [[ -f "$LOCALDESTDIR/bin-video/d3dcompiler_47.dll" ]] &&
+                do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"; then
                 do_install d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll bin-video/
             fi
             stripping=n do_checkIfExist
@@ -1754,9 +1753,9 @@ if [[ $cyanrip != no ]]; then
     do_pacman_install libcdio-paranoia
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
-    if do_pkgConfig "neon = 0.30.2"; then
+    if do_pkgConfig "neon = 0.30.2" &&
         do_wget -h db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca \
-            "http://download.openpkg.org/components/cache/neon/neon-0.30.2.tar.gz"
+            "http://download.openpkg.org/components/cache/neon/neon-0.30.2.tar.gz"; then
         do_uninstall include/neon "${_check[@]}"
         extracommands=()
         do_separate_confmakeinstall --disable-{nls,debug,webdav} "${extracommands[@]}"
