@@ -766,12 +766,15 @@ if %curlINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build static curl?
-    echo. 1 = Yes
+    echo. 1 = Yes ^(same backend as FFmpeg's^)
     echo. 2 = No
+    echo. 3 = SChannel backend
+    echo. 4 = GnuTLS backend
+    echo. 5 = OpenSSL backend
+    echo. 6 = LibreSSL backend
     echo.
-    echo. Use ffmpeg_options.txt to select whether you want SChannel, GnuTLS, or
-    echo. LibreSSL backends. A curl-ca-bundle.crt will be created to be used as trusted
-    echo. certificate store.
+    echo. A curl-ca-bundle.crt will be created to be used as trusted certificate store
+    echo. for all backends except SChannel.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -781,7 +784,11 @@ if %deleteINI%==1 set "writeCurl=yes"
 
 if %buildcurl%==1 set "curl=y"
 if %buildcurl%==2 set "curl=n"
-if %buildcurl% GTR 2 GOTO curl
+if %buildcurl%==3 set "curl=schannel"
+if %buildcurl%==4 set "curl=gnutls"
+if %buildcurl%==5 set "curl=openssl"
+if %buildcurl%==6 set "curl=libressl"
+if %buildcurl% GTR 6 GOTO curl
 if %writeCurl%==yes echo.curl=^%buildcurl%>>%ini%
 
 :ffmbc

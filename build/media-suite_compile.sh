@@ -228,7 +228,13 @@ fi
 
 [[ $ffmpeg != "no" ]] && enabled gcrypt && do_pacman_install libgcrypt
 
-if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
+if [[ $curl = y ]]; then
+    enabled libtls && curl=libressl
+    enabled openssl && curl=openssl
+    enabled gnutls && curl=gnutls
+    [[ $curl = y ]] && curl=schannel
+fi
+if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gnutls ]]; then
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=LATEST"; then
         do_pacman_install nettle
@@ -247,13 +253,12 @@ if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]]; then
         sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
-hide_libressl -R
-_libressl_check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
-if [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; then
-    do_uninstall etc/ssl include/openssl bin-global/openssl.exe "${_libressl_check[@]}"
+if { [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; } || [[ $curl = openssl ]]; then
     do_pacman_install openssl
-elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
-    _check=("${_libressl_check[@]}")
+fi
+hide_libressl -R
+if { [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; } || [[ $curl = libressl ]]; then
+    _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_vcs "https://github.com/libressl-portable/portable.git#tag=LATEST" libressl; then
         do_uninstall etc/ssl include/openssl "${_check[@]}"
@@ -266,24 +271,23 @@ elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
         unset _sed
     fi
 fi
-unset _libressl_check
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
-enabled libtls && _deps+=(libssl.a)
-enabled openssl && _deps+=("$MINGW_PREFIX/lib/libssl.a")
-enabled gnutls && _deps+=(libgnutls.a)
-[[ $standalone = y || $curl = y ]] && _check+=(bin-global/curl.exe)
-if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
+[[ $curl = libressl ]] && _deps+=(libssl.a)
+[[ $curl = openssl ]] && _deps+=("$MINGW_PREFIX/lib/libssl.a")
+[[ $curl = gnutls ]] && _deps+=(libgnutls.a)
+[[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
+if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
     do_pacman_install nghttp2
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
-    [[ $standalone = y || $curl = y ]] ||
+    [[ $standalone = y || $curl != n ]] ||
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
-    if enabled_any libtls openssl; then
+    if [[ $curl =~ (libre|open)ssl ]]; then
         extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
-    elif enabled gnutls; then
+    elif [[ $curl = gnutls ]]; then
         extra_opts+=(--with-gnutls --without-{ssl,nghttp2})
     else
         extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls})
@@ -291,16 +295,18 @@ if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
     /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
         { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
           sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
+    [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
         --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn2} \
         --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
+    [[ $curl = openssl ]] && hide_libressl -R
     _notrequired=yes
     PATH=/usr/bin log ca-bundle make ca-bundle
     unset _notrequired
-    enabled_any libtls openssl gnutls && [[ -f lib/ca-bundle.crt ]] &&
+    [[ $curl != schannel ]] && [[ -f lib/ca-bundle.crt ]] &&
         cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
     do_checkIfExist
 fi
@@ -1282,6 +1288,7 @@ else
     do_removeOption --enable-libvmaf
 fi
 
+enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
@@ -1731,6 +1738,7 @@ if [[ $bmx = "y" ]]; then
         do_checkIfExist
     fi
 fi
+enabled openssl && hide_libressl -R
 
 if [[ $cyanrip != no ]]; then
     do_pacman_install libxml2
