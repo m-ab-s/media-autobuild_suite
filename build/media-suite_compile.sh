@@ -268,10 +268,6 @@ elif [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; then
 fi
 unset _libressl_check
 
-[[ ! "$curl_ver" ]] &&
-    curl_ver="$(clean_html_index https://curl.haxx.se/download/)" &&
-    curl_ver="$(get_last_version "$curl_ver" bz2 "7\.\d+\.\d")"
-curl_ver="${curl_ver:-7.54.0}"
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 enabled libtls && _deps+=(libssl.a)
@@ -279,8 +275,7 @@ enabled openssl && _deps+=("$MINGW_PREFIX/lib/libssl.a")
 enabled gnutls && _deps+=(libgnutls.a)
 [[ $standalone = y || $curl = y ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl = y ]] &&
-    do_pkgConfig "libcurl = $curl_ver" &&
-    do_wget "https://curl.haxx.se/download/curl-${curl_ver}.tar.bz2"; then
+    do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
     do_pacman_install nghttp2
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y || $curl = y ]] ||
