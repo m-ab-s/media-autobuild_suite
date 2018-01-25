@@ -88,9 +88,9 @@ check_valid_vcs() {
 
 vcs_clone() {
     if [[ "$vcsType" = "svn" ]]; then
-        svn checkout -q -r "$ref" "$vcsURL" "$vcsFolder"-svn
+        svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
-        "$vcsType" clone -q "$vcsURL" "$vcsFolder-$vcsType"
+        "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
     fi
     check_valid_vcs "$vcsFolder-$vcsType"
 }
