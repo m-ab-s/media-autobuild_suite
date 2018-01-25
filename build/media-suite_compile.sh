@@ -664,14 +664,10 @@ fi
 unset _deps
 
 _check=(libopenmpt.{a,pc})
-[[ ! $openmpt_rev ]] &&
-    openmpt_rev="$(clean_html_index "https://lib.openmpt.org/files/libopenmpt/src/")" &&
-    openmpt_rev="$(get_last_version "$openmpt_rev" libopenmpt "(?<=0\.2\.)(\d+)")"
-openmpt_rev="${openmpt_rev:-8043}"
-openmpt_url="svn::https://source.openmpt.org/svn/openmpt/trunk/OpenMPT/"
 if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
-    do_vcs "${openmpt_url}#revision=$openmpt_rev" openmpt; then
+    do_vcs "https://github.com/OpenMPT/openmpt.git#tag=LATEST"; then
     do_uninstall include/libopenmpt "${_check[@]}"
+    [[ -d bin ]] || mkdir bin
     extracommands=(CONFIG="mingw64-win${bits%bit}" AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0
         TEST=0 OS=)
     log clean make clean "${extracommands[@]}"
