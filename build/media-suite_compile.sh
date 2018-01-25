@@ -304,11 +304,13 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
         --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     [[ $curl = openssl ]] && hide_libressl -R
-    _notrequired=yes
-    PATH=/usr/bin log ca-bundle make ca-bundle
-    unset _notrequired
-    [[ $curl != schannel ]] && [[ -f lib/ca-bundle.crt ]] &&
-        cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
+    if [[ $curl != schannel ]]; then
+        _notrequired=yes
+        PATH=/usr/bin log ca-bundle make ca-bundle
+        unset _notrequired
+        [[ -f lib/ca-bundle.crt ]] &&
+            cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
+    fi
     do_checkIfExist
 fi
 unset _deps
