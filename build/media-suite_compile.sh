@@ -364,10 +364,9 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
     _check=(liblept.{,l}a lept.pc)
-    if do_pkgConfig "lept = 1.74.4" &&
-        do_wget -h 29c35426a416bf454413c6fec24c24a0b633e26144a17e98351b6dffaa4a833b \
-            "http://www.leptonica.com/source/leptonica-1.74.4.tar.gz"; then
+    if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
         do_uninstall include/leptonica "${_check[@]}"
+        [[ -f configure ]] || log autogen ./autobuild
         do_separate_confmakeinstall --disable-programs --without-{lib{openjpeg,webp},giflib}
         do_checkIfExist
     fi
