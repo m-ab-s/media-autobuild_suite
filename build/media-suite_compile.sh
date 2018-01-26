@@ -869,6 +869,7 @@ fi
 unset _deps
 
 if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
+    do_pacman_install libgcrypt
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "git://git.videolan.org/libaacs.git"; then
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
