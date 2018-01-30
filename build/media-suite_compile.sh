@@ -667,7 +667,7 @@ unset _deps
 
 _check=(libopenmpt.{a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
-    do_vcs "https://github.com/OpenMPT/openmpt.git#tag=LATEST"; then
+    do_vcs "https://github.com/OpenMPT/openmpt.git#tag=libopenmpt-*"; then
     do_uninstall include/libopenmpt "${_check[@]}"
     [[ -d bin ]] || mkdir bin
     extracommands=(CONFIG="mingw64-win${bits%bit}" AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0

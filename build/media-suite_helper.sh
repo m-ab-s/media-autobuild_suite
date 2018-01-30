@@ -146,15 +146,17 @@ vcs_log() {
 
 vcs_getlatesttag() {
     local ref="$1"
-    if [[ -n "$vcsType" && "$vcsType" != git ]] || ! [[ "$ref" =~ (LA|GREA)TEST ]]; then
+    if [[ -n "$vcsType" && "$vcsType" != git ]]; then
         echo "$ref"
         return
     fi
     local tag
     if [[ "$ref" = "LATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1))"
-    else
+    elif [[ "$ref" = "GREATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags)"
+    elif [[ "${ref//\*}" != "$ref" ]]; then
+        tag="$(git describe --abbrev=0 --tags $(git tag -l "$ref" | sort -Vr | head -1))"
     fi
     echo "${tag:-${ref}}"
 }
