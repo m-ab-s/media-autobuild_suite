@@ -1174,9 +1174,6 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
-    implicitlibs="$(printf '"%s" ' -lmingwex -lmingwthrd -lmingw32 -lmoldname -lmsvcrt -ladvapi32 -lshell32 -luser32 -lkernel32)"
-    sed -ri "s|(\"-lc\").*(\"-lpthread\")|\1 ${implicitlibs} \2|" source/CMakeLists.txt
-
     build_x265() {
         create_build_dir
         local build_root
