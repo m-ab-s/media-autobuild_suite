@@ -812,7 +812,7 @@ fi
 
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
-    mpv_enabled sdl2 } &&
+    mpv_enabled sdl2; } &&
     do_pkgConfig "sdl2 = 2.0.7" &&
     do_wget -h ee35c74c4313e2eda104b14b1b86f7db84a04eeab9430d56e001cea268bf4d5e \
         "http://libsdl.org/release/SDL2-2.0.7.tar.gz"; then
