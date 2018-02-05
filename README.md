@@ -112,7 +112,6 @@ Included Tools And Libraries
     - bmx (git)
     - curl (latest release) with WinSSL/LibreSSL/OpenSSL/GnuTLS backend
     - cyanrip (git)
-    - daala (git)
     - faac (1.28)
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
