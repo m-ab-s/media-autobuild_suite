@@ -175,7 +175,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _check=(libfribidi.{l,}a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
-    if do_vcs "https://github.com/fribidi/fribidi.git"; then
+    if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
         extracommands=(--disable-{deprecated,debug} --without-glib)
 
         # don't compile docs and tests, or bin if standalone=n
@@ -193,11 +193,10 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
             bin-global/fribidi.exe "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR/bin-global" \
-            --enable-static "${extracommands[@]}"
+        do_separate_confmakeinstall global "${extracommands[@]}"
         do_make && do_makeinstall
         [[ $ffmpeg = "sharedlibs" ]] &&
-            do_install "$LOCALDESTDIR"/bin/libfribidi-0.dll bin-video/
+            cp -f "$LOCALDESTDIR"/bin/libfribidi-0.dll "$LOCALDESTDIR"/bin-video/
         do_checkIfExist
         unset _sed
     fi
