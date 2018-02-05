@@ -618,16 +618,15 @@ do_pkgConfig() {
 
 do_readoptionsfile() {
     local filename="$1"
-    local varname="$2"
     if [[ -f "$filename" ]]; then
-        printf '%s\n' "$(< $filename dos2unix |
+        < $filename dos2unix |
             sed -r '# remove commented text
                     s/#.*//
                     # delete empty lines
                     /^\s*$/d
                     # remove leading/trailing whitespace
                     s/(^\s+|\s+$)//
-                    ')"
+                    '
         echo "Imported options from ${filename##*/}" >&2
     fi
 }
@@ -653,8 +652,8 @@ do_getFFmpegConfig() {
             FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_full"))
         echo "Imported default FFmpeg options from .bat"
     else
-        IFS=$'\n' FFMPEG_DEFAULT_OPTS=(
-            $(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options.txt"))
+        IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < \
+            <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options.txt")
     fi
     echo "License: $license"
     FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
@@ -849,7 +848,8 @@ do_getMpvConfig() {
             MPV_OPTS+=($(do_readbatoptions "mpv_options_full"))
         echo "Imported default mpv options from .bat"
     else
-        IFS=$'\n' MPV_OPTS=($(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt"))
+        IFS=$'\n' read -d '' -r -a MPV_OPTS < \
+            <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
     do_removeOption MPV_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib)"
