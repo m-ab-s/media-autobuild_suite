@@ -620,18 +620,15 @@ do_readoptionsfile() {
     local filename="$1"
     local varname="$2"
     if [[ -f "$filename" ]]; then
-        IFS=$'\n' read -d '' -r -a "$varname" < <(< $filename dos2unix |
+        printf '%s\n' "$(< $filename dos2unix |
             sed -r '# remove commented text
                     s/#.*//
                     # delete empty lines
                     /^\s*$/d
                     # remove leading/trailing whitespace
                     s/(^\s+|\s+$)//
-                    ')
-        echo "Imported options from ${filename##*/}"
-    else
-        echo "Options file not found, using default options"
-        declare -ag "$varname"
+                    ')"
+        echo "Imported options from ${filename##*/}" >&2
     fi
 }
 
@@ -646,6 +643,7 @@ do_readbatoptions() {
 do_getFFmpegConfig() {
     local license="${1:-nonfree}"
 
+    FFMPEG_DEFAULT_OPTS=()
     if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
         IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         FFMPEG_DEFAULT_OPTS=($(do_readbatoptions "ffmpeg_options_(builtin|basic)"))
@@ -655,7 +653,8 @@ do_getFFmpegConfig() {
             FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_full"))
         echo "Imported default FFmpeg options from .bat"
     else
-        do_readoptionsfile "${CONFIGFILE:-$LOCALBUILDDIR/ffmpeg_options.txt}" FFMPEG_DEFAULT_OPTS
+        IFS=$'\n' FFMPEG_DEFAULT_OPTS=(
+            $(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options.txt"))
     fi
     echo "License: $license"
     FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
@@ -842,6 +841,7 @@ disabled_all() {
 }
 
 do_getMpvConfig() {
+    MPV_OPTS=()
     if [[ -f "/trunk/media-autobuild_suite.bat" && "$ffmpegChoice" =~ (n|z|f) ]]; then
         IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
         MPV_OPTS=($(do_readbatoptions "mpv_options_(builtin|basic)"))
@@ -849,7 +849,7 @@ do_getMpvConfig() {
             MPV_OPTS+=($(do_readbatoptions "mpv_options_full"))
         echo "Imported default mpv options from .bat"
     else
-        do_readoptionsfile "${CONFIGFILE:-$LOCALBUILDDIR/mpv_options.txt}" MPV_OPTS
+        IFS=$'\n' MPV_OPTS=($(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt"))
     fi
     do_removeOption MPV_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib)"
@@ -1107,6 +1107,11 @@ create_build_dir() {
     else
         mkdir "$build_dir" && cd_safe "$build_dir"
     fi
+}
+
+get_external_opts() {
+    local pkgname="$(get_first_subdir)"
+    do_readoptionsfile "$LOCALBUILDDIR/${pkgname%-*}_options.txt"
 }
 
 do_separate_conf() {
