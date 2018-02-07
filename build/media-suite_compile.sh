@@ -304,12 +304,12 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     [[ $curl = openssl ]] && hide_libressl -R
     if [[ $curl != schannel ]]; then
         _notrequired=yes
-        pushd "build-$bits" 2>/dev/null
+        pushd "build-$bits" >/dev/null
         PATH=/usr/bin log ca-bundle make ca-bundle
         unset _notrequired
         [[ -f lib/ca-bundle.crt ]] &&
             cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
-        popd 2>/dev/null
+        popd >/dev/null
     fi
     do_checkIfExist
 fi
