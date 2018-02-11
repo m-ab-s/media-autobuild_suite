@@ -102,8 +102,8 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             case $yn in
                 [Yy]* )
                     for pkg in $uninstall; do
-                        pacman -Rs --noconfirm "$pkg" 2>/dev/null
-                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --asdeps "$pkg" >/dev/null
+                        pacman -Rs --noconfirm --ask 20 "$pkg" 2>/dev/null
+                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --ask 20 --asdeps "$pkg" >/dev/null
                     done
                     break;;
                 [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
@@ -124,8 +124,8 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
             read -r -p "install packs [y/n]? " yn
             case $yn in
                 [Yy]* )
-                    echo $install | xargs $nargs pacman -Sw --noconfirm --needed
-                    echo $install | xargs $nargs pacman -S --noconfirm --needed
+                    echo $install | xargs $nargs pacman -Sw --noconfirm --ask 20 --needed
+                    echo $install | xargs $nargs pacman -S --noconfirm --ask 20 --needed
                     pacman -D --asexplicit $install
                     break;;
                 [Nn]* ) exit;;
@@ -154,11 +154,11 @@ if [[ -n "$have_updates" ]]; then
     echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
         touch build/update_core &&
         have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
-    echo $have_updates | xargs $nargs pacman -S --noconfirm --force
+    echo $have_updates | xargs $nargs pacman -S --noconfirm --ask 20 --force
     sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
 fi
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
-    pacman --noconfirm -S --asdeps ca-certificates
+    pacman -S --noconfirm --ask 20 --asdeps ca-certificates
 
 do_hide_all_sharedlibs
 
