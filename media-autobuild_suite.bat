@@ -99,7 +99,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom daala faac ffmbc curl cyanrip
+aom faac ffmbc curl cyanrip
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -284,29 +284,6 @@ if %buildaom%==1 set "aom=y"
 if %buildaom%==2 set "aom=n"
 if %buildaom% GTR 2 GOTO aom
 if %writeaom%==yes echo.aom=^%buildaom%>>%ini%
-
-:daala
-set "writedaala=no"
-if %daalaINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build daala [Daala codec]?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo. Binaries being built depends on "standalone=y"
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P builddaala="Build daala: "
-    ) else set builddaala=%daalaINI%
-if %deleteINI%==1 set "writedaala=yes"
-
-if %builddaala%==1 set "daala=y"
-if %builddaala%==2 set "daala=n"
-if %builddaala% GTR 2 GOTO daala
-if %writedaala%==yes echo.daala=^%builddaala%>>%ini%
 
 :x264
 set "writex264=no"
@@ -1447,7 +1424,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---daala=%daala% --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip%'
+--faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip%'
 
 endlocal
 goto :EOF
