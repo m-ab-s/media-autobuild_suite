@@ -886,9 +886,11 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     OLD_PATH="$PATH"
     if [[ -n "$JAVA_HOME" ]]; then
         if [[ ! -f /opt/apache-ant/bin/ant ]] &&
-            do_wget -r -c -h 0a4530999b71f92bf17ae823ed3b0b2d \
-                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.1-bin.zip" \
+            do_wget -r -c \
+                -h a8e6320476b721215988819bc554d61f5ec8a80338485b78afbe51df0dfcbc4d \
+                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.2-bin.zip" \
                 apache-ant.zip; then
+            rm -rf /opt/apache-ant
             mv apache-ant/apache-ant* /opt/apache-ant
         fi
         PATH="/opt/apache-ant/bin:$JAVA_HOME/bin:$PATH"
