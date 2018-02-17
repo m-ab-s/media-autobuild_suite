@@ -1030,7 +1030,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     )
 
 :getMintty
-set "mintty=start /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
+set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
     echo.-------------------------------------------------------------------------------
@@ -1416,7 +1416,7 @@ if [%build64%]==[yes] (
     ) else set MSYSTEM=MINGW32
 
 if not exist %build%\last_run if exist %build%\compile.log del %build%\compile.log
-start %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
 %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\compile.log -c '^
 MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 /build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
