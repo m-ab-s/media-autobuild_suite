@@ -104,8 +104,8 @@ Included Tools And Libraries
         - libzvbi (0.2.35)
         - opencl (from system)
         - opengl (from system)
-        - scale_cuda (needs CUDA SDK and MSVC 2015 installed and cl.exe in PATH, and maybe a prayer to Cthulhu)
-            - if it doesn't work, blame Nvidia, don't bother opening issues about this
+        - scale_cuda (needs CUDA SDK and MSVC **2015** installed)
+            - if it doesn't work, blame Nvidia/Microsoft, don't bother opening issues about this
             - needs non-free license and --enable-cuda-sdk
 
  - other tools
