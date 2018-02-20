@@ -748,13 +748,20 @@ do_changeFFmpegConfig() {
     # cuda-only workarounds
     if [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk &&
         [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]] &&
-        [[ -f "$CUDA_PATH/lib/x64/cuda.lib" ]]; then
+        [[ -f "$CUDA_PATH/lib/x64/cuda.lib" ]] && get_cl_path; then
             if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
                 do_removeOption "--enable-libnpp"
             elif enabled libnpp; then
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            local wrong_fucking_version="$(grep -n "_MSC_VER > 19[0-8]." "$CUDA_PATH/include/crt/host_config.h")"
+            if [[ -n "$wrong_fucking_version" ]]; then
+                echo -e "${orange}Go remove this check if you don't want a fucking broken build"
+                echo -E "in $(cygpath -w "$CUDA_PATH/include/crt/host_config.h"):"
+                echo -e "Line $wrong_fucking_version"
+                do_prompt "Remove everything after and including the '||' in that line and press Enter to continue."
+            fi
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
@@ -1345,6 +1352,26 @@ get_vs_prefix() {
         vsprefix="${vsprefix%/*}"
         [[ -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]] &&
             echo "$vsprefix"
+    fi
+}
+
+get_cl_path() {
+    local clpath
+    local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
+    [[ ! -f "$vswhere" ]] && return 1
+    local installationpath="$(cygpath -u "$("$vswhere" -version 15 -products "*" \
+        -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)")"
+    [[ ! -f "$installationpath"/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt ]] &&
+        return 1
+    local vcversion="$(cat "$installationpath"/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt)"
+    [[ -z $vcversion ]] && return 1
+    local basepath="$installationpath/VC/Tools/MSVC/$vcversion/bin"
+    if [[ "$bits" = 32bit && -f "$basepath/HostX86/x86/cl.exe" ]]; then
+        export PATH="$basepath/HostX86/x86/":$PATH
+    elif [[ "$bits" = 64bit && -f "$basepath/HostX64/x64/cl.exe" ]]; then
+        export PATH="$basepath/HostX64/x64":$PATH
+    else
+        return 1
     fi
 }
 
