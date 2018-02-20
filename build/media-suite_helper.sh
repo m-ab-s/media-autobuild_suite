@@ -755,13 +755,6 @@ do_changeFFmpegConfig() {
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            local wrong_fucking_version="$(grep -n "_MSC_VER > 19[0-8]." "$CUDA_PATH/include/crt/host_config.h")"
-            if [[ -n "$wrong_fucking_version" ]]; then
-                echo -e "${orange}Go remove this check if you don't want a fucking broken build"
-                echo -E "in $(cygpath -w "$CUDA_PATH/include/crt/host_config.h"):"
-                echo -e "Line $wrong_fucking_version"
-                do_prompt "Remove everything after and including the '||' in that line and press Enter to continue."
-            fi
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
@@ -1356,22 +1349,30 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    local clpath
     local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
-    [[ ! -f "$vswhere" ]] && return 1
-    local installationpath="$(cygpath -u "$("$vswhere" -version 15 -products "*" \
-        -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)")"
-    [[ ! -f "$installationpath"/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt ]] &&
-        return 1
-    local vcversion="$(cat "$installationpath"/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt)"
-    [[ -z $vcversion ]] && return 1
-    local basepath="$installationpath/VC/Tools/MSVC/$vcversion/bin"
-    if [[ "$bits" = 32bit && -f "$basepath/HostX86/x86/cl.exe" ]]; then
-        export PATH="$basepath/HostX86/x86/":$PATH
-    elif [[ "$bits" = 64bit && -f "$basepath/HostX64/x64/cl.exe" ]]; then
-        export PATH="$basepath/HostX64/x64":$PATH
+    if [[ -f "$vswhere" ]]; then
+        local installationpath="$("$vswhere" -legacy -version 14 -property installationPath | tail -n1)"
+        [[ -z "$installationpath" ]] && return 1
+        local basepath="$(cygpath -u "$installationpath/VC/bin")"
+        if [[ "$bits" = 32bit && -f "$basepath/cl.exe" ]]; then
+            export PATH="$basepath":$PATH
+        elif [[ "$bits" = 64bit && -f "$basepath/amd64/cl.exe" ]]; then
+            export PATH="$basepath/amd64":$PATH
+        else
+            return 1
+        else
     else
-        return 1
+        local clpath
+        local regpath="/HKLM/Software/Microsoft/VisualStudio/VC/19.0"
+        if [[ $bits = 32bit ]]; then
+            clpath="$(regtool -qW get "$regpath/x86/x86/Compiler")"
+        elif [[ $bits = 64bit ]]; then
+            clpath="$(regtool -qW get "$regpath/x64/x64/Compiler")"
+        fi
+        [[ -z "$clpath" ]] && return 1
+        clpath="$(dirname "$(cygpath -u "$clpath")")"
+        [[ ! -f "$clpath"/cl.exe ]] && return 1
+        export PATH="$clpath":$PATH
     fi
 }
 
