@@ -1360,7 +1360,7 @@ get_cl_path() {
             export PATH="$basepath/amd64":$PATH
         else
             return 1
-        else
+        fi
     else
         local clpath
         local regpath="/HKLM/Software/Microsoft/VisualStudio/VC/19.0"
