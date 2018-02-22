@@ -234,7 +234,7 @@ if [[ $curl = y ]]; then
 fi
 if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gnutls ]]; then
     _check=(libgnutls.{,l}a gnutls.pc)
-    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=GREATEST"; then
+    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
