@@ -109,7 +109,7 @@ vcs_reset() {
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
         git checkout ab-suite
-        git reset --hard "$ref"
+        git reset --hard "$(vcs_getlatesttag "$ref")"
         oldHead=$(git rev-parse HEAD)
     fi
 }
@@ -128,6 +128,7 @@ vcs_update() {
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
+        ref="$(vcs_getlatesttag "$ref")"
         git reset --hard "$ref"
         newHead=$(git rev-parse HEAD)
     fi
@@ -220,7 +221,6 @@ do_vcs() {
         return 1
     fi
 
-    ref="$(vcs_getlatesttag "$ref")"
     log quiet "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
