@@ -439,7 +439,7 @@ if [[ $ffmpeg != "no" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev
 fi
 
 enabled libvorbis && do_pacman_install libvorbis
-enabled libspeex && do_pacman_install speex
+enabled_any libspeex libcodec2 && do_pacman_install speex
 enabled libopus && do_pacman_install opus
 
 _check=(bin-audio/speex{enc,dec}.exe)
@@ -580,6 +580,23 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
         do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off -DWITH_OPENMP=off
         do_checkIfExist
     fi
+fi
+
+if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; then 
+    _check=(libcodec2.a codec2.pc) 
+	if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
+            "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
+        do_uninstall include/codec2 "${_check[@]}"
+		touch cmake/GetPrerequisites.cmake
+        sed -i 's|include(${CMAKE_SOURCE_DIR}/cmake/GetPrerequisites.cmake)||' cmake/GetDependencies.cmake.in
+        sed -i 's|get_prerequisites(${CODEC2_DLL} _deps 1 0 "" "")||' cmake/GetDependencies.cmake.in
+		do_cmake -G "MSYS Makefiles"
+        do_makeinstall
+        if [[ $standalone = y ]]; then		
+		    do_install src/*.exe bin-audio/
+        fi
+        do_checkIfExist
+	fi
 fi
 
 if [[ $standalone = y ]] && enabled libmp3lame; then
