@@ -97,6 +97,7 @@ Included Tools And Libraries
         - libssh (mingw)
         - libtesseract (git)
         - libvmaf (git)
+        - libcodec2 (0.7)
         - libxavs (svn snapshot)
         - libxvid (mingw)
             - compiled with gnutls or openssl depending on license chosen
