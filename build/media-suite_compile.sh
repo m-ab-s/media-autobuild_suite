@@ -587,13 +587,13 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; th
 	if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
             "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
         do_uninstall include/codec2 "${_check[@]}"
-		touch cmake/GetPrerequisites.cmake
+	    touch cmake/GetPrerequisites.cmake
         sed -i 's|include(${CMAKE_SOURCE_DIR}/cmake/GetPrerequisites.cmake)||' cmake/GetDependencies.cmake.in
         sed -i 's|get_prerequisites(${CODEC2_DLL} _deps 1 0 "" "")||' cmake/GetDependencies.cmake.in
-		do_cmake -G "MSYS Makefiles"
+	    do_cmake -G "MSYS Makefiles"
         do_makeinstall
-        if [[ $standalone = y ]]; then		
-		    do_install src/*.exe bin-audio/
+        if [[ $standalone = y ]]; then
+	    do_install src/*.exe bin-audio/
         fi
         do_checkIfExist
 	fi
