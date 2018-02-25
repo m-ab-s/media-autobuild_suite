@@ -444,7 +444,7 @@ enabled libopus && do_pacman_install opus
 
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
-    grep -q '1.2rc2' "$LOCALDESTDIR/bin-audio/speexenc.exe"; } &&
+    grep -q '1.2.0' "$LOCALDESTDIR/bin-audio/speexenc.exe"; } &&
     do_vcs "https://git.xiph.org/speex.git"; then
     do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
     do_autoreconf
