@@ -439,7 +439,7 @@ if [[ $ffmpeg != "no" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev
 fi
 
 enabled libvorbis && do_pacman_install libvorbis
-enabled_any libspeex libcodec2 && do_pacman_install speex
+enabled libspeex && do_pacman_install speex
 enabled libopus && do_pacman_install opus
 
 _check=(bin-audio/speex{enc,dec}.exe)
@@ -594,7 +594,7 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; th
         log make ninja
         log install ninja install
         if [[ $standalone = y ]]; then
-            do_install src/*.exe bin-audio/
+            do_install src/c2{enc,dec,sim}.exe bin-audio/
         fi
         do_checkIfExist
 	fi
