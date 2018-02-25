@@ -590,8 +590,9 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; th
         touch cmake/GetPrerequisites.cmake
         sed -i 's|include(${CMAKE_SOURCE_DIR}/cmake/GetPrerequisites.cmake)||' cmake/GetDependencies.cmake.in
         sed -i 's|get_prerequisites(${CODEC2_DLL} _deps 1 0 "" "")||' cmake/GetDependencies.cmake.in
-        do_cmake -G "MSYS Makefiles"
-        do_makeinstall
+        do_cmake
+        log make ninja
+        log install ninja install
         if [[ $standalone = y ]]; then
             do_install src/*.exe bin-audio/
         fi
