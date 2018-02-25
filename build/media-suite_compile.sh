@@ -582,19 +582,17 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     fi
 fi
 
-if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; then 
-    _check=(libcodec2.a codec2.pc) 
+if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; then
+    _check=(libcodec2.a codec2.pc codec2/codec2.h)
+    [[ $standalone = y ]] && _check+=(bin-audio/c2{enc,dec,sim}.exe)
 	if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
             "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
         do_uninstall include/codec2 "${_check[@]}"
-        touch cmake/GetPrerequisites.cmake
-        sed -i 's|include(${CMAKE_SOURCE_DIR}/cmake/GetPrerequisites.cmake)||' cmake/GetDependencies.cmake.in
-        sed -i 's|get_prerequisites(${CODEC2_DLL} _deps 1 0 "" "")||' cmake/GetDependencies.cmake.in
-        do_cmake
-        log make ninja
-        log install ninja install
+        sed -i 's|if(WIN32)|if(FALSE)|g' CMakeLists.txt
+        do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=off \
+            -DCMAKE_INSTALL_BINDIR="$(pwd)/build-$bits/_bin"
         if [[ $standalone = y ]]; then
-            do_install src/c2{enc,dec,sim}.exe bin-audio/
+            do_install _bin/c2{enc,dec,sim}.exe bin-audio/
         fi
         do_checkIfExist
 	fi
