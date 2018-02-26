@@ -1081,16 +1081,18 @@ if [[ $x264 != no ]]; then
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
             if [[ $x264 = fullv ]]; then
-                non_video_codecs=(
+                audio_codecs=(
                     $(sed -n '/audio codecs/,/subtitles/p' ../libavcodec/allcodecs.c | \
-                      grep -P 'REGISTER_(ENCDEC|DECODER)' | grep -oP "[a-z0-9_]+(?=\);)")
+                      sed -n "s/^[^#]*extern.* *ff_\([^ ]*\)_encoder;/\1/p")
                 )
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                     --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
                     --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
-                    --disable-decoder="$(IFS=, ; echo "${non_video_codecs[*]}")" --enable-gpl \
+                    --enable-protocol=file,pipe \
+                    --disable-decoder="$(IFS=, ; echo "${audio_codecs[*]}")" --enable-gpl \
                     --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress
+                unset audio_codecs
             else
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
