@@ -52,6 +52,7 @@ while true; do
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --curl=* ) curl="${1#*=}"; shift ;;
 --cyanrip=* ) cyanrip="${1#*=}"; shift ;;
+--redshift=* ) redshift="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1833,6 +1834,14 @@ if [[ $ffmbc = y ]] && do_vcs https://github.com/bcoudurier/FFmbc.git; then
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
     do_make && do_install ffmbc.exe bin-video/ && do_checkIfExist
     unset _notrequired
+fi
+
+_check=(bin-global/redshift.exe)
+if [[ $redshift = y ]] && do_vcs https://github.com/jonls/redshift.git; then
+    [[ -f configure ]] || log bootstrap ./bootstrap
+    do_separate_confmakeinstall global --enable-wingdi \
+        --disable-{nls,ubuntu,corelocation,quartz,drm,randr,vidmode,geoclue2,gui}
+    do_checkIfExist
 fi
 
 echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"

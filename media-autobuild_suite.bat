@@ -99,7 +99,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip
+aom faac ffmbc curl cyanrip redshift
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -819,6 +819,26 @@ if %buildcyanrip%==3 set "cyanrip=small"
 if %buildcyanrip% GTR 3 GOTO cyanrip
 if %writecyanrip%==yes echo.cyanrip=^%buildcyanrip%>>%ini%
 
+:redshift
+set "writeredshift=no"
+if %redshiftINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build redshift ^(f.lux FOSS clone^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildredshift="Build redshift: "
+    ) else set buildredshift=%redshiftINI%
+if %deleteINI%==1 set "writeredshift=yes"
+
+if %buildredshift%==1 set "redshift=y"
+if %buildredshift%==2 set "redshift=n"
+if %buildredshift% GTR 2 GOTO redshift
+if %writeredshift%==yes echo.redshift=^%buildredshift%>>%ini%
 
 :numCores
 set "writeCores=no"
