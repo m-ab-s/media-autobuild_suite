@@ -104,7 +104,6 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     libopenh264.a
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
-    libopus.{,l}a opus.pc
     bin-global/libgcrypt-config libgcrypt.a gcrypt.h
     lib/libgcrypt.def bin-global/{dumpsexp,hmac256,mpicalc}.exe
 )
@@ -441,7 +440,6 @@ fi
 
 enabled libvorbis && do_pacman_install libvorbis
 enabled libspeex && do_pacman_install speex
-enabled libopus && do_pacman_install opus
 
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
@@ -538,11 +536,20 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
 fi
 unset _deps
 
+_check=(libopus.{,l}a opus.pc opus/opus.h)
+if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
+    do_pacman_remove opus
+    do_uninstall include/opus "${_check[@]}"
+    do_autogen
+    do_separate_confmakeinstall
+    do_checkIfExist
+fi
+
 if [[ $standalone = y ]] && enabled libopus; then
     do_pacman_install openssl
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
-    _deps=("$MINGW_PREFIX"/lib/pkgconfig/{opus,libssl}.pc)
+    _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/libssl.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
@@ -551,7 +558,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     fi
 
     _check=(opus/opusenc.h libopusenc.{pc,{,l}a})
-    _deps=("$MINGW_PREFIX"/lib/pkgconfig/opus.pc)
+    _deps=(opus.pc)
     if do_vcs "https://github.com/xiph/libopusenc.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
@@ -653,7 +660,7 @@ if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; t
 fi
 
 _check=(bin-audio/sox.exe sox.pc)
-_deps=(libsndfile.a "$MINGW_PREFIX"/lib/lib{opus,mp3lame}.a)
+_deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"; then
     do_pacman_install libmad
