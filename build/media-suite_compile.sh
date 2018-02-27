@@ -1292,6 +1292,13 @@ else
     do_removeOption --enable-libvmaf
 fi
 
+_check=(ffnvcodec/nvEncodeAPI.h)
+if [[ $ffmpeg != "no" ]] && ! disabled_any cuda autodetect &&
+    do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git"; then
+    do_makeinstall PREFIX="$LOCALDESTDIR"
+    do_checkIfExist
+fi
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
