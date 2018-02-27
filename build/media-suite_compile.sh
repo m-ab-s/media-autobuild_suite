@@ -1444,7 +1444,7 @@ fi
 _check=(bin-video/m{player,encoder}.exe)
 if [[ $mplayer = "y" ]] &&
     do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer; then
-    [[ $license != "nonfree" || $faac = n ]] && faac_opts=(--disable-faac --disable-faac-lavc)
+    [[ $license != "nonfree" || $faac = n ]] && faac_opts=(--disable-faac)
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
     if [[ ! -d ffmpeg ]]; then
