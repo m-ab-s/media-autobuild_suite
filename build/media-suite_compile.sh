@@ -541,7 +541,8 @@ if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
     do_autogen
-    do_separate_confmakeinstall
+    do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs} \
+            --enable-ambisonics
     do_checkIfExist
 fi
 
