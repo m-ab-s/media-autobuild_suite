@@ -591,11 +591,11 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     fi
 fi
 
+_check=(libcodec2.a codec2.pc codec2/codec2.h)
 if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; then
-    _check=(libcodec2.a codec2.pc codec2/codec2.h)
     [[ $standalone = y ]] && _check+=(bin-audio/c2{enc,dec,sim}.exe)
-	if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
-            "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
+    if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
+        "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
         do_uninstall include/codec2 "${_check[@]}"
         sed -i 's|if(WIN32)|if(FALSE)|g' CMakeLists.txt
         do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=off \
@@ -604,7 +604,7 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; th
             do_install _bin/c2{enc,dec,sim}.exe bin-audio/
         fi
         do_checkIfExist
-	fi
+    fi
 fi
 
 if [[ $standalone = y ]] && enabled libmp3lame; then
