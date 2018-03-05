@@ -1294,7 +1294,7 @@ else
 fi
 
 _check=(ffnvcodec/nvEncodeAPI.h)
-if [[ $ffmpeg != "no" ]] && ! disabled_any cuda autodetect &&
+if [[ $ffmpeg != "no" ]] && ! disabled_any ffnvcodec autodetect &&
     do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git"; then
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
