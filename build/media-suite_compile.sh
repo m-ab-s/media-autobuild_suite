@@ -598,6 +598,11 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; th
         "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
         do_uninstall include/codec2 "${_check[@]}"
         sed -i 's|if(WIN32)|if(FALSE)|g' CMakeLists.txt
+        if enabled libspeex; then
+            # rename same-named symbols copied from speex
+            grep -ERl "\b(lsp|lpc)_to_(lpc|lsp)" --include="*.[ch]" | \
+                xargs -r sed -ri "s;((lsp|lpc)_to_(lpc|lsp));c2_\1;g"
+        fi
         do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=off \
             -DCMAKE_INSTALL_BINDIR="$(pwd)/build-$bits/_bin"
         if [[ $standalone = y ]]; then
