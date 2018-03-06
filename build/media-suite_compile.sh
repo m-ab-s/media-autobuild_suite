@@ -842,9 +842,9 @@ fi
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
     mpv_enabled sdl2; } &&
-    do_pkgConfig "sdl2 = 2.0.7" &&
-    do_wget -h ee35c74c4313e2eda104b14b1b86f7db84a04eeab9430d56e001cea268bf4d5e \
-        "http://libsdl.org/release/SDL2-2.0.7.tar.gz"; then
+    do_pkgConfig "sdl2 = 2.0.8" &&
+    do_wget -h edc77c57308661d576e843344d8638e025a7818bff73f8fbfab09c3c5fd092ec \
+        "http://libsdl.org/release/SDL2-2.0.8.tar.gz"; then
     do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
     do_separate_confmakeinstall
