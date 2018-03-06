@@ -25,8 +25,8 @@ color 80
 title media-autobuild_suite
 
 setlocal
+cd /d "%~dp0"
 set instdir=%CD%
-set "ini=build\media-autobuild_suite.ini"
 
 if not exist %instdir% (
     echo ----------------------------------------------------------------------
@@ -39,10 +39,10 @@ if not exist %instdir% (
     exit
     )
 
-if not ["%CD:~60,1%"]==[""] (
+if not ["%instdir:~60,1%"]==[""] (
     echo -------------------------------------------------------------------------------
     echo. The total filepath to the suite seems too large (larger than 60 characters^):
-    echo. %CD%
+    echo. %instdir%
     echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
     echo. rename the suite directory to a smaller name. Examples:
@@ -103,6 +103,7 @@ aom faac ffmbc curl cyanrip redshift
 
 set previousOptions=0
 set msys2ArchINI=0
+set ini=%build%\media-autobuild_suite.ini
 
 if exist %ini% GOTO checkINI
 :selectmsys2Arch
