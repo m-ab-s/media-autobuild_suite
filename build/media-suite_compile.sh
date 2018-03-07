@@ -173,31 +173,22 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     unset _deps
 
     _check=(libfribidi.{l,}a fribidi.pc)
-    [[ $standalone = y ]] && _check+=(bin-global/fribidi.exe)
+    [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
-    if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
-        extracommands=(--disable-{deprecated,debug} --without-glib)
-
-        # don't compile docs and tests, or bin if standalone=n
-        _sed="doc test"
-        [[ $standalone = n ]] && _sed="bin ${_sed}"
-        sed -i "s| ${_sed} | |" Makefile.am
-
-        # .def is broken, just export all fribidi_ symbols
-        sed -i 's/OS_WIN32/FALSE/g' lib/Makefile.am
-
+    if do_vcs "https://github.com/fribidi/fribidi.git"; then
+        extracommands=(--bindir="$LOCALDESTDIR/bin-video" -Ddocs=false -Dglib=false)
+        [[ $standalone = n ]] && sed -i "/subdir('bin')/d" meson.build
+        sed -i "/subdir('test')/d" meson.build
         if [[ $ffmpeg = "sharedlibs" ]]; then
-            extracommands+=(--enable-shared)
+            create_build_dir shared
+            log meson meson .. --default-library=shared \
+                --prefix="$LOCALDESTDIR" "${extracommands[@]}"
+            log build ninja
+            cpuCount=1 log install ninja install
+            cd_safe ..
         fi
-        log bootstrap ./bootstrap --no-conf --no-make
-        do_uninstall include/fribidi bin{,-video}/libfribidi-0.dll libfribidi.dll.a \
-            bin-global/fribidi.exe "${_check[@]}"
-        [[ -f Makefile ]] && log distclean make distclean
-        do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $ffmpeg = "sharedlibs" ]] &&
-            cp -f "$LOCALDESTDIR"/bin/libfribidi-0.dll "$LOCALDESTDIR"/bin-video/
+        do_mesoninstall "${extracommands[@]}"
         do_checkIfExist
-        unset _sed
     fi
 
     _check=(ass/ass{,_types}.h libass.{{,l}a,pc})

@@ -1022,6 +1022,21 @@ do_cmakeinstall() {
     cpuCount=1 log install ninja install
 }
 
+do_meson() {
+    local root=".."
+    local PKG_CONFIG=pkg-config
+    create_build_dir
+    [[ $1 && -d "../$1" ]] && root="../$1" && shift
+    log meson meson "$root" --default-library=static \
+        --prefix="$LOCALDESTDIR" "$@"
+}
+
+do_mesoninstall() {
+    do_meson "$@"
+    log build ninja
+    cpuCount=1 log install ninja install
+}
+
 compilation_fail() {
     [[ -z $build32 || -z $build64 ]] && return 1
     local reason="$1"
