@@ -172,7 +172,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
     unset _deps
 
-    _check=(libfribidi.{l,}a fribidi.pc)
+    _check=(libfribidi.a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git"; then
