@@ -1087,8 +1087,8 @@ if [[ $x264 != no ]]; then
             create_build_dir light
             if [[ $x264 = fullv ]]; then
                 audio_codecs=(
-                    $(sed -n '/audio codecs/,/subtitles/p' ../libavcodec/allcodecs.c | \
-                      sed -n "s/^[^#]*extern.* *ff_\([^ ]*\)_encoder;/\1/p")
+                    $(sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c | \
+                      sed -n "s/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p")
                 )
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
@@ -1096,7 +1096,8 @@ if [[ $x264 != no ]]; then
                     --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
                     --enable-protocol=file,pipe \
                     --disable-decoder="$(IFS=, ; echo "${audio_codecs[*]}")" --enable-gpl \
-                    --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress
+                    --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress \
+                    --disable-autodetect --enable-{lzma,bzlib,zlib}
                 unset audio_codecs
             else
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
