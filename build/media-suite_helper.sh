@@ -87,17 +87,20 @@ check_valid_vcs() {
 }
 
 vcs_clone() {
+    set -x
     if [[ "$vcsType" = "svn" ]]; then
         svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
     fi
+    set +x
     check_valid_vcs "$vcsFolder-$vcsType"
 }
 
 vcs_reset() {
     local ref="$1"
     check_valid_vcs
+    set -x
     if [[ $vcsType = svn ]]; then
         svn revert --recursive .
         oldHead=$(svnversion)
@@ -112,11 +115,13 @@ vcs_reset() {
         git reset --hard "$(vcs_getlatesttag "$ref")"
         oldHead=$(git rev-parse HEAD)
     fi
+    set +x
 }
 
 vcs_update() {
     local ref="$1"
     check_valid_vcs
+    set -x
     if [[ $vcsType = svn ]]; then
         svn update -r "$ref"
         newHead=$(svnversion)
@@ -132,10 +137,12 @@ vcs_update() {
         git reset --hard "$ref"
         newHead=$(git rev-parse HEAD)
     fi
+    set +x
 }
 
 vcs_log() {
     check_valid_vcs
+    set -x
     if [[ "$vcsType" = "git" ]]; then
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
@@ -143,6 +150,7 @@ vcs_log() {
         hg log --template "{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n" \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
+    set +x
 }
 
 vcs_getlatesttag() {
