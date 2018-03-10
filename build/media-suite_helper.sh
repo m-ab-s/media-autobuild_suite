@@ -142,7 +142,6 @@ vcs_update() {
 
 vcs_log() {
     check_valid_vcs
-    set -x
     if [[ "$vcsType" = "git" ]]; then
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
@@ -150,7 +149,6 @@ vcs_log() {
         hg log --template "{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n" \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
-    set +x
 }
 
 vcs_getlatesttag() {
