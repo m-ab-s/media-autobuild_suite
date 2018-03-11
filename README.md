@@ -90,7 +90,7 @@ Included Tools And Libraries
             - needed for sofalizer filter
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
-        - libopenh264 (mingw)
+        - libopenh264 (official binaries)
         - libopenmpt (svn from beta release)
         - librtmp (git)
         - librubberband (git snapshot)
