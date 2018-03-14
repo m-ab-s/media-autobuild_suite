@@ -284,7 +284,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
         { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
           sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
-    [[ -f configure ]] || log autogen ./buildconf
+    [[ ! -f configure || configure.ac -nt configure ]] && log autogen ./buildconf
     [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
