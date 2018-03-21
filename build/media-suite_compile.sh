@@ -1385,11 +1385,17 @@ if [[ $ffmpeg != "no" ]]; then
         _check=()
         sedflags="prefix|bindir|extra-version|pkg-config-flags"
 
+        # --build-suffix handling
+        opt_exists FFMPEG_OPTS "^--build-suffix=[a-zA-Z0-9-]+$" &&
+            build_suffix="$(printf '%s\n' "${FFMPEG_OPTS[@]}" | \
+            sed -rn '/build-suffix=/{s;.+=(.+);\1;p}')" ||
+            build_suffix=""
+
         if [[ $ffmpeg = "both" ]]; then
-            _check+=(bin-video/ffmpegSHARED/lib/libavutil.dll.a)
+            _check+=(bin-video/ffmpegSHARED/lib/"libavutil${build_suffix}.dll.a")
             FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED")
         elif [[ $ffmpeg =~ "shared" ]]; then
-            _check+=(libavutil.{dll.a,pc})
+            _check+=("libavutil${build_suffix}".{dll.a,pc})
             FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR"
                 --bindir="$LOCALDESTDIR/bin-video"
                 --shlibdir="$LOCALDESTDIR/bin-video")
@@ -1446,7 +1452,7 @@ if [[ $ffmpeg != "no" ]]; then
         do_checkIfExist
         [[ -f "$LOCALDESTDIR"/bin-video/ffmpeg.exe ]] &&
             create_winpty_exe ffmpeg "$LOCALDESTDIR"/bin-video/
-        unset ffmpeg_cflags
+        unset ffmpeg_cflags build_suffix
     fi
 fi
 
