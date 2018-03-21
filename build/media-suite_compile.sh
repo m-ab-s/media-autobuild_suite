@@ -1069,12 +1069,14 @@ fi
 if [[ $x264 != no ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
+    _bitdepth="$(get_api_version x264_config.h BIT_DEPTH)"
     if do_vcs "https://git.videolan.org/git/x264.git" ||
-        [[ $x264 = o8   && "$(get_api_version x264_config.h BIT_DEPTH)" =~ (0|10) ]] ||
-        [[ $x264 = high && "$(get_api_version x264_config.h BIT_DEPTH)" =~ (0|8) ]] ||
-        [[ $x264 =~ (yes|full|shared|fullv) && "$(get_api_version x264_config.h BIT_DEPTH)" != 0 ]]; then
+        [[ $x264 = o8   && "$_bitdepth" =~ (0|10) ]] ||
+        [[ $x264 = high && "$_bitdepth" =~ (0|8) ]] ||
+        [[ $x264 =~ (yes|full|shared|fullv) && "$_bitdepth" != 0 ]]; then
 
-        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR/bin-video")
+        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
+            --bindir="$LOCALDESTDIR/bin-video")
 
         # light ffmpeg build
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
@@ -1160,13 +1162,15 @@ if [[ $x264 != no ]]; then
         do_uninstall "${_check[@]}"
 
         create_build_dir
-        PKGCONFIG="${PKG_CONFIG}" CFLAGS="${CFLAGS// -O2 / }" log configure ../configure "${extracommands[@]}"
+        PKGCONFIG="${PKG_CONFIG}" CFLAGS="${CFLAGS// -O2 / }" \
+            log configure ../configure "${extracommands[@]}"
         do_make
         do_makeinstall
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
         unset extracommands x264_build old_PKG_CONFIG_PATH
     fi
+    unset _bitdepth
 else
     pc_exists x264 || do_removeOption --enable-libx264
 fi
