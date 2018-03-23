@@ -1301,6 +1301,26 @@ if [[ $ffmpeg != "no" ]] && ! disabled_any ffnvcodec autodetect &&
     do_checkIfExist
 fi
 
+_check=(libsrt.a srt.pc srt/srt.h)
+[[ $standalone = y ]] && _check+=(bin-video/{stransmit,suflip}.exe)
+if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git" then
+    do_pacman_install openssl
+    hide_libressl
+    # stransmit works fine in msys2 mingw
+    sed -i '/^if.*ENABLE_CXX11 /,${/if.*NOT MINGW/d}' CMakeLists.txt
+    extracommands=(-DENABLE_SUFLIP=off -DOPENSSL_ROOT_DIR="$MINGW_PREFIX")
+    [[ $standalone = y ]] && extracommands+=(-DENABLE_SUFLIP=on)
+    do_cmakeinstall -DBUILD_SHARED=off "${extracommands[@]}"
+    rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
+    if [[ $standalone = y ]]; then
+        do_install {stransmit,suflip}.exe bin-video/
+        ! disabled_any sdl2 ffplay && do_install sfplay bin-video/
+    fi
+    hide_libressl -R
+    do_checkIfExist
+fi
+do_removeOption FFMPEG_OPTS "--enable-libsrt"
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
