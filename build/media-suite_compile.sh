@@ -47,7 +47,6 @@ while true; do
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
 --aom=* ) aom="${1#*=}"; shift ;;
---daala=* ) daala="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --curl=* ) curl="${1#*=}"; shift ;;
