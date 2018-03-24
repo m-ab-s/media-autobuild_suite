@@ -1529,7 +1529,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     do_pacman_remove uchardet-git
     ! mpv_disabled uchardet && do_pacman_install uchardet
-    mpv_enabled libarchive && do_pacman_install libarchive
+    ! mpv_disabled libarchive && do_pacman_install libarchive
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     do_pacman_remove angleproject-git
