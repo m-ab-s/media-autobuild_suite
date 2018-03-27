@@ -1306,11 +1306,13 @@ _check=(libsrt.a srt.pc srt/srt.h)
 if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
-    # stransmit works fine in msys2 mingw
-    sed -i '/^if.*ENABLE_CXX11 /,${/if.*NOT MINGW/d}' CMakeLists.txt
+    if [[ $standalone = y ]]; then
+        # stransmit works fine in msys2 mingw
+        sed -i '/^if.*ENABLE_CXX11 /,${/if.*NOT MINGW/d}' CMakeLists.txt
+    fi
     extracommands=(-DENABLE_SUFLIP=off -DOPENSSL_ROOT_DIR="$MINGW_PREFIX")
     [[ $standalone = y ]] && extracommands+=(-DENABLE_SUFLIP=on)
-    do_cmakeinstall -DBUILD_SHARED=off "${extracommands[@]}"
+    do_cmakeinstall -DENABLE_SHARED=off "${extracommands[@]}"
     rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
     if [[ $standalone = y ]]; then
         do_install {stransmit,suflip}.exe bin-video/
