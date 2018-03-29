@@ -76,6 +76,7 @@ Included Tools And Libraries
             - needs non-free license
         - frei0r (git)
         - libbs2b (3.1.0)
+        - libaom (git)
         - libcaca (mingw)
         - libcdio (mingw)
         - libfdk-aac (git)

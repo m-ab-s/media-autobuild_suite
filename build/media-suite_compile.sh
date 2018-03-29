@@ -46,7 +46,6 @@ while true; do
 --packing* ) packing="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
---aom=* ) aom="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --curl=* ) curl="${1#*=}"; shift ;;
@@ -804,7 +803,7 @@ fi
 
 _check=(libaom.a aom.pc)
 [[ $standalone = y ]] && _check+=(bin-video/aomenc.exe)
-if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
+if enabled libaom && do_vcs https://aomedia.googlesource.com/aom; then
     extracommands=()
     [[ $standalone = y ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
@@ -812,8 +811,10 @@ if [[ $aom = y ]] && do_vcs https://aomedia.googlesource.com/aom; then
     extracommands+=($(get_external_opts))
     do_cmakeinstall -DENABLE_{DOCS,TOOLS}=off -DENABLE_NASM=on \
         -DCONFIG_UNIT_TESTS=0 "${extracommands[@]}"
-    [[ $standalone = y ]] && mv -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe \
-        "$LOCALDESTDIR"/bin-video/
+    if [[ $standalone = y ]]; then
+        rm -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe
+        do_install aom{enc,dec}.exe bin-video/
+    fi
     do_checkIfExist
     unset extracommands
 fi
