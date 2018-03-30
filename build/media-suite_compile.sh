@@ -1312,7 +1312,7 @@ if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
         # stransmit works fine in msys2 mingw
         sed -i '/^if.*ENABLE_CXX11 /,${/if.*NOT MINGW/d}' CMakeLists.txt
     fi
-    sed -ri ';(Libs.private.*);\1 -lstdc++;g' scripts/haisrt.pc.in
+    sed -ri 's;(Libs.private.*);\1 -lstdc++;g' scripts/haisrt.pc.in
     extracommands=(-DENABLE_SUFLIP=off -DOPENSSL_ROOT_DIR="$MINGW_PREFIX")
     [[ $standalone = y ]] && extracommands+=(-DENABLE_SUFLIP=on)
     do_cmakeinstall -DENABLE_SHARED=off "${extracommands[@]}"
