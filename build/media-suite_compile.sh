@@ -1319,7 +1319,7 @@ if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
     if [[ $standalone = y ]]; then
         do_install {stransmit,suflip}.exe bin-video/
-        ! disabled_any sdl2 ffplay && do_install sfplay bin-video/
+        ! disabled_any sdl2 ffplay && do_install ../scripts/sfplay bin-video/
     fi
     grep -ZlER -- "\bWIN32" "$LOCALDESTDIR"/include/srt | xargs -r -0 sed -ri 's;\bWIN32;_WIN32;g'
     hide_libressl -R
