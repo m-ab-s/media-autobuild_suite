@@ -1285,15 +1285,15 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
 fi
 
 _check=(libvmaf.{a,h,pc})
-if [[ $ffmpeg != "no" && $bits = 64bit ]] && enabled libvmaf &&
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libvmaf
+elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
     log clean make clean
     do_make INSTALL_PREFIX="$LOCALDESTDIR"
     do_makeinstall INSTALL_PREFIX="$LOCALDESTDIR"
     do_checkIfExist
-else
-    do_removeOption --enable-libvmaf
 fi
 
 _check=(ffnvcodec/nvEncodeAPI.h)
