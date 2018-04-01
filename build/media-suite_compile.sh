@@ -403,7 +403,6 @@ if [[ $ffmpeg != "no" ]] && enabled libzimg &&
     do_checkIfExist
 fi
 
-
 set_title "compiling audio tools"
 echo -e "\n\t${orange}Starting $bits compilation of audio tools${reset}"
 
@@ -1374,6 +1373,7 @@ if [[ $ffmpeg != "no" ]]; then
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC && do_pacman_install libxml2
+    enabled ladspa && do_pacman_install ladspa-sdk
 
     do_hide_all_sharedlibs
 

@@ -100,6 +100,7 @@ Included Tools And Libraries
         - libtesseract (git)
         - libvmaf (git)
         - libcodec2 (0.7)
+        - ladspa (mingw)
         - libxavs (svn snapshot)
         - libxvid (mingw)
             - compiled with gnutls or openssl depending on license chosen
