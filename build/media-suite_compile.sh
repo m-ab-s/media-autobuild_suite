@@ -403,6 +403,7 @@ if [[ $ffmpeg != "no" ]] && enabled libzimg &&
     do_checkIfExist
 fi
 
+enabled ladspa && do_pacman_install ladspa-sdk # actually superseeded by lv2 now but better than nothing
 
 set_title "compiling audio tools"
 echo -e "\n\t${orange}Starting $bits compilation of audio tools${reset}"
