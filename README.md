@@ -75,8 +75,8 @@ Included Tools And Libraries
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
-        - libbs2b (3.1.0)
         - libaom (git)
+        - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
         - libfdk-aac (git)

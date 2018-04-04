@@ -46,6 +46,7 @@ while true; do
 --packing* ) packing="${1#*=}"; shift ;;
 --logging=* ) logging="${1#*=}"; shift ;;
 --bmx=* ) bmx="${1#*=}"; shift ;;
+--aom=* ) aom="${1#*=}"; shift ;;
 --faac=* ) faac="${1#*=}"; shift ;;
 --ffmbc=* ) ffmbc="${1#*=}"; shift ;;
 --curl=* ) curl="${1#*=}"; shift ;;
@@ -802,7 +803,8 @@ fi
 
 _check=(libaom.a aom.pc)
 [[ $standalone = y ]] && _check+=(bin-video/aomenc.exe)
-if enabled libaom && do_vcs https://aomedia.googlesource.com/aom; then
+if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
+    do_vcs https://aomedia.googlesource.com/aom; then
     extracommands=()
     [[ $standalone = y ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
