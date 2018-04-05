@@ -375,7 +375,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             do_install "$MINGW_PREFIX/share/tessdata/eng.traineddata" bin-global/tessdata/
             printf "%s\n" "You can get more language data here:"\
-                   "https://github.com/tesseract-ocr/tessdata/blob/master/"\
+                   "https://github.com/tesseract-ocr/tessdata"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
                     > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
