@@ -268,7 +268,13 @@ _deps=()
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
-    do_pacman_install nghttp2
+    do_pacman_install nghttp2 brotli
+
+    # fix retarded google naming schemes for brotli
+    /usr/bin/grep -q -- "-static" "$MINGW_PREFIX"/lib/pkgconfig/libbrotlicommon.pc ||
+        sed -i 's;-lbrotli.*;&-static;' \
+        "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
+
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y || $curl != n ]] ||
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
@@ -289,6 +295,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
         --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn2} \
+        --with-brotli \
         --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     [[ $curl = openssl ]] && hide_libressl -R
