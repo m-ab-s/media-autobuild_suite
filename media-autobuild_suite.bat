@@ -60,6 +60,9 @@ if %PROCESSOR_ARCHITECTURE%==x86 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
+set patches=%instdir%\patches
+if not exist %patches% mkdir %patches%
+
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby
