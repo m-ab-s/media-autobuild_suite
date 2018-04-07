@@ -981,7 +981,9 @@ do_patch() {
     local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
     [[ $patch = ${patch##*/} ]] &&
         patch="/patches/$patch"
-    do_wget -c -r -q "$patch"
+    if ! ( cp -f "/trunk$patch" $(pwd)>/dev/null 2>&1 ); then    
+        do_wget -c -r -q "$patch"
+    fi
     [[ ! -f "$patch" ]] && patch=${patch##*/}
     if [[ -f "$patch" ]]; then
         if [[ "$am" = "am" ]]; then
