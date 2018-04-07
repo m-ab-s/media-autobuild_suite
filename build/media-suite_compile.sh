@@ -1661,7 +1661,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
-        do_vcs "https://github.com/google/shaderc"; then
+        do_vcs "https://github.com/google/shaderc#commit=583fb1326b02"; then
         do_uninstall "${_check[@]}" include/shaderc
 
         function add_third_party() {
