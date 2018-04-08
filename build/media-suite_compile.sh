@@ -81,7 +81,7 @@ _pkg_config_files=$(find "$LOCALDESTDIR/lib/pkgconfig/" -name "*.pc")
 if [[ -n "$_pkg_config_files" ]]; then
     screwed_prefixes=($(grep -E -l "(prefix|libdir|includedir)=[^/$].*" $_pkg_config_files))
     [[ -n "${screwed_prefixes[@]}" ]] &&
-        screwed_prefixes=($(grep -qL "$(cygpath -m "$LOCALDESTDIR")" "${screwed_prefixes[@]}"))
+        screwed_prefixes=($(grep -L "$(cygpath -m "$LOCALDESTDIR")" "${screwed_prefixes[@]}"))
     [[ -n "${screwed_prefixes[@]}" ]] && sed -ri \
         "s;(prefix|libdir|includedir)=.*${LOCALDESTDIR};\1=$(cygpath -m /trunk)${LOCALDESTDIR};g" \
         "${screwed_prefixes[@]}"
@@ -1299,6 +1299,8 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
     log clean make clean
+    grep -ERl -e '\b(read|write)_image\(' --include="*.[ch]" | \
+      xargs -r sed -ri 's;(read|write)_image\(;\1_image2(;g'
     do_make INSTALL_PREFIX="$LOCALDESTDIR"
     do_makeinstall INSTALL_PREFIX="$LOCALDESTDIR"
     do_checkIfExist
