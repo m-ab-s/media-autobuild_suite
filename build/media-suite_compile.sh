@@ -1433,7 +1433,7 @@ if [[ $ffmpeg != "no" ]]; then
                 --bindir="$LOCALDESTDIR/bin-video"
                 --shlibdir="$LOCALDESTDIR/bin-video")
         fi
-        enabled_any debug "debug=gdb" &&
+        ! disabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
@@ -1478,7 +1478,7 @@ if [[ $ffmpeg != "no" ]]; then
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
-            enabled_any debug "debug=gdb" &&
+            ! disabled_any debug "debug=gdb" &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
             cd_safe ..
         fi

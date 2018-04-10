@@ -428,7 +428,7 @@ do_strip() {
         elif [[ $file =~ \.dll$ ]] ||
             [[ $file =~ x265(|-numa)\.exe$ ]]; then
             cmd+=(--strip-unneeded)
-        elif ! enabled debug && [[ $file =~ \.a$ ]]; then
+        elif ! disabled debug && [[ $file =~ \.a$ ]]; then
             cmd+=(--strip-debug)
         else
             file=""
@@ -779,11 +779,9 @@ do_changeFFmpegConfig() {
         # no lgpl here because they are accepted with it
     fi
 
-    if enabled_any debug "debug=gdb"; then
+    if ! disabled debug "debug=gdb"; then
         # fix issue with ffprobe not working with debug and strip
         do_addOption --disable-stripping
-    else
-        do_addOption --disable-debug
     fi
 
     enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
@@ -859,9 +857,6 @@ do_getMpvConfig() {
     fi
     do_removeOption MPV_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib)"
-    if ! mpv_enabled debug-build; then
-        do_addOption MPV_OPTS --disable-debug-build
-    fi
     if [[ $mpv = "y" ]]; then
         mpv_disabled vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then

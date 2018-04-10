@@ -68,7 +68,7 @@ set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-conf
 
 :: built-ins
 set ffmpeg_options_builtin=#amf #bzlib #cuda #cuvid #d3d11va #dxva2 ^
-#iconv #lzma #nvenc #schannel #zlib #sdl2
+#iconv #lzma #nvenc #schannel #zlib #sdl2 --disable-debug
 
 :: common external libs
 set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265
