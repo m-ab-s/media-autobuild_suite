@@ -1,6 +1,6 @@
 media-autobuild_suite
 =========
-[![Join the chat at https://gitter.im/jb-alvarado/media-autobuild_suite](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/jb-alvarado/media-autobuild_suite)
+Before opening an issue, check if it's an issue directly from executing the suite. This isn't Doom9, reddit, stackoverflow or any other forum for general questions about the things being compiled. This script builds them, that's all.
 
 This source code is also mirrored in [GitLab](https://gitlab.com/RiCON/media-autobuild_suite).
 
