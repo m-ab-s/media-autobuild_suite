@@ -1312,7 +1312,8 @@ fi
 
 _check=(libsrt.a srt.pc srt/srt.h)
 [[ $standalone = y ]] && _check+=(bin-video/{stransmit,suflip}.exe)
-if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
+if enabled libsrt &&
+    do_vcs "https://github.com/Haivision/srt.git#commit=1367914ea"; then
     do_pacman_install openssl
     hide_libressl
     if [[ $standalone = y ]]; then
