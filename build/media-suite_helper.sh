@@ -188,7 +188,10 @@ do_vcs() {
                 ref=${vcsBranch##*=}
                 ;;
             branch)
-                ref=origin/${vcsBranch##*=}
+                if [[ $vcsType = hg ]]; then
+                    ref=${vcsBranch##*=}
+                else
+                    ref=origin/${vcsBranch##*=}
                 ;;
         esac
     else
