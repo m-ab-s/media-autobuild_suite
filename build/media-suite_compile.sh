@@ -1395,8 +1395,9 @@ if [[ $ffmpeg != "no" ]]; then
         _check+=(libavutil.a)
         [[ $ffmpeg = "both" ]] && _check+=(bin-video/ffmpegSHARED)
     fi
-    [[ $ffmpegUpdate = y ]] && enabled_any lib{ass,x264,x265,vpx} &&
-        _deps=(lib{ass,x264,x265,vpx}.a)
+    # todo: make this more easily customizable
+    [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
+        _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
 
         do_changeFFmpegConfig "$license"
