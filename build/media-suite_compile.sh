@@ -1797,15 +1797,14 @@ enabled openssl && hide_libressl -R
 if [[ $cyanrip != no ]]; then
     do_pacman_install libxml2
     do_pacman_install libcdio-paranoia
+    sed -ri 's;-R[^ ]*;;g' "$MINGW_PREFIX/lib/pkgconfig/libcdio.pc"
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
     if do_pkgConfig "neon = 0.30.2" &&
         do_wget -h db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca \
             "http://download.openpkg.org/components/cache/neon/neon-0.30.2.tar.gz"; then
         do_uninstall include/neon "${_check[@]}"
-        extracommands=()
-        do_separate_confmakeinstall --disable-{nls,debug,webdav} "${extracommands[@]}"
-        unset extracommands
+        do_separate_confmakeinstall --disable-{nls,debug,webdav}
         do_checkIfExist
     fi
 
@@ -1827,7 +1826,7 @@ if [[ $cyanrip != no ]]; then
 
     _deps=(libdiscid.a libmusicbrainz5.a)
     _check=(bin-audio/cyanrip.exe)
-    if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
+    if do_vcs "https://github.com/atomnuker/cyanrip.git#commit=39c02088b93"; then
         create_ab_pkgconfig
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         if [[ $cyanrip = small ]]; then
