@@ -1826,7 +1826,7 @@ if [[ $cyanrip != no ]]; then
 
     _deps=(libdiscid.a libmusicbrainz5.a)
     _check=(bin-audio/cyanrip.exe)
-    if do_vcs "https://github.com/atomnuker/cyanrip.git#commit=39c02088b93"; then
+    if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
         create_ab_pkgconfig
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         if [[ $cyanrip = small ]]; then
@@ -1859,19 +1859,17 @@ if [[ $cyanrip != no ]]; then
 
         cd_safe "$LOCALBUILDDIR"/cyanrip-git
         _check=(bin-audio/cyanrip.exe)
-        [[ ! -f waf ]] && /usr/bin/python bootstrap.py >/dev/null 2>&1
+        _extra_ldflags=()
         if [[ $cyanrip = small ]]; then
             hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
+            _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/lib")")
         else
             hide_conflicting_libs
         fi
-        [[ -d build ]] && /usr/bin/python waf distclean >/dev/null 2>&1
-        CFLAGS+=" -DLIBXML_STATIC" PKGCONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-            log configure /usr/bin/python waf configure --no-debug \
-            --static-build --bindir="$LOCALDESTDIR"/bin-audio
-        log build /usr/bin/python waf -j "${cpuCount:-1}"
-        log install /usr/bin/python waf -j1 install ||
-            log install /usr/bin/python waf -j1 install
+        _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/lib")")
+        CFLAGS+=" -DLIBXML_STATIC" \
+        LDFLAGS+="$(printf ' -L%s' "${_extra_ldflags[@]}")" \
+            do_mesoninstall --bindir=bin-audio
         if [[ $cyanrip = small ]]; then
             hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
         else
@@ -1879,6 +1877,7 @@ if [[ $cyanrip != no ]]; then
         fi
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
+        unset old_PKG_CONFIG_PATH _extra_ldflags
     fi
 fi
 
