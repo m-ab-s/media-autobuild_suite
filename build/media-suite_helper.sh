@@ -388,7 +388,7 @@ do_extract() {
     fi
     log extract real_extract "$archive" "$dirName"
     [[ -d "$dirName/$dirName" ]] &&
-        find "$dirName/$dirName" -maxdepth 1 -print0 | xargs -0 mv -t "$dirName/" &&
+        find "$dirName/$dirName" -maxdepth 1 -print0 | xargs -r0 mv -t "$dirName/" &&
         rmdir "$dirName/$dirName" 2>/dev/null
     [[ $nocd ]] || cd_safe "$dirName"
 }
@@ -1198,7 +1198,7 @@ do_hide_all_sharedlibs() {
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
     if [[ $dryrun = "n" ]]; then
-        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}' '{}.dyn'
+        printf "%s\n" "${tomove[@]}" | xargs -ri mv -f '{}' '{}.dyn'
     else
         printf "%s\n" "${tomove[@]}"
     fi
@@ -1218,8 +1218,8 @@ do_unhide_all_sharedlibs() {
         fi
     done
     if [[ $dryrun = "n" ]]; then
-        printf "%s\n" "${todelete[@]}" | xargs -i rm -f '{}'
-        printf "%s\n" "${tomove[@]}" | xargs -i mv -f '{}.dyn' '{}'
+        printf "%s\n" "${todelete[@]}" | xargs -ri rm -f '{}'
+        printf "%s\n" "${tomove[@]}" | xargs -ri mv -f '{}.dyn' '{}'
     else
         printf "rm %s\n" "${todelete[@]}"
         printf "%s\n" "${tomove[@]}"
@@ -1484,18 +1484,18 @@ add_to_remove() {
 clean_suite() {
     echo -e "\n\t${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" >/dev/null
-    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -0 rm -f
+    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -r0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -print0 |
-        xargs -0 rm -f
+        xargs -r0 rm -f
     echo -e "\n\t${green}Zipping man files...${reset}"
     do_zipman
 
     if [[ $deleteSource = y ]]; then
         echo -e "\t${orange}Deleting temporary build dirs...${reset}"
-        find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -0 rm -f
-        find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -0 rm -rf
+        find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -r0 rm -f
+        find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -r0 rm -rf
         find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
-            xargs -0 rm -rf
+            xargs -r0 rm -rf
 
         if [[ -f _to_remove ]]; then
             echo -e "\n\t${orange}Deleting source folders...${reset}"
