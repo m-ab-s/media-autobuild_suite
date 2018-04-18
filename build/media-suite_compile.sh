@@ -1859,15 +1859,18 @@ if [[ $cyanrip != no ]]; then
 
         cd_safe "$LOCALBUILDDIR"/cyanrip-git
         _check=(bin-audio/cyanrip.exe)
+        _extra_cflags=()
         _extra_ldflags=()
         if [[ $cyanrip = small ]]; then
             hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
+            _extra_cflags+=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/include")")
             _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/lib")")
         else
             hide_conflicting_libs
         fi
+        _extra_cflags+=("$(cygpath -m "$LOCALDESTDIR/include")")
         _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/lib")")
-        CFLAGS+=" -DLIBXML_STATIC" \
+        CFLAGS+=" -DLIBXML_STATIC $(printf ' -I%s' "${_extra_cflags[@]}")" \
         LDFLAGS+="$(printf ' -L%s' "${_extra_ldflags[@]}")" \
             do_mesoninstall --bindir=bin-audio
         if [[ $cyanrip = small ]]; then
@@ -1877,7 +1880,7 @@ if [[ $cyanrip != no ]]; then
         fi
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
-        unset old_PKG_CONFIG_PATH _extra_ldflags
+        unset old_PKG_CONFIG_PATH _extra_ldflags _extra_cflags
     fi
 fi
 
