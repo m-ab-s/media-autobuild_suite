@@ -917,8 +917,8 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     if [[ -n "$JAVA_HOME" ]]; then
         if [[ ! -f /opt/apache-ant/bin/ant ]] &&
             do_wget -r -c \
-                -h a8e6320476b721215988819bc554d61f5ec8a80338485b78afbe51df0dfcbc4d \
-                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.2-bin.zip" \
+                -h e9e271d02156fd31e76133f643b3027d3d3a1e91e477def00cf50a66bafcfbd9 \
+                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.3-bin.zip" \
                 apache-ant.zip; then
             rm -rf /opt/apache-ant
             mv apache-ant/apache-ant* /opt/apache-ant
@@ -1305,7 +1305,7 @@ fi
 
 _check=(ffnvcodec/nvEncodeAPI.h)
 if [[ $ffmpeg != "no" ]] && { ! disabled_any ffnvcodec autodetect ||
-    ! mpv_disabled cuda_hwaccel; } &&
+    ! mpv_disabled cuda-hwaccel; } &&
     do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git"; then
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
