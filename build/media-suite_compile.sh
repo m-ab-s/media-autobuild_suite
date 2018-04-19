@@ -1017,7 +1017,7 @@ if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
 fi
 
 
-if [[ $ffmpeg != "no" ]] && enabled frei0r; then
+if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     _check=(libdl.a dlfcn.h)
     if do_vcs https://github.com/dlfcn-win32/dlfcn-win32.git; then
         do_uninstall "${_check[@]}"
