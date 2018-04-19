@@ -1844,7 +1844,7 @@ if [[ $cyanrip != no ]]; then
                     --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
                     --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                     --enable-demuxer=image2,png_pipe,bmp_pipe \
-                    --enable-{bzlib,zlib,lzma,iconv}
+                    --enable-{bzlib,zlib,lzma,iconv} \
                     $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
                     $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
                         echo '--enable-encoder=vorbis') \
