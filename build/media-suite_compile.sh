@@ -1827,7 +1827,6 @@ if [[ $cyanrip != no ]]; then
     _deps=(libdiscid.a libmusicbrainz5.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
-        create_ab_pkgconfig
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         if [[ $cyanrip = small ]]; then
             _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
@@ -1840,12 +1839,13 @@ if [[ $cyanrip != no ]]; then
                     --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                     --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
                     --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
-                    --disable-{avdevice,avfilter,dxva2,d3d11va,cuda,cuvid,nvenc,schannel,sdl2} \
-                    --enable-protocol=file \
+                    --disable-{avdevice,avfilter,autodetect} \
+                    --disable-bsfs --enable-protocol=file \
                     --enable-encoder=flac,tta,aac,wavpack,alac \
                     --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
                     --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                     --enable-demuxer=image2,png_pipe,bmp_pipe \
+                    --enable-{bzlib,zlib,lzma,iconv}
                     $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
                     $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
                         echo '--enable-encoder=vorbis') \
