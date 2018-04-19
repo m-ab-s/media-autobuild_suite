@@ -1830,8 +1830,7 @@ if [[ $cyanrip != no ]]; then
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         if [[ $cyanrip = small ]]; then
             _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
-            if [[ ! -f "$LOCALBUILDDIR/ffmpeg-git/build_successful${bits}_cyan" ]] &&
-                do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+            if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
                 do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
                 [[ -f "config.mak" ]] && log "distclean" make distclean
                 create_build_dir cyan

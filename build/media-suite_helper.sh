@@ -238,7 +238,7 @@ do_vcs() {
     fi
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
-        rm -f build_successful{32,64}bit{,_shared}
+        rm -f ./build_successful{32,64}bit{,_*}
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$vcsFolder]"
@@ -247,7 +247,8 @@ do_vcs() {
         vcs_log
         echo >> "$LOCALBUILDDIR"/newchangelog
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
-    elif [[ -f recently_updated && ! -f "build_successful$bits" ]]; then
+    elif [[ -f recently_updated ]] && { [[ ! -f "build_successful$bits" ]] ||
+        [[ -n "$flavor" && ! -f "build_successful${bits}_${flavor}" ]]; }; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
     elif [[ -z "${vcsCheck[*]}" ]] && ! files_exist "$vcsFolder.pc"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Missing pkg-config"
@@ -377,8 +378,11 @@ do_extract() {
     archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
 
     if [[ $dirName != "." && -d "$dirName" ]] &&
-        { [[ $build32 = "yes" && ! -f "$dirName"/build_successful32bit ]] ||
-          [[ $build64 = "yes" && ! -f "$dirName"/build_successful64bit ]]; }; then
+        { [[ $build32 = "yes" ]] && { [[ ! -f "$dirName"/build_successful32bit ]] ||
+            [[ -n "$flavor" && ! -f "$dirName/build_successful32bit_${flavor}" ]]; } ||
+          [[ $build64 = "yes" ]] && { [[ ! -f "$dirName"/build_successful64bit ]] ||
+            [[ -n "$flavor" && ! -f "$dirName/build_successful64bit_${flavor}" ]]; };
+        }; then
         rm -rf "$dirName"
     elif [[ -d "$dirName" ]]; then
         [[ $nocd ]] || cd_safe "$dirName"
