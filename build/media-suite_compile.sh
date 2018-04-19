@@ -1852,7 +1852,7 @@ if [[ $cyanrip != no ]]; then
                     $(enabled libopus && echo '--enable-libopus --enable-encoder=libopus' ||
                         echo '--enable-encoder=opus')
                 do_makeinstall
-                files_exist "${_check[@]}" && touch "build_successful${bits}_cyan"
+                files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
             fi
             PKG_CONFIG_PATH="$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
         fi
