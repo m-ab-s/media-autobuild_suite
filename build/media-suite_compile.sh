@@ -270,9 +270,11 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_pacman_install nghttp2 brotli
 
     # fix retarded google naming schemes for brotli
-    /usr/bin/grep -q -- "-static" "$MINGW_PREFIX"/lib/pkgconfig/libbrotlicommon.pc ||
+    ! /usr/bin/grep -q -- "-static" "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc &&
         sed -i 's;-lbrotli.*;&-static;' \
-        "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
+            "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
+    ! /usr/bin/grep -q -- brotlidec-static configure.ac &&
+        sed -i 's;CHECK_LIB(brotlidec;&-static;' configure.ac
 
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y || $curl != n ]] ||
