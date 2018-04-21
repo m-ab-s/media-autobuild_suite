@@ -1796,7 +1796,7 @@ if [[ $bmx = "y" ]]; then
 fi
 enabled openssl && hide_libressl -R
 
-if [[ $cyanrip != no ]]; then
+if [[ $cyanrip = yes ]]; then
     do_pacman_install libxml2
     do_pacman_install libcdio-paranoia
     sed -ri 's;-R[^ ]*;;g' "$MINGW_PREFIX/lib/pkgconfig/libcdio.pc"
@@ -1830,55 +1830,43 @@ if [[ $cyanrip != no ]]; then
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
-        if [[ $cyanrip = small ]]; then
-            _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
-            if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
-                do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
-                [[ -f "config.mak" ]] && log "distclean" make distclean
-                create_build_dir cyan
-                log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
-                    --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
-                    --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
-                    --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
-                    --disable-{avdevice,avfilter,autodetect} \
-                    --disable-bsfs --enable-protocol=file \
-                    --enable-encoder=flac,tta,aac,wavpack,alac \
-                    --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
-                    --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
-                    --enable-demuxer=image2,png_pipe,bmp_pipe \
-                    --enable-{bzlib,zlib,lzma,iconv} \
-                    $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
-                    $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
-                        echo '--enable-encoder=vorbis') \
-                    $(enabled libopus && echo '--enable-libopus --enable-encoder=libopus' ||
-                        echo '--enable-encoder=opus')
-                do_makeinstall
-                files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
-            fi
-            PKG_CONFIG_PATH="$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
+        _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
+        if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+            do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
+            [[ -f "config.mak" ]] && log "distclean" make distclean
+            create_build_dir cyan
+            log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
+                --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
+                --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
+                --disable-{avdevice,avfilter,autodetect} \
+                --disable-bsfs --enable-protocol=file \
+                --enable-encoder=flac,tta,aac,wavpack,alac \
+                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
+                --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
+                --enable-demuxer=image2,png_pipe,bmp_pipe \
+                --enable-{bzlib,zlib,lzma,iconv} \
+                $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
+                $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
+                    echo '--enable-encoder=vorbis') \
+                $(enabled libopus && echo '--enable-libopus --enable-encoder=libopus' ||
+                    echo '--enable-encoder=opus')
+            do_makeinstall
+            files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
         fi
+        PKG_CONFIG_PATH="$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
 
         cd_safe "$LOCALBUILDDIR"/cyanrip-git
         _check=(bin-audio/cyanrip.exe)
-        _extra_cflags=()
-        _extra_ldflags=()
-        if [[ $cyanrip = small ]]; then
-            hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
-            _extra_cflags+=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/include")")
-            _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/lib")")
-        else
-            hide_conflicting_libs
-        fi
-        _extra_cflags+=("$(cygpath -m "$LOCALDESTDIR/include")")
-        _extra_ldflags+=("$(cygpath -m "$LOCALDESTDIR/lib")")
+        _extra_cflags=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/include")"
+            "$(cygpath -m "$LOCALDESTDIR/include")")
+        _extra_ldflags=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/lib")"
+            "$(cygpath -m "$LOCALDESTDIR/lib")")
+        hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
         CFLAGS+=" -DLIBXML_STATIC $(printf ' -I%s' "${_extra_cflags[@]}")" \
         LDFLAGS+="$(printf ' -L%s' "${_extra_ldflags[@]}")" \
             do_mesoninstall --bindir=bin-audio
-        if [[ $cyanrip = small ]]; then
-            hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
-        else
-            hide_conflicting_libs -R
-        fi
+        hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
         unset old_PKG_CONFIG_PATH _extra_ldflags _extra_cflags

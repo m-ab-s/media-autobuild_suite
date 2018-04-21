@@ -100,7 +100,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip redshift
+aom faac ffmbc curl cyanrip2 redshift
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -800,26 +800,24 @@ if %writeFFmbc%==yes echo.ffmbc=^%buildffmbc%>>%ini%
 
 :cyanrip
 set "writecyanrip=no"
-if %cyanripINI%==0 (
+if %cyanrip2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build cyanrip ^(CLI CD ripper^)?
     echo. 1 = Yes
     echo. 2 = No
-    echo. 3 = Yes with FFmpeg with only needed components
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildcyanrip="Build cyanrip: "
-    ) else set buildcyanrip=%cyanripINI%
+    ) else set buildcyanrip=%cyanrip2INI%
 if %deleteINI%==1 set "writecyanrip=yes"
 
 if %buildcyanrip%==1 set "cyanrip=yes"
 if %buildcyanrip%==2 set "cyanrip=no"
-if %buildcyanrip%==3 set "cyanrip=small"
-if %buildcyanrip% GTR 3 GOTO cyanrip
-if %writecyanrip%==yes echo.cyanrip=^%buildcyanrip%>>%ini%
+if %buildcyanrip% GTR 2 GOTO cyanrip
+if %writecyanrip%==yes echo.cyanrip2=^%buildcyanrip%>>%ini%
 
 :redshift
 set "writeredshift=no"
