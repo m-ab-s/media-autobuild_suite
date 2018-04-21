@@ -807,24 +807,26 @@ else
     pc_exists vpx || do_removeOption --enable-libvpx
 fi
 
+[[ $aom = y || $standalone = y ]] && _aom_bins=y
 _check=(libaom.a aom.pc)
-[[ $standalone = y ]] && _check+=(bin-video/aomenc.exe)
+[[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_vcs https://aomedia.googlesource.com/aom; then
     extracommands=()
-    [[ $standalone = y ]] && _check+=(bin-video/aomdec.exe) ||
+    [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
     do_uninstall include/aom "${_check[@]}"
     extracommands+=($(get_external_opts))
     do_cmakeinstall -DENABLE_{DOCS,TOOLS}=off -DENABLE_NASM=on \
         -DCONFIG_UNIT_TESTS=0 "${extracommands[@]}"
-    if [[ $standalone = y ]]; then
+    if [[ -n $_aom_bins ]]; then
         rm -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe
         do_install aom{enc,dec}.exe bin-video/
     fi
     do_checkIfExist
     unset extracommands
 fi
+unset _aom_bins
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
 [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
