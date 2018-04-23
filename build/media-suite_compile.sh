@@ -886,7 +886,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
-        do_separate_conf video --enable-shared
+        do_separate_conf video --enable-shared --with-libgcrypt-prefix="$MINGW_PREFIX"
         do_make
         do_makeinstall
         mv -f "$LOCALDESTDIR/bin/libaacs-0.dll" "$LOCALDESTDIR/bin-video/libaacs.dll"
