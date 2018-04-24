@@ -1740,7 +1740,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
         mpv_enabled mruby &&
             { git merge --no-edit --no-gpg-sign origin/mruby ||
-              git merge --abort && mpv_disable mruby; }
+              git merge --abort && do_removeOption MPV_OPTS "--enable-mruby"; }
 
         files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
