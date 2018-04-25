@@ -1014,7 +1014,7 @@ do_custom_patches() {
 
 do_cmake() {
     local root=".."
-    local PKG_CONFIG=pkg-config
+    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
@@ -1566,6 +1566,8 @@ case $1 in
 esac
 done
 
+[[ -n $PKGCONF_STATIC ]] && static="--static"
+
 run_pkgcfg() {
     "$MINGW_PREFIX/bin/pkg-config" "$@" || exit 1
 }
@@ -1595,4 +1597,7 @@ EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config ]] &&
         diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config >/dev/null ||
         printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
+    [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
+        printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" | unix2dos |
+            cat > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
 }
