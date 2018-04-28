@@ -885,7 +885,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
         sed -i 's;gpg-error;& -lws2_32;' "$MINGW_PREFIX/bin/libgcrypt-config"
     grep -q ws2_32 "$MINGW_PREFIX/bin/gpg-error-config" ||
         sed -i 's;lgpg-error;& -lws2_32;' "$MINGW_PREFIX/bin/gpg-error-config"
-    _check=(bin-video/libaacs.dll libaacs.dll.a libaacs.{{,l}a,pc} libaacs/aacs.h)
+    _check=(bin-video/libaacs.dll libaacs.{{,dll.,l}a,pc} libaacs/aacs.h)
     if do_vcs "https://git.videolan.org/git/libaacs.git"; then
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
