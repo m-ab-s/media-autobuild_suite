@@ -226,8 +226,7 @@ if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gn
     if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
-        /usr/bin/grep -q "crypt32" lib/gnutls.pc.in ||
-            sed -i 's/Libs.private.*/& -lcrypt32/' lib/gnutls.pc.in
+        grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
         do_autoreconf
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
@@ -287,9 +286,8 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     else
         extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls})
     fi
-    /usr/bin/grep -q "NGHTTP2_STATICLIB" libcurl.pc.in ||
-        { sed -i 's;Cflags.*;& -DNGHTTP2_STATICLIB;' libcurl.pc.in &&
-          sed -i 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;' curl-config.in; }
+    grep_or_sed NGHTTP2_STATICLIB libcurl.pc.in 's;Cflags.*;& -DNGHTTP2_STATICLIB;'
+    grep_or_sed NGHTTP2_STATICLIB curl-config.in 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;'
     [[ ! -f configure || configure.ac -nt configure ]] && log autogen ./buildconf
     [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
@@ -861,12 +859,9 @@ if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
     do_uninstall include/dvdread "${_check[@]}"
     do_separate_confmakeinstall
     do_checkIfExist
-    grep -q 'ldl' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ||
-        sed -i "/Libs:.*/ a\Libs.private: -ldl -lpsapi" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
 fi
-[[ -f "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ]] &&
-    ! grep -q 'psapi' "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc &&
-    sed -ri "s;(Libs.private: .+);\1 -lpsapi;" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc
+grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
+        "/Libs:/ a\Libs.private: -ldl -lpsapi"
 
 _check=(libdvdnav.{l,}a dvdnav.pc)
 _deps=(libdvdread.a)
@@ -879,10 +874,15 @@ if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
 fi
 unset _deps
 
-if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
+if { [[ $ffmpeg != "no" ]] && enabled_any gcrypt libbluray; } ||
+    ! mpv_disabled libbluray; then
     do_pacman_install libgcrypt
-    grep -q ws2_32 "$MINGW_PREFIX/bin/libgcrypt-config" ||
-        sed -i 's;gpg-error;& -lws2_32;' "$MINGW_PREFIX/bin/libgcrypt-config"
+    grep_or_sed ws2_32 "$MINGW_PREFIX/bin/libgcrypt-config" 's;-lgpg-error;& -lws2_32;'
+    grep_or_sed ws2_32 "$MINGW_PREFIX/bin/gpg-error-config" 's;-lgpg-error;& -lws2_32;'
+fi
+
+
+if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "https://git.videolan.org/git/libaacs.git"; then
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
@@ -1353,8 +1353,8 @@ if [[ $ffmpeg != "no" ]]; then
     if enabled libssh; then
         do_pacman_install libssh
         do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
-        grep -q "Requires.private: zlib" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc ||
-            sed -i "/Libs:/ i\Requires.private: zlib libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc
+        grep_or_sed "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc \
+            "/Libs:/ i\Requires.private: zlib libssl"
     fi
     enabled libtheora && do_pacman_install libtheora
     if enabled libcdio; then
@@ -1383,8 +1383,8 @@ if [[ $ffmpeg != "no" ]]; then
         do_pacman_remove fftw && do_pacman_install chromaprint
     if enabled libzmq; then
         do_pacman_install zeromq
-        grep -q ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc ||
-            sed -i 's/-lsodium/& -lws2_32 -liphlpapi/' "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc
+        grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
+            's/-lsodium/& -lws2_32 -liphlpapi/'
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
@@ -1528,8 +1528,7 @@ if [[ $mplayer = "y" ]] &&
         compilation_fail "Finding valid ffmpeg dir"
     fi
 
-    grep -q "windows" libmpcodecs/ad_spdif.c ||
-        sed -i '/#include "mp_msg.h/ a\#include <windows.h>' libmpcodecs/ad_spdif.c
+    grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
 
     _notrequired="true"
     do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \

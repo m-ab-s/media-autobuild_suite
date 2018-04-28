@@ -1461,7 +1461,7 @@ hide_conflicting_libs() {
     fi
 }
 
-function hide_libressl() {
+hide_libressl() {
     local _hide_files=(include/openssl
         lib/lib{crypto,ssl,tls}.{,l}a
         lib/pkgconfig/openssl.pc
@@ -1600,4 +1600,16 @@ EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
         printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" | unix2dos |
             cat > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
+}
+
+grep_or_sed() {
+    local grep_re="$1"
+    local grep_file="$2"
+    local sed_re="$3"
+    shift 3
+    local sed_files=("$grep_file")
+    [[ -n "$1" ]] && sed_files=("$@")
+
+    /usr/bin/grep -q -- "$grep_re" "$grep_file" ||
+        /usr/bin/sed -ri -- "$sed_re" "${sed_files[@]}"
 }
