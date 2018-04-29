@@ -173,7 +173,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _check=(libfribidi.a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
-    if do_vcs "https://github.com/fribidi/fribidi.git"; then
+    if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
         extracommands=(--bindir=bin-video -Ddocs=false -Dglib=false)
         [[ $standalone = n ]] && sed -i "/subdir('bin')/d" meson.build
         sed -i "/subdir('test')/d" meson.build
