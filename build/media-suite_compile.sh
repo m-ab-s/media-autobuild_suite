@@ -79,7 +79,7 @@ local _keys="(prefix|exec_prefix|libdir|includedir)"
 # current abspath root
 local _root="$(cygpath -m /trunk)${LOCALDESTDIR}"
 # find .pc files with Windows abspaths
-grep -ElZ "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig/* | \
+grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
     # find those with a different abspath than the current
     xargs -0r grep -LZ "${_root}" | \
     # replace with current abspath
