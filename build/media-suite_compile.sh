@@ -860,7 +860,8 @@ if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
     do_separate_confmakeinstall
     do_checkIfExist
 fi
-grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
+[[ -f "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc ]] &&
+    grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
         "/Libs:/ a\Libs.private: -ldl -lpsapi"
 
 _check=(libdvdnav.{l,}a dvdnav.pc)

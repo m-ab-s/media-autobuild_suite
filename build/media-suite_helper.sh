@@ -1605,6 +1605,7 @@ EOF
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
+    [[ ! -f "$grep_file" ]] && return
     local sed_re="$3"
     shift 3
     local sed_files=("$grep_file")
