@@ -1340,33 +1340,26 @@ create_debug_link() {
 }
 
 get_vs_prefix() {
-    local vsprefix
-    local regkey="/HKLM/software/vapoursynth"
-    if [[ -n $(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe) ]]; then
+    local vsprefix winvsprefix
+    local regkey="/HKLM/software/vapoursynth/path"
+    local embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
+    if [[ -n "$embedded" ]]; then
         # look for .dlls in bin-video
-        vsprefix=$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)
-        vsprefix="${vsprefix%/*}"
-        [[ -d "$vsprefix/vapoursynth${bits:0:2}" ]] &&
-            echo "$vsprefix"
-    elif [[ $bits = 64bit ]] && regtool -q check "$regkey"; then
+        [[ -d "$vsprefix/vapoursynth${bits%bit}" ]] && vsprefix="${embedded%/*}"
+    elif [[ $bits = 64bit ]] && winvsprefix="$(regtool -q get "$regkey")"; then
         # check in native HKLM for installed VS (R31+)
-        vsprefix="$(regtool -q get "$regkey/path")"
-        [[ -n "$vsprefix" ]] && vsprefix="$(cygpath -u "$vsprefix/core64")" || vsprefix=""
-        [[ -n "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
-            echo "$vsprefix"
-    elif regtool -qW check "$regkey" && [[ $(regtool -qW list "$regkey") = *Path* ]]; then
-        # check in registry for installed VS
-        vsprefix="$(regtool -W get "$regkey/path")"
-        [[ -n "$vsprefix" ]] && vsprefix=$(cygpath -u "$vsprefix/core${bits:0:2}") || vsprefix=""
-        [[ -n "$vsprefix" && -f "$vsprefix/vspipe.exe" ]] &&
-            echo "$vsprefix"
+        [[ -n "$winvsprefix" && -f "$winvsprefix/core64/vspipe.exe" ]] &&
+            vsprefix="$(cygpath -u "$winvsprefix")/core64"
+    elif winvsprefix="$(regtool -qW get "$regkey")"; then
+        # check in 32-bit registry for installed VS
+        [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
+            vsprefix=$(cygpath -u "$vsprefix/core${bits%bit}")
     elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
-        vsprefix=$(which vspipe.exe)
-        vsprefix="${vsprefix%/*}"
-        [[ -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]] &&
-            echo "$vsprefix"
+        vsprefix="$(dirname "$(which vspipe.exe)")"
     fi
+    [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]] &&
+        echo "$vsprefix"
 }
 
 get_cl_path() {

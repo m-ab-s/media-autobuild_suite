@@ -111,6 +111,8 @@ Included Tools And Libraries
         - scale_cuda (needs CUDA SDK and MSVC **2015** installed)
             - if it doesn't work, blame Nvidia/Microsoft, don't bother opening issues about this
             - needs non-free license and --enable-cuda-sdk
+        - vapoursynth
+            - needs vapoursynth installed to compile and run
 
  - other tools
     - aom (git)

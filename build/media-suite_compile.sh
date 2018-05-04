@@ -1342,6 +1342,55 @@ if enabled libsrt &&
     do_checkIfExist
 fi
 
+vsprefix=$(get_vs_prefix)
+if [[ -n "$vsprefix" ]] &&
+    { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
+    vsversion="$("$vsprefix"/vspipe.exe -v | grep -Po "(?<=Core R)\d+")"
+    _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
+        vapoursynth/{VS{Helper,Script},VapourSynth}.h)
+    if ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; then
+        do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
+        do_vcs "https://github.com/vapoursynth/vapoursynth.git"
+        if git show-ref -q "R${vsversion}"; then
+            git reset -q --hard "R${vsversion}"
+        else
+            git reset -q --hard origin/master
+        fi
+
+        do_install include/*.h include/vapoursynth/
+
+        create_build_dir
+        for _file in vapoursynth vsscript; do
+            gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
+                sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
+            dlltool -l "lib${_file}.a" -d "${_file}.def" \
+                $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
+            [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
+        done
+
+        for _file in vapoursynth{,-script}.pc; do
+            sed -e "s;@prefix@;$LOCALDESTDIR;" \
+                -e 's;@exec_prefix@;${prefix};' \
+                -e 's;@libdir@;${prefix}/lib;' \
+                -e 's;@includedir@;${prefix}/include;' \
+                -e "s;@VERSION@;$vsversion;" \
+                -e '/Libs.private/ d' \
+                -e '/Requires.private/ d' \
+                -e 's;lvapoursynth-script;lvsscript;' \
+                "../pc/$_file.in" > "$_file"
+                do_install "$_file"
+        done
+
+        do_checkIfExist
+        add_to_remove
+    fi
+    unset vsversion _file
+else
+    mpv_disable vapoursynth
+    do_removeOption --enable-vapoursynth
+fi
+unset vsprefix
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
@@ -1391,6 +1440,15 @@ if [[ $ffmpeg != "no" ]]; then
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC && do_pacman_install libxml2
     enabled ladspa && do_pacman_install ladspa-sdk
+    if enabled vapoursynth && pc_exists "vapoursynth-script >= 42"; then
+        _ver="$(pkg-config --modversion vapoursynth-script)"
+        echo -e "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
+        echo -e "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run!${reset}"
+        unset _ver
+    elif enabled vapoursynth; then
+        do_removeOption --enable-vapoursynth
+        echo -e "${red}Update to at least Vapoursynth R42 to use with FFmpeg${reset}"
+    fi
 
     do_hide_all_sharedlibs
 
@@ -1573,60 +1631,14 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_print_status "└ $(get_first_subdir)" "$green" "Files up-to-date"
     fi
 
-    vsprefix=$(get_vs_prefix)
-    if ! mpv_disabled vapoursynth && [[ -n $vsprefix ]]; then
-        vsversion=$("$vsprefix"/vspipe -v | grep -Po "(?<=Core R)\d+")
-        if [[ $vsversion -ge 24 ]]; then
-            echo -e "${green}Compiling mpv with Vapoursynth R${vsversion}${reset}"
-            echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to run!${reset}"
-        else
-            vsprefix=""
-            echo -e "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
-        fi
-        _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
-            vapoursynth/{VS{Helper,Script},VapourSynth}.h)
-        if [[ x"$vsprefix" != x ]] &&
-            { ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; }; then
-            do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
-            do_vcs "https://github.com/vapoursynth/vapoursynth.git"
-            if git show-ref -q "R${vsversion}"; then
-                git reset -q --hard "R${vsversion}"
-            else
-                git reset -q --hard origin/master
-            fi
-
-            do_install include/*.h include/vapoursynth/
-
-            create_build_dir
-            for _file in vapoursynth vsscript; do
-                gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
-                    sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
-                dlltool -l "lib${_file}.a" -d "${_file}.def" \
-                    $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
-                [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
-            done
-
-            for _file in vapoursynth{,-script}.pc; do
-                sed -e "s;@prefix@;$LOCALDESTDIR;" \
-                    -e 's;@exec_prefix@;${prefix};' \
-                    -e 's;@libdir@;${prefix}/lib;' \
-                    -e 's;@includedir@;${prefix}/include;' \
-                    -e "s;@VERSION@;$vsversion;" \
-                    -e '/Libs.private/ d' \
-                    -e '/Requires.private/ d' \
-                    -e 's;lvapoursynth-script;lvsscript;' \
-                    "../pc/$_file.in" > "$_file"
-                    do_install "$_file"
-            done
-
-            do_checkIfExist
-            add_to_remove
-        elif [[ -z "$vsprefix" ]]; then
-            mpv_disable vapoursynth
-        fi
-        unset vsprefix vsversion _file
-    elif ! mpv_disabled vapoursynth; then
+    if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
+        _ver="$(pkg-config --modversion vapoursynth-script)"
+        echo -e "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
+        echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to run!${reset}"
+        unset _ver
+    elif ! mpv_disabled vapoursynth
         mpv_disable vapoursynth
+        echo -e "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
     fi
 
     _check=(mujs.h libmujs.a)
