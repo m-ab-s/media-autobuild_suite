@@ -1730,6 +1730,10 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
                 mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
             fi
+            mpv_cflags+=("-DARCH_X86_64=1")
+            export ARCH_X86_64=1
+        else
+            unset ARCH_X86_64
         fi
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
@@ -1758,7 +1762,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
 
-        unset mpv_ldflags replace
+        unset mpv_ldflags mpv_cflags replace ARCH_X86_64
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
