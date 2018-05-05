@@ -1636,7 +1636,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         echo -e "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
         echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to run!${reset}"
         unset _ver
-    elif ! mpv_disabled vapoursynth
+    elif ! mpv_disabled vapoursynth; then
         mpv_disable vapoursynth
         echo -e "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
     fi
