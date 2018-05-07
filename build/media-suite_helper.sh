@@ -1354,7 +1354,7 @@ get_vs_prefix() {
     elif winvsprefix="$(regtool -qW get "$regkey")"; then
         # check in 32-bit registry for installed VS
         [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
-            vsprefix=$(cygpath -u "$vsprefix/core${bits%bit}")
+            vsprefix=$(cygpath -u "$winvsprefix/core${bits%bit}")
     elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
         vsprefix="$(dirname "$(which vspipe.exe)")"
