@@ -1340,7 +1340,8 @@ create_debug_link() {
 }
 
 get_vs_prefix() {
-    local vsprefix winvsprefix
+    unset vsprefix
+    local winvsprefix
     local regkey="/HKLM/software/vapoursynth/path"
     local embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
     if [[ -n "$embedded" ]]; then
@@ -1358,8 +1359,14 @@ get_vs_prefix() {
         # last resort, check if vspipe is in path
         vsprefix="$(dirname "$(which vspipe.exe)")"
     fi
-    [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]] &&
-        echo "$vsprefix"
+    if [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
+        local bitness="$(file "$vsprefix/vapoursynth.dll")"
+        { [[ $bits = 64bit && $bitness = *x86-64* ]] ||
+            [[ $bits = 32bit && $bitness = *80386* ]]; } &&
+            return 0
+    else
+        return 1
+    fi
 }
 
 get_cl_path() {

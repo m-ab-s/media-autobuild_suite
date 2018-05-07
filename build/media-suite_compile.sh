@@ -1342,8 +1342,8 @@ if enabled libsrt &&
     do_checkIfExist
 fi
 
-vsprefix=$(get_vs_prefix)
-if [[ -n "$vsprefix" ]] &&
+
+if get_vs_prefix &&
     { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
     vsversion="$("$vsprefix"/vspipe.exe -v | grep -Po "(?<=Core R)\d+")"
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
