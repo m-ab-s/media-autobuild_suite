@@ -1346,7 +1346,7 @@ get_vs_prefix() {
     local embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
     if [[ -n "$embedded" ]]; then
         # look for .dlls in bin-video
-        [[ -d "$vsprefix/vapoursynth${bits%bit}" ]] && vsprefix="${embedded%/*}"
+        vsprefix="${embedded%/*}"
     elif [[ $bits = 64bit ]] && winvsprefix="$(regtool -q get "$regkey")"; then
         # check in native HKLM for installed VS (R31+)
         [[ -n "$winvsprefix" && -f "$winvsprefix/core64/vspipe.exe" ]] &&
@@ -1354,7 +1354,7 @@ get_vs_prefix() {
     elif winvsprefix="$(regtool -qW get "$regkey")"; then
         # check in 32-bit registry for installed VS
         [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
-            vsprefix=$(cygpath -u "$winvsprefix/core${bits%bit}")
+            vsprefix="$(cygpath -u "$winvsprefix/core${bits%bit}")"
     elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
         vsprefix="$(dirname "$(which vspipe.exe)")"
