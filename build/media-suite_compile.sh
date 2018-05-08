@@ -1349,8 +1349,8 @@ if get_vs_prefix &&
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
         vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; then
-        do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
         do_vcs "https://github.com/vapoursynth/vapoursynth.git"
+        do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
         if git show-ref -q "R${vsversion}"; then
             git reset -q --hard "R${vsversion}"
         else
