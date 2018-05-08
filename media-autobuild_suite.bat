@@ -999,7 +999,7 @@ if exist %build%\msys2-base.tar.xz GOTO unpack
 if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
 if not exist %build%\wget.exe (
     powershell -noprofile -command ^
-    "(new-object System.Net.WebClient).DownloadFile('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe')"
+    "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12';$request = New-Object System.Net.WebCLient; $request.DownloadFile('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe')"
     %build%\wget-pack.exe x
     )
 if not exist %build%\wget.exe (
