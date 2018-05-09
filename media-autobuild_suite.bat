@@ -999,11 +999,16 @@ if exist %build%\msys2-base.tar.xz GOTO unpack
 if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
 if not exist %build%\wget.exe (
     powershell -noprofile -command ^
-    "[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12';"^
-    "(new-object System.Net.WebClient).DownloadFile("^
-    "'https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe')"
-    %build%\wget-pack.exe x
-    )
+"[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12';(new-object System.Net.WebClient).DownloadFile('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe')"
+
+    for /f "tokens=1 delims=" %%a ^
+in ('powershell -noprofile -command "(get-filehash -algorithm sha256 wget-pack.exe).hash"') do set _hash=%%a
+
+    if ["%_hash%"]==["3F226318A73987227674A4FEDDE47DF07E85A48744A07C7F6CDD4F908EF28947"] (
+        %build%\wget-pack.exe x
+    ) else del wget-pack.exe
+
+
 if not exist %build%\wget.exe (
     echo -------------------------------------------------------------------------------
     echo Script to download necessary components failed.
