@@ -966,6 +966,7 @@ if [[ $ffmpeg != "no" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" 
 fi
 
 if [[ $mediainfo = "y" ]]; then
+    [[ $curl=openssl ]] && hide_libressl
     _check=(libzen.{a,pc})
     if do_vcs "https://github.com/MediaArea/ZenLib" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
@@ -993,6 +994,7 @@ if [[ $mediainfo = "y" ]]; then
         do_makeinstall
         do_checkIfExist
     fi
+    [[ $curl=openssl ]] && hide_libressl -R
 fi
 
 _check=(libvidstab.a vidstab.pc)
