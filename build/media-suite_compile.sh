@@ -219,6 +219,7 @@ if [[ $curl = y ]]; then
     enabled libtls && curl=libressl
     enabled openssl && curl=openssl
     enabled gnutls && curl=gnutls
+    enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
 if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gnutls ]]; then
@@ -258,11 +259,14 @@ if { [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; } || [[ $curl = l
     fi
 fi
 
+{ enabled mbedtls || [[ $curl = mbedtls ]]; } && do_pacman_install mbedtls
+
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 [[ $curl = libressl ]] && _deps+=(libssl.a)
 [[ $curl = openssl ]] && _deps+=("$MINGW_PREFIX/lib/libssl.a")
 [[ $curl = gnutls ]] && _deps+=(libgnutls.a)
+[[ $curl = mbedtls ]] && _deps+=("$MINGW_PREFIX/lib/libmbedtls.a")
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
@@ -280,11 +284,13 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
     if [[ $curl =~ (libre|open)ssl ]]; then
-        extra_opts+=(--with-{ssl,nghttp2} --without-gnutls)
+        extra_opts+=(--with-{ssl,nghttp2} --without-{gnutls,mbedtls})
+    elif [[ $curl =~ mbedtls ]]; then
+        extra_opts+=(--with-{mbedtls,nghttp2} --without-ssl)
     elif [[ $curl = gnutls ]]; then
-        extra_opts+=(--with-gnutls --without-{ssl,nghttp2})
+        extra_opts+=(--with-gnutls --without-{ssl,nghttp2,mbedtls})
     else
-        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls})
+        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls,mbedtls})
     fi
     grep_or_sed NGHTTP2_STATICLIB libcurl.pc.in 's;Cflags.*;& -DNGHTTP2_STATICLIB;'
     grep_or_sed NGHTTP2_STATICLIB curl-config.in 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;'

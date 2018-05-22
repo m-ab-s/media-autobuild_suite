@@ -44,9 +44,11 @@ Included Tools And Libraries
             - openssl (mingw)
                 - preferred to gnutls and to libtls if all three are in options
                 - needs non-GPL license
-            - gnutls (latest release)
             - libtls (from libressl) (latest release)
                 - needs non-GPL license
+            - mbedtls (mingw)
+                - preferred to gnutls if GPLv2/v3 license is chosen
+            - gnutls (latest release)
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig, fontconfig backend included

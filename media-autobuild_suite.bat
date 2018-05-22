@@ -77,7 +77,7 @@ set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
-libwebp libxml2 libzimg libshine gpl openssl libtls avisynth
+libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls
 
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint cuda-sdk decklink frei0r libbs2b libcaca ^
@@ -751,6 +751,7 @@ if %curlINI%==0 (
     echo. 4 = GnuTLS backend
     echo. 5 = OpenSSL backend
     echo. 6 = LibreSSL backend
+    echo. 7 = mbedTLS backend
     echo.
     echo. A curl-ca-bundle.crt will be created to be used as trusted certificate store
     echo. for all backends except SChannel.
@@ -767,7 +768,8 @@ if %buildcurl%==3 set "curl=schannel"
 if %buildcurl%==4 set "curl=gnutls"
 if %buildcurl%==5 set "curl=openssl"
 if %buildcurl%==6 set "curl=libressl"
-if %buildcurl% GTR 6 GOTO curl
+if %buildcurl%==7 set "curl=mbedtls"
+if %buildcurl% GTR 7 GOTO curl
 if %writeCurl%==yes echo.curl=^%buildcurl%>>%ini%
 
 :ffmbc

@@ -682,26 +682,31 @@ do_getFFmpegConfig() {
         else
             do_addOption --enable-gnutls
         fi
-        do_removeOption "--enable-(gmp|gcrypt)"
+        do_removeOption "--enable-(gmp|gcrypt|mbedtls)"
     fi
 
+    local _all_tls="--enable-(mbedtls|gnutls|openssl|libtls|schannel)"
     if enabled_any libtls openssl && [[ $license != gpl* ]]; then
         # prefer openssl/libtls if both are in options and not gpl
 
         # prefer openssl over libtls if both enabled
-        local _remove=openssl
+        local _prefer=libtls
         if enabled openssl; then
-            _remove=libtls
+            _prefer=openssl
         fi
 
-        do_removeOption "--enable-(gnutls|schannel|$_remove)"
-
+        do_removeOption "${_all_tls}"
+        do_addOption "--enable-${_prefer}"
+    elif enabled mbedtls; then
+        # prefer mbedtls if any other tls libs are enabled and gpl
+        do_removeOption "${_all_tls}"
+        do_addOption --enable-mbedtls
     elif enabled gnutls; then
-        # prefer gnutls if both are in options and gpl
-        do_removeOption "--enable-(openssl|libtls|schannel)"
+        do_removeOption "${_all_tls}"
         do_addOption --enable-gnutls
-    else
-        do_removeOption "--enable-(openssl|libtls)"
+    elif ! disabled schannel; then
+        # fallback to schannel if no other tls libs are enabled
+        do_addOption --enable-schannel
     fi
 
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128} netcdf &&
@@ -789,7 +794,8 @@ do_changeFFmpegConfig() {
         do_addOption --disable-stripping
     fi
 
-    enabled openssl && do_removeOption "--enable-(gcrypt|gmp)"
+    # both openssl and mbedtls don't need gcrypt/gmp for rtmpe
+    enabled_any openssl mbedtls && do_removeOption "--enable-(gcrypt|gmp)"
 
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
