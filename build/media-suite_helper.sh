@@ -985,27 +985,29 @@ do_patch() {
     local patch=${1%% *}
     local am=$2          # "am" to apply patch with "git am"
     local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
+    local patchfn="${1##* }"
+    [[ $patchfn = "$patch" ]] &&
+        patchfn="${patch##*/}"
     [[ $patch = ${patch##*/} ]] &&
         patch="/patches/$patch"
-    do_wget -c -r -q "$patch"
-    [[ ! -f "$patch" ]] && patch=${patch##*/}
-    if [[ -f "$patch" ]]; then
+    do_wget -c -r -q "$patch" "$patchfn"
+    if [[ -f "$patchfn" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patch" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace "$patchfn" >/dev/null 2>&1; then
                 git am -q --abort
-                echo -e "${orange}${patch}${reset}"
+                echo -e "${orange}${patchfn}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run --binary -s -N -p"$strip" -i "$patch" >/dev/null 2>&1; then
-                patch --binary -s -N -p"$strip" -i "$patch"
+            if patch --dry-run --binary -s -N -p"$strip" -i "$patchfn" >/dev/null 2>&1; then
+                patch --binary -s -N -p"$strip" -i "$patchfn"
             else
-                echo -e "${orange}${patch}${reset}"
+                echo -e "${orange}${patchfn}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
             fi
         fi
     else
-        echo -e "${orange}${patch}${reset}"
+        echo -e "${orange}${patchfn}${reset}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
     fi
 }
