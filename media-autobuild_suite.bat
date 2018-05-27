@@ -77,14 +77,15 @@ set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
-libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls
+libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
+libaom
 
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint cuda-sdk decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 libopenmpt librtmp librubberband libssh ^
-libtesseract libxavs libxvid libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt libaom ladspa vapoursynth
+libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
+libsrt ladspa vapoursynth
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^

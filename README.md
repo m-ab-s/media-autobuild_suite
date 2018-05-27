@@ -49,6 +49,7 @@ Included Tools And Libraries
             - mbedtls (mingw)
                 - preferred to gnutls if GPLv2/v3 license is chosen
             - gnutls (latest release)
+        - libaom (git)
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig, fontconfig backend included
@@ -71,13 +72,13 @@ Included Tools And Libraries
         - libwavpack (mingw)
         - libwebp (git)
         - libxml2 (mingw)
+        - libxvid (1.3.5)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
-        - libaom (git)
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
@@ -104,8 +105,6 @@ Included Tools And Libraries
         - libcodec2 (0.7)
         - ladspa (mingw)
         - libxavs (svn snapshot)
-        - libxvid (mingw)
-            - compiled with gnutls or openssl depending on license chosen
         - libzmq (mingw)
         - libzvbi (0.2.35)
         - opencl (from system)
