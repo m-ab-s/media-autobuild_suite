@@ -67,8 +67,8 @@ gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
 
 :: built-ins
-set ffmpeg_options_builtin=#amf #bzlib #cuda #cuvid #d3d11va #dxva2 ^
-#iconv #lzma #nvenc #schannel #zlib #sdl2 --disable-debug
+set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
+iconv lzma nvenc schannel zlib sdl2 --disable-debug ffnvcodec nvdec
 
 :: common external libs
 set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265
@@ -78,7 +78,7 @@ set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
 libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
-libaom
+libaom version3
 
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint cuda-sdk decklink frei0r libbs2b libcaca ^
@@ -573,7 +573,7 @@ if %buildffmpegChoice%==1 (
         (
             echo.# Lines starting with this character are ignored
             echo.
-            echo.# Built-in options, use --disable- to disable them
+            echo.# Basic built-in options, can be removed if you delete "--disable-autodetect"
             call :writeOption %ffmpeg_options_builtin%
             echo.
             echo.# Common options
