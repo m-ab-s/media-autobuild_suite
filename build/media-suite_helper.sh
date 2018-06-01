@@ -1435,6 +1435,7 @@ get_api_version() {
     [[ -n $(file_installed "$header") ]] && header="$(file_installed "$header")"
     local line="$2"
     local column="$3"
+    [[ ! -f "$header" ]] && printf '' && return
     /usr/bin/grep "${line:-VERSION}" "$header" | awk '{ print $c }' c="${column:-3}" | sed 's|"||g'
 }
 
