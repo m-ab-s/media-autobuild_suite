@@ -847,7 +847,8 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "no" ]] && enabled libkvazaar; }; 
 fi
 
 _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
-if { { [[ $ffmpeg != "no" ]] && ! disabled sdl2; } ||
+if { { [[ $ffmpeg != "no" ]] &&
+    { enabled sdl2 || ! disabled_any sdl2 autodetect; }; } ||
     mpv_enabled sdl2; } &&
     do_pkgConfig "sdl2 = 2.0.8" &&
     do_wget -h edc77c57308661d576e843344d8638e025a7818bff73f8fbfab09c3c5fd092ec \
@@ -1069,7 +1070,7 @@ if [[ $ffmpeg != "no" ]] && enabled libmfx &&
 fi
 
 _check=(AMF/core/Version.h)
-if [[ $ffmpeg != no ]] && ! disabled_any autodetect amf &&
+if [[ $ffmpeg != no ]] && { enabled amf || ! disabled_any autodetect amf; } &&
     do_vcs "https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git"; then
     do_uninstall include/AMF
     cd_safe amf/public/include
@@ -1319,8 +1320,8 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
 fi
 
 _check=(ffnvcodec/nvEncodeAPI.h)
-if [[ $ffmpeg != "no" ]] && { ! disabled_any ffnvcodec autodetect ||
-    ! mpv_disabled cuda-hwaccel; } &&
+if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||
+    ! disabled_any ffnvcodec autodetect || ! mpv_disabled cuda-hwaccel; } &&
     do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git"; then
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
@@ -1343,7 +1344,8 @@ if enabled libsrt &&
     rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
     if [[ $standalone = y ]]; then
         do_install {stransmit,suflip}.exe bin-video/
-        ! disabled_any sdl2 ffplay && do_install ../scripts/sfplay bin-video/
+        { enabled_any sdl2 ffplay || ! disabled_any sdl2 ffplay autodetect; }
+            && do_install ../scripts/sfplay bin-video/
     fi
     grep -ZlER -- "\bWIN32" "$LOCALDESTDIR"/include/srt | xargs -r -0 sed -ri 's;\bWIN32;_WIN32;g'
     hide_libressl -R
