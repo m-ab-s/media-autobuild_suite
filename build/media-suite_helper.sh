@@ -1027,7 +1027,7 @@ do_custom_patches() {
 
 do_cmake() {
     local root=".."
-    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config.bat"
+    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
@@ -1614,6 +1614,9 @@ EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
         printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" | unix2dos |
             cat > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
+    [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat ]] ||
+        printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" | unix2dos |
+            cat > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
 }
 
 grep_or_sed() {
