@@ -374,7 +374,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     fi
 
     _check=(libtesseract.{,l}a tesseract.pc)
-    if do_vcs "https://github.com/tesseract-ocr/tesseract.git"; then
+    if do_vcs "https://github.com/tesseract-ocr/tesseract.git#commit=e313ed1bb96^"; then
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
