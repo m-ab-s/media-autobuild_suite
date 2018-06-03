@@ -1344,7 +1344,7 @@ if enabled libsrt &&
     rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
     if [[ $standalone = y ]]; then
         do_install {stransmit,suflip}.exe bin-video/
-        { enabled_any sdl2 ffplay || ! disabled_any sdl2 ffplay autodetect; }
+        { enabled_any sdl2 ffplay || ! disabled_any sdl2 ffplay autodetect; }\
             && do_install ../scripts/sfplay bin-video/
     fi
     grep -ZlER -- "\bWIN32" "$LOCALDESTDIR"/include/srt | xargs -r -0 sed -ri 's;\bWIN32;_WIN32;g'
