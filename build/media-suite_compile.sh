@@ -1708,7 +1708,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             fi
         }
 
-        add_third_party "https://github.com/google/glslang.git"
+        add_third_party "https://github.com/KhronosGroup/glslang.git"
         add_third_party "https://github.com/KhronosGroup/SPIRV-Tools.git" spirv-tools
         add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
 
