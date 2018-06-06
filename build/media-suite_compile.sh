@@ -1172,7 +1172,7 @@ if [[ $x264 != no ]]; then
         x264_build="$(grep X264_BUILD x264.h | awk '{ print $3 }' | head -1)"
         if [[ $x264 = shared ]]; then
             extracommands+=(--enable-shared)
-            _check+=(libx264{,.dll}.a bin-video/libx264-"${x264_build}".dll)
+            _check+=(libx264.dll.a bin-video/libx264-"${x264_build}".dll)
         else
             extracommands+=(--enable-static)
             _check+=(libx264.a)
