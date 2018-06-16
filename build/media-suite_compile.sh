@@ -1459,6 +1459,7 @@ if [[ $ffmpeg != "no" ]]; then
         do_removeOption --enable-vapoursynth
         echo -e "${red}Update to at least Vapoursynth R42 to use with FFmpeg${reset}"
     fi
+    disabled autodetect && enabled iconv && do_addOption --extra-libs=-liconv
 
     do_hide_all_sharedlibs
 
