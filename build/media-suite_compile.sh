@@ -1679,7 +1679,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             do_checkIfExist
         fi
 
-        _check=(libvulkan.a vulkan.pc vulkan/vk_layer_dispatch_table.h)
+        _check=(libvulkan.a vulkan.pc)
         _deps=(vulkan/vulkan.h)
         if do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
             _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
