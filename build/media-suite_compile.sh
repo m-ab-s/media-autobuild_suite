@@ -929,13 +929,16 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     log javahome get_java_home
     OLD_PATH="$PATH"
     if [[ -n "$JAVA_HOME" ]]; then
-        if [[ ! -f /opt/apache-ant/bin/ant ]] &&
-            do_wget -r -c \
-                -h e9e271d02156fd31e76133f643b3027d3d3a1e91e477def00cf50a66bafcfbd9 \
-                "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.3-bin.zip" \
+        if [[ ! -f /opt/apache-ant/bin/ant ]] ; then
+            apache_ant_ver="$(clean_html_index "https://www.apache.org/dist/ant/binaries/")"
+            apache_ant_ver="$(get_last_version "$apache_ant_ver" "apache-ant" "1\.\d+\.\d+")"
+            apache_ant_ver="${apache_ant_ver:-1.10.4}"
+            if do_wget -r -c \
+                "https://www.apache.org/dist/ant/binaries/apache-ant-${apache_ant_ver}-bin.zip" \
                 apache-ant.zip; then
-            rm -rf /opt/apache-ant
-            mv apache-ant/apache-ant* /opt/apache-ant
+                rm -rf /opt/apache-ant
+                mv apache-ant/apache-ant* /opt/apache-ant
+            fi
         fi
         PATH="/opt/apache-ant/bin:$JAVA_HOME/bin:$PATH"
         log ant-diagnostics ant -diagnostics
