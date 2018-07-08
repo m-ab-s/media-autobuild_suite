@@ -824,7 +824,8 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_uninstall include/aom "${_check[@]}"
     extracommands+=($(get_external_opts))
     do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
-        -DCONFIG_UNIT_TESTS=0 "${extracommands[@]}"
+        -DCONFIG_UNIT_TESTS=0 -DENABLE_TEST{S,DATA}=OFF \
+        "${extracommands[@]}"
     if [[ -n $_aom_bins ]]; then
         rm -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe
         do_install aom{enc,dec}.exe bin-video/
