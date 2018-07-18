@@ -90,6 +90,7 @@ Included Tools And Libraries
         - libgsm (mingw)
         - libilbc (git snapshot)
         - libkvazaar (git)
+        - liblensfun (0.3.95)
         - libmysofa (git)
             - needed for sofalizer filter
         - libnpp (needs CUDA SDK installed)

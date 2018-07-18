@@ -1405,6 +1405,18 @@ else
 fi
 unset vsprefix
 
+_check=(liblensfun.{a,pc} lensfun/lensfun.h)
+if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
+    do_vcs "git://git.code.sf.net/p/lensfun/code#tag=v0.3.95" lensfun; then
+    do_uninstall "bin-video/lensfun" "${_check[@]}"
+    do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/cmake-mingw.patch"
+    do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/lenstool.patch"
+    do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
+        -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
+    do_checkIfExist
+    add_to_remove
+fi
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm

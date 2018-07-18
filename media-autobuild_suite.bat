@@ -554,7 +554,7 @@ if %ffmpegChoiceINI%==0 (
     echo. 3 = No ^(Mimic Zeranoe^)
     echo. 4 = No ^(All available external libs^)
     echo.
-    echo. Avoid the last one unless you're really want useless libraries you'll never use.
+    echo. Avoid the last two unless you're really want useless libraries you'll never use.
     echo. Just because you can include a shitty codec no one uses doesn't mean you should.
     echo.
     echo. If you select yes, we will create files with the default options
