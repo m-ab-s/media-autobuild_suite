@@ -228,7 +228,7 @@ if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gn
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
-        do_autoreconf
+        log bootstrap ./bootstrap
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
