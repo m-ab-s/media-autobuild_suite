@@ -1703,6 +1703,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
             do_uninstall "${_check[@]}"
             do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
+            sed -i 's;if(WIN32);if(MSVC);' loader/CMakeLists.txt
             CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
                 CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
                 CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
