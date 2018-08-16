@@ -89,7 +89,7 @@ libsrt ladspa vapoursynth
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
-#encoding #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
+#libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
 #shaderc #crossc #d3d11 #jpeg
 
 :: overriden defaults
