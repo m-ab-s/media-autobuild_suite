@@ -1187,6 +1187,8 @@ if [[ $x264 != no ]]; then
             extracommands+=(--bit-depth=10)
         elif [[ $x264 = o8 ]]; then
             extracommands+=(--bit-depth=8)
+        else
+            extracommands+=(--bit-depth=all)
         fi
 
         do_uninstall "${_check[@]}"
