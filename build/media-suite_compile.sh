@@ -1752,10 +1752,8 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
 
-        pushd ./third_party/spirv-tools >/dev/null
         _shinchiro_patches="https://github.com/shinchiro/mpv-winbuild-cmake/raw/master/packages"
         do_patch "${_shinchiro_patches}/spirv-tools-0001-readd-message.h-back.patch"
-        popd >/dev/null
 
         do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
         log make ninja
