@@ -1413,7 +1413,7 @@ else
 fi
 unset vsprefix
 
-_check=(liblensfun.{a,pc} lensfun/lensfun.h)
+_check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
 if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
     do_vcs "git://git.code.sf.net/p/lensfun/code#tag=v0.3.95" lensfun; then
     do_pacman_install glib2
