@@ -1415,13 +1415,16 @@ unset vsprefix
 
 _check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
 if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
+    do_pkgConfig "lensfun = 0.3.95.0" &&
     do_vcs "git://git.code.sf.net/p/lensfun/code#tag=v0.3.95" lensfun; then
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
+    grep_or_sed stdc libs/lensfun/lensfun.pc.cmake 's;Libs.private.*;& -lstdc++;'
     do_uninstall "bin-video/lensfun" "${_check[@]}"
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/cmake-mingw.patch"
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/lenstool.patch"
-    do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
+    CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
+        do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
         -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
     do_checkIfExist
     add_to_remove
