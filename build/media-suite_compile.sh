@@ -114,6 +114,7 @@ unset _clean_old_builds
     hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
 hide_conflicting_libs -R
 do_hide_all_sharedlibs
+create_ab_pkgconfig
 
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
