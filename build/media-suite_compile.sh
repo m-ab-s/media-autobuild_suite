@@ -126,6 +126,18 @@ if [[ $packing = y ]] &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
+_check=(bin-global/rg.exe)
+if [[ $ripgrep = y ]] &&
+    do_vcs "https://github.com/BurntSushi/ripgrep.git#tag=0.*"; then
+    update_rust
+    do_uninstall "${_check[@]}"
+    log build cargo build --release --features 'pcre2'
+    log install cargo install --root "$LOCALDESTDIR"
+    [[ -e "$LOCALDESTDIR/bin/rg.exe" ]] && mv -f "$LOCALDESTDIR"/bin{,-global}/rg.exe
+    do_checkIfExist
+fi
+
+
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
