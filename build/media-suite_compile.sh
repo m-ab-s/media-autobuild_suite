@@ -1357,21 +1357,10 @@ _check=(libsrt.a srt.pc srt/srt.h)
 if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
-    if [[ $standalone = y ]]; then
-        # stransmit works fine in msys2 mingw
-        sed -i '/^if.*ENABLE_CXX11 /,${/if.*NOT MINGW/d}' CMakeLists.txt
-    fi
-    sed -ri 's;(Libs.private.*);\1 -lstdc++;g' scripts/haisrt.pc.in
-    extracommands=(-DENABLE_SUFLIP=off -DOPENSSL_ROOT_DIR="$MINGW_PREFIX")
-    [[ $standalone = y ]] && extracommands+=(-DENABLE_SUFLIP=on)
-    do_cmakeinstall -DENABLE_SHARED=off "${extracommands[@]}"
-    rm -f "$LOCALDESTDIR"/bin/{sfplay,suflip.exe,stransmit.exe}
-    if [[ $standalone = y ]]; then
-        do_install {stransmit,suflip}.exe bin-video/
-        { enabled_any sdl2 ffplay || ! disabled_any sdl2 ffplay autodetect; } \
-            && do_install ../scripts/sfplay bin-video/
-    fi
-    grep -ZlER -- "\bWIN32" "$LOCALDESTDIR"/include/srt | xargs -r -0 sed -ri 's;\bWIN32;_WIN32;g'
+    do_patch https://0x0.st/sv8c.txt am
+    do_cmakeinstall -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
+        -DENABLE_EXAMPLES=off -DOPENSSL_ROOT_DIR="$MINGW_PREFIX" \
+        -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-video"
     hide_libressl -R
     do_checkIfExist
 fi
