@@ -513,8 +513,6 @@ if { [[ $ffmpeg != "no" ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
         do_uninstall "${_check[@]}"
         CXXFLAGS+=" -O2" do_separate_confmakeinstall audio
         do_checkIfExist
-    else
-        ! disabled libfdk-aac && do_addOption --enable-libfdk-aac
     fi
     unset _deps
 fi
