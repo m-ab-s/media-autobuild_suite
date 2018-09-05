@@ -1353,7 +1353,7 @@ if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||
 fi
 
 _check=(libsrt.a srt.pc srt/srt.h)
-[[ $standalone = y ]] && _check+=(bin-video/{stransmit,suflip}.exe)
+[[ $standalone = y ]] && _check+=(bin-video/srt-{live-transmit,multiplex}.exe)
 if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
