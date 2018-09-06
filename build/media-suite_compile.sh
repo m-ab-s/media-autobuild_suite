@@ -1420,7 +1420,7 @@ if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
     sed -ri 's; -l(giowin32|gnulib|charset);;g' "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc"
-    grep_or_sed stdc libs/lensfun/lensfun.pc.cmake 's;Libs.private.*;& -lstdc++;'
+    grep_or_sed Libs.private libs/lensfun/lensfun.pc.cmake '/Libs:/ a\Libs.private: -lstdc++'
     do_uninstall "bin-video/lensfun" "${_check[@]}"
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/cmake-mingw.patch"
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/lenstool.patch"
