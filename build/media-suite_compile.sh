@@ -1356,6 +1356,7 @@ if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
     do_patch https://0x0.st/svJz.txt
+    do_patch https://0x0.st/svJV.txt
     do_cmakeinstall -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
         -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on \
         -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-video"
