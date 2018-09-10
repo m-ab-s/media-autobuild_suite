@@ -499,7 +499,7 @@ fi
 
 if { [[ $ffmpeg != "no" ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
     _check=(libfdk-aac.{l,}a fdk-aac.pc)
-    if do_vcs "https://github.com/mstorsjo/fdk-aac"; then
+    if do_vcs "https://github.com/mstorsjo/fdk-aac#commit=e45ae429"; then
         do_autoreconf
         do_uninstall include/fdk-aac "${_check[@]}"
         CXXFLAGS+=" -O2 -fno-exceptions -fno-rtti" do_separate_confmakeinstall
