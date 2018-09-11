@@ -829,19 +829,20 @@ fi
 _check=(libaom.a aom.pc)
 [[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
-    do_vcs https://aomedia.googlesource.com/aom; then
-# as long as GCC 8.2.0 is only used in MinGW64, and only 8.2.0 produces instructions with unaligned memory access:
-    if [[ $bits = 32bit ]]; then
-        extracommands=()
-    else
-        extracommands=(-DAOM_EXTRA_C_FLAGS="-fno-tree-slp-vectorize" -DAOM_EXTRA_CXX_FLAGS="-fno-tree-slp-vectorize")
+    do_vcs "https://aomedia.googlesource.com/aom#commit=df4ffb73140f^"; then
+    extracommands=()
+    # as long as GCC 8.2.0 is only used in MinGW64,
+    # and only 8.2.0 produces instructions with unaligned memory access:
+    if [[ $bits = 64bit ]]; then
+        extracommands+=(-DAOM_EXTRA_C_FLAGS="-fno-tree-slp-vectorize"
+            -DAOM_EXTRA_CXX_FLAGS="-fno-tree-slp-vectorize")
     fi
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
     do_uninstall include/aom "${_check[@]}"
     extracommands+=($(get_external_opts))
     do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
-        -DCONFIG_UNIT_TESTS=0 -DENABLE_TEST{S,DATA}=OFF \
+        -DENABLE_TEST{S,DATA}=OFF \
         "${extracommands[@]}"
     if [[ -n $_aom_bins ]]; then
         rm -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe
