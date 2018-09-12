@@ -829,7 +829,7 @@ fi
 _check=(libaom.a aom.pc)
 [[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
-    do_vcs "https://aomedia.googlesource.com/aom#commit=df4ffb73140f^"; then
+    do_vcs "https://aomedia.googlesource.com/aom"; then
     extracommands=()
     # as long as GCC 8.2.0 is only used in MinGW64,
     # and only 8.2.0 produces instructions with unaligned memory access:
