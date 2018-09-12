@@ -101,7 +101,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -287,6 +287,27 @@ if %buildaom%==1 set "aom=y"
 if %buildaom%==2 set "aom=n"
 if %buildaom% GTR 2 GOTO aom
 if %writeaom%==yes echo.aom=^%buildaom%>>%ini%
+
+:rav1e
+set "writerav1e=no"
+if %rav1eINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build rav1e [Alternative, faster AV1 standalone encoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildrav1e="Build rav1e: "
+    ) else set buildrav1e=%rav1eINI%
+if %deleteINI%==1 set "writerav1e=yes"
+
+if %buildrav1e%==1 set "rav1e=y"
+if %buildrav1e%==2 set "rav1e=n"
+if %buildrav1e% GTR 2 GOTO rav1e
+if %writerav1e%==yes echo.rav1e=^%buildrav1e%>>%ini%
 
 :x264
 set "writex264=no"
@@ -842,6 +863,27 @@ if %buildredshift%==1 set "redshift=y"
 if %buildredshift%==2 set "redshift=n"
 if %buildredshift% GTR 2 GOTO redshift
 if %writeredshift%==yes echo.redshift=^%buildredshift%>>%ini%
+
+:ripgrep
+set "writeripgrep=no"
+if %ripgrepINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build ripgrep ^(faster grep in Rust^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildripgrep="Build ripgrep: "
+    ) else set buildripgrep=%ripgrepINI%
+if %deleteINI%==1 set "writeripgrep=yes"
+
+if %buildripgrep%==1 set "ripgrep=y"
+if %buildripgrep%==2 set "ripgrep=n"
+if %buildripgrep% GTR 2 GOTO ripgrep
+if %writeripgrep%==yes echo.ripgrep=^%buildripgrep%>>%ini%
 
 :numCores
 set "writeCores=no"

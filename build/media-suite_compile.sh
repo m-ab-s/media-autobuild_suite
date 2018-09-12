@@ -137,6 +137,17 @@ if [[ $ripgrep = y ]] &&
     do_checkIfExist
 fi
 
+_check=(bin-video/rav1e.exe)
+if [[ $rav1e = y ]] &&
+    do_vcs "https://github.com/xiph/rav1e.git"; then
+    update_rust
+    log submodule git submodule update --init
+    do_uninstall "${_check[@]}"
+    log build cargo build --release
+    log install cargo install --root "$LOCALDESTDIR"
+    [[ -e "$LOCALDESTDIR/bin/rav1e.exe" ]] && mv -f "$LOCALDESTDIR"/bin{,-video}/rav1e.exe
+    do_checkIfExist
+fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
