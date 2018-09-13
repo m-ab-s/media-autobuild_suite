@@ -1504,8 +1504,8 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift%'
+--rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --rav1e=%rav1e% ^
+--faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --ripgrep=%ripgrep%'
 
 endlocal
 goto :EOF
