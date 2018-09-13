@@ -52,6 +52,8 @@ while true; do
 --curl=* ) curl="${1#*=}"; shift ;;
 --cyanrip=* ) cyanrip="${1#*=}"; shift ;;
 --redshift=* ) redshift="${1#*=}"; shift ;;
+--ripgrep=* ) ripgrep="${1#*=}"; shift ;;
+--rav1e=* ) rav1e="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
