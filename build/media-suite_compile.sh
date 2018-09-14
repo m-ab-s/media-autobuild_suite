@@ -862,12 +862,6 @@ _check=(libaom.a aom.pc)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
     extracommands=()
-    # as long as GCC 8.2.0 is only used in MinGW64,
-    # and only 8.2.0 produces instructions with unaligned memory access:
-    if [[ $bits = 64bit ]]; then
-        extracommands+=(-DAOM_EXTRA_C_FLAGS="-fno-tree-slp-vectorize"
-            -DAOM_EXTRA_CXX_FLAGS="-fno-tree-slp-vectorize")
-    fi
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
     do_uninstall include/aom "${_check[@]}"
