@@ -1674,7 +1674,7 @@ update_rust() {
         pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
         log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
         log install_rust ./rustup.sh -v -y --no-modify-path \
-            "--default-host=${CARCH}-pc-windows-gnu" \
+            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
             --default-toolchain=stable
         popd 2>/dev/null
     fi
