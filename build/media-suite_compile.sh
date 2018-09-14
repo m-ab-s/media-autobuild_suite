@@ -128,26 +128,44 @@ if [[ $packing = y ]] &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
+_check=("$RUSTUP_HOME"/bin/rustup.exe)
+if [[ $ripgrep = y || $rav1e = y ]]; then
+    if [[ ! -e "$RUSTUP_HOME"/bin/rustup.exe ]]; then
+        mkdir -p "$LOCALBUILDDIR/rustinstall"
+        pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
+        log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
+        log install_rust ./rustup.sh -v -y --no-modify-path \
+            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
+            --default-toolchain=stable
+        do_checkIfExist
+        add_to_remove
+        popd 2>/dev/null
+    fi
+    if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
+        # install current target arch toolchain
+        log install_toolchain rustup toolchain install \
+            "stable-$CARCH-pc-windows-gnu"
+    fi
+    log update_rust rustup update
+    log set_default_toolchain rustup default "stable-$CARCH-pc-windows-gnu" 
+fi
+
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git#tag=0.*"; then
-    update_rust
     do_uninstall "${_check[@]}"
-    log build cargo build --release --features 'pcre2'
-    log install cargo install --root "$LOCALDESTDIR"
-    [[ -e "$LOCALDESTDIR/bin/rg.exe" ]] && mv -f "$LOCALDESTDIR"/bin{,-global}/rg.exe
+    do_rust --features 'pcre2'
+    do_install "target/$CARCH-pc-windows-gnu/release/rg.exe" bin-global/
     do_checkIfExist
 fi
 
 _check=(bin-video/rav1e.exe)
 if [[ $rav1e = y ]] &&
     do_vcs "https://github.com/xiph/rav1e.git"; then
-    update_rust
     log submodule git submodule update --init
     do_uninstall "${_check[@]}"
-    log build cargo build --release
-    log install cargo install --root "$LOCALDESTDIR"
-    [[ -e "$LOCALDESTDIR/bin/rav1e.exe" ]] && mv -f "$LOCALDESTDIR"/bin{,-video}/rav1e.exe
+    do_rust
+    do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
     do_checkIfExist
 fi
 

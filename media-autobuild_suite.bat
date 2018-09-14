@@ -1564,12 +1564,12 @@ goto :EOF
     echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
-    echo.export CARGO_HOME="$LOCALDESTDIR/opt/cargo" RUSTUP_HOME="$LOCALDESTDIR/opt/cargo"
+    echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
     echo.
     echo.LANG=en_US.UTF-8
     echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
-    echo.PATH="${LOCALDESTDIR}/opt/cargo/bin:${PATH}"
+    echo.PATH="/opt/cargo/bin:${PATH}"
     echo.source '/etc/profile.d/perlbin.sh'
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
