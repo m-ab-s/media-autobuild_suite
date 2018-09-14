@@ -162,6 +162,10 @@ fi
 
 do_hide_all_sharedlibs
 
+if [[ -x "$RUSTUP_HOME/bin/rustup.exe" ]]; then
+    "$RUSTUP_HOME/bin/rustup.exe" update
+fi
+
 echo "-------------------------------------------------------------------------------"
 echo "Updates finished."
 echo "-------------------------------------------------------------------------------"

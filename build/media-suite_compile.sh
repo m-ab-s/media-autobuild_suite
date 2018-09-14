@@ -130,7 +130,7 @@ fi
 
 _check=("$RUSTUP_HOME"/bin/rustup.exe)
 if [[ $ripgrep = y || $rav1e = y ]]; then
-    if [[ ! -e "$RUSTUP_HOME"/bin/rustup.exe ]]; then
+    if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
         mkdir -p "$LOCALBUILDDIR/rustinstall"
         pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
         log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
@@ -138,16 +138,17 @@ if [[ $ripgrep = y || $rav1e = y ]]; then
             "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
             --default-toolchain=stable
         do_checkIfExist
+        hash -r
         add_to_remove
-        popd 2>/dev/null
+        popd >/dev/null
     fi
     if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
         # install current target arch toolchain
-        log install_toolchain rustup toolchain install \
-            "stable-$CARCH-pc-windows-gnu"
+        log install_toolchain "$RUSTUP_HOME/bin/rustup.exe" toolchain \
+            install "stable-$CARCH-pc-windows-gnu"
     fi
-    log update_rust rustup update
-    log set_default_toolchain rustup default "stable-$CARCH-pc-windows-gnu" 
+    log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
+        "stable-$CARCH-pc-windows-gnu" 
 fi
 
 _check=(bin-global/rg.exe)
