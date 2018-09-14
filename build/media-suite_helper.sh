@@ -1670,10 +1670,14 @@ compare_with_zeranoe() {
 
 update_rust() {
     if [[ ! -e $RUSTUP_HOME/bin/rustc.exe || ! -e $RUSTUP_HOME/bin/rustc.exe ]]; then
-        local rustup_opts=(-v -y --no-modify-path
-            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu"
-            --default-toolchain=stable)
-        log install_rust bash -c "curl https://sh.rustup.rs -sSf | sh -s -- ${rustup_opts[@]}"
+        mkdir -p "$LOCALBUILDDIR/rustinstall"
+        pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
+        log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
+        log install_rust ./rustup.sh -v -y --no-modify-path \
+            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
+            --default-toolchain=stable
+        popd 2>/dev/null
     fi
+    log update_rust rustup update
     log set_default_toolchain rustup default stable
 }
