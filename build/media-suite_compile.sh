@@ -592,10 +592,10 @@ if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
 fi
 
 if [[ $standalone = y ]] && enabled libopus; then
-    do_pacman_install openssl
+    do_pacman_install openssl libogg
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
-    _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/libssl.pc)
+    _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
@@ -618,9 +618,7 @@ if [[ $standalone = y ]] && enabled libopus; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
-        do_separate_conf audio
-        do_make
-        do_install opus{enc,dec,info}.exe bin-audio/
+        do_separate_confmakeinstall audio
         do_checkIfExist
     fi
     hide_libressl -R
