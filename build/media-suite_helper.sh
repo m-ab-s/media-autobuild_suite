@@ -1144,8 +1144,15 @@ create_build_dir() {
 }
 
 get_external_opts() {
+    local array="$1"
     local pkgname="$(get_first_subdir)"
-    do_readoptionsfile "$LOCALBUILDDIR/${pkgname%-*}_options.txt"
+    local optsfile="$LOCALBUILDDIR/${pkgname%-*}_options.txt"
+    if [[ -n $array ]]; then
+        IFS=$'\n' read -d '' -r -a tmp < <(do_readoptionsfile "$optsfile")
+        declare -ag "$array+=(\"\${tmp[@]}\")"
+    else
+        do_readoptionsfile "$optsfile"
+    fi
 }
 
 do_separate_conf() {

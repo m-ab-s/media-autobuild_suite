@@ -839,7 +839,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     create_build_dir
     [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
     [[ $ffmpeg = "sharedlibs" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
-    extracommands+=($(get_external_opts))
+    get_external_opts extracommands
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
         --disable-{shared,unit-tests,docs,install-bins,avx512} \
         "${extracommands[@]}"
@@ -864,7 +864,7 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
     do_uninstall include/aom "${_check[@]}"
-    extracommands+=($(get_external_opts))
+    get_external_opts extracommands
     do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
         -DENABLE_TEST{S,DATA}=OFF \
         "${extracommands[@]}"
