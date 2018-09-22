@@ -108,7 +108,7 @@ vcs_reset() {
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
     elif [[ $vcsType = git ]]; then
-        git remote set-url origin "$vcsURL"
+        [[ -n "$vcsURL" ]] && git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
         git checkout ab-suite
