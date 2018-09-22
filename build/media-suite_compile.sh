@@ -54,6 +54,7 @@ while true; do
 --redshift=* ) redshift="${1#*=}"; shift ;;
 --ripgrep=* ) ripgrep="${1#*=}"; shift ;;
 --rav1e=* ) rav1e="${1#*=}"; shift ;;
+--dav1d=* ) dav1d="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -219,7 +220,6 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
-        do_pacman_install meson
         extracommands=(--bindir=bin-video -Ddocs=false -Dglib=false)
         [[ $standalone = n ]] && sed -i "/subdir('bin')/d" meson.build
         sed -i "/subdir('test')/d" meson.build
@@ -1453,6 +1453,15 @@ if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
         -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
     do_checkIfExist
     add_to_remove
+fi
+
+_check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
+[[ $standalone = y ]] && _check+=(bin-video/dav1d.exe)
+if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
+    do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
+    do_uninstall include/dav1d "${_check[@]}"
+    do_mesoninstall --bindir=bin-video
+    do_checkIfExist
 fi
 
 enabled openssl && hide_libressl

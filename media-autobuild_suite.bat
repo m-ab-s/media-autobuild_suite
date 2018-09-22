@@ -101,7 +101,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -308,6 +308,27 @@ if %buildrav1e%==1 set "rav1e=y"
 if %buildrav1e%==2 set "rav1e=n"
 if %buildrav1e% GTR 2 GOTO rav1e
 if %writerav1e%==yes echo.rav1e=^%buildrav1e%>>%ini%
+
+:dav1d
+set "writedav1d=no"
+if %dav1dINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build dav1d [Alternative, faster AV1 standalone decoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P builddav1d="Build dav1d: "
+    ) else set builddav1d=%dav1dINI%
+if %deleteINI%==1 set "writedav1d=yes"
+
+if %builddav1d%==1 set "dav1d=y"
+if %builddav1d%==2 set "dav1d=n"
+if %builddav1d% GTR 2 GOTO dav1d
+if %writedav1d%==yes echo.dav1d=^%builddav1d%>>%ini%
 
 :x264
 set "writex264=no"
@@ -1506,7 +1527,7 @@ MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep%'
+--rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
 
 endlocal
 goto :EOF
