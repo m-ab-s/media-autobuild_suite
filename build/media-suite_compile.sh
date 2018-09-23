@@ -1461,6 +1461,8 @@ if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
     do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
     do_uninstall include/dav1d "${_check[@]}"
     do_mesoninstall --bindir=bin-video
+    [[ $standalone = y && ! -f "$LOCALDESTDIR"/bin-video/dav1d.exe ]] &&
+        do_install dav1d.exe bin-video/
     do_checkIfExist
 fi
 
