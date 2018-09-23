@@ -1460,6 +1460,8 @@ _check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
 if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
     do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
     do_uninstall include/dav1d "${_check[@]}"
+    grep -q 'entrypoints_src, rev_target' meson.build ||
+        do_patch https://0x0.st/s3e2.txt am
     do_mesoninstall --bindir=bin-video
     [[ $standalone = y && ! -f "$LOCALDESTDIR"/bin-video/dav1d.exe ]] &&
         do_install dav1d.exe bin-video/
