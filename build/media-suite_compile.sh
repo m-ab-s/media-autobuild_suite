@@ -608,7 +608,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     if do_vcs "https://github.com/xiph/libopusenc.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
-        do_separate_confmakeinstall --disable-{http,examples,doc}
+        do_separate_confmakeinstall --disable-{examples,doc}
         do_checkIfExist
     fi
 
