@@ -814,7 +814,7 @@ if [[ $rtmpdump = "y" ]] ||
         _pclibs="$($PKG_CONFIG --libs ${pc##*/}) -lz"
         _deps=(libssl.pc)
     else
-        ssl="No SSL"
+        ssl=NoSSL
         crypto=
         pc="nossl"
     fi
