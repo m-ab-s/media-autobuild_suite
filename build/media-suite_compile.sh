@@ -795,21 +795,30 @@ if [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "no" ]] && enabled librtmp; }; then
     req=""
     pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
+
+    _deps=()
+    _pcver=
+    _pclibs=
     if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
         ssl=GnuTLS
         crypto=GNUTLS
         pc=gnutls
-    elif enabled openssl; then
-        ssl=OpenSSL
-        crypto=OPENSSL
-        pc="$MINGW_PREFIX/lib/pkgconfig/libssl"
-    else
+        _pcver="$(pkg-config --modversion "$pc")"
+        _pclibs="$($PKG_CONFIG --libs ${pc##*/}) -lz"
+        _deps=(gnutls.pc)
+    elif enabled libtls; then
         ssl=LibreSSL
         crypto=OPENSSL
         pc=libssl
+        _pcver="$(pkg-config --modversion "$pc")"
+        _pclibs="$($PKG_CONFIG --libs ${pc##*/}) -lz"
+        _deps=(libssl.pc)
+    else
+        ssl="No SSL"
+        crypto=
+        pc="nossl"
     fi
     _check=(librtmp.{a,pc})
-    _deps=("${pc}.pc")
     [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
     if do_vcs "http://repo.or.cz/rtmpdump.git" librtmp || [[ $req != *${pc##*/}* ]]; then
         [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
@@ -817,13 +826,13 @@ if [[ $rtmpdump = "y" ]] ||
         [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
         _ver="$(printf '%s-%s-%s_%s-%s-static' "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
                 "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" "$ssl" \
-                "$(pkg-config --modversion "${pc##*/}")" "$CARCH")"
+                "$pc" "$CARCH")"
         do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
             SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
             sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
-            CRYPTO="$crypto" LIB_${crypto}="$($PKG_CONFIG --libs ${pc##*/}) -lz" VERSION="$_ver"
+            CRYPTO=${crypto} LIB_${crypto}="$_pclibs" VERSION="$_ver"
         do_checkIfExist
-        unset ssl crypto pc req
+        unset ssl crypto pc req _pcver _pclibs
     fi
     unset _deps
 fi
