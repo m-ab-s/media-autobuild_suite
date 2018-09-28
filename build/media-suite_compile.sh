@@ -1115,6 +1115,48 @@ if [[ $ffmpeg != "no" ]] && enabled decklink &&
     do_checkIfExist
 fi
 
+if [[ $ffmpeg != "no" ]] && enabled libndi_newtek &&
+    [[ -f "$NDI_SDK_DIR/Include/Processing.NDI.Lib.h" ]]; then
+    _includedir="$(cygpath -sm "$NDI_SDK_DIR"/Include)"
+    [[ $bits = 32bit ]] && _arch=x86 || _arch=x64
+
+    echo -e "${green}Compiling ffmpeg with Newtek lib${reset}"
+    echo -e "${orange}ffmpeg and apps that use it will depend on${reset}"
+    echo -e "$(cygpath -m $LOCALDESTDIR/bin-video/Processing.NDI.Lib.${_arch}.dll) to run!${reset}"
+
+    # if installed libndi.a is older than dll or main include file
+    _check=(Processing.NDI.Lib.h libndi.a bin-video/Processing.NDI.Lib.${_arch}.dll)
+    if test_newer installed "$NDI_RUNTIME_DIR_V3/Processing.NDI.Lib.${_arch}.dll" \
+        "$_includedir/Processing.NDI.Lib.h" libndi.a || ! files_exist "${_check[@]}"; then
+        mkdir -p "$LOCALBUILDDIR/newtek"
+        pushd "$LOCALBUILDDIR/newtek" >/dev/null
+
+        # install headers
+        cmake -E copy_directory "$_includedir" "$LOCALDESTDIR/include"
+
+        # fix ffmpeg breakage when compiling shared
+        sed -i 's|__declspec(dllexport)||g' "$LOCALDESTDIR"/include/Processing.NDI.Lib.h
+
+        # create import lib and install redistributable dll
+        create_build_dir
+        cp -f "$NDI_RUNTIME_DIR_V3/Processing.NDI.Lib.${_arch}.dll" .
+        gendef - ./Processing.NDI.Lib.${_arch}.dll 2>/dev/null |
+            sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "libndi.def"
+        dlltool -l "libndi.a" -d "libndi.def" \
+            $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
+        [[ -f libndi.a ]] && do_install "libndi.a"
+        do_install ./Processing.NDI.Lib.${_arch}.dll bin-video/
+        do_checkIfExist
+        add_to_remove
+        popd >/dev/null
+    fi
+    unset _arch _includedir
+elif [[ $ffmpeg != "no" ]] && enabled libndi_newtek; then
+    do_print_status "Newtek SDK" "$orange" "Not installed, disabling"
+    do_removeOption --enable-libndi_newtek
+fi
+
+
 _check=(libmfx.{{l,}a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libmfx &&
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx; then

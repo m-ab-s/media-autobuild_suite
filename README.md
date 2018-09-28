@@ -112,6 +112,8 @@ Included Tools And Libraries
         - scale_cuda (needs CUDA SDK and MSVC **2015** installed)
             - if it doesn't work, blame Nvidia/Microsoft, don't bother opening issues about this
             - needs non-free license and --enable-cuda-sdk
+        - libndi_newtek (needs Newtek SDK installed)
+            - needs non-free license and --enable-libndi_newtek
 
  - other tools
     - aom (git)
