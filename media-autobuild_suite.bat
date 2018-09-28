@@ -1152,7 +1152,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     (
         echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm -Sy --force --asdeps pacman-mirrors
+        echo.pacman --noconfirm -Sy --asdeps pacman-mirrors
         echo.sed -i "s;^^IgnorePkg.*;#&;" /etc/pacman.conf
         echo.sleep ^4
         echo.exit
@@ -1171,7 +1171,7 @@ if not exist %instdir%\mintty.lnk (
     echo.-------------------------------------------------------------------------------
     (
         echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --force --asdeps
+        echo.pacman --noconfirm -Syu --asdeps
         echo.exit
         )>%build%\secondUpdate.sh
     if exist %build%\secondUpdate.log del %build%\secondUpdate.log
@@ -1312,8 +1312,8 @@ if %build32%==yes (
         echo.echo -ne "\033]0;install 32 bit compiler\007"
         echo.mingw32compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-i686-&;g' | tr '\n\r' '  ')"
         echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-        echo.echo $mingw32compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed --force
-        echo.echo $mingw32compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed --force
+        echo.echo $mingw32compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
+        echo.echo $mingw32compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
         echo.sleep ^3
         echo.exit
         )>%build%\mingw32.sh
@@ -1346,8 +1346,8 @@ if %build64%==yes (
         echo.echo -ne "\033]0;install 64 bit compiler\007"
         echo.mingw64compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-x86_64-&;g' | tr '\n\r' '  ')"
         echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-        echo.echo $mingw64compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed --force
-        echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed --force
+        echo.echo $mingw64compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
+        echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
         echo.sleep ^3
         echo.exit
         )>%build%\mingw64.sh
