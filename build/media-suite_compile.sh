@@ -161,16 +161,6 @@ if [[ $ripgrep = y ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/rav1e.exe)
-if [[ $rav1e = y ]] &&
-    do_vcs "https://github.com/xiph/rav1e.git"; then
-    log submodule git submodule update --init
-    do_uninstall "${_check[@]}"
-    do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
-    do_checkIfExist
-fi
-
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
@@ -885,6 +875,16 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     unset extracommands
 fi
 unset _aom_bins
+
+_check=(bin-video/rav1e.exe)
+if [[ $rav1e = y ]] &&
+    do_vcs "https://github.com/xiph/rav1e.git"; then
+    log submodule git submodule update --init
+    do_uninstall "${_check[@]}"
+    do_rust
+    do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
+    do_checkIfExist
+fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
 [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
