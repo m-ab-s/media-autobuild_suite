@@ -129,29 +129,6 @@ if [[ $packing = y ]] &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
-_check=("$RUSTUP_HOME"/bin/rustup.exe)
-if [[ $ripgrep = y || $rav1e = y ]]; then
-    if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
-        mkdir -p "$LOCALBUILDDIR/rustinstall"
-        pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
-        log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
-        log install_rust ./rustup.sh -v -y --no-modify-path \
-            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
-            --default-toolchain=stable
-        do_checkIfExist
-        hash -r
-        add_to_remove
-        popd >/dev/null
-    fi
-    if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
-        # install current target arch toolchain
-        log install_toolchain "$RUSTUP_HOME/bin/rustup.exe" toolchain \
-            install "stable-$CARCH-pc-windows-gnu"
-    fi
-    log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
-        "stable-$CARCH-pc-windows-gnu" 
-fi
-
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git#tag=0.*"; then
@@ -885,6 +862,29 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     unset extracommands
 fi
 unset _aom_bins
+
+_check=("$RUSTUP_HOME"/bin/rustup.exe)
+if [[ $ripgrep = y || $rav1e = y ]]; then
+    if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
+        mkdir -p "$LOCALBUILDDIR/rustinstall"
+        pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
+        log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
+        log install_rust ./rustup.sh -v -y --no-modify-path \
+            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
+            --default-toolchain=stable
+        do_checkIfExist
+        hash -r
+        add_to_remove
+        popd >/dev/null
+    fi
+    if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
+        # install current target arch toolchain
+        log install_toolchain "$RUSTUP_HOME/bin/rustup.exe" toolchain \
+            install "stable-$CARCH-pc-windows-gnu"
+    fi
+    log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
+        "stable-$CARCH-pc-windows-gnu" 
+fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
 [[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
