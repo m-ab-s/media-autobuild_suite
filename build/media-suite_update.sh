@@ -63,6 +63,15 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
+if ! grep -q AE4FF531 <(pacman-key -l); then
+    pacman-key --recv-keys AE4FF531
+    pacman-key --lsign AE4FF531
+fi
+grep -q abrepo /etc/pacman.conf ||
+    sed -i '/\[mingw32\]/ i\[abrepo]\
+Server = https://i.fsbn.eu/abrepo/\
+' /etc/pacman.conf
+
 echo
 echo "-------------------------------------------------------------------------------"
 echo "Updating pacman database..."
