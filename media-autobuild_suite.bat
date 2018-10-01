@@ -1588,6 +1588,8 @@ goto :EOF
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
     echo.
+    echo.export PYTHONPATH=
+    echo.
     echo.LANG=en_US.UTF-8
     echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
