@@ -183,7 +183,7 @@ if %license2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build FFmpeg/rtmpdump with which license?
+    echo. Build FFmpeg with which license?
     echo. 1 = Non-free [unredistributable, but can include anything]
     echo. 2 = GPLv3 [disables OpenSSL and FDK-AAC]
     echo. 3 = GPLv2.1
@@ -198,11 +198,6 @@ if %license2INI%==0 (
     echo. If building to include in a GPLv2.1 binary, choose LGPLv2.1 or GPLv2.1.
     echo. If you want to use FFmpeg together with closed source software, choose LGPL
     echo. and follow instructions in https://www.ffmpeg.org/legal.html
-    echo.
-    echo. In the case of rtmpdump, since its binaries are GPL, it will be compiled
-    echo. with GnuTLS if LGPL is chosen, but if Non-free will use OpenSSL.
-    echo. If not building rtmpdump, but just librtmp ^(which is LGPL^) to use in FFmpeg,
-    echo. OpenSSL can be used.
     echo.
     echo. OpenSSL and FDK-AAC have licenses incompatible with GPL but compatible
     echo. with LGPL, so they won't be disabled automatically if you choose LGPL.

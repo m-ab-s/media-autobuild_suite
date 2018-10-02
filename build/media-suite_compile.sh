@@ -258,7 +258,7 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
-if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gnutls ]]; then
+if enabled gnutls || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; then
     _check=(libgnutls.{,l}a gnutls.pc)
     if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
         do_pacman_install nettle
@@ -276,11 +276,11 @@ if enabled gnutls || [[ $rtmpdump = y && $license != nonfree ]] || [[ $curl = gn
         sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
-if { [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled openssl; } || [[ $curl = openssl ]]; then
+if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
     do_pacman_install openssl
 fi
 hide_libressl -R
-if { [[ $ffmpeg != "no" || $rtmpdump = y ]] && enabled libtls; } || [[ $curl = libressl ]]; then
+if { [[ $ffmpeg != "no" ]] && enabled libtls; } || [[ $curl = libressl ]]; then
     _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_vcs "https://github.com/libressl-portable/portable.git#tag=LATEST" libressl; then
@@ -781,50 +781,30 @@ fi
 set_title "compiling video tools"
 echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
 
-if [[ $rtmpdump = "y" ]] ||
-    { [[ $ffmpeg != "no" ]] && enabled librtmp; }; then
-    req=""
-    pc_exists librtmp && req="$(pkg-config --print-requires "$(file_installed librtmp.pc)")"
-
-    _deps=()
-    _pcver=
-    _pclibs=
-    if enabled gnutls || [[ $rtmpdump = "y" && $license != "nonfree" ]]; then
-        ssl=GnuTLS
-        crypto=GNUTLS
-        pc=gnutls
-        _pcver="$(pkg-config --modversion "$pc")"
-        _pclibs="$($PKG_CONFIG --libs ${pc##*/}) -lz"
-        _deps=(gnutls.pc)
-    elif enabled libtls; then
-        ssl=LibreSSL
-        crypto=OPENSSL
-        pc=libssl
-        _pcver="$(pkg-config --modversion "$pc")"
-        _pclibs="$($PKG_CONFIG --libs ${pc##*/}) -lz"
-        _deps=(libssl.pc)
-    else
-        ssl=NoSSL
-        crypto=
-        pc="nossl"
-    fi
-    _check=(librtmp.{a,pc})
-    [[ $rtmpdump = "y" ]] && _check+=(bin-video/rtmpdump.exe)
-    if do_vcs "http://repo.or.cz/rtmpdump.git" librtmp || [[ $req != *${pc##*/}* ]]; then
-        [[ $rtmpdump = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
-        do_uninstall include/librtmp "${_check[@]}"
-        [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
-        _ver="$(printf '%s-%s-%s_%s-%s-static' "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
-                "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" "$ssl" \
-                "$pc" "$CARCH")"
-        do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
-            SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
-            sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
-            CRYPTO=${crypto} LIB_${crypto}="$_pclibs" VERSION="$_ver"
-        do_checkIfExist
-        unset ssl crypto pc req _pcver _pclibs
-    fi
-    unset _deps
+_deps=(gnutls.pc)
+_check=(librtmp.{a,pc})
+[[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmpdump.exe)
+if { [[ $rtmpdump = "y" ]] ||
+    { [[ $ffmpeg != "no" ]] && enabled librtmp; }; } &&
+    do_vcs "http://repo.or.cz/rtmpdump.git" librtmp; then
+    [[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
+    do_uninstall include/librtmp "${_check[@]}"
+    [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
+    _rtmp_pkgver() {
+        printf '%s-%s-%s_%s-%s-static' \
+            "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
+            "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" \
+            "GnuTLS" \
+            "$($PKG_CONFIG --modversion gnutls)" \
+            "$CARCH"
+    }
+    do_makeinstall XCFLAGS="$CFLAGS -I$MINGW_PREFIX/include" XLDFLAGS="$LDFLAGS" SHARED= \
+        SYS=mingw prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR"/bin-video \
+        sbindir="$LOCALDESTDIR"/bin-video mandir="$LOCALDESTDIR"/share/man \
+        CRYPTO=GNUTLS LIB_GNUTLS="$($PKG_CONFIG --libs gnutls) -lz" \
+        VERSION="$(_rtmp_pkgver)"
+    do_checkIfExist
+    unset _rtmp_pkgver
 fi
 
 _check=(libvpx.a vpx.pc)
