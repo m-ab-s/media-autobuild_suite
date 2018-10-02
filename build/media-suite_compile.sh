@@ -1509,6 +1509,8 @@ _check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
 if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
     do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
     do_uninstall include/dav1d "${_check[@]}"
+    grep -q dav1d_private src/meson.build ||
+        do_patch https://code.videolan.org/videolan/dav1d/merge_requests/118.patch am
     do_mesoninstall --bindir=bin-video
     do_checkIfExist
 fi
