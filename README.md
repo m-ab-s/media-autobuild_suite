@@ -25,7 +25,7 @@ Included Tools And Libraries
         - amd amf encoders (built-in)
         - cuda (built-in)
         - cuvid (built-in)
-        - libdav1d (git)
+        - libdav1d (git) (not enabled by default since it's still unstable)
         - libmp3lame (mingw)
         - libopus (mingw)
         - libvorbis (mingw)
