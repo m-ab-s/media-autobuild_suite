@@ -62,7 +62,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby
+gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
 
