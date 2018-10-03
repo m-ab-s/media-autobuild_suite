@@ -1464,9 +1464,9 @@ if [%removefstab%]==[yes] (
     if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 :update
-if not exist %build%\last_run if exist %build%\update.log del %build%\update.log
-%mintty% -t "update autobuild suite" %instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\update.log ^
--c '/usr/bin/bash --login /build/media-suite_update.sh --build32=%build32% --build64=%build64%'
+if exist %build%\update.log del %build%\update.log
+%mintty% -t "update autobuild suite" --log 2>&1 %build%\update.log ^
+/usr/bin/bash -l /build/media-suite_update.sh --build32=%build32% --build64=%build64%
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
@@ -1513,10 +1513,9 @@ if [%build64%]==[yes] (
     set MSYSTEM=MINGW64
     ) else set MSYSTEM=MINGW32
 
-if not exist %build%\last_run if exist %build%\compile.log del %build%\compile.log
+if exist %build%\compile.log del %build%\compile.log
 start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-%instdir%\%msys2%\usr\bin\script.exe -a -q -f %build%\compile.log -c '^
-MSYS2_PATH_TYPE=inherit MSYSTEM=%MSYSTEM% /usr/bin/bash --login ^
+--log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash --login ^
 /build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
 --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
 --mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
