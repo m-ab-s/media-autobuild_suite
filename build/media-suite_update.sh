@@ -63,13 +63,22 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-if ! grep -q AE4FF531 <(pacman-key -l); then
-    pacman-key --recv-keys AE4FF531
+pacman-key --init
+/usr/bin/grep -q AE4FF531 <(pacman-key -l) || pacman-key --recv-keys AE4FF531
+/usr/bin/grep -q 'full.*wiiaboo@gmail.com' <(pacman-key -l) ||
     pacman-key --lsign AE4FF531
-fi
-grep -q abrepo /etc/pacman.conf ||
+
+# for some people the signature is broken
+printf 'Server = %s\nSigLevel = Optional\n' \
+    'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
+
+# fix fuckup
+grep -q 'i.fsbn.eu/abrepo' /etc/pacman.conf &&
+    sed -i '/\[abrepo\]/,+2d' /etc/pacman.conf
+
+/usr/bin/grep -q abrepo /etc/pacman.conf ||
     sed -i '/\[mingw32\]/ i\[abrepo]\
-Server = https://i.fsbn.eu/abrepo/\
+Include = /etc/pacman.d/abrepo.conf\
 ' /etc/pacman.conf
 
 echo
