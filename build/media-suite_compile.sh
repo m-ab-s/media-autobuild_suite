@@ -1411,6 +1411,8 @@ _check=(libsrt.a srt.pc srt/srt.h)
 if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
+    grep -q CheckFunctionExists CMakeLists.txt ||
+        do_patch https://github.com/Haivision/srt/pull/476.patch am
     do_cmakeinstall -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
         -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on \
         -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-video"
