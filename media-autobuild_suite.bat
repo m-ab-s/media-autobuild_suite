@@ -102,7 +102,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -1047,6 +1047,35 @@ if %updateSuiteF%==2 set "updateSuite=n"
 if %updateSuiteF% GTR 2 GOTO updateSuite
 if %writeUpdateSuite%==yes echo.updateSuite=^%updateSuiteF%>>%ini%
 
+:forceQuitBatch
+set "writeforceQuitBatch=no"
+if %forceQuitBatchINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Force quit this batch window after launching compilation script?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo This will forcibly close all console windows that are open, including ones not
+    echo related to this autobuild script. Make sure you're not running any other if
+    echo you enable this.
+    echo.
+    echo For some reason, leaving this as no can also fix the issue where the batch
+    echo window stays open after launching the compiling script. Who knows how Windows
+    echo works anyway.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P forceQuitBatchF="Forcefully close batch: "
+    ) else set forceQuitBatchF=%forceQuitBatchINI%
+if %deleteINI%==1 set "writeforceQuitBatch=yes"
+
+if %forceQuitBatchF%==1 set "forceQuitBatch=y"
+if %forceQuitBatchF%==2 set "forceQuitBatch=n"
+if %forceQuitBatchF% GTR 2 GOTO forceQuitBatch
+if %writeforceQuitBatch%==yes echo.forceQuitBatch=^%forceQuitBatchF%>>%ini%
+
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -1525,6 +1554,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
 
 endlocal
+if [%forceQuitBatch%]==[y] taskkill -im conhost.exe /f
 goto :EOF
 
 :createBaseFolders
