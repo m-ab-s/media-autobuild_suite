@@ -1616,3 +1616,4 @@ for %%i in (%*) do (
     )
 setlocal
 goto :EOF
+.profile/.bash_logout
