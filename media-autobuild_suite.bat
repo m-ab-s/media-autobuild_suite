@@ -1057,13 +1057,8 @@ if %forceQuitBatchINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo This will forcibly close all console windows that are open, including ones not
-    echo related to this autobuild script. Make sure you're not running any other if
-    echo you enable this.
-    echo.
-    echo For some reason, leaving this as no can also fix the issue where the batch
-    echo window stays open after launching the compiling script. Who knows how Windows
-    echo works anyway.
+    echo This will forcibly this batch window. Only use this if you have the issue where
+    echo the window doesn^'t close after launching the compilation script.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1542,6 +1537,9 @@ if [%build64%]==[yes] (
     set MSYSTEM=MINGW64
     ) else set MSYSTEM=MINGW32
 
+for /f "tokens=2 usebackq" %%P in (`tasklist /nh /v /fi "imagename eq cmd.exe" ^
+    /fi "windowtitle eq media-autobuild_suite"`) do set ourPID=%%P
+
 if exist %build%\compile.log del %build%\compile.log
 start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
 --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash --login ^
@@ -1554,7 +1552,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
 
 endlocal
-if [%forceQuitBatch%]==[y] taskkill -im conhost.exe /f
+if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
 goto :EOF
 
 :createBaseFolders
