@@ -838,7 +838,7 @@ fi
 _check=(libaom.a aom.pc)
 [[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
-    do_vcs "https://aomedia.googlesource.com/aom"; then
+    do_vcs "https://aomedia.googlesource.com/aom#commit=7cae98f4e^"; then
     extracommands=()
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
