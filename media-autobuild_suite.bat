@@ -22,7 +22,7 @@
 
 @echo off
 color 80
-title media-autobuild_suite
+title MABSbat
 
 setlocal
 cd /d "%~dp0"
@@ -1057,8 +1057,8 @@ if %forceQuitBatchINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo This will forcibly this batch window. Only use this if you have the issue where
-    echo the window doesn^'t close after launching the compilation script.
+    echo This will forcibly close this batch window. Only use this if you have the issue
+    echo where the window doesn^'t close after launching the compilation script.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1537,8 +1537,7 @@ if [%build64%]==[yes] (
     set MSYSTEM=MINGW64
     ) else set MSYSTEM=MINGW32
 
-for /f "tokens=2 usebackq" %%P in (`tasklist /nh /v /fi "imagename eq cmd.exe" ^
-    /fi "windowtitle eq media-autobuild_suite"`) do set ourPID=%%P
+for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 
 if exist %build%\compile.log del %build%\compile.log
 start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
