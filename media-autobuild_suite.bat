@@ -1551,7 +1551,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
 
 endlocal
-if [%forceQuitBatch%]==[y] taskkill /f /pid %ourPID% /f
+if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
 goto :EOF
 
 :createBaseFolders
