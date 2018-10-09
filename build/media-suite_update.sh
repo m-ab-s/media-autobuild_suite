@@ -63,10 +63,9 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-pacman-key --init
 /usr/bin/grep -q AE4FF531 <(pacman-key -l) || pacman-key --recv-keys AE4FF531
 /usr/bin/grep -q 'full.*wiiaboo@gmail.com' <(pacman-key -l) ||
-    pacman-key --lsign AE4FF531
+    { pacman-key --lsign AE4FF531 && taskkill -im gpg-agent.exe -f; }
 
 # for some people the signature is broken
 printf 'Server = %s\nSigLevel = Optional\n' \
