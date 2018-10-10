@@ -588,7 +588,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
         do_uninstall "${_check[@]}"
-        do_patch http://0x0.st/sgO6.txt
+        do_patch https://0x0.st/sgwa.txt
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
         do_checkIfExist
