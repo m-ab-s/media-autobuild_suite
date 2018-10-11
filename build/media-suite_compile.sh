@@ -1218,7 +1218,7 @@ if [[ $x264 != no ]]; then
             if do_vcs https://github.com/FFMS/ffms2.git; then
                 do_uninstall "${_check[@]}"
                 sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
-                do_patch 0001-ffmsindex-fix-linking-issues.patch
+                do_patch https://0x0.st/sgEY.txt
                 mkdir -p src/config
                 do_autoreconf
                 do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg"
