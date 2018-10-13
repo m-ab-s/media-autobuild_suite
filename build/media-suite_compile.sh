@@ -838,9 +838,8 @@ fi
 [[ $aom = y || $standalone = y ]] && _aom_bins=y
 _check=(libaom.a aom.pc)
 [[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
-enabled libvpx && enabled libaom && _clamp="#commit=bb8157b89"
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
-    do_vcs "https://aomedia.googlesource.com/aom${_clamp:-}"; then
+    do_vcs "https://aomedia.googlesource.com/aom"; then
     extracommands=()
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
         extracommands+=(-DENABLE_EXAMPLES=off)
