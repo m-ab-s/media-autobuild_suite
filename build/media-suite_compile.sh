@@ -1490,7 +1490,7 @@ fi
 _check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
 [[ $standalone = y ]] && _check+=(bin-video/dav1d.exe)
 if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
-    do_vcs "https://code.videolan.org/videolan/dav1d.git#commit=d2d79ed7^"; then
+    do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
     do_uninstall include/dav1d "${_check[@]}"
     do_mesoninstall --bindir=bin-video
     do_checkIfExist
@@ -1575,7 +1575,7 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         enabled libdav1d && ! grep -q libdav1d configure &&
-            { do_patch "https://patchwork.ffmpeg.org/patch/10535/mbox/ libdav1d.patch" am ||
+            { do_patch "https://patchwork.ffmpeg.org/patch/10722/mbox/ libdav1d.patch" am ||
                 do_removeOption --enable-libdav1d; }
 
         _patches="$(git rev-list origin/master.. --count)"
