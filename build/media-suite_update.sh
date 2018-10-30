@@ -178,8 +178,13 @@ if [[ -n "$have_updates" ]]; then
         --overwrite "/mingw64/*" --overwrite "/mingw32/*" --overwrite "/usr/*"
     sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
 fi
+
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
     pacman -S --noconfirm --ask 20 --asdeps ca-certificates
+
+# do a final overall installation for potential downgrades
+pacman -Syyuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
+    --overwrite "/mingw32/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
 
