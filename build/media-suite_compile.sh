@@ -1847,7 +1847,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         hide_conflicting_libs
         create_ab_pkgconfig
 
-        test_newer bootstrap.py waf && /usr/bin/python bootstrap.py >/dev/null 2>&1
+        log bootstrap /usr/bin/python bootstrap.py
         if [[ -d build ]]; then
             /usr/bin/python waf distclean >/dev/null 2>&1
             do_uninstall bin-video/mpv{.exe,-1.dll}.debug "${_check[@]}"
