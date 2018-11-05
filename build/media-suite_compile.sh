@@ -1524,9 +1524,10 @@ if [[ $ffmpeg != "no" ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        if [[ ! -f $LOCALDESTDIR/bin-video/libopenh264.dll ]]; then
+        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
-            do_wget -c -r -q "http://ciscobinary.openh264.org/openh264-1.7.0-win${bits%bit}.dll.bz2" \
+            do_wget -c -r -q -h "427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2" \
+            "http://ciscobinary.openh264.org/openh264-1.8.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
             popd >/dev/null
