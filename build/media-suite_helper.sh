@@ -1392,13 +1392,18 @@ get_vs_prefix() {
 get_cl_path() {
     local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
     if [[ -f "$vswhere" ]]; then
-        local installationpath="$("$vswhere" -legacy -version 14 -property installationPath | tail -n1)"
+        local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
         [[ -z "$installationpath" ]] && return 1
-        local basepath="$(cygpath -u "$installationpath/VC/bin")"
-        if [[ "$bits" = 32bit && -f "$basepath/cl.exe" ]]; then
-            export PATH="$basepath":$PATH
-        elif [[ "$bits" = 64bit && -f "$basepath/amd64/cl.exe" ]]; then
-            export PATH="$basepath/amd64":$PATH
+        # apparently this is MS's official way of knowing the default version ???
+        local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
+        local _hostbits=HostX64
+        [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
+        local _arch=x64
+        [[ $bits = 32bit ]] && _arch=x86
+
+        local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
+        if [[ -f "$basepath/cl.exe" ]]; then
+            export PATH="$basepath:$PATH"
         else
             return 1
         fi
@@ -1413,7 +1418,7 @@ get_cl_path() {
         [[ -z "$clpath" ]] && return 1
         clpath="$(dirname "$(cygpath -u "$clpath")")"
         [[ ! -f "$clpath"/cl.exe ]] && return 1
-        export PATH="$clpath":$PATH
+        export PATH="$clpath:$PATH"
     fi
 }
 
