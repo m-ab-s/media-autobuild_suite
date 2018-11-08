@@ -1390,6 +1390,8 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
+    which cl.exe &>/dev/null && return 0
+
     local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
     if [[ -f "$vswhere" ]]; then
         local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
