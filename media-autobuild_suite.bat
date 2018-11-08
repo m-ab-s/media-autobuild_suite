@@ -72,7 +72,7 @@ iconv lzma nvenc schannel zlib sdl2 --disable-debug ffnvcodec nvdec
 
 :: common external libs
 set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265 ^
-#libdav1d
+libdav1d
 
 :: options used in zeranoe builds and not present above
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
@@ -311,7 +311,7 @@ if %dav1dINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build dav1d [Alternative, faster AV1 standalone decoder]?
+    echo. Build dav1d [Alternative, faster AV1 decoder]?
     echo. 1 = Yes
     echo. 2 = No
     echo.

@@ -1573,10 +1573,6 @@ if [[ $ffmpeg != "no" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
-        enabled libdav1d && ! grep -q libdav1d configure &&
-            { do_patch "https://patchwork.ffmpeg.org/patch/10843/mbox/ libdav1d.patch" am ||
-                do_removeOption --enable-libdav1d; }
-
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
