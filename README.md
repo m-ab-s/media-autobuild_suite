@@ -256,7 +256,7 @@ Optional User Files
 --------
 
 `/local32|64/etc/custom_profile` & `$HOME/custom_build_options`
- - Put here any general/platform tweaks that you need for _your_ specific environment. For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for msvc and nvcc, then you can use:
+ - Put here any general/platform tweaks that you need for _your_ specific environment. For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for msvc and nvcc, then you can use (please adapt directories to your environment):
 ```bash
 export CUDA_PATH=$(cygpath -sm "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0")
 export PATH=$PATH:$(dirname "$(cygpath -u "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.15.26726\bin\Hostx64\x64\cl.exe")")
