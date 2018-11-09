@@ -227,6 +227,7 @@ If there's some error during compilation follow these steps:
  3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
  4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
  5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
+ 6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk` then you need to check that: 1) The CUDA_PATH environment variable exists and points to the CUDA SDK; 2) And both `cl.exe` and `nvcc.exe` executables are available in the PATH search environment.
 
 
 What The Individual Files Do
