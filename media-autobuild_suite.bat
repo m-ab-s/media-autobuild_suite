@@ -1156,8 +1156,8 @@ if "%SSH_TTY%"=="windows-pty" (
         echo "   ******            WARNING             ******   "
         echo "   ****** console only mode (no MinTTY)! ******   "
         echo "   ******                                ******   "
-        echo "   ******    You need to manally copy    ******   "
-        echo "   ******    what's printed in a shell   ******   "
+        echo "   ******   You need to manually copy    ******   "
+        echo "   ******   what's printed in a shell    ******   "
         set "mintty=start /B /I /WAIT %instdir%\%msys2%\usr\bin\echo.exe"
     ) else (
         set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
