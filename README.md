@@ -110,8 +110,8 @@ Included Tools And Libraries
         - libzvbi (0.2.35)
         - opencl (from system)
         - opengl (from system)
-        - scale_cuda (needs CUDA SDK and MSVC **2015** installed)
-            - if it doesn't work, blame Nvidia/Microsoft, don't bother opening issues about this
+        - scale_cuda (needs CUDA SDK and MSVC **2017** installed)
+            - if it doesn't work, see [Notes about CUDA SDK](#notes-about-cuda-sdk), then blame Nvidia/Microsoft if it still doesn't work, don't bother opening issues about this
             - needs non-free license and --enable-cuda-sdk
         - libndi_newtek (needs Newtek SDK installed)
             - needs non-free license and --enable-libndi_newtek
@@ -227,7 +227,7 @@ If there's some error during compilation follow these steps:
  3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
  4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
  5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
- 6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk` then you need to check that: 1) The CUDA_PATH environment variable exists and points to the CUDA SDK; 2) And both `cl.exe` and `nvcc.exe` executables are available in the PATH search environment. Note that with standard installations this is true, and the building suite can find them.
+ 6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
 
 What The Individual Files Do
@@ -256,11 +256,29 @@ Optional User Files
 --------
 
 `/local32|64/etc/custom_profile` & `$HOME/custom_build_options`
- - Put here any general/platform tweaks that you need for _your_ specific environment. For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for msvc and nvcc, then you can use (please adapt directories to your environment):
+ - Put here any general/platform tweaks that you need for _your_ specific environment. See `/local32|64/etc/profile2.local` for example usage.
+
+
+Notes about CUDA SDK
+--------
+
+For `--enable-cuda-sdk` and `--enable-libnpp` to work, you need either the `CUDA_PATH` variable to be set system-wide and VS2017 installed with vswhere.exe; or if for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed along with VS2017, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+
+For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
 ```bash
-export CUDA_PATH=$(cygpath -sm "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0")
-export PATH=$PATH:$(dirname "$(cygpath -u "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.15.26726\bin\Hostx64\x64\cl.exe")")
-export PATH=$PATH:$(dirname "$(cygpath -u "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v10.0\bin\nvcc.exe")")
+# adapt these to your environment
+_cuda_basepath="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA"
+_cuda_version=10.0
+
+_msvc_basepath="C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC"
+_msvc_version=14.15.26726
+_msvc_hostarch=x64
+_msvc_targetarch=x64
+
+# you shouldn't need to change these unless your environment is weird or you know what you're doing
+export CUDA_PATH=$(cygpath -sm "${_cuda_basepath}")/${_cuda_version}
+export PATH=$PATH:$(dirname "$(cygpath -u "\\${_msvc_basepath}\\${_msvc_version}\bin\Host\\${_msvc_hostarch}\\${_msvc_targetarch}\cl.exe")")
+export PATH=$PATH:$CUDA_PATH/bin
 ```
 
 
