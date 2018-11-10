@@ -776,9 +776,17 @@ do_changeFFmpegConfig() {
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            which nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH/bin"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
+    elif [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk; then
+            [[ -z "$CUDA_PATH" ]] &&
+                echo -e "${orange}CUDA_PATH environment variable not set.${reset}"
+            which cl.exe &>/dev/null ||
+                echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere.${reset}"
+            echo -e "${orange}Disabling libnpp/cuda-sdk.${reset}"
+            do_removeOption "--enable-(libnpp|cuda-sdk)"
     else
         do_removeOption "--enable-(libnpp|cuda-sdk)"
     fi
@@ -1392,35 +1400,36 @@ get_vs_prefix() {
 get_cl_path() {
     which cl.exe &>/dev/null && return 0
 
-    local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
-    if [[ -f "$vswhere" ]]; then
-        local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
-        [[ -z "$installationpath" ]] && return 1
-        # apparently this is MS's official way of knowing the default version ???
-        local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
-        local _hostbits=HostX64
-        [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
-        local _arch=x64
-        [[ $bits = 32bit ]] && _arch=x86
-
-        local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
-        if [[ -f "$basepath/cl.exe" ]]; then
-            export PATH="$basepath:$PATH"
-        else
-            return 1
-        fi
+    local _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
+    local _suite_vswhere="/opt/bin/vswhere.exe"
+    if [[ -f "$_sys_vswhere" ]]; then
+        vswhere=$_sys_vswhere
+    elif [[ -f "$_suite_vswhere" ]]; then
+        vswhere=$_suite_vswhere
     else
-        local clpath
-        local regpath="/HKLM/Software/Microsoft/VisualStudio/VC/19.0"
-        if [[ $bits = 32bit ]]; then
-            clpath="$(regtool -qW get "$regpath/x86/x86/Compiler")"
-        elif [[ $bits = 64bit ]]; then
-            clpath="$(regtool -qW get "$regpath/x64/x64/Compiler")"
-        fi
-        [[ -z "$clpath" ]] && return 1
-        clpath="$(dirname "$(cygpath -u "$clpath")")"
-        [[ ! -f "$clpath"/cl.exe ]] && return 1
-        export PATH="$clpath:$PATH"
+        pushd "$LOCALBUILDDIR" 2>/dev/null
+        local _ver=2.5.2
+        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/download/$_ver/vswhere.exe"
+        [[ -f vswhere.exe ]] || return 1
+        do_install vswhere.exe /opt/bin/
+        vswhere=$_suite_vswhere
+        popd 2>/dev/null
+    fi
+
+    local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
+    [[ -z "$installationpath" ]] && return 1
+    # apparently this is MS's official way of knowing the default version ???
+    local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
+    local _hostbits=HostX64
+    [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
+    local _arch=x64
+    [[ $bits = 32bit ]] && _arch=x86
+
+    local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
+    if [[ -f "$basepath/cl.exe" ]]; then
+        export PATH="$basepath:$PATH"
+    else
+        return 1
     fi
 }
 

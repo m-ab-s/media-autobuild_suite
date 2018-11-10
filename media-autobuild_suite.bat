@@ -1610,7 +1610,7 @@ goto :EOF
     echo.LANG=en_US.UTF-8
     echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
-    echo.PATH="/opt/cargo/bin:${PATH}"
+    echo.PATH="/opt/cargo/bin:/opt/bin:${PATH}"
     echo.source '/etc/profile.d/perlbin.sh'
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
