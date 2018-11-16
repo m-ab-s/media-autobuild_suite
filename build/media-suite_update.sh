@@ -188,8 +188,9 @@ pacman -Syyuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
 
 do_hide_all_sharedlibs
 
-if [[ -x "$RUSTUP_HOME/bin/rustup.exe" ]]; then
-    "$RUSTUP_HOME/bin/rustup.exe" update
+if which rustup &> /dev/null; then
+    echo "Updating rust..."
+    rustup update
 fi
 
 echo "-------------------------------------------------------------------------------"
