@@ -1692,6 +1692,7 @@ compare_with_zeranoe() {
 }
 
 do_rust() {
+    log update "$RUSTUP_HOME/bin/cargo.exe" update
     log build "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@"
