@@ -7,7 +7,7 @@ bits="${bits:-64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
     --retry-delay 5 --silent --location --insecure --fail)
 
-if which tput >/dev/null 2>&1; then
+if command -v tput &>/dev/null; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test "$ncolors" -ge 8; then
         bold=$(tput bold)
@@ -776,14 +776,14 @@ do_changeFFmpegConfig() {
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            which nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH/bin"
+            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH/bin"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
     elif [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk; then
             [[ -z "$CUDA_PATH" ]] &&
                 echo -e "${orange}CUDA_PATH environment variable not set.${reset}"
-            which cl.exe &>/dev/null ||
+            command -v cl.exe &>/dev/null ||
                 echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere.${reset}"
             echo -e "${orange}Disabling libnpp/cuda-sdk.${reset}"
             do_removeOption "--enable-(libnpp|cuda-sdk)"
@@ -1383,9 +1383,9 @@ get_vs_prefix() {
         # check in 32-bit registry for installed VS
         [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
             vsprefix="$(cygpath -u "$winvsprefix/core${bits%bit}")"
-    elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
+    elif [[ -n $(command -v vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
-        vsprefix="$(dirname "$(which vspipe.exe)")"
+        vsprefix="$(dirname "$(command -v vspipe.exe)")"
     fi
     if [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
         local bitness="$(file "$vsprefix/vapoursynth.dll")"
@@ -1398,7 +1398,7 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    which cl.exe &>/dev/null && return 0
+    command -v cl.exe &>/dev/null && return 0
 
     local _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
     local _suite_vswhere="/opt/bin/vswhere.exe"
