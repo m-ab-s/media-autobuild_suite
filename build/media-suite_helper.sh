@@ -1697,3 +1697,14 @@ do_rust() {
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@"
 }
+
+fix_libtiff_pc() {
+    if ! pc_exists libtiff-4; then return; fi
+
+    local _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 \
+        | sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
+
+    if [[ ! -f "$_pkgconfLoc" ]]; then return; fi
+
+    grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
+}

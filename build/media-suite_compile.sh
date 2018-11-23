@@ -359,6 +359,7 @@ _check=(libwebp{,mux}.{{,l}a,pc})
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install libtiff
+    fix_libtiff_pc
     if [[ $standalone = y ]]; then
         extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)")
@@ -401,6 +402,7 @@ unset syspath opencldll
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     do_pacman_install libtiff
+    fix_libtiff_pc
     _check=(liblept.{,l}a lept.pc)
     if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
         do_uninstall include/leptonica "${_check[@]}"
