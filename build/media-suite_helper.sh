@@ -159,11 +159,11 @@ vcs_getlatesttag() {
     fi
     local tag
     if [[ "$ref" = "LATEST" ]]; then
-        tag="$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1))"
+        tag="$(git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)")"
     elif [[ "$ref" = "GREATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags)"
     elif [[ "${ref//\*}" != "$ref" ]]; then
-        tag="$(git describe --abbrev=0 --tags $(git tag -l "$ref" | sort -Vr | head -1))"
+        tag="$(git describe --abbrev=0 --tags "$(git tag -l "$ref" | sort -Vr | head -1)")"
     fi
     echo "${tag:-${ref}}"
 }
