@@ -314,7 +314,7 @@ do_wget() {
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
             response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
-            let tries-=1
+            (( tries-=1 ))
 
             if [[ $response_code = "200" || $response_code = "226" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
