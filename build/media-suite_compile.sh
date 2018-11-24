@@ -1011,21 +1011,25 @@ if [[ $ffmpeg != "no" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" 
 fi
 
 if [[ $mediainfo = "y" ]]; then
-    [[ $curl=openssl ]] && hide_libressl
+    [[ $curl = openssl ]] && hide_libressl
     _check=(libzen.{a,pc})
     if do_vcs "https://github.com/MediaArea/ZenLib" libzen; then
-        do_uninstall include/ZenLib bin-global/libzen-config "${_check[@]}" libzen.la
+        do_uninstall include/ZenLib bin-global/libzen-config \
+            "${_check[@]}" libzen.la lib/cmake/zenlib
         do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
+    fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/zenlib"
 
     _check=(libmediainfo.{a,pc})
     _deps=(lib{zen,curl}.a)
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
-        do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config "${_check[@]}" libmediainfo.la
+        do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
+            "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
         do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
         do_checkIfExist
     fi
+    fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/mediainfolib"
 
     _check=(bin-video/mediainfo.exe)
     _deps=(libmediainfo.a)
@@ -1039,7 +1043,7 @@ if [[ $mediainfo = "y" ]]; then
         do_makeinstall
         do_checkIfExist
     fi
-    [[ $curl=openssl ]] && hide_libressl -R
+    [[ $curl = openssl ]] && hide_libressl -R
 fi
 
 _check=(libvidstab.a vidstab.pc)

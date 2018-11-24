@@ -1708,3 +1708,32 @@ fix_libtiff_pc() {
 
     grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
 }
+
+fix_cmake_crap_exports() {
+    local _dir="$1"
+    # noop if passed directory is not valid
+    test -d "$_dir" || return 1
+
+    local _mixeddestdir _oldDestDir _cmakefile
+    declare -a _cmakefiles
+
+    _mixeddestdir="$(cygpath -m "$LOCALDESTDIR")"
+    < <(grep -Plr '\w:/[\w/]*local(?:32|64)' "$_dir"/*.cmake) \
+        mapfile -t _cmakefiles
+
+    # noop if array is empty
+    test ${#_cmakefiles[@]} -lt 1 && return
+
+    for _cmakefile in "${_cmakefiles[@]}"; do
+        # find at least one
+        _oldDestDir="$(grep -oP -m1 '\w:/[\w/]*local(?:32|64)' "$_cmakefile")"
+
+        # noop if there's no expected install prefix found
+        [[ -z "$_oldDestDir" ]] && continue
+        # noop if old and current install prefix are equal
+        [[ "$_mixeddestdir" = "$_oldDestDir" ]] && continue
+
+        # use perl for the matching and replacing, a bit simpler than with sed
+        perl -i -p -e 's;([A-Z]:/.*?)local(?:32|64);'"$_mixeddestdir"'\2;' "$_cmakefile"
+    done
+}
