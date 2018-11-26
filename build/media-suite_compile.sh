@@ -431,7 +431,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
         fi
         do_checkIfExist
     fi
-    do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
+    do_addOption --extra-cflags=-fopenmp --extra-libs='-lgomp -lzstd'
 fi
 
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
