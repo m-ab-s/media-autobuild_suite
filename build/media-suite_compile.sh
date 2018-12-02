@@ -260,7 +260,7 @@ if [[ $curl = y ]]; then
 fi
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; then
     _check=(libgnutls.{,l}a gnutls.pc)
-    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
+    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_6_4"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
