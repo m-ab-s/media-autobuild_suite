@@ -102,7 +102,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -398,7 +398,7 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build standalone Kvazaar?
+    echo. Build standalone Kvazaar? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -412,6 +412,27 @@ if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
+
+:vvc
+set "writevvc=no"
+if %vvcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build Fraunhofer VVC? [H.265 successor enc/decoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvvc="Build vvc: "
+    ) else set buildvvc=%vvcINI%
+if %deleteINI%==1 set "writevvc=yes"
+
+if %buildvvc%==1 set "vvc=y"
+if %buildvvc%==2 set "vvc=n"
+if %buildvvc% GTR 2 GOTO vvc
+if %writevvc%==yes echo.vvc=^%buildvvc%>>%ini%
 
 :flac
 set "writeflac=no"
@@ -1544,7 +1565,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
+--rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc%'
 
 endlocal
 :: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f

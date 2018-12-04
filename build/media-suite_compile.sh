@@ -55,6 +55,7 @@ while true; do
 --ripgrep=* ) ripgrep="${1#*=}"; shift ;;
 --rav1e=* ) rav1e="${1#*=}"; shift ;;
 --dav1d=* ) dav1d="${1#*=}"; shift ;;
+--vvc=* ) vvc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1497,6 +1498,19 @@ if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
     do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
     do_uninstall include/dav1d "${_check[@]}"
     do_mesoninstall --bindir=bin-video
+    do_checkIfExist
+fi
+
+_check=(bin-video/vvc/{Encoder,Decoder}App.exe)
+if [[ $vvc = y ]] &&
+    do_vcs "https://vcgit.hhi.fraunhofer.de/jvet/VVCSoftware_VTM.git" vvc; then
+    do_uninstall bin-video/vvc
+    # patch for easier install of apps
+    # probably not of upstream's interest because of how experimental the codec is
+    do_patch "https://0x0.st/sG0V.txt"
+    # install to own dir because the binaries' names are too generic
+    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
+        -DBUILD_STATIC=on
     do_checkIfExist
 fi
 
