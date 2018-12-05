@@ -1508,10 +1508,12 @@ if [[ $vvc = y ]] &&
     # patch for easier install of apps
     # probably not of upstream's interest because of how experimental the codec is
     do_patch "https://0x0.st/sG0V.txt"
+    _notrequired="true"
     # install to own dir because the binaries' names are too generic
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
         -DBUILD_STATIC=on
     do_checkIfExist
+    unset _notrequired
 fi
 
 enabled openssl && hide_libressl
