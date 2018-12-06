@@ -1371,7 +1371,7 @@ if %build32%==yes (
         echo -------------------------------------------------------------------------------
         set /P try32="try again [y/n]: "
 
-        if %packF%==y (
+        if %try32%==y (
             GOTO getmingw32
             ) else exit
         )
@@ -1405,7 +1405,7 @@ if %build64%==yes (
         echo -------------------------------------------------------------------------------
         set /P try64="try again [y/n]: "
 
-        if %packF%==y (
+        if %try64%==y (
             GOTO getmingw64
             ) else exit
         )
