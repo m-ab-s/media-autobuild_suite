@@ -1880,6 +1880,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
             fi
         fi
+        enabled libtesseract && mpv_cflags+=("-fopenmp") mpv_ldflags+=("-lgomp")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python3-docutils
