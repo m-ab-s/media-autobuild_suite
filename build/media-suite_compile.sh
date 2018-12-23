@@ -1659,7 +1659,10 @@ if [[ $ffmpeg != "no" ]]; then
             if ! disabled_any programs avcodec avformat; then
                 if ! disabled swresample; then
                     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
-                    disabled_any sdl2 ffplay || _check+=(bin-video/ffplay.exe)
+                    if { disabled autodetect && enabled_any sdl2 ffplay; } ||
+                        { ! disabled autodetect && ! disabled_any sdl2 ffplay; }; then
+                        _check+=(bin-video/ffplay.exe)
+                    fi
                 fi
                 disabled ffprobe || _check+=(bin-video/ffprobe.exe)
             fi
