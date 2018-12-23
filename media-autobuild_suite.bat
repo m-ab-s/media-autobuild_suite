@@ -315,6 +315,8 @@ if %dav1dINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P builddav1d="Build dav1d: "
