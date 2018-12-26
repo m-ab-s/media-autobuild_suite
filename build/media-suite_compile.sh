@@ -168,6 +168,7 @@ if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
     do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
+    do_autoreconf
     do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls
     do_checkIfExist
 fi
