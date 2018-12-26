@@ -942,9 +942,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
-        do_separate_conf video --enable-shared --with-libgcrypt-prefix="$MINGW_PREFIX"
-        do_make
-        do_makeinstall
+        do_separate_confmakeinstall video --enable-shared --with-libgcrypt-prefix="$MINGW_PREFIX"
         mv -f "$LOCALDESTDIR/bin/libaacs-0.dll" "$LOCALDESTDIR/bin-video/libaacs.dll"
         rm -f "$LOCALDESTDIR/bin-video/${MINGW_CHOST}-aacs_info.exe"
         do_checkIfExist
@@ -955,9 +953,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
         sed -ri 's;noinst_PROGRAMS.*;noinst_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libbdplus
-        do_separate_conf video --enable-shared
-        do_make
-        do_makeinstall
+        do_separate_confmakeinstall video --enable-shared
         mv -f "$LOCALDESTDIR/bin/libbdplus-0.dll" "$LOCALDESTDIR/bin-video/libbdplus.dll"
         do_checkIfExist
     fi
