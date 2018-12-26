@@ -62,7 +62,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty
+gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
 
@@ -102,7 +102,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc jq
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -924,6 +924,27 @@ if %buildripgrep%==1 set "ripgrep=y"
 if %buildripgrep%==2 set "ripgrep=n"
 if %buildripgrep% GTR 2 GOTO ripgrep
 if %writeripgrep%==yes echo.ripgrep=^%buildripgrep%>>%ini%
+
+:jq
+set "writejq=no"
+if %jqINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build jq ^(CLI JSON processor^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildjq="Build jq: "
+    ) else set buildjq=%jqINI%
+if %deleteINI%==1 set "writejq=yes"
+
+if %buildjq%==1 set "jq=y"
+if %buildjq%==2 set "jq=n"
+if %buildjq% GTR 2 GOTO jq
+if %writejq%==yes echo.jq=^%buildjq%>>%ini%
 
 :numCores
 set "writeCores=no"

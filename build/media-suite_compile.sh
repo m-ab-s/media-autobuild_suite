@@ -56,6 +56,7 @@ while true; do
 --rav1e=* ) rav1e="${1#*=}"; shift ;;
 --dav1d=* ) dav1d="${1#*=}"; shift ;;
 --vvc=* ) vvc="${1#*=}"; shift ;;
+--jq=* ) jq="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -159,6 +160,15 @@ if [[ $ripgrep = y ]] &&
     do_uninstall "${_check[@]}"
     do_rust --features 'pcre2'
     do_install "target/$CARCH-pc-windows-gnu/release/rg.exe" bin-global/
+    do_checkIfExist
+fi
+
+_check=(bin-global/jq.exe)
+if [[ "$jq" = y ]] &&
+    do_vcs "https://github.com/stedolan/jq.git"; then
+    do_pacman_install oniguruma
+    do_uninstall "${_check[@]}"
+    do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls
     do_checkIfExist
 fi
 

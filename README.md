@@ -127,6 +127,7 @@ Included Tools And Libraries
     - ffmbc (git) (unsupported)
     - flac (git)
     - haisrt tools (git)
+    - jq (git)
     - kvazaar (git)
     - lame (3.99.5)
     - libaacs (git) (shared)
