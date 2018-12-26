@@ -1588,7 +1588,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc%'
+--rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc% --jq=%jq%'
 
 endlocal
 :: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
