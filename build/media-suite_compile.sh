@@ -938,7 +938,7 @@ fi
 
 if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
-    if do_vcs "https://code.videolan.org/videolan/libbdplus.git"; then
+    if do_vcs "https://code.videolan.org/videolan/libaacs.git"; then
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
@@ -951,7 +951,7 @@ if { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
     fi
 
     _check=(bin-video/libbdplus.dll libbdplus.{{,l}a,pc} libbdplus/bdplus.h)
-    if do_vcs "https://code.videolan.org/videolan/libaacs.git"; then
+    if do_vcs "https://code.videolan.org/videolan/libbdplus.git"; then
         sed -ri 's;noinst_PROGRAMS.*;noinst_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libbdplus
