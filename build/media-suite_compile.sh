@@ -250,7 +250,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         [[ $ffmpeg = "sharedlibs" ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
     fi
-    if [[ $ffmpeg != "sharedlibs" ]]; then
+    if [[ $ffmpeg != "sharedlibs" && $ffmpeg != "shared" ]]; then
         _libs=(lib{freetype,fribidi,ass}.dll.a
             libav{codec,device,filter,format,util,resample}.dll.a}
             lib{sw{scale,resample},postproc}.dll.a)
@@ -1905,7 +1905,19 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             { git merge --no-edit --no-gpg-sign origin/mruby ||
               git merge --abort && do_removeOption MPV_OPTS "--enable-mruby"; }
 
-        files_exist libavutil.a && MPV_OPTS+=(--enable-static-build)
+        if files_exist libavutil.a; then
+            MPV_OPTS+=(--enable-static-build)
+        else
+            # force pkg-config lookup to look for static requirements
+            export PKGCONF_STATIC=yes
+            # hacky way of ignoring ffmpeg libs own shared dependencies
+            for _avpc in avcodec avdevice avfilter avformat avutil swresample swscale; do
+                if [[ -f "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc" ]]; then
+                    sed -i 's;^Requires.private;# &;g' "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc"
+                fi
+            done
+        fi
+
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html3" \
@@ -1919,7 +1931,16 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
 
-        unset mpv_ldflags replace
+        if ! files_exist libavutil.a; then
+            # revert hack
+            for _avpc in avcodec avdevice avfilter avformat avutil swresample swscale; do
+                if [[ -f "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc" ]]; then
+                    sed -ri 's;#.*(Requires.private);\1;g' "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc"
+                fi
+            done
+        fi
+
+        unset mpv_ldflags replace PKGCONF_STATIC
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
