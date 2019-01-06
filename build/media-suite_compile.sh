@@ -150,8 +150,9 @@ if [[ $ripgrep = y || $rav1e = y ]]; then
         log install_toolchain "$RUSTUP_HOME/bin/rustup.exe" toolchain \
             install "stable-$CARCH-pc-windows-gnu"
     fi
+    log rustup_update "$RUSTUP_HOME/bin/rustup.exe" update
     log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
-        "stable-$CARCH-pc-windows-gnu" 
+        "stable-$CARCH-pc-windows-gnu"
 fi
 
 _check=(bin-global/rg.exe)

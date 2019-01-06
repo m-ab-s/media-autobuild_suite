@@ -162,6 +162,11 @@ else
     cd_safe "$(cygpath -w /).."
 fi
 
+if which rustup &> /dev/null; then
+    echo "Updating rust..."
+    rustup update
+fi
+
 # --------------------------------------------------
 # packet msys2 system
 # --------------------------------------------------
@@ -187,11 +192,6 @@ pacman -Syyuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
     --overwrite "/mingw32/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
-
-if which rustup &> /dev/null; then
-    echo "Updating rust..."
-    rustup update
-fi
 
 echo "-------------------------------------------------------------------------------"
 echo "Updates finished."
