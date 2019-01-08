@@ -63,9 +63,8 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-/usr/bin/grep -q AE4FF531 <(pacman-key -l) || pacman-key --recv-keys AE4FF531
-/usr/bin/grep -q 'full.*wiiaboo@gmail.com' <(pacman-key -l) ||
-    pacman-key --lsign AE4FF531
+/usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531
+/usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531
 
 #always kill gpg-agent
 ps|grep gpg-agent|awk '{print $1}'|xargs kill -9
