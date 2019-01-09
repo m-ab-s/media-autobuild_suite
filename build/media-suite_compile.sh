@@ -1983,7 +1983,7 @@ if [[ $bmx = "y" ]]; then
 fi
 enabled openssl && hide_libressl -R
 
-if [[ $cyanrip = yes ]]; then
+if [[ $cyanrip = y ]]; then
     do_pacman_install libxml2
     do_pacman_install libcdio-paranoia
     sed -ri 's;-R[^ ]*;;g' "$MINGW_PREFIX/lib/pkgconfig/libcdio.pc"
