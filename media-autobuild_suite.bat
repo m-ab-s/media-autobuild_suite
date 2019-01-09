@@ -878,8 +878,8 @@ if %cyanrip2INI%==0 (
     ) else set buildcyanrip=%cyanrip2INI%
 if %deleteINI%==1 set "writecyanrip=yes"
 
-if %buildcyanrip%==1 set "cyanrip=yes"
-if %buildcyanrip%==2 set "cyanrip=no"
+if %buildcyanrip%==1 set "cyanrip=y"
+if %buildcyanrip%==2 set "cyanrip=n"
 if %buildcyanrip% GTR 2 GOTO cyanrip
 if %writecyanrip%==yes echo.cyanrip2=^%buildcyanrip%>>%ini%
 
@@ -1173,7 +1173,7 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
         ) else set "msysprefix=x86_64"
     wget --tries=5 --retry-connrefused --waitretry=5 --continue -O msys2-base.tar.xz ^
     "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz"
-    
+
 :unpack
 if exist %build%\msys2-base.tar.xz (
     %build%\7za.exe x msys2-base.tar.xz -so | %build%\7za.exe x -aoa -si -ttar -o..
@@ -1384,7 +1384,7 @@ if %build32%==yes (
     if exist %build%\mingw32.log del %build%\mingw32.log
     %mintty% --log 2>&1 %build%\mingw32.log /usr/bin/bash --login %build%\mingw32.sh
     del %build%\mingw32.sh
-    
+
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
         echo.
@@ -1399,7 +1399,7 @@ if %build32%==yes (
             ) else exit
         )
     )
-    
+
 :getmingw64
 if %build64%==yes (
     if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
