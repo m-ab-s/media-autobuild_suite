@@ -57,6 +57,7 @@ while true; do
 --dav1d=* ) dav1d="${1#*=}"; shift ;;
 --vvc=* ) vvc="${1#*=}"; shift ;;
 --jq=* ) jq="${1#*=}"; shift ;;
+--dssim=* ) dssim="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -132,7 +133,7 @@ if [[ $packing = y ]] &&
 fi
 
 _check=("$RUSTUP_HOME"/bin/rustup.exe)
-if [[ $ripgrep = y || $rav1e = y ]]; then
+if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
     if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
         mkdir -p "$LOCALBUILDDIR/rustinstall"
         pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
@@ -171,6 +172,15 @@ if [[ "$jq" = y ]] &&
     do_uninstall "${_check[@]}"
     do_autoreconf
     do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls
+    do_checkIfExist
+fi
+
+_check=(bin-global/dssim.exe)
+if [[ $dssim = y ]] &&
+    do_vcs "https://github.com/kornelski/dssim.git"; then
+    do_uninstall "${_check[@]}"
+    do_rust
+    do_install "target/$CARCH-pc-windows-gnu/release/dssim.exe" bin-global/
     do_checkIfExist
 fi
 
