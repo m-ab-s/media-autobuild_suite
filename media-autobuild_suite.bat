@@ -62,7 +62,7 @@ if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
+gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
 
@@ -102,7 +102,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc jq
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc jq dssim
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -946,6 +946,27 @@ if %buildjq%==2 set "jq=n"
 if %buildjq% GTR 2 GOTO jq
 if %writejq%==yes echo.jq=^%buildjq%>>%ini%
 
+:dssim
+set "writedssim=no"
+if %dssimINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build dssim ^(multiscale SSIM in Rust^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P builddssim="Build dssim: "
+    ) else set builddssim=%dssimINI%
+if %deleteINI%==1 set "writedssim=yes"
+
+if %builddssim%==1 set "dssim=y"
+if %builddssim%==2 set "dssim=n"
+if %builddssim% GTR 2 GOTO dssim
+if %writedssim%==yes echo.dssim=^%builddssim%>>%ini%
+
 :numCores
 set "writeCores=no"
 if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
@@ -1588,7 +1609,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc% --jq=%jq%'
+--rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim%'
 
 endlocal
 :: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
