@@ -89,7 +89,7 @@ echo "--------------------------------------------------------------------------
 echo
 
 pacman -Sy
-pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex > /dev/null > /dev/null
+pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex > /dev/null
 do_unhide_all_sharedlibs
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
