@@ -1152,9 +1152,9 @@ if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOT
 setlocal enabledelayedexpansion
 if not exist %build%\wget.exe (
     (
-        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12';
-        echo.$wc = new-object System.Net.WebClient;
-        echo.$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe'^);
+        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
+        echo.$wc = New-Object System.Net.WebClient
+        echo.$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', "$PWD\wget-pack.exe"^)
         )>wget.ps1
     powershell -noprofile -executionpolicy bypass .\wget.ps1
     del wget.ps1
