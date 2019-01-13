@@ -1027,6 +1027,34 @@ if [[ $ffmpeg != "no" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" 
     unset _file
 fi
 
+_check=(bin-video/xavs2.exe libxavs2.a xavs2_config.h xavs2.{h,pc})
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libxavs2
+elif [[ $ffmpeg != "no" ]] && enabled libxavs2 &&
+    do_vcs "https://github.com/pkuvcl/xavs2.git"; then
+    cd build/linux
+    [[ -f "config.mak" ]] && log "distclean" make distclean
+    do_uninstall all "${_check[@]}"
+    do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
+        --bindir="$LOCALDESTDIR"/bin-video --enable-static --enable-strip
+    do_makeinstall
+    do_checkIfExist
+fi
+
+_check=(bin-video/davs2.exe libdavs2.a davs2_config.h davs2.{h,pc})
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libdavs2
+elif [[ $ffmpeg != "no" ]] && enabled libdavs2 &&
+    do_vcs "https://github.com/pkuvcl/davs2.git"; then
+    cd build/linux
+    [[ -f "config.mak" ]] && log "distclean" make distclean
+    do_uninstall all "${_check[@]}"
+    do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
+        --bindir="$LOCALDESTDIR"/bin-video --enable-strip
+    do_makeinstall
+    do_checkIfExist
+fi
+
 if [[ $mediainfo = "y" ]]; then
     [[ $curl = openssl ]] && hide_libressl
     _check=(libzen.{a,pc})
