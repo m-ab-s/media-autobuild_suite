@@ -80,6 +80,7 @@ Included Tools And Libraries
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
+        - ladspa (mingw)
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
@@ -92,7 +93,6 @@ Included Tools And Libraries
         - libgsm (mingw)
         - libilbc (git snapshot)
         - libkvazaar (git)
-        - ladspa (mingw)
         - libmysofa (git)
             - needed for sofalizer filter
         - libnpp (needs CUDA SDK installed)
