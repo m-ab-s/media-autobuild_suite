@@ -156,10 +156,10 @@ Included Tools And Libraries
             - shared libmpv
             - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)
-    - redshift (git)
-    - rtmpdump (git)
     - rav1e (git)
+    - redshift (git)
     - ripgrep (git latest release)
+    - rtmpdump (git)
     - sox (14.4.2)
     - speex (git)
     - tesseract (git)
