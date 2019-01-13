@@ -83,6 +83,7 @@ Included Tools And Libraries
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
+        - libcodec2 (0.7)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
@@ -91,6 +92,7 @@ Included Tools And Libraries
         - libgsm (mingw)
         - libilbc (git snapshot)
         - libkvazaar (git)
+        - ladspa (mingw)
         - libmysofa (git)
             - needed for sofalizer filter
         - libnpp (needs CUDA SDK installed)
@@ -103,8 +105,6 @@ Included Tools And Libraries
         - libssh (mingw)
         - libtesseract (git)
         - libvmaf (git)
-        - libcodec2 (0.7)
-        - ladspa (mingw)
         - libxavs (svn snapshot)
         - libzmq (mingw)
         - libzvbi (0.2.35)
