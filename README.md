@@ -85,6 +85,7 @@ Included Tools And Libraries
         - libcaca (mingw)
         - libcdio (mingw)
         - libcodec2 (0.8)
+        - libdavs2 (git)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
@@ -106,6 +107,7 @@ Included Tools And Libraries
         - libtesseract (git)
         - libvmaf (git)
         - libxavs (svn snapshot)
+        - libxavs2 (git)
         - libzmq (mingw)
         - libzvbi (0.2.35)
         - opencl (from system)
