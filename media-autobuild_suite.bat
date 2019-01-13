@@ -400,7 +400,7 @@ if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build standalone Kvazaar? [H.265 encoder]
+    echo. Build Kvazaar? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
