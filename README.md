@@ -84,7 +84,7 @@ Included Tools And Libraries
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
-        - libcodec2 (0.7)
+        - libcodec2 (0.8)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
