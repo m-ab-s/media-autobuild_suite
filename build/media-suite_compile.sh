@@ -651,11 +651,10 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
 fi
 
 _check=(libcodec2.a codec2.pc codec2/codec2.h)
-if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.7"; then
+if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.8"; then
     [[ $standalone = y ]] && _check+=(bin-audio/c2{enc,dec,sim}.exe)
-    if do_wget -h 0695bb93cd985dd39f02f0db35ebc28a98b9b88747318f90774aba5f374eadb2 \
-        "https://freedv.com/wp-content/uploads/sites/8/2017/10/codec2-0.7.tar.xz"; then
-        do_uninstall include/codec2 "${_check[@]}"
+    if do_vcs "svn::svn://svn.code.sf.net/p/freetel/code/codec2/branches/0.8" codec2-0.8; then
+        do_uninstall all include/codec2 "${_check[@]}"
         sed -i 's|if(WIN32)|if(FALSE)|g' CMakeLists.txt
         if enabled libspeex; then
             # rename same-named symbols copied from speex
