@@ -80,9 +80,11 @@ Included Tools And Libraries
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
+        - ladspa (mingw)
         - libbs2b (3.1.0)
         - libcaca (mingw)
         - libcdio (mingw)
+        - libcodec2 (0.8)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
@@ -103,8 +105,6 @@ Included Tools And Libraries
         - libssh (mingw)
         - libtesseract (git)
         - libvmaf (git)
-        - libcodec2 (0.7)
-        - ladspa (mingw)
         - libxavs (svn snapshot)
         - libzmq (mingw)
         - libzvbi (0.2.35)
@@ -156,10 +156,10 @@ Included Tools And Libraries
             - shared libmpv
             - vapoursynth (if installed or standalone inside /local(32|64))
     - opus-tools (git)
-    - redshift (git)
-    - rtmpdump (git)
     - rav1e (git)
+    - redshift (git)
     - ripgrep (git latest release)
+    - rtmpdump (git)
     - sox (14.4.2)
     - speex (git)
     - tesseract (git)
