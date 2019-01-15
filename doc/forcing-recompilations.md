@@ -69,20 +69,32 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
     sox
 
 /bin-global
+    dssim
+    jq
     redshift
+    rg
 
 /bin-video
     bmxtranswrap
+    dav1d
+    davs2
     ffmpeg (for static and both)
     ffmpegSHARED/ffmpeg (for shared only)
+    ffmsindex
     kvazaar
     libEGL.dll
     mediainfo
     MP4Box
     mplayer
     mpv
+    MXFDump
+    rav1e
     rtmpdump (if rtmpdump=y)
     x264
     x265
+    xavs2
+    vvc
+        EncoderApp
+        DecoderApp
     vpxenc
 ```
