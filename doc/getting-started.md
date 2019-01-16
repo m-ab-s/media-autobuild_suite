@@ -30,10 +30,15 @@ To use these, you can either:
 - Copy the files in those folders to a folder that is in your enviroment PATH*.
 - Add the bin-* folders to your enviroment PATH*.
 - Invoke the programs using their path
+  - For CMD: `C:\Users\Potatoe>C:\media-autobuild_suite\local64\bin-video\ffmpeg.exe -h`
+  - For Powershell: `PS C:\Users\Potatoe> C:\media-autobuild_suite\local64\bin-video\ffmpeg.exe -h`
+  - Adjust the path to match your situation.
+
+*Note: It is almost always recommeded to copy/move the files in the bin-\* folders to somewhere you can easily remember and use as you cannot use them while the suite is updating or compiling.*
 
 \* If you do not know what your enviroment PATH is, either ignore those options or google what the enviroment PATH is.
 
-## Any time after that
+## Afterwards
 
 Look at [updating.md](./updating.md) for when you want to update the suite or just rerun the batch script as it will automatically look for updates itself.
 
