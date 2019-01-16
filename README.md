@@ -1,26 +1,22 @@
-media-autobuild_suite
-=========
+# media-autobuild_suite
+
 Before opening an issue, check if it's an issue directly from executing the suite. This isn't Doom9, reddit, stackoverflow or any other forum for general questions about the things being compiled. This script builds them, that's all.
 
 This source code is also mirrored in [GitLab](https://gitlab.com/RiCON/media-autobuild_suite).
 
 Most git sources in the suite use GitHub, so if it's down, it's probably useless to run the suite at that time.
 
+## Download
 
-Download
---------
-
-#### [Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)
+**[Click here to download latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip)**
 
 For information about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
 
-
-Included Tools And Libraries
---------
+## Included Tools And Libraries
 
 ### [Information about FFmpeg external libraries](https://github.com/jb-alvarado/media-autobuild_suite/wiki/ffmpeg_options.txt)
 
- - FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
+- FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
     - Light build:
         - amd amf encoders (built-in)
         - cuda (built-in)
@@ -118,7 +114,7 @@ Included Tools And Libraries
         - libndi_newtek (needs Newtek SDK installed)
             - needs non-free license and --enable-libndi_newtek
 
- - other tools
+- other tools
     - aom (git)
     - bmx (git)
     - curl (latest release) with WinSSL/LibreSSL/OpenSSL/GnuTLS backend
@@ -140,7 +136,7 @@ Included Tools And Libraries
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - Base build (ffmpegChoice=2 or 3)
-            - ANGLE (from https://i.fsbn.eu/pub/angle/)
+            - ANGLE (from <https://i.fsbn.eu/pub/angle/>)
             - lcms2 (mingw)
             - libass (git)
             - libbluray (git)
@@ -173,9 +169,10 @@ Included Tools And Libraries
     - x265 (8, 10 and 12 bit) (hg)
     - xvid (1.3.5)
 
-
 --------
- Requirements
+
+## Requirements
+
 --------
 
 - Windows 32/64-bits (tested with Win10 64-bits; 32-bits is not tested at all by anyone, avoid)
@@ -184,17 +181,19 @@ Included Tools And Libraries
 - 4GB+ RAM
 
 --------
- Information
+
+## Information
+
 --------
 
 This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
-https://github.com/rdp/ffmpeg-windows-build-helpers
+<https://github.com/rdp/ffmpeg-windows-build-helpers>
 
 It is based on msys2 and tested under Windows 7, 8.1. and 10.
-http://sourceforge.net/projects/msys2/
+<http://sourceforge.net/projects/msys2/>
 
 I use some jscript parts from nu774:
-https://github.com/nu774/fdkaac_autobuild
+<https://github.com/nu774/fdkaac_autobuild>
 
 Thanks to all of them!
 
@@ -202,74 +201,84 @@ This Windows Batchscript setups a MinGW/GCC compiler environment for building ff
 After building the environment it retrieves and compiles all tools. All tools get static compiled, no external .dlls needed (with some optional exceptions)
 
 How to use it:
- - Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder without space characters. A good place is: c:\mingw
- - Double click the media-autobuild_suite.bat file
- - Select the toolchain you'll want (select the one your operating system is on, if you don't know it's probably 64-bit)
- - Select if you want to compile for Windows 32-bit, 64-bit or both
- - Select if you want to compile non-free tools like "fdk aac"
- - Select the numbers of CPU (cores) you want to use
- - Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-(audio/global/video) or local64\bin-(audio/global/video)
+
+- Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder without space characters. A good place is: c:\mingw
+- Double click the media-autobuild_suite.bat file
+- Select the toolchain you'll want (select the one your operating system is on, if you don't know it's probably 64-bit)
+- Select if you want to compile for Windows 32-bit, 64-bit or both
+- Select if you want to compile non-free tools like "fdk aac"
+- Select the numbers of CPU (cores) you want to use
+- Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-(audio/global/video) or local64\bin-(audio/global/video)
 
 The Script writes a ini-file, so you only need to make these choices the first time what you want to build.
 
 For all you need ~7 GB disk space.
-The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. 
-Building everything from scratch takes about ~3 hours.
+The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean.
+Building everything from scratch takes about ~3 hours depending on what is enabled.
 
-Check doc/forcing-recompilations.md to check how you can force a rebuild of all libs/binaries.
+Check [doc/forcing-recompilations.md](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
 
 To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
 
 Have fun!
 
+## Troubleshooting
 
-Troubleshooting
 --------
 
 If there's some error during compilation follow these steps:
- 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
- 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
- 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
- 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
- 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
- 6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
+1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/jb-alvarado/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
+2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
+3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
+4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
+5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
+6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
-What The Individual Files Do
+## What The Individual Files Do
+
 --------
 
 `media-autobuild_suite.bat`
- - This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
+
+- This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
 
 `/build/media-autobuild_suite.ini`
- - This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
+
+- This file get generated after the first start and saves the settings that you have selected. Before the next run you can edit it.
 
 `/build/media-suite_compile.sh`
- - This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
+
+- This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
 
 `/build/media-suite_update.sh`
- - This script runs every time you run the batch file. It checks for updates to the MinGW environment.
+
+- This script runs every time you run the batch file. It checks for updates to the MinGW environment.
 
 `/build/media-suite_helper.sh`
- - This script contains helper functions used by compile and update that can also be `source`'d by the user if desired.
+
+- This script contains helper functions used by compile and update that can also be `source`'d by the user if desired.
 
 `/build/ffmpeg_options.txt` & `/build/mpv_options.txt`
- - If you select the option to choose your own FFmpeg/mpv optional libraries, this file will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg/mpv without features you don't need or with additional features not compiled by default, if supported.
 
+- If you select the option to choose your own FFmpeg/mpv optional libraries, this file will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg/mpv without features you don't need or with additional features not compiled by default, if supported.
 
-Optional User Files
+## Optional User Files
+
 --------
 
 `/local32|64/etc/custom_profile` & `$HOME/custom_build_options`
- - Put here any general/platform tweaks that you need for _your_ specific environment. See `/local32|64/etc/profile2.local` for example usage.
 
+- Put here any general/platform tweaks that you need for _your_ specific environment. See `/local32|64/etc/profile2.local` for example usage.
 
-Notes about CUDA SDK
+## Notes about CUDA SDK
+
 --------
 
 For `--enable-cuda-sdk` and `--enable-libnpp` to work, you need either the `CUDA_PATH` variable to be set system-wide and VS2017 installed with vswhere.exe; or if for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed along with VS2017, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
 
 For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
+
 ```bash
 # adapt these to your environment
 _cuda_basepath="C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA"
@@ -286,10 +295,10 @@ export PATH=$PATH:$(dirname "$(cygpath -u "\\${_msvc_basepath}\\${_msvc_version}
 export PATH=$PATH:$CUDA_PATH/bin
 ```
 
+## References
 
-References
 --------
 
-http://ingar.satgnu.net/devenv/mingw32/base.html
+<http://ingar.satgnu.net/devenv/mingw32/base.html>
 
-http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html
+<http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html>
