@@ -1887,6 +1887,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         add_third_party "https://github.com/KhronosGroup/glslang.git"
         add_third_party "https://github.com/KhronosGroup/SPIRV-Tools.git" spirv-tools
         add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
+        add_third_party "https://github.com/KhronosGroup/SPIRV-Cross.git" spirv-cross
 
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
