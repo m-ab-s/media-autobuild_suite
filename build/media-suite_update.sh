@@ -170,7 +170,7 @@ fi
 # packet msys2 system
 # --------------------------------------------------
 
-have_updates="$(pacman -Quq)"
+have_updates="$(pacman -Qu|grep -v ignored]$|awk '{print $1}')"
 if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
@@ -180,7 +180,6 @@ if [[ -n "$have_updates" ]]; then
         have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
     echo $have_updates | xargs $nargs pacman -S --noconfirm --ask 20 \
         --overwrite "/mingw64/*" --overwrite "/mingw32/*" --overwrite "/usr/*"
-    sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
