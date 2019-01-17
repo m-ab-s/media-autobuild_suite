@@ -1606,7 +1606,7 @@ if [[ $ffmpeg != "no" ]]; then
     if enabled libzmq; then
         do_pacman_install zeromq
         grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
-            's/-lsodium/& -lws2_32 -liphlpapi/'
+            's/-lpthread/& -lws2_32/'
         do_addOption --extra-cflags=-DZMQ_STATIC
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
