@@ -1151,7 +1151,8 @@ if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOT
 
 setlocal enabledelayedexpansion
 if not exist %build%\wget.exe (
-    powershell -noprofile -command Invoke-WebRequest -UseBasicParsing -Uri "https://i.fsbn.eu/pub/wget-pack.exe" -OutFile "$PWD\wget-pack.exe"
+    powershell -noprofile -command [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12;^
+     Invoke-WebRequest -UseBasicParsing -Uri "https://i.fsbn.eu/pub/wget-pack.exe" -OutFile "$PWD\wget-pack.exe"
 
     for /f "tokens=1 delims=" %%a ^
 in ('powershell -noprofile -command "(get-filehash wget-pack.exe).hash"') do set _hash=%%a
