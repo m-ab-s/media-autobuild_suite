@@ -1154,7 +1154,7 @@ if not exist %build%\wget.exe (
     powershell -noprofile -command Invoke-WebRequest -UseBasicParsing -Uri "https://i.fsbn.eu/pub/wget-pack.exe" -OutFile "$PWD\wget-pack.exe"
 
     for /f "tokens=1 delims=" %%a ^
-in ('powershell -noprofile -command "(get-filehash -algorithm sha256 wget-pack.exe).hash"') do set _hash=%%a
+in ('powershell -noprofile -command "(get-filehash wget-pack.exe).hash"') do set _hash=%%a
 
     if ["!_hash!"]==["3F226318A73987227674A4FEDDE47DF07E85A48744A07C7F6CDD4F908EF28947"] (
         %build%\wget-pack.exe x
