@@ -1153,11 +1153,17 @@ if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOT
 setlocal enabledelayedexpansion
 if not exist %build%\wget.exe (
     (
+        echo.param^($server^)
         echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
         echo.$wc = New-Object System.Net.WebClient
-        echo.$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', "$PWD\wget-pack.exe"^)
+        echo.if ^($server -eq "fsbn"^) {$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', "$PWD\wget-pack.exe"^)}
+        echo.else {$wc.DownloadFile^('https://www.randomderp.com/wget-pack.exe', "$PWD\wget-pack.exe"^)}
         )>wget.ps1
-    powershell -noprofile -executionpolicy bypass .\wget.ps1
+        for /f "usebackq tokens=*" %%f in (`powershell -noprofile -command ^(Test-Connection -ComputerName i.fsbn.eu -Count 1 -InformationAction Ignore -ErrorAction Ignore^).ResponseTime`) do if not "%%f"=="" (
+            powershell -noprofile -executionpolicy bypass %build%\wget.ps1 -server fsbn
+        ) else (
+            powershell -noprofile -executionpolicy bypass %build%\wget.ps1 -server rdp
+        )
     del wget.ps1
 
     for /f "tokens=1 delims=" %%a ^
