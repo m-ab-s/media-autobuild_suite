@@ -41,7 +41,7 @@ if not exist %instdir% (
 
 if not ["%instdir:~60,1%"]==[""] (
     echo -------------------------------------------------------------------------------
-    echo. The total filepath to the suite seems too large (larger than 60 characters^):
+    echo. The total filepath to the suite seems too large ^(larger than 60 characters^):
     echo. %instdir%
     echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
