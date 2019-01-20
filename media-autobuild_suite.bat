@@ -1175,48 +1175,8 @@ if %writeforceQuitBatch%==yes echo.forceQuitBatch=^%forceQuitBatchF%>>%ini%
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
-echo -------------------------------------------------------------
-echo.
-echo - Download wget
-echo.
-echo -------------------------------------------------------------
 cd build
 if exist %build%\msys2-base.tar.xz GOTO unpack
-if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
-
-setlocal enabledelayedexpansion
-if not exist %build%\wget.exe (
-    (
-        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-        echo.$wc = New-Object System.Net.WebClient
-        echo.$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', "$PWD\wget-pack.exe"^)
-        )>wget.ps1
-    powershell -noprofile -executionpolicy bypass .\wget.ps1
-    del wget.ps1
-
-    for /f "tokens=1 delims=" %%a ^
-in ('powershell -noprofile -command "(get-filehash -algorithm sha256 wget-pack.exe).hash"') do set _hash=%%a
-
-    if ["!_hash!"]==["3F226318A73987227674A4FEDDE47DF07E85A48744A07C7F6CDD4F908EF28947"] (
-        %build%\wget-pack.exe x
-        ) else del wget-pack.exe
-    )
-setlocal
-
-
-if not exist %build%\wget.exe (
-    echo -------------------------------------------------------------------------------
-    echo Script to download necessary components failed.
-    echo.
-    echo Download and extract this manually to inside "%build%":
-    echo https://i.fsbn.eu/pub/wget-pack.exe
-    echo -------------------------------------------------------------------------------
-    pause
-    exit
-    ) else (
-    del wget-pack.exe 2>nul
-    )
 
 :checkmsys2
 if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
@@ -1228,13 +1188,50 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     if %msys2%==msys32 (
         set "msysprefix=i686"
         ) else set "msysprefix=x86_64"
-    wget --tries=5 --retry-connrefused --waitretry=5 --continue -O msys2-base.tar.xz ^
-    "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz"
+    (
+        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
+        echo.$wc = New-Object System.Net.WebClient
+        echo.try {
+        echo.if ^($i -le 5^) {
+        echo.$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', "$PWD\msys2-base.tar.xz"^)
+        echo.}
+        echo.} catch {
+        echo.$i++
+        echo.}
+    )>msys.ps1
+    powershell -noprofile -executionpolicy bypass .\msys.ps1
+    del msys.ps1
 
 :unpack
 if exist %build%\msys2-base.tar.xz (
-    %build%\7za.exe x msys2-base.tar.xz -so | %build%\7za.exe x -aoa -si -ttar -o..
-    del %build%\msys2-base.tar.xz
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.- Downloading Pscx and unpacking msys2 basic system
+    echo.
+    echo -------------------------------------------------------------------------------
+    (
+        echo if ^(!^(Get-ChildItem 'HKLM:^\SOFTWARE^\Microsoft^\NET Framework Setup^\NDP' -Recurse ^| Get-ItemProperty -name Version -ErrorAction Ignore ^| Select-Object -Property PSChildName, Version ^| Where-Object {$_.PSChildName -match "Client"} ^| Where-Object {$_.Version -ge 4.5}^)^) {
+        echo.Write-Output "You lack a dotnet version greater than or equal to 4.5, thus this script cannot automatically extract the msys2 system"
+        echo.Write-Output "Please upgrade your dotnet either by updating your OS or by downloading the latest version at:"
+        echo.Write-Output "https://dotnet.microsoft.com/download/dotnet-framework-runtime"
+        echo.exit 3
+        echo.}
+        echo.$wc = New-Object System.Net.WebClient
+        echo.$wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^)
+        echo.Add-Type -assembly "System.IO.Compression.FileSystem"
+        echo.[System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^)
+        echo.Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package
+        echo.powershell -noprofile -command {
+        echo.Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za
+        echo.Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz
+        echo.Remove-Item $PWD\msys2-base.tar.xz
+        echo.Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar
+        echo.Remove-Item $PWD\msys2-base.tar
+        echo.}
+        echo.Remove-Item -Recurse $PWD\pscx
+    )>7z.ps1
+    powershell -noprofile -executionpolicy bypass .\7z.ps1
+    del 7z.ps1
     )
 
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
