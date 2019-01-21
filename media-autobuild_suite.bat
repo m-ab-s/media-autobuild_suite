@@ -52,6 +52,18 @@ if not ["%instdir:~60,1%"]==[""] (
     pause
     )
 
+for /f "usebackq tokens=*" %%f in (`powershell -noprofile -command $PSVersionTable.PSVersion.Major`) do if %%f lss 4 (
+    echo ----------------------------------------------------------------------
+    echo. You do not have a powershell version greater than 4.
+    echo. This is not supported.
+    echo. Please upgrade your powershell either through downloading and installing WMF 5.1
+    echo. https://docs.microsoft.com/en-us/powershell/wmf/5.1/install-configure
+    echo. or by upgrading your OS.
+    echo. This is not Powershell Core. That is separate.
+    pause
+    exit
+    )
+
 set _bitness=64
 if %PROCESSOR_ARCHITECTURE%==x86 (
     IF NOT DEFINED PROCESSOR_ARCHITEW6432 set _bitness=32
