@@ -58,6 +58,7 @@ while true; do
 --vvc=* ) vvc="${1#*=}"; shift ;;
 --jq=* ) jq="${1#*=}"; shift ;;
 --dssim=* ) dssim="${1#*=}"; shift ;;
+--avs2=* ) avs2="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1027,12 +1028,13 @@ if [[ $ffmpeg != "no" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" 
     unset _file
 fi
 
-_check=(bin-video/xavs2.exe libxavs2.a xavs2_config.h xavs2.{h,pc})
+_check=(libxavs2.a xavs2_config.h xavs2.{h,pc})
+[[ $standalone = y ]] && _check+=(bin-video/xavs2.exe)
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libxavs2
-elif [[ $ffmpeg != "no" ]] && enabled libxavs2 &&
+elif { [[ $avs2 = y ]] || { [[ $ffmpeg != "no" ]] && enabled libxavs2; }; } &&
     do_vcs "https://github.com/pkuvcl/xavs2.git"; then
-    cd build/linux
+    cd_safe build/linux
     [[ -f "config.mak" ]] && log "distclean" make distclean
     do_uninstall all "${_check[@]}"
     do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
@@ -1041,12 +1043,13 @@ elif [[ $ffmpeg != "no" ]] && enabled libxavs2 &&
     do_checkIfExist
 fi
 
-_check=(bin-video/davs2.exe libdavs2.a davs2_config.h davs2.{h,pc})
+_check=(libdavs2.a davs2_config.h davs2.{h,pc})
+[[ $standalone = y ]] && _check+=(bin-video/davs2.exe)
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libdavs2
-elif [[ $ffmpeg != "no" ]] && enabled libdavs2 &&
+elif { [[ $avs2 = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdavs2; }; } &&
     do_vcs "https://github.com/pkuvcl/davs2.git"; then
-    cd build/linux
+    cd_safe build/linux
     [[ -f "config.mak" ]] && log "distclean" make distclean
     do_uninstall all "${_check[@]}"
     do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
