@@ -102,7 +102,7 @@ pdf-build libmpv-shared
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
 ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc jq dssim
+aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch vvc jq dssim avs2
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -968,6 +968,29 @@ if %builddssim%==2 set "dssim=n"
 if %builddssim% GTR 2 GOTO dssim
 if %writedssim%==yes echo.dssim=^%builddssim%>>%ini%
 
+:avs2
+set "writeavs2=no"
+if %avs2INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build avs2 ^(Audio Video Coding Standard Gen2 encoder/decoder^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildavs2="Build avs2: "
+    ) else set buildavs2=%avs2INI%
+if %deleteINI%==1 set "writeavs2=yes"
+
+if %buildavs2%==1 set "avs2=y"
+if %buildavs2%==2 set "avs2=n"
+if %buildavs2% GTR 2 GOTO avs2
+if %writeavs2%==yes echo.avs2=^%buildavs2%>>%ini%
+
 :numCores
 set "writeCores=no"
 if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
@@ -1610,7 +1633,7 @@ start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_
 --mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
 --rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
 --faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim%'
+--rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2%'
 
 endlocal
 :: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
