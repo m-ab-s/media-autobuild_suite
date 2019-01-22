@@ -139,14 +139,12 @@ if exist %ini% GOTO checkINI
 :checkINI
 set deleteIni=0
 for %%a in (%iniOptions%) do (
-    findstr %%a %ini% > nul
-    if %ERRORLEVEL% EQU 0 (
-        for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do (
-            set %%aINI=%%b
-            if %%b==0 set deleteIni=1
-            )
-        ) else set deleteIni=1 && set %%aINI=0
+    for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+    if not defined %%aINI (
+        set %%aINI=0
+        set deleteIni=1
     )
+)
 if %deleteINI%==1 (
     del %ini%
     set previousOptions=1
