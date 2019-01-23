@@ -29,17 +29,30 @@ do_print_status() {
     local status="$3"
     local pad
     pad=$(printf '%0.1s' "."{1..72})
-    local padlen=$((ncols-${#name}-${#status}-3))
-    printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
-        "$padlen" "$pad" "${color}${status}${reset}"
+    if [[ $timeStamp = y ]]; then
+        printf '%(%H:%M:%S)T %s%*.*s [%s]\n' -1 "${bold}$name${reset}" 0 \
+        "$((ncols-${#name}-${#status}-12))" "$pad" "${color}${status}${reset}"
+    else
+        printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
+        "$((ncols-${#name}-${#status}-3))" "$pad" "${color}${status}${reset}"
+    fi
 }
 
 do_print_progress() {
     if [[ $logging = y ]]; then
-        [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
+        if [[ $timeStamp = y ]]; then
+            [[ ${1} =~ ^[a-zA-Z] ]] && printf '%(%H:%M:%S)T %s\n' -1 \
+            "${bold}├${reset} $*..." || printf '%(%H:%M:%S)T %s\n' -1 "$*..."
+        else
+            [[ ${1} =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
+        fi
     else
         set_title "$* in $(get_first_subdir)"
-        echo -e "${bold}$* in $(get_first_subdir)${reset}"
+        if [[ $timeStamp = y ]]; then
+            printf '%(%H:%M:%S)T %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
+        else
+            echo -e "${bold}$* in $(get_first_subdir)${reset}"
+        fi
     fi
 }
 
@@ -345,7 +358,7 @@ do_wget() {
             fi
         fi
     else
-        [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green" "File up-to-date"
+        [[ $quiet ]] || do_print_status "${bold}├${reset} ${dirName:-$archive}" "$green" "File up-to-date"
     fi
     [[ $norm ]] || add_to_remove "$(pwd)/$archive"
     do_extract "$archive" "$dirName"
@@ -549,7 +562,7 @@ files_exist() {
     [[ $list ]] && verbose= && soft=y
     for opt; do
         if file=$(file_installed $opt); then
-            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green}" "Found"
+            [[ $verbose && $soft ]] && do_print_status "${bold}├${reset} $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
@@ -557,7 +570,7 @@ files_exist() {
                 echo -n "$file" && echo -ne "$term"
             fi
         else
-            [[ $verbose ]] && do_print_status "├ $file" "${red}" "Not found"
+            [[ $verbose ]] && do_print_status "${bold}├${reset} $file" "${red}" "Not found"
             [[ ! $soft ]] && return 1
         fi
     done
