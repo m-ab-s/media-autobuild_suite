@@ -1187,17 +1187,22 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
         set "msysprefix=i686"
         ) else set "msysprefix=x86_64"
     (
-        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
+        echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
         echo.$wc = New-Object System.Net.WebClient
         echo.try {
-        echo.if ^($i -le 5^) {
+        echo.while ^(!^(Test-Path $PWD\msys2-base.tar.xz^) -and ^($i -le 5^)^) {
+        echo.try {
         echo.$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', "$PWD\msys2-base.tar.xz"^)
-        echo.}
         echo.} catch {
         echo.$i++
         echo.}
+        echo.}
+        echo.} catch {
+        echo.exit 1
+        echo.}
     )>msys.ps1
     powershell -noprofile -executionpolicy bypass .\msys.ps1
+    If %ERRORLEVEL%==1 GOTO errorMsys
     del msys.ps1
 
 :unpack
@@ -1233,6 +1238,7 @@ if exist %build%\msys2-base.tar.xz (
     )
 
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
+    :errorMsys
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download msys2 basic system failed,
