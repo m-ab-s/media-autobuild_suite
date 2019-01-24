@@ -1310,14 +1310,10 @@ if not exist %instdir%\mintty.lnk (
     )
 
     if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
-
-    if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
-    (
-        echo.printf '%s\n' Locale=en_US Charset=UTF-8 ^
-        Font=Consolas Columns=120 Rows=30 ^> /home/%USERNAME%/.minttyrc
-        )>%build%\mintty.sh
-    %mintty% /usr/bin/bash --login %build%\mintty.sh
-    del %build%\mintty.sh
+    for /F "tokens=2 delims==" %%b in ('findstr TERM %instdir%\%msys2%\home\%USERNAME%\.minttyrc') do set TERM=%%b
+    if not defined TERM (
+        %mintty%/usr/bin/bash -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color>/home/%USERNAME%/.minttyrc"
+    )
 
 :hgsettings
 if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
