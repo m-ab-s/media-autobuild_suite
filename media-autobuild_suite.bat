@@ -1312,7 +1312,7 @@ if not exist %instdir%\mintty.lnk (
     if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
     for /F "tokens=2 delims==" %%b in ('findstr TERM %instdir%\%msys2%\home\%USERNAME%\.minttyrc') do set TERM=%%b
     if not defined TERM (
-        %mintty%/usr/bin/bash -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color>/home/%USERNAME%/.minttyrc"
+        %mintty%\usr\bin\bash -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color>/home/%USERNAME%/.minttyrc"
     )
 
 :hgsettings
