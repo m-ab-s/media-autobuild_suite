@@ -1189,17 +1189,11 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     (
         echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
         echo.$wc = New-Object System.Net.WebClient
-        echo.try {
-        echo.while ^(!^(Test-Path $PWD\msys2-base.tar.xz^) -and ^($i -le 5^)^) {
-        echo.try {
-        echo.$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', "$PWD\msys2-base.tar.xz"^)
-        echo.} catch {
-        echo.$i++
-        echo.}
-        echo.}
-        echo.} catch {
-        echo.exit 1
-        echo.}
+        echo.while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
+        ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
+        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
+        {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
+        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}}
     )>msys.ps1
     powershell -noprofile -executionpolicy bypass .\msys.ps1
     If %ERRORLEVEL%==1 GOTO errorMsys
