@@ -599,7 +599,7 @@ fi
 unset _deps
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
-if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
+if enabled libopus && do_vcs "https://git.xiph.org/opus.git"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
     do_autogen
@@ -613,7 +613,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
-    if do_vcs "https://github.com/xiph/opusfile.git"; then
+    if do_vcs "https://git.xiph.org/opusfile.git"; then
         do_uninstall "${_check[@]}"
         do_patch https://0x0.st/sgwa.txt
         do_autogen
@@ -623,7 +623,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(opus/opusenc.h libopusenc.{pc,{,l}a})
     _deps=(opus.pc)
-    if do_vcs "https://github.com/xiph/libopusenc.git"; then
+    if do_vcs "https://git.xiph.org/libopusenc.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
@@ -632,7 +632,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(bin-audio/opusenc.exe)
     _deps=(opusfile.pc libopusenc.pc)
-    if do_vcs "https://github.com/xiph/opus-tools.git"; then
+    if do_vcs "https://git.xiph.org/opus-tools.git"; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
@@ -647,7 +647,7 @@ if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     _check=(soxr.h libsoxr.a)
     if do_vcs https://notabug.org/RiCON/soxr.git libsoxr; then
         do_uninstall "${_check[@]}"
-        do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off -DWITH_OPENMP=off
+        do_cmakeinstall -DWITH_LSR_BINDINGS=OFF -DBUILD_TESTS=OFF -DWITH_OPENMP=OFF
         do_checkIfExist
     fi
 fi
@@ -663,7 +663,7 @@ if [[ $ffmpeg != "no" ]] && enabled libcodec2 && do_pkgConfig "codec2 = 0.8"; th
             grep -ERl "\b(lsp|lpc)_to_(lpc|lsp)" --include="*.[ch]" | \
                 xargs -r sed -ri "s;((lsp|lpc)_to_(lpc|lsp));c2_\1;g"
         fi
-        do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=off \
+        do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=OFF \
             -DCMAKE_INSTALL_BINDIR="$(pwd)/build-$bits/_bin"
         if [[ $standalone = y ]]; then
             do_install _bin/c2{enc,dec,sim}.exe bin-audio/
@@ -771,7 +771,7 @@ _check=(libmysofa.a mysofa.h)
 if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
     do_vcs "https://github.com/hoene/libmysofa.git"; then
     do_uninstall "${_check[@]}"
-    do_cmakeinstall -DBUILD_TESTS=no
+    do_cmakeinstall -DBUILD_TESTS=OFF
     do_checkIfExist
 fi
 
@@ -868,10 +868,10 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
     extracommands=()
     [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
-        extracommands+=(-DENABLE_EXAMPLES=off)
+        extracommands+=(-DENABLE_EXAMPLES=OFF)
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
-    do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
+    do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=OFF -DENABLE_NASM=ON \
         -DENABLE_TEST{S,DATA}=OFF -DCONFIG_LOWBITDEPTH=1 \
         "${extracommands[@]}"
     if [[ -n $_aom_bins ]]; then
@@ -1075,7 +1075,7 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
-        do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
+        do_cmakeinstall Project/CMake -DBUILD_ZLIB=OFF -DBUILD_ZENLIB=OFF
         do_checkIfExist
     fi
     fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/mediainfolib"
@@ -1467,8 +1467,8 @@ _check=(libsrt.a srt.pc srt/srt.h)
 if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_pacman_install openssl
     hide_libressl
-    do_cmakeinstall -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
-        -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on \
+    do_cmakeinstall -DENABLE_SHARED=OFF -DENABLE_SUFLIP=OFF \
+        -DENABLE_EXAMPLES=OFF -DUSE_OPENSSL_PC=ON \
         -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-video"
     hide_libressl -R
     do_checkIfExist
@@ -1534,8 +1534,8 @@ if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/cmake-mingw.patch"
     do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/lenstool.patch"
     CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
-        do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
-        -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
+        do_cmakeinstall -DBUILD_STATIC=ON -DBUILD_{TESTS,LENSTOOL,DOC}=OFF \
+        -DINSTALL_HELPER_SCRIPTS=OFF -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
     do_checkIfExist
     add_to_remove
 fi
@@ -1560,8 +1560,7 @@ if [[ $vvc = y ]] &&
     do_patch "https://0x0.st/sG0V.txt"
     _notrequired="true"
     # install to own dir because the binaries' names are too generic
-    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
-        -DBUILD_STATIC=on
+    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc -DBUILD_STATIC=ON
     do_checkIfExist
     unset _notrequired
 fi
@@ -1569,7 +1568,7 @@ fi
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
-    enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
+    enabled libsnappy && do_pacman_install snappy
     if enabled libxvid && [[ $standalone = n ]]; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
@@ -1855,12 +1854,12 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
             do_uninstall "${_check[@]}"
             do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
-            CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-                CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-                CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
-                do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows  \
+            CFLAGS+=" -D_WIN32_WINNT=0x0601 -D__STDC_FORMAT_MACROS" \
+                CPPFLAGS+=" -D_WIN32_WINNT=0x0601 -D__STDC_FORMAT_MACROS" \
+                CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0601" \
+                do_cmake -DBUILD_TESTS=OFF -DCMAKE_SYSTEM_NAME=Windows  \
                 -DCMAKE_ASM-ATT_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
-                -DENABLE_STATIC_LOADER=ON -DUNIX=off
+                -DENABLE_STATIC_LOADER=ON -DUNIX=OFF
             log make ninja
             do_install loader/libvulkan.a lib/
             do_install loader/vulkan.pc lib/pkgconfig/
@@ -1872,7 +1871,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc"; then
-        do_uninstall "${_check[@]}" include/shaderc
+        do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
         function add_third_party() {
             local repo="$1"
@@ -1894,11 +1893,12 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         add_third_party "https://github.com/KhronosGroup/SPIRV-Cross.git" spirv-cross
 
         # fix python indentation errors from non-existant code review
-        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
+        # grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
 
-        do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
+        do_cmake -DSHADERC_SKIP_TESTS=ON -DSHADERC_SKIP_INSTALL=ON
         log make ninja
         cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
+        cmake -E copy_directory ../libshaderc_util/include/libshaderc_util "$LOCALDESTDIR/include/libshaderc_util"
         do_install libshaderc/libshaderc_combined.a lib/
         do_checkIfExist
         unset add_third_party
