@@ -1151,7 +1151,7 @@ if [[ $ffmpeg != "no" ]] && enabled decklink &&
     do_checkIfExist
 fi
 
-if [[ $ffmpeg != "no" ]] && enabled libndi_newtek &&
+if [[ $ffmpeg != "no" ]] && enabled_any libndi-newtek &&
     [[ -f "$NDI_SDK_DIR/Include/Processing.NDI.Lib.h" ]]; then
     _includedir="$(cygpath -sm "$NDI_SDK_DIR"/Include)"
     [[ $bits = 32bit ]] && _arch=x86 || _arch=x64
@@ -1187,9 +1187,9 @@ if [[ $ffmpeg != "no" ]] && enabled libndi_newtek &&
         popd >/dev/null
     fi
     unset _arch _includedir
-elif [[ $ffmpeg != "no" ]] && enabled libndi_newtek; then
+elif [[ $ffmpeg != "no" ]] && enabled libndi-newtek; then
     do_print_status "Newtek SDK" "$orange" "Not installed, disabling"
-    do_removeOption --enable-libndi_newtek
+    do_removeOption --enable-libndi-newtek
 fi
 
 
