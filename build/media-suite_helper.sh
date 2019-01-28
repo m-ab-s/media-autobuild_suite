@@ -805,7 +805,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=(${EXTERNAL_LIBRARY_NONFREE_LIST//_/-})
+    local nonfreegpl=(${EXTERNAL_LIBRARY_NONFREE_LIST//_/-} libndi_newtek)
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
