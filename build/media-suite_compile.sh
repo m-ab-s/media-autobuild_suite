@@ -599,7 +599,7 @@ fi
 unset _deps
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
-if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
+if enabled libopus && do_vcs "https://git.xiph.org/opus.git"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
     do_autogen
@@ -613,7 +613,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
-    if do_vcs "https://github.com/xiph/opusfile.git"; then
+    if do_vcs "https://git.xiph.org/opusfile.git"; then
         do_uninstall "${_check[@]}"
         do_patch https://0x0.st/sgwa.txt
         do_autogen
@@ -623,7 +623,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(opus/opusenc.h libopusenc.{pc,{,l}a})
     _deps=(opus.pc)
-    if do_vcs "https://github.com/xiph/libopusenc.git"; then
+    if do_vcs "https://git.xiph.org/libopusenc.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
@@ -632,7 +632,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(bin-audio/opusenc.exe)
     _deps=(opusfile.pc libopusenc.pc)
-    if do_vcs "https://github.com/xiph/opus-tools.git"; then
+    if do_vcs "https://git.xiph.org/opus-tools.git"; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
