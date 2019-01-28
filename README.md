@@ -30,9 +30,9 @@ For information about the compiler environment see the wiki, there you also have
         - libx265 (hg)
         - nvenc (built-in)
         - schannel with gmp (mingw)
-            - enabled by default if openssl, libtls or gnutls aren't enabled
+            - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
             - gmp can be switched by gcrypt (mingw) with --enable-gcrypt
-        - sdl2 (2.0.5) (needed for ffplay)
+        - sdl2 (2.0.9) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - avisynth (needs avisynth dll installed)
@@ -117,7 +117,7 @@ For information about the compiler environment see the wiki, there you also have
 - other tools
     - aom (git)
     - bmx (git)
-    - curl (latest release) with WinSSL/LibreSSL/OpenSSL/GnuTLS backend
+    - curl (latest release) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
     - dav1d (git)
     - dssim (git)
