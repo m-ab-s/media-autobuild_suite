@@ -1872,7 +1872,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc"; then
-        do_uninstall "${_check[@]}" include/shaderc
+        do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
         function add_third_party() {
             local repo="$1"
@@ -1899,6 +1899,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_cmake -GNinja -DSHADERC_SKIP_TESTS=ON
         log make ninja
         cmake -E copy_directory ../libshaderc/include/shaderc "$LOCALDESTDIR/include/shaderc"
+        cmake -E copy_directory ../libshaderc_util/include/libshaderc_util "$LOCALDESTDIR/include/libshaderc_util"
         do_install libshaderc/libshaderc_combined.a lib/
         do_checkIfExist
         unset add_third_party
