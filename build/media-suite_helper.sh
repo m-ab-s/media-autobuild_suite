@@ -1088,21 +1088,33 @@ compilation_fail() {
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
-    if [[ $logging = y ]]; then
-        echo "Likely error:"
-        tail "ab-suite.${operation}.log"
-        echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
-    fi
     if [[ $_notrequired ]]; then
+        if [[ $logging = y ]]; then
+            echo "Likely error:"
+            tail "ab-suite.${operation}.log"
+            echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
+        fi
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        echo "${red}This is required for other packages, so this script will exit.${reset}"
-        create_diagnostic
-        zip_logs
-        echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
-        do_prompt "Try running the build again at a later time."
-        exit 1
+        if [[ $noMintty = y ]]; then
+            diff <(cat $LOCALBUILDDIR/old.var) <(set -o posix ; set) | grep '^[<>]' | sed -nr 's/> (.*)/\1/p' > "$LOCALBUILDDIR/fail.var"
+            echo "$PWD" > "$LOCALBUILDDIR/compilation_failed"
+            echo -e "$reason\n$operation" >> "$LOCALBUILDDIR/compilation_failed"
+            exit
+        else
+            if [[ $logging = y ]]; then
+                echo "Likely error:"
+                tail "ab-suite.${operation}.log"
+                echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
+            fi
+            echo "${red}This is required for other packages, so this script will exit.${reset}"
+            create_diagnostic
+            zip_logs
+            echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
+            do_prompt "Try running the build again at a later time."
+            exit 1
+        fi
     fi
 }
 

@@ -111,7 +111,7 @@ pdf-build libmpv-shared
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d forceQuitBatch vvc jq dssim avs2 timeStamp
+ripgrep dav1d forceQuitBatch vvc jq dssim avs2 timeStamp noMintty
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -1154,6 +1154,86 @@ if %timeStampF%==2 set "timeStamp=n"
 if %timeStampF% GTR 2 GOTO timeStamp
 if %deleteINI%==1 echo.timeStamp=^%timeStampF%>>%ini%
 
+:noMintty
+if %noMinttyINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Are you running this script through ssh or similar?
+    echo. ^(Can't open another window outside of this terminal^)
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo This will disable the use of mintty and print the output to this console.
+    echo There is no guarantee that this will work properly.
+    echo You must make sure that you have ssh keep-alive enabled or something similar
+    echo to screen that will allow you to run this script in the background.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P noMinttyF="SSH: "
+) else set noMinttyF=%noMinttyINI%
+
+if "%noMinttyF%"=="" GOTO noMintty
+if %noMinttyF%==1 (
+    set "noMintty=y"
+    color
+    (
+        echo.param^([string]$Bash, [string]$BashCommand, [string]$LogFile^)
+        echo.function Write-Transcript {
+        echo.try {Stop-Transcript ^| Out-Null} catch [System.InvalidOperationException] {}
+        echo.if ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************' -Quiet^) {
+        echo.$linenumber = ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************'^).LineNumber
+        echo.$transcriptContent = Get-Content -Path $LogFile ^| Select-Object -Index ^($linenumber[1]..^($linenumber[$linenumber.Length - 2] - 2^)^)
+        echo.Set-Content -Force -Path $LogFile -Value $transcriptContent
+        echo.}
+        echo.}
+        echo.try {
+        echo.$host.ui.RawUI.WindowTitle = switch -wildcard ^($BashCommand^) {
+        echo.*media-suite_update* {"update autobuild suite"}
+        echo.*media-suite_compile* {"media-autobuild_suite"}
+        echo.Default {$host.ui.RawUI.WindowTitle}
+        echo.}
+        echo.Start-Transcript -Force $LogFile ^| Out-Null
+        echo.$build = ^(Get-Item $LogFile^).Directory.FullName
+        echo.if ^($LogFile -match "compile"^) {
+        echo.$env:MSYSTEM = switch ^($env:Build64^) { yes {"MINGW64"} Default {"MINGW32"}}
+        echo.$env:MSYS2_PATH_TYPE = "inherit"
+        echo.}
+        echo.Remove-Item -Force -Path "$build\compilation_failed", "$build\fail_comp" -ErrorAction Ignore
+        echo.^&$bash "-l" $BashCommand.Split^(' '^)
+        echo.if ^(Test-Path "$build\compilation_failed"^) {
+        echo.Write-Transcript
+        echo.$compilefail = Get-Content -Path $build\compilation_failed
+        echo.$env:reason = $compilefail[1]
+        echo.$env:operation = $compilefail[2]
+        echo.New-Item -Force -ItemType File -Path "$build\fail_comp" -Value $^(
+        echo."while read line; do declare -x `"`$line`"; done < /build/fail.var`n" +
+        echo."source /build/media-suite_helper.sh`n" +
+        echo."cd `$(head -n 1 /build/compilation_failed)`n" +
+        echo."if [[ `$logging = y ]]; then`n" +
+        echo."echo `"Likely error:`"`n" +
+        echo."tail `"ab-suite.`${operation}.log`"`n" +
+        echo."echo `"`${red}`$reason failed. Check `$^(pwd -W^)/ab-suite.`$operation.log`${reset}`"`n" +
+        echo."fi`n" +
+        echo."echo `"`${red}This is required for other packages, so this script will exit.`${reset}`"`n" +
+        echo."zip_logs`n" +
+        echo."echo `"Make sure the suite is up-to-date before reporting an issue. It might've been fixed already.`"`n" +
+        echo."do_prompt `"Try running the build again at a later time.`""^) ^| Out-Null
+        echo.Start-Process -NoNewWindow -Wait -FilePath $bash -ArgumentList ^("-l /build/fail_comp"^).Split^(' '^)
+        echo.Remove-Item -Force -Path $build\compilation_failed, $build\fail_comp
+        echo.}
+        echo.} catch {
+        echo.Write-Output "Stopping log and exiting"
+        echo.} finally {
+        echo.Write-Transcript
+        echo.}
+    )>%build%\bash.ps1
+    )
+if %noMinttyF%==2 set "noMintty=n"
+if %noMinttyF% GTR 2 GOTO noMintty
+if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
+
 endlocal & (
     set forceQuitBatch=%forceQuitBatch%
     set updateSuite=%updateSuite%
@@ -1196,6 +1276,7 @@ endlocal & (
     set dssim=%dssim%
     set avs2=%avs2%
     set timeStamp=%timeStamp%
+    set noMintty=%noMintty%
 )
 
 ::------------------------------------------------------------------
@@ -1279,8 +1360,10 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 )
 
 :getMintty
-setlocal
+set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
 set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
+if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
+setlocal
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
         echo.-------------------------------------------------------------------------------
@@ -1292,8 +1375,7 @@ if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.- make a first run
     echo -------------------------------------------------------------------------------
-    if exist %build%\firstrun.log del %build%\firstrun.log
-    %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login -c exit
+    call :runBash firstrun.log "-c exit"
 
     echo.-------------------------------------------------------------------------------
     echo.first update
@@ -1305,14 +1387,13 @@ if not exist %instdir%\mintty.lnk (
         echo.sleep ^4
         echo.exit
     )>%build%\firstUpdate.sh
-    if exist %build%\firstUpdate.log del %build%\firstUpdate.log
-    %mintty% --log 2>&1 %build%\firstUpdate.log /usr/bin/bash --login %build%\firstUpdate.sh
+    call :runBash firstUpdate.log "%build%\firstUpdate.sh"
     del %build%\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
+    %bash% -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
 
     echo.-------------------------------------------------------------------------------
     echo.second update
@@ -1322,8 +1403,7 @@ if not exist %instdir%\mintty.lnk (
         echo.pacman --noconfirm -Syu --asdeps
         echo.exit
     )>%build%\secondUpdate.sh
-    if exist %build%\secondUpdate.log del %build%\secondUpdate.log
-    %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
+    call :runBash secondUpdate.log "%build%\secondUpdate.sh"
     del %build%\secondUpdate.sh
 
     (
@@ -1344,7 +1424,8 @@ if not exist %instdir%\mintty.lnk (
 if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
 for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
 if not defined TERM (
-    %instdir%\%msys2%\usr\bin\bash.exe -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
+    %bash% -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" ^
+    > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 )
 
 :hgsettings
@@ -1410,8 +1491,7 @@ if exist %build%\install_base_failed del %build%\install_base_failed
     echo.sleep ^3
     echo.exit
 )>%build%\pacman.sh
-if exist %build%\pacman.log del %build%\pacman.log
-%mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
+call :runBash pacman.log "%build%\pacman.sh"
 del %build%\pacman.sh
 
 for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
@@ -1421,8 +1501,7 @@ for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
             echo.sleep ^3
             echo.exit
         )>%build%\cert.sh
-        if exist %build%\cert.log del %build%\cert.log
-        %mintty% --log 2>&1 %build%\cert.log /usr/bin/bash --login %build%\cert.sh
+        call :runBash cert.log "%build%\cert.sh"
         del %build%\cert.sh
     )
 )
@@ -1461,8 +1540,7 @@ if %build32%==yes (
         echo.sleep ^3
         echo.exit
     )>%build%\mingw32.sh
-    if exist %build%\mingw32.log del %build%\mingw32.log
-    %mintty% --log 2>&1 %build%\mingw32.log /usr/bin/bash --login %build%\mingw32.sh
+    call :runBash mingw32.log "%build%\mingw32.sh"
     del %build%\mingw32.sh
 
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
@@ -1495,8 +1573,7 @@ if %build64%==yes (
         echo.sleep ^3
         echo.exit
     )>%build%\mingw64.sh
-    if exist %build%\mingw64.log del %build%\mingw64.log
-    %mintty% --log 2>&1 %build%\mingw64.log /usr/bin/bash --login %build%\mingw64.sh
+    call :runBash mingw64.log "%build%\mingw64.sh"
     del %build%\mingw64.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
@@ -1613,9 +1690,7 @@ if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fs
 if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 :update
-if exist %build%\update.log del %build%\update.log
-%mintty% -t "update autobuild suite" --log 2>&1 %build%\update.log ^
-/usr/bin/bash -l /build/media-suite_update.sh --build32=%build32% --build64=%build64%
+call :runBash update.log "/build/media-suite_update.sh --build32=%build32% --build64=%build64%"
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
@@ -1660,20 +1735,31 @@ if [%build64%]==[yes] (
 ) else set MSYSTEM=MINGW32
 
 title MABSbat
+if %noMintty%==y cls
 for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 
-if exist %build%\compile.log del %build%\compile.log
-start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
---log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash --login ^
-/build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
+if exist %build%\compilation_failed del %build%\compilation_failed
+if exist %build%\fail_comp del %build%\compilation_failed
+
+set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
 --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
---dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp%'
+--dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
+--noMintty=%noMintty%
 
+if %noMintty%==y (
+    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
+    -Logfile "%build%\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
+) else (
+    if exist %build%\compile.log del %build%\compile.log
+    start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
+    --login /build/media-suite_compile.sh %compileArgs%
+)
 endlocal
 :: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
 goto :EOF
@@ -1764,6 +1850,22 @@ for %%i in (%*) do (
     ) else (
         echo --enable-!_opt!
     )
+)
+endlocal
+goto :EOF
+
+:runBash
+setlocal
+set log=%1
+shift
+set "command1=%1 %2 %3 %4 %5 %6 %7 %8 %9"
+set command=%command1:"=%
+if %noMintty%==y (
+    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
+    -Logfile "%build%\%log%" -BashCommand \"%command%\"
+) else (
+    if exist %build%\%log% del %build%\%log%
+    %mintty% --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
 )
 endlocal
 goto :EOF
