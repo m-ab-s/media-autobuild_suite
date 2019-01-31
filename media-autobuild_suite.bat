@@ -1758,5 +1758,5 @@ for %%i in (%*) do (
         echo --enable-!_opt!
     )
 )
-setlocal
+endlocal
 goto :EOF
