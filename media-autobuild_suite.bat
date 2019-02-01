@@ -1013,6 +1013,11 @@ if %coresINI%==0 (
     echo.
     echo. Recommended: %coreHalf%
     echo.
+    echo. If you have Windows Defender Real-time protection on, most of your processing
+    echo. power will go to it. It is recommended to whitelist this directory from
+    echo. scanning due to the amount of new files and copying/moving done by the suite.
+    echo. If you do not know how to do this, google it. If you don't care, ignore this.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P cpuCores="Core/Thread Count: "
