@@ -275,7 +275,13 @@ If there's some error during compilation follow these steps:
 
 --------
 
-For `--enable-cuda-sdk` and `--enable-libnpp` to work, you need either the `CUDA_PATH` variable to be set system-wide and VS2017 installed with vswhere.exe; or if for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed along with VS2017, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+### This is for CUDA and libnpp, not for NVENC, it is built with ffmpeg by default
+
+For `--enable-cuda-sdk` and `--enable-libnpp` to work, you need either NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+
+### You do not need to do the following if you installed the SDK with the default locations etc
+
+### Nothing should be disabled manually when using CUDA as disabling random things can cause the compilation to fail
 
 For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
 
