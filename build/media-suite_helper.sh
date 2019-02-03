@@ -13,6 +13,7 @@ if command -v tput &>/dev/null; then
         bold=$(tput bold)
         blue=$(tput setaf 12)
         orange=$(tput setaf 11)
+        purple=$(tput setaf 13)
         green=$(tput setaf 2)
         red=$(tput setaf 1)
         reset=$(tput sgr0)
@@ -30,7 +31,7 @@ do_print_status() {
     local pad
     pad=$(printf '%0.1s' "."{1..72})
     if [[ $timeStamp = y ]]; then
-        printf '%(%H:%M:%S)T %s%*.*s [%s]\n' -1 "${bold}$name${reset}" 0 \
+        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%*.*s [%s]\n' -1 "${bold}$name${reset}" 0 \
         "$((ncols-${#name}-${#status}-12))" "$pad" "${color}${status}${reset}"
     else
         printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
@@ -41,15 +42,15 @@ do_print_status() {
 do_print_progress() {
     if [[ $logging = y ]]; then
         if [[ $timeStamp = y ]]; then
-            [[ ${1} =~ ^[a-zA-Z] ]] && printf '%(%H:%M:%S)T %s\n' -1 \
-            "${bold}├${reset} $*..." || printf '%(%H:%M:%S)T %s\n' -1 "$*..."
+            [[ ${1} =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
+            "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
         else
             [[ ${1} =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
         fi
     else
         set_title "$* in $(get_first_subdir)"
         if [[ $timeStamp = y ]]; then
-            printf '%(%H:%M:%S)T %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
         else
             echo -e "${bold}$* in $(get_first_subdir)${reset}"
         fi
