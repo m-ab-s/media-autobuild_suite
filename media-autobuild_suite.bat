@@ -156,6 +156,8 @@ set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 set "msys2=msys32"
 if %msys2Arch%==2 set "msys2=msys64"
 
+setlocal
+
 :selectSystem
 if %archINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -1118,6 +1120,50 @@ if %timeStampF%==1 set "timeStamp=y"
 if %timeStampF%==2 set "timeStamp=n"
 if %timeStampF% GTR 2 GOTO timeStamp
 if %deleteINI%==1 echo.timeStamp=^%timeStampF%>>%ini%
+
+endlocal & (
+    set forceQuitBatch=%forceQuitBatch%
+    set updateSuite=%updateSuite%
+    set cpuCount=%cpuCount%
+    set build32=%build32%
+    set build64=%build64%
+    set deleteSource=%deleteSource%
+    set mp4box=%mp4box%
+    set vpx2=%vpx2%
+    set x2643=%x2643%
+    set x2652=%x2652%
+    set other265=%other265%
+    set flac=%flac%
+    set fdkaac=%fdkaac%
+    set mediainfo=%mediainfo%
+    set sox=%sox%
+    set ffmpeg=%ffmpeg%
+    set ffmpegUpdate=%ffmpegUpdate%
+    set ffmpegChoice=%ffmpegChoice%
+    set mplayer=%mplayer%
+    set mpv=%mpv%
+    set license2=%license2%
+    set stripFile=%stripFile%
+    set packFile=%packFile%
+    set rtmpdump=%rtmpdump%
+    set logging=%logging%
+    set bmx=%bmx%
+    set standalone=%standalone%
+    set aom=%aom%
+    set faac=%faac%
+    set ffmbc=%ffmbc%
+    set curl=%curl%
+    set cyanrip=%cyanrip%
+    set redshift=%redshift%
+    set rav1e=%rav1e%
+    set ripgrep=%ripgrep%
+    set dav1d=%dav1d%
+    set vvc=%vvc%
+    set jq=%jq%
+    set dssim=%dssim%
+    set avs2=%avs2%
+    set timeStamp=%timeStamp%
+)
 
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
