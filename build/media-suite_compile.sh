@@ -289,11 +289,15 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; th
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
+        sed -i 's|@CODE_COVERAGE_RULES@|include $(top_srcdir)/aminclude_static.am|' Makefile.am
+        do_wget -c -q \
+            "https://raw.githubusercontent.com/autoconf-archive/autoconf-archive/master/m4/ax_code_coverage.m4" \
+            m4/ax_code_coverage.m4
         log bootstrap ./bootstrap --skip-po
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
-            --with-included-unistring \
+            --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
     fi
