@@ -1246,6 +1246,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 )
 
 :getMintty
+setlocal
 set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
@@ -1615,6 +1616,8 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
     echo.   source /local32/etc/profile2.local
     echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
+
+endlocal
 
 :compileLocals
 cd %instdir%
