@@ -1284,7 +1284,11 @@ do_pacman_install() {
     for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
-        echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if [[ $timeStamp = y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        else
+            echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        fi
         if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
             /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
@@ -1306,7 +1310,11 @@ do_pacman_remove() {
         [[ -f /etc/pac-mingw-extra.pk ]] &&
             sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
-        echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if [[ $timeStamp = y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        else
+            echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        fi
         do_hide_pacman_sharedlibs "$pkg" revert
         if pacman -Rs --noconfirm "$pkg" >/dev/null 2>&1; then
             echo "done"
