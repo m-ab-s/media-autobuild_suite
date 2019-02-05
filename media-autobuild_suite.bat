@@ -173,6 +173,7 @@ if %archINI%==0 (
     set /P buildEnv="Build System: "
 ) else set buildEnv=%archINI%
 
+if "%buildEnv%"=="" GOTO selectSystem
 if %buildEnv%==1 (
     set "build32=yes"
     set "build64=yes"
@@ -217,6 +218,7 @@ if %license2INI%==0 (
     set /P ffmpegLicense="FFmpeg license: "
 ) else set ffmpegLicense=%license2INI%
 
+if "%ffmpegLicense%"=="" GOTO ffmpeglicense
 if %ffmpegLicense%==1 set "license2=nonfree"
 if %ffmpegLicense%==2 set "license2=gplv3"
 if %ffmpegLicense%==3 set "license2=gpl"
@@ -240,6 +242,7 @@ if %standaloneINI%==0 (
      set /P buildstandalone="Build standalone binaries: "
 ) else set buildstandalone=%standaloneINI%
 
+if "%buildstandalone%"=="" GOTO standalone
 if %buildstandalone%==1 set "standalone=y"
 if %buildstandalone%==2 set "standalone=n"
 if %buildstandalone% GTR 2 GOTO standalone
@@ -261,6 +264,7 @@ if %vpx2INI%==0 (
     set /P buildvpx="Build vpx: "
 ) else set buildvpx=%vpx2INI%
 
+if "%buildvpx%"=="" GOTO vpx
 if %buildvpx%==1 set "vpx2=y"
 if %buildvpx%==2 set "vpx2=n"
 if %buildvpx% GTR 2 GOTO vpx
@@ -282,6 +286,7 @@ if %aomINI%==0 (
     set /P buildaom="Build aom: "
 ) else set buildaom=%aomINI%
 
+if "%buildaom%"=="" GOTO aom
 if %buildaom%==1 set "aom=y"
 if %buildaom%==2 set "aom=n"
 if %buildaom% GTR 2 GOTO aom
@@ -301,6 +306,7 @@ if %rav1eINI%==0 (
     set /P buildrav1e="Build rav1e: "
 ) else set buildrav1e=%rav1eINI%
 
+if "%buildrav1e%"=="" GOTO rav1e
 if %buildrav1e%==1 set "rav1e=y"
 if %buildrav1e%==2 set "rav1e=n"
 if %buildrav1e% GTR 2 GOTO rav1e
@@ -322,6 +328,7 @@ if %dav1dINI%==0 (
     set /P builddav1d="Build dav1d: "
 ) else set builddav1d=%dav1dINI%
 
+if "%builddav1d%"=="" GOTO dav1d
 if %builddav1d%==1 set "dav1d=y"
 if %builddav1d%==2 set "dav1d=n"
 if %builddav1d% GTR 2 GOTO dav1d
@@ -348,6 +355,7 @@ if %x2643INI%==0 (
     set /P buildx264="Build x264: "
 ) else set buildx264=%x2643INI%
 
+if "%buildx264%"=="" GOTO x264
 if %buildx264%==1 set "x2643=yes"
 if %buildx264%==2 set "x2643=no"
 if %buildx264%==3 set "x2643=high"
@@ -379,6 +387,7 @@ if %x2652INI%==0 (
     set /P buildx265="Build x265: "
 ) else set buildx265=%x2652INI%
 
+if "%buildx265%"=="" GOTO x265
 if %buildx265%==1 set "x2652=y"
 if %buildx265%==2 set "x2652=n"
 if %buildx265%==3 set "x2652=o10"
@@ -403,6 +412,7 @@ if %other265INI%==0 (
     set /P buildother265="Build kvazaar: "
 ) else set buildother265=%other265INI%
 
+if "%buildother265%"=="" GOTO other265
 if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
@@ -422,6 +432,7 @@ if %vvcINI%==0 (
     set /P buildvvc="Build vvc: "
 ) else set buildvvc=%vvcINI%
 
+if "%buildvvc%"=="" GOTO vvc
 if %buildvvc%==1 set "vvc=y"
 if %buildvvc%==2 set "vvc=n"
 if %buildvvc% GTR 2 GOTO vvc
@@ -441,6 +452,7 @@ if %flacINI%==0 (
     set /P buildflac="Build flac: "
 ) else set buildflac=%flacINI%
 
+if "%buildflac%"=="" GOTO flac
 if %buildflac%==1 set "flac=y"
 if %buildflac%==2 set "flac=n"
 if %buildflac% GTR 2 GOTO flac
@@ -465,6 +477,7 @@ if %fdkaacINI%==0 (
     set /P buildfdkaac="Build fdkaac: "
 ) else set buildfdkaac=%fdkaacINI%
 
+if "%buildfdkaac%"=="" GOTO fdkaac
 if %buildfdkaac%==1 set "fdkaac=y"
 if %buildfdkaac%==2 set "fdkaac=n"
 if %buildfdkaac% GTR 2 GOTO fdkaac
@@ -484,6 +497,7 @@ if %faacINI%==0 (
     set /P buildfaac="Build faac: "
 ) else set buildfaac=%faacINI%
 
+if "%buildfaac%"=="" GOTO faac
 if %buildfaac%==1 set "faac=y"
 if %buildfaac%==2 set "faac=n"
 if %buildfaac% GTR 2 GOTO faac
@@ -503,6 +517,7 @@ if %mediainfoINI%==0 (
     set /P buildmediainfo="Build mediainfo: "
 ) else set buildmediainfo=%mediainfoINI%
 
+if "%buildmediainfo%"=="" GOTO mediainfo
 if %buildmediainfo%==1 set "mediainfo=y"
 if %buildmediainfo%==2 set "mediainfo=n"
 if %buildmediainfo% GTR 2 GOTO mediainfo
@@ -522,6 +537,7 @@ if %soxBINI%==0 (
     set /P buildsox="Build sox: "
 ) else set buildsox=%soxBINI%
 
+if "%buildsox%"=="" GOTO sox
 if %buildsox%==1 set "sox=y"
 if %buildsox%==2 set "sox=n"
 if %buildsox% GTR 2 GOTO sox
@@ -548,6 +564,7 @@ if %ffmpegB2INI%==0 (
     set /P buildffmpeg="Build FFmpeg: "
 ) else set buildffmpeg=%ffmpegB2INI%
 
+if "%buildffmpeg%"=="" GOTO ffmpeg
 if %buildffmpeg%==1 set "ffmpeg=static"
 if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
@@ -574,6 +591,7 @@ if %ffmpegUpdateINI%==0 (
     set /P buildffmpegUp="Build ffmpeg if lib is new: "
 ) else set buildffmpegUp=%ffmpegUpdateINI%
 
+if "%buildffmpegUp%"=="" GOTO ffmpegUp
 if %buildffmpegUp%==1 set "ffmpegUpdate=y"
 if %buildffmpegUp%==2 set "ffmpegUpdate=n"
 if %buildffmpegUp%==3 set "ffmpegUpdate=onlyFFmpeg"
@@ -603,6 +621,7 @@ if %ffmpegChoiceINI%==0 (
     set /P buildffmpegChoice="Choose ffmpeg and mpv optional libs: "
 ) else set buildffmpegChoice=%ffmpegChoiceINI%
 
+if "%buildffmpegChoice%"=="" GOTO ffmpegChoice
 if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
     if not exist %build%\ffmpeg_options.txt (
@@ -671,6 +690,7 @@ if %mp4boxINI%==0 (
     set /P buildMp4box="Build mp4box: "
 ) else set buildMp4box=%mp4boxINI%
 
+if "%buildMp4box%"=="" GOTO mp4boxStatic
 if %buildMp4box%==1 set "mp4box=y"
 if %buildMp4box%==2 set "mp4box=n"
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
@@ -690,6 +710,7 @@ if %rtmpdumpINI%==0 (
     set /P buildrtmpdump="Build rtmpdump: "
 ) else set buildrtmpdump=%rtmpdumpINI%
 
+if "%buildrtmpdump%"=="" GOTO rtmpdump
 if %buildrtmpdump%==1 set "rtmpdump=y"
 if %buildrtmpdump%==2 set "rtmpdump=n"
 if %buildrtmpdump% GTR 2 GOTO rtmpdump
@@ -715,6 +736,7 @@ if %mplayer2INI%==0 (
     set /P buildmplayer="Build mplayer: "
 ) else set buildmplayer=%mplayer2INI%
 
+if "%buildmplayer%"=="" GOTO mplayer
 if %buildmplayer%==1 set "mplayer=y"
 if %buildmplayer%==2 set "mplayer=n"
 if %buildmplayer% GTR 2 GOTO mplayer
@@ -740,6 +762,7 @@ if %mpvINI%==0 (
     set /P buildmpv="Build mpv: "
 ) else set buildmpv=%mpvINI%
 
+if "%buildmpv%"=="" GOTO mpv
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
 if %buildmpv%==3 set "mpv=v"
@@ -760,6 +783,7 @@ if %bmxINI%==0 (
     set /P buildbmx="Build bmx: "
 ) else set buildbmx=%bmxINI%
 
+if "%buildbmx%"=="" GOTO bmx
 if %buildbmx%==1 set "bmx=y"
 if %buildbmx%==2 set "bmx=n"
 if %buildbmx% GTR 2 GOTO bmx
@@ -787,6 +811,7 @@ if %curlINI%==0 (
     set /P buildcurl="Build curl: "
 ) else set buildcurl=%curlINI%
 
+if "%buildcurl%"=="" GOTO curl
 if %buildcurl%==1 set "curl=y"
 if %buildcurl%==2 set "curl=n"
 if %buildcurl%==3 set "curl=schannel"
@@ -818,6 +843,7 @@ if %ffmbcINI%==0 (
     set /P buildffmbc="Build ffmbc: "
 ) else set buildffmbc=%ffmbcINI%
 
+if "%buildffmbc%"=="" GOTO ffmbc
 if %buildffmbc%==1 set "ffmbc=y"
 if %buildffmbc%==2 set "ffmbc=n"
 if %buildffmbc% GTR 2 GOTO ffmbc
@@ -837,6 +863,7 @@ if %cyanrip2INI%==0 (
     set /P buildcyanrip="Build cyanrip: "
 ) else set buildcyanrip=%cyanrip2INI%
 
+if "%buildcyanrip%"=="" GOTO cyanrip
 if %buildcyanrip%==1 set "cyanrip=y"
 if %buildcyanrip%==2 set "cyanrip=n"
 if %buildcyanrip% GTR 2 GOTO cyanrip
@@ -856,6 +883,7 @@ if %redshiftINI%==0 (
     set /P buildredshift="Build redshift: "
 ) else set buildredshift=%redshiftINI%
 
+if "%buildredshift%"=="" GOTO redshift
 if %buildredshift%==1 set "redshift=y"
 if %buildredshift%==2 set "redshift=n"
 if %buildredshift% GTR 2 GOTO redshift
@@ -875,6 +903,7 @@ if %ripgrepINI%==0 (
     set /P buildripgrep="Build ripgrep: "
 ) else set buildripgrep=%ripgrepINI%
 
+if "%buildripgrep%"=="" GOTO ripgrep
 if %buildripgrep%==1 set "ripgrep=y"
 if %buildripgrep%==2 set "ripgrep=n"
 if %buildripgrep% GTR 2 GOTO ripgrep
@@ -894,6 +923,7 @@ if %jqINI%==0 (
     set /P buildjq="Build jq: "
 ) else set buildjq=%jqINI%
 
+if "%buildjq%"=="" GOTO jq
 if %buildjq%==1 set "jq=y"
 if %buildjq%==2 set "jq=n"
 if %buildjq% GTR 2 GOTO jq
@@ -913,6 +943,7 @@ if %dssimINI%==0 (
     set /P builddssim="Build dssim: "
 ) else set builddssim=%dssimINI%
 
+if "%builddssim%"=="" GOTO dssim
 if %builddssim%==1 set "dssim=y"
 if %builddssim%==2 set "dssim=n"
 if %builddssim% GTR 2 GOTO dssim
@@ -934,6 +965,7 @@ if %avs2INI%==0 (
     set /P buildavs2="Build avs2: "
 ) else set buildavs2=%avs2INI%
 
+if "%buildavs2%"=="" GOTO avs2
 if %buildavs2%==1 set "avs2=y"
 if %buildavs2%==2 set "avs2=n"
 if %buildavs2% GTR 2 GOTO avs2
@@ -959,11 +991,9 @@ if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
     set /P cpuCores="Core/Thread Count: "
 ) else set cpuCores=%coresINI%
-    for /l %%a in (1,1,%cpuCores%) do (
-        set cpuCount=%%a
-        )
+for /l %%a in (1,1,%cpuCores%) do set cpuCount=%%a
 
-if "%cpuCount%"=="" GOTO :numCores
+if "%cpuCount%"=="" GOTO numCores
 if %deleteINI%==1 echo.cores=^%cpuCount%>>%ini%
 
 if %deleteSourceINI%==0 (
@@ -982,6 +1012,7 @@ if %deleteSourceINI%==0 (
     set /P deleteS="Delete source: "
 ) else set deleteS=%deleteSourceINI%
 
+if "%deleteS%"=="" GOTO delete
 if %deleteS%==1 set "deleteSource=y"
 if %deleteS%==2 set "deleteSource=n"
 if %deleteS% GTR 2 GOTO delete
@@ -1003,6 +1034,7 @@ if %stripINI%==0 (
     set /P stripF="Strip files: "
 ) else set stripF=%stripINI%
 
+if "%stripF%"=="" GOTO stripEXE
 if %stripF%==1 set "stripFile=y"
 if %stripF%==2 set "stripFile=n"
 if %stripF% GTR 2 GOTO stripEXE
@@ -1028,6 +1060,7 @@ if %packINI%==0 (
     set /P packF="Pack files: "
 ) else set packF=%packINI%
 
+if "%packF%"=="" GOTO packEXE
 if %packF%==1 set "packFile=y"
 if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
@@ -1050,6 +1083,7 @@ if %loggingINI%==0 (
     set /P loggingF="Write logs: "
 ) else set loggingF=%loggingINI%
 
+if "%loggingF%"=="" GOTO logging
 if %loggingF%==1 set "logging=y"
 if %loggingF%==2 set "logging=n"
 if %loggingF% GTR 2 GOTO logging
@@ -1072,6 +1106,7 @@ if %updateSuiteINI%==0 (
     set /P updateSuiteF="Create update script: "
 ) else set updateSuiteF=%updateSuiteINI%
 
+if "%updateSuiteF%"=="" GOTO updateSuite
 if %updateSuiteF%==1 set "updateSuite=y"
 if %updateSuiteF%==2 set "updateSuite=n"
 if %updateSuiteF% GTR 2 GOTO updateSuite
@@ -1094,6 +1129,7 @@ if %forceQuitBatchINI%==0 (
     set /P forceQuitBatchF="Forcefully close batch: "
 ) else set forceQuitBatchF=%forceQuitBatchINI%
 
+if "%forceQuitBatchF%"=="" GOTO forceQuitBatch
 if %forceQuitBatchF%==1 set "forceQuitBatch=y"
 if %forceQuitBatchF%==2 set "forceQuitBatch=n"
 if %forceQuitBatchF% GTR 2 GOTO forceQuitBatch
@@ -1116,6 +1152,7 @@ if %timeStampINI%==0 (
     set /P timeStampF="Show Timestamps: "
 ) else set timeStampF=%timeStampINI%
 
+if "%timeStampF%"=="" GOTO timestamp
 if %timeStampF%==1 set "timeStamp=y"
 if %timeStampF%==2 set "timeStamp=n"
 if %timeStampF% GTR 2 GOTO timeStamp
