@@ -150,8 +150,7 @@ if %deleteINI%==1 (
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
-if %msys2Arch%==1 set "msys2=msys32"
-if %msys2Arch%==2 set "msys2=msys64"
+if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
 
 setlocal
 
