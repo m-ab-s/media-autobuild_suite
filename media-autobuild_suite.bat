@@ -65,9 +65,6 @@ do if %%f lss 4 (
     exit
 )
 
-set _bitness=64
-if %PROCESSOR_ARCHITECTURE%==x86 IF NOT DEFINED PROCESSOR_ARCHITEW6432 set _bitness=32
-
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
@@ -124,9 +121,9 @@ if exist %ini% GOTO checkINI
 :selectmsys2Arch
 set deleteIni=1
 
-if %_bitness%==64 (
-    set msys2Arch=2
-) else set msys2Arch=1
+if %PROCESSOR_ARCHITECTURE%==x86 IF NOT DEFINED PROCESSOR_ARCHITEW6432 (
+    set msys2Arch=1
+) else set msys2Arch=2
 
 echo.[compiler list]>%ini%
 echo.msys2Arch=^%msys2Arch%>>%ini%
