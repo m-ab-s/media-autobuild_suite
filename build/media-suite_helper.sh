@@ -1113,7 +1113,7 @@ strip_ansi() {
         local name="${txtfile%.*}"
         local ext="${txtfile##*.}"
         [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
-        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile" > "${newfile}"
+        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g;s/^[0-9]{2}:[0-9]{2}:[0-9]{2}//' "$txtfile" > "${newfile}"
     done
 }
 
