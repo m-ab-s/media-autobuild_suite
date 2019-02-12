@@ -1562,7 +1562,11 @@ add_to_remove() {
 }
 
 clean_suite() {
-    echo -e "\n\t${orange}Deleting status files...${reset}"
+    if [[ $timeStamp = y ]]; then
+        printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Deleting status files...${reset}"
+    else
+        echo -e "\n\t${orange}Deleting status files...${reset}"
+    fi
     cd_safe "$LOCALBUILDDIR" >/dev/null
     find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -r0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -print0 |
