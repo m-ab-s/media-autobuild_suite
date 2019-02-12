@@ -111,7 +111,7 @@ pdf-build libmpv-shared
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d forceQuitBatch vvc jq dssim avs2 timeStamp noMintty
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -1108,29 +1108,6 @@ if %updateSuiteF%==2 set "updateSuite=n"
 if %updateSuiteF% GTR 2 GOTO updateSuite
 if %deleteINI%==1 echo.updateSuite=^%updateSuiteF%>>%ini%
 
-:forceQuitBatch
-if %forceQuitBatchINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Force quit this batch window after launching compilation script?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo This will forcibly close this batch window. Only use this if you have the issue
-    echo where the window doesn^'t close after launching the compilation script.
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P forceQuitBatchF="Forcefully close batch: "
-) else set forceQuitBatchF=%forceQuitBatchINI%
-
-if "%forceQuitBatchF%"=="" GOTO forceQuitBatch
-if %forceQuitBatchF%==1 set "forceQuitBatch=y"
-if %forceQuitBatchF%==2 set "forceQuitBatch=n"
-if %forceQuitBatchF% GTR 2 GOTO forceQuitBatch
-if %deleteINI%==1 echo.forceQuitBatch=^%forceQuitBatchF%>>%ini%
-
 :timeStamp
 if %timeStampINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -1235,7 +1212,6 @@ if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 
 endlocal & (
-    set forceQuitBatch=%forceQuitBatch%
     set updateSuite=%updateSuite%
     set cpuCount=%cpuCount%
     set build32=%build32%
@@ -1761,7 +1737,6 @@ if %noMintty%==y (
     --login /build/media-suite_compile.sh %compileArgs%
 )
 endlocal
-:: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
 goto :EOF
 
 :createBaseFolders
