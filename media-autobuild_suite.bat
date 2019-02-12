@@ -17,7 +17,7 @@
 ::    GNU General Public License for more details.
 ::
 ::    You should have received a copy of the GNU General Public License
-::    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+::    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ::-----------------------------------------------------------------------------
 
 @echo off
@@ -37,11 +37,11 @@ if not exist %instdir% (
     echo. Correct:   C:\build_suite\
     pause
     exit
-    )
+)
 
 if not ["%instdir:~60,1%"]==[""] (
     echo -------------------------------------------------------------------------------
-    echo. The total filepath to the suite seems too large (larger than 60 characters^):
+    echo. The total filepath to the suite seems too large ^(larger than 60 characters^):
     echo. %instdir%
     echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
@@ -50,19 +50,27 @@ if not ["%instdir:~60,1%"]==[""] (
     echo. Prefer: C:\media-autobuild_suite
     echo. Prefer: C:\ab-suite
     pause
-    )
+)
 
-set _bitness=64
-if %PROCESSOR_ARCHITECTURE%==x86 (
-    IF NOT DEFINED PROCESSOR_ARCHITEW6432 set _bitness=32
-    )
+for /f "usebackq tokens=*" %%f in (`powershell -noprofile -command $PSVersionTable.PSVersion.Major`) ^
+do if %%f lss 4 (
+    echo ----------------------------------------------------------------------
+    echo. You do not have a powershell version greater than 4.
+    echo. This is not supported.
+    echo. Please upgrade your powershell either through downloading and installing WMF 5.1
+    echo. https://docs.microsoft.com/en-us/powershell/wmf/5.1/install-configure
+    echo. or by upgrading your OS.
+    echo. This is not Powershell Core. That is separate.
+    pause
+    exit
+)
 
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
-gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty
+gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
 
@@ -100,9 +108,10 @@ set mpv_options_basic=--disable-debug-build "--lua=luajit"
 set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
 pdf-build libmpv-shared
 
-set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo soxB ffmpegB2 ffmpegUpdate ^
-ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource strip pack logging bmx standalone updateSuite ^
-aom faac ffmbc curl cyanrip2 redshift rav1e ripgrep dav1d forceQuitBatch
+set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
+soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
+strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -110,43 +119,42 @@ set ini=%build%\media-autobuild_suite.ini
 
 if exist %ini% GOTO checkINI
 :selectmsys2Arch
-    set deleteIni=1
+set deleteIni=1
 
-    if %_bitness%==64 (
-        set msys2Arch=2
-        ) else set msys2Arch=1
+if %PROCESSOR_ARCHITECTURE%==x86 (
+    IF NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
+) else set msys2Arch=2
 
-    echo.[compiler list]>%ini%
-    echo.msys2Arch=^%msys2Arch%>>%ini%
+echo.[compiler list]>%ini%
+echo.msys2Arch=^%msys2Arch%>>%ini%
 
-    if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
-    set msys2ArchINI=%msys2Arch%
+if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
+set msys2ArchINI=%msys2Arch%
 
-    GOTO systemVars
+GOTO systemVars
 
 :checkINI
 set deleteIni=0
 for %%a in (%iniOptions%) do (
-    findstr %%a %ini% > nul
-    if errorlevel 1 set deleteIni=1 && set %%aINI=0
-    if errorlevel 0 for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do (
-        set %%aINI=%%b
-        if %%b==0 set deleteIni=1
-        )
+    for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+    if not defined %%aINI (
+        set %%aINI=0
+        set deleteIni=1
     )
+)
 if %deleteINI%==1 (
     del %ini%
     set previousOptions=1
     GOTO selectmsys2Arch
-    )
+)
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
-if %msys2Arch%==1 set "msys2=msys32"
-if %msys2Arch%==2 set "msys2=msys64"
+if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
+
+setlocal
 
 :selectSystem
-set "writeArch=no"
 if %archINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -159,26 +167,25 @@ if %archINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildEnv="Build System: "
-    ) else set buildEnv=%archINI%
-if %deleteINI%==1 set "writeArch=yes"
+) else set buildEnv=%archINI%
 
+if "%buildEnv%"=="" GOTO selectSystem
 if %buildEnv%==1 (
     set "build32=yes"
     set "build64=yes"
-    )
+)
 if %buildEnv%==2 (
     set "build32=yes"
     set "build64=no"
-    )
+)
 if %buildEnv%==3 (
     set "build32=no"
     set "build64=yes"
-    )
+)
 if %buildEnv% GTR 3 GOTO selectSystem
-if %writeArch%==yes echo.arch=^%buildEnv%>>%ini%
+if %deleteINI%==1 echo.arch=^%buildEnv%>>%ini%
 
 :ffmpeglicense
-set "writeLicense=no"
 if %license2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -205,41 +212,39 @@ if %license2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P ffmpegLicense="FFmpeg license: "
-    ) else set ffmpegLicense=%license2INI%
-if %deleteINI%==1 set "writeLicense=yes"
+) else set ffmpegLicense=%license2INI%
 
+if "%ffmpegLicense%"=="" GOTO ffmpeglicense
 if %ffmpegLicense%==1 set "license2=nonfree"
 if %ffmpegLicense%==2 set "license2=gplv3"
 if %ffmpegLicense%==3 set "license2=gpl"
 if %ffmpegLicense%==4 set "license2=lgplv3"
 if %ffmpegLicense%==5 set "license2=lgpl"
 if %ffmpegLicense% GTR 5 GOTO ffmpeglicense
-if %writeLicense%==yes echo.license2=^%ffmpegLicense%>>%ini%
+if %deleteINI%==1 echo.license2=^%ffmpegLicense%>>%ini%
 
 :standalone
-set "writestandalone=no"
 if %standaloneINI%==0 (
-     echo -------------------------------------------------------------------------------
-     echo -------------------------------------------------------------------------------
-     echo.
-     echo. Build standalone binaries for libraries included in FFmpeg?
-     echo. eg. Compile opusenc.exe if --enable-libopus
-     echo. 1 = Yes
-     echo. 2 = No
-     echo.
-     echo -------------------------------------------------------------------------------
-     echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build standalone binaries for libraries included in FFmpeg?
+    echo. eg. Compile opusenc.exe if --enable-libopus
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
      set /P buildstandalone="Build standalone binaries: "
-     ) else set buildstandalone=%standaloneINI%
-if %deleteINI%==1 set "writestandalone=yes"
+) else set buildstandalone=%standaloneINI%
 
+if "%buildstandalone%"=="" GOTO standalone
 if %buildstandalone%==1 set "standalone=y"
 if %buildstandalone%==2 set "standalone=n"
 if %buildstandalone% GTR 2 GOTO standalone
-if %writestandalone%==yes echo.standalone=^%buildstandalone%>>%ini%
+if %deleteINI%==1 echo.standalone=^%buildstandalone%>>%ini%
 
 :vpx
-set "writevpx=no"
 if %vpx2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -253,16 +258,15 @@ if %vpx2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvpx="Build vpx: "
-    ) else set buildvpx=%vpx2INI%
-if %deleteINI%==1 set "writevpx=yes"
+) else set buildvpx=%vpx2INI%
 
+if "%buildvpx%"=="" GOTO vpx
 if %buildvpx%==1 set "vpx2=y"
 if %buildvpx%==2 set "vpx2=n"
 if %buildvpx% GTR 2 GOTO vpx
-if %writevpx%==yes echo.vpx2=^%buildvpx%>>%ini%
+if %deleteINI%==1 echo.vpx2=^%buildvpx%>>%ini%
 
 :aom
-set "writeaom=no"
 if %aomINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -276,16 +280,15 @@ if %aomINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildaom="Build aom: "
-    ) else set buildaom=%aomINI%
-if %deleteINI%==1 set "writeaom=yes"
+) else set buildaom=%aomINI%
 
+if "%buildaom%"=="" GOTO aom
 if %buildaom%==1 set "aom=y"
 if %buildaom%==2 set "aom=n"
 if %buildaom% GTR 2 GOTO aom
-if %writeaom%==yes echo.aom=^%buildaom%>>%ini%
+if %deleteINI%==1 echo.aom=^%buildaom%>>%ini%
 
 :rav1e
-set "writerav1e=no"
 if %rav1eINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -297,16 +300,15 @@ if %rav1eINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildrav1e="Build rav1e: "
-    ) else set buildrav1e=%rav1eINI%
-if %deleteINI%==1 set "writerav1e=yes"
+) else set buildrav1e=%rav1eINI%
 
+if "%buildrav1e%"=="" GOTO rav1e
 if %buildrav1e%==1 set "rav1e=y"
 if %buildrav1e%==2 set "rav1e=n"
 if %buildrav1e% GTR 2 GOTO rav1e
-if %writerav1e%==yes echo.rav1e=^%buildrav1e%>>%ini%
+if %deleteINI%==1 echo.rav1e=^%buildrav1e%>>%ini%
 
 :dav1d
-set "writedav1d=no"
 if %dav1dINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -315,19 +317,20 @@ if %dav1dINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P builddav1d="Build dav1d: "
-    ) else set builddav1d=%dav1dINI%
-if %deleteINI%==1 set "writedav1d=yes"
+) else set builddav1d=%dav1dINI%
 
+if "%builddav1d%"=="" GOTO dav1d
 if %builddav1d%==1 set "dav1d=y"
 if %builddav1d%==2 set "dav1d=n"
 if %builddav1d% GTR 2 GOTO dav1d
-if %writedav1d%==yes echo.dav1d=^%builddav1d%>>%ini%
+if %deleteINI%==1 echo.dav1d=^%builddav1d%>>%ini%
 
 :x264
-set "writex264=no"
 if %x2643INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -346,9 +349,9 @@ if %x2643INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx264="Build x264: "
-    ) else set buildx264=%x2643INI%
-if %deleteINI%==1 set "writex264=yes"
+) else set buildx264=%x2643INI%
 
+if "%buildx264%"=="" GOTO x264
 if %buildx264%==1 set "x2643=yes"
 if %buildx264%==2 set "x2643=no"
 if %buildx264%==3 set "x2643=high"
@@ -357,10 +360,9 @@ if %buildx264%==5 set "x2643=shared"
 if %buildx264%==6 set "x2643=fullv"
 if %buildx264%==7 set "x2643=o8"
 if %buildx264% GTR 7 GOTO x264
-if %writex264%==yes echo.x2643=^%buildx264%>>%ini%
+if %deleteINI%==1 echo.x2643=^%buildx264%>>%ini%
 
 :x265
-set "writex265=no"
 if %x2652INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -379,9 +381,9 @@ if %x2652INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
-    ) else set buildx265=%x2652INI%
-if %deleteINI%==1 set "writex265=yes"
+) else set buildx265=%x2652INI%
 
+if "%buildx265%"=="" GOTO x265
 if %buildx265%==1 set "x2652=y"
 if %buildx265%==2 set "x2652=n"
 if %buildx265%==3 set "x2652=o10"
@@ -390,31 +392,49 @@ if %buildx265%==5 set "x2652=s"
 if %buildx265%==6 set "x2652=d"
 if %buildx265%==7 set "x2652=o12"
 if %buildx265% GTR 7 GOTO x265
-if %writex265%==yes echo.x2652=^%buildx265%>>%ini%
+if %deleteINI%==1 echo.x2652=^%buildx265%>>%ini%
 
 :other265
-set "writeother265=no"
 if %other265INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build standalone Kvazaar?
+    echo. Build Kvazaar? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildother265="Build kvazaar: "
-    ) else set buildother265=%other265INI%
-if %deleteINI%==1 set "writeother265=yes"
+) else set buildother265=%other265INI%
 
+if "%buildother265%"=="" GOTO other265
 if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
-if %writeother265%==yes echo.other265=^%buildother265%>>%ini%
+if %deleteINI%==1 echo.other265=^%buildother265%>>%ini%
+
+:vvc
+if %vvcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build Fraunhofer VVC? [H.265 successor enc/decoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvvc="Build vvc: "
+) else set buildvvc=%vvcINI%
+
+if "%buildvvc%"=="" GOTO vvc
+if %buildvvc%==1 set "vvc=y"
+if %buildvvc%==2 set "vvc=n"
+if %buildvvc% GTR 2 GOTO vvc
+if %deleteINI%==1 echo.vvc=^%buildvvc%>>%ini%
 
 :flac
-set "writeflac=no"
 if %flacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -426,16 +446,15 @@ if %flacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildflac="Build flac: "
-    ) else set buildflac=%flacINI%
-if %deleteINI%==1 set "writeflac=yes"
+) else set buildflac=%flacINI%
 
+if "%buildflac%"=="" GOTO flac
 if %buildflac%==1 set "flac=y"
 if %buildflac%==2 set "flac=n"
 if %buildflac% GTR 2 GOTO flac
-if %writeflac%==yes echo.flac=^%buildflac%>>%ini%
+if %deleteINI%==1 echo.flac=^%buildflac%>>%ini%
 
 :fdkaac
-set "writefdkaac=no"
 if %fdkaacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -452,16 +471,15 @@ if %fdkaacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildfdkaac="Build fdkaac: "
-    ) else set buildfdkaac=%fdkaacINI%
-if %deleteINI%==1 set "writefdkaac=yes"
+) else set buildfdkaac=%fdkaacINI%
 
+if "%buildfdkaac%"=="" GOTO fdkaac
 if %buildfdkaac%==1 set "fdkaac=y"
 if %buildfdkaac%==2 set "fdkaac=n"
 if %buildfdkaac% GTR 2 GOTO fdkaac
-if %writefdkaac%==yes echo.fdkaac=^%buildfdkaac%>>%ini%
+if %deleteINI%==1 echo.fdkaac=^%buildfdkaac%>>%ini%
 
 :faac
-set "writefaac=no"
 if %faacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -473,16 +491,15 @@ if %faacINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildfaac="Build faac: "
-    ) else set buildfaac=%faacINI%
-if %deleteINI%==1 set "writefaac=yes"
+) else set buildfaac=%faacINI%
 
+if "%buildfaac%"=="" GOTO faac
 if %buildfaac%==1 set "faac=y"
 if %buildfaac%==2 set "faac=n"
 if %buildfaac% GTR 2 GOTO faac
-if %writefaac%==yes echo.faac=^%buildfaac%>>%ini%
+if %deleteINI%==1 echo.faac=^%buildfaac%>>%ini%
 
 :mediainfo
-set "writemediainfo=no"
 if %mediainfoINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -494,16 +511,15 @@ if %mediainfoINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmediainfo="Build mediainfo: "
-    ) else set buildmediainfo=%mediainfoINI%
-if %deleteINI%==1 set "writemediainfo=yes"
+) else set buildmediainfo=%mediainfoINI%
 
+if "%buildmediainfo%"=="" GOTO mediainfo
 if %buildmediainfo%==1 set "mediainfo=y"
 if %buildmediainfo%==2 set "mediainfo=n"
 if %buildmediainfo% GTR 2 GOTO mediainfo
-if %writemediainfo%==yes echo.mediainfo=^%buildmediainfo%>>%ini%
+if %deleteINI%==1 echo.mediainfo=^%buildmediainfo%>>%ini%
 
 :sox
-set "writesox=no"
 if %soxBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -515,16 +531,15 @@ if %soxBINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsox="Build sox: "
-    ) else set buildsox=%soxBINI%
-if %deleteINI%==1 set "writesox=yes"
+) else set buildsox=%soxBINI%
 
+if "%buildsox%"=="" GOTO sox
 if %buildsox%==1 set "sox=y"
 if %buildsox%==2 set "sox=n"
 if %buildsox% GTR 2 GOTO sox
-if %writesox%==yes echo.soxB=^%buildsox%>>%ini%
+if %deleteINI%==1 echo.soxB=^%buildsox%>>%ini%
 
 :ffmpeg
-set "writeFF=no"
 if %ffmpegB2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -543,19 +558,18 @@ if %ffmpegB2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpeg="Build FFmpeg: "
-    ) else set buildffmpeg=%ffmpegB2INI%
-if %deleteINI%==1 set "writeFF=yes"
+) else set buildffmpeg=%ffmpegB2INI%
 
+if "%buildffmpeg%"=="" GOTO ffmpeg
 if %buildffmpeg%==1 set "ffmpeg=static"
 if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
 if %buildffmpeg%==4 set "ffmpeg=both"
 if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
 if %buildffmpeg% GTR 5 GOTO ffmpeg
-if %writeFF%==yes echo.ffmpegB2=^%buildffmpeg%>>%ini%
+if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
-set "writeFFU=no"
 if %ffmpegUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -571,17 +585,16 @@ if %ffmpegUpdateINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpegUp="Build ffmpeg if lib is new: "
-    ) else set buildffmpegUp=%ffmpegUpdateINI%
-if %deleteINI%==1 set "writeFFU=yes"
+) else set buildffmpegUp=%ffmpegUpdateINI%
 
+if "%buildffmpegUp%"=="" GOTO ffmpegUp
 if %buildffmpegUp%==1 set "ffmpegUpdate=y"
 if %buildffmpegUp%==2 set "ffmpegUpdate=n"
 if %buildffmpegUp%==3 set "ffmpegUpdate=onlyFFmpeg"
 if %buildffmpegUp% GTR 3 GOTO ffmpegUp
-if %writeFFU%==yes echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
+if %deleteINI%==1 echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
 :ffmpegChoice
-set "writeFFC=no"
 if %ffmpegChoiceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -602,9 +615,9 @@ if %ffmpegChoiceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmpegChoice="Choose ffmpeg and mpv optional libs: "
-    ) else set buildffmpegChoice=%ffmpegChoiceINI%
-if %deleteINI%==1 set "writeFFC=yes"
+) else set buildffmpegChoice=%ffmpegChoiceINI%
 
+if "%buildffmpegChoice%"=="" GOTO ffmpegChoice
 if %buildffmpegChoice%==1 (
     set "ffmpegChoice=y"
     if not exist %build%\ffmpeg_options.txt (
@@ -657,10 +670,9 @@ if %buildffmpegChoice%==2 set "ffmpegChoice=n"
 if %buildffmpegChoice%==3 set "ffmpegChoice=z"
 if %buildffmpegChoice%==4 set "ffmpegChoice=f"
 if %buildffmpegChoice% GTR 4 GOTO ffmpegChoice
-if %writeFFC%==yes echo.ffmpegChoice=^%buildffmpegChoice%>>%ini%
+if %deleteINI%==1 echo.ffmpegChoice=^%buildffmpegChoice%>>%ini%
 
 :mp4boxStatic
-set "writeMP4Box=no"
 if %mp4boxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -672,16 +684,15 @@ if %mp4boxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildMp4box="Build mp4box: "
-    ) else set buildMp4box=%mp4boxINI%
-if %deleteINI%==1 set "writeMP4Box=yes"
+) else set buildMp4box=%mp4boxINI%
 
+if "%buildMp4box%"=="" GOTO mp4boxStatic
 if %buildMp4box%==1 set "mp4box=y"
 if %buildMp4box%==2 set "mp4box=n"
 if %buildMp4box% GTR 2 GOTO mp4boxStatic
-if %writeMP4Box%==yes echo.mp4box=^%buildMp4box%>>%ini%
+if %deleteINI%==1 echo.mp4box=^%buildMp4box%>>%ini%
 
 :rtmpdump
-set "writertmpdump=no"
 if %rtmpdumpINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -693,16 +704,15 @@ if %rtmpdumpINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildrtmpdump="Build rtmpdump: "
-    ) else set buildrtmpdump=%rtmpdumpINI%
-if %deleteINI%==1 set "writertmpdump=yes"
+) else set buildrtmpdump=%rtmpdumpINI%
 
+if "%buildrtmpdump%"=="" GOTO rtmpdump
 if %buildrtmpdump%==1 set "rtmpdump=y"
 if %buildrtmpdump%==2 set "rtmpdump=n"
 if %buildrtmpdump% GTR 2 GOTO rtmpdump
-if %writertmpdump%==yes echo.rtmpdump=^%buildrtmpdump%>>%ini%
+if %deleteINI%==1 echo.rtmpdump=^%buildrtmpdump%>>%ini%
 
 :mplayer
-set "writeMPlayer=no"
 if %mplayer2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -720,16 +730,15 @@ if %mplayer2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmplayer="Build mplayer: "
-    ) else set buildmplayer=%mplayer2INI%
-if %deleteINI%==1 set "writeMPlayer=yes"
+) else set buildmplayer=%mplayer2INI%
 
+if "%buildmplayer%"=="" GOTO mplayer
 if %buildmplayer%==1 set "mplayer=y"
 if %buildmplayer%==2 set "mplayer=n"
 if %buildmplayer% GTR 2 GOTO mplayer
-if %writeMPlayer%==yes echo.mplayer2=^%buildmplayer%>>%ini%
+if %deleteINI%==1 echo.mplayer2=^%buildmplayer%>>%ini%
 
 :mpv
-set "writeMPV=no"
 if %mpvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -747,17 +756,16 @@ if %mpvINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
-    ) else set buildmpv=%mpvINI%
-if %deleteINI%==1 set "writeMPV=yes"
+) else set buildmpv=%mpvINI%
 
+if "%buildmpv%"=="" GOTO mpv
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
 if %buildmpv%==3 set "mpv=v"
 if %buildmpv% GTR 3 GOTO mpv
-if %writeMPV%==yes echo.mpv=^%buildmpv%>>%ini%
+if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
 
 :bmx
-set "writeBmx=no"
 if %bmxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -769,16 +777,15 @@ if %bmxINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildbmx="Build bmx: "
-    ) else set buildbmx=%bmxINI%
-if %deleteINI%==1 set "writeBmx=yes"
+) else set buildbmx=%bmxINI%
 
+if "%buildbmx%"=="" GOTO bmx
 if %buildbmx%==1 set "bmx=y"
 if %buildbmx%==2 set "bmx=n"
 if %buildbmx% GTR 2 GOTO bmx
-if %writeBmx%==yes echo.bmx=^%buildbmx%>>%ini%
+if %deleteINI%==1 echo.bmx=^%buildbmx%>>%ini%
 
 :curl
-set "writeCurl=no"
 if %curlINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -798,9 +805,9 @@ if %curlINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildcurl="Build curl: "
-    ) else set buildcurl=%curlINI%
-if %deleteINI%==1 set "writeCurl=yes"
+) else set buildcurl=%curlINI%
 
+if "%buildcurl%"=="" GOTO curl
 if %buildcurl%==1 set "curl=y"
 if %buildcurl%==2 set "curl=n"
 if %buildcurl%==3 set "curl=schannel"
@@ -809,10 +816,9 @@ if %buildcurl%==5 set "curl=openssl"
 if %buildcurl%==6 set "curl=libressl"
 if %buildcurl%==7 set "curl=mbedtls"
 if %buildcurl% GTR 7 GOTO curl
-if %writeCurl%==yes echo.curl=^%buildcurl%>>%ini%
+if %deleteINI%==1 echo.curl=^%buildcurl%>>%ini%
 
 :ffmbc
-set "writeFFmbc=no"
 if %ffmbcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -831,16 +837,15 @@ if %ffmbcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildffmbc="Build ffmbc: "
-    ) else set buildffmbc=%ffmbcINI%
-if %deleteINI%==1 set "writeFFmbc=yes"
+) else set buildffmbc=%ffmbcINI%
 
+if "%buildffmbc%"=="" GOTO ffmbc
 if %buildffmbc%==1 set "ffmbc=y"
 if %buildffmbc%==2 set "ffmbc=n"
 if %buildffmbc% GTR 2 GOTO ffmbc
-if %writeFFmbc%==yes echo.ffmbc=^%buildffmbc%>>%ini%
+if %deleteINI%==1 echo.ffmbc=^%buildffmbc%>>%ini%
 
 :cyanrip
-set "writecyanrip=no"
 if %cyanrip2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -852,16 +857,15 @@ if %cyanrip2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildcyanrip="Build cyanrip: "
-    ) else set buildcyanrip=%cyanrip2INI%
-if %deleteINI%==1 set "writecyanrip=yes"
+) else set buildcyanrip=%cyanrip2INI%
 
-if %buildcyanrip%==1 set "cyanrip=yes"
-if %buildcyanrip%==2 set "cyanrip=no"
+if "%buildcyanrip%"=="" GOTO cyanrip
+if %buildcyanrip%==1 set "cyanrip=y"
+if %buildcyanrip%==2 set "cyanrip=n"
 if %buildcyanrip% GTR 2 GOTO cyanrip
-if %writecyanrip%==yes echo.cyanrip2=^%buildcyanrip%>>%ini%
+if %deleteINI%==1 echo.cyanrip2=^%buildcyanrip%>>%ini%
 
 :redshift
-set "writeredshift=no"
 if %redshiftINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -873,16 +877,15 @@ if %redshiftINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildredshift="Build redshift: "
-    ) else set buildredshift=%redshiftINI%
-if %deleteINI%==1 set "writeredshift=yes"
+) else set buildredshift=%redshiftINI%
 
+if "%buildredshift%"=="" GOTO redshift
 if %buildredshift%==1 set "redshift=y"
 if %buildredshift%==2 set "redshift=n"
 if %buildredshift% GTR 2 GOTO redshift
-if %writeredshift%==yes echo.redshift=^%buildredshift%>>%ini%
+if %deleteINI%==1 echo.redshift=^%buildredshift%>>%ini%
 
 :ripgrep
-set "writeripgrep=no"
 if %ripgrepINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -894,16 +897,77 @@ if %ripgrepINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildripgrep="Build ripgrep: "
-    ) else set buildripgrep=%ripgrepINI%
-if %deleteINI%==1 set "writeripgrep=yes"
+) else set buildripgrep=%ripgrepINI%
 
+if "%buildripgrep%"=="" GOTO ripgrep
 if %buildripgrep%==1 set "ripgrep=y"
 if %buildripgrep%==2 set "ripgrep=n"
 if %buildripgrep% GTR 2 GOTO ripgrep
-if %writeripgrep%==yes echo.ripgrep=^%buildripgrep%>>%ini%
+if %deleteINI%==1 echo.ripgrep=^%buildripgrep%>>%ini%
+
+:jq
+if %jqINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build jq ^(CLI JSON processor^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildjq="Build jq: "
+) else set buildjq=%jqINI%
+
+if "%buildjq%"=="" GOTO jq
+if %buildjq%==1 set "jq=y"
+if %buildjq%==2 set "jq=n"
+if %buildjq% GTR 2 GOTO jq
+if %deleteINI%==1 echo.jq=^%buildjq%>>%ini%
+
+:dssim
+if %dssimINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build dssim ^(multiscale SSIM in Rust^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P builddssim="Build dssim: "
+) else set builddssim=%dssimINI%
+
+if "%builddssim%"=="" GOTO dssim
+if %builddssim%==1 set "dssim=y"
+if %builddssim%==2 set "dssim=n"
+if %builddssim% GTR 2 GOTO dssim
+if %deleteINI%==1 echo.dssim=^%builddssim%>>%ini%
+
+:avs2
+if %avs2INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build avs2 ^(Audio Video Coding Standard Gen2 encoder/decoder^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildavs2="Build avs2: "
+) else set buildavs2=%avs2INI%
+
+if "%buildavs2%"=="" GOTO avs2
+if %buildavs2%==1 set "avs2=y"
+if %buildavs2%==2 set "avs2=n"
+if %buildavs2% GTR 2 GOTO avs2
+if %deleteINI%==1 echo.avs2=^%buildavs2%>>%ini%
 
 :numCores
-set "writeCores=no"
 if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
 if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -914,19 +978,20 @@ if %coresINI%==0 (
     echo.
     echo. Recommended: %coreHalf%
     echo.
+    echo. If you have Windows Defender Real-time protection on, most of your processing
+    echo. power will go to it. It is recommended to whitelist this directory from
+    echo. scanning due to the amount of new files and copying/moving done by the suite.
+    echo. If you do not know how to do this, google it. If you don't care, ignore this.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P cpuCores="Core/Thread Count: "
-    ) else set cpuCores=%coresINI%
-    for /l %%a in (1,1,%cpuCores%) do (
-        set cpuCount=%%a
-        )
-if %deleteINI%==1 set "writeCores=yes"
+) else set cpuCores=%coresINI%
+for /l %%a in (1,1,%cpuCores%) do set cpuCount=%%a
 
-if "%cpuCount%"=="" GOTO :numCores
-if %writeCores%==yes echo.cores=^%cpuCount%>>%ini%
+if "%cpuCount%"=="" GOTO numCores
+if %deleteINI%==1 echo.cores=^%cpuCount%>>%ini%
 
-set "writeDel=no"
 if %deleteSourceINI%==0 (
 :delete
     echo -------------------------------------------------------------------------------
@@ -941,16 +1006,15 @@ if %deleteSourceINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P deleteS="Delete source: "
-    ) else set deleteS=%deleteSourceINI%
-if %deleteINI%==1 set "writeDel=yes"
+) else set deleteS=%deleteSourceINI%
 
+if "%deleteS%"=="" GOTO delete
 if %deleteS%==1 set "deleteSource=y"
 if %deleteS%==2 set "deleteSource=n"
 if %deleteS% GTR 2 GOTO delete
-if %writeDel%==yes echo.deleteSource=^%deleteS%>>%ini%
+if %deleteINI%==1 echo.deleteSource=^%deleteS%>>%ini%
 
 :stripEXE
-set "writeStrip=no"
 if %stripINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -964,16 +1028,15 @@ if %stripINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P stripF="Strip files: "
-    ) else set stripF=%stripINI%
-if %deleteINI%==1 set "writeStrip=yes"
+) else set stripF=%stripINI%
 
+if "%stripF%"=="" GOTO stripEXE
 if %stripF%==1 set "stripFile=y"
 if %stripF%==2 set "stripFile=n"
 if %stripF% GTR 2 GOTO stripEXE
-if %writeStrip%==yes echo.strip=^%stripF%>>%ini%
+if %deleteINI%==1 echo.strip=^%stripF%>>%ini%
 
 :packEXE
-set "writePack=no"
 if %packINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -991,16 +1054,15 @@ if %packINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P packF="Pack files: "
-    ) else set packF=%packINI%
-if %deleteINI%==1 set "writePack=yes"
+) else set packF=%packINI%
 
+if "%packF%"=="" GOTO packEXE
 if %packF%==1 set "packFile=y"
 if %packF%==2 set "packFile=n"
 if %packF% GTR 2 GOTO packEXE
-if %writePack%==yes echo.pack=^%packF%>>%ini%
+if %deleteINI%==1 echo.pack=^%packF%>>%ini%
 
 :logging
-set "writeLogging=no"
 if %loggingINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1015,16 +1077,15 @@ if %loggingINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P loggingF="Write logs: "
-    ) else set loggingF=%loggingINI%
-if %deleteINI%==1 set "writeLogging=yes"
+) else set loggingF=%loggingINI%
 
+if "%loggingF%"=="" GOTO logging
 if %loggingF%==1 set "logging=y"
 if %loggingF%==2 set "logging=n"
 if %loggingF% GTR 2 GOTO logging
-if %writeLogging%==yes echo.logging=^%loggingF%>>%ini%
+if %deleteINI%==1 echo.logging=^%loggingF%>>%ini%
 
 :updateSuite
-set "writeUpdateSuite=no"
 if %updateSuiteINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1039,83 +1100,166 @@ if %updateSuiteINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P updateSuiteF="Create update script: "
-    ) else set updateSuiteF=%updateSuiteINI%
-if %deleteINI%==1 set "writeUpdateSuite=yes"
+) else set updateSuiteF=%updateSuiteINI%
 
+if "%updateSuiteF%"=="" GOTO updateSuite
 if %updateSuiteF%==1 set "updateSuite=y"
 if %updateSuiteF%==2 set "updateSuite=n"
 if %updateSuiteF% GTR 2 GOTO updateSuite
-if %writeUpdateSuite%==yes echo.updateSuite=^%updateSuiteF%>>%ini%
+if %deleteINI%==1 echo.updateSuite=^%updateSuiteF%>>%ini%
 
-:forceQuitBatch
-set "writeforceQuitBatch=no"
-if %forceQuitBatchINI%==0 (
+:timeStamp
+if %timeStampINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Force quit this batch window after launching compilation script?
+    echo. Show timestamps of commands during compilation?
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo This will forcibly close this batch window. Only use this if you have the issue
-    echo where the window doesn^'t close after launching the compilation script.
+    echo This will show the start times of commands during compilation.
+    echo Don't turn this on unless you really want to see the timestamps.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P forceQuitBatchF="Forcefully close batch: "
-    ) else set forceQuitBatchF=%forceQuitBatchINI%
-if %deleteINI%==1 set "writeforceQuitBatch=yes"
+    set /P timeStampF="Show Timestamps: "
+) else set timeStampF=%timeStampINI%
 
-if %forceQuitBatchF%==1 set "forceQuitBatch=y"
-if %forceQuitBatchF%==2 set "forceQuitBatch=n"
-if %forceQuitBatchF% GTR 2 GOTO forceQuitBatch
-if %writeforceQuitBatch%==yes echo.forceQuitBatch=^%forceQuitBatchF%>>%ini%
+if "%timeStampF%"=="" GOTO timestamp
+if %timeStampF%==1 set "timeStamp=y"
+if %timeStampF%==2 set "timeStamp=n"
+if %timeStampF% GTR 2 GOTO timeStamp
+if %deleteINI%==1 echo.timeStamp=^%timeStampF%>>%ini%
+
+:noMintty
+if %noMinttyINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Are you running this script through ssh or similar?
+    echo. ^(Can't open another window outside of this terminal^)
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo This will disable the use of mintty and print the output to this console.
+    echo There is no guarantee that this will work properly.
+    echo You must make sure that you have ssh keep-alive enabled or something similar
+    echo to screen that will allow you to run this script in the background.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P noMinttyF="SSH: "
+) else set noMinttyF=%noMinttyINI%
+
+if "%noMinttyF%"=="" GOTO noMintty
+if %noMinttyF%==1 (
+    set "noMintty=y"
+    color
+    (
+        echo.param^([string]$Bash, [string]$BashCommand, [string]$LogFile^)
+        echo.function Write-Transcript {
+        echo.try {Stop-Transcript ^| Out-Null} catch [System.InvalidOperationException] {}
+        echo.if ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************' -Quiet^) {
+        echo.$linenumber = ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************'^).LineNumber
+        echo.$transcriptContent = Get-Content -Path $LogFile ^| Select-Object -Index ^($linenumber[1]..^($linenumber[$linenumber.Length - 2] - 2^)^)
+        echo.Set-Content -Force -Path $LogFile -Value $transcriptContent
+        echo.}
+        echo.}
+        echo.try {
+        echo.$host.ui.RawUI.WindowTitle = switch -wildcard ^($BashCommand^) {
+        echo.*media-suite_update* {"update autobuild suite"}
+        echo.*media-suite_compile* {"media-autobuild_suite"}
+        echo.Default {$host.ui.RawUI.WindowTitle}
+        echo.}
+        echo.Start-Transcript -Force $LogFile ^| Out-Null
+        echo.$build = ^(Get-Item $LogFile^).Directory.FullName
+        echo.if ^($LogFile -match "compile"^) {
+        echo.$env:MSYSTEM = switch ^($env:Build64^) { yes {"MINGW64"} Default {"MINGW32"}}
+        echo.$env:MSYS2_PATH_TYPE = "inherit"
+        echo.}
+        echo.Remove-Item -Force -Path "$build\compilation_failed", "$build\fail_comp" -ErrorAction Ignore
+        echo.^&$bash "-l" $BashCommand.Split^(' '^)
+        echo.if ^(Test-Path "$build\compilation_failed"^) {
+        echo.Write-Transcript
+        echo.$compilefail = Get-Content -Path $build\compilation_failed
+        echo.$env:reason = $compilefail[1]
+        echo.$env:operation = $compilefail[2]
+        echo.New-Item -Force -ItemType File -Path "$build\fail_comp" -Value $^(
+        echo."while read line; do declare -x `"`$line`"; done < /build/fail.var`n" +
+        echo."source /build/media-suite_helper.sh`n" +
+        echo."cd `$(head -n 1 /build/compilation_failed)`n" +
+        echo."if [[ `$logging = y ]]; then`n" +
+        echo."echo `"Likely error:`"`n" +
+        echo."tail `"ab-suite.`${operation}.log`"`n" +
+        echo."echo `"`${red}`$reason failed. Check `$^(pwd -W^)/ab-suite.`$operation.log`${reset}`"`n" +
+        echo."fi`n" +
+        echo."echo `"`${red}This is required for other packages, so this script will exit.`${reset}`"`n" +
+        echo."zip_logs`n" +
+        echo."echo `"Make sure the suite is up-to-date before reporting an issue. It might've been fixed already.`"`n" +
+        echo."do_prompt `"Try running the build again at a later time.`""^) ^| Out-Null
+        echo.Start-Process -NoNewWindow -Wait -FilePath $bash -ArgumentList ^("-l /build/fail_comp"^).Split^(' '^)
+        echo.Remove-Item -Force -Path $build\compilation_failed, $build\fail_comp
+        echo.}
+        echo.} catch {
+        echo.Write-Output "Stopping log and exiting"
+        echo.} finally {
+        echo.Write-Transcript
+        echo.}
+    )>%build%\bash.ps1
+    )
+if %noMinttyF%==2 set "noMintty=n"
+if %noMinttyF% GTR 2 GOTO noMintty
+if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
+
+endlocal & (
+    set updateSuite=%updateSuite%
+    set cpuCount=%cpuCount%
+    set build32=%build32%
+    set build64=%build64%
+    set deleteSource=%deleteSource%
+    set mp4box=%mp4box%
+    set vpx2=%vpx2%
+    set x2643=%x2643%
+    set x2652=%x2652%
+    set other265=%other265%
+    set flac=%flac%
+    set fdkaac=%fdkaac%
+    set mediainfo=%mediainfo%
+    set sox=%sox%
+    set ffmpeg=%ffmpeg%
+    set ffmpegUpdate=%ffmpegUpdate%
+    set ffmpegChoice=%ffmpegChoice%
+    set mplayer=%mplayer%
+    set mpv=%mpv%
+    set license2=%license2%
+    set stripFile=%stripFile%
+    set packFile=%packFile%
+    set rtmpdump=%rtmpdump%
+    set logging=%logging%
+    set bmx=%bmx%
+    set standalone=%standalone%
+    set aom=%aom%
+    set faac=%faac%
+    set ffmbc=%ffmbc%
+    set curl=%curl%
+    set cyanrip=%cyanrip%
+    set redshift=%redshift%
+    set rav1e=%rav1e%
+    set ripgrep=%ripgrep%
+    set dav1d=%dav1d%
+    set vvc=%vvc%
+    set jq=%jq%
+    set dssim=%dssim%
+    set avs2=%avs2%
+    set timeStamp=%timeStamp%
+    set noMintty=%noMintty%
+)
 
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-if exist "%instdir%\%msys2%\usr\bin\wget.exe" GOTO getMintty
-echo -------------------------------------------------------------
-echo.
-echo - Download wget
-echo.
-echo -------------------------------------------------------------
 cd build
 if exist %build%\msys2-base.tar.xz GOTO unpack
-if exist %build%\wget.exe if exist %build%\7za.exe if exist %build%\grep.exe GOTO checkmsys2
-
-setlocal enabledelayedexpansion
-if not exist %build%\wget.exe (
-    (
-        echo.[System.Net.ServicePointManager]::SecurityProtocol = 'Tls12';
-        echo.$wc = new-object System.Net.WebClient;
-        echo.$wc.DownloadFile^('https://i.fsbn.eu/pub/wget-pack.exe', 'wget-pack.exe'^);
-        )>wget.ps1
-    powershell -noprofile -executionpolicy bypass .\wget.ps1
-    del wget.ps1
-
-    for /f "tokens=1 delims=" %%a ^
-in ('powershell -noprofile -command "(get-filehash -algorithm sha256 wget-pack.exe).hash"') do set _hash=%%a
-
-    if ["!_hash!"]==["3F226318A73987227674A4FEDDE47DF07E85A48744A07C7F6CDD4F908EF28947"] (
-        %build%\wget-pack.exe x
-        ) else del wget-pack.exe
-    )
-setlocal
-
-
-if not exist %build%\wget.exe (
-    echo -------------------------------------------------------------------------------
-    echo Script to download necessary components failed.
-    echo.
-    echo Download and extract this manually to inside "%build%":
-    echo https://i.fsbn.eu/pub/wget-pack.exe
-    echo -------------------------------------------------------------------------------
-    pause
-    exit
-    ) else (
-    del wget-pack.exe 2>nul
-    )
 
 :checkmsys2
 if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
@@ -1126,17 +1270,57 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     echo -------------------------------------------------------------------------------
     if %msys2%==msys32 (
         set "msysprefix=i686"
-        ) else set "msysprefix=x86_64"
-    wget --tries=5 --retry-connrefused --waitretry=5 --continue -O msys2-base.tar.xz ^
-    "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz"
-    
+    ) else set "msysprefix=x86_64"
+    (
+        echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
+        echo.$wc = New-Object System.Net.WebClient
+        echo.while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
+        ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
+        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
+        {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
+        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}}
+    )>msys.ps1
+    powershell -noprofile -executionpolicy bypass .\msys.ps1
+    If %ERRORLEVEL%==1 GOTO errorMsys
+    del msys.ps1
+
 :unpack
 if exist %build%\msys2-base.tar.xz (
-    %build%\7za.exe x msys2-base.tar.xz -so | %build%\7za.exe x -aoa -si -ttar -o..
-    del %build%\msys2-base.tar.xz
-    )
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.- Downloading Pscx and unpacking msys2 basic system
+    echo.
+    echo -------------------------------------------------------------------------------
+    (
+        echo if ^(!^(Get-ChildItem 'HKLM:^\SOFTWARE^\Microsoft^\NET Framework Setup^\NDP' ^
+        -Recurse ^| Get-ItemProperty -name Version -ErrorAction Ignore ^| Select-Object ^
+        -Property PSChildName, Version ^| Where-Object {$_.PSChildName -match "Client"} ^| ^
+        Where-Object {$_.Version -ge 4.5}^)^) {
+        echo.Write-Output "You lack a dotnet version greater than or equal to 4.5, thus this script cannot automatically extract the msys2 system"
+        echo.Write-Output "Please upgrade your dotnet either by updating your OS or by downloading the latest version at:"
+        echo.Write-Output "https://dotnet.microsoft.com/download/dotnet-framework-runtime"
+        echo.exit 3
+        echo.}
+        echo.$wc = New-Object System.Net.WebClient
+        echo.$wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^)
+        echo.Add-Type -assembly "System.IO.Compression.FileSystem"
+        echo.[System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^)
+        echo.Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package
+        echo.powershell -noprofile -command {
+        echo.Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za
+        echo.Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz
+        echo.Remove-Item $PWD\msys2-base.tar.xz
+        echo.Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar
+        echo.Remove-Item $PWD\msys2-base.tar
+        echo.}
+        echo.Remove-Item -Recurse $PWD\pscx
+    )>7z.ps1
+    powershell -noprofile -executionpolicy bypass .\7z.ps1
+    del 7z.ps1
+)
 
 if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
+    :errorMsys
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download msys2 basic system failed,
@@ -1149,23 +1333,25 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
     echo -------------------------------------------------------------------------------
     pause
     GOTO unpack
-    )
+)
 
 :getMintty
+set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
 set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
+if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
+setlocal
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
-    echo.-------------------------------------------------------------------------------
-    echo.rebase %msys2% system
-    echo.-------------------------------------------------------------------------------
-    call %instdir%\%msys2%\autorebase.bat
+        echo.-------------------------------------------------------------------------------
+        echo.rebase %msys2% system
+        echo.-------------------------------------------------------------------------------
+        call %instdir%\%msys2%\autorebase.bat
     )
 
     echo -------------------------------------------------------------------------------
     echo.- make a first run
     echo -------------------------------------------------------------------------------
-    if exist %build%\firstrun.log del %build%\firstrun.log
-    %mintty% --log 2>&1 %build%\firstrun.log /usr/bin/bash --login -c exit
+    call :runBash firstrun.log "-c exit"
 
     echo.-------------------------------------------------------------------------------
     echo.first update
@@ -1176,15 +1362,14 @@ if not exist %instdir%\mintty.lnk (
         echo.sed -i "s;^^IgnorePkg.*;#&;" /etc/pacman.conf
         echo.sleep ^4
         echo.exit
-        )>%build%\firstUpdate.sh
-    if exist %build%\firstUpdate.log del %build%\firstUpdate.log
-    %mintty% --log 2>&1 %build%\firstUpdate.log /usr/bin/bash --login %build%\firstUpdate.sh
+    )>%build%\firstUpdate.sh
+    call :runBash firstUpdate.log "%build%\firstUpdate.sh"
     del %build%\firstUpdate.sh
 
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
+    %bash% -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
 
     echo.-------------------------------------------------------------------------------
     echo.second update
@@ -1193,9 +1378,8 @@ if not exist %instdir%\mintty.lnk (
         echo.echo -ne "\033]0;second msys2 update\007"
         echo.pacman --noconfirm -Syu --asdeps
         echo.exit
-        )>%build%\secondUpdate.sh
-    if exist %build%\secondUpdate.log del %build%\secondUpdate.log
-    %mintty% --log 2>&1 %build%\secondUpdate.log /usr/bin/bash --login %build%\secondUpdate.sh
+    )>%build%\secondUpdate.sh
+    call :runBash secondUpdate.log "%build%\secondUpdate.sh"
     del %build%\secondUpdate.sh
 
     (
@@ -1208,20 +1392,17 @@ if not exist %instdir%\mintty.lnk (
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%"
         echo.link.Save
-        )>%build%\setlink.vbs
+    )>%build%\setlink.vbs
     cscript /nologo %build%\setlink.vbs
     del %build%\setlink.vbs
-    )
+)
 
-    if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
-
-    if exist "%instdir%\%msys2%\home\%USERNAME%\.minttyrc" GOTO hgsettings
-    (
-        echo.printf '%s\n' Locale=en_US Charset=UTF-8 ^
-        Font=Consolas Columns=120 Rows=30 ^> /home/%USERNAME%/.minttyrc
-        )>%build%\mintty.sh
-    %mintty% /usr/bin/bash --login %build%\mintty.sh
-    del %build%\mintty.sh
+if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
+for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
+if not defined TERM (
+    %bash% -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" ^
+    > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
+)
 
 :hgsettings
 if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
@@ -1244,7 +1425,7 @@ if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
         echo.status.deleted = cyan bold
         echo.status.unknown = blue bold
         echo.status.ignored = black bold
-        )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
+    )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
 
 :gitsettings
 if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO installBase
@@ -1265,18 +1446,18 @@ if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO installBase
         echo.
         echo.[push]
         echo.default = simple
-        )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
+    )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
 
 :installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
 for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base.pk
 
 if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
-    echo.-------------------------------------------------------------------------------
-    echo.install msys2 base system
-    echo.-------------------------------------------------------------------------------
-    if exist %build%\install_base_failed del %build%\install_base_failed
-    (
+echo.-------------------------------------------------------------------------------
+echo.install msys2 base system
+echo.-------------------------------------------------------------------------------
+if exist %build%\install_base_failed del %build%\install_base_failed
+(
     echo.echo -ne "\033]0;install base system\007"
     echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
     echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
@@ -1285,23 +1466,21 @@ if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
     echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
     echo.sleep ^3
     echo.exit
-        )>%build%\pacman.sh
-    if exist %build%\pacman.log del %build%\pacman.log
-    %mintty% --log 2>&1 %build%\pacman.log /usr/bin/bash --login %build%\pacman.sh
-    del %build%\pacman.sh
+)>%build%\pacman.sh
+call :runBash pacman.log "%build%\pacman.sh"
+del %build%\pacman.sh
 
-    for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
-        if %%~zi==0 (
-            (
-                echo.update-ca-trust
-                echo.sleep ^3
-                echo.exit
-                )>%build%\cert.sh
-            if exist %build%\cert.log del %build%\cert.log
-            %mintty% --log 2>&1 %build%\cert.log /usr/bin/bash --login %build%\cert.sh
-            del %build%\cert.sh
-            )
-        )
+for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
+    if %%~zi==0 (
+        (
+            echo.update-ca-trust
+            echo.sleep ^3
+            echo.exit
+        )>%build%\cert.sh
+        call :runBash cert.log "%build%\cert.sh"
+        del %build%\cert.sh
+    )
+)
 
 :sethgBat
 if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
@@ -1317,7 +1496,7 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
     echo.set out=^%%out:^} =^}^" ^%%
     echo.
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
-    )>>%instdir%\%msys2%\usr\bin\hg.bat
+)>>%instdir%\%msys2%\usr\bin\hg.bat
 
 :getmingw32
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
@@ -1336,11 +1515,10 @@ if %build32%==yes (
         echo.echo $mingw32compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
         echo.sleep ^3
         echo.exit
-        )>%build%\mingw32.sh
-    if exist %build%\mingw32.log del %build%\mingw32.log
-    %mintty% --log 2>&1 %build%\mingw32.log /usr/bin/bash --login %build%\mingw32.sh
+    )>%build%\mingw32.sh
+    call :runBash mingw32.log "%build%\mingw32.sh"
     del %build%\mingw32.sh
-    
+
     if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
         echo -------------------------------------------------------------------------------
         echo.
@@ -1350,12 +1528,12 @@ if %build32%==yes (
         echo -------------------------------------------------------------------------------
         set /P try32="try again [y/n]: "
 
-        if %packF%==y (
+        if [%try32%]==[y] (
             GOTO getmingw32
-            ) else exit
-        )
+        ) else exit
     )
-    
+)
+
 :getmingw64
 if %build64%==yes (
     if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
@@ -1370,9 +1548,8 @@ if %build64%==yes (
         echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
         echo.sleep ^3
         echo.exit
-        )>%build%\mingw64.sh
-    if exist %build%\mingw64.log del %build%\mingw64.log
-    %mintty% --log 2>&1 %build%\mingw64.log /usr/bin/bash --login %build%\mingw64.sh
+    )>%build%\mingw64.sh
+    call :runBash mingw64.log "%build%\mingw64.sh"
     del %build%\mingw64.sh
 
     if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
@@ -1384,11 +1561,11 @@ if %build64%==yes (
         echo -------------------------------------------------------------------------------
         set /P try64="try again [y/n]: "
 
-        if %packF%==y (
+        if [%try64%]==[y] (
             GOTO getmingw64
-            ) else exit
-        )
+        ) else exit
     )
+)
 
 :updatebase
 echo.-------------------------------------------------------------------------------
@@ -1401,8 +1578,8 @@ for %%s in (%scripts%) do (
     if not exist "%build%\media-suite_%%s.sh" (
         %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
         https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
-        )
     )
+)
 if %updateSuite%==y (
     if not exist %instdir%\update_suite.sh (
         echo -------------------------------------------------------------------------------
@@ -1413,7 +1590,7 @@ if %updateSuite%==y (
         echo.
         echo. It needs to be run separately and with the suite not running!
         echo -------------------------------------------------------------------------------
-        )
+    )
     (
         echo.#!/bin/bash
         echo.
@@ -1423,8 +1600,8 @@ if %updateSuite%==y (
         echo.update=yes
         %instdir%\%msys2%\usr\bin\sed -n '/start suite update/,/end suite update/p' ^
             %build%/media-suite_update.sh
-        )>%instdir%\update_suite.sh
-    )
+    )>%instdir%\update_suite.sh
+)
 
 :createFolders
 if %build32%==yes call :createBaseFolders local32
@@ -1435,62 +1612,61 @@ if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
 set "removefstab=no"
 
 set "grep=%instdir%\%msys2%\usr\bin\grep.exe"
-set fstab=%instdir%\%msys2%\etc\fstab
+set "fstab=%instdir%\%msys2%\etc\fstab"
 
 %grep% -q build32 %fstab% && set "removefstab=yes"
 %grep% -q trunk %fstab% || set "removefstab=yes"
 
-for /f "tokens=1 delims= " %%a in ('%grep% trunk %fstab%') do set searchRes=%%a
-if not [%searchRes%]==[%instdir%\] set "removefstab=yes"
+for /f "tokens=1 delims= " %%a in ('%grep% trunk %fstab%') do ^
+if not [%%a]==[%instdir%\] set "removefstab=yes"
+
 
 %grep% -q local32 %fstab%
 if not errorlevel 1 (
     if [%build32%]==[no] set "removefstab=yes"
-    ) else (
+) else (
     if [%build32%]==[yes] set "removefstab=yes"
-    )
+)
 
 %grep% -q local64 %fstab%
 if not errorlevel 1 (
     if [%build64%]==[no] set "removefstab=yes"
-    ) else (
+) else (
     if [%build64%]==[yes] set "removefstab=yes"
-    )
+)
 
 if [%removefstab%]==[yes] (
     del %instdir%\%msys2%\etc\fstab.
     GOTO writeFstab
-    ) else (
+) else (
     GOTO update
-    )
+)
 
-    :writeFstab
-    echo -------------------------------------------------------------------------------
+:writeFstab
+echo -------------------------------------------------------------------------------
+echo.
+echo.- write fstab mount file
+echo.
+echo -------------------------------------------------------------------------------
+
+set cygdrive=no
+
+if exist %instdir%\%msys2%\etc\fstab. (
+    for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
+)
+if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
+(
     echo.
-    echo.- write fstab mount file
-    echo.
-    echo -------------------------------------------------------------------------------
-
-    set cygdrive=no
-
-    if exist %instdir%\%msys2%\etc\fstab. (
-        for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
-        )
-    if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
-    (
-        echo.
-        echo.%instdir%\ /trunk
-        echo.%instdir%\build\ /build
-        echo.%instdir%\%msys2%\mingw32\ /mingw32
-        echo.%instdir%\%msys2%\mingw64\ /mingw64
-        )>>%instdir%\%msys2%\etc\fstab.
-    if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
-    if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
+    echo.%instdir%\ /trunk
+    echo.%instdir%\build\ /build
+    echo.%instdir%\%msys2%\mingw32\ /mingw32
+    echo.%instdir%\%msys2%\mingw64\ /mingw64
+)>>%instdir%\%msys2%\etc\fstab.
+if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
+if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 :update
-if exist %build%\update.log del %build%\update.log
-%mintty% -t "update autobuild suite" --log 2>&1 %build%\update.log ^
-/usr/bin/bash -l /build/media-suite_update.sh --build32=%build32% --build64=%build64%
+call :runBash update.log "/build/media-suite_update.sh --build32=%build32% --build64=%build64%"
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
@@ -1498,14 +1674,14 @@ if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime"
     del "%build%\update_core"
-    )
+)
 
 if %msys2%==msys32 (
     echo.-------------------------------------------------------------------------------
     echo.second rebase %msys2% system
     echo.-------------------------------------------------------------------------------
     call %instdir%\%msys2%\autorebase.bat
-    )
+)
 
 ::------------------------------------------------------------------
 :: write config profiles:
@@ -1523,31 +1699,44 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
     echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
     echo.   source /local32/etc/profile2.local
     echo.fi
-    )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
+)>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
+
+endlocal
 
 :compileLocals
 cd %instdir%
 
 if [%build64%]==[yes] (
     set MSYSTEM=MINGW64
-    ) else set MSYSTEM=MINGW32
+) else set MSYSTEM=MINGW32
 
 title MABSbat
+if %noMintty%==y cls
 for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 
-if exist %build%\compile.log del %build%\compile.log
-start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
---log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash --login ^
-/build/media-suite_compile.sh --cpuCount=%cpuCount% --build32=%build32% --build64=%build64% --deleteSource=%deleteSource% ^
---mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% ^
---mediainfo=%mediainfo% --sox=%sox% --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% ^
---mplayer=%mplayer% --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% ^
---rtmpdump=%rtmpdump% --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% ^
---faac=%faac% --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% ^
---rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d%'
+if exist %build%\compilation_failed del %build%\compilation_failed
+if exist %build%\fail_comp del %build%\compilation_failed
 
+set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
+--deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
+--other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
+--ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
+--mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
+--logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
+--curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
+--dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
+--noMintty=%noMintty%
+
+if %noMintty%==y (
+    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
+    -Logfile "%build%\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
+) else (
+    if exist %build%\compile.log del %build%\compile.log
+    start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
+    --login /build/media-suite_compile.sh %compileArgs%
+)
 endlocal
-:: if [%forceQuitBatch%]==[y] taskkill /pid %ourPID% /f
 goto :EOF
 
 :createBaseFolders
@@ -1565,7 +1754,7 @@ if not exist %instdir%\%1\share (
     mkdir %instdir%\%1\lib
     mkdir %instdir%\%1\lib\pkgconfig
     mkdir %instdir%\%1\share
-    )
+)
 goto :EOF
 
 :writeProfile
@@ -1610,7 +1799,7 @@ goto :EOF
     echo.LANG=en_US.UTF-8
     echo.PATH="${LOCALDESTDIR}/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${PATH}"
-    echo.PATH="/opt/cargo/bin:${PATH}"
+    echo.PATH="/opt/cargo/bin:/opt/bin:${PATH}"
     echo.source '/etc/profile.d/perlbin.sh'
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
@@ -1619,7 +1808,7 @@ goto :EOF
     echo.stty susp undef
     echo.cd /trunk
     echo.test -f "$LOCALDESTDIR/etc/custom_profile" ^&^& source "$LOCALDESTDIR/etc/custom_profile"
-    )>%instdir%\local%1\etc\profile2.local
+)>%instdir%\local%1\etc\profile2.local
 %instdir%\%msys2%\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
 goto :EOF
 
@@ -1628,14 +1817,30 @@ setlocal enabledelayedexpansion
 for %%i in (%*) do (
     set _opt=%%~i
     if ["!_opt:~0,2!"]==["--"] (
-            echo !_opt!
-        ) else if ["!_opt:~0,3!"]==["#--"] (
-            echo !_opt!
-        ) else if ["!_opt:~0,1!"]==["#"] (
-            echo #--enable-!_opt:~1!
-        ) else (
-            echo --enable-!_opt!
-        )
+        echo !_opt!
+    ) else if ["!_opt:~0,3!"]==["#--"] (
+        echo !_opt!
+    ) else if ["!_opt:~0,1!"]==["#"] (
+        echo #--enable-!_opt:~1!
+    ) else (
+        echo --enable-!_opt!
     )
+)
+endlocal
+goto :EOF
+
+:runBash
 setlocal
+set log=%1
+shift
+set "command1=%1 %2 %3 %4 %5 %6 %7 %8 %9"
+set command=%command1:"=%
+if %noMintty%==y (
+    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
+    -Logfile "%build%\%log%" -BashCommand \"%command%\"
+) else (
+    if exist %build%\%log% del %build%\%log%
+    %mintty% --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+)
+endlocal
 goto :EOF

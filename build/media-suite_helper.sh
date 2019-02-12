@@ -7,12 +7,13 @@ bits="${bits:-64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
     --retry-delay 5 --silent --location --insecure --fail)
 
-if which tput >/dev/null 2>&1; then
+if command -v tput &>/dev/null; then
     ncolors=$(tput colors)
     if test -n "$ncolors" && test "$ncolors" -ge 8; then
         bold=$(tput bold)
         blue=$(tput setaf 12)
         orange=$(tput setaf 11)
+        purple=$(tput setaf 13)
         green=$(tput setaf 2)
         red=$(tput setaf 1)
         reset=$(tput sgr0)
@@ -29,17 +30,30 @@ do_print_status() {
     local status="$3"
     local pad
     pad=$(printf '%0.1s' "."{1..72})
-    local padlen=$((ncols-${#name}-${#status}-3))
-    printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
-        "$padlen" "$pad" "${color}${status}${reset}"
+    if [[ $timeStamp = y ]]; then
+        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%*.*s [%s]\n' -1 "${bold}$name${reset}" 0 \
+        "$((ncols-${#name}-${#status}-12))" "$pad" "${color}${status}${reset}"
+    else
+        printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
+        "$((ncols-${#name}-${#status}-3))" "$pad" "${color}${status}${reset}"
+    fi
 }
 
 do_print_progress() {
     if [[ $logging = y ]]; then
-        [[ ${1} =~ ^[a-zA-Z] ]] && echo "├ $*..." || echo -e "$*..."
+        if [[ $timeStamp = y ]]; then
+            [[ ${1} =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
+            "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
+        else
+            [[ ${1} =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
+        fi
     else
         set_title "$* in $(get_first_subdir)"
-        echo -e "${bold}$* in $(get_first_subdir)${reset}"
+        if [[ $timeStamp = y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
+        else
+            echo -e "${bold}$* in $(get_first_subdir)${reset}"
+        fi
     fi
 }
 
@@ -159,11 +173,11 @@ vcs_getlatesttag() {
     fi
     local tag
     if [[ "$ref" = "LATEST" ]]; then
-        tag="$(git describe --abbrev=0 --tags $(git rev-list --tags --max-count=1))"
+        tag="$(git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)")"
     elif [[ "$ref" = "GREATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags)"
     elif [[ "${ref//\*}" != "$ref" ]]; then
-        tag="$(git describe --abbrev=0 --tags $(git tag -l "$ref" | sort -Vr | head -1))"
+        tag="$(git describe --abbrev=0 --tags "$(git tag -l "$ref" | sort -Vr | head -1)")"
     fi
     echo "${tag:-${ref}}"
 }
@@ -314,7 +328,7 @@ do_wget() {
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
             response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
-            let tries-=1
+            (( tries-=1 ))
 
             if [[ $response_code = "200" || $response_code = "226" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
@@ -345,7 +359,7 @@ do_wget() {
             fi
         fi
     else
-        [[ $quiet ]] || do_print_status "├ ${dirName:-$archive}" "$green" "File up-to-date"
+        [[ $quiet ]] || do_print_status "${bold}├${reset} ${dirName:-$archive}" "$green" "File up-to-date"
     fi
     [[ $norm ]] || add_to_remove "$(pwd)/$archive"
     do_extract "$archive" "$dirName"
@@ -549,7 +563,7 @@ files_exist() {
     [[ $list ]] && verbose= && soft=y
     for opt; do
         if file=$(file_installed $opt); then
-            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green}" "Found"
+            [[ $verbose && $soft ]] && do_print_status "${bold}├${reset} $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
@@ -557,7 +571,7 @@ files_exist() {
                 echo -n "$file" && echo -ne "$term"
             fi
         else
-            [[ $verbose ]] && do_print_status "├ $file" "${red}" "Not found"
+            [[ $verbose ]] && do_print_status "${bold}├${reset} $file" "${red}" "Not found"
             [[ ! $soft ]] && return 1
         fi
     done
@@ -714,6 +728,11 @@ do_getFFmpegConfig() {
         do_addOption --enable-schannel
     fi
 
+    if enabled libndi_newtek; then
+        do_removeOption --enable-libndi_newtek
+        do_addOption --enable-libndi-newtek
+    fi
+
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128} netcdf &&
         do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)|netcdf)" &&
         sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128)|netcdf);;g' \
@@ -776,9 +795,17 @@ do_changeFFmpegConfig() {
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH/bin"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
+    elif [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk; then
+            [[ -z "$CUDA_PATH" ]] &&
+                echo -e "${orange}CUDA_PATH environment variable not set.${reset}"
+            command -v cl.exe &>/dev/null ||
+                echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere.${reset}"
+            echo -e "${orange}Disabling libnpp/cuda-sdk.${reset}"
+            do_removeOption "--enable-(libnpp|cuda-sdk)"
     else
         do_removeOption "--enable-(libnpp|cuda-sdk)"
     fi
@@ -1061,21 +1088,33 @@ compilation_fail() {
     local reason="$1"
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
-    if [[ $logging = y ]]; then
-        echo "Likely error:"
-        tail "ab-suite.${operation}.log"
-        echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
-    fi
     if [[ $_notrequired ]]; then
+        if [[ $logging = y ]]; then
+            echo "Likely error:"
+            tail "ab-suite.${operation}.log"
+            echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
+        fi
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        echo "${red}This is required for other packages, so this script will exit.${reset}"
-        create_diagnostic
-        zip_logs
-        echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
-        do_prompt "Try running the build again at a later time."
-        exit 1
+        if [[ $noMintty = y ]]; then
+            diff <(cat $LOCALBUILDDIR/old.var) <(set -o posix ; set) | grep '^[<>]' | sed -nr 's/> (.*)/\1/p' > "$LOCALBUILDDIR/fail.var"
+            echo "$PWD" > "$LOCALBUILDDIR/compilation_failed"
+            echo -e "$reason\n$operation" >> "$LOCALBUILDDIR/compilation_failed"
+            exit
+        else
+            if [[ $logging = y ]]; then
+                echo "Likely error:"
+                tail "ab-suite.${operation}.log"
+                echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
+            fi
+            echo "${red}This is required for other packages, so this script will exit.${reset}"
+            create_diagnostic
+            zip_logs
+            echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
+            do_prompt "Try running the build again at a later time."
+            exit 1
+        fi
     fi
 }
 
@@ -1086,7 +1125,7 @@ strip_ansi() {
         local name="${txtfile%.*}"
         local ext="${txtfile##*.}"
         [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
-        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g' "$txtfile" > "${newfile}"
+        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g;s/^[0-9]{2}:[0-9]{2}:[0-9]{2}//' "$txtfile" > "${newfile}"
     done
 }
 
@@ -1257,7 +1296,11 @@ do_pacman_install() {
     for pkg; do
         [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
-        echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if [[ $timeStamp = y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        else
+            echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        fi
         if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
             /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
@@ -1279,7 +1322,11 @@ do_pacman_remove() {
         [[ -f /etc/pac-mingw-extra.pk ]] &&
             sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
         /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
-        echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if [[ $timeStamp = y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        else
+            echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        fi
         do_hide_pacman_sharedlibs "$pkg" revert
         if pacman -Rs --noconfirm "$pkg" >/dev/null 2>&1; then
             echo "done"
@@ -1375,9 +1422,9 @@ get_vs_prefix() {
         # check in 32-bit registry for installed VS
         [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
             vsprefix="$(cygpath -u "$winvsprefix/core${bits%bit}")"
-    elif [[ -n $(which vspipe.exe 2>/dev/null) ]]; then
+    elif [[ -n $(command -v vspipe.exe 2>/dev/null) ]]; then
         # last resort, check if vspipe is in path
-        vsprefix="$(dirname "$(which vspipe.exe)")"
+        vsprefix="$(dirname "$(command -v vspipe.exe)")"
     fi
     if [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
         local bitness="$(file "$vsprefix/vapoursynth.dll")"
@@ -1390,37 +1437,38 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    which cl.exe &>/dev/null && return 0
+    command -v cl.exe &>/dev/null && return 0
 
-    local vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
-    if [[ -f "$vswhere" ]]; then
-        local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
-        [[ -z "$installationpath" ]] && return 1
-        # apparently this is MS's official way of knowing the default version ???
-        local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
-        local _hostbits=HostX64
-        [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
-        local _arch=x64
-        [[ $bits = 32bit ]] && _arch=x86
-
-        local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
-        if [[ -f "$basepath/cl.exe" ]]; then
-            export PATH="$basepath:$PATH"
-        else
-            return 1
-        fi
+    local _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
+    local _suite_vswhere="/opt/bin/vswhere.exe"
+    if [[ -f "$_sys_vswhere" ]]; then
+        vswhere=$_sys_vswhere
+    elif [[ -f "$_suite_vswhere" ]]; then
+        vswhere=$_suite_vswhere
     else
-        local clpath
-        local regpath="/HKLM/Software/Microsoft/VisualStudio/VC/19.0"
-        if [[ $bits = 32bit ]]; then
-            clpath="$(regtool -qW get "$regpath/x86/x86/Compiler")"
-        elif [[ $bits = 64bit ]]; then
-            clpath="$(regtool -qW get "$regpath/x64/x64/Compiler")"
-        fi
-        [[ -z "$clpath" ]] && return 1
-        clpath="$(dirname "$(cygpath -u "$clpath")")"
-        [[ ! -f "$clpath"/cl.exe ]] && return 1
-        export PATH="$clpath:$PATH"
+        pushd "$LOCALBUILDDIR" 2>/dev/null
+        local _ver=2.5.2
+        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/download/$_ver/vswhere.exe"
+        [[ -f vswhere.exe ]] || return 1
+        do_install vswhere.exe /opt/bin/
+        vswhere=$_suite_vswhere
+        popd 2>/dev/null
+    fi
+
+    local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
+    [[ -z "$installationpath" ]] && return 1
+    # apparently this is MS's official way of knowing the default version ???
+    local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
+    local _hostbits=HostX64
+    [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
+    local _arch=x64
+    [[ $bits = 32bit ]] && _arch=x86
+
+    local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
+    if [[ -f "$basepath/cl.exe" ]]; then
+        export PATH="$basepath:$PATH"
+    else
+        return 1
     fi
 }
 
@@ -1514,7 +1562,11 @@ add_to_remove() {
 }
 
 clean_suite() {
-    echo -e "\n\t${orange}Deleting status files...${reset}"
+    if [[ $timeStamp = y ]]; then
+        printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Deleting status files...${reset}"
+    else
+        echo -e "\n\t${orange}Deleting status files...${reset}"
+    fi
     cd_safe "$LOCALBUILDDIR" >/dev/null
     find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -r0 rm -f
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -print0 |
@@ -1683,7 +1735,48 @@ compare_with_zeranoe() {
 }
 
 do_rust() {
+    log update "$RUSTUP_HOME/bin/cargo.exe" update
     log build "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@"
+}
+
+fix_libtiff_pc() {
+    if ! pc_exists libtiff-4; then return; fi
+
+    local _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 \
+        | sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
+
+    if [[ ! -f "$_pkgconfLoc" ]]; then return; fi
+
+    grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
+}
+
+fix_cmake_crap_exports() {
+    local _dir="$1"
+    # noop if passed directory is not valid
+    test -d "$_dir" || return 1
+
+    local _mixeddestdir _oldDestDir _cmakefile
+    declare -a _cmakefiles
+
+    _mixeddestdir="$(cygpath -m "$LOCALDESTDIR")"
+    < <(grep -Plr '\w:/[\w/]*local(?:32|64)' "$_dir"/*.cmake) \
+        mapfile -t _cmakefiles
+
+    # noop if array is empty
+    test ${#_cmakefiles[@]} -lt 1 && return
+
+    for _cmakefile in "${_cmakefiles[@]}"; do
+        # find at least one
+        _oldDestDir="$(grep -oP -m1 '\w:/[\w/]*local(?:32|64)' "$_cmakefile")"
+
+        # noop if there's no expected install prefix found
+        [[ -z "$_oldDestDir" ]] && continue
+        # noop if old and current install prefix are equal
+        [[ "$_mixeddestdir" = "$_oldDestDir" ]] && continue
+
+        # use perl for the matching and replacing, a bit simpler than with sed
+        perl -i -p -e 's;([A-Z]:/.*?)local(?:32|64);'"$_mixeddestdir"'\2;' "$_cmakefile"
+    done
 }

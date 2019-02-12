@@ -63,9 +63,8 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-/usr/bin/grep -q AE4FF531 <(pacman-key -l) || pacman-key --recv-keys AE4FF531
-/usr/bin/grep -q 'full.*wiiaboo@gmail.com' <(pacman-key -l) ||
-    pacman-key --lsign AE4FF531
+/usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531 >/dev/null
+/usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531 >/dev/null
 
 #always kill gpg-agent
 ps|grep gpg-agent|awk '{print $1}'|xargs kill -9
@@ -89,8 +88,8 @@ echo "Updating pacman database..."
 echo "-------------------------------------------------------------------------------"
 echo
 
-pacman -Sy
-pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - > /dev/null
+pacman -Sy --ask=20 --noconfirm
+pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex > /dev/null
 do_unhide_all_sharedlibs
 if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo
@@ -162,11 +161,16 @@ else
     cd_safe "$(cygpath -w /).."
 fi
 
+if which rustup &> /dev/null; then
+    echo "Updating rust..."
+    rustup update
+fi
+
 # --------------------------------------------------
 # packet msys2 system
 # --------------------------------------------------
 
-have_updates="$(pacman -Quq)"
+have_updates="$(pacman -Qu|grep -v ignored]$|awk '{print $1}')"
 if [[ -n "$have_updates" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
@@ -176,7 +180,6 @@ if [[ -n "$have_updates" ]]; then
         have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
     echo $have_updates | xargs $nargs pacman -S --noconfirm --ask 20 \
         --overwrite "/mingw64/*" --overwrite "/mingw32/*" --overwrite "/usr/*"
-    sed -i "s;^IgnorePkg.*;#&;" /etc/pacman.conf
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
@@ -187,10 +190,6 @@ pacman -Syyuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
     --overwrite "/mingw32/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
-
-if [[ -x "$RUSTUP_HOME/bin/rustup.exe" ]]; then
-    "$RUSTUP_HOME/bin/rustup.exe" update
-fi
 
 echo "-------------------------------------------------------------------------------"
 echo "Updates finished."
