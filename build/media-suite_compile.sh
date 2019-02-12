@@ -2123,7 +2123,11 @@ if [[ $redshift = y ]] && do_vcs https://github.com/jonls/redshift.git; then
     do_checkIfExist
 fi
 
-echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"
+if [[ $timeStamp = y ]]; then
+    printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Finished $bits compilation of all tools${reset}"
+else
+    echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"
+fi
 }
 
 run_builds() {
@@ -2159,7 +2163,10 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 clean_suite
-
-echo -e "\n\t${green}Compilation successful.${reset}"
-echo -e "\t${green}This window will close automatically in 5 seconds.${reset}"
+if [[ $timeStamp = y ]]; then
+    printf "\n${purple}%(%H:%M:%S)T${reset} %s\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 \
+    "${green}Compilation successful.${reset}" -1 "${green}This window will close automatically in 5 seconds.${reset}"
+else
+    echo -e "\n\t${green}Compilation successful.\n\tThis window will close automatically in 5 seconds.${reset}"
+fi
 sleep 5
