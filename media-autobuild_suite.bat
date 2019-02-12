@@ -1138,8 +1138,13 @@ if %noMinttyINI%==0 (
     echo.
     echo. Are you running this script through ssh or similar?
     echo. ^(Can't open another window outside of this terminal^)
-    echo. 1 = Yes
-    echo. 2 = No
+    if "%SSH_TTY%"!="" (
+        echo. 1 = Yes [recommended]
+        echo. 2 = No
+    ) else (
+        echo. 1 = Yes
+        echo. 2 = No [recommended]
+    )
     echo.
     echo This will disable the use of mintty and print the output to this console.
     echo There is no guarantee that this will work properly.
