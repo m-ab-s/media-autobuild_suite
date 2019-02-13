@@ -177,7 +177,7 @@ For information about the compiler environment see the wiki, there you also have
 
 - Windows 32/64-bits (tested with Win10 64-bits; 32-bits is not tested at all by anyone, avoid)
 - NTFS drive
-- 8GB+ disk space for a full 32 and 64-bit build
+- 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
 - 4GB+ RAM
 
 --------
@@ -216,7 +216,7 @@ For all you need ~7 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean.
 Building everything from scratch takes about ~3 hours depending on what is enabled.
 
-Check [doc/forcing-recompilations.md](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
+Check [forcing-recompilations](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
 
 To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
 
