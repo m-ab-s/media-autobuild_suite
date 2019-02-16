@@ -211,7 +211,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
-        do_vcs "https://anongit.freedesktop.org/git/fontconfig#tag=2.12.6"; then
+        do_vcs "https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=2.12.6"; then
         do_pacman_install python2-lxml python2-six
         do_uninstall include/fontconfig "${_check[@]}"
         [[ $standalone = y ]] || sed -ri Makefile.am \
