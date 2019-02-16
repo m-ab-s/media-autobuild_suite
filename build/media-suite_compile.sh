@@ -1144,6 +1144,7 @@ if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     if do_vcs https://github.com/dyne/frei0r.git; then
         sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
         do_uninstall lib/frei0r-1 "${_check[@]}"
+        do_pacman_install gavl
         do_cmakeinstall
         do_checkIfExist
     fi
