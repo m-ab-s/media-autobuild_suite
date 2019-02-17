@@ -795,7 +795,8 @@ do_changeFFmpegConfig() {
                 echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
             fi
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH/bin"
+			local fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
+			command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
