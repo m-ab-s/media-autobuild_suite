@@ -574,12 +574,12 @@ fi
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
-    do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
-        "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"; then
-    ./bootstrap 2>/dev/null
+    do_wget_sf -h 2b58d621fad8fda879f07b7cad8bfe10 \
+        "faac/faac-src/faac-1.29/faac-1.29.9.2.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
-    do_separate_conf --without-mp4v2
+    do_separate_conf
+    cp -r ../frontend/* ./frontend
     do_make
     do_install frontend/faac.exe bin-audio/
     do_checkIfExist
