@@ -1448,7 +1448,7 @@ get_cl_path() {
         vswhere=$_suite_vswhere
     else
         pushd "$LOCALBUILDDIR" 2>/dev/null
-        local _ver=2.5.2
+        local _ver=2.6.7
         do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/download/$_ver/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
