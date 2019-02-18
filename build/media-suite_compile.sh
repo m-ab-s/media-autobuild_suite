@@ -722,12 +722,10 @@ if [[ $ffmpeg != "no" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
     do_checkIfExist
 fi
 
-_check=(libsndfile.{l,}a sndfile.{h,pc})
+_check=(libsndfile.a sndfile.{h,pc})
 if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
-    sed -i 's/ examples tests//g' Makefile.am
-    do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
-    do_separate_confmakeinstall --disable-full-suite
+    do_cmakeinstall -DBUILD_EXAMPLES=off -DBUILD_TESTING=off -DBUILD_PROGRAMS=OFF
     do_checkIfExist
 fi
 
