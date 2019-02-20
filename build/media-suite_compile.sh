@@ -290,8 +290,8 @@ _check=(libgnutls.{,l}a gnutls.pc)
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
     ! files_exist "${_check[@]}" &&
     do_wget -h bb9acab8af2ac430edf45faaaa4ed2c51f86e57cb57689be6701aceef4732ca7 \
-	"https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.6.tar.xz"; then
-	    do_pacman_install nettle
+    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.6.tar.xz"; then
+        do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
 		do_separate_confmakeinstall \
