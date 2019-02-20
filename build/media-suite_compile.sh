@@ -286,23 +286,22 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
-if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; then
-    _check=(libgnutls.{,l}a gnutls.pc)
-    #if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
-    if do_vcs "https://gitlab.com/gnutls/gnutls.git#branch=tmp-update-ax-code-coverage"; then
-        do_pacman_install nettle
+_check=(libgnutls.{,l}a gnutls.pc)
+if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
+    ! files_exist "${_check[@]}" &&
+    do_wget -h bb9acab8af2ac430edf45faaaa4ed2c51f86e57cb57689be6701aceef4732ca7 \
+	"https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.6.tar.xz"; then
+	    do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
-        log bootstrap ./bootstrap --skip-po
-        do_separate_confmakeinstall \
+		do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
-    fi
-    grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
-        sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
+        grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
+            sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
