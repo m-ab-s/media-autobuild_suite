@@ -336,19 +336,22 @@ if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
 fi
 hide_libressl -R
 if { [[ $ffmpeg != "no" ]] && enabled libtls; } || [[ $curl = libressl ]]; then
-    _check=(tls.h lib{crypto,ssl,tls}.{pc,{,l}a} openssl.pc)
+    _check=(tls.h lib{crypto,ssl,tls}.{pc,a} openssl.pc)
     [[ $standalone = y ]] && _check+=("bin-global/openssl.exe")
     if do_vcs "https://github.com/libressl-portable/portable.git#tag=LATEST" libressl; then
         do_uninstall etc/ssl include/openssl "${_check[@]}"
-        _sed="man"
-        [[ $standalone = y ]] || _sed="apps tests $_sed"
-        sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.am
+        extracommands=()
+        if [[ $standalone = n ]]; then
+            extracommands=(-DLIBRESSL_APPS=off)
+        fi
         do_autogen
-        do_separate_confmakeinstall global
+        do_basecmake -DMINGW=on -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
+            "${extracommands[@]}"
+        do_ninja
         do_checkIfExist
-        unset _sed
     fi
 fi
+
 
 { enabled mbedtls || [[ $curl = mbedtls ]]; } && do_pacman_install mbedtls
 
