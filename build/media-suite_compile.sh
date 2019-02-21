@@ -542,12 +542,11 @@ if [[ $ffmpeg != "no" || $sox = y ]]; then
     enabled libmp3lame && do_pacman_install lame
 fi
 
-_check=(ilbc.h libilbc.{{l,}a,pc})
+_check=(ilbc.h libilbc.{a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev" &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
-    do_autoreconf
     do_uninstall "${_check[@]}"
-    do_separate_confmakeinstall
+    do_cmakeinstall
     do_checkIfExist
     add_to_remove
 fi
