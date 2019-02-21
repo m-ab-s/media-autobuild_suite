@@ -936,7 +936,7 @@ if { [[ $other265 = "y" ]] || { [[ $ffmpeg != "no" ]] && enabled libkvazaar; }; 
     do_checkIfExist
 fi
 
-_check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
+_check=(libSDL2{.dll,-static,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != "no" ]] &&
     { enabled sdl2 || ! disabled_any sdl2 autodetect; }; } ||
     mpv_enabled sdl2; } &&
@@ -944,8 +944,9 @@ if { { [[ $ffmpeg != "no" ]] &&
     do_wget -h 255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1 \
         "http://libsdl.org/release/SDL2-2.0.9.tar.gz"; then
     do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
-    sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
-    do_separate_confmakeinstall
+    do_patch -p "https://pastebin.com/raw/8w91n1hw"
+    do_basecmake -DBUILD_SHARED_LIBS=off
+    do_ninja
     do_checkIfExist
 fi
 
