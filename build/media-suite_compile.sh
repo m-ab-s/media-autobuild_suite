@@ -1185,9 +1185,11 @@ fi
 _check=(libmfx.{{l,}a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libmfx &&
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx; then
-    do_autoreconf
     do_uninstall include/mfx "${_check[@]}"
-    do_separate_confmakeinstall
+    do_patch -p "https://pastebin.com/raw/mg10p3gf"
+    do_basecmake -DBUILD_SHARED_LIBS=off
+    do_ninja
+    cp libmfx.a "$LOCALDESTDIR/lib/libmfx.dll.a"
     do_checkIfExist
 fi
 
