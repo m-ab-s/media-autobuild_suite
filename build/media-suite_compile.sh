@@ -1160,10 +1160,8 @@ if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     _check=(libdl.a dlfcn.h)
     if do_vcs "https://github.com/dlfcn-win32/dlfcn-win32.git"; then
         do_uninstall "${_check[@]}"
-        [[ -f config.mak ]] && log clean make distclean
         sed -i 's|__declspec(dllexport)||g' dlfcn.h
-        do_configure --prefix="$LOCALDESTDIR" --disable-shared
-        do_make && do_makeinstall
+        do_cmakeinstall
         do_checkIfExist
     fi
 
