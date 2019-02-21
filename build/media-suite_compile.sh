@@ -422,8 +422,8 @@ if enabled_any libwebp libtesseract &&
     do_checkIfExist
 fi
 
-_check=(libwebp{,mux}.{{,l}a,pc})
-[[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
+_check=(libwebp{,mux}.{a,pc})
+[[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{a,pc}
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
@@ -434,10 +434,11 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
         extracommands=()
         sed -i -e '/examples/d' -e 's/ man//' Makefile.am
     fi
-    do_autoreconf
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
-    do_separate_confmakeinstall global --enable-{swap-16bit-csp,libwebpmux} \
+    do_basecmake -DBUILD_SHARED_LIBS=off -DWEBP_ENABLE_SWAP_16BIT_CSP=on \
+        -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR/bin-global" \
         "${extracommands[@]}"
+    do_ninja
     do_checkIfExist
 fi
 
