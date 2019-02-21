@@ -1075,14 +1075,19 @@ do_custom_patches() {
     done
 }
 
-do_cmake() {
+do_ninja() {
+    log build ninja "$@"
+    cpuCount=1 log install ninja install
+}
+
+do_basecmake() {
     local root=".."
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre cmake
-    log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
-        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
+    log "cmake" cmake "$root" -G"Ninja" \
+        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
         -DCMAKE_BUILD_TYPE=Release "$@"
     extra_script post cmake
 }
@@ -1097,6 +1102,10 @@ do_ninjainstall(){
     extra_script pre install
     cpuCount=1 log "install" ninja install "$@"
     extra_script post install
+}
+
+do_cmake() {
+    do_basecmake "$@" -DBUILD_SHARED_LIBS=off -DUNIX=on
 }
 
 do_cmakeinstall() {
