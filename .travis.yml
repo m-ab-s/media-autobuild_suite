@@ -1,0 +1,35 @@
+---
+before_cache:
+  - "powershell -NoProfile -NoLogo -command Start-Process -FilePath \\$env:TRAVIS_BUILD_DIR/msys64/usr/bin/bash.exe -NoNewWindow -Wait -ArgumentList \"-lc 'paccache -rk 1'\".Split(' ')"
+  - "powershell -NoProfile -NoLogo -command Get-Process -Name gpg-agent \\| Stop-Process"
+before_install: "curl http://repo.msys2.org/distrib/msys2-x86_64-latest.tar.xz -o $TRAVIS_BUILD_DIR/build/msys2-base.tar.xz && curl -o $TRAVIS_BUILD_DIR/build/media-autobuild_suite.ini $mini"
+cache:
+  directories:
+    - msys64/var/cache
+install: "cd build && 7z x ./msys2-base.tar.xz && 7z x -aoa ./msys2-base.tar -o$TRAVIS_BUILD_DIR && rm ./msys2-base.tar.xz ./msys2-base.tar && cd .."
+language: bash
+matrix:
+  allow_failures:
+    -
+      name: Win32
+    -
+      name: Win64
+  fast_finish: true
+  include:
+    -
+      Msys2: ~
+      env: "mini=https://pastebin.com/raw/z7xRReJt travisstage=0"
+      name: "msys2 system build"
+      stage: "prepare cache"
+    -
+      Win64: ~
+      env: "mini=https://pastebin.com/raw/jwMuMeek travisstage=1"
+      name: Win64
+      stage: tests
+    -
+      Win32: ~
+      env: "mini=https://pastebin.com/raw/2XgJq7Ni travisstage=1"
+      name: Win32
+      stage: tests
+os: windows
+script: $TRAVIS_BUILD_DIR/media-autobuild_suite.bat
