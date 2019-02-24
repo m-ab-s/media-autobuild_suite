@@ -1015,6 +1015,8 @@ do_removeOptions() {
 }
 
 do_patch() {
+    local binarypatch="--binary"
+    case $1 in -p) binarypatch="" && shift;; esac
     local patch=${1%% *}
     local am=$2          # "am" to apply patch with "git am"
     local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
@@ -1032,8 +1034,8 @@ do_patch() {
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run --binary -s -N -p"$strip" -i "$patchfn" >/dev/null 2>&1; then
-                patch --binary -s -N -p"$strip" -i "$patchfn"
+            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchfn" >/dev/null 2>&1; then
+                patch $binarypatch -s -N -p"$strip" -i "$patchfn"
             else
                 echo -e "${orange}${patchfn}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
