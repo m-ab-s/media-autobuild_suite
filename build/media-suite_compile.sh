@@ -206,20 +206,11 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_checkIfExist
     fi
 
-    _deps=(libfreetype.a)
-    _check=(libfontconfig.{,l}a fontconfig.pc)
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
-    if enabled_any {lib,}fontconfig &&
-        do_vcs "https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=2.12.6"; then
-        do_pacman_install python2-lxml python2-six
-        do_uninstall include/fontconfig "${_check[@]}"
-        [[ $standalone = y ]] || sed -ri Makefile.am \
-            -e '/^SUBDIRS=/,+2{s/(fontconfig( [a-z-]+){2}).*/\1 src/;/^\s+fc-[^b]/d}' \
-            -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
-        do_autogen --noconf
-        PYTHON="$MINGW_PREFIX/bin/python2" do_separate_confmakeinstall global --disable-docs
-        do_checkIfExist
+    if enabled_any {lib,}fontconfig; then
+        do_pacman_install fontconfig
+        sed -i 's/-liconv/-lintl -liconv/g' "$MINGW_PREFIX"/lib/pkgconfig/fontconfig.pc
     fi
 
     _deps=(libfreetype.a)
