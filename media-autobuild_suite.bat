@@ -1483,7 +1483,7 @@ for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
 )
 
 :sethgBat
-if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw
+if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
 (
     echo.@echo off
     echo.
@@ -1498,6 +1498,7 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
 )>>%instdir%\%msys2%\usr\bin\hg.bat
 
+:installmingw
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 if %build32%==yes call :getmingw 32 i
