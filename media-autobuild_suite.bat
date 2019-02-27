@@ -1809,7 +1809,7 @@ if not exist %instdir%\%msys2%\mingw%1\bin\gcc.exe (
     set /P try="try again [y/n]: "
 
     if [%try%]==[y] (
-        GOTO getmingw
+        GOTO getmingw %1 %2
     ) else exit
 )
 endlocal
