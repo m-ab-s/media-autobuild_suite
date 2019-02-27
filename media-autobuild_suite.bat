@@ -1807,7 +1807,7 @@ if not exist %instdir%\%msys2%\mingw%1\bin\gcc.exe (
     echo -------------------------------------------------------------------------------
     set /P try="try again [y/n]: "
 
-    if [%try%]==[y]
+    if [%try%]==[y] (
         GOTO getmingw
     ) else exit
 )
