@@ -191,7 +191,7 @@ fi
 
 if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
-    do_pacman_remove freetype fontconfig harfbuzz fribidi
+    do_pacman_remove freetype harfbuzz fribidi
 
     _check=(libfreetype.{l,}a freetype2.pc)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
