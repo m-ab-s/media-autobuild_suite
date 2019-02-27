@@ -1483,7 +1483,7 @@ for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
 )
 
 :sethgBat
-if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
+if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw
 (
     echo.@echo off
     echo.
