@@ -1771,7 +1771,6 @@ if [[ $mplayer = "y" ]] &&
     fi
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
-    do_patch https://www.ligh.de/tmp/fixpollfd.diff
 
     _notrequired="true"
     do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
