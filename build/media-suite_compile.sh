@@ -211,7 +211,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig; then
-        pacman -Sdd --needed --noconfirm mingw-w64-x86_64-fontconfig >/dev/null 2>&1
+        pacman -Sdd --needed --noconfirm mingw-w64-$CARCH-fontconfig >/dev/null 2>&1
         sed -i 's/-liconv/-lintl -liconv/g' "$MINGW_PREFIX"/lib/pkgconfig/fontconfig.pc
     fi
 
