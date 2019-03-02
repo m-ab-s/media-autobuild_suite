@@ -605,7 +605,7 @@ if %ffmpegChoiceINI%==0 (
     echo. 3 = No ^(Mimic Zeranoe^)
     echo. 4 = No ^(All available external libs^)
     echo.
-    echo. Avoid the last two unless you're really want useless libraries you'll never use.
+    echo. Avoid the last two unless you really want useless libraries you'll never use.
     echo. Just because you can include a shitty codec no one uses doesn't mean you should.
     echo.
     echo. If you select yes, we will create files with the default options
@@ -1483,7 +1483,7 @@ for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
 )
 
 :sethgBat
-if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
+if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
 (
     echo.@echo off
     echo.
@@ -1498,74 +1498,12 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO getmingw32
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
 )>>%instdir%\%msys2%\usr\bin\hg.bat
 
-:getmingw32
+:installmingw
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
-
-if %build32%==yes (
-    if exist %instdir%\%msys2%\mingw32\bin\gcc.exe GOTO getmingw64
-    echo.-------------------------------------------------------------------------------
-    echo.install 32 bit compiler
-    echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;install 32 bit compiler\007"
-        echo.mingw32compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-i686-&;g' | tr '\n\r' '  ')"
-        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-        echo.echo $mingw32compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
-        echo.echo $mingw32compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
-        echo.sleep ^3
-        echo.exit
-    )>%build%\mingw32.sh
-    call :runBash mingw32.log "%build%\mingw32.sh"
-    del %build%\mingw32.sh
-
-    if not exist %instdir%\%msys2%\mingw32\bin\gcc.exe (
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.MinGW32 GCC compiler isn't installed; maybe the download didn't work
-        echo.Do you want to try it again?
-        echo.
-        echo -------------------------------------------------------------------------------
-        set /P try32="try again [y/n]: "
-
-        if [%try32%]==[y] (
-            GOTO getmingw32
-        ) else exit
-    )
-)
-
-:getmingw64
-if %build64%==yes (
-    if exist %instdir%\%msys2%\mingw64\bin\gcc.exe GOTO updatebase
-    echo.-------------------------------------------------------------------------------
-    echo.install 64 bit compiler
-    echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;install 64 bit compiler\007"
-        echo.mingw64compiler="$(cat /etc/pac-mingw.pk | sed 's;.*;mingw-w64-x86_64-&;g' | tr '\n\r' '  ')"
-        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-        echo.echo $mingw64compiler ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
-        echo.echo $mingw64compiler ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
-        echo.sleep ^3
-        echo.exit
-    )>%build%\mingw64.sh
-    call :runBash mingw64.log "%build%\mingw64.sh"
-    del %build%\mingw64.sh
-
-    if not exist %instdir%\%msys2%\mingw64\bin\gcc.exe (
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo.MinGW64 GCC compiler isn't installed; maybe the download didn't work
-        echo.Do you want to try it again?
-        echo.
-        echo -------------------------------------------------------------------------------
-        set /P try64="try again [y/n]: "
-
-        if [%try64%]==[y] (
-            GOTO getmingw64
-        ) else exit
-    )
-)
+if %build32%==yes call :getmingw 32 i
+if %build64%==yes call :getmingw 64 x
+del %build%\mingw.sh
 
 :updatebase
 echo.-------------------------------------------------------------------------------
@@ -1841,6 +1779,38 @@ if %noMintty%==y (
 ) else (
     if exist %build%\%log% del %build%\%log%
     %mintty% --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+)
+endlocal
+goto :EOF
+
+:getmingw
+setlocal
+if exist %instdir%\%msys2%\mingw%1\bin\gcc.exe GOTO :EOF
+echo.-------------------------------------------------------------------------------
+echo.install %1 bit compiler
+echo.-------------------------------------------------------------------------------
+(
+    echo.echo -ne "\033]0;install %1 bit compiler\007"
+    echo.mingwcompiler="$(cat /etc/pac-mingw.pk | sed 's;.*;&:%2;g' | tr '\n\r' '  ')"
+    echo.echo $mingwcompiler ^| xargs $nargs pacboy -Sw --noconfirm --ask=20 --needed
+    echo.echo $mingwcompiler ^| xargs $nargs pacboy -S --noconfirm --ask=20 --needed
+    echo.sleep ^3
+    echo.exit
+)>%build%\mingw.sh
+call :runBash mingw%1.log "%build%\mingw.sh"
+
+if not exist %instdir%\%msys2%\mingw%1\bin\gcc.exe (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.MinGW%1 GCC compiler isn't installed; maybe the download didn't work
+    echo.Do you want to try it again?
+    echo.
+    echo -------------------------------------------------------------------------------
+    set /P try="try again [y/n]: "
+
+    if [%try%]==[y] (
+        GOTO getmingw %1 %2
+    ) else exit
 )
 endlocal
 goto :EOF
