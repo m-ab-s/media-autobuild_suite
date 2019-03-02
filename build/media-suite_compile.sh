@@ -211,14 +211,27 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
-        do_vcs "https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=2.12.6"; then
-        do_pacman_install python2-lxml python2-six
+        do_vcs "https://anongit.freedesktop.org/git/fontconfig.git#tag=2.13.1"; then
         do_uninstall include/fontconfig "${_check[@]}"
-        [[ $standalone = y ]] || sed -ri Makefile.am \
-            -e '/^SUBDIRS=/,+2{s/(fontconfig( [a-z-]+){2}).*/\1 src/;/^\s+fc-[^b]/d}' \
-            -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
+        sed -i 's| test$||' Makefile.am
+        sed -i 's|Libs.private:|& -lintl|' fontconfig.pc.in
+        _ss=(printf fprintf snprintf vfprintf)
+        for _s in "${_ss[@]}"; do
+            grep -Rl "$_s" --include="*.[c]" | xargs sed -i "/__mingw_/! s/\b$_s/__mingw_&/g"
+        done
+        unset _s _ss
         do_autogen --noconf
-        PYTHON="$MINGW_PREFIX/bin/python2" do_separate_confmakeinstall global --disable-docs
+        extracommands=(--disable-docs --enable-iconv --with-libiconv-prefix=$MINGW_PREFIX \
+            --with-libiconv-lib=$MINGW_PREFIX/lib --with-libiconv-includes=$MINGW_PREFIX/include \
+            LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib")
+        if enabled libxml2; then
+            do_pacman_install libxml2
+            sed -i 's|Cflags:|& -DLIBXML_STATIC|' fontconfig.pc.in
+			extracommands+=(--enable-libxml2)
+        fi
+        CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)"
+        do_separate_confmakeinstall global "${extracommands[@]}"
+        [[ $standalone = y ]] || rm -f $LOCALDESTDIR/bin-global/fc-*.exe
         do_checkIfExist
     fi
 
