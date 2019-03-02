@@ -227,7 +227,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         if enabled libxml2; then
             do_pacman_install libxml2
             sed -i 's|Cflags:|& -DLIBXML_STATIC|' fontconfig.pc.in
-			extracommands+=(--enable-libxml2)
+            extracommands+=(--enable-libxml2)
         fi
         CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)"
         do_separate_confmakeinstall global "${extracommands[@]}"
