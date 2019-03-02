@@ -211,7 +211,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
-        do_vcs "https://anongit.freedesktop.org/git/fontconfig.git#tag=2.13.1"; then
+        do_vcs "https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=2.13.1"; then
         do_uninstall include/fontconfig "${_check[@]}"
         sed -i 's| test$||' Makefile.am
         sed -i 's|Libs.private:|& -lintl|' fontconfig.pc.in
