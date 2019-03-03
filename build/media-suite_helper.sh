@@ -1778,8 +1778,8 @@ fix_cmake_crap_exports() {
 verify_cuda_deps() {
     enabled_any libnpp cuda-nvcc || return 1
     if [[ $bits = 32bit ]]; then
-        echo -e "${orange}cuda-nvcc and libnpp are only supported in 64-bit.${reset}"
-        return 1
+        echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
+        do_removeOption --enable-libnpp
     fi
     if [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
         echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
