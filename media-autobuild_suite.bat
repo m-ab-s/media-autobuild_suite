@@ -87,12 +87,12 @@ set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
 libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
-libaom version3
+libaom libopenmpt version3
 
 :: options also available with the suite
-set ffmpeg_options_full=chromaprint cuda-sdk decklink frei0r libbs2b libcaca ^
+set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
-libmodplug libnpp libopenh264 libopenmpt librtmp librubberband libssh ^
+libmodplug libnpp libopenh264 librtmp librubberband libssh ^
 libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
 libsrt ladspa #vapoursynth #liblensfun libndi_newtek
 
