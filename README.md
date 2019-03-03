@@ -21,7 +21,7 @@ For information about the compiler environment see the wiki, there you also have
         - amd amf encoders (built-in)
         - cuda (built-in)
         - cuvid (built-in)
-        - ffnvcodec (built-in)
+        - ffnvcodec (git)
         - libdav1d (git)
         - libmp3lame (mingw)
         - libopus (mingw)
@@ -76,6 +76,8 @@ For information about the compiler environment see the wiki, there you also have
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
+        - cuda filters (needs CUDA SDK installed)
+            - needs non-free license
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
@@ -95,6 +97,8 @@ For information about the compiler environment see the wiki, there you also have
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
+        - libndi_newtek (needs Newtek SDK installed)
+            - needs non-free license and --enable-libndi_newtek
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (official binaries)
@@ -110,8 +114,6 @@ For information about the compiler environment see the wiki, there you also have
         - libzvbi (0.2.35)
         - opencl (from system)
         - opengl (from system)
-        - libndi_newtek (needs Newtek SDK installed)
-            - needs non-free license and --enable-libndi_newtek
 
 - other tools
     - aom (git)
@@ -274,16 +276,15 @@ If there's some error during compilation follow these steps:
 
 --------
 
-### This is for CUDA and libnpp, not for NVENC, it is built with ffmpeg by default
-#### scale_cuda had switched from using the full cuda sdk to using the ffnvcodec headers and loader.
+### This is for cuda-nvcc and libnpp, not for NVENC, it is built with ffmpeg by default
 
-For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need either NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
 
 ### You do not need to do the following if you installed the SDK with the default locations etc
 
-### Nothing should be disabled manually when using CUDA as disabling random things can cause the compilation to fail
+### Nothing should be disabled manually when installing CUDA SDK as disabling random things can cause the compilation to fail
 
-For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
+For example, if you need to manually set the CUDA_PATH and include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
 
 ```bash
 # adapt these to your environment

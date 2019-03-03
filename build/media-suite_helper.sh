@@ -786,29 +786,20 @@ do_changeFFmpegConfig() {
     fi
 
     # cuda-only workarounds
-    if [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk &&
-        [[ -n "$CUDA_PATH" && -f "$CUDA_PATH/include/cuda.h" ]] &&
-        [[ -f "$CUDA_PATH/lib/x64/cuda.lib" ]] && get_cl_path; then
-            if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
-                do_removeOption "--enable-libnpp"
-            elif enabled libnpp; then
-                echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK!${reset}"
-            fi
+    if [[ $license = "nonfree" ]] && verify_cuda_deps; then
+        if enabled libnpp; then
+            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
             local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-			local fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
-			command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
+        fi
+        if enabled cuda-nvcc; then
+            local fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
+            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
-    elif [[ $license = "nonfree" && $bits = 64bit ]] && enabled_any libnpp cuda-sdk; then
-            [[ -z "$CUDA_PATH" ]] &&
-                echo -e "${orange}CUDA_PATH environment variable not set.${reset}"
-            command -v cl.exe &>/dev/null ||
-                echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere.${reset}"
-            echo -e "${orange}Disabling libnpp/cuda-sdk.${reset}"
-            do_removeOption "--enable-(libnpp|cuda-sdk)"
+        fi
     else
-        do_removeOption "--enable-(libnpp|cuda-sdk)"
+        do_removeOption "--enable-(libnpp|cuda-nvcc)"
     fi
 
     # handle gpl-incompatible libs
@@ -1782,4 +1773,30 @@ fix_cmake_crap_exports() {
         # use perl for the matching and replacing, a bit simpler than with sed
         perl -i -p -e 's;([A-Z]:/.*?)local(?:32|64);'"$_mixeddestdir"'\2;' "$_cmakefile"
     done
+}
+
+verify_cuda_deps() {
+    enabled_any libnpp cuda-nvcc || return 1
+    if [[ $bits = 32bit ]]; then
+        echo -e "${orange}cuda-nvcc and libnpp are only supported in 64-bit.${reset}"
+        return 1
+    fi
+    if [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
+        echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
+        return 1
+    fi
+    if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
+        do_removeOption --enable-libnpp
+    fi
+    if enabled cuda-nvcc; then
+        if ! get_cl_path; then
+            echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere; needed by nvcc.${reset}"
+            do_removeOption --enable-cuda-nvcc
+        elif enabled cuda-nvcc && ! command -v nvcc.exe &>/dev/null &&
+            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &>/dev/null; then
+            echo -e "${orange}nvcc.exe not found in PATH or installed in CUDA_PATH.${reset}"
+            do_removeOption --enable-cuda-nvcc
+        fi
+    fi
+    enabled_any libnpp cuda-nvcc
 }
