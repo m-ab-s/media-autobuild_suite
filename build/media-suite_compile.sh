@@ -1614,10 +1614,16 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
         if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
-            do_wget -c -r -q -h "427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2" \
+            if [ $bits = "64bit" ]; then
+              _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
+            else
+              _sha256="86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
+            fi
+            do_wget -c -r -q -h $_sha256 \
             "http://ciscobinary.openh264.org/openh264-1.8.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
+            unset _sha256
             popd >/dev/null
         fi
     fi
