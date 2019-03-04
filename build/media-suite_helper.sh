@@ -1783,7 +1783,7 @@ verify_cuda_deps() {
     fi
     if [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
         echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
-        return 1
+        do_removeOption "--enable-(cuda-nvcc|libnpp)"
     fi
     if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
         do_removeOption --enable-libnpp
