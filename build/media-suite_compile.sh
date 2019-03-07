@@ -454,11 +454,12 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
 
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "https://github.com/tesseract-ocr/tesseract.git"; then
-        do_pacman_install docbook-xsl
+        do_pacman_install docbook-xsl nettle
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i "s|Libs.private.*|& -lstdc++|" tesseract.pc.in
+        sed -i -e 's|Libs.private.*|& -lstdc++|' \
+               -e 's|Requires.private.*|& libarchive iconv|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs iconv lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
