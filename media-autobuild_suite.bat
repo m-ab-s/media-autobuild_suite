@@ -1503,7 +1503,7 @@ if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-min
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 if %build32%==yes call :getmingw 32 i
 if %build64%==yes call :getmingw 64 x
-del %build%\mingw.sh
+if exist "%build%\mingw.sh" del %build%\mingw.sh
 
 :updatebase
 echo.-------------------------------------------------------------------------------
@@ -1792,6 +1792,7 @@ echo.---------------------------------------------------------------------------
 (
     echo.echo -ne "\033]0;install %1 bit compiler\007"
     echo.mingwcompiler="$(cat /etc/pac-mingw.pk | sed 's;.*;&:%2;g' | tr '\n\r' '  ')"
+    echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
     echo.echo $mingwcompiler ^| xargs $nargs pacboy -Sw --noconfirm --ask=20 --needed
     echo.echo $mingwcompiler ^| xargs $nargs pacboy -S --noconfirm --ask=20 --needed
     echo.sleep ^3
