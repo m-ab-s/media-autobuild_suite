@@ -1797,8 +1797,9 @@ if [[ $mplayer = "y" ]] &&
     --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
     --extra-libs='-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm' \
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
-    --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
-    --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
+    --enable-demuxer=avs_demuxer --disable-{gif,cddb} "${faac_opts[@]}" \
+    --with-dvdread-config="$PKG_CONFIG dvdread" --with-freetype-config="$PKG_CONFIG freetype2" \
+    --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
         do_makeinstall && do_checkIfExist
     unset _notrequired faac_opts
 fi
