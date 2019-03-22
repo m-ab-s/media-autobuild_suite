@@ -1894,6 +1894,15 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_make install-static prefix="$LOCALDESTDIR"
         do_checkIfExist
     fi
+    
+    _check=(libplacebo.{a,pc})
+    _deps=(lib{vulkan,shaderc_combined}.a)
+    if ! mpv_disabled libplacebo &&
+        do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
+        do_uninstall "${_check[@]}"
+        do_mesoninstall
+        do_checkIfExist
+    fi
 
     _check=(bin-video/mpv.{exe,com})
     _deps=(lib{ass,avcodec,vapoursynth}.a "$MINGW_PREFIX"/lib/libuchardet.a)
