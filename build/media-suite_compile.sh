@@ -61,6 +61,7 @@ while true; do
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
 --noMintty=* ) noMintty="${1#*=}"; set >"$LOCALBUILDDIR/old.var"; shift ;;
+--svtav1=* ) svtav1="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -911,6 +912,25 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     unset extracommands
 fi
 unset _aom_bins
+
+# TODO:
+# Test ffmpeg inclusion
+# Change to https://github.com/OpenVisualCloud/SVT-AV1.git after
+#    https://github.com/OpenVisualCloud/SVT-AV1/pull/192 or
+#    https://github.com/OpenVisualCloud/SVT-AV1/pull/291 is merged
+
+_check=(bin/SvtAv1{Enc,Dec}App.exe
+    lib/libSvtAv1{Enc,Dec}.a SvtAv1{Enc,Dec}.pc)
+if [[ $svtav1 = y ]] &&
+    do_vcs "https://github.com/OpenVisualCloud/SVT-AV1.git"; then
+    do_uninstall include/svt-av1 "${_check[@]}"
+    create_build_dir
+    log "cmake" cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR"
+    log "build" ninja
+    log ninja install
+    do_checkIfExist
+fi
 
 _check=(bin-video/rav1e.exe)
 if [[ $rav1e = y ]] &&

@@ -113,7 +113,7 @@ pdf-build libmpv-shared
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty
+ripgrep dav1d vvc svtav1 jq dssim avs2 timeStamp noMintty
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -432,6 +432,30 @@ if %buildvvc%==1 set "vvc=y"
 if %buildvvc%==2 set "vvc=n"
 if %buildvvc% GTR 2 GOTO vvc
 if %deleteINI%==1 echo.vvc=^%buildvvc%>>%ini%
+
+:svtav1
+if %svtav1INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build SVT-AV1? [AV1 encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note: Requires at least an Intel fifth generation core or AMD Zen and a good
+    echo. ammount of ram to run. Look at
+    echo. https://github.com/OpenVisualCloud/SVT-AV1/blob/master/README.md#Hardware
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsvtav1="Build SVT-AV1: "
+) else set buildsvtav1=%svtav1INI%
+
+if "%buildsvtav1%"=="" GOTO svtav1
+if %buildsvtav1%==1 set "svtav1=y"
+if %buildsvtav1%==2 set "svtav1=n"
+if %buildsvtav1% GTR 2 GOTO svtav1
+if %deleteINI%==1 echo.svtav1=^%buildsvtav1%>>%ini%
 
 :flac
 if %flacINI%==0 (
@@ -1559,7 +1583,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty%
+--noMintty=%noMintty% --svtav1=%svtav1%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
