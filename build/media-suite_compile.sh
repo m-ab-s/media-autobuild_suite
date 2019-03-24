@@ -61,6 +61,7 @@ while true; do
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
 --noMintty=* ) noMintty="${1#*=}"; [ -f "$LOCALBUILDDIR/fail.var" ] && rm "$LOCALBUILDDIR/fail.var"; (declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/old.var"; shift ;;
 --svthevc=* ) svthevc="${1#*=}"; shift ;;
+--svtav1=* ) svtav1="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1289,6 +1290,18 @@ if [[ $bits = "32bit" ]]; then
 elif { [[ $svthevc = "y" ]] || enabled libsvthevc; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
     do_uninstall "${_check[@]}" include/svt-hevc
+    do_cmakeinstall video -DUNIX=OFF
+    do_checkIfExist
+fi
+
+_check=(bin-video/SvtAv1{Enc,Dec}App.exe
+    libSvtAv1{Enc,Dec}.a SvtAv1{Enc,Dec}.pc)
+if [[ $bits = "32bit" ]]; then
+    do_removeOption --enable-libsvtav1
+elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
+    do_vcs "https://github.com/OpenVisualCloud/SVT-AV1.git"; then
+    do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
+    do_patch "https://patch-diff.githubusercontent.com/raw/OpenVisualCloud/SVT-AV1/pull/558.patch" am
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi
