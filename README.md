@@ -97,8 +97,6 @@ For information about the compiler environment see the wiki, there you also have
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
-        - libndi_newtek (needs Newtek SDK installed)
-            - needs non-free license and --enable-libndi_newtek
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (official binaries)

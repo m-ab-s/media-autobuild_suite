@@ -94,7 +94,7 @@ set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 librtmp librubberband libssh ^
 libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt ladspa #vapoursynth #liblensfun libndi_newtek
+libsrt ladspa #vapoursynth #liblensfun
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
@@ -121,9 +121,8 @@ if exist %ini% GOTO checkINI
 :selectmsys2Arch
 set deleteIni=1
 
-if %PROCESSOR_ARCHITECTURE%==x86 (
-    IF NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
-) else set msys2Arch=2
+if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
+if NOT DEFINED msys2Arch set msys2Arch=2
 
 echo.[compiler list]>%ini%
 echo.msys2Arch=^%msys2Arch%>>%ini%
