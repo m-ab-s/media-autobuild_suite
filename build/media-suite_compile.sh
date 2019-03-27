@@ -394,13 +394,20 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
 fi
 unset _deps
 
+_check=(libtiff{.a,-4.pc})
+if enabled_any libwebp libtesseract &&
+    do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
+    do_uninstall "${_check[@]}"
+    sed -i 's/Libs.private.*/& -ljpeg -llzma -lz -lzstd/' libtiff-4.pc.in
+    do_cmakeinstall -Dwebp=OFF -DUNIX=OFF
+    do_checkIfExist
+fi
+
 _check=(libwebp{,mux}.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
-    do_pacman_install libtiff
-    fix_libtiff_pc
     if [[ $standalone = y ]]; then
         extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)")
@@ -442,8 +449,6 @@ unset syspath opencldll
 
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
-    do_pacman_install libtiff
-    fix_libtiff_pc
     _check=(liblept.{,l}a lept.pc)
     if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
         do_uninstall include/leptonica "${_check[@]}"
@@ -462,7 +467,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
                -e 's|Requires.private.*|& libarchive iconv|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
-            LIBS="$($PKG_CONFIG --libs iconv lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
+            LIBS="$($PKG_CONFIG --libs iconv lept)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
@@ -1894,7 +1899,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_make install-static prefix="$LOCALDESTDIR"
         do_checkIfExist
     fi
-    
+
     _check=(libplacebo.{a,pc})
     _deps=(lib{vulkan,shaderc_combined}.a)
     if ! mpv_disabled libplacebo &&
