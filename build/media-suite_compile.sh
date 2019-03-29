@@ -396,6 +396,7 @@ unset _deps
 
 _check=(libtiff{.a,-4.pc})
 if enabled_any libwebp libtesseract &&
+    do_pacman_install libjpeg-turbo
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
     do_uninstall "${_check[@]}"
     sed -i 's/Libs.private.*/& -ljpeg -llzma -lz -lzstd/' libtiff-4.pc.in
@@ -544,7 +545,6 @@ fi
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
 if [[ $flac = y ]] && do_vcs "https://git.xiph.org/flac.git"; then
-    # release = #tag=1.3.1
     do_pacman_install libogg
     do_autogen
     if [[ $standalone = y ]]; then
