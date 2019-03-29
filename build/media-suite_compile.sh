@@ -407,6 +407,7 @@ if enabled_any libwebp libtesseract &&
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
     do_uninstall "${_check[@]}"
     sed -i 's/Libs.private.*/& -ljpeg -llzma -lz -lzstd/' libtiff-4.pc.in
+    do_patch "https://gitlab.com/libtiff/libtiff/merge_requests/73.patch"
     do_cmakeinstall -Dwebp=OFF -DUNIX=OFF
     do_checkIfExist
 fi
