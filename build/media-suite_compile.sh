@@ -313,8 +313,6 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
-        grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
-            sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
