@@ -1826,7 +1826,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     if ! mpv_disabled vulkan; then
         _check=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git" vulkan-headers; then
+        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=v1.1.102" vulkan-headers; then
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
