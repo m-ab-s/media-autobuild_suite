@@ -302,8 +302,8 @@ fi
 _check=(libgnutls.{,l}a gnutls.pc)
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
     ! files_exist "${_check[@]}" &&
-    do_wget -h bb9acab8af2ac430edf45faaaa4ed2c51f86e57cb57689be6701aceef4732ca7 \
-    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.6.tar.xz"; then
+    do_wget -h 881b26409ecd8ea4c514fd3fbdb6fae5fab422ca7b71116260e263940a4bbbad \
+    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.7.1.tar.xz" gnutls-3.6.7.tar.xz; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
@@ -313,8 +313,6 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
-        grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
-            sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
@@ -1578,7 +1576,7 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
         if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
-            if [ $bits = "64bit" ]; then
+            if [[ $bits = "64bit" ]]; then
               _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
             else
               _sha256="86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
