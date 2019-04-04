@@ -1539,7 +1539,7 @@ if [[ $vvc = y ]] &&
     _notrequired="true"
     # install to own dir because the binaries' names are too generic
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
-        -DBUILD_STATIC=on
+        -DBUILD_STATIC=on -DSET_ENABLE_SPLIT_PARALLELISM=ON -DENABLE_SPLIT_PARALLELISM=ON
     do_checkIfExist
     unset _notrequired
 fi
