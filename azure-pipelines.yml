@@ -1,0 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- docker
+
+variables:
+  dockerId: 1480c1
+  imageName: media-autobuild_suite
+strategy:
+  matrix:
+    windows2019:
+      imageName: 'windows-2019'
+      WindowsTag: 'ltsc2019'
+    windows1803:
+      imageName: 'win1803'
+      WindowsTag: '1803'
+    windows2016:
+      imageName: 'vs2017-win2016'
+      WindowsTag: 'ltsc2016'
+pool:
+  vmImage: $(imageName)
+steps:
+  - pwsh: |
+      docker build -t 1480c1/media-autobuild_suite --build-arg WindowsTag=${env:WINDOWSTAG} .
+    displayName: Build
+    timeoutInMinutes: 0
+
+  - task: Docker@2
+    inputs:
+      containerRegistry: '09b248cf-6bbe-4c91-a22d-f5a203b1ca14'
+      repository: '1480c1/media-autobuild_suite'
+      imageName: $(WindowsTag)
+      command: 'push'
