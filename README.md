@@ -21,6 +21,7 @@ For information about the compiler environment see the wiki, there you also have
         - amd amf encoders (built-in)
         - cuda (built-in)
         - cuvid (built-in)
+        - ffnvcodec (git)
         - libdav1d (git)
         - libmp3lame (mingw)
         - libopus (mingw)
@@ -28,6 +29,7 @@ For information about the compiler environment see the wiki, there you also have
         - libvpx (git)
         - libx264 (git)
         - libx265 (hg)
+        - nvdec (built-in)
         - nvenc (built-in)
         - schannel with gmp (mingw)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
@@ -36,7 +38,7 @@ For information about the compiler environment see the wiki, there you also have
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - avisynth (needs avisynth dll installed)
-        - fontconfig (git)
+        - fontconfig (2.13.1)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw)
                 - preferred to gnutls and to libtls if all three are in options
@@ -44,7 +46,7 @@ For information about the compiler environment see the wiki, there you also have
             - libtls (from libressl) (latest release)
                 - needs non-GPL license
             - mbedtls (mingw)
-                - preferred to gnutls if GPLv2/v3 license is chosen
+                - preferred to gnutls if GPLv3 license is chosen
             - gnutls (latest release)
         - libaom (git)
         - libass (git)
@@ -59,6 +61,7 @@ For information about the compiler environment see the wiki, there you also have
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
         - libopenjpeg2 (mingw)
+        - libopenmpt (svn from beta release)
         - libsnappy (mingw)
         - libsoxr (git)
         - libspeex (mingw)
@@ -73,6 +76,8 @@ For information about the compiler environment see the wiki, there you also have
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw)
+        - cuda filters (needs CUDA SDK installed)
+            - needs non-free license
         - decklink (10.9.3)
             - needs non-free license
         - frei0r (git)
@@ -95,7 +100,6 @@ For information about the compiler environment see the wiki, there you also have
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (official binaries)
-        - libopenmpt (svn from beta release)
         - librtmp (git)
         - librubberband (git snapshot)
         - libsrt (git)
@@ -108,11 +112,6 @@ For information about the compiler environment see the wiki, there you also have
         - libzvbi (0.2.35)
         - opencl (from system)
         - opengl (from system)
-        - scale_cuda (needs CUDA SDK and MSVC **2017** installed)
-            - if it doesn't work, see [Notes about CUDA SDK](#notes-about-cuda-sdk), then blame Nvidia/Microsoft if it still doesn't work, don't bother opening issues about this
-            - needs non-free license and --enable-cuda-sdk
-        - libndi_newtek (needs Newtek SDK installed)
-            - needs non-free license and --enable-libndi_newtek
 
 - other tools
     - aom (git)
@@ -121,14 +120,14 @@ For information about the compiler environment see the wiki, there you also have
     - cyanrip (git)
     - dav1d (git)
     - dssim (git)
-    - faac (1.28)
+    - faac (1.29.9.2)
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
     - flac (git)
     - haisrt tools (git)
     - jq (git)
     - kvazaar (git)
-    - lame (3.99.5)
+    - lame (3.100)
     - libaacs (git) (shared)
     - libbdplus (git) (shared)
     - mediainfo cli (git)
@@ -177,7 +176,7 @@ For information about the compiler environment see the wiki, there you also have
 
 - Windows 32/64-bits (tested with Win10 64-bits; 32-bits is not tested at all by anyone, avoid)
 - NTFS drive
-- 8GB+ disk space for a full 32 and 64-bit build
+- 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
 - 4GB+ RAM
 
 --------
@@ -216,7 +215,7 @@ For all you need ~7 GB disk space.
 The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean.
 Building everything from scratch takes about ~3 hours depending on what is enabled.
 
-Check [doc/forcing-recompilations.md](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
+Check [forcing-recompilations](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
 
 To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
 
@@ -275,15 +274,15 @@ If there's some error during compilation follow these steps:
 
 --------
 
-### This is for CUDA and libnpp, not for NVENC, it is built with ffmpeg by default
+### This is for cuda-nvcc and libnpp, not for NVENC, it is built with ffmpeg by default
 
-For `--enable-cuda-sdk` and `--enable-libnpp` to work, you need either NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
 
 ### You do not need to do the following if you installed the SDK with the default locations etc
 
-### Nothing should be disabled manually when using CUDA as disabling random things can cause the compilation to fail
+### Nothing should be disabled manually when installing CUDA SDK as disabling random things can cause the compilation to fail
 
-For example, if you need to manually set the CUDA_PATH & include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
+For example, if you need to manually set the CUDA_PATH and include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
 
 ```bash
 # adapt these to your environment

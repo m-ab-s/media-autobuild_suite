@@ -176,7 +176,7 @@ if [[ "$jq" = y ]] &&
     do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
-    do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls
+    do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls --disable-docs
     do_checkIfExist
 fi
 
@@ -211,14 +211,27 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $ffmpeg = "sharedlibs" ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
-        do_vcs "https://anongit.freedesktop.org/git/fontconfig#tag=2.12.6"; then
-        do_pacman_install python2-lxml python2-six
+        do_vcs "https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=2.13.1"; then
         do_uninstall include/fontconfig "${_check[@]}"
-        [[ $standalone = y ]] || sed -ri Makefile.am \
-            -e '/^SUBDIRS=/,+2{s/(fontconfig( [a-z-]+){2}).*/\1 src/;/^\s+fc-[^b]/d}' \
-            -e 's;(RUN_FC_CACHE_TEST=).*;\1false;g'
+        sed -i 's| test$||' Makefile.am
+        sed -i 's|Libs.private:|& -lintl|' fontconfig.pc.in
+        _ss=(printf fprintf snprintf vfprintf)
+        for _s in "${_ss[@]}"; do
+            grep -Rl "$_s" --include="*.[c]" | xargs sed -i "/__mingw_/! s/\b$_s/__mingw_&/g"
+        done
+        unset _s _ss
         do_autogen --noconf
-        PYTHON="$MINGW_PREFIX/bin/python2" do_separate_confmakeinstall global --disable-docs
+        extracommands=(--disable-docs --enable-iconv --with-libiconv-prefix=$MINGW_PREFIX \
+            --with-libiconv-lib=$MINGW_PREFIX/lib --with-libiconv-includes=$MINGW_PREFIX/include \
+            LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib")
+        if enabled libxml2; then
+            do_pacman_install libxml2
+            sed -i 's|Cflags:|& -DLIBXML_STATIC|' fontconfig.pc.in
+            extracommands+=(--enable-libxml2)
+        fi
+        CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)"
+        do_separate_confmakeinstall global "${extracommands[@]}"
+        [[ $standalone = y ]] || rm -f $LOCALDESTDIR/bin-global/fc-*.exe
         do_checkIfExist
     fi
 
@@ -286,23 +299,20 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
-if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; then
-    _check=(libgnutls.{,l}a gnutls.pc)
-    if do_vcs "https://gitlab.com/gnutls/gnutls.git#tag=gnutls_3_*"; then
+_check=(libgnutls.{,l}a gnutls.pc)
+if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
+    ! files_exist "${_check[@]}" &&
+    do_wget -h 881b26409ecd8ea4c514fd3fbdb6fae5fab422ca7b71116260e263940a4bbbad \
+    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.7.1.tar.xz" gnutls-3.6.7.tar.xz; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
-        do_patch https://gitlab.com/gnutls/gnutls/merge_requests/905.diff
-        log bootstrap ./bootstrap --skip-po
         do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
-    fi
-    grep -q "lib.*\.a" "$(file_installed gnutls.pc)" &&
-        sed -ri "s;($LOCALDESTDIR|$MINGW_PREFIX)/lib/lib(\w+).a;-l\2;g" "$(file_installed gnutls.pc)"
 fi
 
 if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
@@ -382,13 +392,21 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
 fi
 unset _deps
 
+_check=(libtiff{.a,-4.pc})
+if enabled_any libwebp libtesseract &&
+    do_pacman_install libjpeg-turbo
+    do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
+    do_uninstall "${_check[@]}"
+    sed -i 's/Libs.private.*/& -ljpeg -llzma -lz -lzstd/' libtiff-4.pc.in
+    do_cmakeinstall -Dwebp=OFF -DUNIX=OFF
+    do_checkIfExist
+fi
+
 _check=(libwebp{,mux}.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
-    do_pacman_install libtiff
-    fix_libtiff_pc
     if [[ $standalone = y ]]; then
         extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
             LIBS="$($PKG_CONFIG --libs libpng libtiff-4)")
@@ -430,8 +448,6 @@ unset syspath opencldll
 
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
-    do_pacman_install libtiff
-    fix_libtiff_pc
     _check=(liblept.{,l}a lept.pc)
     if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
         do_uninstall include/leptonica "${_check[@]}"
@@ -442,14 +458,15 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
 
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "https://github.com/tesseract-ocr/tesseract.git"; then
-        do_pacman_install docbook-xsl
+        do_pacman_install docbook-xsl libarchive
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i "s|Libs.private.*|& -lstdc++|" tesseract.pc.in
+        sed -i -e 's|Libs.private.*|& -lstdc++|' \
+               -e 's|Requires.private.*|& libarchive iconv|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
-            LIBS="$($PKG_CONFIG --libs lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
+            LIBS="$($PKG_CONFIG --libs iconv lept)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
@@ -526,7 +543,6 @@ fi
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
 if [[ $flac = y ]] && do_vcs "https://git.xiph.org/flac.git"; then
-    # release = #tag=1.3.1
     do_pacman_install libogg
     do_autogen
     if [[ $standalone = y ]]; then
@@ -574,12 +590,12 @@ fi
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
-    do_wget_sf -h c5dde68840cefe46532089c9392d1df0 \
-        "faac/faac-src/faac-1.28/faac-1.28.tar.bz2"; then
-    ./bootstrap 2>/dev/null
+    do_wget_sf -h 2b58d621fad8fda879f07b7cad8bfe10 \
+        "faac/faac-src/faac-1.29/faac-1.29.9.2.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
-    do_separate_conf --without-mp4v2
+    do_separate_conf
+    cp -r ../frontend/* ./frontend
     do_make
     do_install frontend/faac.exe bin-audio/
     do_checkIfExist
@@ -722,12 +738,10 @@ if [[ $ffmpeg != "no" ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
     do_checkIfExist
 fi
 
-_check=(libsndfile.{l,}a sndfile.{h,pc})
+_check=(libsndfile.a sndfile.{h,pc})
 if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
-    sed -i 's/ examples tests//g' Makefile.am
-    do_autogen
     do_uninstall include/sndfile.hh "${_check[@]}"
-    do_separate_confmakeinstall --disable-full-suite
+    do_cmakeinstall -DBUILD_EXAMPLES=off -DBUILD_TESTING=off -DBUILD_PROGRAMS=OFF
     do_checkIfExist
 fi
 
@@ -1144,7 +1158,8 @@ if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     if do_vcs https://github.com/dyne/frei0r.git; then
         sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
         do_uninstall lib/frei0r-1 "${_check[@]}"
-        do_cmakeinstall
+        do_pacman_install gavl
+        do_cmakeinstall -DWITHOUT_OPENCV=on
         do_checkIfExist
     fi
 fi
@@ -1155,48 +1170,6 @@ if [[ $ffmpeg != "no" ]] && enabled decklink &&
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
 fi
-
-if [[ $ffmpeg != "no" ]] && enabled_any libndi-newtek &&
-    [[ -f "$NDI_SDK_DIR/Include/Processing.NDI.Lib.h" ]]; then
-    _includedir="$(cygpath -sm "$NDI_SDK_DIR"/Include)"
-    [[ $bits = 32bit ]] && _arch=x86 || _arch=x64
-
-    echo -e "${green}Compiling ffmpeg with Newtek lib${reset}"
-    echo -e "${orange}ffmpeg and apps that use it will depend on${reset}"
-    echo -e "$(cygpath -m $LOCALDESTDIR/bin-video/Processing.NDI.Lib.${_arch}.dll) to run!${reset}"
-
-    # if installed libndi.a is older than dll or main include file
-    _check=(Processing.NDI.Lib.h libndi.a bin-video/Processing.NDI.Lib.${_arch}.dll)
-    if test_newer installed "$NDI_RUNTIME_DIR_V3/Processing.NDI.Lib.${_arch}.dll" \
-        "$_includedir/Processing.NDI.Lib.h" libndi.a || ! files_exist "${_check[@]}"; then
-        mkdir -p "$LOCALBUILDDIR/newtek"
-        pushd "$LOCALBUILDDIR/newtek" >/dev/null
-
-        # install headers
-        cmake -E copy_directory "$_includedir" "$LOCALDESTDIR/include"
-
-        # fix ffmpeg breakage when compiling shared
-        sed -i 's|__declspec(dllexport)||g' "$LOCALDESTDIR"/include/Processing.NDI.Lib.h
-
-        # create import lib and install redistributable dll
-        create_build_dir
-        cp -f "$NDI_RUNTIME_DIR_V3/Processing.NDI.Lib.${_arch}.dll" .
-        gendef - ./Processing.NDI.Lib.${_arch}.dll 2>/dev/null |
-            sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "libndi.def"
-        dlltool -l "libndi.a" -d "libndi.def" \
-            $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
-        [[ -f libndi.a ]] && do_install "libndi.a"
-        do_install ./Processing.NDI.Lib.${_arch}.dll bin-video/
-        do_checkIfExist
-        add_to_remove
-        popd >/dev/null
-    fi
-    unset _arch _includedir
-elif [[ $ffmpeg != "no" ]] && enabled libndi-newtek; then
-    do_print_status "Newtek SDK" "$orange" "Not installed, disabling"
-    do_removeOption --enable-libndi-newtek
-fi
-
 
 _check=(libmfx.{{l,}a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libmfx &&
@@ -1566,7 +1539,7 @@ if [[ $vvc = y ]] &&
     _notrequired="true"
     # install to own dir because the binaries' names are too generic
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
-        -DBUILD_STATIC=on
+        -DBUILD_STATIC=on -DSET_ENABLE_SPLIT_PARALLELISM=ON -DENABLE_SPLIT_PARALLELISM=ON
     do_checkIfExist
     unset _notrequired
 fi
@@ -1603,10 +1576,16 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
         if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
             pushd $LOCALDESTDIR/bin-video >/dev/null
-            do_wget -c -r -q -h "427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2" \
+            if [[ $bits = "64bit" ]]; then
+              _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
+            else
+              _sha256="86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
+            fi
+            do_wget -c -r -q -h $_sha256 \
             "http://ciscobinary.openh264.org/openh264-1.8.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
+            unset _sha256
             popd >/dev/null
         fi
     fi
@@ -1773,7 +1752,6 @@ if [[ $mplayer = "y" ]] &&
     fi
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
-    do_patch https://www.ligh.de/tmp/fixpollfd.diff
 
     _notrequired="true"
     do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
@@ -1848,7 +1826,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     if ! mpv_disabled vulkan; then
         _check=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git" vulkan-headers; then
+        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=v1.1.102" vulkan-headers; then
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
@@ -1920,6 +1898,15 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_checkIfExist
     fi
 
+    _check=(libplacebo.{a,pc})
+    _deps=(lib{vulkan,shaderc_combined}.a)
+    if ! mpv_disabled libplacebo &&
+        do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
+        do_uninstall "${_check[@]}"
+        do_mesoninstall
+        do_checkIfExist
+    fi
+
     _check=(bin-video/mpv.{exe,com})
     _deps=(lib{ass,avcodec,vapoursynth}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
@@ -1935,7 +1922,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
         if [[ $bits = "64bit" ]]; then
             mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-            if enabled_any libnpp cuda-sdk && [[ -n "$CUDA_PATH" ]]; then
+            if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
                 mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
                 mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
             fi
