@@ -16,6 +16,9 @@ update_suite.sh
 !build/patches/
 !build/extras/
 
+## VS Code
+.vscode
+
 #############
 ## Windows detritus
 #############
