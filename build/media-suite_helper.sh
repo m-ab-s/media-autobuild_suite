@@ -250,6 +250,9 @@ do_vcs() {
     else
         newHead="$oldHead"
     fi
+
+    check_custom_patches
+
     if [[ "$oldHead" != "$newHead" ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
@@ -404,7 +407,7 @@ do_extract() {
     elif [[ ! $archive_type ]]; then
         return 0
     fi
-    log extract real_extract "$archive" "$dirName"
+    log "extract" real_extract "$archive" "$dirName"
     [[ -d "$dirName/$dirName" ]] &&
         find "$dirName/$dirName" -maxdepth 1 -print0 | xargs -r0 mv -t "$dirName/" &&
         rmdir "$dirName/$dirName" 2>/dev/null
@@ -417,6 +420,7 @@ do_wget_sf() {
     [[ $1 = "-h" ]] && hash="$2" && shift 2
     local url="https://download.sourceforge.net/$1"
     shift 1
+    check_custom_patches
     if [[ -n $hash ]]; then
         do_wget -h "$hash" "$url" "$@"
     else
@@ -523,6 +527,7 @@ do_checkIfExist() {
         fi
     fi
     unset _check
+    unset_extra_script
 }
 
 file_installed() {
@@ -598,7 +603,9 @@ do_install() {
     if [[ -n $dryrun ]]; then
         echo install -D -p "${files[@]}" "$dest"
     else
+        extra_script pre install
         install -D -p "${files[@]}" "$dest"
+        extra_script post install
     fi
 }
 
@@ -1046,15 +1053,29 @@ do_cmake() {
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
+    extra_script pre cmake
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
         -DCMAKE_BUILD_TYPE=Release "$@"
+    extra_script post cmake
+}
+
+do_ninja(){
+    extra_script pre ninja
+    log "build" ninja "$@"
+    extra_script post ninja
+}
+
+do_ninjainstall(){
+    extra_script pre install
+    cpuCount=1 log "install" ninja install "$@"
+    extra_script post install
 }
 
 do_cmakeinstall() {
     do_cmake "$@"
-    log build ninja
-    cpuCount=1 log install ninja install
+    do_ninja
+    do_ninjainstall
 }
 
 do_meson() {
@@ -1062,14 +1083,16 @@ do_meson() {
     local PKG_CONFIG=pkg-config
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
-    log meson meson "$root" --default-library=static \
+    extra_script pre meson
+    log "meson" meson "$root" --default-library=static \
         --prefix="$LOCALDESTDIR" "$@"
+    extra_script post meson
 }
 
 do_mesoninstall() {
     do_meson "$@"
-    log build ninja
-    cpuCount=1 log install ninja install
+    do_ninja
+    do_ninjainstall
 }
 
 compilation_fail() {
@@ -1127,7 +1150,7 @@ zip_logs() {
     files=(/trunk/media-autobuild_suite.bat)
     [[ $failed ]] && files+=($(find "$failed" -name "*.log"))
     files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
-        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt"))
+        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
     [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
@@ -1199,8 +1222,10 @@ do_separate_conf() {
         config_path=".."
         create_build_dir
     fi
-    log configure ${config_path}/configure --{build,host,target}="$MINGW_CHOST" \
+    extra_script pre configure
+    log "configure" ${config_path}/configure --{build,host,target}="$MINGW_CHOST" \
         --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
+    extra_script post configure
 }
 
 do_separate_confmakeinstall() {
@@ -1211,15 +1236,21 @@ do_separate_confmakeinstall() {
 }
 
 do_configure() {
+    extra_script pre configure
     log "configure" ./configure "$@"
+    extra_script post configure
 }
 
 do_make() {
+    extra_script pre make
     log "make" make "$@"
+    extra_script post make
 }
 
 do_makeinstall() {
+    extra_script pre install
     log "install" make install "$@"
+    extra_script post install
 }
 
 do_hide_pacman_sharedlibs() {
@@ -1339,7 +1370,9 @@ do_autoreconf() {
     if { [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
+        extra_script pre autoreconf
         log "autoreconf" autoreconf -fiv $*
+        extra_script post autoreconf
     fi
 }
 
@@ -1350,7 +1383,9 @@ do_autogen() {
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
         git clean -qxfd -e "/build_successful*" -e "/recently_updated"
+        extra_script pre autogen
         log "autogen" ./autogen.sh $*
+        extra_script post autogen
     fi
 }
 
@@ -1724,10 +1759,12 @@ compare_with_zeranoe() {
 }
 
 do_rust() {
-    log update "$RUSTUP_HOME/bin/cargo.exe" update
-    log build "$RUSTUP_HOME/bin/cargo.exe" build --release \
+    log "update" "$RUSTUP_HOME/bin/cargo.exe" update
+    extra_script pre rust
+    log "build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@"
+    extra_script post rust
 }
 
 fix_libtiff_pc() {
@@ -1794,4 +1831,66 @@ verify_cuda_deps() {
         fi
     fi
     enabled_any libnpp cuda-nvcc
+}
+
+check_custom_patches(){
+    local _basedir="$(get_first_subdir)"
+    local vcsFolder="${_basedir%-*}"
+    local vcsType="${_basedir##*-}"
+   if [ -d $LOCALBUILDDIR ] && [ -f $LOCALBUILDDIR/${vcsFolder}_extra.sh ]; then
+        export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
+        export REPO_NAME="${vcsFolder}"
+        source $LOCALBUILDDIR/${vcsFolder}_extra.sh
+        echo "${vcsFolder}" >> $LOCALBUILDDIR/patchedFolders
+        sort -uo $LOCALBUILDDIR/patchedFolders{,}
+    fi
+}
+
+extra_script(){
+    local stage="$1"
+    local commandname="$2"
+    if type _${stage}_${commandname} >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null
+        log "${stage}_${commandname}" _${stage}_${commandname}
+        popd >/dev/null
+    fi
+}
+
+unset_extra_script(){
+    # The current repository folder (/build/ffmpeg-git)
+    unset REPO_DIR
+    # The repository name (ffmpeg)
+    unset REPO_NAME
+
+    # Each of the _{pre,post}_<Command> means that there is a "_pre_<Command>"
+    # and "_post_<Command>"
+
+    # Runs before and after building rust packages (do_rust)
+    unset _{pre,post}_rust
+
+    # Runs before and after running autoreconf -fiv (do_autoreconf)
+    unset _{pre,post}_autoreconf
+
+    # Runs before and after running ./autogen.sh (do_autogen)
+    unset _{pre,post}_autogen
+
+    # Runs before and after running ./configure (do_separate_conf, do_configure)
+    unset _{pre,post}_configure
+
+    # Runs before and after runing make (do_make)
+    unset _{pre,post}_make
+
+    # Runs before and after running cmake (do_cmake)
+    unset _{pre,post}_cmake
+
+    # Runs before and after running meson (do_meson)
+    unset _{pre,post}_meson
+
+    # Runs before and after running ninja (do_ninja)
+    unset _{pre,post}_ninja
+
+    # Runs before and after either ninja install
+    # or make install or using install
+    # (do_makeinstall, do_ninjainstall, do_install)
+    unset _{pre,post}_install
 }
