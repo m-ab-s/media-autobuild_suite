@@ -257,6 +257,19 @@ do_vcs() {
         newHead="$oldHead"
     fi
 
+    _commit_id=$(
+        if [[ $vcsType = git ]]; then
+            git rev-parse --short HEAD
+        elif [[ $vcsType = hg ]]; then
+            hg id -i
+        elif [[ $vcsType = svn ]]; then
+            svn info --show-item revision
+        fi
+    )
+
+    sed -i "/^${vcsFolder}:/d" $LOCALBUILDDIR/commit_ids
+    echo "${vcsFolder}: ${_commit_id}" >> $LOCALBUILDDIR/commit_ids
+    sort -k1 -uo $LOCALBUILDDIR/commit_ids{,}
     rm -f custom_updated
     check_custom_patches
 
@@ -1176,7 +1189,8 @@ zip_logs() {
     files=(/trunk/media-autobuild_suite.bat)
     [[ $failed ]] && files+=($(find "$failed" -name "*.log"))
     files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
-        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"))
+        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders" \
+        -o -name "commit_ids"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
