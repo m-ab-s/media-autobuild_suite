@@ -1847,13 +1847,20 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     fi
 
     if ! mpv_disabled vulkan; then
+        # Get the known_good json and get the commit version of the Vulkan-Headers.
+        # It is assumed that the version number has quotes around them (sed)
+        [[ "$jq" != y ]] && do_pacman_install jq
+        _Vulkan_Version=$(
+            ${curl_opts[@]} https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/master/scripts/known_good.json |
+            jq -r '.repos[] | select(.name == "Vulkan-Headers").commit')
+        [[ "$jq" != y ]] && do_pacman_remove jq
         _check=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=v1.1.102" vulkan-headers; then
+        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=${_Vulkan_Version:-v1.1.106}" vulkan-headers; then
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
         fi
-
+        unset _Vulkan_Version
         _check=(libvulkan.a vulkan.pc)
         _deps=(vulkan/vulkan.h)
         if do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
