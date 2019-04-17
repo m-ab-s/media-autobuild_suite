@@ -1840,6 +1840,7 @@ check_custom_patches(){
    if [ -d $LOCALBUILDDIR ] && [ -f $LOCALBUILDDIR/${vcsFolder}_extra.sh ]; then
         export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
         export REPO_NAME="${vcsFolder}"
+        do_print_progress "Found ${vcsFolder}_extra.sh. Sourcing script"
         source $LOCALBUILDDIR/${vcsFolder}_extra.sh
         echo "${vcsFolder}" >> $LOCALBUILDDIR/patchedFolders
         sort -uo $LOCALBUILDDIR/patchedFolders{,}
@@ -1851,7 +1852,10 @@ extra_script(){
     local commandname="$2"
     if type _${stage}_${commandname} >/dev/null 2>&1; then
         pushd "${REPO_DIR}" >/dev/null
-        log "${stage}_${commandname}" _${stage}_${commandname}
+        local vcsFolder="${REPO_DIR%-*}"
+        vcsFolder="${vcsFolder#*build/}"
+        do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
+        log quiet "${stage}_${commandname}" _${stage}_${commandname}
         popd >/dev/null
     fi
 }
