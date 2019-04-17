@@ -170,10 +170,18 @@ if [[ $ripgrep = y ]] &&
     do_checkIfExist
 fi
 
+_check=(libonig.a oniguruma.pc)
+if [[ "$jq" = y ]] &&
+    do_vcs "https://github.com/kkos/oniguruma.git"; then
+    do_pacman_remove oniguruma
+    do_uninstall include/onig{uruma,gnu,posix}.h "${_check[@]}"
+    do_cmakeinstall
+    do_checkIfExist
+fi
+
 _check=(bin-global/jq.exe)
 if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
-    do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
     do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls --disable-docs
