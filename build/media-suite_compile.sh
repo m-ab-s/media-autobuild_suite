@@ -1790,7 +1790,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
-        do_pacman_install luajit-git
+        do_pacman_install luajit
     fi
 
     do_pacman_remove uchardet-git
