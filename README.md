@@ -338,13 +338,19 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 ``` bash
 #!/bin/bash
 _pre_configure(){
+    #
     # Apply a patch from ffmpeg's patchwork site.
     do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    #
+    # Apply a local patch inside the directory where is "ffmpeg_extra.sh"
+    patch -p1 -i "../ffmpeg-0001-my_patch.patch"
+    #
     # Add extra configure options to ffmpeg (ffmpeg specific)
     # If you want to add something to ffmpeg not within the suite already
     # you will need to install it yourself, either through pacman
     # or compiling from source.
     FFMPEG_OPTS+=(--enable-libsvthevc)
+    #
 }
 ```
 
