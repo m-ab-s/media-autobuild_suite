@@ -21,7 +21,7 @@
 ::-----------------------------------------------------------------------------
 
 @echo off
-color 80
+color 70
 title media-autobuild_suite
 
 setlocal

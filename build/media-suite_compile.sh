@@ -170,10 +170,18 @@ if [[ $ripgrep = y ]] &&
     do_checkIfExist
 fi
 
+_check=(libonig.a oniguruma.pc)
+if [[ "$jq" = y ]] &&
+    do_vcs "https://github.com/kkos/oniguruma.git"; then
+    do_pacman_remove oniguruma
+    do_uninstall include/onig{uruma,gnu,posix}.h "${_check[@]}"
+    do_cmakeinstall
+    do_checkIfExist
+fi
+
 _check=(bin-global/jq.exe)
 if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
-    do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
     do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls --disable-docs
@@ -1217,6 +1225,7 @@ if [[ $x264 != no ]]; then
         # light ffmpeg build
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         PKG_CONFIG_PATH="$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig"
+        unset_extra_script
         if [[ $standalone = y && $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
@@ -1228,6 +1237,7 @@ if [[ $x264 != no ]]; then
                     $(sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c | \
                       sed -n "s/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p")
                 )
+                extra_script pre configure
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                     --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
@@ -1236,15 +1246,19 @@ if [[ $x264 != no ]]; then
                     --disable-decoder="$(IFS=, ; echo "${audio_codecs[*]}")" --enable-gpl \
                     --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress \
                     --disable-autodetect --enable-{lzma,bzlib,zlib}
+                extra_script post configure
                 unset audio_codecs
             else
+                extra_script pre configure
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                     --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
                     --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,doc} --enable-gpl
+                    extra_script post configure
             fi
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
+            unset_extra_script
 
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs https://github.com/FFMS/ffms2.git; then
@@ -1298,10 +1312,12 @@ if [[ $x264 != no ]]; then
         fi
 
         do_uninstall "${_check[@]}"
-
+        check_custom_patches
         create_build_dir
+        extra_script pre configure
         PKGCONFIG="${PKG_CONFIG}" CFLAGS="${CFLAGS// -O2 / }" \
             log configure ../configure "${extracommands[@]}"
+        extra_script post configure
         do_make
         do_makeinstall
         do_checkIfExist
@@ -1328,11 +1344,13 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
 
     do_x265_cmake() {
         do_print_progress "Building $1" && shift 1
+        extra_script pre cmake
         log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
         -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
-        log "ninja" ninja -j "${cpuCount:-1}"
+        extra_script post cmake
+        do_ninja
     }
     [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
@@ -1384,7 +1402,7 @@ EOF
     fi
     }
     build_x265
-    log "install" ninja -j1 install
+    cpuCount=1 log "install" ninja install
     if [[ $standalone = y && $x265 = d ]]; then
         cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
         do_uninstall bin-video/x265-numa.exe
@@ -1676,10 +1694,12 @@ if [[ $ffmpeg != "no" ]]; then
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir shared
+            extra_script pre configure
             CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
                 log configure ../configure \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
+            extra_script post configure
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
@@ -1703,10 +1723,12 @@ if [[ $ffmpeg != "no" ]]; then
             fi
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
+            extra_script pre configure
             CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
                 log configure ../configure --prefix="$LOCALDESTDIR" \
                 --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
+            extra_script post configure
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
@@ -1768,7 +1790,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
     elif ! mpv_disabled lua; then
-        do_pacman_install luajit-git
+        do_pacman_install luajit
     fi
 
     do_pacman_remove uchardet-git
@@ -1808,7 +1830,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     _check=(mujs.h libmujs.a)
     if ! mpv_disabled javascript &&
         do_vcs http://git.ghostscript.com/user/tor/mujs.git; then
-        do_uninstall bin-global/mujs.exe "$_{check[@]}"
+        do_uninstall bin-global/mujs.exe "${_check[@]}"
         log clean make clean
         do_make install-static prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
         do_checkIfExist
@@ -1825,13 +1847,20 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     fi
 
     if ! mpv_disabled vulkan; then
+        # Get the known_good json and get the commit version of the Vulkan-Headers.
+        # It is assumed that the version number has quotes around them (sed)
+        [[ "$jq" != y ]] && do_pacman_install jq
+        _Vulkan_Version=$(
+            ${curl_opts[@]} https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/master/scripts/known_good.json |
+            jq -r '.repos[] | select(.name == "Vulkan-Headers").commit')
+        [[ "$jq" != y ]] && do_pacman_remove jq
         _check=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=v1.1.102" vulkan-headers; then
+        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=${_Vulkan_Version:-v1.1.106}" vulkan-headers; then
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
         fi
-
+        unset _Vulkan_Version
         _check=(libvulkan.a vulkan.pc)
         _deps=(vulkan/vulkan.h)
         if do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then

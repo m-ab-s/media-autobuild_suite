@@ -270,6 +270,86 @@ If there's some error during compilation follow these steps:
 
 - Put here any general/platform tweaks that you need for _your_ specific environment. See `/local32|64/etc/profile2.local` for example usage.
 
+## Custom Patches
+
+--------
+
+Using custom patches is not officially supported, if you do use custom patches, do not expect much support from this suite. Either go to the patch's author or to a forum for help
+
+- It is assumed that you, the reader, have enough knowledge of bash specifically in order to understand some basic terminology. If not, please look up what you do not know.
+- It is highly recommended to look through the [compile script](build/media-suite_compile.sh) for the exact package you want to modify and cross-reference the functions with the [helper script](build/media-suite_compile.sh) to see what is actually being done.
+- Although it is recommended to use the functions provided in the helper script, there is nothing stopping you from using the actual commands.
+
+--------
+
+- To use a custom patch, create a script within the build folder named `<repository's name>_extra.sh`.
+  - For ffmpeg, the folder name would be ffmpeg-git, but the repository's name would be ffmpeg.
+  - For game-music-emu, the folder name would be game-music-emu-0.6.2 and the repository's name would be game-music-emu
+
+- The commands will run in the cloned/unzipped folder unless otherwise stated. (flac_extra.sh would run commands within flac-git)
+
+To reference the cloned folder itself (`flac-git` `ffmpeg-git`) you can use the variable `${REPO_DIR}`.
+To reference the generated build folder, you would need to use `${REPO_DIR}/build-${bits}` to reference the build-64bit folder for 64 bit builds or build-32bit folder for 32 bit builds.
+
+- For some packages, the build folder may be slightly different (`build-shared-${bits}` for shared ffmpeg or `build-light-${bits}` for light build, etc. Try to compile at least once to see what folders are generated or look through the [compile script](build/media-suite_compile.sh))
+
+If you are building for both 32 and 64-bit, you can gate certain commands using `if [ "$bits"="64bits" ]; then <command>; fi` to only run them when building for 64 bits.\
+Be careful with certain packages due to their unique build process (x265, x264, and some others) so make sure to check the compile script
+
+Example Script: `/build/aom_extra.sh` for `aom-git`
+
+``` bash
+#!/bin/bash
+
+# Commands to run before running cmake
+_pre_cmake(){
+    # Installs libwebp
+    do_pacman_install libwebp
+    # Downloads the patch and then applies the patch
+    do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
+}
+
+_post_cmake(){
+    # Change directory to the build folder
+    cd_safe "build-${bits}"
+    # Rerun cmake with custom options. This will override the previous cmake commands.
+    # $LOCALDESTDIR refers to local64 or local32
+    cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
+        -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
+        -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+}
+
+# Commands to run before building using ninja
+_pre_ninja(){
+    # Change directory to the build folder (Absolute path or relative to aom-git)
+    cd_safe "build-${bits}"
+    # applies a local patch (Absolute or relative to aom-git)
+    do_patch "/build/patches/test-diff-files.diff"
+    # run a custom ninja command.
+    ninja aom_version_check
+    # Not necessary, but just for readability sake
+    cd_safe ..
+}
+
+```
+
+Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
+
+``` bash
+#!/bin/bash
+_pre_configure(){
+    # Apply a patch from ffmpeg's patchwork site.
+    do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    # Add extra configure options to ffmpeg (ffmpeg specific)
+    # If you want to add something to ffmpeg not within the suite already
+    # you will need to install it yourself, either through pacman
+    # or compiling from source.
+    FFMPEG_OPTS+=(--enable-libsvthevc)
+}
+```
+
+For a list of possible directive, look under `unset_extra_script` in [media-suite_helper.sh](build/media-suite_helper.sh).
+
 ## Notes about CUDA SDK
 
 --------
