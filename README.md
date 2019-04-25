@@ -338,7 +338,7 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 ``` bash
 #!/bin/bash
 
-# Force the recompile every time this script is executed
+# Force to recompile every time this script is executed
 touch custom_updated
 
 _pre_configure(){
