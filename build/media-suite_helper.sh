@@ -1031,8 +1031,9 @@ do_patch() {
         do_wget -c -r -q "$patch" "$patchName"
     elif [[ -f "$patch" ]]; then
         # Check if the patch is a local patch and copy it to the current dir
+        patch="$(realpath $patch)" # Resolve fullpatch
         [[ "${patch%/*}" != "$PWD" ]] &&
-            cp -f "$patch" "$patchName"
+            cp -f "$patch" "$patchName" >/dev/null 2>&1
     else
         # Fall through option if the patch is from some other protocol
         # I don't know why anyone would use this but just in case.
