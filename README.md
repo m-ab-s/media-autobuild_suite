@@ -324,7 +324,7 @@ _pre_ninja(){
     # Change directory to the build folder (Absolute path or relative to aom-git)
     cd_safe "build-${bits}"
     # applies a local patch (Absolute or relative to aom-git)
-    do_patch "/build/patches/test-diff-files.diff"
+    do_patch "My-Custom-Patches/test-diff-files.diff"
     # run a custom ninja command.
     ninja aom_version_check
     # Not necessary, but just for readability sake
