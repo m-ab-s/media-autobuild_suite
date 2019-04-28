@@ -1011,32 +1011,51 @@ do_removeOptions() {
 do_patch() {
     local binarypatch="--binary"
     case $1 in -p) binarypatch="" && shift;; esac
-    local patch=${1%% *}
-    local am=$2          # "am" to apply patch with "git am"
-    local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
-    local patchfn="${1##* }"
-    [[ $patchfn = "$patch" ]] &&
-        patchfn="${patch##*/}"
-    [[ $patch = ${patch##*/} ]] &&
-        patch="/patches/$patch"
-    do_wget -c -r -q "$patch" "$patchfn"
-    if [[ -f "$patchfn" ]]; then
+    local patch=${1%% *} # Location or link to patch.
+    local am=$2          # Use git am to apply patch. Use with .patch files
+    local strip=${3:-1}  # Leading directories to strip. "patch -p${strip}"
+    local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
+    [[ $patchName = "$patch" ]] && patchName="${patch##*/}"
+
+    # Just don't. Make a fork or use the suite's directory as the root for
+    # your diffs or manually edit the scripts if you are trying to modify
+    # the helper and compile scripts. If you really need to, use patch instead.
+    # Else create a patch file for the individual folders you want to apply
+    # the patch to.
+    [[ "$PWD" = "$LOCALBUILDDIR" ]] &&
+        do_exit_prompt "Running patches in the build folder is not supported.
+        Please make a patch for individual folders or modify the script directly"
+
+    if [[ ${patch:0:4} = "http" ]] || [[ ${patch:0:3} = "ftp" ]]; then
+        # Filter out patches that would require curl
+        do_wget -c -r -q "$patch" "$patchName"
+    elif [[ -f "$patch" ]]; then
+        # Check if the patch is a local patch and copy it to the current dir
+        [[ "${patch%/*}" != "$PWD" ]] &&
+            cp -f "$patch" "$patchName"
+    else
+        # Fall through option if the patch is from some other protocol
+        # I don't know why anyone would use this but just in case.
+        do_wget -c -r -q "$patch" "$patchName"
+    fi
+
+    if [[ -f "$patchName" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchfn" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace "$patchName" >/dev/null 2>&1; then
                 git am -q --abort
-                echo -e "${orange}${patchfn}${reset}"
+                echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
             fi
         else
-            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchfn" >/dev/null 2>&1; then
-                patch $binarypatch -s -N -p"$strip" -i "$patchfn"
+            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" >/dev/null 2>&1; then
+                patch $binarypatch -s -N -p"$strip" -i "$patchName"
             else
-                echo -e "${orange}${patchfn}${reset}"
+                echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
             fi
         fi
     else
-        echo -e "${orange}${patchfn}${reset}"
+        echo -e "${orange}${patchName}${reset}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
     fi
 }
