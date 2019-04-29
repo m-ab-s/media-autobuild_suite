@@ -324,7 +324,7 @@ _pre_ninja(){
     # Change directory to the build folder (Absolute path or relative to aom-git)
     cd_safe "build-${bits}"
     # applies a local patch (Absolute or relative to aom-git)
-    do_patch "/build/patches/test-diff-files.diff"
+    do_patch "My-Custom-Patches/test-diff-files.diff"
     # run a custom ninja command.
     ninja aom_version_check
     # Not necessary, but just for readability sake
@@ -337,14 +337,24 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 
 ``` bash
 #!/bin/bash
+
+# Force to recompile every time this script is executed
+touch custom_updated
+
 _pre_configure(){
+    #
     # Apply a patch from ffmpeg's patchwork site.
     do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    #
+    # Apply a local patch inside the directory where is "ffmpeg_extra.sh"
+    patch -p1 -i "$LOCALBUILDDIR/ffmpeg-0001-my_patch.patch"
+    #
     # Add extra configure options to ffmpeg (ffmpeg specific)
     # If you want to add something to ffmpeg not within the suite already
     # you will need to install it yourself, either through pacman
     # or compiling from source.
     FFMPEG_OPTS+=(--enable-libsvthevc)
+    #
 }
 ```
 
