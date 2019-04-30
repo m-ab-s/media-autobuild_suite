@@ -1846,39 +1846,32 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_checkIfExist
     fi
 
-    if ! mpv_disabled vulkan; then
-        # Get the known_good json and get the commit version of the Vulkan-Headers.
-        # It is assumed that the version number has quotes around them (sed)
-        [[ "$jq" != y ]] && do_pacman_install jq
-        _Vulkan_Version=$(
-            ${curl_opts[@]} https://raw.githubusercontent.com/KhronosGroup/Vulkan-ValidationLayers/master/scripts/known_good.json |
-            jq -r '.repos[] | select(.name == "Vulkan-Headers").commit')
-        [[ "$jq" != y ]] && do_pacman_remove jq
-        _check=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Headers.git#tag=${_Vulkan_Version:-v1.1.106}" vulkan-headers; then
+    _check=(libvulkan.a vulkan.pc)
+    if ! mpv_disabled vulkan &&
+        do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
+        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
+        do_uninstall "${_check[@]}"
+        do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
+        create_build_dir
+        log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
+        cd Vulkan-Headers
+            _check=(vulkan/vulkan.h)
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
-        fi
-        unset _Vulkan_Version
-        _check=(libvulkan.a vulkan.pc)
-        _deps=(vulkan/vulkan.h)
-        if do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
-            _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
-            do_uninstall "${_check[@]}"
-            do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
-            CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-                CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-                CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
-                do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows  \
-                -DCMAKE_ASM-ATT_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
-                -DENABLE_STATIC_LOADER=ON -DUNIX=off
-            log make ninja
-            do_install loader/libvulkan.a lib/
-            do_install loader/vulkan.pc lib/pkgconfig/
-            do_checkIfExist
-            unset _shinchiro_patches
-        fi
+            _check=(libvulkan.a vulkan.pc)
+        cd ..
+        CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
+            CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
+            CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
+            do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows  \
+            -DCMAKE_ASM-ATT_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
+            -DENABLE_STATIC_LOADER=ON -DUNIX=off
+        log make ninja
+        do_install loader/libvulkan.a lib/
+        do_install loader/vulkan.pc lib/pkgconfig/
+        do_checkIfExist
+        unset _shinchiro_patches
     fi
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
