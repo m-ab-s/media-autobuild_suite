@@ -492,7 +492,7 @@ fi
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "no" ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1" &&
-    do_vcs https://github.com/lachs0r/rubberband.git; then
+    do_vcs "https://github.com/lachs0r/rubberband.git"; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
@@ -644,7 +644,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
     if do_vcs "https://git.xiph.org/opusfile.git"; then
         do_uninstall "${_check[@]}"
-        do_patch https://0x0.st/sgwa.txt
+        do_patch "https://0x0.st/sgwa.txt"
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
         do_checkIfExist
@@ -1153,7 +1153,7 @@ fi
 
 if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     _check=(libdl.a dlfcn.h)
-    if do_vcs https://github.com/dlfcn-win32/dlfcn-win32.git; then
+    if do_vcs "https://github.com/dlfcn-win32/dlfcn-win32.git"; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log clean make distclean
         sed -i 's|__declspec(dllexport)||g' dlfcn.h
@@ -1163,7 +1163,7 @@ if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
     fi
 
     _check=(frei0r.{h,pc})
-    if do_vcs https://github.com/dyne/frei0r.git; then
+    if do_vcs "https://github.com/dyne/frei0r.git"; then
         sed -i 's/find_package (Cairo)//' "CMakeLists.txt"
         do_uninstall lib/frei0r-1 "${_check[@]}"
         do_pacman_install gavl
@@ -1261,10 +1261,10 @@ if [[ $x264 != no ]]; then
             unset_extra_script
 
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
-            if do_vcs https://github.com/FFMS/ffms2.git; then
+            if do_vcs "https://github.com/FFMS/ffms2.git"; then
                 do_uninstall "${_check[@]}"
                 sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
-                do_patch https://0x0.st/sgEY.txt
+                do_patch "https://0x0.st/sgEY.txt"
                 mkdir -p src/config
                 do_autoreconf
                 do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg"
@@ -1685,7 +1685,7 @@ if [[ $ffmpeg != "no" ]]; then
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
             # remove redundant -L and -l flags from extralibs
-            do_patch ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch
+            do_patch "ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch"
         fi
 
         # shared
@@ -2118,7 +2118,7 @@ if [[ $cyanrip = y ]]; then
 fi
 
 _check=(bin-video/ffmbc.exe)
-if [[ $ffmbc = y ]] && do_vcs https://github.com/bcoudurier/FFmbc.git; then
+if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git"; then
     _notrequired=yes
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
@@ -2128,7 +2128,7 @@ if [[ $ffmbc = y ]] && do_vcs https://github.com/bcoudurier/FFmbc.git; then
 fi
 
 _check=(bin-global/redshift.exe)
-if [[ $redshift = y ]] && do_vcs https://github.com/jonls/redshift.git; then
+if [[ $redshift = y ]] && do_vcs "https://github.com/jonls/redshift.git"; then
     [[ -f configure ]] || log bootstrap ./bootstrap
     do_separate_confmakeinstall global --enable-wingdi \
         --disable-{nls,ubuntu,corelocation,quartz,drm,randr,vidmode,geoclue2,gui}
