@@ -1089,7 +1089,7 @@ fi
 if [[ $mediainfo = "y" ]]; then
     [[ $curl = openssl ]] && hide_libressl
     _check=(libzen.{a,pc})
-    if do_vcs "https://github.com/MediaArea/ZenLib" libzen; then
+    if do_vcs "https://github.com/MediaArea/ZenLib.git" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config \
             "${_check[@]}" libzen.la lib/cmake/zenlib
         do_cmakeinstall Project/CMake
@@ -1099,7 +1099,7 @@ if [[ $mediainfo = "y" ]]; then
 
     _check=(libmediainfo.{a,pc})
     _deps=(lib{zen,curl}.a)
-    if do_vcs "https://github.com/MediaArea/MediaInfoLib" libmediainfo; then
+    if do_vcs "https://github.com/MediaArea/MediaInfoLib.git" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
         do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
@@ -1876,7 +1876,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
     if ! mpv_disabled shaderc &&
-        do_vcs "https://github.com/google/shaderc"; then
+        do_vcs "https://github.com/google/shaderc.git"; then
         do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
         function add_third_party() {
@@ -1912,7 +1912,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     _check=(crossc.{h,pc} libcrossc.a)
     if ! mpv_disabled crossc &&
-        do_vcs "https://github.com/rossy/crossc"; then
+        do_vcs "https://github.com/rossy/crossc.git"; then
         do_uninstall "${_check[@]}"
         log submodule git submodule update --init
         log clean make clean
