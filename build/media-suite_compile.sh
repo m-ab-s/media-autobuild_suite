@@ -674,7 +674,7 @@ fi
 
 if [[ $ffmpeg != "no" ]] && enabled libsoxr; then
     _check=(soxr.h libsoxr.a)
-    if do_vcs https://notabug.org/RiCON/soxr.git libsoxr; then
+    if do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/libsoxr.git"; then
         do_uninstall "${_check[@]}"
         do_cmakeinstall -DWITH_LSR_BINDINGS=off -DBUILD_TESTS=off -DWITH_OPENMP=off
         do_checkIfExist
@@ -1174,7 +1174,7 @@ fi
 
 _check=(DeckLinkAPI.h DeckLinkAPIVersion.h DeckLinkAPI_i.c)
 if [[ $ffmpeg != "no" ]] && enabled decklink &&
-    do_vcs "https://notabug.org/RiCON/decklink-headers.git"; then
+    do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/decklink-headers.git"; then
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
 fi
@@ -2012,7 +2012,7 @@ if [[ $bmx = "y" ]]; then
     do_pacman_install uriparser
 
     _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
-    if do_vcs https://notabug.org/RiCON/libmxf.git libMXF-1.0; then
+    if do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/libmxf.git" libMXF-1.0; then
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         do_separate_confmakeinstall video --disable-examples
@@ -2021,7 +2021,7 @@ if [[ $bmx = "y" ]]; then
 
     _check=(libMXF++-1.0.{{,l}a,pc})
     _deps=(libMXF-1.0.a)
-    if do_vcs https://notabug.org/RiCON/libmxfpp.git libMXF++-1.0; then
+    if do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/libmxfpp.git" libMXF++-1.0; then
         do_autogen
         do_uninstall include/libMXF++-1.0 "${_check[@]}"
         do_separate_confmakeinstall video --disable-examples
@@ -2030,7 +2030,7 @@ if [[ $bmx = "y" ]]; then
 
     _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
     _deps=("$MINGW_PREFIX"/lib/liburiparser.a lib{MXF{,++}-1.0,curl}.a)
-    if do_vcs https://notabug.org/RiCON/bmx.git; then
+    if do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/bmx.git"; then
         do_autogen
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
