@@ -1834,8 +1834,11 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled javascript &&
         do_vcs "https://github.com/ccxvii/mujs.git"; then
         do_uninstall bin-global/mujs.exe "${_check[@]}"
-        log clean make clean
-        do_make install-static prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
+        log clean env -i PATH="$PATH" $(which make) clean
+        extra_script pre make
+        log "make" env -i PATH="$PATH" TEMP="$TEMP" CPATH="$CPATH" $(which make) \
+            install prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
+        extra_script post make
         do_checkIfExist
     fi
 
