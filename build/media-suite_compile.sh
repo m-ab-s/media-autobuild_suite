@@ -840,7 +840,7 @@ _check=(librtmp.{a,pc})
 [[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmpdump.exe)
 if { [[ $rtmpdump = "y" ]] ||
     { [[ $ffmpeg != "no" ]] && enabled librtmp; }; } &&
-    do_vcs "http://repo.or.cz/rtmpdump.git" librtmp; then
+    do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/rtmpdump.git" librtmp; then
     [[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
     do_uninstall include/librtmp "${_check[@]}"
     [[ -f "librtmp/librtmp.a" ]] && log "clean" make clean
