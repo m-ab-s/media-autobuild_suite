@@ -1522,7 +1522,7 @@ unset vsprefix
 _check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
 if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
     do_pkgConfig "lensfun = 0.3.95.0" &&
-    do_vcs "git://git.code.sf.net/p/lensfun/code#tag=v0.3.95" lensfun; then
+    do_vcs "https://github.com/lensfun/lensfun.git"; then
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
     grep_or_sed Libs.private libs/lensfun/lensfun.pc.cmake '/Libs:/ a\Libs.private: -lstdc++'
