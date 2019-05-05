@@ -538,7 +538,7 @@ enabled libspeex && do_pacman_install speex
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex && ! { files_exist "${_check[@]}" &&
     grep -q '1.2.0' "$LOCALDESTDIR/bin-audio/speexenc.exe"; } &&
-    do_vcs "https://git.xiph.org/speex.git"; then
+    do_vcs "https://github.com/xiph/speex.git"; then
     do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
     do_autoreconf
     do_separate_conf --enable-vorbis-psy --enable-binaries
@@ -550,7 +550,7 @@ fi
 
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
-if [[ $flac = y ]] && do_vcs "https://git.xiph.org/flac.git"; then
+if [[ $flac = y ]] && do_vcs "https://github.com/xiph/flac.git"; then
     do_pacman_install libogg
     do_autogen
     if [[ $standalone = y ]]; then
@@ -612,7 +612,7 @@ fi
 _check=(bin-audio/oggenc.exe)
 _deps=("$MINGW_PREFIX"/lib/libvorbis.a)
 if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
-    do_vcs "https://git.xiph.org/vorbis-tools.git" vorbis-tools; then
+    do_vcs "https://github.com/xiph/vorbis-tools.git"; then
     _check+=(bin-audio/oggdec.exe)
     do_autoreconf
     do_uninstall "${_check[@]}"
@@ -628,7 +628,7 @@ fi
 unset _deps
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
-if enabled libopus && do_vcs "https://git.xiph.org/opus.git"; then
+if enabled libopus && do_vcs "https://github.com/xiph/opus.git"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
     do_autogen
@@ -642,7 +642,7 @@ if [[ $standalone = y ]] && enabled libopus; then
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
-    if do_vcs "https://git.xiph.org/opusfile.git"; then
+    if do_vcs "https://github.com/xiph/opusfile.git"; then
         do_uninstall "${_check[@]}"
         do_patch "https://0x0.st/sgwa.txt"
         do_autogen
@@ -652,7 +652,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(opus/opusenc.h libopusenc.{pc,{,l}a})
     _deps=(opus.pc)
-    if do_vcs "https://git.xiph.org/libopusenc.git"; then
+    if do_vcs "https://github.com/xiph/libopusenc.git"; then
         do_uninstall "${_check[@]}"
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
@@ -661,7 +661,7 @@ if [[ $standalone = y ]] && enabled libopus; then
 
     _check=(bin-audio/opusenc.exe)
     _deps=(opusfile.pc libopusenc.pc)
-    if do_vcs "https://git.xiph.org/opus-tools.git"; then
+    if do_vcs "https://github.com/xiph/opus-tools.git"; then
         _check+=(bin-audio/opus{dec,info}.exe)
         do_uninstall "${_check[@]}"
         do_autogen
