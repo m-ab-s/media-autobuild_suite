@@ -1829,7 +1829,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     _check=(mujs.h libmujs.a)
     if ! mpv_disabled javascript &&
-        do_vcs http://git.ghostscript.com/user/tor/mujs.git; then
+        do_vcs "https://github.com/ccxvii/mujs.git"; then
         do_uninstall bin-global/mujs.exe "${_check[@]}"
         log clean make clean
         do_make install-static prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
