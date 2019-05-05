@@ -1214,7 +1214,7 @@ if [[ $x264 != no ]]; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     _bitdepth="$(get_api_version x264_config.h BIT_DEPTH)"
-    if do_vcs "https://git.videolan.org/git/x264.git" ||
+    if do_vcs "https://code.videolan.org/videolan/x264.git" ||
         [[ $x264 = o8   && "$_bitdepth" =~ (0|10) ]] ||
         [[ $x264 = high && "$_bitdepth" =~ (0|8) ]] ||
         [[ $x264 =~ (yes|full|shared|fullv) && "$_bitdepth" != 0 ]]; then
