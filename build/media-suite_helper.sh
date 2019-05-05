@@ -220,7 +220,15 @@ do_vcs() {
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        log quiet "$vcsType.clone" vcs_clone || do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        if ! log quiet "$vcsType.clone" vcs_clone && [[ $vcsType = git ]] &&
+            [[ "$vcsURL" != *"media-autobuild_suite-dependencies"* ]]; then
+            local repoName=${vcsURL##*/}
+            vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
+            log quiet "$vcsType.clone" vcs_clone ||
+            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        else
+            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
             touch recently_updated recently_checked
