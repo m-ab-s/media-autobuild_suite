@@ -71,6 +71,8 @@ if [[ $noMintty = y ]]; then ( set -o posix ; set )>"$LOCALBUILDDIR/old.var"; fi
 
 source "$LOCALBUILDDIR"/media-suite_helper.sh
 
+echo -e "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip! ${reset}"
+
 buildProcess() {
 set_title
 echo -e "\n\t${orange}Starting $bits compilation of all tools${reset}"
