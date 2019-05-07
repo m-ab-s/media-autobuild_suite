@@ -226,8 +226,6 @@ do_vcs() {
             vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
             log quiet "$vcsType.clone" vcs_clone ||
             do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
-        else
-            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
         fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
