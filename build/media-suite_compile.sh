@@ -1688,7 +1688,7 @@ if [[ $ffmpeg != "no" ]]; then
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
             # remove redundant -L and -l flags from extralibs
-            do_patch "https://jb-alvarado.github.io/media-autobuild_suite/ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch"
+            do_patch "https://jb-alvarado.github.io/media-autobuild_suite/patches/ffmpeg-0001-configure-fix-failures-with-long-command-lines.patch"
         fi
 
         # shared
