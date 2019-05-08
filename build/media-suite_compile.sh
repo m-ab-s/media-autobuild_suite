@@ -71,8 +71,8 @@ if [[ $noMintty = y ]]; then ( set -o posix ; set )>"$LOCALBUILDDIR/old.var"; fi
 
 source "$LOCALBUILDDIR"/media-suite_helper.sh
 
-[[ -f "$LOCALBUILDDIR/no_logs" ||  $logging = n ]]
-    && echo -e "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!${reset}"
+[[ -f "$LOCALBUILDDIR/no_logs" ||  $logging = n ]] &&
+    echo -e "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!${reset}"
 
 buildProcess() {
 set_title
