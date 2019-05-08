@@ -1863,7 +1863,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             do_cmakeinstall
             do_checkIfExist
             _check=(libvulkan.a vulkan.pc)
-        cd ..
+        cd "$LOCALBUILDDIR/$(get_first_subdir)"
         CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
