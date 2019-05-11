@@ -1289,7 +1289,7 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 
 :getMintty
 set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
-set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
+
 if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
@@ -1729,7 +1729,8 @@ if %noMintty%==y (
     -Logfile "%build%\%log%" -BashCommand \"%command%\"
 ) else (
     if exist %build%\%log% del %build%\%log%
-    %mintty% --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
+    --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
 )
 endlocal
 goto :EOF
