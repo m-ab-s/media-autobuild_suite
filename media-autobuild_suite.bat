@@ -108,6 +108,8 @@ set mpv_options_basic=--disable-debug-build "--lua=luajit"
 set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
 pdf-build libmpv-shared
 
+setlocal
+
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
@@ -150,8 +152,6 @@ if %deleteINI%==1 (
 :systemVars
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
-
-setlocal
 
 :selectSystem
 if %archINI%==0 (
@@ -1211,6 +1211,7 @@ if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 
 endlocal & (
+    set msys2=%msys2%
     set updateSuite=%updateSuite%
     set cpuCount=%cpuCount%
     set build32=%build32%
