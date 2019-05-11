@@ -26,6 +26,7 @@ title media-autobuild_suite
 
 setlocal
 cd /d "%~dp0"
+setlocal
 set instdir=%CD%
 
 if not exist %instdir% (
@@ -150,8 +151,6 @@ if %deleteINI%==1 (
 :systemVars
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
-
-setlocal
 
 :selectSystem
 if %archINI%==0 (
@@ -1210,50 +1209,6 @@ if %noMinttyF%==2 set "noMintty=n"
 if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 
-endlocal & (
-    set updateSuite=%updateSuite%
-    set cpuCount=%cpuCount%
-    set build32=%build32%
-    set build64=%build64%
-    set deleteSource=%deleteSource%
-    set mp4box=%mp4box%
-    set vpx2=%vpx2%
-    set x2643=%x2643%
-    set x2652=%x2652%
-    set other265=%other265%
-    set flac=%flac%
-    set fdkaac=%fdkaac%
-    set mediainfo=%mediainfo%
-    set sox=%sox%
-    set ffmpeg=%ffmpeg%
-    set ffmpegUpdate=%ffmpegUpdate%
-    set ffmpegChoice=%ffmpegChoice%
-    set mplayer=%mplayer%
-    set mpv=%mpv%
-    set license2=%license2%
-    set stripFile=%stripFile%
-    set packFile=%packFile%
-    set rtmpdump=%rtmpdump%
-    set logging=%logging%
-    set bmx=%bmx%
-    set standalone=%standalone%
-    set aom=%aom%
-    set faac=%faac%
-    set ffmbc=%ffmbc%
-    set curl=%curl%
-    set cyanrip=%cyanrip%
-    set redshift=%redshift%
-    set rav1e=%rav1e%
-    set ripgrep=%ripgrep%
-    set dav1d=%dav1d%
-    set vvc=%vvc%
-    set jq=%jq%
-    set dssim=%dssim%
-    set avs2=%avs2%
-    set timeStamp=%timeStamp%
-    set noMintty=%noMintty%
-)
-
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
@@ -1267,9 +1222,7 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     echo.- Download and install msys2 basic system
     echo.
     echo -------------------------------------------------------------------------------
-    if %msys2%==msys32 (
-        set "msysprefix=i686"
-    ) else set "msysprefix=x86_64"
+    if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
     (
         echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
         echo.$wc = New-Object System.Net.WebClient
@@ -1338,7 +1291,6 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
 set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
 if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
-setlocal
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
         echo.-------------------------------------------------------------------------------
@@ -1638,14 +1590,8 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
     echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
 
-endlocal
-
 :compileLocals
 cd %instdir%
-
-if [%build64%]==[yes] (
-    set MSYSTEM=MINGW64
-) else set MSYSTEM=MINGW32
 
 title MABSbat
 if %noMintty%==y cls
@@ -1654,6 +1600,7 @@ for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
+endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
@@ -1663,14 +1610,19 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty%
-
+    set "msys2=%msys2%"
+    set "noMintty=%noMintty%"
+    set "build64=%build64%"
+)
+set "TERM=xterm-256color"
+if [%build64%]==[yes] ( set MSYSTEM=MINGW64 ) else set MSYSTEM=MINGW32
 if %noMintty%==y (
-    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
-    -Logfile "%build%\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
+    powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
+    -Logfile "%CD%\build\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
 ) else (
-    if exist %build%\compile.log del %build%\compile.log
-    start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
+    if exist %CD%\build\compile.log del %CD%\build\compile.log
+    start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
 endlocal
