@@ -99,7 +99,7 @@ libsrt ladspa #vapoursynth #liblensfun
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #crossc #d3d11 #jpeg
+#shaderc #spirv-cross #d3d11 #jpeg
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
