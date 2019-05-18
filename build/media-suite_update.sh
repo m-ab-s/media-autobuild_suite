@@ -98,9 +98,9 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     old=$(pacman -Qqe | sort)
-    new=$(cat /etc/pac-base.pk | dos2unix)
-    newmingw=$(cat /etc/pac-mingw.pk | dos2unix)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(cat /etc/pac-mingw-extra.pk | dos2unix)")
+    new=$(dos2unix < /etc/pac-base.pk)
+    newmingw=$(dos2unix < /etc/pac-mingw.pk)
+    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(dos2unix < /etc/pac-mingw-extra.pk)")
     [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
     [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
     diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
