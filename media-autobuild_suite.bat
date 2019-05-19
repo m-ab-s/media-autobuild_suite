@@ -1612,10 +1612,9 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --noMintty=%noMintty%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
-    set "build64=%build64%"
+    if [%build64%]==[yes] ( set MSYSTEM=MINGW64 ) else set MSYSTEM=MINGW32
 )
 set "TERM=xterm-256color"
-if [%build64%]==[yes] ( set MSYSTEM=MINGW64 ) else set MSYSTEM=MINGW32
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
     -Logfile "%CD%\build\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
