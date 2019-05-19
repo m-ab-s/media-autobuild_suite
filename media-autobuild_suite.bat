@@ -26,6 +26,7 @@ title media-autobuild_suite
 
 setlocal
 cd /d "%~dp0"
+set "TERM=xterm-256color"
 setlocal
 set instdir=%CD%
 
@@ -1614,7 +1615,6 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "noMintty=%noMintty%"
     if [%build64%]==[yes] ( set MSYSTEM=MINGW64 ) else set MSYSTEM=MINGW32
 )
-set "TERM=xterm-256color"
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
     -Logfile "%CD%\build\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
