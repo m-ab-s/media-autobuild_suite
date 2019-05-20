@@ -60,14 +60,12 @@ while true; do
 --dssim=* ) dssim="${1#*=}"; shift ;;
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
---noMintty=* ) noMintty="${1#*=}"; shift ;;
+--noMintty=* ) noMintty="${1#*=}"; set >"$LOCALBUILDDIR/old.var"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
   esac
 done
-
-if [[ $noMintty = y ]]; then ( set -o posix ; set )>"$LOCALBUILDDIR/old.var"; fi
 
 source "$LOCALBUILDDIR"/media-suite_helper.sh
 

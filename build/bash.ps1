@@ -20,16 +20,14 @@ try {
     if (Test-Path "$build\compilation_failed") {
         Write-Transcript
         $compilefail = Get-Content -Path $build\compilation_failed
-        $env:reason = $compilefail[1]
-        $env:operation = $compilefail[2]
         New-Item -Force -ItemType File -Path "$build\fail_comp" -Value $(
-            "while read line; do declare -x `"`$line`"; done < /build/fail.var`n" +
             "source /build/media-suite_helper.sh`n" +
+            "source /build/fail.var`n" +
             "cd `$(head -n 1 /build/compilation_failed)`n" +
             "if [[ `$logging = y ]]; then`n" +
-            "echo `"Likely error:`"`n" +
-            "tail `"ab-suite.`${operation}.log`"`n" +
-            "echo `"`${red}`$reason failed. Check `$(pwd -W)/ab-suite.`$operation.log`${reset}`"`n" +
+            "   echo `"Likely error:`"`n" +
+            "   tail `"ab-suite.$($compilefail[2]).log`"`n" +
+            "   echo `"`${red}$($compilefail[1]) failed. Check `$(pwd -W)/ab-suite.$($compilefail[2]).log`${reset}`"`n" +
             "fi`n" +
             "echo `"`${red}This is required for other packages, so this script will exit.`${reset}`"`n" +
             "zip_logs`n" +
