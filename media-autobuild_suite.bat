@@ -1154,58 +1154,7 @@ if "%noMinttyF%"=="" GOTO noMintty
 if %noMinttyF%==1 (
     set "noMintty=y"
     color
-    (
-        echo.param^([string]$Bash, [string]$BashCommand, [string]$LogFile^)
-        echo.function Write-Transcript {
-        echo.try {Stop-Transcript ^| Out-Null} catch [System.InvalidOperationException] {}
-        echo.if ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************' -Quiet^) {
-        echo.$linenumber = ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************'^).LineNumber
-        echo.$transcriptContent = Get-Content -Path $LogFile ^| Select-Object -Index ^($linenumber[1]..^($linenumber[$linenumber.Length - 2] - 2^)^)
-        echo.Set-Content -Force -Path $LogFile -Value $transcriptContent
-        echo.}
-        echo.}
-        echo.try {
-        echo.$host.ui.RawUI.WindowTitle = switch -wildcard ^($BashCommand^) {
-        echo.*media-suite_update* {"update autobuild suite"}
-        echo.*media-suite_compile* {"media-autobuild_suite"}
-        echo.Default {$host.ui.RawUI.WindowTitle}
-        echo.}
-        echo.Start-Transcript -Force $LogFile ^| Out-Null
-        echo.$build = ^(Get-Item $LogFile^).Directory.FullName
-        echo.if ^($LogFile -match "compile"^) {
-        echo.$env:MSYSTEM = switch ^($env:Build64^) { yes {"MINGW64"} Default {"MINGW32"}}
-        echo.$env:MSYS2_PATH_TYPE = "inherit"
-        echo.}
-        echo.Remove-Item -Force -Path "$build\compilation_failed", "$build\fail_comp" -ErrorAction Ignore
-        echo.^&$bash "-l" $BashCommand.Split^(' '^)
-        echo.if ^(Test-Path "$build\compilation_failed"^) {
-        echo.Write-Transcript
-        echo.$compilefail = Get-Content -Path $build\compilation_failed
-        echo.$env:reason = $compilefail[1]
-        echo.$env:operation = $compilefail[2]
-        echo.New-Item -Force -ItemType File -Path "$build\fail_comp" -Value $^(
-        echo."while read line; do declare -x `"`$line`"; done < /build/fail.var`n" +
-        echo."source /build/media-suite_helper.sh`n" +
-        echo."cd `$(head -n 1 /build/compilation_failed)`n" +
-        echo."if [[ `$logging = y ]]; then`n" +
-        echo."echo `"Likely error:`"`n" +
-        echo."tail `"ab-suite.`${operation}.log`"`n" +
-        echo."echo `"`${red}`$reason failed. Check `$^(pwd -W^)/ab-suite.`$operation.log`${reset}`"`n" +
-        echo."fi`n" +
-        echo."echo `"`${red}This is required for other packages, so this script will exit.`${reset}`"`n" +
-        echo."zip_logs`n" +
-        echo."echo `"Make sure the suite is up-to-date before reporting an issue. It might've been fixed already.`"`n" +
-        echo."do_prompt `"Try running the build again at a later time.`""^) ^| Out-Null
-        echo.Start-Process -NoNewWindow -Wait -FilePath $bash -ArgumentList ^("-l /build/fail_comp"^).Split^(' '^)
-        echo.Remove-Item -Force -Path $build\compilation_failed, $build\fail_comp
-        echo.}
-        echo.} catch {
-        echo.Write-Output "Stopping log and exiting"
-        echo.} finally {
-        echo.Write-Transcript
-        echo.}
-    )>%build%\bash.ps1
-    )
+)
 if %noMinttyF%==2 set "noMintty=n"
 if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
@@ -1613,7 +1562,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --noMintty=%noMintty%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
-    if [%build64%]==[yes] ( set MSYSTEM=MINGW64 ) else set MSYSTEM=MINGW32
+    if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
+    set "MSYS2_PATH_TYPE=inherit"
 )
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
