@@ -1216,13 +1216,15 @@ log() {
 
 create_build_dir() {
     local build_dir="build${1:+-$1}-$bits"
-    if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
-        rm -rf ./*
-    elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
-        cd_safe "$build_dir" && rm -rf ./*
-    else
-        mkdir "$build_dir" && cd_safe "$build_dir"
+    if [[ ! -f "$(get_first_subdir)/do_not_clean" ]]; then
+        if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
+            rm -rf ./* && cd_safe ".."
+        elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
+            cd_safe "$build_dir" && rm -rf ./* && cd_safe ".."
+        fi
     fi
+    [[ ! -d "$build_dir" ]] && mkdir "$build_dir"
+    cd_safe "$build_dir"
 }
 
 get_external_opts() {
