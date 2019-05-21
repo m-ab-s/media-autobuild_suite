@@ -1898,26 +1898,39 @@ unset_extra_script(){
     # Runs before and after building rust packages (do_rust)
     unset _{pre,post}_rust
 
+    ## Pregenerational hooks
+
     # Runs before and after running autoreconf -fiv (do_autoreconf)
     unset _{pre,post}_autoreconf
 
     # Runs before and after running ./autogen.sh (do_autogen)
     unset _{pre,post}_autogen
 
+    # Generational hooks
+
     # Runs before and after running ./configure (do_separate_conf, do_configure)
     unset _{pre,post}_configure
 
-    # Runs before and after runing make (do_make)
-    unset _{pre,post}_make
-
     # Runs before and after running cmake (do_cmake)
     unset _{pre,post}_cmake
+
+    ## Build hooks
+
+    # Runs before and after runing make (do_make)
+    unset _{pre,post}_make
 
     # Runs before and after running meson (do_meson)
     unset _{pre,post}_meson
 
     # Runs before and after running ninja (do_ninja)
     unset _{pre,post}_ninja
+
+    # Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
+    # If this is present, it will override the other hooks
+    # Use for mpv and python waf based stuff.
+    unset _{pre,post}_build
+
+    ## Post build hooks
 
     # Runs before and after either ninja install
     # or make install or using install
