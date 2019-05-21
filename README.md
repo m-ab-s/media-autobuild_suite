@@ -301,22 +301,27 @@ Example Script: `/build/aom_extra.sh` for `aom-git`
 ``` bash
 #!/bin/bash
 
+# Don't automatically run cmake || configure
+touch do_not_reconfigure
+
 # Commands to run before running cmake
 _pre_cmake(){
     # Installs libwebp
     do_pacman_install libwebp
     # Downloads the patch and then applies the patch
     do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
-}
-
-_post_cmake(){
     # Change directory to the build folder
     cd_safe "build-${bits}"
-    # Rerun cmake with custom options. This will override the previous cmake commands.
+    # Run cmake with custom options. This will override the previous cmake commands.
     # $LOCALDESTDIR refers to local64 or local32
     cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
         -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
         -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+}
+
+_post_cmake(){
+# post cmake and post configure will be unavailable due to "touch do_not_reconfigure"
+# as the do_not_reconfigure flag will skip the post commands.
 }
 
 # Commands to run before building using ninja
@@ -338,7 +343,8 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 ``` bash
 #!/bin/bash
 
-# Force to recompile every time this script is executed
+# Force to the suite to think the package has updates to recompile.
+# Alternatively, you can use "touch recompile" for a similar effect.
 touch custom_updated
 
 _pre_configure(){
@@ -355,6 +361,14 @@ _pre_configure(){
     # or compiling from source.
     FFMPEG_OPTS+=(--enable-libsvthevc)
     #
+}
+
+_post_make(){
+    # Don't run configure again.
+    touch "$(get_first_subdir)/do_not_reconfigure"
+    # Don't clean the build folder on each successive run.
+    # This is for if you want to keep the current build folder as is and just recompile only.
+    touch "$(get_first_subdir)/do_not_clean"
 }
 ```
 
