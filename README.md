@@ -359,6 +359,7 @@ _pre_configure(){
 ```
 
 For a list of possible directive, look under `unset_extra_script` in [media-suite_helper.sh](build/media-suite_helper.sh).
+Beware as they may change in the future.
 
 ## Notes about CUDA SDK
 
