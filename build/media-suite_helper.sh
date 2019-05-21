@@ -260,7 +260,7 @@ do_vcs() {
     rm -f custom_updated
     check_custom_patches
 
-    if { [[ "$oldHead" != "$newHead" ]] || [[ -f custom_updated ]]; }; then
+    if [[ "$oldHead" != "$newHead" ]] || [[ -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
