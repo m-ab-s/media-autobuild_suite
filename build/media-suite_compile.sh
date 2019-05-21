@@ -1980,6 +1980,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             done
         fi
 
+        extra_script pre configure
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html3" \
@@ -1988,6 +1989,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
+        extra_script post configure
 
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         log install /usr/bin/python waf -j1 install ||
