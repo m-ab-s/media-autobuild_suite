@@ -282,7 +282,12 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
-        return 1
+        if [[ -f recompile ]]; then
+            do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
+            do_print_status "${bold}├${reset} Found recompile flag" "$orange" "Recompiling"
+        else
+            return 1
+        fi
     fi
     return 0
 }
