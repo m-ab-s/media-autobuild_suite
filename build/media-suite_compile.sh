@@ -1991,7 +1991,10 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
         extra_script post configure
 
+        extra_script pre build
         log build /usr/bin/python waf -j "${cpuCount:-1}"
+        extra_script post build
+
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
 
