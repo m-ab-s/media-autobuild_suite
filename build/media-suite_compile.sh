@@ -1995,8 +1995,10 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         extra_script post build
 
+        extra_script pre install
         log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
+        extra_script post install
 
         if ! files_exist libavutil.a; then
             # revert hack
