@@ -1255,10 +1255,7 @@ do_separate_conf() {
         config_path=".."
         create_build_dir
     fi
-    extra_script pre configure
-    log "configure" ${config_path}/configure --{build,host,target}="$MINGW_CHOST" \
-        --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
-    extra_script post configure
+    do_configure --{build,host,target}="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
 }
 
 do_separate_confmakeinstall() {
@@ -1270,7 +1267,9 @@ do_separate_confmakeinstall() {
 
 do_configure() {
     extra_script pre configure
-    log "configure" ./configure "$@"
+    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+        return
+    log "configure" ${config_path:-.}/configure "$@"
     extra_script post configure
 }
 
