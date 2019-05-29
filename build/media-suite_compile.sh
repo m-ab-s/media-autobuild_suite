@@ -180,6 +180,7 @@ if [[ "$jq" = y ]] &&
     do_checkIfExist
 fi
 
+_deps=(oniguruma.pc)
 _check=(bin-global/jq.exe)
 if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
