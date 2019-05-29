@@ -1842,7 +1842,9 @@ fix_cmake_crap_exports() {
 }
 
 verify_cuda_deps() {
-    enabled_any libnpp cuda-nvcc || return 1
+    enabled_any libnpp cuda-nvcc cuda-sdk || return 1
+    enabled cuda-sdk && do_removeOption --enable-cuda-sdk &&
+        do_addOption --enable-cuda-nvcc
     if [[ $bits = 32bit ]]; then
         echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
         do_removeOption --enable-libnpp
