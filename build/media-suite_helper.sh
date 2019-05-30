@@ -1082,13 +1082,13 @@ do_custom_patches() {
 
 do_cmake() {
     local root=".."
-    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
+        -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
         -DCMAKE_BUILD_TYPE=Release "$@"
     extra_script post cmake
@@ -1741,6 +1741,27 @@ EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat ]] ||
         printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" | unix2dos |
             cat > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
+}
+
+create_cmake_toolchain() {
+    local _win_path_LOCALDESTDIR="$(cygpath -m $LOCALDESTDIR)"
+    local _win_path_MINGW_PREFIX="$(cygpath -m $MINGW_PREFIX)"
+    local toolchain_file=(
+        "SET(CMAKE_C_COMPILER gcc)"
+        "SET(CMAKE_CXX_COMPILER g++)"
+        "SET(CMAKE_RC_COMPILER_INIT windres)"
+        "SET(PKG_CONFIG_EXECUTABLE $_win_path_LOCALDESTDIR/bin/ab-pkg-config-static.bat)"
+        ""
+        "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin ...)"
+        "SET(CMAKE_FIND_ROOT_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
+        "SET(CMAKE_PREFIX_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
+        "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
+        "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
+    )
+
+    [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
+        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake >/dev/null ||
+        printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
 }
 
 grep_or_sed() {

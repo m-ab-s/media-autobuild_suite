@@ -127,6 +127,7 @@ unset _clean_old_builds
 hide_conflicting_libs -R
 do_hide_all_sharedlibs
 create_ab_pkgconfig
+create_cmake_toolchain
 
 set_title "compiling global tools"
 echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
@@ -410,7 +411,6 @@ if enabled_any libwebp libtesseract &&
     do_uninstall "${_check[@]}"
     grep_or_sed 'Requires.private' libtiff-4.pc.in \
         '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
-    do_patch "https://gitlab.com/libtiff/libtiff/merge_requests/73.patch"
     do_cmakeinstall -Dwebp=OFF -DUNIX=OFF
     do_checkIfExist
 fi
