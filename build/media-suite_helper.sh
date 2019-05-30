@@ -210,7 +210,7 @@ do_vcs() {
         if [[ $vcsType = git ]]; then
             ref="origin/HEAD"
         elif [[ $vcsType = hg ]]; then
-            ref="default"
+            ref="tip"
         elif [[ $vcsType = svn ]]; then
             ref="HEAD"
         fi
