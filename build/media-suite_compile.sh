@@ -405,10 +405,11 @@ unset _deps
 
 _check=(libtiff{.a,-4.pc})
 if enabled_any libwebp libtesseract &&
-    do_pacman_install libjpeg-turbo
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
+    do_pacman_install libjpeg-turbo xz zlib zstd
     do_uninstall "${_check[@]}"
-    sed -i 's/Libs.private.*/& -ljpeg -llzma -lz -lzstd/' libtiff-4.pc.in
+    grep_or_sed 'Requires.private' libtiff-4.pc.in \
+        '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
     do_patch "https://gitlab.com/libtiff/libtiff/merge_requests/73.patch"
     do_cmakeinstall -Dwebp=OFF -DUNIX=OFF
     do_checkIfExist
