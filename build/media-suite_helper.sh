@@ -1747,12 +1747,10 @@ create_cmake_toolchain() {
     local _win_path_LOCALDESTDIR="$(cygpath -m $LOCALDESTDIR)"
     local _win_path_MINGW_PREFIX="$(cygpath -m $MINGW_PREFIX)"
     local toolchain_file=(
-        "SET(CMAKE_C_COMPILER gcc)"
-        "SET(CMAKE_CXX_COMPILER g++)"
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         "SET(PKG_CONFIG_EXECUTABLE $_win_path_LOCALDESTDIR/bin/ab-pkg-config-static.bat)"
         ""
-        "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin ...)"
+        "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin)"
         "SET(CMAKE_FIND_ROOT_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
         "SET(CMAKE_PREFIX_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
