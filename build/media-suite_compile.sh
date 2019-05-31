@@ -187,6 +187,8 @@ if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
     do_uninstall "${_check[@]}"
     do_autoreconf
+    # fix borken builtin.jq with out-of-root builds
+    do_patch "https://patch-diff.githubusercontent.com/raw/stedolan/jq/pull/1914.patch"
     CFLAGS+=' -D_POSIX_C_SOURCE' YFLAGS='--warnings=no-yacc' \
         do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls --disable-docs
     do_checkIfExist
