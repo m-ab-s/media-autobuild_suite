@@ -606,7 +606,7 @@ fi
 _check=(bin-audio/faac.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     do_wget -h e23a05f13f9695a81f250c30bd30e5bd636a0f6891a9ea9093ce4bfbf758217b \
-        "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz"; then
+        "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz" "faac-1_29_9_2.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
     do_separate_conf
