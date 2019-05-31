@@ -605,8 +605,8 @@ fi
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
-    do_wget_sf -h 2b58d621fad8fda879f07b7cad8bfe10 \
-        "faac/faac-src/faac-1.29/faac-1.29.9.2.tar.gz"; then
+    do_wget -h e23a05f13f9695a81f250c30bd30e5bd636a0f6891a9ea9093ce4bfbf758217b \
+        "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
     do_separate_conf
