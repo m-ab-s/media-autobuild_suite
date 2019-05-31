@@ -2147,7 +2147,7 @@ fi
 _check=(bin-global/redshift.exe)
 if [[ $redshift = y ]] && do_vcs "https://github.com/jonls/redshift.git"; then
     [[ -f configure ]] || log bootstrap ./bootstrap
-    CFLAGS=+' -D_POSIX_C_SOURCE' \
+    CFLAGS+=' -D_POSIX_C_SOURCE' \
         do_separate_confmakeinstall global --enable-wingdi \
         --disable-{nls,ubuntu,corelocation,quartz,drm,randr,vidmode,geoclue2,gui}
     do_checkIfExist
