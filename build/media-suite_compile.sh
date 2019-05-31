@@ -1020,7 +1020,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
         if [[ ! -f /opt/apache-ant/bin/ant ]] ; then
             apache_ant_ver="$(clean_html_index "https://www.apache.org/dist/ant/binaries/")"
             apache_ant_ver="$(get_last_version "$apache_ant_ver" "apache-ant" "1\.\d+\.\d+")"
-            apache_ant_ver="${apache_ant_ver:-1.10.4}"
+            apache_ant_ver="${apache_ant_ver:-1.10.6}"
             if do_wget -r -c \
                 "https://www.apache.org/dist/ant/binaries/apache-ant-${apache_ant_ver}-bin.zip" \
                 apache-ant.zip; then
