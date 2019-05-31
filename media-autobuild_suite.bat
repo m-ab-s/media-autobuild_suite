@@ -1412,11 +1412,11 @@ echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
 cd %build%
-set scripts=compile helper update
+set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
     if not exist "%build%\media-suite_%%s.sh" (
         %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
-        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
+        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s
     )
 )
 if %updateSuite%==y (
