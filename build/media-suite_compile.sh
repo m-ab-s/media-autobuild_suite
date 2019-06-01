@@ -603,16 +603,18 @@ if { [[ $ffmpeg != "no" ]] && enabled libfdk-aac; } || [[ $fdkaac = "y" ]]; then
 fi
 
 [[ $faac = y ]] && do_pacman_install faac
-_check=(bin-audio/faac.exe)
+_check=(bin-audio/faac{,gui}.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     do_wget -h e23a05f13f9695a81f250c30bd30e5bd636a0f6891a9ea9093ce4bfbf758217b \
         "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz" "faac-1_29_9_2.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
-    [[ $standalone = y ]] || sed -i 's|frontend||' Makefile.am
-    do_separate_conf
-    cp -r ../frontend/* ./frontend
-    do_make
-    do_install frontend/faac.exe bin-audio/
+    # autoconf: frontend compilation optional
+    # blockswitch: add missing stdint include
+    # frontend: fix out-of-root build
+    do_patch https://0x0.st/zMuQ.txt
+    extracommands=()
+    [[ $standalone = n ]] && extracommands+=(--disable-frontend)
+    do_separate_confmakeinstall audio "${extracommands[@]}"
     do_checkIfExist
 fi
 
