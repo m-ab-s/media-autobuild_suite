@@ -1825,6 +1825,23 @@ check_signature(){
     gpg --verify "$sigFile" $@
 }
 
+check_file_integrity(){
+    local quiet key sigFile hash
+    while true; do
+        case $1 in
+            -k) key="$2" && shift 2;;
+            -s) sigFile="$2" && shift 2;;
+            -h) hash="$2" && shift 2;;
+            --) shift; break;;
+            *) break;;
+        esac
+    done
+    local file="$1"
+    if [[ -n "$hash" ]]; then
+        check_hash "$file" "$hash" || true # replace with something
+    fi
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
