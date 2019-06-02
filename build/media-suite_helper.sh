@@ -1801,6 +1801,30 @@ get_signature(){
     fi
 }
 
+check_signature(){
+    # check_signature -k 96865171 gnutls-3.6.8.tar.xz.sig gnutls-3.6.8.tar.xz
+    # check_signature -k 1528635D8053A57F77D1E08630A59377A7763BE6 SDL2-2.0.9.tar.gz.sig
+    # run in the same directory as the files. Works with .sig and some .asc
+    # file needs to start with -----BEGIN PGP SIGNATURE-----
+    local key=()
+    while true; do
+        case $1 in
+            -k) key+=("$2") && shift 2;; # keys to retrieve using get_signature
+            --) shift; break;;
+            *) break;;
+        esac
+    done
+    local sigFile="$(readlink -f $1)"
+    shift
+    if [[ -n "$key" ]]; then
+        get_signature "${key[@]}"
+    fi
+    if [[ -n "$sigFile" ]]; then
+        [[ ! -f "$sigFile" ]] && do_wget -c -r -q "$sigFile"
+    fi
+    gpg --verify "$sigFile" $@
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
