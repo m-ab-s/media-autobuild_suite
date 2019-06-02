@@ -1778,6 +1778,29 @@ create_cmake_toolchain() {
         printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
 }
 
+get_signature(){
+    # get_signature -s game-music-emu-0.6.2.tar.xz.asc
+    # get_signature 96865171 0F3BE490
+    # adds keys to gpg keychain for verifying
+    while true; do
+        case $1 in
+            -s) local keyFiles+=("$2") && shift 2;;
+            --) shift; break;;
+            *) break;;
+        esac
+    done
+    if [[ -n "$keyFiles" ]]; then
+        for keyFile in ${keyFiles[@]}; do
+            [[ ! -f "$keyFile" ]] && do_wget -c -r -q "$keyFile"
+            gpg --import "$keyFile"
+        done
+    fi
+    if [[ $# -ne 0 ]]; then
+        gpg --receive-keys $@ ||
+            gpg --keyserver pgp.mit.edu --receive-keys $@
+    fi
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
