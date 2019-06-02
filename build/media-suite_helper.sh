@@ -2013,6 +2013,14 @@ create_cmake_toolchain() {
         printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
 }
 
+get_signature() {
+    # get_signature 96865171 0F3BE490
+    # adds keys to gpg keychain for verifying
+    for keyserver in keys.openpgp.org pool.sks-keyservers.net keyserver.ubuntu.com pgp.mit.edu; do
+        gpg --keyserver "$keyserver" --receive-keys "$@" && break
+    done > /dev/null 2>&1
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
