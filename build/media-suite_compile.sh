@@ -612,6 +612,7 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     # blockswitch: add missing stdint include
     # frontend: fix out-of-root build
     do_patch https://0x0.st/zMuQ.txt
+    log bootstrap ./bootstrap
     extracommands=()
     [[ $standalone = n ]] && extracommands+=(--disable-frontend)
     do_separate_confmakeinstall audio "${extracommands[@]}"
