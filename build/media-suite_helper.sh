@@ -2021,6 +2021,52 @@ get_signature() {
     done > /dev/null 2>&1
 }
 
+check_signature() {
+    # check_signature -k 96865171 gnutls-3.6.8.tar.xz.sig gnutls-3.6.8.tar.xz
+    # check_signature -k 1528635D8053A57F77D1E08630A59377A7763BE6 http://libsdl.org/release/SDL2-2.0.10.tar.gz.sig SDL2-2.0.10.tar.gz
+    # run in the same directory as the files. Works with .sig and some .asc
+    # file needs to start with -----BEGIN PGP SIGNATURE-----
+    local key=()
+    while true; do
+        case $1 in
+        -k) key+=("$2") && shift 2 ;; # keys to retrieve using get_signature
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
+        esac
+    done
+    local sigFile=$1
+    shift
+
+    # Get name of sig file
+    local sigFileName=${sigFile##*/}
+    sigFileName=${sigFileName:-"$(/usr/bin/curl -sI "$sigFile" | grep -Eo 'filename=.*$' | sed 's/filename=//')"}
+    [[ -z $sigFileName ]] && echo "Sig file not set" && return 1
+
+    # Download sig file if url/cp file if local file
+    if ! do_wget -c -r -q "$sigFile" "$sigFileName" && [[ -f $sigFile ]]; then
+        sigFile="$(
+            cd_safe "$(dirname "$sigFile")"
+            printf '%s' "$(pwd -P)" '/' "$(basename -- "$sigFile")"
+        )"
+        [[ ${sigFile%/*} != "$PWD" ]] && cp -f "$sigFile" "$sigFileName" > /dev/null 2>&1
+    fi
+
+    # Retrive keys
+    [[ -n ${key[0]} ]] && get_signature "${key[@]}"
+
+    # Verify file is correct
+    # $? 1 Bad sig or file integrity compromised
+    # $? 2 no-pub-key or no file
+    gpg --auto-key-retrieve --keyserver hkps://hkps.pool.sks-keyservers.net --verify "$sigFileName" "$@" > /dev/null 2>&1
+    case $? in
+    1) do_exit_prompt "Failed to verify integrity of ${sigFileName%%.sig}" ;;
+    2) do_exit_prompt "Failed to find gpg key or no file found for ${sigFileName%%.sig}" ;;
+    esac
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
