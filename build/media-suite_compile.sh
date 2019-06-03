@@ -2138,12 +2138,18 @@ if [[ $cyanrip = y ]]; then
 fi
 
 _check=(bin-video/ffmbc.exe)
-if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git"; then
+if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
     _notrequired=yes
+    sed -i -e 's/nfds_t;/&\n\n#if HAVE_WINSOCK2_H\n#include <winsock2.h>\n#define HAVE_STRUCT_POLLFD 1/' \
+           -e 's/FD 1/&\n#else\n#include <poll.h>\n#define HAVE_STRUCT_POLLFD 0\n#endif\n\n\n#if !HAVE_STRUCT_POLLFD/' \
+           -e 's/int poll/#endif\n\n&/' -e 's/int poll/int ff_poll/' \
+           -e 's/int timeout);/&\n#define poll ff_poll/' libavformat/os_support.h
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
-    do_make && do_install ffmbc.exe bin-video/ && do_checkIfExist
+    do_make
+    do_install ffmbc.exe bin-video/
+    do_checkIfExist
     unset _notrequired
 fi
 
