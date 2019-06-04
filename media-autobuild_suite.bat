@@ -1414,7 +1414,7 @@ echo.---------------------------------------------------------------------------
 cd %build%
 set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
-    if not exist "%build%\media-suite_%%s.sh" (
+    if not exist "%build%\%%s" (
         %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
         https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s
     )
