@@ -1626,9 +1626,10 @@ goto :EOF
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
     echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
+    echo.CXX="g++"
     echo.CXXFLAGS="${CFLAGS}"
     echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
-    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXX CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
     echo.
