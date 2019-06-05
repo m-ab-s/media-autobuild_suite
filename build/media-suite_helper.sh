@@ -1082,6 +1082,7 @@ do_custom_patches() {
 
 do_cmake() {
     local root=".."
+    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
     [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre cmake
@@ -1747,7 +1748,6 @@ create_cmake_toolchain() {
     local _win_path_MINGW_PREFIX="$(cygpath -m $MINGW_PREFIX)"
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
-        "SET(PKG_CONFIG_EXECUTABLE $_win_path_LOCALDESTDIR/bin/ab-pkg-config-static.bat)"
         ""
         "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin)"
         "SET(CMAKE_FIND_ROOT_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
