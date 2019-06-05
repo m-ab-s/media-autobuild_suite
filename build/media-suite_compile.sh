@@ -904,16 +904,19 @@ _check=(libaom.a aom.pc)
 if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
     extracommands=()
-    [[ -n $_aom_bins ]] && _check+=(bin-video/aomdec.exe) ||
+    if [[ -n $_aom_bins ]]; then
+        _check+=(bin-video/aomdec.exe)
+        # fix google's shit
+        sed -ri 's;_PREFIX.+CMAKE_INSTALL_BINDIR;_FULL_BINDIR;' \
+            build/cmake/aom_install.cmake
+    else
         extracommands+=(-DENABLE_EXAMPLES=off)
+    fi
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
-    do_cmakeinstall -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
+    do_cmakeinstall video -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
         -DENABLE_TEST{S,DATA}=OFF -DCONFIG_LOWBITDEPTH=1 \
         "${extracommands[@]}"
-    if [[ -n $_aom_bins ]]; then
-        rm -f "$LOCALDESTDIR"/bin/aom{enc,dec}.exe
-        do_install aom{enc,dec}.exe bin-video/
     fi
     do_checkIfExist
     unset extracommands
