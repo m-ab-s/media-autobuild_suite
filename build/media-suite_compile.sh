@@ -1481,53 +1481,40 @@ if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
 fi
 
 
-if get_vs_prefix &&
-    { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    vsversion="$("$vsprefix"/vspipe.exe -v | grep -Po "(?<=Core R)\d+")"
-    _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc
-        vapoursynth/{VS{Helper,Script},VapourSynth}.h)
-    if ! pc_exists "vapoursynth = $vsversion" || ! files_exist "${_check[@]}"; then
-        do_vcs "https://github.com/vapoursynth/vapoursynth.git"
-        do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
-        if git show-ref -q "R${vsversion}"; then
-            git reset -q --hard "R${vsversion}"
-        else
-            git reset -q --hard origin/master
-        fi
-
-        do_install include/*.h include/vapoursynth/
-
-        create_build_dir
-        for _file in vapoursynth vsscript; do
-            gendef - "$vsprefix/${_file}.dll" 2>/dev/null |
-                sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
-            dlltool -l "lib${_file}.a" -d "${_file}.def" \
-                $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
-            [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
-        done
-
-        for _file in vapoursynth{,-script}.pc; do
-            sed -e "s;@prefix@;$LOCALDESTDIR;" \
-                -e 's;@exec_prefix@;${prefix};' \
-                -e 's;@libdir@;${prefix}/lib;' \
-                -e 's;@includedir@;${prefix}/include;' \
-                -e "s;@VERSION@;$vsversion;" \
-                -e '/Libs.private/ d' \
-                -e '/Requires.private/ d' \
-                -e 's;lvapoursynth-script;lvsscript;' \
-                "../pc/$_file.in" > "$_file"
-                do_install "$_file"
-        done
-
+if { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
+    _ver=3.7.3
+    _file=python37
+    [[ $bits = 64bit ]] && arch=amd64 || arch=win32
+    _check=("lib$_file.a")
+    if files_exist "${_check[@]}"; then
+        do_print_status "python $_ver" "$green" "Up-to-date"
+    elif do_wget "https://www.python.org/ftp/python/$_ver/python-$_ver-embed-$arch.zip"; then
+        [[ -f "$_file.dll" ]] && gendef "$_file.dll" >/dev/null 2>&1
+        [[ -f "$_file.def" ]] && dlltool -y "lib$_file.a" -d "$_file.def" >/dev/null 2>&1
+        [[ -f "lib$_file.a" ]] && do_install "lib$_file.a"
         do_checkIfExist
-        add_to_remove
     fi
-    unset vsversion _file
+
+    _check=(libvapoursynth{,-script}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
+    if do_vcs "https://github.com/vapoursynth/vapoursynth.git"; then
+        do_uninstall "${_check[@]}"
+        do_autogen
+        sed -i '31s/Windows/windows/' src/vsscript/vsscript.cpp
+        sed -i "s/@PYTHON3_LIBS@/-l$_file/g" pc/vapoursynth-script.pc.in
+        create_build_dir
+        CPPFLAGS+=" -DVS_CORE_EXPORTS" PYTHON="$MINGW_PREFIX/bin/python3" log configure \
+        ../configure --prefix="$LOCALDESTDIR" --disable-shared --disable-vspipe --disable-python-module --disable-plugins
+        do_make
+        sed -i "s/Cflags.*/& -DVS_CORE_EXPORTS/" pc/vapoursynth.pc
+        sed -i "/Requires.private/ d" pc/vapoursynth-script.pc
+        do_makeinstall
+        do_checkIfExist
+    fi
+    unset _ver _file arch
 else
     mpv_disable vapoursynth
     do_removeOption --enable-vapoursynth
 fi
-unset vsprefix
 
 _check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
 if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
