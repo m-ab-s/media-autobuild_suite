@@ -2138,12 +2138,15 @@ if [[ $cyanrip = y ]]; then
 fi
 
 _check=(bin-video/ffmbc.exe)
-if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git"; then
+if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
     _notrequired=yes
+    do_patch https://0x0.st/zM5A.patch
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
-    do_make && do_install ffmbc.exe bin-video/ && do_checkIfExist
+    do_make
+    do_install ffmbc.exe bin-video/
+    do_checkIfExist
     unset _notrequired
 fi
 
