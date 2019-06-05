@@ -1081,17 +1081,25 @@ do_custom_patches() {
 }
 
 do_cmake() {
+    local bindir=""
     local root=".."
+    case "$1" in
+    global|audio|video)
+        bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1" ;;
+    *)
+        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
+    esac
+    shift 1
+
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     create_build_dir
-    [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release "$@"
+        -DCMAKE_BUILD_TYPE=Release $bindir "$@"
     extra_script post cmake
 }
 
