@@ -1135,7 +1135,8 @@ do_meson() {
     local PKG_CONFIG=pkg-config
     create_build_dir
     extra_script pre meson
-    log "meson" meson "$root" --default-library=static --buildtype=release \
+    CC=gcc CXX=g++ \
+        log "meson" meson "$root" --default-library=static --buildtype=release \
         --prefix="$LOCALDESTDIR" --backend=ninja --debug=false $bindir "$@"
     extra_script post meson
 }
