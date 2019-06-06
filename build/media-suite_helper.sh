@@ -1137,7 +1137,7 @@ do_meson() {
     extra_script pre meson
     CC=gcc CXX=g++ \
         log "meson" meson "$root" --default-library=static --buildtype=release \
-        --prefix="$LOCALDESTDIR" --backend=ninja --debug=false $bindir "$@"
+        --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@"
     extra_script post meson
 }
 
