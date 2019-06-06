@@ -917,7 +917,6 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     do_cmakeinstall video -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
         -DENABLE_TEST{S,DATA}=OFF -DCONFIG_LOWBITDEPTH=1 \
         "${extracommands[@]}"
-    fi
     do_checkIfExist
     unset extracommands
 fi
