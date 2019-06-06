@@ -1126,7 +1126,7 @@ do_meson() {
     local root=".."
     case "$1" in
     global|audio|video)
-        bindir="--bindir=$LOCALDESTDIR/bin-$1" ;;
+        bindir="--bindir=bin-$1" ;;
     *)
         [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
     esac
