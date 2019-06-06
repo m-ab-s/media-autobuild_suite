@@ -1122,13 +1122,21 @@ do_cmakeinstall() {
 }
 
 do_meson() {
+    local bindir=""
     local root=".."
+    case "$1" in
+    global|audio|video)
+        bindir="--bindir=$LOCALDESTDIR/bin-$1" ;;
+    *)
+        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
+    esac
+    shift 1
+
     local PKG_CONFIG=pkg-config
     create_build_dir
-    [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre meson
-    log "meson" meson "$root" --default-library=static \
-        --prefix="$LOCALDESTDIR" "$@"
+    log "meson" meson "$root" --default-library=static --buildtype=release \
+        --prefix="$LOCALDESTDIR" --backend=ninja --debug=false $bindir "$@"
     extra_script post meson
 }
 
