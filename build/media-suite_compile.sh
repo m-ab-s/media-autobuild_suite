@@ -2130,7 +2130,7 @@ if [[ $cyanrip = y ]]; then
         hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
         CFLAGS+=" -DLIBXML_STATIC $(printf ' -I%s' "${_extra_cflags[@]}")" \
         LDFLAGS+="$(printf ' -L%s' "${_extra_ldflags[@]}")" \
-            do_mesoninstall --bindir=bin-audio
+            do_mesoninstall audio
         hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
