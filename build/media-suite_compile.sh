@@ -1227,7 +1227,7 @@ _check=(SvtHevcEnc.pc libSvtHevcEnc.dll.a svt-hevc/EbApi.h
 if [[ $svthevc = "y" ]] && do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
     do_uninstall bin-video/SVT-Hevc/libSvtHevcEnc.dll.a "${_check[@]}"
     do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/213.patch"
-    do_patch "http://0x0.st/zQKB.patch"
+    do_patch "http://0x0.st/zQP4.patch"
     do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/206.patch"
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
