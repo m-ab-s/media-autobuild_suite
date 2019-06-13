@@ -1080,7 +1080,7 @@ do_custom_patches() {
     done
 }
 
-do_cmake() {
+do_basecmake() {
     local bindir=""
     local root=".."
     case "$1" in
@@ -1098,9 +1098,13 @@ do_cmake() {
         return
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
-        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
+        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
         -DCMAKE_BUILD_TYPE=Release $bindir "$@"
     extra_script post cmake
+}
+
+do_cmake() {
+    do_basecmake "$@" -DUNIX=on
 }
 
 do_ninja(){
