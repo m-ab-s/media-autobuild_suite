@@ -113,7 +113,7 @@ pdf-build libmpv-shared
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty svthevc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -412,6 +412,29 @@ if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %deleteINI%==1 echo.other265=^%buildother265%>>%ini%
+
+:svthevc
+if %svthevcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build SVT-Hevc? [H.265 encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note: Requires at least an Intel fourth generation core or AMD Zen to
+    echo. run.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsvthevc="Build SVT-Hevc: "
+) else set buildsvthevc=%svthevcINI%
+
+if "%buildsvthevc%"=="" GOTO svthevc
+if %buildsvthevc%==1 set "svthevc=y"
+if %buildsvthevc%==2 set "svthevc=n"
+if %buildsvthevc% GTR 2 GOTO svthevc
+if %deleteINI%==1 echo.svthevc=^%buildsvthevc%>>%ini%
 
 :vvc
 if %vvcINI%==0 (
@@ -1561,7 +1584,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty%
+--noMintty=%noMintty% --svthevc=%svthevc%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"

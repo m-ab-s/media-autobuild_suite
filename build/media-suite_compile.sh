@@ -61,6 +61,7 @@ while true; do
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
 --noMintty=* ) noMintty="${1#*=}"; set >"$LOCALBUILDDIR/old.var"; shift ;;
+--svthevc=* ) svthevc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1218,6 +1219,17 @@ if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_make
     log "install" make install-lib
     do_install bin/gcc/MP4Box.exe bin-video/
+    do_checkIfExist
+fi
+
+_check=(SvtHevcEnc.pc libSvtHevcEnc.dll.a svt-hevc/EbApi.h
+    bin-video/Svt-Hevc/{libSvtHevcEnc.dll,SvtHevcEncApp.exe})
+if [[ $svthevc = "y" ]] && do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
+    do_uninstall bin-video/SVT-Hevc/libSvtHevcEnc.dll.a "${_check[@]}"
+    do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/213.patch"
+    do_patch "http://0x0.st/zQP4.patch"
+    do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/206.patch"
+    do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi
 
