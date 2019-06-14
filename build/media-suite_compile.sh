@@ -1934,15 +1934,13 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         unset add_third_party
     fi
 
-    _check=(spirv_cross/spirv_cross_c.h spirv-cross-c-shared.pc libspirv-cross-c-shared.a)
+    _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
     if ! mpv_disabled spirv-cross &&
         do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
-        do_uninstall "${_check[@]}"
-        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
-        do_patch "$_shinchiro_patches/spirv-cross-0001-static-linking-hacks.patch"
-        do_cmakeinstall -DSPIRV_CROSS_SHARED=ON -DSPIRV_CROSS_ENABLE_TESTS=OFF -DSPIRV_CROSS_CLI=OFF
+        do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
+        do_patch "https://github.com/KhronosGroup/SPIRV-Cross/compare/master...taisei-project:meson.diff"
+        do_mesoninstall
         do_checkIfExist
-        unset _shinchiro_patches
     fi
 
     _check=(libplacebo.{a,pc})
@@ -1955,7 +1953,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     fi
 
     _check=(bin-video/mpv.{exe,com})
-    _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross-c-shared}.a "$MINGW_PREFIX"/lib/libuchardet.a)
+    _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
         create_ab_pkgconfig
