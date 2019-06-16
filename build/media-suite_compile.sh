@@ -1361,6 +1361,12 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
     do_patch "https://gist.githubusercontent.com/1480c1/7743056f52e4a546294e2160431674bc/raw/0001-CMake-alias-CMAKE_INSTALL_BINDIR-to-BIN_INSTALL_DIR.patch"
 
+    if [[ $svthevc = "y" ]]; then
+        export SVT_HEVC_INCLUDE_DIR="$LOCALDESTDIR/include/svt-hevc"
+        export SVT_HEVC_LIBRARY_DIR="$LOCALDESTDIR/lib"
+        x265_cmake_extra+=(-DENABLE_SVT_HEVC=ON)
+    fi
+
     do_x265_cmake() {
         do_print_progress "Building $1" && shift
         do_cmake video "$(realpath --relative-to="$PWD" "$LOCALBUILDDIR/$(get_first_subdir)/source")" \
