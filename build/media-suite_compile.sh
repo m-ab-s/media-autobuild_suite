@@ -1223,13 +1223,14 @@ if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
 fi
 
 _check=(SvtHevcEnc.pc libSvtHevcEnc.dll.a svt-hevc/EbApi.h
-    bin-video/Svt-Hevc/{libSvtHevcEnc.dll,SvtHevcEncApp.exe})
+    bin-video/{libSvtHevcEnc.dll,SvtHevcEncApp.exe})
 if [[ $svthevc = "y" ]] && do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
-    do_uninstall bin-video/SVT-Hevc/libSvtHevcEnc.dll.a "${_check[@]}"
+    do_uninstall bin-video/libSvtHevcEnc.dll.a "${_check[@]}"
     do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/213.patch" am
     do_patch "https://gist.githubusercontent.com/1480c1/a5fbbff6aa2cb9880275ae6ad63bd9df/raw/0001-transition-between-y4m-and-cmakelists.patch" am
     do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/206.patch" am
     do_cmakeinstall video -DUNIX=OFF -DNATIVE=OFF
+    do_install "$LOCALDESTDIR"/lib/libSvtHevcEnc.dll "$LOCALDESTDIR"/bin-video/
     do_checkIfExist
 fi
 
