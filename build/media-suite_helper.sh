@@ -1050,7 +1050,7 @@ do_patch() {
 
     if [[ -f "$patchName" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchName" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" >/dev/null 2>&1; then
                 git am -q --abort
                 echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
