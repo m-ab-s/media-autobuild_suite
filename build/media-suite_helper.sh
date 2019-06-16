@@ -335,9 +335,6 @@ do_wget() {
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
-        [[ ${url#/patches} != "$url" || ${url#/extras} != "$url" ]] &&
-            url="https://jb-alvarado.github.io/media-autobuild_suite${url}"
-
         curlcmds=("${curl_opts[@]}")
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive" -R)
         [[ $hash ]] && tries=3
