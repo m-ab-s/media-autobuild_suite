@@ -1369,10 +1369,11 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
 
     do_x265_cmake() {
         do_print_progress "Building $1" && shift
-        do_cmake video "$(realpath --relative-to="$PWD" "$LOCALBUILDDIR/$(get_first_subdir)/source")" \
-        skip_build_dir
-        -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
-        -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
+        do_cmake video skip_build_dir \
+            "$(realpath --relative-to="$PWD" "$LOCALBUILDDIR/$(get_first_subdir)/source")" \
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON \
+            -DHG_EXECUTABLE=/usr/bin/hg.bat -DENABLE_HDR10_PLUS=ON $xpsupport \
+            ${x265_cmake_extra[@]} "$@"
         do_ninja
     }
     build_x265() {
