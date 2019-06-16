@@ -1440,7 +1440,7 @@ EOF
         _check+=(bin-video/x265-numa.exe)
     fi
     do_checkIfExist
-    unset xpsupport assembly cli
+    unset xpsupport assembly cli x265_cmake_extra
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
