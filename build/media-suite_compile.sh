@@ -1362,13 +1362,11 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_patch "https://gist.githubusercontent.com/1480c1/7743056f52e4a546294e2160431674bc/raw/0001-CMake-alias-CMAKE_INSTALL_BINDIR-to-BIN_INSTALL_DIR.patch"
 
     do_x265_cmake() {
-        do_print_progress "Building $1" && shift 1
-        extra_script pre cmake
-        log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
-        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
+        do_print_progress "Building $1" && shift
+        do_cmake video "$(realpath --relative-to="$PWD" "$LOCALBUILDDIR/$(get_first_subdir)/source")" \
+        skip_build_dir
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
         -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
-        extra_script post cmake
         do_ninja
     }
     build_x265() {
