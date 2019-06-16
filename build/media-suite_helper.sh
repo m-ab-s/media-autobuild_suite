@@ -1080,24 +1080,36 @@ do_custom_patches() {
 do_cmake() {
     local bindir=""
     local root=".."
-    case "$1" in
-    global|audio|video)
-        bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1" ;;
-    *)
-        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
-    esac
-    shift 1
+    local cmakebuilddir=""
+    while (( "$#" )); do
+        case "$1" in
+        global|audio|video)
+            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"; shift ;;
+        builddir=*)
+            cmake_build_dir="${1#*=}"; shift ;;
+        skip_build_dir)
+            local skip_build_dir=y; shift ;;
+        *)
+            if [[ -d "./$1" ]]; then
+                [[ -n "$skip_build_dir" ]] && root="./$1" || root="../$1"
+            else
+                bindir="$1"
+            fi
+            shift && break ;;
+        esac
+    done
 
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
-    create_build_dir
+    [[ -z "$skip_build_dir" ]] && create_build_dir $cmake_build_dir
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release $bindir "$@"
+        -DCMAKE_BUILD_TYPE=Release $bindir ${cmake_extras[@]} "$@"
     extra_script post cmake
+    unset cmake_extras
 }
 
 do_ninja(){
