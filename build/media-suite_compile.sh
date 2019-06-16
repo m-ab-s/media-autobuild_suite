@@ -1359,6 +1359,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
+    do_patch "https://gist.githubusercontent.com/1480c1/7743056f52e4a546294e2160431674bc/raw/0001-CMake-alias-CMAKE_INSTALL_BINDIR-to-BIN_INSTALL_DIR.patch"
 
     build_x265() {
         create_build_dir
