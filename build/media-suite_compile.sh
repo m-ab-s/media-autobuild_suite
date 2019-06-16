@@ -1938,7 +1938,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled spirv-cross &&
         do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
         do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
-        do_patch "https://github.com/KhronosGroup/SPIRV-Cross/compare/master...taisei-project:meson.diff"
+        do_patch "https://github.com/KhronosGroup/SPIRV-Cross/compare/master...taisei-project:meson.patch meson.patch" am
         do_mesoninstall
         do_checkIfExist
     fi
