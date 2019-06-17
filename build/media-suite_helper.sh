@@ -1092,7 +1092,7 @@ do_cmake() {
         *)
             if [[ -d "./$1" ]]; then
                 [[ -n "$skip_build_dir" ]] && root="./$1" || root="../$1"
-            else
+            elif [[ -z "$bindir" ]]; then
                 bindir="$1"
             fi
             shift && break ;;
