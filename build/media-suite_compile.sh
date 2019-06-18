@@ -1709,6 +1709,13 @@ if [[ $ffmpeg != "no" ]]; then
             do_patch "https://0x0.st/zeB6.txt"
         fi
 
+        if enabled libsvthevc; then
+            SVT_HEVC_ffmpeg_patches="https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin"
+            do_patch "${SVT_HEVC_ffmpeg_patches}/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am
+            do_patch "${SVT_HEVC_ffmpeg_patches}/0002-doc-Add-libsvt_hevc-encoder-docs.patch" am
+            unset SVT_HEVC_ffmpeg_patches
+        fi
+
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold}shared${reset} FFmpeg"
