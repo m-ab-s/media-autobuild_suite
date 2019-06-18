@@ -1080,7 +1080,7 @@ do_custom_patches() {
 do_cmake() {
     local bindir=""
     local root=".."
-    local cmakebuilddir=""
+    local cmake_build_dir=""
     while (( "$#" )); do
         case "$1" in
         global|audio|video)
