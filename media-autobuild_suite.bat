@@ -423,8 +423,9 @@ if %svthevcINI%==0 (
     echo. 2 = No
     echo.
     echo. Note: Requires at least an Intel fourth generation core or AMD Zen to
-    echo. run.
-    echo.
+    echo. run and only supports 64-bit
+    echo. To add to ffmpeg, add --enable-libsvthevc to ffmpeg_options.txt under
+    echo. the build folder
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsvthevc="Build SVT-Hevc: "
