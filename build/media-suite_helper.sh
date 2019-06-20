@@ -1054,6 +1054,7 @@ do_patch() {
                 git am -q --abort
                 echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
+                return 1
             fi
         else
             if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" >/dev/null 2>&1; then
@@ -1061,12 +1062,15 @@ do_patch() {
             else
                 echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
+                return 1
             fi
         fi
     else
         echo -e "${orange}${patchName}${reset}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
+        return 1
     fi
+    return 0
 }
 
 do_custom_patches() {
