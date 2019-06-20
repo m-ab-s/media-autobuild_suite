@@ -1713,11 +1713,8 @@ if [[ $ffmpeg != "no" ]]; then
         fi
 
         if enabled libsvthevc; then
-            SVT_HEVC_ffmpeg_patches="https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin"
-            do_patch "${SVT_HEVC_ffmpeg_patches}/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am &&
-                do_patch "${SVT_HEVC_ffmpeg_patches}/0002-doc-Add-libsvt_hevc-encoder-docs.patch" am ||
+            do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
                 do_removeOption --enable-libsvthevc
-            unset SVT_HEVC_ffmpeg_patches
         fi
 
         # shared
