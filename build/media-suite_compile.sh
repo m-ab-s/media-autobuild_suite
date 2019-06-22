@@ -1705,14 +1705,14 @@ if [[ $ffmpeg != "no" ]]; then
         ! disabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
 
-        if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
-            # remove redundant -L and -l flags from extralibs
-            do_patch "https://0x0.st/zeB6.txt"
-        fi
-
         if enabled libsvthevc; then
             do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
                 do_removeOption --enable-libsvthevc
+        fi
+
+        if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
+            # remove redundant -L and -l flags from extralibs
+            do_patch "https://0x0.st/zeB6.txt"
         fi
 
         # shared
