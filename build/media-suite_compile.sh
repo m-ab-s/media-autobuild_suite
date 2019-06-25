@@ -1229,7 +1229,6 @@ if [[ $bits = "32bit" ]]; then
 elif { [[ $svthevc = "y" ]] || enabled libsvthevc; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
     do_uninstall "${_check[@]}" include/svt-hevc
-    do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/206.patch" am
     do_cmakeinstall video -DUNIX=OFF -DNATIVE=OFF
     do_checkIfExist
 fi
@@ -1359,23 +1358,27 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
+    do_patch "https://gist.githubusercontent.com/1480c1/7743056f52e4a546294e2160431674bc/raw/0001-CMake-alias-CMAKE_INSTALL_BINDIR-to-BIN_INSTALL_DIR.patch"
 
-    build_x265() {
-        create_build_dir
-        local build_root
-        build_root="$(pwd)"
-        mkdir -p {8,10,12}bit
+    if [[ $svthevc = "y" ]]; then
+        export SVT_HEVC_INCLUDE_DIR="$LOCALDESTDIR/include/svt-hevc"
+        export SVT_HEVC_LIBRARY_DIR="$LOCALDESTDIR/lib"
+        x265_cmake_extra+=(-DENABLE_SVT_HEVC=ON)
+    fi
 
     do_x265_cmake() {
-        do_print_progress "Building $1" && shift 1
-        extra_script pre cmake
-        log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
-        -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
-        -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
-        -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
-        extra_script post cmake
+        do_print_progress "Building $1" && shift
+        do_cmake video skip_build_dir \
+            "$(realpath --relative-to="$PWD" "$LOCALBUILDDIR/$(get_first_subdir)/source")" \
+            -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON \
+            -DHG_EXECUTABLE=/usr/bin/hg.bat -DENABLE_HDR10_PLUS=ON $xpsupport \
+            ${x265_cmake_extra[@]} "$@"
         do_ninja
     }
+    build_x265() {
+        create_build_dir
+        local build_root="$(pwd)"
+        mkdir -p {8,10,12}bit
     [[ $standalone = y ]] && cli="-DENABLE_CLI=ON"
 
     if [[ $x265 =~ (o12|s|d|y) ]]; then
@@ -1426,7 +1429,7 @@ EOF
     fi
     }
     build_x265
-    cpuCount=1 log "install" ninja install
+    do_ninjainstall
     if [[ $standalone = y && $x265 = d ]]; then
         cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
         do_uninstall bin-video/x265-numa.exe
@@ -1436,7 +1439,7 @@ EOF
         _check+=(bin-video/x265-numa.exe)
     fi
     do_checkIfExist
-    unset xpsupport assembly cli
+    unset xpsupport assembly cli x265_cmake_extra
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
