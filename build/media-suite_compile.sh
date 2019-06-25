@@ -1229,7 +1229,6 @@ if [[ $bits = "32bit" ]]; then
 elif { [[ $svthevc = "y" ]] || enabled libsvthevc; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
     do_uninstall "${_check[@]}" include/svt-hevc
-    do_patch "https://github.com/OpenVisualCloud/SVT-HEVC/pull/206.patch" am
     do_cmakeinstall video -DUNIX=OFF -DNATIVE=OFF
     do_checkIfExist
 fi
