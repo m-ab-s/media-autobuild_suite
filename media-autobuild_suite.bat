@@ -96,7 +96,7 @@ set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 librtmp librubberband libssh ^
 libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt ladspa #vapoursynth #liblensfun #libsvthevc
+libsrt ladspa libsvthevc #vapoursynth #liblensfun
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
