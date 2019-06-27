@@ -377,6 +377,9 @@ if %x2652INI%==0 (
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
+    echo. Note: In order to use the SVT-HEVC-Encoder with x265,
+    echo. it needs to be enabled separately.
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
@@ -418,14 +421,15 @@ if %svthevcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build SVT-Hevc? [H.265 encoder]
+    echo. Build SVT-HEVC? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
     echo. Note: Requires at least an Intel fourth generation core or AMD Zen to
-    echo. run and only supports 64-bit
-    echo. To add to ffmpeg, add --enable-libsvthevc to ffmpeg_options.txt under
-    echo. the build folder
+    echo. run and only supports 64-bit.
+    echo.
+    echo. Needs to be enabled to use it with x265.
+    echo. Only enabling it for FFmpeg will not include it in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsvthevc="Build SVT-Hevc: "
