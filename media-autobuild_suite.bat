@@ -432,7 +432,7 @@ if %svthevcINI%==0 (
     echo. Only enabling it for FFmpeg will not include it in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildsvthevc="Build SVT-Hevc: "
+    set /P buildsvthevc="Build SVT-HEVC: "
 ) else set buildsvthevc=%svthevcINI%
 
 if "%buildsvthevc%"=="" GOTO svthevc
