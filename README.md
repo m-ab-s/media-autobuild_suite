@@ -104,6 +104,7 @@ For information about the compiler environment see the wiki, there you also have
         - librubberband (git snapshot)
         - libsrt (git)
         - libssh (mingw)
+        - libsvthevc (git)
         - libtesseract (git)
         - libvmaf (git)
         - libxavs (svn snapshot)
@@ -155,10 +156,11 @@ For information about the compiler environment see the wiki, there you also have
     - opus-tools (git)
     - rav1e (git)
     - redshift (git)
-    - ripgrep (git latest release)
+    - ripgrep (git)
     - rtmpdump (git)
     - sox (14.4.2)
     - speex (git)
+    - svt-hevc (git)
     - tesseract (git)
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
@@ -166,6 +168,7 @@ For information about the compiler environment see the wiki, there you also have
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
+        - includes svt-hevc encoder if enabled
     - xvid (1.3.5)
 
 --------

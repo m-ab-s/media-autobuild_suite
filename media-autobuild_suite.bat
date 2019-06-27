@@ -96,7 +96,7 @@ set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 librtmp librubberband libssh ^
 libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt ladspa #vapoursynth #liblensfun #libsvthevc
+libsrt ladspa libsvthevc #vapoursynth #liblensfun
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
@@ -377,6 +377,9 @@ if %x2652INI%==0 (
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
+    echo. Note: To include SVT-HEVC in x265, you need to enable it, not just add its
+    echo. flag to ffmpeg_options.txt
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
@@ -418,17 +421,17 @@ if %svthevcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build SVT-Hevc? [H.265 encoder]
+    echo. Build SVT-HEVC? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: Requires at least an Intel fourth generation core or AMD Zen to
-    echo. run and only supports 64-bit
-    echo. To add to ffmpeg, add --enable-libsvthevc to ffmpeg_options.txt under
-    echo. the build folder
+    echo. Note: 64-bit only and requires a CPU with AVX2 instruction set support to run.
+    echo. [Intel Haswell or later, AMD Ryzen or later]
+    echo.
+    echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P buildsvthevc="Build SVT-Hevc: "
+    set /P buildsvthevc="Build SVT-HEVC: "
 ) else set buildsvthevc=%svthevcINI%
 
 if "%buildsvthevc%"=="" GOTO svthevc
