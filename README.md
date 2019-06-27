@@ -104,6 +104,7 @@ For information about the compiler environment see the wiki, there you also have
         - librubberband (git snapshot)
         - libsrt (git)
         - libssh (mingw)
+        - libsvthevc (git)
         - libtesseract (git)
         - libvmaf (git)
         - libxavs (svn snapshot)
