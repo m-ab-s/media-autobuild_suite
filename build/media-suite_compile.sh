@@ -1718,6 +1718,8 @@ if [[ $ffmpeg != "no" ]]; then
             do_patch "https://0x0.st/zeB6.txt"
         fi
 
+        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
+
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
             do_print_progress "Compiling ${bold}shared${reset} FFmpeg"
