@@ -1727,7 +1727,7 @@ if [[ $ffmpeg != "no" ]]; then
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
-            do_patch "https://0x0.st/zeB6.txt"
+            do_patch "https://0x0.st/zLsN.txt" am
         fi
 
         # shared
