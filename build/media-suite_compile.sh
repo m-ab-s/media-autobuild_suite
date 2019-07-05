@@ -1512,44 +1512,42 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
     elif do_wget "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth${bits%bit}-Portable-R$_vsver.7z"; then
-        do_uninstall {vapoursynth,vsscript}.lib "${_check[@]}"
+        do_uninstall {vapoursynth,vsscript}.lib include/vapoursynth "${_check[@]}"
         do_install sdk/include/*.h include/vapoursynth/
 
         create_build_dir
+        declare -A _pc_vars=(
+            [vapoursynth-name]=vapoursynth
+            [vapoursynth-description]='A frameserver for the 21st century'
+            [vapoursynth-cflags]="-DVS_CORE_EXPORTS"
+            
+            [vsscript-name]=vapoursynth-script
+            [vsscript-description]='Library for interfacing VapourSynth with Python'
+            [vsscript-private]="-l$_python_lib -lstdc++"
+        )
         for _file in vapoursynth vsscript; do
             gendef "../$_file.dll" >/dev/null 2>&1
             dlltool -y "lib${_file}.a" -d "${_file}.def"
             [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
+
+            printf "%s \n" \
+               "prefix=$LOCALDESTDIR" \
+               'exec_prefix=${prefix}' \
+               'libdir=${exec_prefix}/lib' \
+               'includedir=${prefix}/include/vapoursynth' \
+               "Name: ${_pc_vars[${_file}-name]}" \
+               "Description: ${_pc_vars[${_file}-description]}" \
+               "Version: $_vsver" \
+               "Libs: -L\${libdir} -l${_file}" \
+               "Libs.private: ${_pc_vars[${_file}-private]}" \
+               "Cflags: -I\${includedir} ${_pc_vars[${_file}-cflags]}" \
+               > "${_pc_vars[${_file}-name]}.pc"
         done
-
-        printf "%s \n" \
-               "prefix=$LOCALDESTDIR" \
-               'exec_prefix=${prefix}' \
-               'libdir=${exec_prefix}/lib' \
-               'includedir=${prefix}/include/vapoursynth' \
-               'Name: vapoursynth' \
-               'Description: A frameserver for the 21st century' \
-               "Version: $_vsver" \
-               'Libs: -L${libdir} -lvapoursynth' \
-               'Cflags: -I${includedir} -DVS_CORE_EXPORTS' > vapoursynth.pc
-
-        printf "%s \n" \
-               "prefix=$LOCALDESTDIR" \
-               'exec_prefix=${prefix}' \
-               'libdir=${exec_prefix}/lib' \
-               'includedir=${prefix}/include/vapoursynth' \
-               'Name: vapoursynth-script' \
-               'Description: Library for interfacing VapourSynth with Python' \
-               "Version: $_vsver" \
-               'Requires: vapoursynth' \
-               'Libs: -L${libdir} -lvsscript' \
-               "Libs.private: -l$_python_lib -lstdc++" \
-               'Cflags: -I${includedir}' > vapoursynth-script.pc
 
         do_install vapoursynth{,-script}.pc lib/pkgconfig/
         do_checkIfExist
     fi
-    unset _arch _file _python_lib _python_ver _vsver
+    unset _arch _file _python_lib _python_ver _vsver _pc_vars
 else
     mpv_disable vapoursynth
     do_removeOption --enable-vapoursynth
@@ -1657,7 +1655,7 @@ if [[ $ffmpeg != "no" ]]; then
     if enabled vapoursynth && pc_exists "vapoursynth-script >= 42"; then
         _ver="$(pkg-config --modversion vapoursynth-script)"
         echo -e "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
-        echo -e "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run!${reset}"
+        echo -e "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers!${reset}"
         unset _ver
     elif enabled vapoursynth; then
         do_removeOption --enable-vapoursynth
@@ -1724,12 +1722,13 @@ if [[ $ffmpeg != "no" ]]; then
                 do_removeOption --enable-libsvthevc
         fi
 
-        if [[ ${#FFMPEG_OPTS[@]} -gt 25 ]]; then
+        # vapoursynth-alt
+        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
+
+        if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://0x0.st/zeB6.txt"
         fi
-
-        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
@@ -1863,7 +1862,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
         _ver="$(pkg-config --modversion vapoursynth-script)"
         echo -e "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
-        echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to run!${reset}"
+        echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter!${reset}"
         unset _ver
     elif ! mpv_disabled vapoursynth; then
         mpv_disable vapoursynth
