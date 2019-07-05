@@ -1998,8 +1998,11 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python3-docutils
         fi
-        do_pacman_remove python3-rst2pdf
-        mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
+        # do_pacman_remove python3-rst2pdf
+        # mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
+
+        # rst2pdf is broken
+        mpv_disable pdf-build
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
