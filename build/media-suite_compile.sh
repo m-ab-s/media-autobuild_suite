@@ -444,8 +444,14 @@ if files_exist "$LOCALDESTDIR/bin-video/OpenCL.dll"; then
 fi
 if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$opencldll" ]]; then
     echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
+    do_pacman_remove opencl-headers
+    _check=(CL/cl.h)
+    if do_vcs "https://github.com/KhronosGroup/OpenCL-Headers.git"; then
+        do_uninstall include/CL
+        do_install CL/*.h include/CL/
+        do_checkIfExist
+    fi
     _check=(libOpenCL.a)
-    do_pacman_install opencl-headers
     if test_newer installed "$opencldll" "${_check[@]}"; then
         cd_safe "$LOCALBUILDDIR"
         [[ -d opencl ]] && rm -rf opencl
