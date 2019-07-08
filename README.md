@@ -339,7 +339,7 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 #!/bin/bash
 _pre_configure(){
     # Apply a patch from ffmpeg's patchwork site.
-    do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/ 12563.patch" am
     # Add extra configure options to ffmpeg (ffmpeg specific)
     # If you want to add something to ffmpeg not within the suite already
     # you will need to install it yourself, either through pacman
