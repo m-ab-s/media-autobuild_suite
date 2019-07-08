@@ -1027,7 +1027,7 @@ do_patch() {
 
     if [[ -z "$patchName" ]]; then
         # hack for URLs without filename
-        patchName="$(/usr/bin/curl -sI "$patch" | ggrep -Pio '(?<=filename=)(.+)')"
+        patchName="$(/usr/bin/curl -sI "$patch" | grep -Pio '(?<=filename=)(.+)')"
         if [[ -z "$patchName" ]]; then
             echo -e "${red}Failed to apply patch '$patch'${reset}"
             echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
