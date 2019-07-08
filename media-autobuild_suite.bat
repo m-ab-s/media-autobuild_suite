@@ -26,6 +26,8 @@ title media-autobuild_suite
 
 setlocal
 cd /d "%~dp0"
+set "TERM=xterm-256color"
+setlocal
 set instdir=%CD%
 
 if not exist %instdir% (
@@ -94,12 +96,12 @@ set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 librtmp librubberband libssh ^
 libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt ladspa #vapoursynth #liblensfun
+libsrt ladspa libsvthevc #vapoursynth #liblensfun
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #crossc #d3d11 #jpeg
+#shaderc #spirv-cross #d3d11 #jpeg
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
@@ -111,7 +113,7 @@ pdf-build libmpv-shared
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty svthevc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -150,8 +152,6 @@ if %deleteINI%==1 (
 :systemVars
 set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
-
-setlocal
 
 :selectSystem
 if %archINI%==0 (
@@ -377,6 +377,9 @@ if %x2652INI%==0 (
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
+    echo. Note: To include SVT-HEVC in x265, you need to enable it, not just add its
+    echo. flag to ffmpeg_options.txt
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
@@ -412,6 +415,30 @@ if %buildother265%==1 set "other265=y"
 if %buildother265%==2 set "other265=n"
 if %buildother265% GTR 2 GOTO other265
 if %deleteINI%==1 echo.other265=^%buildother265%>>%ini%
+
+:svthevc
+if %svthevcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build SVT-HEVC? [H.265 encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note: 64-bit only and requires a CPU with AVX2 instruction set support to run.
+    echo. [Intel Haswell or later, AMD Ryzen or later]
+    echo.
+    echo. Needs to be enabled for it to be included in x265.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsvthevc="Build SVT-HEVC: "
+) else set buildsvthevc=%svthevcINI%
+
+if "%buildsvthevc%"=="" GOTO svthevc
+if %buildsvthevc%==1 set "svthevc=y"
+if %buildsvthevc%==2 set "svthevc=n"
+if %buildsvthevc% GTR 2 GOTO svthevc
+if %deleteINI%==1 echo.svthevc=^%buildsvthevc%>>%ini%
 
 :vvc
 if %vvcINI%==0 (
@@ -1154,105 +1181,10 @@ if "%noMinttyF%"=="" GOTO noMintty
 if %noMinttyF%==1 (
     set "noMintty=y"
     color
-    (
-        echo.param^([string]$Bash, [string]$BashCommand, [string]$LogFile^)
-        echo.function Write-Transcript {
-        echo.try {Stop-Transcript ^| Out-Null} catch [System.InvalidOperationException] {}
-        echo.if ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************' -Quiet^) {
-        echo.$linenumber = ^(Select-String -Path $LogFile -SimpleMatch -Pattern '**********************'^).LineNumber
-        echo.$transcriptContent = Get-Content -Path $LogFile ^| Select-Object -Index ^($linenumber[1]..^($linenumber[$linenumber.Length - 2] - 2^)^)
-        echo.Set-Content -Force -Path $LogFile -Value $transcriptContent
-        echo.}
-        echo.}
-        echo.try {
-        echo.$host.ui.RawUI.WindowTitle = switch -wildcard ^($BashCommand^) {
-        echo.*media-suite_update* {"update autobuild suite"}
-        echo.*media-suite_compile* {"media-autobuild_suite"}
-        echo.Default {$host.ui.RawUI.WindowTitle}
-        echo.}
-        echo.Start-Transcript -Force $LogFile ^| Out-Null
-        echo.$build = ^(Get-Item $LogFile^).Directory.FullName
-        echo.if ^($LogFile -match "compile"^) {
-        echo.$env:MSYSTEM = switch ^($env:Build64^) { yes {"MINGW64"} Default {"MINGW32"}}
-        echo.$env:MSYS2_PATH_TYPE = "inherit"
-        echo.}
-        echo.Remove-Item -Force -Path "$build\compilation_failed", "$build\fail_comp" -ErrorAction Ignore
-        echo.^&$bash "-l" $BashCommand.Split^(' '^)
-        echo.if ^(Test-Path "$build\compilation_failed"^) {
-        echo.Write-Transcript
-        echo.$compilefail = Get-Content -Path $build\compilation_failed
-        echo.$env:reason = $compilefail[1]
-        echo.$env:operation = $compilefail[2]
-        echo.New-Item -Force -ItemType File -Path "$build\fail_comp" -Value $^(
-        echo."while read line; do declare -x `"`$line`"; done < /build/fail.var`n" +
-        echo."source /build/media-suite_helper.sh`n" +
-        echo."cd `$(head -n 1 /build/compilation_failed)`n" +
-        echo."if [[ `$logging = y ]]; then`n" +
-        echo."echo `"Likely error:`"`n" +
-        echo."tail `"ab-suite.`${operation}.log`"`n" +
-        echo."echo `"`${red}`$reason failed. Check `$^(pwd -W^)/ab-suite.`$operation.log`${reset}`"`n" +
-        echo."fi`n" +
-        echo."echo `"`${red}This is required for other packages, so this script will exit.`${reset}`"`n" +
-        echo."zip_logs`n" +
-        echo."echo `"Make sure the suite is up-to-date before reporting an issue. It might've been fixed already.`"`n" +
-        echo."do_prompt `"Try running the build again at a later time.`""^) ^| Out-Null
-        echo.Start-Process -NoNewWindow -Wait -FilePath $bash -ArgumentList ^("-l /build/fail_comp"^).Split^(' '^)
-        echo.Remove-Item -Force -Path $build\compilation_failed, $build\fail_comp
-        echo.}
-        echo.} catch {
-        echo.Write-Output "Stopping log and exiting"
-        echo.} finally {
-        echo.Write-Transcript
-        echo.}
-    )>%build%\bash.ps1
-    )
+)
 if %noMinttyF%==2 set "noMintty=n"
 if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
-
-endlocal & (
-    set updateSuite=%updateSuite%
-    set cpuCount=%cpuCount%
-    set build32=%build32%
-    set build64=%build64%
-    set deleteSource=%deleteSource%
-    set mp4box=%mp4box%
-    set vpx2=%vpx2%
-    set x2643=%x2643%
-    set x2652=%x2652%
-    set other265=%other265%
-    set flac=%flac%
-    set fdkaac=%fdkaac%
-    set mediainfo=%mediainfo%
-    set sox=%sox%
-    set ffmpeg=%ffmpeg%
-    set ffmpegUpdate=%ffmpegUpdate%
-    set ffmpegChoice=%ffmpegChoice%
-    set mplayer=%mplayer%
-    set mpv=%mpv%
-    set license2=%license2%
-    set stripFile=%stripFile%
-    set packFile=%packFile%
-    set rtmpdump=%rtmpdump%
-    set logging=%logging%
-    set bmx=%bmx%
-    set standalone=%standalone%
-    set aom=%aom%
-    set faac=%faac%
-    set ffmbc=%ffmbc%
-    set curl=%curl%
-    set cyanrip=%cyanrip%
-    set redshift=%redshift%
-    set rav1e=%rav1e%
-    set ripgrep=%ripgrep%
-    set dav1d=%dav1d%
-    set vvc=%vvc%
-    set jq=%jq%
-    set dssim=%dssim%
-    set avs2=%avs2%
-    set timeStamp=%timeStamp%
-    set noMintty=%noMintty%
-)
 
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
@@ -1267,9 +1199,7 @@ if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
     echo.- Download and install msys2 basic system
     echo.
     echo -------------------------------------------------------------------------------
-    if %msys2%==msys32 (
-        set "msysprefix=i686"
-    ) else set "msysprefix=x86_64"
+    if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
     (
         echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
         echo.$wc = New-Object System.Net.WebClient
@@ -1336,9 +1266,8 @@ if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
 
 :getMintty
 set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
-set "mintty=start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico"
+
 if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
-setlocal
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
         echo.-------------------------------------------------------------------------------
@@ -1397,10 +1326,12 @@ if not exist %instdir%\mintty.lnk (
 )
 
 if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
+set "TERM="
 for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
 if not defined TERM (
     %bash% -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" ^
     > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
+    set "TERM=xterm-256color"
 )
 
 :hgsettings
@@ -1510,11 +1441,11 @@ echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
 cd %build%
-set scripts=compile helper update
+set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
-    if not exist "%build%\media-suite_%%s.sh" (
+    if not exist "%build%\%%s" (
         %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
-        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/media-suite_%%s.sh
+        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s
     )
 )
 if %updateSuite%==y (
@@ -1638,14 +1569,8 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
     echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
 
-endlocal
-
 :compileLocals
 cd %instdir%
-
-if [%build64%]==[yes] (
-    set MSYSTEM=MINGW64
-) else set MSYSTEM=MINGW32
 
 title MABSbat
 if %noMintty%==y cls
@@ -1654,6 +1579,7 @@ for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
+endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
@@ -1662,15 +1588,19 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty%
-
+--noMintty=%noMintty% --svthevc=%svthevc%
+    set "msys2=%msys2%"
+    set "noMintty=%noMintty%"
+    if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
+    set "MSYS2_PATH_TYPE=inherit"
+)
 if %noMintty%==y (
-    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
-    -Logfile "%build%\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
+    powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
+    -Logfile "%CD%\build\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
 ) else (
-    if exist %build%\compile.log del %build%\compile.log
-    start /I %instdir%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
+    if exist %CD%\build\compile.log del %CD%\build\compile.log
+    start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
 endlocal
@@ -1777,7 +1707,8 @@ if %noMintty%==y (
     -Logfile "%build%\%log%" -BashCommand \"%command%\"
 ) else (
     if exist %build%\%log% del %build%\%log%
-    %mintty% --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
+    --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
 )
 endlocal
 goto :EOF

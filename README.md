@@ -104,6 +104,7 @@ For information about the compiler environment see the wiki, there you also have
         - librubberband (git snapshot)
         - libsrt (git)
         - libssh (mingw)
+        - libsvthevc (git)
         - libtesseract (git)
         - libvmaf (git)
         - libxavs (svn snapshot)
@@ -155,10 +156,11 @@ For information about the compiler environment see the wiki, there you also have
     - opus-tools (git)
     - rav1e (git)
     - redshift (git)
-    - ripgrep (git latest release)
+    - ripgrep (git)
     - rtmpdump (git)
     - sox (14.4.2)
     - speex (git)
+    - svt-hevc (git)
     - tesseract (git)
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
@@ -166,6 +168,7 @@ For information about the compiler environment see the wiki, there you also have
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
+        - includes svt-hevc encoder if enabled
     - xvid (1.3.5)
 
 --------
@@ -232,7 +235,7 @@ If there's some error during compilation follow these steps:
 3. If it still doesn't work, [create an issue](https://github.com/jb-alvarado/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys32, /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
-6. If you compile with `--enable-libnpp` and/or `--enable-cuda-sdk`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
+6. If you compile with `--enable-libnpp` and/or `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
 ## What The Individual Files Do
 
@@ -301,22 +304,27 @@ Example Script: `/build/aom_extra.sh` for `aom-git`
 ``` bash
 #!/bin/bash
 
+# Don't automatically run cmake || configure
+touch do_not_reconfigure
+
 # Commands to run before running cmake
 _pre_cmake(){
     # Installs libwebp
     do_pacman_install libwebp
     # Downloads the patch and then applies the patch
     do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
-}
-
-_post_cmake(){
     # Change directory to the build folder
     cd_safe "build-${bits}"
-    # Rerun cmake with custom options. This will override the previous cmake commands.
+    # Run cmake with custom options. This will override the previous cmake commands.
     # $LOCALDESTDIR refers to local64 or local32
     cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
         -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
         -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+}
+
+_post_cmake(){
+# post cmake and post configure will be unavailable due to "touch do_not_reconfigure"
+# as the do_not_reconfigure flag will skip the post commands.
 }
 
 # Commands to run before building using ninja
@@ -324,7 +332,7 @@ _pre_ninja(){
     # Change directory to the build folder (Absolute path or relative to aom-git)
     cd_safe "build-${bits}"
     # applies a local patch (Absolute or relative to aom-git)
-    do_patch "/build/patches/test-diff-files.diff"
+    do_patch "My-Custom-Patches/test-diff-files.diff"
     # run a custom ninja command.
     ninja aom_version_check
     # Not necessary, but just for readability sake
@@ -337,18 +345,39 @@ Example Script: `/build/ffmpeg_extra.sh` for `ffmpeg-git`
 
 ``` bash
 #!/bin/bash
+
+# Force to the suite to think the package has updates to recompile.
+# Alternatively, you can use "touch recompile" for a similar effect.
+touch custom_updated
+
 _pre_configure(){
+    #
     # Apply a patch from ffmpeg's patchwork site.
+
     do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/ 12563.patch" am
+    #
+    # Apply a local patch inside the directory where is "ffmpeg_extra.sh"
+    patch -p1 -i "$LOCALBUILDDIR/ffmpeg-0001-my_patch.patch"
+    #
     # Add extra configure options to ffmpeg (ffmpeg specific)
     # If you want to add something to ffmpeg not within the suite already
     # you will need to install it yourself, either through pacman
     # or compiling from source.
     FFMPEG_OPTS+=(--enable-libsvthevc)
+    #
+}
+
+_post_make(){
+    # Don't run configure again.
+    touch "$(get_first_subdir)/do_not_reconfigure"
+    # Don't clean the build folder on each successive run.
+    # This is for if you want to keep the current build folder as is and just recompile only.
+    touch "$(get_first_subdir)/do_not_clean"
 }
 ```
 
 For a list of possible directive, look under `unset_extra_script` in [media-suite_helper.sh](build/media-suite_helper.sh).
+Beware as they may change in the future.
 
 ## Notes about CUDA SDK
 

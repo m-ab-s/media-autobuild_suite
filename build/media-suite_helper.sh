@@ -220,7 +220,13 @@ do_vcs() {
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        log quiet "$vcsType.clone" vcs_clone || do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        if ! log quiet "$vcsType.clone" vcs_clone && [[ $vcsType = git ]] &&
+            [[ "$vcsURL" != *"media-autobuild_suite-dependencies"* ]]; then
+            local repoName=${vcsURL##*/}
+            vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
+            log quiet "$vcsType.clone" vcs_clone ||
+            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+        fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
             touch recently_updated recently_checked
@@ -251,9 +257,10 @@ do_vcs() {
         newHead="$oldHead"
     fi
 
+    rm -f custom_updated
     check_custom_patches
 
-    if [[ "$oldHead" != "$newHead" ]]; then
+    if [[ "$oldHead" != "$newHead" ]] || [[ -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
         if [[ $build32 = "yes" && $build64 = "yes" ]] && [[ $bits = "64bit" ]]; then
@@ -275,7 +282,12 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
-        return 1
+        if [[ -f recompile ]]; then
+            do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
+            do_print_status "${bold}├${reset} Found recompile flag" "$orange" "Recompiling"
+        else
+            return 1
+        fi
     fi
     return 0
 }
@@ -323,9 +335,6 @@ do_wget() {
 
     [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
     if ! check_hash "$archive" "$hash"; then
-        [[ ${url#/patches} != "$url" || ${url#/extras} != "$url" ]] &&
-            url="https://jb-alvarado.github.io/media-autobuild_suite${url}"
-
         curlcmds=("${curl_opts[@]}")
         [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive" -R)
         [[ $hash ]] && tries=3
@@ -893,7 +902,7 @@ do_getMpvConfig() {
             <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
     do_removeOption MPV_OPTS \
-        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding)"
+        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc)"
     if [[ $mpv = "y" ]]; then
         mpv_disabled vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
     elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
@@ -1010,34 +1019,68 @@ do_removeOptions() {
 do_patch() {
     local binarypatch="--binary"
     case $1 in -p) binarypatch="" && shift;; esac
-    local patch=${1%% *}
-    local am=$2          # "am" to apply patch with "git am"
-    local strip=${3:-1}  # value of "patch" -p i.e. leading directories to strip
-    local patchfn="${1##* }"
-    [[ $patchfn = "$patch" ]] &&
-        patchfn="${patch##*/}"
-    [[ $patch = ${patch##*/} ]] &&
-        patch="/patches/$patch"
-    do_wget -c -r -q "$patch" "$patchfn"
-    if [[ -f "$patchfn" ]]; then
+    local patch=${1%% *} # Location or link to patch.
+    local am=$2          # Use git am to apply patch. Use with .patch files
+    local strip=${3:-1}  # Leading directories to strip. "patch -p${strip}"
+    local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
+    [[ $patchName = "$patch" ]] && patchName="${patch##*/}"
+
+    if [[ -z "$patchName" ]]; then
+        # hack for URLs without filename
+        patchName="$(/usr/bin/curl -sI "$patch" | ggrep -Pio '(?<=filename=)(.+)')"
+        if [[ -z "$patchName" ]]; then
+            echo -e "${red}Failed to apply patch '$patch'${reset}"
+            echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
+            return 1
+        fi
+    fi
+
+    # Just don't. Make a fork or use the suite's directory as the root for
+    # your diffs or manually edit the scripts if you are trying to modify
+    # the helper and compile scripts. If you really need to, use patch instead.
+    # Else create a patch file for the individual folders you want to apply
+    # the patch to.
+    [[ "$PWD" = "$LOCALBUILDDIR" ]] &&
+        do_exit_prompt "Running patches in the build folder is not supported.
+        Please make a patch for individual folders or modify the script directly"
+
+    if [[ ${patch:0:4} = "http" ]] || [[ ${patch:0:3} = "ftp" ]]; then
+        # Filter out patches that would require curl
+        do_wget -c -r -q "$patch" "$patchName"
+    elif [[ -f "$patch" ]]; then
+        # Check if the patch is a local patch and copy it to the current dir
+        patch="$(realpath "$patch")" # Resolve fullpatch
+        [[ "${patch%/*}" != "$PWD" ]] &&
+            cp -f "$patch" "$patchName" >/dev/null 2>&1
+    else
+        # Fall through option if the patch is from some other protocol
+        # I don't know why anyone would use this but just in case.
+        do_wget -c -r -q "$patch" "$patchName"
+    fi
+
+    if [[ -f "$patchName" ]]; then
         if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace "$patchfn" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" >/dev/null 2>&1; then
                 git am -q --abort
-                echo -e "${orange}${patchfn}${reset}"
+                echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
+                return 1
             fi
         else
-            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchfn" >/dev/null 2>&1; then
-                patch $binarypatch -s -N -p"$strip" -i "$patchfn"
+            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" >/dev/null 2>&1; then
+                patch $binarypatch -s -N -p"$strip" -i "$patchName"
             else
-                echo -e "${orange}${patchfn}${reset}"
+                echo -e "${orange}${patchName}${reset}"
                 echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
+                return 1
             fi
         fi
     else
-        echo -e "${orange}${patchfn}${reset}"
+        echo -e "${orange}${patchName}${reset}"
         echo -e "\tPatch not found anywhere. Continuing without patching."
+        return 1
     fi
+    return 0
 }
 
 do_custom_patches() {
@@ -1049,15 +1092,37 @@ do_custom_patches() {
 }
 
 do_cmake() {
+    local bindir=""
     local root=".."
+    local cmake_build_dir=""
+    while (( "$#" )); do
+        case "$1" in
+        global|audio|video)
+            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"; shift ;;
+        builddir=*)
+            cmake_build_dir="${1#*=}"; shift ;;
+        skip_build_dir)
+            local skip_build_dir=y; shift ;;
+        *)
+            if [[ -d "./$1" ]]; then
+                [[ -n "$skip_build_dir" ]] && root="./$1" || root="../$1"
+                shift
+            fi
+            break ;;
+        esac
+    done
+
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
-    create_build_dir
-    [[ $1 && -d "../$1" ]] && root="../$1" && shift
+    [[ -z "$skip_build_dir" ]] && create_build_dir $cmake_build_dir
     extra_script pre cmake
+    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+        return
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
+        -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release "$@"
+        -DCMAKE_BUILD_TYPE=Release $bindir ${cmake_extras[@]} "$@"
     extra_script post cmake
+    unset cmake_extras
 }
 
 do_ninja(){
@@ -1079,13 +1144,22 @@ do_cmakeinstall() {
 }
 
 do_meson() {
+    local bindir=""
     local root=".."
+    case "$1" in
+    global|audio|video)
+        bindir="--bindir=bin-$1" ;;
+    *)
+        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
+    esac
+    shift 1
+
     local PKG_CONFIG=pkg-config
     create_build_dir
-    [[ $1 && -d "../$1" ]] && root="../$1" && shift
     extra_script pre meson
-    log "meson" meson "$root" --default-library=static \
-        --prefix="$LOCALDESTDIR" "$@"
+    CC=gcc CXX=g++ \
+        log "meson" meson "$root" --default-library=static --buildtype=release \
+        --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@"
     extra_script post meson
 }
 
@@ -1110,9 +1184,8 @@ compilation_fail() {
         return 1
     else
         if [[ $noMintty = y ]]; then
-            diff <(cat $LOCALBUILDDIR/old.var) <(set -o posix ; set) | grep '^[<>]' | sed -nr 's/> (.*)/\1/p' > "$LOCALBUILDDIR/fail.var"
-            echo "$PWD" > "$LOCALBUILDDIR/compilation_failed"
-            echo -e "$reason\n$operation" >> "$LOCALBUILDDIR/compilation_failed"
+            diff "$LOCALBUILDDIR/old.var" <(set) | grep '^[<>]' | sed -nr 's/> (.*)/\1/p' > "$LOCALBUILDDIR/fail.var"
+            echo -e "$PWD\n$reason\n$operation" > "$LOCALBUILDDIR/compilation_failed"
             exit
         else
             if [[ $logging = y ]]; then
@@ -1152,7 +1225,7 @@ zip_logs() {
     files+=($(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
         -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
-    [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
+    [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     popd >/dev/null
     echo
     if [[ $url ]]; then
@@ -1185,13 +1258,15 @@ log() {
 
 create_build_dir() {
     local build_dir="build${1:+-$1}-$bits"
-    if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
-        rm -rf ./*
-    elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
-        cd_safe "$build_dir" && rm -rf ./*
-    else
-        mkdir "$build_dir" && cd_safe "$build_dir"
+    if [[ ! -f "$(get_first_subdir)/do_not_clean" ]]; then
+        if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
+            rm -rf ./* && cd_safe ".."
+        elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
+            cd_safe "$build_dir" && rm -rf ./* && cd_safe ".."
+        fi
     fi
+    [[ ! -d "$build_dir" ]] && mkdir "$build_dir"
+    cd_safe "$build_dir"
 }
 
 get_external_opts() {
@@ -1222,10 +1297,7 @@ do_separate_conf() {
         config_path=".."
         create_build_dir
     fi
-    extra_script pre configure
-    log "configure" ${config_path}/configure --{build,host,target}="$MINGW_CHOST" \
-        --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
-    extra_script post configure
+    do_configure --{build,host,target}="$MINGW_CHOST" --prefix="$LOCALDESTDIR" --disable-shared --enable-static "$bindir" "$@"
 }
 
 do_separate_confmakeinstall() {
@@ -1237,7 +1309,9 @@ do_separate_confmakeinstall() {
 
 do_configure() {
     extra_script pre configure
-    log "configure" ./configure "$@"
+    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+        return
+    log "configure" ${config_path:-.}/configure "$@"
     extra_script post configure
 }
 
@@ -1471,8 +1545,7 @@ get_cl_path() {
         vswhere=$_suite_vswhere
     else
         pushd "$LOCALBUILDDIR" 2>/dev/null
-        local _ver=2.6.7
-        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/download/$_ver/vswhere.exe"
+        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
         vswhere=$_suite_vswhere
@@ -1709,6 +1782,24 @@ EOF
             cat > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
 }
 
+create_cmake_toolchain() {
+    local _win_path_LOCALDESTDIR="$(cygpath -m $LOCALDESTDIR)"
+    local _win_path_MINGW_PREFIX="$(cygpath -m $MINGW_PREFIX)"
+    local toolchain_file=(
+        "SET(CMAKE_RC_COMPILER_INIT windres)"
+        ""
+        "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin)"
+        "SET(CMAKE_FIND_ROOT_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
+        "SET(CMAKE_PREFIX_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
+        "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
+        "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
+    )
+
+    [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
+        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake >/dev/null ||
+        printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
@@ -1808,7 +1899,9 @@ fix_cmake_crap_exports() {
 }
 
 verify_cuda_deps() {
-    enabled_any libnpp cuda-nvcc || return 1
+    enabled_any libnpp cuda-nvcc cuda-sdk || return 1
+    enabled cuda-sdk && do_removeOption --enable-cuda-sdk &&
+        do_addOption --enable-cuda-nvcc
     if [[ $bits = 32bit ]]; then
         echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
         do_removeOption --enable-libnpp
@@ -1850,10 +1943,16 @@ check_custom_patches(){
 extra_script(){
     local stage="$1"
     local commandname="$2"
-    if type _${stage}_${commandname} >/dev/null 2>&1; then
+    local vcsFolder="${REPO_DIR%-*}"
+    vcsFolder="${vcsFolder#*build/}"
+    if [[ $commandname =~ ^(make|meson|ninja)$ ]] &&
+        type _${stage}_build >/dev/null 2>&1; then
         pushd "${REPO_DIR}" >/dev/null
-        local vcsFolder="${REPO_DIR%-*}"
-        vcsFolder="${vcsFolder#*build/}"
+        do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
+        log quiet "${stage}_build" _${stage}_build
+        popd >/dev/null
+    elif type _${stage}_${commandname} >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
         log quiet "${stage}_${commandname}" _${stage}_${commandname}
         popd >/dev/null
@@ -1872,26 +1971,39 @@ unset_extra_script(){
     # Runs before and after building rust packages (do_rust)
     unset _{pre,post}_rust
 
+    ## Pregenerational hooks
+
     # Runs before and after running autoreconf -fiv (do_autoreconf)
     unset _{pre,post}_autoreconf
 
     # Runs before and after running ./autogen.sh (do_autogen)
     unset _{pre,post}_autogen
 
+    # Generational hooks
+
     # Runs before and after running ./configure (do_separate_conf, do_configure)
     unset _{pre,post}_configure
 
-    # Runs before and after runing make (do_make)
-    unset _{pre,post}_make
-
     # Runs before and after running cmake (do_cmake)
     unset _{pre,post}_cmake
+
+    ## Build hooks
+
+    # Runs before and after runing make (do_make)
+    unset _{pre,post}_make
 
     # Runs before and after running meson (do_meson)
     unset _{pre,post}_meson
 
     # Runs before and after running ninja (do_ninja)
     unset _{pre,post}_ninja
+
+    # Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
+    # If this is present, it will override the other hooks
+    # Use for mpv and python waf based stuff.
+    unset _{pre,post}_build
+
+    ## Post build hooks
 
     # Runs before and after either ninja install
     # or make install or using install

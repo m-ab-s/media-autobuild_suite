@@ -63,11 +63,11 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-/usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531 >/dev/null
+/usr/bin/pacman-key -f EFD16019AE4FF531 >/dev/null || pacman-key -r EFD16019AE4FF531 >/dev/null
 /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531 >/dev/null
 
 #always kill gpg-agent
-ps|grep gpg-agent|awk '{print $1}'|xargs kill -9
+ps|grep gpg-agent|awk '{print $1}'|xargs -r kill -9
 
 # for some people the signature is broken
 printf 'Server = %s\nSigLevel = Optional\n' \
@@ -98,9 +98,9 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
     old=$(pacman -Qqe | sort)
-    new=$(cat /etc/pac-base.pk | dos2unix)
-    newmingw=$(cat /etc/pac-mingw.pk | dos2unix)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(cat /etc/pac-mingw-extra.pk | dos2unix)")
+    new=$(dos2unix < /etc/pac-base.pk)
+    newmingw=$(dos2unix < /etc/pac-mingw.pk)
+    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(dos2unix < /etc/pac-mingw-extra.pk)")
     [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
     [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
     diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
