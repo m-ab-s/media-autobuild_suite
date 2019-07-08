@@ -1456,7 +1456,7 @@ do_autogen() {
     if { [[ -f "$basedir"/recently_updated &&
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
-        git clean -qxfd -e "/build_successful*" -e "/recently_updated"
+        safe_git_clean -q
         extra_script pre autogen
         log "autogen" ./autogen.sh $*
         extra_script post autogen
@@ -2009,4 +2009,17 @@ unset_extra_script(){
     # or make install or using install
     # (do_makeinstall, do_ninjainstall, do_install)
     unset _{pre,post}_install
+}
+
+# if you absolutely need to remove some of these,
+# add a "-e '!<hardcoded rule>'"  option
+# ex: "-e '!/recently_updated'"
+safe_git_clean() {
+    git clean -xfd \
+        -e "/build_successful*" \
+        -e "/recently_updated" \
+        -e '/recently_checked' \
+        -e '/custom_updated' \
+        -e '**/ab-suite.*.log' \
+        "${@}"
 }
