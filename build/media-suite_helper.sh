@@ -1025,6 +1025,16 @@ do_patch() {
     local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
     [[ $patchName = "$patch" ]] && patchName="${patch##*/}"
 
+    if [[ -z "$patchName" ]]; then
+        # hack for URLs without filename
+        patchName="$(/usr/bin/curl -sI "$patch" | ggrep -Pio '(?<=filename=)(.+)')"
+        if [[ -z "$patchName" ]]; then
+            echo -e "${red}Failed to apply patch '$patch'${reset}"
+            echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
+            return 1
+        fi
+    fi
+
     # Just don't. Make a fork or use the suite's directory as the root for
     # your diffs or manually edit the scripts if you are trying to modify
     # the helper and compile scripts. If you really need to, use patch instead.
