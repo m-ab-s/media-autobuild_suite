@@ -1713,6 +1713,25 @@ if [[ $ffmpeg != "no" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
+        if enabled libsvthevc; then
+            do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
+                do_removeOption --enable-libsvthevc
+        fi
+
+        # vapoursynth-alt
+        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
+
+        # librav1e
+        if enabled librav1e; then
+            do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
+                do_removeOption "--enable-librav1e"
+        fi
+
+        if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
+            # remove redundant -L and -l flags from extralibs
+            do_patch "https://0x0.st/zLsN.txt" am
+        fi
+
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
@@ -1748,25 +1767,6 @@ if [[ $ffmpeg != "no" ]]; then
         fi
         ! disabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
-
-        if enabled libsvthevc; then
-            do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
-                do_removeOption --enable-libsvthevc
-        fi
-
-        # vapoursynth-alt
-        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
-
-        # librav1e
-        if enabled librav1e; then
-            do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
-                do_removeOption "--enable-librav1e"
-        fi
-
-        if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
-            # remove redundant -L and -l flags from extralibs
-            do_patch "https://0x0.st/zLsN.txt" am
-        fi
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
