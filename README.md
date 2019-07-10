@@ -100,11 +100,12 @@ For information about the compiler environment see the wiki, there you also have
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (official binaries)
+        - librav1e (git) (using non-upstream patch)
         - librtmp (git)
         - librubberband (git snapshot)
         - libsrt (git)
         - libssh (mingw)
-        - libsvthevc (git)
+        - libsvthevc (git) (using non-upstream patch)
         - libtesseract (git)
         - libvmaf (git)
         - libxavs (svn snapshot)

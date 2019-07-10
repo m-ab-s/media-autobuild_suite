@@ -928,13 +928,38 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
 fi
 unset _aom_bins
 
-_check=(bin-video/rav1e.exe)
-if [[ $rav1e = y ]] &&
+_check=()
+{ [[ $rav1e = y ]] ||
+    { enabled librav1e && $standalone = y ]]; }; } &&
+    _check+=(bin-video/rav1e.exe)
+enabled librav1e && _check+=(librav1e.a rav1e.pc rav1e/rav1e.h)
+if { [[ $rav1e = y ]] || enabled librav1e; } &&
     do_vcs "https://github.com/xiph/rav1e.git"; then
     log submodule git submodule update --init
-    do_uninstall "${_check[@]}"
-    do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
+    do_uninstall "${_check[@]}" include/rav1e
+
+    # standalone binary
+    if [[ $rav1e = y || $standalone = y ]]; then
+        do_rust
+        do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
+    fi
+
+    # C lib
+    if enabled librav1e; then
+        command -v cargo-cinstall.exe &>/dev/null ||
+            log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
+            --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount"
+        # force cpuCount jobs for cbuild/cinstall
+        printf '%s\n' '[build]' "jobs = $cpuCount" > "$CARGO_HOME/config"
+        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" cinstall --release \
+            --prefix "$(pwd)/install-$bits"
+        # do_install "install-$bits/bin/rav1e.dll" bin-video/
+        # do_install "install-$bits/lib/librav1e.dll.a" lib/
+        do_install "install-$bits/lib/librav1e.a" lib/
+        do_install "install-$bits/lib/pkgconfig/rav1e.pc" lib/pkgconfig/
+        do_install "install-$bits/include/rav1e"/*.h include/rav1e/
+    fi
+
     do_checkIfExist
 fi
 
@@ -1732,6 +1757,12 @@ if [[ $ffmpeg != "no" ]]; then
 
         # vapoursynth-alt
         enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
+
+        # librav1e
+        if enabled librav1e; then
+            do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
+                do_removeOption "--enable-librav1e"
+        fi
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
