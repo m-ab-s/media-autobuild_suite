@@ -949,10 +949,9 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         command -v cargo-cinstall.exe &>/dev/null ||
             log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
             --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount"
-        # force cpuCount jobs for cbuild/cinstall
-        printf '%s\n' '[build]' "jobs = $cpuCount" > "$CARGO_HOME/config"
-        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" cinstall --release \
-            --prefix "$(pwd)/install-$bits"
+        [[ -f $CARGO_HOME/config ]] && rm -f $CARGO_HOME/config
+        CARGO_BUILD_JOBS="$cpuCount" log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
+            cinstall --release --prefix "$(pwd)/install-$bits"
         # do_install "install-$bits/bin/rav1e.dll" bin-video/
         # do_install "install-$bits/lib/librav1e.dll.a" lib/
         do_install "install-$bits/lib/librav1e.a" lib/
