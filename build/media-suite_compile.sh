@@ -1718,8 +1718,8 @@ if [[ $ffmpeg != "no" ]]; then
                 do_removeOption --enable-libsvthevc
         fi
 
-        # vapoursynth-alt
-        enabled vapoursynth && do_patch "https://github.com/Helenerineium/FFmpeg/commit/09af1ed650cfd221282ca47b851ad96a4bfcc700.patch" am
+        enabled vapoursynth &&
+            do_patch "https://gist.githubusercontent.com/Helenerineium/0e0ead347890ca9762d63aa2ab3ea739/raw/vapoursynth_alt.patch" am
 
         # librav1e
         if enabled librav1e; then
