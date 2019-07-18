@@ -930,7 +930,7 @@ unset _aom_bins
 
 _check=()
 { [[ $rav1e = y ]] ||
-    { enabled librav1e && $standalone = y ]]; }; } &&
+    { enabled librav1e && [[ $standalone = y ]]; }; } &&
     _check+=(bin-video/rav1e.exe)
 enabled librav1e && _check+=(librav1e.a rav1e.pc rav1e/rav1e.h)
 if { [[ $rav1e = y ]] || enabled librav1e; } &&
