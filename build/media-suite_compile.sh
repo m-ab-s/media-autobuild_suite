@@ -1492,6 +1492,12 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
+    if [[ $svthevc = y ]]; then
+        export SVT_HEVC_INCLUDE_DIR="$LOCALDESTDIR/include/svt-hevc"
+        export SVT_HEVC_LIBRARY_DIR="$LOCALDESTDIR/lib"
+        x265_svt_hevc="-DENABLE_SVT_HEVC=ON"
+    fi
+
     build_x265() {
         create_build_dir
         local build_root
@@ -1504,7 +1510,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
         log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
-        -DENABLE_HDR10_PLUS=ON $xpsupport \
+        -DENABLE_HDR10_PLUS=ON $xpsupport $x265_svt_hevc \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" "$@"
         extra_script post cmake
         do_ninja
