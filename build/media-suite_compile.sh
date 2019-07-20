@@ -1932,7 +1932,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     _check=(libvulkan.a vulkan.pc)
     if ! mpv_disabled vulkan &&
         do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git#tag=v1.1.114" vulkan-loader; then
-        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages"
+        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/b1f8bc13/packages"
         do_uninstall "${_check[@]}"
         do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
         create_build_dir
