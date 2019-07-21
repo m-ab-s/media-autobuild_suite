@@ -1168,10 +1168,10 @@ do_meson() {
     esac
     shift 1
 
-    local PKG_CONFIG=pkg-config
     create_build_dir
     extra_script pre meson
-    CC=gcc CXX=g++ \
+    # shellcheck disable=SC2086
+    PKG_CONFIG=pkg-config CC=gcc CXX=g++ \
         log "meson" meson "$root" --default-library=static --buildtype=release \
         --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@"
     extra_script post meson
