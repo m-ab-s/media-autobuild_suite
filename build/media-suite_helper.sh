@@ -1108,7 +1108,7 @@ do_cmake() {
     local bindir=""
     local root=".."
     local cmake_build_dir=""
-    while (( "$#" )); do
+    while [[ -n "$*" ]]; do
         case "$1" in
         global|audio|video)
             bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"; shift ;;
@@ -1126,14 +1126,15 @@ do_cmake() {
     done
 
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
-    [[ -z "$skip_build_dir" ]] && create_build_dir $cmake_build_dir
+    [[ -z "$skip_build_dir" ]] && create_build_dir "$cmake_build_dir"
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
+    # shellcheck disable=SC2086
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release $bindir ${cmake_extras[@]} "$@"
+        -DCMAKE_BUILD_TYPE=Release $bindir "${cmake_extras[@]}" "$@"
     extra_script post cmake
     unset cmake_extras
 }
