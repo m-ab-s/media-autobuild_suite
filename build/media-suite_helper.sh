@@ -951,14 +951,14 @@ mpv_enabled_any() {
 mpv_enabled_all() {
     local opt
     for opt; do
-        mpv_enabled $opt || return 1
+        mpv_enabled "$opt" || return 1
     done
 }
 
 mpv_disabled_all() {
     local opt
     for opt; do
-        mpv_disabled $opt || return 1
+        mpv_disabled "$opt" || return 1
     done
 }
 
@@ -988,7 +988,7 @@ mpv_disable() {
 
 do_addOption() {
     local varname="$1" array opt
-    if [[ ${varname#--} = $varname ]]; then
+    if [[ ${varname#--} = "$varname" ]]; then
         array="$varname" && shift 1
     else
         array="FFMPEG_OPTS"
@@ -1001,14 +1001,14 @@ do_addOption() {
 do_removeOption() {
     local varname="$1"
     local arrayname
-    if [[ ${varname#--} = $varname ]]; then
+    if [[ ${varname#--} = "$varname" ]]; then
         arrayname="$varname" && shift 1
     else
         arrayname="FFMPEG_OPTS"
     fi
 
     local option="$1"
-    local basearray opt temp=()
+    local basearray temp=()
     basearray="${arrayname}[@]"
     local orig=("${!basearray}")
 
@@ -1017,6 +1017,7 @@ do_removeOption() {
             temp+=("${orig[$i]}")
         fi
     done
+    # shellcheck disable=SC1117,SC1083
     eval "$arrayname"=\(\"\${temp[@]}\"\)
 }
 
@@ -1024,7 +1025,7 @@ do_removeOptions() {
     local option
     local shared=$2
     for option in $1; do
-        do_removeOption "$option" $shared
+        do_removeOption "$option" "$shared"
     done
 }
 
