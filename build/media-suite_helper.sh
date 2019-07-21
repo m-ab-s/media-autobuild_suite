@@ -7,19 +7,16 @@ bits="${bits:-64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
     --retry-delay 5 --silent --location --insecure --fail)
 
-if command -v tput &>/dev/null; then
-    ncolors=$(tput colors)
-    if test -n "$ncolors" && test "$ncolors" -ge 8; then
-        bold=$(tput bold)
-        blue=$(tput setaf 12)
-        orange=$(tput setaf 11)
-        purple=$(tput setaf 13)
-        green=$(tput setaf 2)
-        red=$(tput setaf 1)
-        reset=$(tput sgr0)
-    fi
-    ncols=72
+if test -n "$(tput colors)" && test "$(tput colors)" -ge 8; then
+    bold=$(tput bold)
+    blue=$(tput setaf 12)
+    orange=$(tput setaf 11)
+    purple=$(tput setaf 13)
+    green=$(tput setaf 2)
+    red=$(tput setaf 1)
+    reset=$(tput sgr0)
 fi
+ncols=72
 
 [[ -f "$LOCALBUILDDIR"/grep.exe ]] &&
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
