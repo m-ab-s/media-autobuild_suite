@@ -399,11 +399,9 @@ real_extract() {
 
 do_extract() {
     local nocd="${nocd:-}"
-    local archive="$1" dirName="$2" archive_type
+    local archive="$1" dirName="$2"
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
-    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
-
     if [[ $dirName != "." && -d "$dirName" ]] &&
         { [[ $build32 = "yes" ]] && { [[ ! -f "$dirName"/build_successful32bit ]] ||
             [[ -n "$flavor" && ! -f "$dirName/build_successful32bit_${flavor}" ]]; } ||
@@ -418,9 +416,6 @@ do_extract() {
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
-    [[ -d "$dirName/$dirName" ]] &&
-        find "$dirName/$dirName" -maxdepth 1 -print0 | xargs -r0 mv -t "$dirName/" &&
-        rmdir "$dirName/$dirName" 2>/dev/null
     [[ $nocd ]] || cd_safe "$dirName"
 }
 
