@@ -622,7 +622,11 @@ do_uninstall() {
     [[ $1 = dry ]] && dry=y && shift
     [[ $1 = q ]] && quiet=y && shift
     [[ $1 = all ]] && all=y && shift
-    [[ $all ]] && files=($(files_exist -l "$@")) || files=($(files_exist -l -b "$@"))
+    if [[ $all ]]; then
+        mapfile -t files < <(files_exist -l "$@")
+    else
+        mapfile -t files < <(files_exist -l -b "$@")
+    fi
     if [[ -n "${files[*]}" ]]; then
         [[ ! $quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
