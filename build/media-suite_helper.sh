@@ -41,10 +41,10 @@ do_print_status() {
 do_print_progress() {
     if [[ $logging = y ]]; then
         if [[ $timeStamp = y ]]; then
-            [[ ${1} =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
+            [[ $1 =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
             "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
         else
-            [[ ${1} =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
+            [[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
         fi
     else
         set_title "$* in $(get_first_subdir)"
