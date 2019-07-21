@@ -673,10 +673,11 @@ do_readoptionsfile() {
 
 do_readbatoptions() {
     local varname="$1"
-    printf '%s\n' "${bat[@]}" | \
-        sed -rne "/set ${varname}=/,/[^^]$/p" | \
-        sed -re '/^:/d' -e "s/(set ${varname}=| \^|\")//g" | tr ' ' '\n' | \
-        sed -re '/^#/d' -e '/^[^-]/{s/^/--enable-/g}'
+    # shellcheck disable=SC1117
+    printf '%s\n' "${bat[@]}" |
+        sed -En "/set ${varname}=/,/[^^]$/p" |
+        sed -E "/^:/d;s/(set ${varname}=| \\^|\")//g;s/ /\\n/g" |
+        sed -E '/^#/d;/^[^-]/{s/^/--enable-/g}'
 }
 
 do_getFFmpegConfig() {
