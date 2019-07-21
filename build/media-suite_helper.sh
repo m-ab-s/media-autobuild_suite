@@ -60,7 +60,7 @@ do_print_progress() {
 set_title() {
     local title="media-autobuild_suite ($bits)"
     [[ -z $1 ]] || title="$title: $1"
-    echo -ne "\e]0;$title\a"
+    printf '\033]0;%s\a' "$title"
 }
 
 do_exit_prompt() {
