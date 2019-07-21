@@ -438,7 +438,7 @@ do_wget_sf() {
 }
 
 do_strip() {
-    local cmd exts nostrip file val
+    local cmd exts nostrip file
     local cmd=(strip)
     local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
     local exts="exe|dll|com|a"
@@ -451,7 +451,7 @@ do_strip() {
     done
     for file; do
         local orig_file="$file"
-        if ! file="$(file_installed $orig_file)"; then
+        if ! file="$(file_installed "$orig_file")"; then
             continue
         fi
         if [[ $file =~ \.(exe|com)$ ]] &&
@@ -486,12 +486,12 @@ do_pack() {
     done
     for file; do
         local orig_file="$file"
-        if ! file="$(file_installed $orig_file)"; then
+        if ! file="$(file_installed "$orig_file")"; then
             continue
         fi
         if [[ $file =~ \.($exts)$ ]] &&
             ! [[ -n "$nopack" && $file =~ ($nopack)\.exe$ ]]; then
-            [[ $stripping = y ]] && cmd+=(--strip-relocs=0)
+            [[ $stripping = y ]] && cmd+=("--strip-relocs=0")
         else
             file=""
         fi
