@@ -771,13 +771,14 @@ do_changeFFmpegConfig() {
     local config_script=configure
     [[ $(get_first_subdir) != "ffmpeg-git" ]] && config_script="$LOCALBUILDDIR/ffmpeg-git/configure"
     [[ -f "$config_script" ]] || do_exit_prompt "There's no configure script to retrieve libs from"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' "$config_script")"
-    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script")"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script")"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script")"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
 
     # handle gpl libs
-    local gpl=(${EXTERNAL_LIBRARY_GPL_LIST//_/-} gpl)
+    local gpl
+    read -ra gpl <<< "$EXTERNAL_LIBRARY_GPL_LIST gpl"
     if [[ $license = gpl* || $license = nonfree ]] &&
         { enabled_any "${gpl[@]}" || ! disabled postproc; }; then
         do_addOption --enable-gpl
@@ -786,14 +787,16 @@ do_changeFFmpegConfig() {
     fi
 
     # handle (l)gplv3 libs
-    local version3=(${EXTERNAL_LIBRARY_VERSION3_LIST//_/-})
+    local version3
+    read -ra version3 <<< "$EXTERNAL_LIBRARY_VERSION3_LIST"
     if [[ $license =~ (l|)gplv3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
     fi
 
-    local nonfreehwaccel=(${HWACCEL_LIBRARY_NONFREE_LIST//_/-})
+    local nonfreehwaccel
+    read -ra nonfreehwaccel <<< "$HWACCEL_LIBRARY_NONFREE_LIST"
     if [[ $license = "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
@@ -804,12 +807,14 @@ do_changeFFmpegConfig() {
     if [[ $license = "nonfree" ]] && verify_cuda_deps; then
         if enabled libnpp; then
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
-            local fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            local fixed_CUDA_PATH
+            fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
         fi
         if enabled cuda-nvcc; then
-            local fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
+            local fixed_CUDA_PATH_UNIX
+            fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
             command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
@@ -818,7 +823,7 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=(${EXTERNAL_LIBRARY_NONFREE_LIST//_/-})
+    local nonfreegpl=("${EXTERNAL_LIBRARY_NONFREE_LIST//_/-}")
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
