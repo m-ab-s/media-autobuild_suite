@@ -371,20 +371,30 @@ do_wget() {
 }
 
 real_extract() {
+    local archive="$1" dirName="$2" archive_type
+    [[ -z "$archive" ]] && return 1
+    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    [[ ! $dirName ]] && dirName=$(guess_dirname "$archive" || echo "${archive}")
     case $archive_type in
     zip|7z)
-        7z x -aoa -o"$2" "$1"
+        7z x -aoa -o"$dirName" "$archive"
         ;;
     tar*)
-        [[ $archive_type = tar.* ]] && 7z x -aoa "$1"
-        if [[ $(/usr/bin/file -b "${1%.tar*}.tar") = POSIX* ]]; then
-            tar -xf "${1%.tar*}.tar" || 7z x -aoa "${1%.tar*}.tar"
-        else
-           7z x -aoa "${1%.tar*}.tar"
+        [[ -n "$dirName" && ! -d "$dirName" ]] && mkdir -p "$dirName"
+        [[ $archive_type = tar.* ]] && 7z x -aoa "$archive"
+        [[ $(tar -tf "$archive" | cut -d'/' -f1 | sort -u | wc -l) = 1 ]] && strip_comp="--strip-components=1"
+        if ! tar $strip_comp -C "$dirName" -xf "${1%.tar*}.tar"; then
+            7z x -aoa "${archive%.tar*}.tar" -o"$dirName"
         fi
-        rm -f "${1%.tar*}.tar"
+        rm -f "${archive%.tar*}.tar"
         ;;
     esac
+    local temp_dir
+    temp_dir=$(find "$dirName/" -maxdepth 1 ! -wholename "$dirName/")
+    if [[ -n "$temp_dir" && $(wc -l <<< "$temp_dir" ) = 1 ]]; then
+        find "$temp_dir" -maxdepth 2 ! -wholename "$temp_dir" -exec mv -t "$dirName/" {} +
+        rmdir "$temp_dir" 2>/dev/null
+    fi
 }
 
 do_extract() {
@@ -404,7 +414,7 @@ do_extract() {
     elif [[ -d "$dirName" ]]; then
         [[ $nocd ]] || cd_safe "$dirName"
         return 0
-    elif [[ ! $archive_type ]]; then
+    elif  ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
