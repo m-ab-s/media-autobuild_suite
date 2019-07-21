@@ -26,13 +26,12 @@ do_print_status() {
     local color="$2"
     local status="$3"
     local pad
-    pad=$(printf '%0.1s' "."{1..72})
+    printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
     if [[ $timeStamp = y ]]; then
-        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%*.*s [%s]\n' -1 "${bold}$name${reset}" 0 \
-        "$((ncols-${#name}-${#status}-12))" "$pad" "${color}${status}${reset}"
+        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s %s [%s]\n' -1 "${bold}$name${reset}" \
+        "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
     else
-        printf '%s%*.*s [%s]\n' "${bold}$name${reset}" 0 \
-        "$((ncols-${#name}-${#status}-3))" "$pad" "${color}${status}${reset}"
+        printf '%s %s [%s]\n' "${bold}$name${reset}" "${pad:0:$((ncols - ${#name} - ${#status} - 3))}" "${color}${status}${reset}"
     fi
 }
 
