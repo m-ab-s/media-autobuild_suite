@@ -1043,7 +1043,7 @@ do_patch() {
         patchName="$(/usr/bin/curl -sI "$patch" | grep -Pio '(?<=filename=)(.+)')"
         if [[ -z "$patchName" ]]; then
             echo -e "${red}Failed to apply patch '$patch'${reset}"
-            echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
+            echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}"
             return 1
         fi
     fi
@@ -1076,7 +1076,7 @@ do_patch() {
             if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" >/dev/null 2>&1; then
                 git am -q --abort
                 echo -e "${orange}${patchName}${reset}"
-                echo -e "\tPatch couldn't be applied with 'git am'. Continuing without patching."
+                echo -e "\\tPatch couldn't be applied with 'git am'. Continuing without patching."
                 return 1
             fi
         else
@@ -1084,13 +1084,13 @@ do_patch() {
                 patch $binarypatch -s -N -p"$strip" -i "$patchName"
             else
                 echo -e "${orange}${patchName}${reset}"
-                echo -e "\tPatch couldn't be applied with 'patch'. Continuing without patching."
+                echo -e "\\tPatch couldn't be applied with 'patch'. Continuing without patching."
                 return 1
             fi
         fi
     else
         echo -e "${orange}${patchName}${reset}"
-        echo -e "\tPatch not found anywhere. Continuing without patching."
+        echo -e "\\tPatch not found anywhere. Continuing without patching."
         return 1
     fi
     return 0
