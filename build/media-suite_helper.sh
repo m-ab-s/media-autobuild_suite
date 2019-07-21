@@ -688,21 +688,22 @@ do_getFFmpegConfig() {
 
     FFMPEG_DEFAULT_OPTS=()
     if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
-        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
-        FFMPEG_DEFAULT_OPTS=($(do_readbatoptions "ffmpeg_options_(builtin|basic)"))
-        [[ $ffmpegChoice != n ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_zeranoe"))
-        [[ $ffmpegChoice = f ]] &&
-            FFMPEG_DEFAULT_OPTS+=($(do_readbatoptions "ffmpeg_options_full"))
+        IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
+        mapfile -t FFMPEG_DEFAULT_OPTS < <(do_readbatoptions "ffmpeg_options_(builtin|basic)")
+        local option
+        [[ $ffmpegChoice != n ]] && while read -r option; do
+            FFMPEG_DEFAULT_OPTS+=("$option")
+        done < <(do_readbatoptions "ffmpeg_options_zeranoe")
+        [[ $ffmpegChoice = f ]] && while read -r option; do
+            FFMPEG_DEFAULT_OPTS+=("$option")
+        done < <(do_readbatoptions "ffmpeg_options_full")
         echo "Imported default FFmpeg options from .bat"
     else
         local custom_opts_file="$LOCALBUILDDIR/ffmpeg_options.txt"
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_$bits.txt" ]]; then
             custom_opts_file="$LOCALBUILDDIR/ffmpeg_options_$bits.txt"
         fi
-        IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < \
-            <(do_readoptionsfile "$custom_opts_file")
-        echo "Imported custom options from ${custom_opts_file##*/}"
+        IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$custom_opts_file")
     fi
     echo "License: $license"
     FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
