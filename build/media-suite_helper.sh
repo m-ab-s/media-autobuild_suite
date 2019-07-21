@@ -61,12 +61,12 @@ set_title() {
 }
 
 do_exit_prompt() {
-    if [[ -n $build32 || -n $build64 ]]; then
+    if [[ -n "$build32$build64" ]]; then # meaning "executing this in the suite's context"
         create_diagnostic
         zip_logs
     fi
     do_prompt "$*"
-    [[ -n $build32 || -n $build64 ]] && exit 1
+    [[ -n "$build32$build64" ]] && exit 1
 }
 
 cd_safe() {
