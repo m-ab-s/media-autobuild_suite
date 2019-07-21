@@ -340,18 +340,13 @@ do_wget() {
 
             if [[ $response_code = "200" || $response_code = "226" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
-                if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
-                    tries=0
-                else
-                    rm -f "$archive"
-                fi
             elif [[ $response_code = "304" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
-                if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
-                    tries=0
-                else
-                    rm -f "$archive"
-                fi
+            fi
+            if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
+                tries=0
+            else
+                rm -f "$archive"
             fi
         done
         if [[ $response_code -gt 400 || $response_code = "000" ]]; then
