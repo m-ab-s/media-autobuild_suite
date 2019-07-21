@@ -295,11 +295,11 @@ guess_dirname() {
 check_hash() {
     local file="$1" check="$2" md5sum sha256sum
     if [[ -f $file ]]; then
-        md5sum=$(md5sum "$file" | awk '{ print $1 }')
-        sha256sum=$(sha256sum "$file" | awk '{ print $1 }')
+        sha256sum=$(sha256sum "$file" | cut -d' ' -f1)
         if [[ $check = print ]]; then
             echo "$sha256sum"
         else
+            md5sum=$(md5sum "$file" | cut -d' ' -f1)
             test "$sha256sum" = "$check" || test "$md5sum" = "$check"
         fi
     else
