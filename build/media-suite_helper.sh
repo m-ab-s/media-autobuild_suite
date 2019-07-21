@@ -500,9 +500,9 @@ do_pack() {
 }
 
 do_zipman() {
-    local file
+    local file files
     local man_dirs=(/local{32,64}/share/man)
-    local files=$(find ${man_dirs[@]} -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2>/dev/null)
+    files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2>/dev/null)
     for file in $files; do
         gzip -9 -n -f "$file"
         rm -f "$file"
