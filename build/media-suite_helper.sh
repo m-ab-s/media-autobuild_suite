@@ -1804,8 +1804,9 @@ EOF
 }
 
 create_cmake_toolchain() {
-    local _win_path_LOCALDESTDIR="$(cygpath -m $LOCALDESTDIR)"
-    local _win_path_MINGW_PREFIX="$(cygpath -m $MINGW_PREFIX)"
+    local _win_path_LOCALDESTDIR _win_path_MINGW_PREFIX
+    _win_path_LOCALDESTDIR="$(cygpath -m "$LOCALDESTDIR")"
+    _win_path_MINGW_PREFIX="$(cygpath -m "$MINGW_PREFIX")"
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         ""
