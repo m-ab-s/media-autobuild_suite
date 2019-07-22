@@ -1503,8 +1503,8 @@ get_last_version() {
     local filter="$2"
     local version="$3"
     local ret
-    ret="$(echo "$filelist" | /usr/bin/grep -E "$filter" | sort -V | tail -1)"
-    [[ -n "$version" ]] && ret="$(echo "$ret" | /usr/bin/grep -oP "$version")"
+    ret="$(/usr/bin/grep -E "$filter" <<< "$filelist" | sort -V | tail -1)"
+    [[ -n "$version" ]] && ret="$(/usr/bin/grep -oP "$version" <<< "$ret")"
     echo "$ret"
 }
 
