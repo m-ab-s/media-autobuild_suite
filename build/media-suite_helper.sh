@@ -1527,7 +1527,8 @@ get_vs_prefix() {
     unset vsprefix
     local winvsprefix
     local regkey="/HKLM/software/vapoursynth/path"
-    local embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
+    local embedded
+    embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
     if [[ -n "$embedded" ]]; then
         # look for .dlls in bin-video
         vsprefix="${embedded%/*}"
@@ -1544,7 +1545,8 @@ get_vs_prefix() {
         vsprefix="$(dirname "$(command -v vspipe.exe)")"
     fi
     if [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
-        local bitness="$(file "$vsprefix/vapoursynth.dll")"
+        local bitness
+        bitness="$(file "$vsprefix/vapoursynth.dll")"
         { [[ $bits = 64bit && $bitness = *x86-64* ]] ||
             [[ $bits = 32bit && $bitness = *80386* ]]; } &&
             return 0
