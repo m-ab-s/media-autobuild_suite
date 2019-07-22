@@ -1374,9 +1374,9 @@ do_hide_all_sharedlibs() {
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
     if [[ $dryrun = "n" ]]; then
-        printf "%s\n" "${tomove[@]}" | xargs -ri mv -f '{}' '{}.dyn'
+        printf '%s\n' "${tomove[@]}" | xargs -ri mv -f '{}' '{}.dyn'
     else
-        printf "%s\n" "${tomove[@]}"
+        printf '%s\n' "${tomove[@]}"
     fi
 }
 
