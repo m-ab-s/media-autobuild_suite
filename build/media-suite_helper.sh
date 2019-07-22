@@ -1897,8 +1897,7 @@ fix_cmake_crap_exports() {
     declare -a _cmakefiles
 
     _mixeddestdir="$(cygpath -m "$LOCALDESTDIR")"
-    < <(grep -Plr '\w:/[\w/]*local(?:32|64)' "$_dir"/*.cmake) \
-        mapfile -t _cmakefiles
+    mapfile -t _cmakefiles < <(grep -Plr '\w:/[\w/]*local(?:32|64)' "$_dir"/*.cmake)
 
     # noop if array is empty
     test ${#_cmakefiles[@]} -lt 1 && return
