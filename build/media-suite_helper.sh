@@ -1464,7 +1464,7 @@ do_autoreconf() {
         -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
         [[ ! -f configure ]]; then
         extra_script pre autoreconf
-        log "autoreconf" autoreconf -fiv $*
+        log "autoreconf" autoreconf -fiv "$@"
         extra_script post autoreconf
     fi
 }
@@ -1477,7 +1477,7 @@ do_autogen() {
         [[ ! -f configure ]]; then
         safe_git_clean -q
         extra_script pre autogen
-        log "autogen" ./autogen.sh $*
+        log "autogen" ./autogen.sh "$@"
         extra_script post autogen
     fi
 }
