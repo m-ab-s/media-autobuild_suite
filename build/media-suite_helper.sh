@@ -1945,16 +1945,17 @@ verify_cuda_deps() {
 }
 
 check_custom_patches(){
-    local _basedir="$(get_first_subdir)"
+    local _basedir
+    _basedir="$(get_first_subdir)"
     local vcsFolder="${_basedir%-*}"
     local vcsType="${_basedir##*-}"
-   if [ -d $LOCALBUILDDIR ] && [ -f $LOCALBUILDDIR/${vcsFolder}_extra.sh ]; then
+   if [[ -d "$LOCALBUILDDIR" && -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]]; then
         export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
         export REPO_NAME="${vcsFolder}"
         do_print_progress "Found ${vcsFolder}_extra.sh. Sourcing script"
-        source $LOCALBUILDDIR/${vcsFolder}_extra.sh
-        echo "${vcsFolder}" >> $LOCALBUILDDIR/patchedFolders
-        sort -uo $LOCALBUILDDIR/patchedFolders{,}
+        source "$LOCALBUILDDIR/${vcsFolder}_extra.sh"
+        echo "${vcsFolder}" >> "$LOCALBUILDDIR/patchedFolders"
+        sort -uo "$LOCALBUILDDIR/patchedFolders"{,}
     fi
 }
 
