@@ -1727,11 +1727,10 @@ create_winpty_exe() {
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
 
-_define(){ IFS=$'\n' read -r -d '' ${1} || true; }
 create_ab_pkgconfig() {
     # from https://stackoverflow.com/a/8088167
     local script_file
-    _define script_file <<'EOF'
+    IFS=$'\n' read -r -d '' script_file <<'EOF' || true
 #!/bin/sh
 
 while true; do
