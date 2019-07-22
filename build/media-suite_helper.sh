@@ -1742,6 +1742,7 @@ create_winpty_exe() {
     local installdir="$2"
     shift 2
     [[ -f "${installdir}/${exename}".exe ]] && mv "${installdir}/${exename}"{.,_}exe
+    # shellcheck disable=SC2016
     printf '%s\n' "#!/usr/bin/env bash" "$@" \
         'if [[ -t 1 ]]; then' \
         '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"' \
