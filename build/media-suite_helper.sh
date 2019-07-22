@@ -1288,9 +1288,11 @@ create_build_dir() {
 
 get_external_opts() {
     local array="$1"
-    local pkgname="$(get_first_subdir)"
+    local pkgname
+    pkgname="$(get_first_subdir)"
     local optsfile="$LOCALBUILDDIR/${pkgname%-*}_options.txt"
     if [[ -n $array ]]; then
+        # shellcheck disable=SC2034
         IFS=$'\n' read -d '' -r -a tmp < <(do_readoptionsfile "$optsfile")
         declare -ag "$array+=(\"\${tmp[@]}\")"
     else
