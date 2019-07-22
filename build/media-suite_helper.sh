@@ -1394,11 +1394,11 @@ do_unhide_all_sharedlibs() {
         fi
     done
     if [[ $dryrun = "n" ]]; then
-        printf "%s\n" "${todelete[@]}" | xargs -ri rm -f '{}'
-        printf "%s\n" "${tomove[@]}" | xargs -ri mv -f '{}.dyn' '{}'
+        printf '%s\n' "${todelete[@]}" | xargs -ri rm -f '{}'
+        printf '%s\n' "${tomove[@]}" | xargs -ri mv -f '{}.dyn' '{}'
     else
-        printf "rm %s\n" "${todelete[@]}"
-        printf "%s\n" "${tomove[@]}"
+        printf 'rm %s\n' "${todelete[@]}"
+        printf '%s\n' "${tomove[@]}"
     fi
 }
 
