@@ -1774,11 +1774,9 @@ EOF
         diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config >/dev/null ||
         printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
-        printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" | unix2dos |
-            cat > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
+        printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat ]] ||
-        printf '%s\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" | unix2dos |
-            cat > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
+        printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
 }
 
 create_cmake_toolchain() {
