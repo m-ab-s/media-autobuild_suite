@@ -1816,9 +1816,10 @@ grep_or_sed() {
 compare_with_zeranoe() {
     local comparison="${1:-builtin}"
     local zeranoebase="https://ffmpeg.zeranoe.com/builds/readme"
-    local zeranoe32="$(curl -s "${zeranoebase}"/win32/static/ffmpeg-latest-win32-static-readme.txt | \
+    local zeranoe32 zeranoe64
+    zeranoe32="$(curl -s "${zeranoebase}"/win32/static/ffmpeg-latest-win32-static-readme.txt |
         sed -n '/Configuration/,/Libraries/{/\s*--/{s/\s*//gp}}' | sort)"
-    local zeranoe64="$(curl -s "${zeranoebase}"/win64/static/ffmpeg-latest-win64-static-readme.txt | \
+    zeranoe64="$(curl -s "${zeranoebase}"/win64/static/ffmpeg-latest-win64-static-readme.txt |
         sed -n '/Configuration/,/Libraries/{/\s*--/{s/\s*//gp}}' | sort)"
     local localopts32=""
     local localopts64=""
@@ -1829,15 +1830,13 @@ compare_with_zeranoe() {
         [[ -f "$custom32" ]] || custom32="$custom"
         [[ -f "$custom64" ]] || custom64="$custom"
         if [[ -f "$custom32" ]]; then
-            IFS=$'\n' read -d '' -r -a localopts32 < \
-                <(do_readoptionsfile "$custom32")
+            IFS=$'\n' read -d '' -r -a localopts32 < <(do_readoptionsfile "$custom32")
         fi
         if [[ -f "$custom64" ]]; then
-            IFS=$'\n' read -d '' -r -a localopts64 < \
-                <(do_readoptionsfile "$custom64")
+            IFS=$'\n' read -d '' -r -a localopts64 < <(do_readoptionsfile "$custom64")
         fi
     else
-        IFS=$'\n' read -d '' -r -a bat < <(< /trunk/media-autobuild_suite.bat dos2unix)
+        IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
         localopts32="$(do_readbatoptions "ffmpeg_options_(builtin|basic|zeranoe)" | sort)"
         localopts64="$localopts32"
     fi
