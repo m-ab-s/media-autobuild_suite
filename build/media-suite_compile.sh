@@ -1719,7 +1719,7 @@ if [[ $ffmpeg != "no" ]]; then
         fi
 
         enabled vapoursynth &&
-            do_patch "https://gist.githubusercontent.com/Helenerineium/0e0ead347890ca9762d63aa2ab3ea739/raw/vapoursynth_alt.patch" am
+            do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
 
         # librav1e
         if enabled librav1e; then
