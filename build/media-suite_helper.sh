@@ -1537,31 +1537,35 @@ get_vs_prefix() {
 get_cl_path() {
     command -v cl.exe &>/dev/null && return 0
 
-    local _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
+    local _sys_vswhere
     local _suite_vswhere="/opt/bin/vswhere.exe"
+    _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
     if [[ -f "$_sys_vswhere" ]]; then
         vswhere=$_sys_vswhere
     elif [[ -f "$_suite_vswhere" ]]; then
         vswhere=$_suite_vswhere
     else
-        pushd "$LOCALBUILDDIR" 2>/dev/null
+        pushd "$LOCALBUILDDIR" 2>/dev/null || do_exit_prompt "Did you delete /build?"
         do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
         vswhere=$_suite_vswhere
-        popd 2>/dev/null
+        popd 2>/dev/null || do_exit_prompt "Did you delete the previous folder?"
     fi
 
-    local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
+    local installationpath
+    installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
     [[ -z "$installationpath" ]] && return 1
     # apparently this is MS's official way of knowing the default version ???
-    local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
+    local _version
+    _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
     local _hostbits=HostX64
     [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
     local _arch=x64
     [[ $bits = 32bit ]] && _arch=x86
 
-    local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
+    local basepath
+    basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
     if [[ -f "$basepath/cl.exe" ]]; then
         export PATH="$basepath:$PATH"
     else
