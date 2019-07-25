@@ -361,7 +361,7 @@ do_wget() {
         if [[ $response_code -gt 400 || $response_code = "000" ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange}${archive}${reset}"
-                echo -e "\tFile not found online. Using local copy."
+                echo -e '\tFile not found online. Using local copy.'
             else
                 do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
                 echo "Error $response_code while downloading $url"
