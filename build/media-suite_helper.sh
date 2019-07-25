@@ -1217,7 +1217,7 @@ strip_ansi() {
 zip_logs() {
     local failed url files
     failed="$(get_first_subdir)"
-    pushd "$LOCALBUILDDIR" >/dev/null
+    pushd "$LOCALBUILDDIR" >/dev/null || do_exit_prompt "Did you delete /build?"
     rm -f logs.zip
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
@@ -1226,7 +1226,7 @@ zip_logs() {
         -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
-    popd >/dev/null
+    popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
