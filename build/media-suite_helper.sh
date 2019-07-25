@@ -1855,13 +1855,11 @@ do_rust() {
 }
 
 fix_libtiff_pc() {
-    if ! pc_exists libtiff-4; then return; fi
-
-    local _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 \
-        | sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
-
-    if [[ ! -f "$_pkgconfLoc" ]]; then return; fi
-
+    pc_exists libtiff-4 || return
+    local _pkgconfLoc
+    _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 |
+        sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
+    [[ ! -f "$_pkgconfLoc" ]] && return
     grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
 }
 
