@@ -660,14 +660,13 @@ do_pkgConfig() {
 do_readoptionsfile() {
     local filename="$1"
     if [[ -f "$filename" ]]; then
-        < $filename dos2unix |
-            sed -r '# remove commented text
-                    s/#.*//
-                    # delete empty lines
-                    /^\s*$/d
-                    # remove leading/trailing whitespace
-                    s/(^\s+|\s+$)//
-                    '
+        sed -r '# remove commented text
+                s/#.*//
+                # delete empty lines
+                /^\s*$/d
+                # remove leading/trailing whitespace
+                s/(^\s+|\s+$)//
+                ' "$filename" | tr -d '\r' # cut cr out from any crlf files
         echo "Imported options from ${filename##*/}" >&2
     fi
 }
