@@ -1658,31 +1658,29 @@ add_to_remove() {
 
 clean_suite() {
     if [[ $timeStamp = y ]]; then
-        printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Deleting status files...${reset}"
+        printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 "${orange}Deleting status files...${reset}"
     else
-        echo -e "\n\t${orange}Deleting status files...${reset}"
+        echo -e "\\n\\t${orange}Deleting status files...${reset}"
     fi
     cd_safe "$LOCALBUILDDIR" >/dev/null
-    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -r0 rm -f
-    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -print0 |
-        xargs -r0 rm -f
-    echo -e "\n\t${green}Zipping man files...${reset}"
+    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
+    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
+    echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
 
     if [[ $deleteSource = y ]]; then
-        echo -e "\t${orange}Deleting temporary build dirs...${reset}"
-        find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -r0 rm -f
-        find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -r0 rm -rf
-        find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
-            xargs -r0 rm -rf
+        echo -e "\\t${orange}Deleting temporary build dirs...${reset}"
+        find . -maxdepth 5 -name "ab-suite.*.log" -delete
+        find . -maxdepth 5 -type d -name "build-*bit" -exec rm -rf {} +
+        find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -exec rm -rf {} ';'
 
         if [[ -f _to_remove ]]; then
-            echo -e "\n\t${orange}Deleting source folders...${reset}"
+            echo -e "\\n\\t${orange}Deleting source folders...${reset}"
             grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
                 grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         fi
         if [[ $(du -s /var/cache/pacman/pkg/ | awk '{print $1}') -gt 1000000 ]]; then
-            echo -e "\t${orange}Deleting unneeded Pacman packages...${reset}"
+            echo -e "\\t${orange}Deleting unneeded Pacman packages...${reset}"
             pacman -Sc --noconfirm
         fi
     fi
