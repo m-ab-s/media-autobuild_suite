@@ -160,7 +160,7 @@ vcs_log() {
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ "$vcsType" = "hg" ]]; then
-        hg log --template "{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n" \
+        hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
 }
