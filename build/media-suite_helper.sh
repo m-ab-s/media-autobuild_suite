@@ -561,28 +561,27 @@ file_installed() {
 }
 
 files_exist() {
-    local verbose list soft ignorebinaries term="\n"
+    local verbose list soft ignorebinaries term='\n' file
     while true; do
         case $1 in
             -v) verbose=y && shift;;
             -l) list=y && shift;;
             -s) soft=y && shift;;
             -b) ignorebinaries=y && shift;;
-            -l0) list=y && term="\0" && shift;;
+            -l0) list=y && term='\0' && shift;;
             --) shift; break;;
             *) break;;
         esac
     done
-    local file
     [[ $list ]] && verbose= && soft=y
     for opt; do
-        if file=$(file_installed $opt); then
+        if file=$(file_installed "$opt"); then
             [[ $verbose && $soft ]] && do_print_status "${bold}├${reset} $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
                 fi
-                echo -n "$file" && echo -ne "$term"
+                printf "%s%b" "$file" "$term"
             fi
         else
             [[ $verbose ]] && do_print_status "${bold}├${reset} $file" "${red}" "Not found"
