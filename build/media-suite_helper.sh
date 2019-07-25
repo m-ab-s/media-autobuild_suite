@@ -1244,8 +1244,7 @@ log() {
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging = "y" ]]; then
-        echo -e "CFLAGS: $CFLAGS\nLDFLAGS: $LDFLAGS" > "ab-suite.$name.log"
-        echo "$_cmd $*" >> "ab-suite.$name.log"
+        printf 'CFLAGS: %s\nLDFLAGS: %s\n%s %s\n' "$CFLAGS" "$LDFLAGS" "$_cmd" "$*" > "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
             { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
             compilation_fail "$name"
