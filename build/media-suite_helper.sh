@@ -1950,16 +1950,16 @@ extra_script(){
     local vcsFolder="${REPO_DIR%-*}"
     vcsFolder="${vcsFolder#*build/}"
     if [[ $commandname =~ ^(make|meson|ninja)$ ]] &&
-        type _${stage}_build >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null
+        type "_${stage}_build" >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_build" _${stage}_build
-        popd >/dev/null
-    elif type _${stage}_${commandname} >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null
+        log quiet "${stage}_build" "_${stage}_build"
+        popd >/dev/null || true
+    elif type "_${stage}_${commandname}" >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_${commandname}" _${stage}_${commandname}
-        popd >/dev/null
+        log quiet "${stage}_${commandname}" "_${stage}_${commandname}"
+        popd >/dev/null || true
     fi
 }
 
