@@ -1181,8 +1181,8 @@ compilation_fail() {
         return 1
     else
         if [[ $noMintty = y ]]; then
-            diff "$LOCALBUILDDIR/old.var" <(set) | grep '^[<>]' | sed -nr 's/> (.*)/\1/p' > "$LOCALBUILDDIR/fail.var"
-            echo -e "$PWD\n$reason\n$operation" > "$LOCALBUILDDIR/compilation_failed"
+            diff --changed-group-format='%>' --unchanged-group-format='' "$LOCALBUILDDIR/old.var" <(declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/fail.var"
+            printf '%s\n%s\n%s\n' "$PWD" "$reasons" "$operation" > "$LOCALBUILDDIR/compilation_failed"
             exit
         else
             if [[ $logging = y ]]; then

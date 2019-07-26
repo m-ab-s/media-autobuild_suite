@@ -60,7 +60,7 @@ while true; do
 --dssim=* ) dssim="${1#*=}"; shift ;;
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
---noMintty=* ) noMintty="${1#*=}"; set >"$LOCALBUILDDIR/old.var"; shift ;;
+--noMintty=* ) noMintty="${1#*=}"; [ -f "$LOCALBUILDDIR/fail.var" ] && rm "$LOCALBUILDDIR/fail.var"; (declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/old.var"; shift ;;
 --svthevc=* ) svthevc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
@@ -1562,7 +1562,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
             [vapoursynth-name]=vapoursynth
             [vapoursynth-description]='A frameserver for the 21st century'
             [vapoursynth-cflags]="-DVS_CORE_EXPORTS"
-            
+
             [vsscript-name]=vapoursynth-script
             [vsscript-description]='Library for interfacing VapourSynth with Python'
             [vsscript-private]="-l$_python_lib -lstdc++"
