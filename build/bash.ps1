@@ -33,7 +33,7 @@ try {
             "zip_logs`n" +
             "echo `"Make sure the suite is up-to-date before reporting an issue. It might've been fixed already.`"`n" +
             "do_prompt `"Try running the build again at a later time.`"") | Out-Null
-        Start-Process -NoNewWindow -Wait -FilePath $bash -ArgumentList ("-l /build/fail_comp").Split(' ')
+        &$bash "-l" "/build/fail_comp"
         Remove-Item -Force -Path $build\compilation_failed, $build\fail_comp
     }
 } catch {
