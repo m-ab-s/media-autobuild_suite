@@ -928,6 +928,18 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
 fi
 unset _aom_bins
 
+_check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
+[[ $standalone = y ]] && _check+=(bin-video/dav1d.exe)
+if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
+    do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
+    do_uninstall include/dav1d "${_check[@]}"
+    extracommands=()
+    sed -i 's/sdl2_dependency.found()/false/' tools/meson.build
+    [[ $standalone = y ]] || extracommands=(-Denable_tools=false)
+    do_mesoninstall video -Denable_tests=false "${extracommands[@]}"
+    do_checkIfExist
+fi
+
 _check=()
 { [[ $rav1e = y ]] ||
     { enabled librav1e && [[ $standalone = y ]]; }; } &&
@@ -1600,17 +1612,6 @@ if [[ $ffmpeg != "no" ]] && enabled liblensfun &&
         -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
     do_checkIfExist
     add_to_remove
-fi
-
-_check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
-[[ $standalone = y ]] && _check+=(bin-video/dav1d.exe)
-if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
-    do_vcs "https://code.videolan.org/videolan/dav1d.git"; then
-    do_uninstall include/dav1d "${_check[@]}"
-    extracommands=()
-    [[ $standalone = y ]] || extracommands=(-Denable_tools=false)
-    do_mesoninstall video -Denable_tests=false "${extracommands[@]}"
-    do_checkIfExist
 fi
 
 _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
