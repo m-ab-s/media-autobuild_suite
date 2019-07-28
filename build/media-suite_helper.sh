@@ -667,8 +667,10 @@ do_readoptionsfile() {
                 s/#.*//
                 # delete empty lines
                 /^\s*$/d
-                # remove leading/trailing whitespace
-                s/(^\s+|\s+$)//
+                # remove leading whitespace
+                s/^\s+//
+                # remove trailing whitespace
+                s/\s+$//
                 ' "$filename" | tr -d '\r' # cut cr out from any crlf files
         echo "Imported options from ${filename##*/}" >&2
     fi
