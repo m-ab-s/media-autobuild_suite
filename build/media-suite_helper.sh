@@ -294,16 +294,19 @@ guess_dirname() {
 
 check_hash() {
     local file="$1" check="$2" md5sum sha256sum
-    if [[ -f $file ]]; then
-        sha256sum=$(sha256sum "$file" | cut -d' ' -f1)
-        if [[ $check = print ]]; then
-            echo "$sha256sum"
-        else
-            md5sum=$(md5sum "$file" | cut -d' ' -f1)
-            test "$sha256sum" = "$check" || test "$md5sum" = "$check"
-        fi
-    else
+    if [[ -z "$file" || ! -f "$file" ]]; then
         return 1
+    elif [[ -z "$check" ]]; then
+        # if no hash to check, just check if the file exists
+        return 0
+    fi
+
+    sha256sum=$(sha256sum "$file" | cut -d' ' -f1)
+    if [[ $check = print ]]; then
+        echo "$sha256sum"
+    else
+        md5sum=$(md5sum "$file" | cut -d' ' -f1)
+        test "$sha256sum" = "$check" || test "$md5sum" = "$check"
     fi
 }
 
@@ -343,7 +346,7 @@ do_wget() {
             elif [[ $response_code = "304" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
             fi
-            if { [[ $hash ]] && check_hash "$archive" "$hash"; } || [[ ! $hash ]]; then
+            if check_hash "$archive" "$hash"; then
                 tries=0
             else
                 rm -f "$archive"
