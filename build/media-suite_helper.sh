@@ -56,7 +56,7 @@ do_print_progress() {
 set_title() {
     local title="media-autobuild_suite ($bits)"
     [[ -z $1 ]] || title="$title: $1"
-    echo -ne "\e]0;$title\a"
+    printf '\033]0;%s\a' "$title"
 }
 
 do_exit_prompt() {
@@ -156,7 +156,7 @@ vcs_log() {
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
     elif [[ "$vcsType" = "hg" ]]; then
-        hg log --template "{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n" \
+        hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
 }
@@ -357,7 +357,7 @@ do_wget() {
         if [[ $response_code -gt 400 || $response_code = "000" ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange}${archive}${reset}"
-                echo -e "\tFile not found online. Using local copy."
+                echo -e '\tFile not found online. Using local copy.'
             else
                 do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
                 echo "Error $response_code while downloading $url"
@@ -557,28 +557,27 @@ file_installed() {
 }
 
 files_exist() {
-    local verbose list soft ignorebinaries term="\n"
+    local verbose list soft ignorebinaries term='\n' file
     while true; do
         case $1 in
             -v) verbose=y && shift;;
             -l) list=y && shift;;
             -s) soft=y && shift;;
             -b) ignorebinaries=y && shift;;
-            -l0) list=y && term="\0" && shift;;
+            -l0) list=y && term='\0' && shift;;
             --) shift; break;;
             *) break;;
         esac
     done
-    local file
     [[ $list ]] && verbose= && soft=y
     for opt; do
-        if file=$(file_installed $opt); then
+        if file=$(file_installed "$opt"); then
             [[ $verbose && $soft ]] && do_print_status "${bold}├${reset} $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
                 fi
-                echo -n "$file" && echo -ne "$term"
+                printf "%s%b" "$file" "$term"
             fi
         else
             [[ $verbose ]] && do_print_status "${bold}├${reset} $file" "${red}" "Not found"
@@ -1241,8 +1240,7 @@ log() {
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
     if [[ $logging = "y" ]]; then
-        echo -e "CFLAGS: $CFLAGS\nLDFLAGS: $LDFLAGS" > "ab-suite.$name.log"
-        echo "$_cmd $*" >> "ab-suite.$name.log"
+        printf 'CFLAGS: %s\nLDFLAGS: %s\n%s %s\n' "$CFLAGS" "$LDFLAGS" "$_cmd" "$*" > "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
             { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
             compilation_fail "$name"
@@ -1656,31 +1654,29 @@ add_to_remove() {
 
 clean_suite() {
     if [[ $timeStamp = y ]]; then
-        printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Deleting status files...${reset}"
+        printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 "${orange}Deleting status files...${reset}"
     else
-        echo -e "\n\t${orange}Deleting status files...${reset}"
+        echo -e "\\n\\t${orange}Deleting status files...${reset}"
     fi
     cd_safe "$LOCALBUILDDIR" >/dev/null
-    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -print0 | xargs -r0 rm -f
-    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -print0 |
-        xargs -r0 rm -f
-    echo -e "\n\t${green}Zipping man files...${reset}"
+    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
+    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
+    echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
 
     if [[ $deleteSource = y ]]; then
-        echo -e "\t${orange}Deleting temporary build dirs...${reset}"
-        find . -maxdepth 5 -name "ab-suite.*.log" -print0 | xargs -r0 rm -f
-        find . -maxdepth 5 -type d -name "build-*bit" -print0 | xargs -r0 rm -rf
-        find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -print0 |
-            xargs -r0 rm -rf
+        echo -e "\\t${orange}Deleting temporary build dirs...${reset}"
+        find . -maxdepth 5 -name "ab-suite.*.log" -delete
+        find . -maxdepth 5 -type d -name "build-*bit" -exec rm -rf {} +
+        find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -exec rm -rf {} ';'
 
         if [[ -f _to_remove ]]; then
-            echo -e "\n\t${orange}Deleting source folders...${reset}"
+            echo -e "\\n\\t${orange}Deleting source folders...${reset}"
             grep -E "^($LOCALBUILDDIR|/trunk$LOCALBUILDDIR)" < _to_remove |
                 grep -Ev "^$LOCALBUILDDIR/(patches|extras|$)" | sort -u | xargs -r rm -rf
         fi
         if [[ $(du -s /var/cache/pacman/pkg/ | awk '{print $1}') -gt 1000000 ]]; then
-            echo -e "\t${orange}Deleting unneeded Pacman packages...${reset}"
+            echo -e "\\t${orange}Deleting unneeded Pacman packages...${reset}"
             pacman -Sc --noconfirm
         fi
     fi
@@ -1855,13 +1851,11 @@ do_rust() {
 }
 
 fix_libtiff_pc() {
-    if ! pc_exists libtiff-4; then return; fi
-
-    local _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 \
-        | sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
-
-    if [[ ! -f "$_pkgconfLoc" ]]; then return; fi
-
+    pc_exists libtiff-4 || return
+    local _pkgconfLoc
+    _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 |
+        sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
+    [[ ! -f "$_pkgconfLoc" ]] && return
     grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
 }
 
