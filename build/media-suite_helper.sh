@@ -392,7 +392,7 @@ real_extract() {
     local temp_dir
     temp_dir=$(find "$dirName/" -maxdepth 1 ! -wholename "$dirName/")
     if [[ -n "$temp_dir" && $(wc -l <<< "$temp_dir" ) = 1 ]]; then
-        find "$temp_dir" -maxdepth 2 ! -wholename "$temp_dir" -exec mv -t "$dirName/" {} +
+        find "$temp_dir" -maxdepth 1 ! -wholename "$temp_dir" -exec mv -t "$dirName/" {} +
         rmdir "$temp_dir" 2>/dev/null
     fi
 }
