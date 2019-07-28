@@ -1212,7 +1212,7 @@ strip_ansi() {
 zip_logs() {
     local failed url files
     failed="$(get_first_subdir)"
-    pushd "$LOCALBUILDDIR" >/dev/null
+    pushd "$LOCALBUILDDIR" >/dev/null || do_exit_prompt "Did you delete /build?"
     rm -f logs.zip
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
@@ -1221,7 +1221,7 @@ zip_logs() {
         -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"))
     7za -mx=9 a logs.zip "${files[@]}" >/dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ $build32 || $build64 ]] && url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
-    popd >/dev/null
+    popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
@@ -1531,31 +1531,35 @@ get_vs_prefix() {
 get_cl_path() {
     command -v cl.exe &>/dev/null && return 0
 
-    local _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
+    local _sys_vswhere
     local _suite_vswhere="/opt/bin/vswhere.exe"
+    _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
     if [[ -f "$_sys_vswhere" ]]; then
         vswhere=$_sys_vswhere
     elif [[ -f "$_suite_vswhere" ]]; then
         vswhere=$_suite_vswhere
     else
-        pushd "$LOCALBUILDDIR" 2>/dev/null
+        pushd "$LOCALBUILDDIR" 2>/dev/null || do_exit_prompt "Did you delete /build?"
         do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
         vswhere=$_suite_vswhere
-        popd 2>/dev/null
+        popd 2>/dev/null || do_exit_prompt "Did you delete the previous folder?"
     fi
 
-    local installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
+    local installationpath
+    installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
     [[ -z "$installationpath" ]] && return 1
     # apparently this is MS's official way of knowing the default version ???
-    local _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
+    local _version
+    _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
     local _hostbits=HostX64
     [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
     local _arch=x64
     [[ $bits = 32bit ]] && _arch=x86
 
-    local basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
+    local basepath
+    basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
     if [[ -f "$basepath/cl.exe" ]]; then
         export PATH="$basepath:$PATH"
     else
@@ -1936,16 +1940,16 @@ extra_script(){
     local vcsFolder="${REPO_DIR%-*}"
     vcsFolder="${vcsFolder#*build/}"
     if [[ $commandname =~ ^(make|meson|ninja)$ ]] &&
-        type _${stage}_build >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null
+        type "_${stage}_build" >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_build" _${stage}_build
-        popd >/dev/null
-    elif type _${stage}_${commandname} >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null
+        log quiet "${stage}_build" "_${stage}_build"
+        popd >/dev/null || true
+    elif type "_${stage}_${commandname}" >/dev/null 2>&1; then
+        pushd "${REPO_DIR}" >/dev/null || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_${commandname}" _${stage}_${commandname}
-        popd >/dev/null
+        log quiet "${stage}_${commandname}" "_${stage}_${commandname}"
+        popd >/dev/null || true
     fi
 }
 
