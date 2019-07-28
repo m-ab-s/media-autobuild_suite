@@ -655,24 +655,24 @@ do_pkgConfig() {
 do_readoptionsfile() {
     local filename="$1"
     if [[ -f "$filename" ]]; then
-        < $filename dos2unix |
-            sed -r '# remove commented text
-                    s/#.*//
-                    # delete empty lines
-                    /^\s*$/d
-                    # remove leading/trailing whitespace
-                    s/(^\s+|\s+$)//
-                    '
+        sed -r '# remove commented text
+                s/#.*//
+                # delete empty lines
+                /^\s*$/d
+                # remove leading/trailing whitespace
+                s/(^\s+|\s+$)//
+                ' "$filename" | tr -d '\r' # cut cr out from any crlf files
         echo "Imported options from ${filename##*/}" >&2
     fi
 }
 
 do_readbatoptions() {
     local varname="$1"
-    printf '%s\n' "${bat[@]}" | \
-        sed -rne "/set ${varname}=/,/[^^]$/p" | \
-        sed -re '/^:/d' -e "s/(set ${varname}=| \^|\")//g" | tr ' ' '\n' | \
-        sed -re '/^#/d' -e '/^[^-]/{s/^/--enable-/g}'
+    # shellcheck disable=SC1117
+    printf '%s\n' "${bat[@]}" |
+        sed -En "/set ${varname}=/,/[^^]$/p" |
+        sed -E "/^:/d;s/(set ${varname}=| \\^|\")//g;s/ /\\n/g" |
+        sed -E '/^#/d;/^[^-]/{s/^/--enable-/g}'
 }
 
 do_getFFmpegConfig() {
