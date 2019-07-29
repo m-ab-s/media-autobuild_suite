@@ -295,7 +295,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     fi
     if [[ $ffmpeg != "sharedlibs" && $ffmpeg != "shared" ]]; then
         _libs=(lib{freetype,fribidi,ass}.dll.a
-            libav{codec,device,filter,format,util,resample}.dll.a}
+            libav{codec,device,filter,format,util,resample}.dll.a
             lib{sw{scale,resample},postproc}.dll.a)
         for _lib in "${_libs[@]}"; do
             rm -f "$LOCALDESTDIR/lib/$_lib"
