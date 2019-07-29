@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034,SC1090,SC1117,SC1091,SC2119
 shopt -s extglob
 
 FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
