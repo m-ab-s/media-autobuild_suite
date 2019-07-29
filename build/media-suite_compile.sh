@@ -145,7 +145,7 @@ _check=("$RUSTUP_HOME"/bin/rustup.exe)
 if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
     if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
         mkdir -p "$LOCALBUILDDIR/rustinstall"
-        pushd "$LOCALBUILDDIR/rustinstall" >/dev/null
+        cd_safe "$LOCALBUILDDIR/rustinstall"
         log download_rustup curl "https://sh.rustup.rs" -sSo rustup.sh
         log install_rust ./rustup.sh -v -y --no-modify-path \
             "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
@@ -153,7 +153,7 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
         do_checkIfExist
         hash -r
         add_to_remove
-        popd >/dev/null
+        cd_safe "$LOCALBUILDDIR"
     fi
     if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
         # install current target arch toolchain
@@ -395,12 +395,12 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     [[ $curl = openssl ]] && hide_libressl -R
     if [[ $curl != schannel ]]; then
         _notrequired=yes
-        pushd "build-$bits" >/dev/null
+        cd_safe "build-$bits"
         PATH=/usr/bin log ca-bundle make ca-bundle
         unset _notrequired
         [[ -f lib/ca-bundle.crt ]] &&
             cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
-        popd >/dev/null
+        cd_safe ..
     fi
     do_checkIfExist
 fi
@@ -1673,8 +1673,8 @@ if [[ $ffmpeg != "no" ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
-            pushd $LOCALDESTDIR/bin-video >/dev/null
+        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264.dll"; then
+            pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
             if [[ $bits = "64bit" ]]; then
               _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
             else
@@ -1685,7 +1685,7 @@ if [[ $ffmpeg != "no" ]]; then
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
             unset _sha256
-            popd >/dev/null
+            popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
         fi
     fi
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
@@ -1845,11 +1845,11 @@ if [[ $mplayer = "y" ]] &&
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
     if [[ ! -d ffmpeg ]]; then
-        if [[ "$ffmpeg" != "no" ]] &&
-            git clone -q "$LOCALBUILDDIR"/ffmpeg-git ffmpeg; then
-            pushd ffmpeg >/dev/null
+        if [[ "$ffmpeg" != "no" && -d "$LOCALBUILDDIR/ffmpeg-git" ]] &&
+            git clone -q "$LOCALBUILDDIR/ffmpeg-git" ffmpeg; then
+            cd_safe ffmpeg
             git checkout -qf --no-track -B master origin/HEAD
-            popd >/dev/null
+            cd_safe ..
         elif ! git clone "https://git.ffmpeg.org/ffmpeg.git" ffmpeg; then
             rm -rf ffmpeg
             printf '%s\n' \
@@ -1953,13 +1953,13 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
-        cd Vulkan-Headers
+        cd_safe Vulkan-Headers
             _check=(vulkan/vulkan.h)
             do_uninstall include/vulkan
             do_cmakeinstall
             do_checkIfExist
             _check=(libvulkan.a vulkan.pc)
-        cd "$LOCALBUILDDIR/$(get_first_subdir)"
+        cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
         CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
             CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
