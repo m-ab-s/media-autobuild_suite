@@ -13,7 +13,7 @@ if [[ x"$LOCALBUILDDIR" = "x" ]]; then
     read -r -p "Enter to continue" ret
     exit 1
 fi
-echo -e "\nBuild start: $(date +"%F %T %z")" >> "$LOCALBUILDDIR"/newchangelog
+printf '\nBuild start: %(%F %T %z)T\n' -1 >> "$LOCALBUILDDIR/newchangelog"
 
 {
     echo '#!/bin/bash'
