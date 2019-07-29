@@ -4,12 +4,13 @@ shopt -s extglob
 
 FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
 if [[ x"$LOCALBUILDDIR" = "x" ]]; then
-    echo "Something went wrong."
-    echo "MSYSTEM: $MSYSTEM"
-    echo "pwd: $(cygpath -w "$(pwd)")"
-    echo "fstab: "
-    cat /etc/fstab
-    echo "Create a new issue and upload all logs you can find, especially compile.log"
+    printf '%s\n' \
+        "Something went wrong." \
+        "MSYSTEM: $MSYSTEM" \
+        "pwd: $(cygpath -w "$(pwd)")" \
+        "fstab: " \
+        "$(cat /etc/fstab)" \
+        "Create a new issue and upload all logs you can find, especially compile.log"
     read -r -p "Enter to continue" ret
     exit 1
 fi
@@ -491,10 +492,11 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             do_install "$MINGW_PREFIX/share/tessdata/eng.traineddata" bin-global/tessdata/
-            printf '%s\n' "You can get more language data here:"\
-                   "https://github.com/tesseract-ocr/tessdata"\
-                   "Just download <lang you want>.traineddata and copy it to this directory."\
-                    > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
+            printf '%s\n' \
+                "You can get more language data here:" \
+                "https://github.com/tesseract-ocr/tessdata" \
+                "Just download <lang you want>.traineddata and copy it to this directory." \
+                > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
         do_checkIfExist
     fi
@@ -1850,10 +1852,11 @@ if [[ $mplayer = "y" ]] &&
             popd >/dev/null
         elif ! git clone "https://git.ffmpeg.org/ffmpeg.git" ffmpeg; then
             rm -rf ffmpeg
-            echo "Failed to get a FFmpeg checkout"
-            echo "Please try again or put FFmpeg source code copy into ffmpeg/ manually."
-            echo "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2"
-            echo "Either re-run the script or extract above to inside /build/mplayer-svn."
+            printf '%s\n' \
+                "Failed to get a FFmpeg checkout" \
+                "Please try again or put FFmpeg source code copy into ffmpeg/ manually." \
+                "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2" \
+                "Either re-run the script or extract above to inside /build/mplayer-svn."
             do_prompt "<Enter> to continue or <Ctrl+c> to exit the script"
         fi
     fi
@@ -2270,10 +2273,11 @@ run_builds
 
 while [[ $new_updates = "yes" ]]; do
     ret="no"
-    echo "-------------------------------------------------------------------------------"
-    echo "There were new updates while compiling."
-    echo "Updated:$new_updates_packages"
-    echo "Would you like to run compilation again to get those updates? Default: no"
+    printf '%s\n' \
+        "-------------------------------------------------------------------------------" \
+        "There were new updates while compiling." \
+        "Updated:$new_updates_packages" \
+        "Would you like to run compilation again to get those updates? Default: no"
     do_prompt "y/[n] "
     echo "-------------------------------------------------------------------------------"
     if [[ $ret = "y" || $ret = "Y" || $ret = "yes" ]]; then
