@@ -90,7 +90,8 @@ mkdir -p "$LOCALDESTDIR/lib/pkgconfig"
 # pkgconfig keys to find the wrong abspaths from
 local _keys="(prefix|exec_prefix|libdir|includedir)"
 # current abspath root
-local _root="$(cygpath -m /trunk)${LOCALDESTDIR}"
+local _root
+_root="$(cygpath -m /trunk)${LOCALDESTDIR}"
 # find .pc files with Windows abspaths
 grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
     # find those with a different abspath than the current
@@ -213,6 +214,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
+        # shellcheck disable=SC2191
         extracommands=(--with-{harfbuzz,png,bzip2}=no)
         [[ $ffmpeg = "sharedlibs" ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
@@ -245,7 +247,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         fi
         CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)"
         do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $standalone = y ]] || rm -f $LOCALDESTDIR/bin-global/fc-*.exe
+        [[ $standalone = y ]] || rm -f "$LOCALDESTDIR"/bin-global/fc-*.exe
         do_checkIfExist
     fi
 
@@ -839,6 +841,7 @@ if enabled libshine && do_pkgConfig "shine = 3.1.1" &&
     do_uninstall "${_check[@]}"
     [[ $standalone = n ]] && sed -i '/bin_PROGRAMS/,+4d' Makefile.am
     # fix out-of-root build
+    # shellcheck disable=SC2016
     sed -ri -e 's;(libshine.sym)$;$(srcdir)/\1;' \
         -e '/libshine_la_HEADERS/{s;(src/lib);$(srcdir)/\1;}' \
         -e '/shineenc_CFLAGS/{s;(src/lib);$(srcdir)/\1;}' Makefile.am
@@ -975,7 +978,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         command -v cargo-cinstall.exe &>/dev/null ||
             log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
             --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount"
-        [[ -f $CARGO_HOME/config ]] && rm -f $CARGO_HOME/config
+        [[ -f $CARGO_HOME/config ]] && rm -f "$CARGO_HOME/config"
         CARGO_BUILD_JOBS="$cpuCount" log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
             cinstall --release --prefix "$(pwd)/install-$bits"
         # do_install "install-$bits/bin/rav1e.dll" bin-video/
@@ -1102,7 +1105,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
     else
         extracommands+=(--without-libxml2)
     fi
-    CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)" \
+    CFLAGS+=" $(enabled libxml2 && echo "-DLIBXML_STATIC")" \
         do_separate_confmakeinstall --disable-{examples,doxygen-doc} \
         --without-{fontconfig,freetype} "${extracommands[@]}"
     do_checkIfExist
@@ -1507,8 +1510,8 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     do_configure --prefix="$LOCALDESTDIR" --{build,host}="$MINGW_CHOST"
     do_make
     do_install ../../src/xvid.h include/
-    do_install \=build/xvidcore.a libxvidcore.a
-    do_install \=build/xvidcore.dll bin-video/
+    do_install '=build/xvidcore.a' libxvidcore.a
+    do_install '=build/xvidcore.dll' bin-video/
     cd_safe ../../examples
     sed -ri "s;(#define MAX_ZONES\s*) \S.*$;\1 8192;" xvid_encraw.c
     do_make xvid_encraw
@@ -1584,7 +1587,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
             gendef - "../$_file.dll" >/dev/null 2>&1 |
                 sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
             dlltool -y "lib${_file}.a" -d "${_file}.def" \
-                $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
+                "$([[ $bits = 32bit ]] && echo "-U")" 2>/dev/null
             [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             # shellcheck disable=SC2016
             printf '%s\n' \
@@ -1780,7 +1783,7 @@ if [[ $ffmpeg != "no" ]]; then
                 --shlibdir="$LOCALDESTDIR/bin-video")
         fi
         ! disabled_any debug "debug=gdb" &&
-            ffmpeg_cflags="$(echo $CFLAGS | sed -r 's/ (-O[1-3]|-mtune=\S+)//g')"
+            ffmpeg_cflags="$(sed -r 's/ (-O[1-3]|-mtune=\S+)//g' <<< "$CFLAGS")"
 
         # shared
         if [[ $ffmpeg != "static" ]] && [[ ! -f build_successful${bits}_shared ]]; then
@@ -1904,7 +1907,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             cp -rf include/* "$LOCALDESTDIR/include/"
             if ! [[ -f "$LOCALDESTDIR/bin-video/d3dcompiler_47.dll" ]] &&
                 do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"; then
-                do_install d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll bin-video/
+                do_install "d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll" bin-video/
             fi
             stripping=n do_checkIfExist
     elif ! mpv_disabled egl-angle &&
@@ -1977,14 +1980,14 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_vcs "https://github.com/google/shaderc.git"; then
         do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
-        function add_third_party() {
+        add_third_party() {
             local repo="$1"
             local name="$2"
             [[ ! "$name" ]] && name="${repo##*/}" && name="${name%.*}"
             local dest="third_party/$name"
 
             if [[ -d "$dest/.git" ]]; then
-                log "$name-reset" git -C "$dest" reset --hard @{u}
+                log "$name-reset" git -C "$dest" reset --hard "@{u}"
                 log "$name-pull" git -C "$dest" pull
             else
                 log "$name-clone" git clone --depth 1 "$repo" "$dest"
