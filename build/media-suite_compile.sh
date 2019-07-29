@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034,SC1090,SC1117,SC1091,SC2119
 shopt -s extglob
 
-FFMPEG_BASE_OPTS=(--pkg-config-flags=--static)
+FFMPEG_BASE_OPTS=("--pkg-config-flags=--static")
 if [[ x"$LOCALBUILDDIR" = "x" ]]; then
     printf '%s\n' \
         "Something went wrong." \
@@ -237,9 +237,9 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
         done
         unset _s _ss
         do_autogen --noconf
-        extracommands=(--disable-docs --enable-iconv --with-libiconv-prefix=$MINGW_PREFIX \
-            --with-libiconv-lib=$MINGW_PREFIX/lib --with-libiconv-includes=$MINGW_PREFIX/include \
-            LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib")
+        extracommands=(--disable-docs --enable-iconv "--with-libiconv-prefix=$MINGW_PREFIX" \
+            "--with-libiconv-lib=$MINGW_PREFIX/lib" "--with-libiconv-includes=$MINGW_PREFIX/include" \
+            "LDFLAGS=$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib")
         if enabled libxml2; then
             do_pacman_install libxml2
             sed -i 's|Cflags:|& -DLIBXML_STATIC|' fontconfig.pc.in
@@ -267,7 +267,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
-        extracommands=(--bindir=bin-video -Ddocs=false -Dglib=false)
+        extracommands=("--bindir=bin-video" "-Ddocs=false" "-Dglib=false")
         [[ $standalone = n ]] && sed -i "/subdir('bin')/d" meson.build
         sed -i "/subdir('test')/d" meson.build
         if [[ $ffmpeg = "sharedlibs" ]]; then
@@ -426,7 +426,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     if [[ $standalone = y ]]; then
         extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
-            LIBS="$($PKG_CONFIG --libs libpng libtiff-4)")
+            "LIBS=$($PKG_CONFIG --libs libpng libtiff-4)")
     else
         extracommands=()
         sed -i -e '/examples/d' -e 's/ man//' Makefile.am
@@ -805,8 +805,8 @@ if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
     do_vcs "https://github.com/OpenMPT/openmpt.git#tag=libopenmpt-*"; then
     do_uninstall include/libopenmpt "${_check[@]}"
     [[ -d bin ]] || mkdir bin
-    extracommands=(CONFIG="mingw64-win${bits%bit}" AR=ar STATIC_LIB=1 EXAMPLES=0 OPENMPT123=0
-        TEST=0 OS=)
+    extracommands=("CONFIG=mingw64-win${bits%bit}" "AR=ar" "STATIC_LIB=1" "EXAMPLES=0" "OPENMPT123=0"
+        "TEST=0" "OS=")
     log clean make clean "${extracommands[@]}"
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
     sed -i 's/Libs.private.*/& -lrpcrt4 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
@@ -933,7 +933,7 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
         sed -ri 's;_PREFIX.+CMAKE_INSTALL_BINDIR;_FULL_BINDIR;' \
             build/cmake/aom_install.cmake
     else
-        extracommands+=(-DENABLE_EXAMPLES=off)
+        extracommands+=("-DENABLE_EXAMPLES=off")
     fi
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
@@ -952,7 +952,7 @@ if { [[ $dav1d = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdav1d; }; } &&
     do_uninstall include/dav1d "${_check[@]}"
     extracommands=()
     sed -i 's/sdl2_dependency.found()/false/' tools/meson.build
-    [[ $standalone = y ]] || extracommands=(-Denable_tools=false)
+    [[ $standalone = y ]] || extracommands=("-Denable_tools=false")
     do_mesoninstall video -Denable_tests=false "${extracommands[@]}"
     do_checkIfExist
 fi
@@ -1301,8 +1301,8 @@ if [[ $x264 != no ]]; then
         [[ $x264 = high && "$_bitdepth" =~ (0|8) ]] ||
         [[ $x264 =~ (yes|full|shared|fullv) && "$_bitdepth" != 0 ]]; then
 
-        extracommands=(--host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
-            --bindir="$LOCALDESTDIR/bin-video")
+        extracommands=("--host=$MINGW_CHOST" "--prefix=$LOCALDESTDIR"
+            "--bindir=$LOCALDESTDIR/bin-video")
 
         # light ffmpeg build
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
@@ -1385,11 +1385,11 @@ if [[ $x264 != no ]]; then
         fi
 
         if [[ $x264 = high ]]; then
-            extracommands+=(--bit-depth=10)
+            extracommands+=("--bit-depth=10")
         elif [[ $x264 = o8 ]]; then
-            extracommands+=(--bit-depth=8)
+            extracommands+=("--bit-depth=8")
         else
-            extracommands+=(--bit-depth=all)
+            extracommands+=("--bit-depth=all")
         fi
 
         do_uninstall "${_check[@]}"
@@ -1776,12 +1776,12 @@ if [[ $ffmpeg != "no" ]]; then
 
         if [[ $ffmpeg = "both" ]]; then
             _check+=(bin-video/ffmpegSHARED/lib/"libavutil${build_suffix}.dll.a")
-            FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR/bin-video/ffmpegSHARED")
+            FFMPEG_OPTS_SHARED+=("--prefix=\"$LOCALDESTDIR/bin-video/ffmpegSHARED\"")
         elif [[ $ffmpeg =~ "shared" ]]; then
             _check+=("libavutil${build_suffix}".{dll.a,pc})
-            FFMPEG_OPTS_SHARED+=(--prefix="$LOCALDESTDIR"
-                --bindir="$LOCALDESTDIR/bin-video"
-                --shlibdir="$LOCALDESTDIR/bin-video")
+            FFMPEG_OPTS_SHARED+=("--prefix=\"$LOCALDESTDIR\""
+                "--bindir=\"$LOCALDESTDIR/bin-video\""
+                "--shlibdir=\"$LOCALDESTDIR/bin-video\"")
         fi
         ! disabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(sed -r 's/ (-O[1-3]|-mtune=\S+)//g' <<< "$CFLAGS")"
