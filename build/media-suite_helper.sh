@@ -773,10 +773,10 @@ do_changeFFmpegConfig() {
     local config_script=configure
     [[ $(get_first_subdir) != "ffmpeg-git" ]] && config_script="$LOCALBUILDDIR/ffmpeg-git/configure"
     [[ -f "$config_script" ]] || do_exit_prompt "There's no configure script to retrieve libs from"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
-    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
-    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p;s/_/-/' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p;s/_/-/' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p;s/_/-/' "$config_script" | tr -s '\n' ' ')"
+    eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p;s/_/-/' "$config_script" | tr -s '\n' ' ')"
 
     # handle gpl libs
     local gpl
@@ -825,7 +825,8 @@ do_changeFFmpegConfig() {
     fi
 
     # handle gpl-incompatible libs
-    local nonfreegpl=("${EXTERNAL_LIBRARY_NONFREE_LIST//_/-}")
+    local nonfreegpl
+    read -ra nonfreegpl <<< "$EXTERNAL_LIBRARY_NONFREE_LIST"
     if enabled_any "${nonfreegpl[@]}"; then
         if [[ $license = "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
