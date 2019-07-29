@@ -74,7 +74,7 @@ source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 buildProcess() {
 set_title
-echo -e "\n\t${orange}Starting $bits compilation of all tools${reset}"
+echo -e '\n\t'"${orange}Starting $bits compilation of all tools${reset}"
 [[ -f "$HOME"/custom_build_options ]] &&
     echo "Imported custom build options (unsupported)" &&
     source "$HOME"/custom_build_options
@@ -131,7 +131,7 @@ create_ab_pkgconfig
 create_cmake_toolchain
 
 set_title "compiling global tools"
-echo -e "\n\t${orange}Starting $bits compilation of global tools${reset}"
+echo -e '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
 if [[ $packing = y ]] &&
     ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.95" ]] &&
@@ -491,7 +491,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
             do_install "$MINGW_PREFIX/share/tessdata/eng.traineddata" bin-global/tessdata/
-            printf "%s\n" "You can get more language data here:"\
+            printf '%s\n' "You can get more language data here:"\
                    "https://github.com/tesseract-ocr/tessdata"\
                    "Just download <lang you want>.traineddata and copy it to this directory."\
                     > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
@@ -522,7 +522,7 @@ if [[ $ffmpeg != "no" ]] && enabled libzimg &&
 fi
 
 set_title "compiling audio tools"
-echo -e "\n\t${orange}Starting $bits compilation of audio tools${reset}"
+echo -e '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
 if [[ $ffmpeg != "no" || $sox = y ]]; then
     enabled libwavpack && do_pacman_install wavpack
@@ -861,7 +861,7 @@ if { { [[ $ffmpeg != "no" ]] &&
 fi
 
 set_title "compiling video tools"
-echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
+echo -e '\n\t'"${orange}Starting $bits compilation of video tools${reset}"
 
 _deps=(gnutls.pc)
 _check=(librtmp.{a,pc})
@@ -1585,8 +1585,8 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
             dlltool -y "lib${_file}.a" -d "${_file}.def" \
                 $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
             [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
-
-            printf "%s \n" \
+            # shellcheck disable=SC2016
+            printf '%s\n' \
                "prefix=$LOCALDESTDIR" \
                'exec_prefix=${prefix}' \
                'libdir=${exec_prefix}/lib' \
@@ -2245,9 +2245,9 @@ if [[ $redshift = y ]] && do_vcs "https://github.com/jonls/redshift.git"; then
 fi
 
 if [[ $timeStamp = y ]]; then
-    printf "\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 "${orange}Finished $bits compilation of all tools${reset}"
+    printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 "${orange}Finished $bits compilation of all tools${reset}"
 else
-    echo -e "\n\t${orange}Finished $bits compilation of all tools${reset}"
+    echo -e '\n\t'"${orange}Finished $bits compilation of all tools${reset}"
 fi
 }
 
@@ -2285,9 +2285,9 @@ done
 
 clean_suite
 if [[ $timeStamp = y ]]; then
-    printf "\n${purple}%(%H:%M:%S)T${reset} %s\n${purple}%(%H:%M:%S)T${reset} %s\n" -1 \
+    printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 \
     "${green}Compilation successful.${reset}" -1 "${green}This window will close automatically in 5 seconds.${reset}"
 else
-    echo -e "\n\t${green}Compilation successful.\n\tThis window will close automatically in 5 seconds.${reset}"
+    echo -e '\n\t'"${green}Compilation successful.\\n\\tThis window will close automatically in 5 seconds.${reset}"
 fi
 sleep 5
