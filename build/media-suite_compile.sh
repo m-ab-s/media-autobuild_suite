@@ -1312,10 +1312,9 @@ if [[ $x264 != no ]]; then
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
             if [[ $x264 = fullv ]]; then
-                audio_codecs=(
-                    $(sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c | \
-                      sed -n "s/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p")
-                )
+                mapfile -t audio_codecs < <(
+                    sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c |
+                    sed -n 's/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p')
                 extra_script pre configure
                 LDFLAGS+=" -L$MINGW_PREFIX/lib" \
                     log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
