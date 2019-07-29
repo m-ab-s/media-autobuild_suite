@@ -15,10 +15,7 @@ if [[ x"$LOCALBUILDDIR" = "x" ]]; then
 fi
 printf '\nBuild start: %(%F %T %z)T\n' -1 >> "$LOCALBUILDDIR/newchangelog"
 
-{
-    echo '#!/bin/bash'
-    echo "bash $LOCALBUILDDIR/media-suite_compile.sh $*"
-} > "$LOCALBUILDDIR/last_run"
+printf '#!/bin/bash\nbash %s %s\n' "$LOCALBUILDDIR/media-suite_compile.sh" "$*" > "$LOCALBUILDDIR/last_run"
 
 while true; do
   case $1 in
