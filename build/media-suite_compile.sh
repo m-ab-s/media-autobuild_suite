@@ -852,7 +852,7 @@ if enabled libshine && do_pkgConfig "shine = 3.1.1" &&
 fi
 
 _check=(openal.pc libopenal.a)
-if { { [[ $ffmpeg != "no" ]] && 
+if { { [[ $ffmpeg != "no" ]] &&
     enabled openal; } || mpv_enabled openal; } &&
     do_vcs "https://github.com/kcat/openal-soft.git"; then
     do_uninstall "${_check[@]}"
