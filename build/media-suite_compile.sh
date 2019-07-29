@@ -2189,6 +2189,20 @@ if [[ $cyanrip = y ]]; then
         if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
             do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
+            mapfile -t cyan_ffmpeg_opts < <(
+                enabled libmp3lame &&
+                    printf '%s\n' "--enable-libmp3lame" "--enable-encoder=libmp3lame"
+                if enabled libvorbis; then
+                    printf '%s\n' "--enable-libvorbis" "--enable-encoder=libvorbis"
+                else
+                    echo "--enable-encoder=vorbis"
+                fi
+                if enabled libopus; then
+                    printf '%s\n' "--enable-libopus" "--enable-encoder=libopus"
+                else
+                    echo "--enable-encoder=opus"
+                fi
+            )
             create_build_dir cyan
             log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
@@ -2201,14 +2215,11 @@ if [[ $cyanrip = y ]]; then
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \
                 --enable-{bzlib,zlib,lzma,iconv} \
-                $(enabled libmp3lame && echo '--enable-libmp3lame --enable-encoder=libmp3lame') \
-                $(enabled libvorbis && echo '--enable-libvorbis --enable-encoder=libvorbis' ||
-                    echo '--enable-encoder=vorbis') \
-                $(enabled libopus && echo '--enable-libopus --enable-encoder=libopus' ||
-                    echo '--enable-encoder=opus')
+                "${cyan_ffmpeg_opts[@]}"
             do_makeinstall
             files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
         fi
+        unset cyan_ffmpeg_opts
         PKG_CONFIG_PATH="$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
 
         cd_safe "$LOCALBUILDDIR"/cyanrip-git
