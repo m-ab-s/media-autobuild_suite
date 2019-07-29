@@ -1770,9 +1770,9 @@ if [[ $ffmpeg != "no" ]]; then
 
         # --build-suffix handling
         opt_exists FFMPEG_OPTS "^--build-suffix=[a-zA-Z0-9-]+$" &&
-            build_suffix="$(printf '%s\n' "${FFMPEG_OPTS[@]}" | \
-            sed -rn '/build-suffix=/{s;.+=(.+);\1;p}')" ||
-            build_suffix=""
+            build_suffix="$(printf '%s\n' "${FFMPEG_OPTS[@]}" |
+                sed -rn '/build-suffix=/{s;.+=(.+);\1;p}')" ||
+                build_suffix=""
 
         if [[ $ffmpeg = "both" ]]; then
             _check+=(bin-video/ffmpegSHARED/lib/"libavutil${build_suffix}.dll.a")
