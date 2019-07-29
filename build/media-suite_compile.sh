@@ -1584,10 +1584,11 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
             [vsscript-private]="-l$_python_lib -lstdc++"
         )
         for _file in vapoursynth vsscript; do
-            gendef - "../$_file.dll" >/dev/null 2>&1 |
-                sed -r -e 's|^_||' -e 's|@[1-9]+$||' > "${_file}.def"
+            gendef - "../$_file.dll" 2>/dev/null |
+                sed -E 's|^_||;s|@[1-9]+$||' > "${_file}.def"
+            # shellcheck disable=SC2046
             dlltool -y "lib${_file}.a" -d "${_file}.def" \
-                "$([[ $bits = 32bit ]] && echo "-U")" 2>/dev/null
+                $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
             [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             # shellcheck disable=SC2016
             printf '%s\n' \
