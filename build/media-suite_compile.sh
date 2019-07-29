@@ -66,6 +66,7 @@ while true; do
   esac
 done
 
+# shellcheck source=media-suite_helper.sh
 source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 [[ -f "$LOCALBUILDDIR/no_logs" ||  $logging = n ]] &&
