@@ -1438,12 +1438,17 @@ do_unhide_all_sharedlibs() {
 }
 
 do_pacman_install() {
-    local installed
-    local pkg
-    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
+    local pkg msyspackage
+    while [ -n "$*" ]; do
+        case "$1" in
+        -m) msyspackage=y ;;
+        *) break ;;
+        esac
+    done
     for pkg; do
-        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
+        [[ $msyspackage != "y" && "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
+            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        pacman -Qqe "^${pkg}$" >/dev/null 2>&1 && continue
         if [[ $timeStamp = y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
@@ -1453,6 +1458,7 @@ do_pacman_install() {
             pacman -D --asexplicit "$pkg" >/dev/null
             /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
                 echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+            sort -uo /etc/pac-mingw-extra.pk{,}
             echo "done"
         else
             echo "failed"
@@ -1462,14 +1468,20 @@ do_pacman_install() {
 }
 
 do_pacman_remove() {
-    local installed
-    local pkg
-    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
+    local pkg msyspackage
+    while [ -n "$*" ]; do
+        case "$1" in
+        -m) msyspackage=y ;;
+        *) break ;;
+        esac
+    done
     for pkg; do
-        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        [[ $msyspackage != "y" && "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
+            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         [[ -f /etc/pac-mingw-extra.pk ]] &&
             sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
-        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
+        sort -uo /etc/pac-mingw-extra.pk{,}
+        pacman -Qqe "^${pkg}$" >/dev/null 2>&1 || continue
         if [[ $timeStamp = y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
