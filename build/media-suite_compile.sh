@@ -1776,12 +1776,12 @@ if [[ $ffmpeg != "no" ]]; then
 
         if [[ $ffmpeg = "both" ]]; then
             _check+=(bin-video/ffmpegSHARED/lib/"libavutil${build_suffix}.dll.a")
-            FFMPEG_OPTS_SHARED+=("--prefix=\"$LOCALDESTDIR/bin-video/ffmpegSHARED\"")
+            FFMPEG_OPTS_SHARED+=("--prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED")
         elif [[ $ffmpeg =~ "shared" ]]; then
             _check+=("libavutil${build_suffix}".{dll.a,pc})
-            FFMPEG_OPTS_SHARED+=("--prefix=\"$LOCALDESTDIR\""
-                "--bindir=\"$LOCALDESTDIR/bin-video\""
-                "--shlibdir=\"$LOCALDESTDIR/bin-video\"")
+            FFMPEG_OPTS_SHARED+=("--prefix=$LOCALDESTDIR"
+                "--bindir=$LOCALDESTDIR/bin-video"
+                "--shlibdir=$LOCALDESTDIR/bin-video")
         fi
         ! disabled_any debug "debug=gdb" &&
             ffmpeg_cflags="$(sed -r 's/ (-O[1-3]|-mtune=\S+)//g' <<< "$CFLAGS")"
