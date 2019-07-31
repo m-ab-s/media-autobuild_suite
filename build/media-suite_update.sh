@@ -200,11 +200,11 @@ if [[ -n $have_updates ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
-        touch build/update_core &&
-        have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
-    echo $have_updates | xargs $nargs pacman -S --noconfirm --ask 20 \
-        --overwrite "/mingw64/*" --overwrite "/mingw32/*" --overwrite "/usr/*"
+    /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
+        touch /build/update_core &&
+        have_updates="$(/usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
+    xargs $nargs pacman -S --noconfirm --ask 20 --overwrite "/mingw64/*" \
+        --overwrite "/mingw32/*" --overwrite "/usr/*" <<< "$have_updates"
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
