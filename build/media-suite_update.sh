@@ -166,13 +166,14 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         while true; do
             read -r -p "install packs [y/n]? " yn
             case $yn in
-                [Yy]* )
-                    echo $install | xargs $nargs pacman -Sw --noconfirm --ask 20 --needed
-                    echo $install | xargs $nargs pacman -S --noconfirm --ask 20 --needed
-                    pacman -D --asexplicit $install
-                    break;;
-                [Nn]* ) exit;;
-                * ) echo "Please answer yes or no";;
+            [Yy]*)
+                xargs $nargs pacman -Sw --noconfirm --ask 20 --needed <<< "$install"
+                xargs $nargs pacman -S --noconfirm --ask 20 --needed <<< "$install"
+                pacman -D --asexplicit $install
+                break
+                ;;
+            [Nn]*) exit ;;
+            *) echo "Please answer yes or no" ;;
             esac
         done
     fi
