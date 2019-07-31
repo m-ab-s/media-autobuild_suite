@@ -445,7 +445,7 @@ if files_exist "$LOCALDESTDIR/bin-video/OpenCL.dll"; then
     opencldll="$LOCALDESTDIR/bin-video/OpenCL.dll"
 fi
 if [[ $ffmpeg != "no" ]] && enabled opencl && [[ -f "$opencldll" ]]; then
-    echo -e "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
+    do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
     do_pacman_remove opencl-headers
     _check=(CL/cl.h)
     if do_vcs "https://github.com/KhronosGroup/OpenCL-Headers.git"; then
@@ -1704,12 +1704,12 @@ if [[ $ffmpeg != "no" ]]; then
     enabled ladspa && do_pacman_install ladspa-sdk
     if enabled vapoursynth && pc_exists "vapoursynth-script >= 42"; then
         _ver="$(pkg-config --modversion vapoursynth-script)"
-        echo -e "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
-        echo -e "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers!${reset}"
+        do_simple_print "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
+        do_simple_print "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers"'!'"${reset}"
         unset _ver
     elif enabled vapoursynth; then
         do_removeOption --enable-vapoursynth
-        echo -e "${red}Update to at least Vapoursynth R42 to use with FFmpeg${reset}"
+        do_simple_print "${red}Update to at least Vapoursynth R42 to use with FFmpeg${reset}"
     fi
     disabled autodetect && enabled iconv && do_addOption --extra-libs=-liconv
 
@@ -1918,12 +1918,12 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
         _ver="$(pkg-config --modversion vapoursynth-script)"
-        echo -e "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
-        echo -e "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter!${reset}"
+        do_simple_print "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
+        do_simple_print "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter"'!'"${reset}"
         unset _ver
     elif ! mpv_disabled vapoursynth; then
         mpv_disable vapoursynth
-        echo -e "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
+        do_simple_print "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
     fi
 
     _check=(mujs.h libmujs.a)
@@ -2261,11 +2261,7 @@ if [[ $redshift = y ]] && do_vcs "https://github.com/jonls/redshift.git"; then
     do_checkIfExist
 fi
 
-if [[ $timeStamp = y ]]; then
-    printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 "${orange}Finished $bits compilation of all tools${reset}"
-else
-    echo -e '\n\t'"${orange}Finished $bits compilation of all tools${reset}"
-fi
+do_simple_print -p "${orange}Finished $bits compilation of all tools${reset}"
 }
 
 run_builds() {
@@ -2302,10 +2298,6 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 clean_suite
-if [[ $timeStamp = y ]]; then
-    printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 \
-    "${green}Compilation successful.${reset}" -1 "${green}This window will close automatically in 5 seconds.${reset}"
-else
-    echo -e '\n\t'"${green}Compilation successful.\\n\\tThis window will close automatically in 5 seconds.${reset}"
-fi
+do_simple_print -p "${green}Compilation successful.${reset}"
+do_simple_print -p "${green}This window will close automatically in 5 seconds.${reset}"
 sleep 5
