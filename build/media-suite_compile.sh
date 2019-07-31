@@ -71,11 +71,11 @@ done
 source "$LOCALBUILDDIR"/media-suite_helper.sh
 
 [[ -f "$LOCALBUILDDIR/no_logs" ||  $logging = n ]] &&
-    echo -e "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!${reset}"
+    do_simple_print -p "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!${reset}"
 
 buildProcess() {
 set_title
-echo -e '\n\t'"${orange}Starting $bits compilation of all tools${reset}"
+do_simple_print -p '\n\t'"${orange}Starting $bits compilation of all tools${reset}"
 [[ -f "$HOME"/custom_build_options ]] &&
     echo "Imported custom build options (unsupported)" &&
     source "$HOME"/custom_build_options
@@ -133,7 +133,7 @@ create_ab_pkgconfig
 create_cmake_toolchain
 
 set_title "compiling global tools"
-echo -e '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
+do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
 if [[ $packing = y ]] &&
     ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.95" ]] &&
@@ -526,7 +526,7 @@ if [[ $ffmpeg != "no" ]] && enabled libzimg &&
 fi
 
 set_title "compiling audio tools"
-echo -e '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
+do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
 if [[ $ffmpeg != "no" || $sox = y ]]; then
     enabled libwavpack && do_pacman_install wavpack
@@ -866,7 +866,7 @@ if { { [[ $ffmpeg != "no" ]] &&
 fi
 
 set_title "compiling video tools"
-echo -e '\n\t'"${orange}Starting $bits compilation of video tools${reset}"
+do_simple_print -p '\n\t'"${orange}Starting $bits compilation of video tools${reset}"
 
 _deps=(gnutls.pc)
 _check=(librtmp.{a,pc})
