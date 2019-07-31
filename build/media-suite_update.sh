@@ -2,14 +2,29 @@
 # shellcheck disable=SC2086
 
 while true; do
-  case $1 in
---build32=* ) build32="${1#*=}"; shift ;;
---build64=* ) build64="${1#*=}"; shift ;;
---update=* ) update="${1#*=}"; shift ;;
-    -- ) shift; break ;;
-    -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
-    * ) break ;;
-  esac
+    case $1 in
+    --build32=*)
+        build32="${1#*=}"
+        shift
+        ;;
+    --build64=*)
+        build64="${1#*=}"
+        shift
+        ;;
+    --update=*)
+        update="${1#*=}"
+        shift
+        ;;
+    --)
+        shift
+        break
+        ;;
+    -*)
+        echo "Error, unknown option: '$1'."
+        exit 1
+        ;;
+    *) break ;;
+    esac
 done
 
 # start suite update
@@ -120,14 +135,20 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
         while true; do
             read -r -p "remove packs [y/n]? " yn
             case $yn in
-                [Yy]* )
-                    for pkg in $uninstall; do
-                        pacman -Rs --noconfirm --ask 20 "$pkg" 2>/dev/null
-                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --ask 20 --asdeps "$pkg" >/dev/null
-                    done
-                    break;;
-                [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
-                * ) echo "Please answer yes or no";;
+            [Yy]*)
+                for pkg in $uninstall; do
+                    {
+                        pacman -Rs --noconfirm --ask 20 "$pkg" >&2 2> /dev/null
+                        pacman -Qs "^${pkg}$" && pacman -D --noconfirm --ask 20 --asdeps "$pkg"
+                    } > /dev/null
+                done
+                break
+                ;;
+            [Nn]*)
+                pacman --noconfirm -D --asdeps $uninstall
+                break
+                ;;
+            *) echo "Please answer yes or no" ;;
             esac
         done
     fi
