@@ -88,17 +88,16 @@ fi # end suite update
 gpgconf --kill gpg-agent
 
 # for some people the signature is broken
-printf 'Server = %s\nSigLevel = Optional\n' \
-    'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
+/usr/bin/grep -q Optional /etc/pacman.d/abrepo.conf ||
+    printf 'Server = %s\nSigLevel = Optional\n' \
+        'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
 
 # fix fuckup
 grep -q 'i.fsbn.eu/abrepo' /etc/pacman.conf &&
     sed -i '/\[abrepo\]/,+2d' /etc/pacman.conf
 
 /usr/bin/grep -q abrepo /etc/pacman.conf ||
-    sed -i '/\[mingw32\]/ i\[abrepo]\
-Include = /etc/pacman.d/abrepo.conf\
-' /etc/pacman.conf
+    sed -i '/\[mingw32\]/ i\[abrepo]\nInclude = /etc/pacman.d/abrepo.conf\n' /etc/pacman.conf
 
 echo
 echo "-------------------------------------------------------------------------------"
