@@ -847,6 +847,19 @@ if enabled libshine && do_pkgConfig "shine = 3.1.1" &&
     do_checkIfExist
 fi
 
+_check=(openal.pc libopenal.a)
+if { { [[ $ffmpeg != "no" ]] && 
+    enabled openal; } || mpv_enabled openal; } &&
+    do_vcs "https://github.com/kcat/openal-soft.git"; then
+    do_uninstall "${_check[@]}"
+    _mingw_patches="https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-openal"
+    do_patch "$_mingw_patches/0003-openal-not-32.mingw.patch" am
+    do_patch "$_mingw_patches/0004-disable-OSS-windows.patch" am
+    do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
+    sed -i 's/Libs.private.*/& -lwinmm -latomic -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
+    do_checkIfExist
+    unset _mingw_patches
+fi
 
 set_title "compiling video tools"
 echo -e "\n\t${orange}Starting $bits compilation of video tools${reset}"
