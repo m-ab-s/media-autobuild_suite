@@ -95,7 +95,7 @@ libaom libopenmpt version3
 set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
 libmodplug libnpp libopenh264 librtmp librubberband libssh ^
-libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
+libtesseract libxavs libzmq libzvbi openal opencl opengl libvmaf libcodec2 ^
 libsrt ladspa libsvthevc #vapoursynth #liblensfun #librav1e
 
 :: built-ins
@@ -108,7 +108,7 @@ set mpv_options_basic=--disable-debug-build "--lua=luajit"
 
 :: all supported options
 set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
-pdf-build libmpv-shared
+pdf-build libmpv-shared openal
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
