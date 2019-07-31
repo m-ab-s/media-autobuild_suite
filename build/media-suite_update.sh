@@ -195,7 +195,7 @@ fi
 # packet msys2 system
 # --------------------------------------------------
 
-have_updates="$(pacman -Qu|grep -v ignored]$|awk '{print $1}')"
+have_updates="$(pacman -Qu | grep -v ignored]$ | cut -d' ' -f1)"
 if [[ -n $have_updates ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
