@@ -22,6 +22,22 @@ ncols=72
 [[ -f "$LOCALBUILDDIR"/grep.exe ]] &&
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
 
+do_simple_print() {
+    local plain formatString='' dateValue
+    [[ $1 = -p ]] && plain=y && shift
+
+    if [[ $timeStamp = y ]]; then
+        formatString+="${purple}"'%(%H:%M:%S)T'"${reset}"' '
+        dateValue='-1'
+    else
+        [[ $plain = y ]] && formatString+='\t'
+    fi
+    if [[ -z $plain ]]; then
+        formatString+="${bold}├${reset} "
+    fi
+    printf "$formatString"'%b'"$reset"'\n' $dateValue "$*"
+}
+
 do_print_status() {
     local name="$1 "
     local color="$2"
