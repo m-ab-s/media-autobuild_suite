@@ -85,7 +85,7 @@ fi # end suite update
 { /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
 
 #always kill gpg-agent
-ps|grep gpg-agent|awk '{print $1}'|xargs -r kill -9
+gpgconf --kill gpg-agent
 
 # for some people the signature is broken
 printf 'Server = %s\nSigLevel = Optional\n' \
