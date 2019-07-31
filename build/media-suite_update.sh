@@ -56,7 +56,7 @@ if [[ $update == "yes" ]]; then
     fi
     cd_safe ..
     if [[ -d .git ]]; then
-        if [[ -n $(git status --short --untracked-files=no) ]]; then
+        if [[ -n "$(git diff --name-only)" ]]; then
             diffname="$(date +%F-%H.%M.%S)"
             git diff --diff-filter=M >> "build/user-changes-${diffname}.diff"
             echo "Your changes have been exported to build/user-changes-${diffname}.diff."
