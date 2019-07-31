@@ -81,8 +81,8 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-/usr/bin/pacman-key -f EFD16019AE4FF531 >/dev/null || pacman-key -r EFD16019AE4FF531 >/dev/null
-/usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531 >/dev/null
+{ /usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531; } > /dev/null
+{ /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
 
 #always kill gpg-agent
 ps|grep gpg-agent|awk '{print $1}'|xargs -r kill -9
@@ -107,7 +107,7 @@ echo "--------------------------------------------------------------------------
 echo
 
 pacman -Sy --ask=20 --noconfirm
-pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex > /dev/null
+{ pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex; } > /dev/null
 do_unhide_all_sharedlibs
 
 if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
