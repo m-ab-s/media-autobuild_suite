@@ -27,6 +27,8 @@ while true; do
     esac
 done
 
+[[ "$(uname)" == *6.1* ]] && nargs="-n 4"
+
 # start suite update
 if [[ -d "/trunk/build" ]]; then
     cd "/trunk/build" || exit 1
