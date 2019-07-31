@@ -115,15 +115,33 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
+    printf -v new '%s\n' "$(tr -d '\r' < /etc/pac-base.pk)"
+    printf -v newmingw '%s\n' "$(tr -d '\r' < /etc/pac-mingw.pk)"
+    [[ -f /etc/pac-mingw-extra.pk ]] && printf -v newmingw '%s\n' "$newmingw" \
+        "$(tr -d '\r' < /etc/pac-mingw-extra.pk)"
+    new=$(echo -n "$new" | tr ' ' '\n' | sort -u)
+    newmingw=$(echo -n "$newmingw" | tr ' ' '\n' | sort -u)
+    for pkg in $newmingw; do
+        pkg=${pkg#mingw-w64-i686-}
+        pkg=${pkg#mingw-w64-x86_64-}
+        [[ $build32 == "yes" ]] &&
+            pacman -Ss "mingw-w64-i686-$pkg" > /dev/null 2>&1 &&
+            mingw32pkg="mingw-w64-i686-$pkg"
+        [[ $build64 == "yes" ]] &&
+            pacman -Ss "mingw-w64-x86_64-$pkg" > /dev/null 2>&1 &&
+            mingw64pkg="mingw-w64-x86_64-$pkg"
+        if [[ -n $mingw32pkg || -n $mingw64pkg ]]; then
+            [[ $build32 == "yes" ]] && printf -v new '%b' "$new\\n$mingw32pkg"
+            [[ $build64 == "yes" ]] && printf -v new '%b' "$new\\n$mingw64pkg"
+        else
+            pacman -Ss "$pkg" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
+        fi
+        unset mingw32pkg mingw64pkg
+    done
     old=$(pacman -Qqe | sort)
-    new=$(dos2unix < /etc/pac-base.pk)
-    newmingw=$(dos2unix < /etc/pac-mingw.pk)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(dos2unix < /etc/pac-mingw-extra.pk)")
-    [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
-    [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
-    diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
-    install=$(echo "$diff" | sed -nr 's/> (.*)/\1/p')
-    uninstall=$(echo "$diff" | sed -nr 's/< (.*)/\1/p')
+    new=$(sort -u <<< "$new")
+    install=$(diff --changed-group-format='%>' --unchanged-group-format='' <(echo "$old") <(echo "$new"))
+    uninstall=$(diff --changed-group-format='%<' --unchanged-group-format='' <(echo "$old") <(echo "$new"))
 
     if [[ -n $uninstall ]]; then
         echo
