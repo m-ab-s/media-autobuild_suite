@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 
 while true; do
   case $1 in
