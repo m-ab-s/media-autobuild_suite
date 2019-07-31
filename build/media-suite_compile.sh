@@ -106,13 +106,12 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
     {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,luajit,uchardet}.pc
-    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
+    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
     share/aclocal/{ogg,vorbis}.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
     bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
     libebur128.a ebur128.h
-    libopenh264.a
     liburiparser.{{,l}a,pc}
     libchromaprint.{a,pc} chromaprint.h
     bin-global/libgcrypt-config libgcrypt.a gcrypt.h
@@ -1652,27 +1651,15 @@ if [[ $ffmpeg != "no" ]]; then
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
-    if enabled libopenh264; then
-        do_pacman_install openh264
-        if [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]]; then
-            mv -f "$MINGW_PREFIX"/lib/libopenh264.a{,.bak}
-            mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
-        fi
-        [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a $LOCALDESTDIR/bin-video/libopenh264.dll; then
-            pushd $LOCALDESTDIR/bin-video >/dev/null
-            if [[ $bits = "64bit" ]]; then
-              _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
-            else
-              _sha256="86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
-            fi
-            do_wget -c -r -q -h $_sha256 \
-            "http://ciscobinary.openh264.org/openh264-1.8.0-win${bits%bit}.dll.bz2" \
-                libopenh264.dll.bz2
-            [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
-            unset _sha256
-            popd >/dev/null
-        fi
+    _check=(libopenh264.a openh264.pc)
+    if enabled libopenh264 &&
+        do_vcs "https://github.com/cisco/openh264.git"; then
+        do_pacman_remove openh264
+        _DeadSix27_patches="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master/patches/openh264"
+        do_patch "$_DeadSix27_patches/0001-openh264-static-only.patch" am
+        do_mesoninstall
+        do_checkIfExist
+        unset _DeadSix27_patches
     fi
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
         do_pacman_remove fftw && do_pacman_install chromaprint
