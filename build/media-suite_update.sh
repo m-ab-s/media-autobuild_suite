@@ -48,7 +48,7 @@ if [[ "$update" = "yes" ]]; then
     echo "-------------------------------------------------------------------------------"
     echo
 
-    if [[ ! -d ../.git ]] && which git > /dev/null; then
+    if [[ ! -d ../.git ]] && command -v git > /dev/null; then
         if ! git clone "https://github.com/jb-alvarado/media-autobuild_suite.git" ab-git; then
             git -C ab-git fetch
         fi
@@ -185,7 +185,7 @@ else
     cd_safe "$(cygpath -w /).."
 fi
 
-if which rustup &> /dev/null; then
+if command -v rustup &> /dev/null; then
     echo "Updating rust..."
     rustup update
 fi
