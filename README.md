@@ -185,6 +185,7 @@ For information about the compiler environment see the wiki, there you also have
 - NTFS drive
 - 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
 - 4GB+ RAM
+- At least Powershell 4, Powershell core is not supported at this time
 
 --------
 
