@@ -857,8 +857,8 @@ if { { [[ $ffmpeg != "no" ]] &&
     do_vcs "https://github.com/kcat/openal-soft.git"; then
     do_uninstall "${_check[@]}"
     _mingw_patches="https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-openal"
-    do_patch "$_mingw_patches/0003-openal-not-32.mingw.patch" am
-    do_patch "$_mingw_patches/0004-disable-OSS-windows.patch" am
+    do_patch "$_mingw_patches/0003-openal-not-32.mingw.patch"
+    do_patch "$_mingw_patches/0004-disable-OSS-windows.patch"
     do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
     sed -i 's/Libs.private.*/& -lwinmm -latomic -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
     do_checkIfExist
@@ -1743,6 +1743,11 @@ if [[ $ffmpeg != "no" ]]; then
         if enabled librav1e; then
             do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
                 do_removeOption "--enable-librav1e"
+        fi
+
+        if enabled openal; then
+            do_patch "https://gist.githubusercontent.com/Helenerineium/406d836f81f99a0656bdaf885265ca2e/raw/openal-pkgconfig.patch" ||
+                do_removeOption "--enable-openal"
         fi
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
