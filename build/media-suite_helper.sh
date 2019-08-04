@@ -822,7 +822,7 @@ do_changeFFmpegConfig() {
     fi
 
     # cuda-only workarounds
-    if [[ $license = "nonfree" ]] && verify_cuda_deps; then
+    if verify_cuda_deps; then
         if enabled libnpp; then
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
             local fixed_CUDA_PATH
@@ -1934,19 +1934,26 @@ fix_cmake_crap_exports() {
 }
 
 verify_cuda_deps() {
-    enabled_any libnpp cuda-nvcc cuda-sdk || return 1
-    enabled cuda-sdk && do_removeOption --enable-cuda-sdk &&
-        do_addOption --enable-cuda-nvcc
-    if [[ $bits = 32bit ]]; then
+    enabled cuda-sdk && do_removeOption --enable-cuda-sdk && do_addOption --enable-cuda-nvcc
+    if enabled_any libnpp cuda-nvcc && [[ $license != "nonfree" ]]; then
+        do_removeOption "--enable-(cuda-nvcc|libnpp)"
+    fi
+    if enabled libnpp && [[ $bits = 32bit ]]; then
         echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
         do_removeOption --enable-libnpp
     fi
-    if [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
+    if enabled_any libnpp cuda-nvcc && [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
         echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
         do_removeOption "--enable-(cuda-nvcc|libnpp)"
     fi
     if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
         do_removeOption --enable-libnpp
+    fi
+    if ! disabled cuda-llvm && do_pacman_install clang; then
+        do_removeOption --enable-cuda-nvcc
+    else
+        do_removeOption --enable-cuda-llvm
+        do_addOption --disable-cuda-llvm
     fi
     if enabled cuda-nvcc; then
         if ! get_cl_path; then
@@ -1958,7 +1965,7 @@ verify_cuda_deps() {
             do_removeOption --enable-cuda-nvcc
         fi
     fi
-    enabled_any libnpp cuda-nvcc
+    enabled_any libnpp cuda-nvcc || ! disabled cuda-llvm
 }
 
 check_custom_patches(){
