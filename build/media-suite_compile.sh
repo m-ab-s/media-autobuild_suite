@@ -2087,8 +2087,8 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
         extra_script pre configure
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
-            RST2MAN="${MINGW_PREFIX}/bin/rst2man3" \
-            RST2HTML="${MINGW_PREFIX}/bin/rst2html3" \
+            RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
+            RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
