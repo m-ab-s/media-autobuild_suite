@@ -323,7 +323,11 @@ check_hash() {
         echo "$sha256sum"
     else
         md5sum=$(md5sum "$file" | cut -d' ' -f1)
-        test "$sha256sum" = "$check" || test "$md5sum" = "$check"
+        if [[ "$sha256sum" = "$check" || "$md5sum" = "$check" ]]; then
+            return 0
+        fi
+        do_simple_print "${orange}Hash mismatch, file may be broken: ${check} != ${sha256sum} || ${md5sum}"
+        return 1
     fi
 }
 
