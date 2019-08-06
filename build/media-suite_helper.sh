@@ -2058,6 +2058,133 @@ unset_extra_script(){
     unset _{pre,post}_install
 }
 
+create_extra_skeleton() {
+    local overwrite
+    while true; do
+        case $1 in
+            -f) overwrite=y && shift;;
+            --) shift; break;;
+            *) break;;
+        esac
+    done
+    local extraName="$1"
+    [[ -z "$extraName" ]] &&
+        printf '%s\n' \
+            'Usage: create_extra_skeleton [-f] <vcs folder name without the vcs type suffix>' \
+            'For example, to create a ffmpeg_extra.sh skeleton file in '"$LOCALBUILDDIR"':' \
+            '> create_extra_skeleton ffmpeg' && return 1
+    [[ -f "$LOCALBUILDDIR/$extraName"_extra.sh && -z $overwrite ]] &&
+        echo "$LOCALBUILDDIR/$extraName_extra.sh already exists. Use -f if you are sure you want to overwrite it." && return 1
+
+    IFS=$'\n' read -r -d '' script_file <<'EOF' || true
+#!/bin/bash
+
+# Force to the suite to think the package has updates to recompile.
+# Alternatively, you can use "touch recompile" for a similar effect.
+#touch custom_updated
+
+# Runs before and after building rust packages (do_rust)
+_pre_rust() {
+}
+_post_rust() {
+}
+
+# Runs before and after running autoreconf -fiv (do_autoreconf)
+_pre_autoreconf() {
+}
+_post_autoreconf() {
+}
+
+# Runs before and after running ./autogen.sh (do_autogen)
+_pre_autogen() {
+}
+_post_autogen() {
+}
+
+# Commands to run before and after running configure on a Autoconf/Automake/configure-using package
+_pre_configure(){
+    #
+    # Apply a patch from ffmpeg's patchwork site.
+    #do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    #
+    # Apply a local patch inside the directory where is "ffmpeg_extra.sh"
+    #patch -p1 -i "$LOCALBUILDDIR/ffmpeg-0001-my_patch.patch"
+    #
+    # Add extra configure options to ffmpeg (ffmpeg specific)
+    # If you want to add something to ffmpeg not within the suite already
+    # you will need to install it yourself, either through pacman
+    # or compiling from source.
+    #FFMPEG_OPTS+=(--enable-libsvthevc)
+    #
+}
+_post_configure(){
+}
+
+# Commands to run before and after running cmake (do_cmake)
+_pre_cmake(){
+    # Installs libwebp
+    #do_pacman_install libwebp
+    # Downloads the patch and then applies the patch
+    #do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
+    # Change directory to the build folder
+    #cd_safe "build-${bits}"
+    # Add additional options to suite's cmake execution
+    #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
+}
+
+_post_cmake(){
+    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
+    #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
+    #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
+    #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+    # You can also do the same thing in _pre_cmake after creating a 'do_not_reconfigure' 
+    # file in the source directory. This way you can avoid running cmake twice.
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+}
+
+# Runs before and after runing make (do_make)
+_pre_make(){}
+_post_make(){
+    # Don't run configure again.
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+    # Don't clean the build folder on each successive run.
+    # This is for if you want to keep the current build folder as is and just recompile only.
+    #touch "$(get_first_subdir)/do_not_clean"
+}
+
+# Runs before and after running meson (do_meson)
+_pre_meson() {
+}
+_post_meson() {
+}
+
+# Runs before and after running ninja (do_ninja)
+_pre_ninja() {
+}
+_post_ninja() {
+}
+
+# Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
+# If this is present, it will override the other hooks
+# Use for mpv and python waf based stuff.
+_pre_build() {
+}
+_post_build() {
+}
+
+# Runs before and after either ninja install
+# or make install or using install
+# (do_makeinstall, do_ninjainstall, do_install)
+_pre_install() {
+}
+_post_install() {
+}
+
+EOF
+    printf '%s' "$script_file" > "$LOCALBUILDDIR/$extraName"_extra.sh
+    echo "Created skeleton file $LOCALBUILDDIR/$extraName_extra.sh"
+}
+
 # if you absolutely need to remove some of these,
 # add a "-e '!<hardcoded rule>'"  option
 # ex: "-e '!/recently_updated'"
