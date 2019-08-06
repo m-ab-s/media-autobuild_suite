@@ -859,8 +859,9 @@ if { { [[ $ffmpeg != "no" ]] &&
     _mingw_patches="https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-openal"
     do_patch "$_mingw_patches/0003-openal-not-32.mingw.patch"
     do_patch "$_mingw_patches/0004-disable-OSS-windows.patch"
+    do_patch "https://0x0.st/zOfU.txt"
     do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
-    sed -i 's/Libs.private.*/& -lwinmm -latomic -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
+    sed -i 's/Libs.private.*/& -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
     do_checkIfExist
     unset _mingw_patches
 fi
