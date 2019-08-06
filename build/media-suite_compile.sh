@@ -1746,14 +1746,14 @@ if [[ $ffmpeg != "no" ]]; then
                 do_removeOption "--enable-librav1e"
         fi
 
-        if enabled openal; then
-            do_patch "https://gist.githubusercontent.com/Helenerineium/406d836f81f99a0656bdaf885265ca2e/raw/openal-pkgconfig.patch" ||
-                do_removeOption "--enable-openal"
-        fi
-
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://0x0.st/zLsN.txt" am
+        fi
+
+        if enabled openal; then
+            do_patch "https://gist.githubusercontent.com/Helenerineium/406d836f81f99a0656bdaf885265ca2e/raw/openal-pkgconfig.patch" ||
+                do_removeOption "--enable-openal"
         fi
 
         _patches="$(git rev-list origin/master.. --count)"
