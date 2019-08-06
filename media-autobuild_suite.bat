@@ -101,14 +101,14 @@ libsrt ladspa libsvthevc #vapoursynth #liblensfun #librav1e
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #spirv-cross #d3d11 #jpeg
+#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
 
 :: all supported options
-set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
-pdf-build libmpv-shared openal
+set mpv_options_full=dvdread dvdnav cdda #egl-angle #html-build ^
+#pdf-build libmpv-shared openal
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
