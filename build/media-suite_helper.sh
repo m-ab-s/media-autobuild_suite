@@ -2085,24 +2085,31 @@ create_extra_skeleton() {
 
 # Runs before and after building rust packages (do_rust)
 _pre_rust() {
+    true
 }
 _post_rust() {
+    true
 }
 
 # Runs before and after running autoreconf -fiv (do_autoreconf)
 _pre_autoreconf() {
+    true
 }
 _post_autoreconf() {
+    true
 }
 
 # Runs before and after running ./autogen.sh (do_autogen)
 _pre_autogen() {
+    true
 }
 _post_autogen() {
+    true
 }
 
 # Commands to run before and after running configure on a Autoconf/Automake/configure-using package
 _pre_configure(){
+    true
     #
     # Apply a patch from ffmpeg's patchwork site.
     #do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
@@ -2118,10 +2125,12 @@ _pre_configure(){
     #
 }
 _post_configure(){
+    true
 }
 
 # Commands to run before and after running cmake (do_cmake)
 _pre_cmake(){
+    true
     # Installs libwebp
     #do_pacman_install libwebp
     # Downloads the patch and then applies the patch
@@ -2133,6 +2142,7 @@ _pre_cmake(){
 }
 
 _post_cmake(){
+    true
     # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
     #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
     #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
@@ -2143,8 +2153,11 @@ _post_cmake(){
 }
 
 # Runs before and after runing make (do_make)
-_pre_make(){}
+_pre_make(){
+    true
+}
 _post_make(){
+    true
     # Don't run configure again.
     #touch "$(get_first_subdir)/do_not_reconfigure"
     # Don't clean the build folder on each successive run.
@@ -2154,35 +2167,43 @@ _post_make(){
 
 # Runs before and after running meson (do_meson)
 _pre_meson() {
+    true
 }
 _post_meson() {
+    true
 }
 
 # Runs before and after running ninja (do_ninja)
 _pre_ninja() {
+    true
 }
 _post_ninja() {
+    true
 }
 
 # Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
 # If this is present, it will override the other hooks
 # Use for mpv and python waf based stuff.
 _pre_build() {
+    true
 }
 _post_build() {
+    true
 }
 
 # Runs before and after either ninja install
 # or make install or using install
 # (do_makeinstall, do_ninjainstall, do_install)
 _pre_install() {
+    true
 }
 _post_install() {
+    true
 }
 
 EOF
-    printf '%s' "$script_file" > "$LOCALBUILDDIR/$extraName"_extra.sh
-    echo "Created skeleton file $LOCALBUILDDIR/$extraName_extra.sh"
+    printf '%s' "$script_file" > "${LOCALBUILDDIR}/${extraName}_extra.sh"
+    echo "Created skeleton file ${LOCALBUILDDIR}/${extraName}_extra.sh"
 }
 
 # if you absolutely need to remove some of these,
