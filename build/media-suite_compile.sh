@@ -1904,22 +1904,16 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     do_pacman_remove angleproject-git
-    _check=(EGL/egl.h bin-video/lib{GLESv2,EGL}.dll)
-    if ! mpv_disabled egl-angle &&
-        do_wget -z -r "https://i.fsbn.eu/pub/angle/angle-latest-win${bits%bit}.7z" &&
-        test_newer installed ./libGLESv2.dll bin-video/libGLESv2.dll; then
-            do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
-                lib{GLESv2,EGL}.a "${_check[@]}"
-            do_install lib{GLESv2,EGL}.dll bin-video/
-            cp -rf include/* "$LOCALDESTDIR/include/"
-            if ! [[ -f "$LOCALDESTDIR/bin-video/d3dcompiler_47.dll" ]] &&
-                do_wget -c -q "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win${bits%bit}.7z"; then
-                do_install "d3dcompiler_47-win${bits%bit}/d3dcompiler_47.dll" bin-video/
-            fi
-            stripping=n do_checkIfExist
-    elif ! mpv_disabled egl-angle &&
-        ! test_newer installed ./libGLESv2.dll bin-video/libGLESv2.dll; then
-        do_print_status "└ $(get_first_subdir)" "$green" "Files up-to-date"
+    _check=(EGL/egl.h)
+    if mpv_enabled egl-angle && do_vcs "https://github.com/google/angle.git"; then
+        do_simple_print "${orange}mpv will need libGLESv2.dll and libEGL.dll to execute"'!'
+        do_simple_print "You can find these in your browser's installation directory, usually."
+        do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
+            lib{GLESv2,EGL}.a "${_check[@]}"
+        cp -rf include/{EGL,KHR} "$LOCALDESTDIR/include/"
+        do_checkIfExist
+    elif ! mpv_disabled egl-angle; then
+        mpv_disable egl-angle
     fi
 
     if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
