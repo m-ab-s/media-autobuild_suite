@@ -1090,7 +1090,7 @@ if { { [[ $ffmpeg != "no" ]] && enabled libbluray; } || ! mpv_disabled libbluray
                 "https://www.apache.org/dist/ant/binaries/apache-ant-${apache_ant_ver}-bin.zip" \
                 apache-ant.zip; then
                 rm -rf /opt/apache-ant
-                mv apache-ant/apache-ant* /opt/apache-ant
+                mv apache-ant /opt/apache-ant
             fi
         fi
         PATH="/opt/apache-ant/bin:$JAVA_HOME/bin:$PATH"
