@@ -1579,6 +1579,16 @@ for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
+REM Test mklink availability
+set symlinkSupport=""
+mkdir testmklink
+mklink /d linkedtestmklink testmklink 2>NUL
+if %ERRORLEVEL%==0 (
+    set symlinkSupported="winsymlinks:nativestrict"
+    rmdir /q linkedtestmklink
+)
+rmdir /q testmklink
+
 endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
@@ -1593,7 +1603,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
-    set "MSYS=winsymlinks:nativestrict"
+    set "MSYS=%symlinkSupported%"
 )
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
@@ -1602,7 +1612,7 @@ if %noMintty%==y (
     if exist %CD%\build\compile.log del %CD%\build\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
     --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
-    MSYS=winsymlinks:nativestrict /usr/bin/bash ^
+    MSYS=%symlinkSupported% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
 endlocal
