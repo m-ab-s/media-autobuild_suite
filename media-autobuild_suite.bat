@@ -78,11 +78,11 @@ set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-conf
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
-iconv lzma nvenc schannel zlib sdl2 --disable-debug ffnvcodec nvdec
+iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec
 
 :: common external libs
 set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265 ^
-libdav1d
+libdav1d --disable-debug
 
 :: options used in zeranoe builds and not present above
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
