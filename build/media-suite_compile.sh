@@ -1742,7 +1742,7 @@ if [[ $ffmpeg != "no" ]]; then
 
         # librav1e
         if enabled librav1e; then
-            do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
+            # do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
                 do_removeOption "--enable-librav1e"
         fi
 
