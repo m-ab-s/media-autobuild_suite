@@ -1553,7 +1553,7 @@ fi
 
 
 if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    _python_ver=3.7.3
+    _python_ver=3.7.4
     _python_lib=python37
     [[ $bits = 64bit ]] && _arch=amd64 || _arch=win32
     _check=("lib$_python_lib.a")
@@ -1566,7 +1566,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
         do_checkIfExist
     fi
 
-    _vsver=46
+    _vsver=47
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
@@ -1680,12 +1680,12 @@ if [[ $ffmpeg != "no" ]]; then
         if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264.dll"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
             if [[ $bits = "64bit" ]]; then
-              _sha256="427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2"
+              _sha256="273f8f6f8e964ec26986efdf78fa17b7e344640987a64fd1f6ac9f3bec2bebad"
             else
-              _sha256="86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
+              _sha256="7be41e496f43272b707e4d9bafdfc27d53b00aaf9468667a4a2107c192b27249"
             fi
             do_wget -c -r -q -h $_sha256 \
-            "http://ciscobinary.openh264.org/openh264-1.8.0-win${bits%bit}.dll.bz2" \
+            "http://ciscobinary.openh264.org/openh264-2.0.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
             unset _sha256
