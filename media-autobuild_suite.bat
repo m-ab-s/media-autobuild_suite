@@ -654,6 +654,7 @@ if %buildffmpegChoice%==1 (
     if not exist %build%\ffmpeg_options.txt (
         (
             echo.# Lines starting with this character are ignored
+            echo.# To override some options specifically for the shared build, create a ffmpeg_options_shared.txt file.
             echo.
             echo.# Basic built-in options, can be removed if you delete "--disable-autodetect"
             call :writeOption %ffmpeg_options_builtin%
