@@ -726,6 +726,7 @@ do_getFFmpegConfig() {
             custom_opts_file="$LOCALBUILDDIR/ffmpeg_options_$bits.txt"
         fi
         IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$custom_opts_file")
+        unset FFMPEG_DEFAULT_OPTS_SHARED
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_shared.txt" ]]; then
             IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < \
                 <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt") 
@@ -870,7 +871,8 @@ do_changeFFmpegConfig() {
 
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
-        FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS_SHARED}")
+        FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
+        [[ -v FFMPEG_DEFAULT_OPTS_SHARED ]] && FFMPEG_OPTS_SHARED+=("${FFMPEG_DEFAULT_OPTS_SHARED[@]}")
     fi
     if [[ $ffmpeg = "bothstatic" ]]; then
         do_removeOption "--enable-(opencl|opengl|libsvthevc|cuda-nvcc|libnpp|libopenh264)"
