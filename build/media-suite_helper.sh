@@ -936,11 +936,6 @@ do_getMpvConfig() {
     fi
     do_removeOption MPV_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc)"
-    if [[ $mpv = "y" ]]; then
-        mpv_disabled vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
-    elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
-        do_addOption MPV_OPTS --enable-vapoursynth
-    fi
 }
 
 mpv_enabled() {

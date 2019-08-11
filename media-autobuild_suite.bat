@@ -772,13 +772,10 @@ if %mpvINI%==0 (
     echo. Build mpv?
     echo. 1 = Yes
     echo. 2 = No
-    echo. 3 = compile with Vapoursynth, if installed [see Warning]
     echo.
     echo. Note: when built with shared-only FFmpeg, mpv is also shared.
-    echo. Note: Requires at least Windows Vista.
-    echo. Warning: the third option isn't completely static. There's no way to include
-    echo. a library dependant on Python statically. All users of the compiled binary
-    echo. will need VapourSynth installed using the official package to even open mpv!
+    echo. Note: the third option was removed since vapoursynth is now a delay-import
+    echo. dependency that is only required if you try to use the corresponding filter.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
@@ -787,8 +784,7 @@ if %mpvINI%==0 (
 if "%buildmpv%"=="" GOTO mpv
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
-if %buildmpv%==3 set "mpv=v"
-if %buildmpv% GTR 3 GOTO mpv
+if %buildmpv% GTR 2 GOTO mpv
 if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
 
 :bmx
