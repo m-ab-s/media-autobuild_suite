@@ -718,7 +718,7 @@ do_getFFmpegConfig() {
         done < <(do_readbatoptions "ffmpeg_options_zeranoe")
         [[ $ffmpegChoice = f ]] && while read -r option; do
             FFMPEG_DEFAULT_OPTS+=("$option")
-        done < <(do_readbatoptions "ffmpeg_options_full")
+        done < <(do_readbatoptions "ffmpeg_options_full(|_shared)")
         echo "Imported default FFmpeg options from .bat"
     else
         local custom_opts_file="$LOCALBUILDDIR/ffmpeg_options.txt"

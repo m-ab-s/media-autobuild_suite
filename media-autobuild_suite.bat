@@ -92,11 +92,14 @@ libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
 libaom libopenmpt version3
 
 :: options also available with the suite
-set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
+set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
-libmodplug libnpp libopenh264 librtmp librubberband libssh ^
-libtesseract libxavs libzmq libzvbi openal opencl opengl libvmaf libcodec2 ^
-libsrt ladspa libsvthevc #vapoursynth #liblensfun #librav1e
+libmodplug librtmp librubberband libssh libtesseract libxavs libzmq ^
+libzvbi openal libvmaf libcodec2 libsrt ladspa #vapoursynth #liblensfun #librav1e
+
+:: options also available with the suite that add shared dependencies
+set ffmpeg_options_full_shared=opencl opengl libsvthevc ^
+cuda-nvcc libnpp libopenh264
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
@@ -576,6 +579,7 @@ if %ffmpegB2INI%==0 (
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
     echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
+    REM echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
     echo. compiled shared so they take less space. This one isn't tested a lot and
@@ -592,6 +596,7 @@ if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
 if %buildffmpeg%==4 set "ffmpeg=both"
 if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
+REM if %buildffmpeg%==6 set "ffmpeg=bothstatic"
 if %buildffmpeg% GTR 5 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
@@ -661,6 +666,9 @@ if %buildffmpegChoice%==1 (
             echo.
             echo.# Full
             call :writeOption %ffmpeg_options_full%
+            echo.
+            echo.# Full plus options that add shared dependencies
+            call :writeOption %ffmpeg_options_full_shared%
             )>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default FFmpeg options has been created in
