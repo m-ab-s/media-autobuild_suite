@@ -869,8 +869,11 @@ do_changeFFmpegConfig() {
     enabled_any openssl mbedtls && do_removeOption "--enable-(gcrypt|gmp)"
 
     # remove libs that don't work with shared
-    if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
+    if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
         FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS_SHARED}")
+    fi
+    if [[ $ffmpeg = "bothstatic" ]]; then
+        do_removeOption "--enable-(opencl|opengl|libsvthevc|cuda-nvcc|libnpp|libopenh264)"
     fi
 }
 

@@ -1722,7 +1722,7 @@ if [[ $ffmpeg != "no" ]]; then
         _check+=(libavutil.dll.a)
     else
         _check+=(libavutil.a)
-        [[ $ffmpeg = "both" ]] && _check+=(bin-video/ffmpegSHARED)
+        [[ $ffmpeg =~ "both" ]] && _check+=(bin-video/ffmpegSHARED)
     fi
     # todo: make this more easily customizable
     [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
@@ -1780,7 +1780,7 @@ if [[ $ffmpeg != "no" ]]; then
                 sed -rn '/build-suffix=/{s;.+=(.+);\1;p}')" ||
                 build_suffix=""
 
-        if [[ $ffmpeg = "both" ]]; then
+        if [[ $ffmpeg =~ "both" ]]; then
             _check+=(bin-video/ffmpegSHARED/lib/"libavutil${build_suffix}.dll.a")
             FFMPEG_OPTS_SHARED+=("--prefix=$LOCALDESTDIR/bin-video/ffmpegSHARED")
         elif [[ $ffmpeg =~ "shared" ]]; then

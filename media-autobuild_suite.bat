@@ -579,7 +579,7 @@ if %ffmpegB2INI%==0 (
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
     echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
-    REM echo. 6 = Same as 4, but static compilation ignores shared dependencies
+    echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
     echo. compiled shared so they take less space. This one isn't tested a lot and
@@ -596,8 +596,8 @@ if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
 if %buildffmpeg%==4 set "ffmpeg=both"
 if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
-REM if %buildffmpeg%==6 set "ffmpeg=bothstatic"
-if %buildffmpeg% GTR 5 GOTO ffmpeg
+if %buildffmpeg%==6 set "ffmpeg=bothstatic"
+if %buildffmpeg% GTR 6 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
