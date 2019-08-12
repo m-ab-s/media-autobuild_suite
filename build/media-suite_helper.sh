@@ -1456,9 +1456,15 @@ do_pacman_install() {
         fi
         if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
-            /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
-                echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+            if [[ $msyspackage != "y" ]]; then
+                /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk >/dev/null 2>&1 ||
+                    echo "${pkg}" >> /etc/pac-msys-extra.pk
+            else
+                /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
+                    echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+            fi
             sort -uo /etc/pac-mingw-extra.pk{,}
+            sort -uo /etc/pac-msys-extra.pk{,}
             echo "done"
         else
             echo "failed"
@@ -1478,9 +1484,15 @@ do_pacman_remove() {
     for pkg; do
         [[ $msyspackage != "y" && "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
             pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        [[ -f /etc/pac-mingw-extra.pk ]] &&
-            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
+        if [[ $msyspackage != "y" ]]; then
+            [[ -f /etc/pac-msys-extra.pk ]] &&
+                sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk >/dev/null 2>&1
+        else
+            [[ -f /etc/pac-mingw-extra.pk ]] &&
+                sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
+        fi
         sort -uo /etc/pac-mingw-extra.pk{,}
+        sort -uo /etc/pac-msys-extra.pk{,}
         pacman -Qqe "^${pkg}$" >/dev/null 2>&1 || continue
         if [[ $timeStamp = y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
