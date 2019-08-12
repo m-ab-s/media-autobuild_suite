@@ -937,20 +937,24 @@ disabled_all() {
 }
 
 do_getMpvConfig() {
+    local MPV_TEMP_OPTS=()
     MPV_OPTS=()
     if [[ -f "/trunk/media-autobuild_suite.bat" && "$ffmpegChoice" =~ (n|z|f) ]]; then
         IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
-        mapfile -t MPV_OPTS < <(do_readbatoptions "mpv_options_(builtin|basic)")
+        mapfile -t MPV_TEMP_OPTS < <(do_readbatoptions "mpv_options_(builtin|basic)")
         local option
         [[ $ffmpegChoice = f ]] && while read -r option; do
-            MPV_OPTS+=("$option")
+            [[ -n "$option" ]] && MPV_TEMP_OPTS+=("$option")
         done < <(do_readbatoptions "mpv_options_full")
         echo "Imported default mpv options from .bat"
     else
-        IFS=$'\n' read -d '' -r -a MPV_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
+        IFS=$'\n' read -d '' -r -a MPV_TEMP_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
-    do_removeOption MPV_OPTS \
+    do_removeOption MPV_TEMP_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc)"
+    for opt in "${MPV_TEMP_OPTS[@]}"; do
+        [[ -n "$opt" ]] && MPV_OPTS+=("$opt")
+    done
 }
 
 mpv_enabled() {
