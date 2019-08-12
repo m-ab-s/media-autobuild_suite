@@ -1282,14 +1282,14 @@ if [[ $mp4box = "y" ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_checkIfExist
 fi
 
-_check=(SvtHevcEnc.pc libSvtHevcEnc.dll.a svt-hevc/EbApi.h
-    bin-video/{libSvtHevcEnc.dll,SvtHevcEncApp.exe})
+_check=(SvtHevcEnc.pc libSvtHevcEnc.a svt-hevc/EbApi.h
+    bin-video/SvtHevcEncApp.exe)
 if [[ $bits = "32bit" ]]; then
     do_removeOption --enable-libsvthevc
 elif { [[ $svthevc = "y" ]] || enabled libsvthevc; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
     do_uninstall "${_check[@]}" include/svt-hevc
-    do_cmakeinstall video -DUNIX=OFF -DNATIVE=OFF
+    do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi
 

@@ -93,13 +93,12 @@ libaom libopenmpt version3
 
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
-libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
+libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libsvthevc libkvazaar ^
 libmodplug librtmp librubberband libssh libtesseract libxavs libzmq ^
 libzvbi openal libvmaf libcodec2 libsrt ladspa #vapoursynth #liblensfun #librav1e
 
 :: options also available with the suite that add shared dependencies
-set ffmpeg_options_full_shared=opencl opengl libsvthevc ^
-cuda-nvcc libnpp libopenh264
+set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
@@ -427,9 +426,6 @@ if %svthevcINI%==0 (
     echo. Build SVT-HEVC? [H.265 encoder]
     echo. 1 = Yes
     echo. 2 = No
-    echo.
-    echo. Note: 64-bit only and requires a CPU with AVX2 instruction set support to run.
-    echo. [Intel Haswell or later, AMD Ryzen or later]
     echo.
     echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
