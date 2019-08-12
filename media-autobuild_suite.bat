@@ -98,8 +98,7 @@ libmodplug librtmp librubberband libssh libtesseract libxavs libzmq ^
 libzvbi openal libvmaf libcodec2 libsrt ladspa #vapoursynth #liblensfun #librav1e
 
 :: options also available with the suite that add shared dependencies
-set ffmpeg_options_full_shared=opencl opengl libsvthevc ^
-cuda-nvcc libnpp libopenh264
+set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
