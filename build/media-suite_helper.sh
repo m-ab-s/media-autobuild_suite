@@ -878,8 +878,10 @@ do_changeFFmpegConfig() {
 
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
-        FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
-        [[ -v FFMPEG_DEFAULT_OPTS_SHARED ]] && FFMPEG_OPTS_SHARED+=("${FFMPEG_DEFAULT_OPTS_SHARED[@]}")
+        FFMPEG_OPTS_SHARED=()
+        for opt in "${FFMPEG_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS_SHARED[@]}"; do
+            [[ -n "$opt" ]] && FFMPEG_OPTS_SHARED+=("$opt")
+        done
     fi
     if [[ $ffmpeg = "bothstatic" ]]; then
         do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libnpp|libopenh264)"
