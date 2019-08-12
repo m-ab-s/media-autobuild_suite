@@ -732,8 +732,15 @@ do_getFFmpegConfig() {
                 <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt")
         fi
     fi
+
+    for opt in "${FFMPEG_BASE_OPTS[@]}"; do
+        [[ -n "$opt" ]] && FFMPEG_OPTS+=("$opt")
+    done
+    for opt in "${FFMPEG_DEFAULT_OPTS[@]}"; do
+        [[ -n "$opt" ]] && FFMPEG_OPTS+=("$opt")
+    done
+
     echo "License: $license"
-    FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
 
     # we set these accordingly for static or shared
     do_removeOption "--(en|dis)able-(shared|static)"
