@@ -428,9 +428,6 @@ if %svthevcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: 64-bit only and requires a CPU with AVX2 instruction set support to run.
-    echo. [Intel Haswell or later, AMD Ryzen or later]
-    echo.
     echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
