@@ -1456,7 +1456,7 @@ do_pacman_install() {
         fi
         if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
-            if [[ $msyspackage != "y" ]]; then
+            if [[ $msyspackage = "y" ]]; then
                 /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk >/dev/null 2>&1 ||
                     echo "${pkg}" >> /etc/pac-msys-extra.pk
             else
@@ -1484,7 +1484,7 @@ do_pacman_remove() {
     for pkg; do
         [[ $msyspackage != "y" && "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
             pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        if [[ $msyspackage != "y" ]]; then
+        if [[ $msyspackage = "y" ]]; then
             [[ -f /etc/pac-msys-extra.pk ]] &&
                 sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk >/dev/null 2>&1
         else

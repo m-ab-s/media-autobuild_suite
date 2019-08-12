@@ -135,8 +135,6 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         if [[ -n $mingw32pkg || -n $mingw64pkg ]]; then
             [[ $build32 == "yes" ]] && printf -v new '%b' "$new\\n$mingw32pkg"
             [[ $build64 == "yes" ]] && printf -v new '%b' "$new\\n$mingw64pkg"
-        else
-            pacman -Ss "$pkg" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
         fi
         unset mingw32pkg mingw64pkg
     done
