@@ -729,7 +729,7 @@ do_getFFmpegConfig() {
         unset FFMPEG_DEFAULT_OPTS_SHARED
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_shared.txt" ]]; then
             IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < \
-                <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt") 
+                <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt")
         fi
     fi
     echo "License: $license"
@@ -875,7 +875,7 @@ do_changeFFmpegConfig() {
         [[ -v FFMPEG_DEFAULT_OPTS_SHARED ]] && FFMPEG_OPTS_SHARED+=("${FFMPEG_DEFAULT_OPTS_SHARED[@]}")
     fi
     if [[ $ffmpeg = "bothstatic" ]]; then
-        do_removeOption "--enable-(opencl|opengl|libsvthevc|cuda-nvcc|libnpp|libopenh264)"
+        do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libnpp|libopenh264)"
     fi
 }
 
@@ -2151,7 +2151,7 @@ _post_cmake(){
     #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
     #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
     #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
-    # You can also do the same thing in _pre_cmake after creating a 'do_not_reconfigure' 
+    # You can also do the same thing in _pre_cmake after creating a 'do_not_reconfigure'
     # file in the source directory. This way you can avoid running cmake twice.
     #touch "$(get_first_subdir)/do_not_reconfigure"
 }
