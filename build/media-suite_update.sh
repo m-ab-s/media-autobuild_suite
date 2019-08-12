@@ -119,8 +119,10 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     printf -v newmingw '%s\n' "$(tr -d '\r' < /etc/pac-mingw.pk)"
     [[ -f /etc/pac-mingw-extra.pk ]] && printf -v newmingw '%s\n' "$newmingw" \
         "$(tr -d '\r' < /etc/pac-mingw-extra.pk)"
+    [[ -f /etc/pac-msys-extra.pk ]] && printf -v newmsys '%s\n' "$(tr -d '\r' < /etc/pac-msys-extra.pk)"
     new=$(echo -n "$new" | tr ' ' '\n' | sort -u)
     newmingw=$(echo -n "$newmingw" | tr ' ' '\n' | sort -u)
+    newmsys=$(echo -n "$newmsys" | tr ' ' '\n' | sort -u)
     for pkg in $newmingw; do
         pkg=${pkg#mingw-w64-i686-}
         pkg=${pkg#mingw-w64-x86_64-}
@@ -137,6 +139,9 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
             pacman -Ss "$pkg" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
         fi
         unset mingw32pkg mingw64pkg
+    done
+    for pkg in $newmsys; do
+        pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
     done
     old=$(pacman -Qqe | sort)
     new=$(sort -u <<< "$new")
