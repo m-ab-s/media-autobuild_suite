@@ -733,10 +733,7 @@ do_getFFmpegConfig() {
         fi
     fi
 
-    for opt in "${FFMPEG_BASE_OPTS[@]}"; do
-        [[ -n "$opt" ]] && FFMPEG_OPTS+=("$opt")
-    done
-    for opt in "${FFMPEG_DEFAULT_OPTS[@]}"; do
+    for opt in "${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}"; do
         [[ -n "$opt" ]] && FFMPEG_OPTS+=("$opt")
     done
 
