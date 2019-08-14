@@ -1190,7 +1190,13 @@ if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-cd build
+cd %build%
+set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
+for %%s in (%scripts%) do (
+    if not exist "%build%\%%s" (
+        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+    )
+)
 if exist %build%\msys2-base.tar.xz GOTO unpack
 
 :checkmsys2
@@ -1442,13 +1448,6 @@ echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
 cd %build%
-set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
-for %%s in (%scripts%) do (
-    if not exist "%build%\%%s" (
-        %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
-        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s
-    )
-)
 if %updateSuite%==y (
     if not exist %instdir%\update_suite.sh (
         echo -------------------------------------------------------------------------------
