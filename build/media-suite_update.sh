@@ -126,17 +126,14 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     for pkg in $newmingw; do
         pkg=${pkg#mingw-w64-i686-}
         pkg=${pkg#mingw-w64-x86_64-}
-        [[ $build32 == "yes" ]] &&
-            pacman -Ss "mingw-w64-i686-$pkg" > /dev/null 2>&1 &&
-            mingw32pkg="mingw-w64-i686-$pkg"
-        [[ $build64 == "yes" ]] &&
-            pacman -Ss "mingw-w64-x86_64-$pkg" > /dev/null 2>&1 &&
-            mingw64pkg="mingw-w64-x86_64-$pkg"
-        if [[ -n $mingw32pkg || -n $mingw64pkg ]]; then
-            [[ $build32 == "yes" ]] && printf -v new '%b' "$new\\n$mingw32pkg"
-            [[ $build64 == "yes" ]] && printf -v new '%b' "$new\\n$mingw64pkg"
+        if [[ $build32 == "yes" ]] &&
+            pacman -Ss "mingw-w64-i686-$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\nmingw-w64-i686-$pkg"
         fi
-        unset mingw32pkg mingw64pkg
+        if [[ $build64 == "yes" ]] &&
+            pacman -Ss "mingw-w64-x86_64-$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\nmingw-w64-x86_64-$pkg"
+        fi
     done
     for pkg in $newmsys; do
         pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
