@@ -1463,8 +1463,8 @@ do_pacman_install() {
                 /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
                     echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
             fi
-            sort -uo /etc/pac-mingw-extra.pk{,}
-            sort -uo /etc/pac-msys-extra.pk{,}
+            sort -uo /etc/pac-mingw-extra.pk{,} 2>/dev/null >&2
+            sort -uo /etc/pac-msys-extra.pk{,} 2>/dev/null >&2
             echo "done"
         else
             echo "failed"
@@ -1491,8 +1491,8 @@ do_pacman_remove() {
             [[ -f /etc/pac-mingw-extra.pk ]] &&
                 sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
         fi
-        sort -uo /etc/pac-mingw-extra.pk{,}
-        sort -uo /etc/pac-msys-extra.pk{,}
+        sort -uo /etc/pac-mingw-extra.pk{,} 2>/dev/null >&2
+        sort -uo /etc/pac-msys-extra.pk{,} 2>/dev/null >&2
         pacman -Qqe "^${pkg}$" >/dev/null 2>&1 || continue
         if [[ $timeStamp = y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
