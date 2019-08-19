@@ -1905,7 +1905,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h)
-    if mpv_enabled egl-angle && do_vcs "https://github.com/google/angle.git"; then
+    if mpv_enabled egl-angle && do_vcs "https://chromium.googlesource.com/angle/angle"; then
         do_simple_print "${orange}mpv will need libGLESv2.dll and libEGL.dll to execute"'!'
         do_simple_print "You can find these in your browser's installation directory, usually."
         do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
