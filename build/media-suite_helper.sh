@@ -1454,7 +1454,7 @@ do_pacman_install() {
         else
             echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         fi
-        if pacman -S --overwrite --noconfirm --ask=20 --needed "$pkg" >/dev/null 2>&1; then
+        if pacman -S --overwrite /usr/* --overwrite /mingw64/* --overwrite /mingw32/* --noconfirm --ask=20 --needed "$pkg" >/dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" >/dev/null
             if [[ $msyspackage = "y" ]]; then
                 /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk >/dev/null 2>&1 ||
