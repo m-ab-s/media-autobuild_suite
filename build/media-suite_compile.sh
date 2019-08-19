@@ -1493,6 +1493,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
     if [[ $svthevc = y ]]; then
+        do_patch "https://patches.videolan.org/patch/24281/raw/"
         export SVT_HEVC_INCLUDE_DIR="$LOCALDESTDIR/include/svt-hevc"
         export SVT_HEVC_LIBRARY_DIR="$LOCALDESTDIR/lib"
         x265_svt_hevc="-DENABLE_SVT_HEVC=ON"
