@@ -1288,7 +1288,6 @@ if [[ $bits = "32bit" ]]; then
     do_removeOption --enable-libsvthevc
 elif { [[ $svthevc = "y" ]] || enabled libsvthevc; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-HEVC.git"; then
-    do_patch "https://gist.githubusercontent.com/moisesmcardona/96c58aaa6d5b83ca654f92d29733b5af/raw/860e96c0036e477aa573f27aeb94d3bfacc695da/copy-EbTime.h-to-install-directory.patch"
     do_uninstall "${_check[@]}" include/svt-hevc
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
@@ -1734,7 +1733,7 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         if enabled libsvthevc; then
-            do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" ||
                 do_removeOption --enable-libsvthevc
         fi
 
