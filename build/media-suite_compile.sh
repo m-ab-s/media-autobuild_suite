@@ -1750,6 +1750,11 @@ if [[ $ffmpeg != "no" ]]; then
                 do_removeOption --enable-libsvthevc
         fi
 
+        if enabled libsvtav1; then
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch" am ||
+                do_removeOption --enable-libsvtav1
+        fi
+
         enabled vapoursynth &&
             do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
 
