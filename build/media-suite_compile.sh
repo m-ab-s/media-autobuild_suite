@@ -1733,7 +1733,7 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         if enabled libsvthevc; then
-            do_patch "https://gist.githubusercontent.com/wiiaboo/9a570057d6bc605a3c72429cfe0cf45b/raw/ffmpeg-libsvthevc-patches.patch" am ||
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
         fi
 
