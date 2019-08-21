@@ -1138,7 +1138,7 @@ do_patch() {
         fi
     else
         echo -e "${orange}${patchName}${reset}"
-        echo -e "\\tPatch not found anywhere. Continuing without patching."
+        echo -e '\tPatch not found anywhere. Continuing without patching.'
         return 1
     fi
     return 0
