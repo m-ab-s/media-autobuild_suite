@@ -2,7 +2,7 @@
 # shellcheck disable=SC2154,SC2120,SC2119,SC2034,SC1090,SC1117
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
-    cpuCount="$(($(nproc)/2))"
+    cpuCount="$(($(nproc) / 2))"
 fi
 bits="${bits:-64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
@@ -46,7 +46,7 @@ do_print_status() {
     printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
     if [[ $timeStamp == y ]]; then
         printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s %s [%s]\n' -1 "${bold}$name${reset}" \
-        "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
+            "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
     else
         printf '%s %s [%s]\n' "${bold}$name${reset}" "${pad:0:$((ncols - ${#name} - ${#status} - 3))}" "${color}${status}${reset}"
     fi
@@ -56,7 +56,7 @@ do_print_progress() {
     if [[ $logging == y ]]; then
         if [[ $timeStamp == y ]]; then
             [[ $1 =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
-            "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
+                "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
         else
             [[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
         fi
@@ -238,7 +238,7 @@ do_vcs() {
             local repoName=${vcsURL##*/}
             vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
             log quiet "$vcsType.clone" vcs_clone ||
-            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+                do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
         fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
@@ -363,7 +363,7 @@ do_wget() {
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
             response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
-            (( tries-=1 ))
+            ((tries -= 1))
 
             if [[ $response_code == "200" || $response_code == "226" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
@@ -440,7 +440,7 @@ do_extract() {
     elif [[ -d $dirName ]]; then
         [[ $nocd ]] || cd_safe "$dirName"
         return 0
-    elif  ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
+    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
@@ -795,7 +795,7 @@ do_getFFmpegConfig() {
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,ndi_newtek,ndi-newtek} netcdf &&
         do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf)" &&
         sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf);;g' \
-        "$LOCALBUILDDIR/ffmpeg_options.txt"
+            "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
 do_changeFFmpegConfig() {
@@ -1537,7 +1537,7 @@ do_pacman_remove() {
 
 do_prompt() {
     # from http://superuser.com/a/608509
-    while read -r -s -e -t 0.1; do : ; done
+    while read -r -s -e -t 0.1; do :; done
     read -r -p "$1" ret
 }
 
