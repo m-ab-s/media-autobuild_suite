@@ -420,7 +420,7 @@ real_extract() {
     temp_dir=$(find "$dirName/" -maxdepth 1 ! -wholename "$dirName/")
     if [[ -n $temp_dir && $(wc -l <<< "$temp_dir") == 1 ]]; then
         find "$temp_dir" -maxdepth 1 ! -wholename "$temp_dir" -exec mv -t "$dirName/" {} +
-        rmdir "$temp_dir" 2>/dev/null
+        rmdir "$temp_dir" 2> /dev/null
     fi
 }
 
@@ -490,8 +490,8 @@ do_strip() {
             file=""
         fi
         [[ $file ]] &&
-            { eval "${cmd[@]}" "$file" 2>/dev/null ||
-              eval "${cmd[@]}" "$file" -o "$file.stripped" 2>/dev/null; }
+            { eval "${cmd[@]}" "$file" 2> /dev/null ||
+                eval "${cmd[@]}" "$file" -o "$file.stripped" 2> /dev/null; }
         [[ -f ${file}.stripped ]] && mv -f "${file}"{.stripped,}
     done
 }
@@ -526,7 +526,7 @@ do_pack() {
 do_zipman() {
     local file files
     local man_dirs=(/local{32,64}/share/man)
-    files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2>/dev/null)
+    files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2> /dev/null)
     for file in $files; do
         gzip -9 -n -f "$file"
         rm -f "$file"
@@ -858,7 +858,7 @@ do_changeFFmpegConfig() {
         if enabled cuda-nvcc; then
             local fixed_CUDA_PATH_UNIX
             fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
-            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
+            command -v nvcc.exe &> /dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
     else
@@ -1120,14 +1120,14 @@ do_patch() {
 
     if [[ -f $patchName ]]; then
         if [[ $am == "am" ]]; then
-            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" >/dev/null 2>&1; then
+            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1; then
                 git am -q --abort
                 echo -e "${orange}${patchName}${reset}"
                 echo -e "\\tPatch couldn't be applied with 'git am'. Continuing without patching."
                 return 1
             fi
         else
-            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" >/dev/null 2>&1; then
+            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" > /dev/null 2>&1; then
                 patch $binarypatch -s -N -p"$strip" -i "$patchName"
             else
                 echo -e "${orange}${patchName}${reset}"
@@ -1287,7 +1287,7 @@ strip_ansi() {
 zip_logs() {
     local failed url files
     failed="$(get_first_subdir)"
-    pushd "$LOCALBUILDDIR" >/dev/null || do_exit_prompt "Did you delete /build?"
+    pushd "$LOCALBUILDDIR" > /dev/null || do_exit_prompt "Did you delete /build?"
     rm -f logs.zip
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
@@ -1297,10 +1297,10 @@ zip_logs() {
     mapfile -t -O "${#files[@]}" files < \
         <(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
         -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders")
-    7za -mx=9 a logs.zip "${files[@]}" >/dev/null
+    7za -mx=9 a logs.zip "${files[@]}" > /dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ -n "$build32$build64" ]] &&
         url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
-    popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
+    popd > /dev/null || do_exit_prompt "Did you delete the previous folder?"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
@@ -1407,7 +1407,7 @@ do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
     local files
-    files="$(pacman -Qql "$packages" 2>/dev/null | /usr/bin/grep .dll.a)"
+    files="$(pacman -Qql "$packages" 2> /dev/null | /usr/bin/grep .dll.a)"
 
     for file in $files; do
         if [[ -f "${file%*.dll.a}.a" ]]; then
@@ -1425,7 +1425,7 @@ do_hide_pacman_sharedlibs() {
 do_hide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2>/dev/null)"
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
@@ -1440,7 +1440,7 @@ do_hide_all_sharedlibs() {
 do_unhide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2>/dev/null)"
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
     local tomove=()
     local todelete=()
     for file in $files; do
@@ -1470,23 +1470,23 @@ do_pacman_install() {
     for pkg; do
         [[ $msyspackage != "y" && $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
             pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        pacman -Qqe "^${pkg}$" >/dev/null 2>&1 && continue
+        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 && continue
         if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
             echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         fi
-        if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" >/dev/null 2>&1; then
-            pacman -D --asexplicit "$pkg" >/dev/null
+        if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" > /dev/null 2>&1; then
+            pacman -D --asexplicit "$pkg" > /dev/null
             if [[ $msyspackage == "y" ]]; then
-                /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk >/dev/null 2>&1 ||
+                /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk > /dev/null 2>&1 ||
                     echo "${pkg}" >> /etc/pac-msys-extra.pk
             else
-                /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
+                /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk > /dev/null 2>&1 ||
                     echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
             fi
-            sort -uo /etc/pac-mingw-extra.pk{,} 2>/dev/null >&2
-            sort -uo /etc/pac-msys-extra.pk{,} 2>/dev/null >&2
+            sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
+            sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
             echo "done"
         else
             echo "failed"
@@ -1508,24 +1508,24 @@ do_pacman_remove() {
             pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
         if [[ $msyspackage == "y" ]]; then
             [[ -f /etc/pac-msys-extra.pk ]] &&
-                sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk >/dev/null 2>&1
+                sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk > /dev/null 2>&1
         else
             [[ -f /etc/pac-mingw-extra.pk ]] &&
-                sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
+                sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk > /dev/null 2>&1
         fi
-        sort -uo /etc/pac-mingw-extra.pk{,} 2>/dev/null >&2
-        sort -uo /etc/pac-msys-extra.pk{,} 2>/dev/null >&2
-        pacman -Qqe "^${pkg}$" >/dev/null 2>&1 || continue
+        sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
+        sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
+        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 || continue
         if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
             echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         fi
         do_hide_pacman_sharedlibs "$pkg" revert
-        if pacman -Rs --noconfirm --ask=20 "$pkg" >/dev/null 2>&1; then
+        if pacman -Rs --noconfirm --ask=20 "$pkg" > /dev/null 2>&1; then
             echo "done"
         else
-            pacman -D --asdeps "$pkg" >/dev/null 2>&1
+            pacman -D --asdeps "$pkg" > /dev/null 2>&1
             echo "failed"
         fi
     done
@@ -1637,7 +1637,7 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    command -v cl.exe &>/dev/null && return 0
+    command -v cl.exe &> /dev/null && return 0
 
     local _sys_vswhere
     local _suite_vswhere="/opt/bin/vswhere.exe"
@@ -1647,12 +1647,12 @@ get_cl_path() {
     elif [[ -f $_suite_vswhere ]]; then
         vswhere=$_suite_vswhere
     else
-        pushd "$LOCALBUILDDIR" 2>/dev/null || do_exit_prompt "Did you delete /build?"
+        pushd "$LOCALBUILDDIR" 2> /dev/null || do_exit_prompt "Did you delete /build?"
         do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
         vswhere=$_suite_vswhere
-        popd 2>/dev/null || do_exit_prompt "Did you delete the previous folder?"
+        popd 2> /dev/null || do_exit_prompt "Did you delete the previous folder?"
     fi
 
     local installationpath
@@ -1770,7 +1770,7 @@ clean_suite() {
     else
         echo -e "\\n\\t${orange}Deleting status files...${reset}"
     fi
-    cd_safe "$LOCALBUILDDIR" >/dev/null
+    cd_safe "$LOCALBUILDDIR" > /dev/null
     find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
     echo -e "\\n\\t${green}Zipping man files...${reset}"
@@ -1808,13 +1808,13 @@ create_diagnostic() {
     do_print_progress "  Creating diagnostics file"
     [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
     rm -f "$LOCALBUILDDIR/diagnostics.txt"
-    echo "Env variables:" >>"$LOCALBUILDDIR/diagnostics.txt"
+    echo "Env variables:" >> "$LOCALBUILDDIR/diagnostics.txt"
     for _env in "${envs[@]}"; do
-        printf '\t%s=%s\n' "$_env" "${!_env}" >>"$LOCALBUILDDIR/diagnostics.txt"
+        printf '\t%s=%s\n' "$_env" "${!_env}" >> "$LOCALBUILDDIR/diagnostics.txt"
     done
-    echo >>"$LOCALBUILDDIR/diagnostics.txt"
+    echo >> "$LOCALBUILDDIR/diagnostics.txt"
     for cmd in "${cmds[@]}"; do
-        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >>"$LOCALBUILDDIR/diagnostics.txt"
+        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >> "$LOCALBUILDDIR/diagnostics.txt"
     done
 }
 
@@ -1876,7 +1876,7 @@ else
 fi
 EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config ]] &&
-        diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config >/dev/null ||
+        diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config > /dev/null ||
         printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
         printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
@@ -1899,7 +1899,7 @@ create_cmake_toolchain() {
     )
 
     [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
-        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake >/dev/null ||
+        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake > /dev/null ||
         printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
 }
 
@@ -2023,8 +2023,8 @@ verify_cuda_deps() {
         if ! get_cl_path; then
             echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere; needed by nvcc.${reset}"
             do_removeOption --enable-cuda-nvcc
-        elif enabled cuda-nvcc && ! command -v nvcc.exe &>/dev/null &&
-            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &>/dev/null; then
+        elif enabled cuda-nvcc && ! command -v nvcc.exe &> /dev/null &&
+            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &> /dev/null; then
             echo -e "${orange}nvcc.exe not found in PATH or installed in CUDA_PATH.${reset}"
             do_removeOption --enable-cuda-nvcc
         fi
@@ -2053,16 +2053,16 @@ extra_script(){
     local vcsFolder="${REPO_DIR%-*}"
     vcsFolder="${vcsFolder#*build/}"
     if [[ $commandname =~ ^(make|meson|ninja)$ ]] &&
-        type "_${stage}_build" >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null || true
+        type "_${stage}_build" > /dev/null 2>&1; then
+        pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
         log quiet "${stage}_build" "_${stage}_build"
-        popd >/dev/null || true
-    elif type "_${stage}_${commandname}" >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null || true
+        popd > /dev/null || true
+    elif type "_${stage}_${commandname}" > /dev/null 2>&1; then
+        pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
         log quiet "${stage}_${commandname}" "_${stage}_${commandname}"
-        popd >/dev/null || true
+        popd > /dev/null || true
     fi
 }
 
