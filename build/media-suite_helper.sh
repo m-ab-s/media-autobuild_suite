@@ -740,8 +740,9 @@ do_getFFmpegConfig() {
         IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$custom_opts_file")
         unset FFMPEG_DEFAULT_OPTS_SHARED
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_shared.txt" ]]; then
-            IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < \
-                <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt")
+            IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < <(
+                do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt"
+            )
         fi
     fi
 
@@ -1292,11 +1293,13 @@ zip_logs() {
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
     local option
-    [[ $failed ]] && mapfile -t -O "${#files[@]}" files < \
-        <(find "$failed" -name "*.log")
-    mapfile -t -O "${#files[@]}" files < \
-        <(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
-        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders")
+    [[ $failed ]] && mapfile -t -O "${#files[@]}" files < <(
+        find "$failed" -name "*.log"
+    )
+    mapfile -t -O "${#files[@]}" files < <(
+        find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
+            -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"
+    )
     7za -mx=9 a logs.zip "${files[@]}" > /dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ -n "$build32$build64" ]] &&
         url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
