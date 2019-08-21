@@ -1194,13 +1194,13 @@ do_cmake() {
     unset cmake_extras
 }
 
-do_ninja(){
+do_ninja() {
     extra_script pre ninja
     log "build" ninja "$@"
     extra_script post ninja
 }
 
-do_ninjainstall(){
+do_ninjainstall() {
     extra_script pre install
     cpuCount=1 log "install" ninja install "$@"
     extra_script post install
@@ -2035,7 +2035,7 @@ verify_cuda_deps() {
     enabled_any libnpp cuda-nvcc || ! disabled cuda-llvm
 }
 
-check_custom_patches(){
+check_custom_patches() {
     local _basedir
     _basedir="$(get_first_subdir)"
     local vcsFolder="${_basedir%-*}"
@@ -2050,7 +2050,7 @@ check_custom_patches(){
     fi
 }
 
-extra_script(){
+extra_script() {
     local stage="$1"
     local commandname="$2"
     local vcsFolder="${REPO_DIR%-*}"
@@ -2069,7 +2069,7 @@ extra_script(){
     fi
 }
 
-unset_extra_script(){
+unset_extra_script() {
     # The current repository folder (/build/ffmpeg-git)
     unset REPO_DIR
     # The repository name (ffmpeg)
