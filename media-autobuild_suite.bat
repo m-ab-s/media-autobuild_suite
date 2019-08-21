@@ -74,7 +74,7 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2u
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson
+set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -115,7 +115,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty svthevc svtav1
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -236,7 +236,7 @@ if %standaloneINI%==0 (
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-     set /P buildstandalone="Build standalone binaries: "
+    set /P buildstandalone="Build standalone binaries: "
 ) else set buildstandalone=%standaloneINI%
 
 if "%buildstandalone%"=="" GOTO standalone
@@ -1181,6 +1181,29 @@ if %timeStampF%==2 set "timeStamp=n"
 if %timeStampF% GTR 2 GOTO timeStamp
 if %deleteINI%==1 echo.timeStamp=^%timeStampF%>>%ini%
 
+:ccache
+if %ccacheINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Use ccache when compiling?
+    echo. Experimental.
+    echo. Speeds up rebuilds and recompilations, but requires the files to be
+    echo. compiled at least once before any effect is seen
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildwithccache="Use ccache: "
+) else set buildwithccache=%ccacheINI%
+
+if "%buildwithccache%"=="" GOTO ccache
+if %buildwithccache%==1 set "ccache=y"
+if %buildwithccache%==2 set "ccache=n"
+if %buildwithccache% GTR 2 GOTO ccache
+if %deleteINI%==1 echo.ccache=^%buildwithccache%>>%ini%
+
 :noMintty
 if %noMinttyINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -1620,7 +1643,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --svthevc=%svthevc% --svtav1=%svtav1%
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
@@ -1673,7 +1696,8 @@ goto :EOF
     echo.
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
-    echo.export CC=gcc
+    echo.export CC="ccache gcc"
+    echo.export CXX="ccache g++"
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"

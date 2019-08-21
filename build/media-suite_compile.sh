@@ -60,6 +60,7 @@ while true; do
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
 --noMintty=* ) noMintty="${1#*=}"; [ -f "$LOCALBUILDDIR/fail.var" ] && rm "$LOCALBUILDDIR/fail.var"; (declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/old.var"; shift ;;
+--ccache=* ) ccache="${1#*=}"; shift ;;
 --svthevc=* ) svthevc="${1#*=}"; shift ;;
 --svtav1=* ) svtav1="${1#*=}"; shift ;;
     -- ) shift; break ;;
@@ -67,6 +68,8 @@ while true; do
     * ) break ;;
   esac
 done
+
+[[ $ccache != y ]] && export CCACHE_DISABLE=1
 
 # shellcheck source=media-suite_helper.sh
 source "$LOCALBUILDDIR"/media-suite_helper.sh
