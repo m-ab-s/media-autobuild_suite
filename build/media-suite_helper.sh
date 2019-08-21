@@ -429,14 +429,14 @@ do_extract() {
     local archive="$1" dirName="$2"
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
-    if [[ $dirName != "." && -d $dirName ]] &&
-        {
-            [[ $build32 == "yes" ]] && { [[ ! -f "$dirName"/build_successful32bit ]] ||
-                [[ -n $flavor && ! -f "$dirName/build_successful32bit_${flavor}" ]]; } ||
-                [[ $build64 == "yes" ]] && { [[ ! -f "$dirName"/build_successful64bit ]] ||
-                    [[ -n $flavor && ! -f "$dirName/build_successful64bit_${flavor}" ]]; }
-        }; then
-        rm -rf "$dirName"
+    if [[ $dirName != "." && -d $dirName ]]; then
+        if [[ $build32 == "yes" ]] &&
+            [[ ! -f "$dirName"/build_successful32bit || -n $flavor && ! -f "$dirName/build_successful32bit_${flavor}" ]]; then
+            rm -rf "$dirName"
+        elif [[ $build64 == "yes" ]] &&
+            [[ ! -f "$dirName"/build_successful64bit || -n $flavor && ! -f "$dirName/build_successful64bit_${flavor}" ]]; then
+            rm -rf "$dirName"
+        fi
     elif [[ -d $dirName ]]; then
         [[ $nocd ]] || cd_safe "$dirName"
         return 0
