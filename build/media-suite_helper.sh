@@ -211,13 +211,13 @@ do_vcs() {
     if [[ $vcsBranch ]]; then
         vcsURL="${vcsURL%#*}"
         case ${vcsBranch%%=*} in
-            commit|tag|revision)
-                ref=${vcsBranch##*=}
-                ;;
-            branch)
-                ref=${vcsBranch##*=}
-                [[ $vcsType = git && $ref = "${ref%/*}" ]] && ref=origin/$ref
-                ;;
+        commit | tag | revision)
+            ref=${vcsBranch##*=}
+            ;;
+        branch)
+            ref=${vcsBranch##*=}
+            [[ $vcsType == git && $ref == "${ref%/*}" ]] && ref=origin/$ref
+            ;;
         esac
     else
         if [[ $vcsType == git ]]; then
@@ -336,13 +336,16 @@ do_wget() {
     local nocd norm quiet hash notmodified
     while true; do
         case $1 in
-            -c) nocd=nocd && shift;;
-            -r) norm=y && shift;;
-            -q) quiet=y && shift;;
-            -h) hash="$2" && shift 2;;
-            -z) notmodified=y && shift;;
-            --) shift; break;;
-            *) break;;
+        -c) nocd=nocd && shift ;;
+        -r) norm=y && shift ;;
+        -q) quiet=y && shift ;;
+        -h) hash="$2" && shift 2 ;;
+        -z) notmodified=y && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
         esac
     done
     local url="$1" archive="$2" dirName="$3" response_code curlcmds tries=1
@@ -400,7 +403,7 @@ real_extract() {
     archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
     [[ ! $dirName ]] && dirName=$(guess_dirname "$archive" || echo "${archive}")
     case $archive_type in
-    zip|7z)
+    zip | 7z)
         7z x -aoa -o"$dirName" "$archive"
         ;;
     tar*)
@@ -565,16 +568,21 @@ file_installed() {
     local silent
     [[ $1 == "-s" ]] && silent=y
     case $1 in
-        /*|./* )
-            file="$1" ;;
-        *.pc )
-            file="lib/pkgconfig/$1" ;;
-        *.a|*.la|*.lib )
-            file="lib/$1" ;;
-        *.h|*.hpp|*.c )
-            file="include/$1" ;;
-        * )
-            file="$1" ;;
+    /* | ./*)
+        file="$1"
+        ;;
+    *.pc)
+        file="lib/pkgconfig/$1"
+        ;;
+    *.a | *.la | *.lib)
+        file="lib/$1"
+        ;;
+    *.h | *.hpp | *.c)
+        file="include/$1"
+        ;;
+    *)
+        file="$1"
+        ;;
     esac
     [[ ${file::1} != "/" ]] && file="$LOCALDESTDIR/$file"
     [[ -z $silent ]] && echo "$file"
@@ -585,13 +593,16 @@ files_exist() {
     local verbose list soft ignorebinaries term='\n' file
     while true; do
         case $1 in
-            -v) verbose=y && shift;;
-            -l) list=y && shift;;
-            -s) soft=y && shift;;
-            -b) ignorebinaries=y && shift;;
-            -l0) list=y && term='\0' && shift;;
-            --) shift; break;;
-            *) break;;
+        -v) verbose=y && shift ;;
+        -l) list=y && shift ;;
+        -s) soft=y && shift ;;
+        -b) ignorebinaries=y && shift ;;
+        -l0) list=y && term='\0' && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
         esac
     done
     [[ $list ]] && verbose= && soft=y
@@ -1146,18 +1157,25 @@ do_cmake() {
     local cmake_build_dir=""
     while [[ -n $* ]]; do
         case "$1" in
-        global|audio|video)
-            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"; shift ;;
+        global | audio | video)
+            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"
+            shift
+            ;;
         builddir=*)
-            cmake_build_dir="${1#*=}"; shift ;;
+            cmake_build_dir="${1#*=}"
+            shift
+            ;;
         skip_build_dir)
-            local skip_build_dir=y; shift ;;
+            local skip_build_dir=y
+            shift
+            ;;
         *)
             if [[ -d "./$1" ]]; then
                 [[ -n $skip_build_dir ]] && root="./$1" || root="../$1"
                 shift
             fi
-            break ;;
+            break
+            ;;
         esac
     done
 
@@ -1197,10 +1215,12 @@ do_meson() {
     local bindir=""
     local root=".."
     case "$1" in
-    global|audio|video)
-        bindir="--bindir=bin-$1" ;;
+    global | audio | video)
+        bindir="--bindir=bin-$1"
+        ;;
     *)
-        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
+        [[ -d "./$1" ]] && root="../$1" || bindir="$1"
+        ;;
     esac
     shift 1
 
@@ -1340,8 +1360,9 @@ do_separate_conf() {
     local bindir=""
     local last config_path
     case "$1" in
-    global|audio|video)
-        bindir="--bindir=$LOCALDESTDIR/bin-$1" ;;
+    global | audio | video)
+        bindir="--bindir=$LOCALDESTDIR/bin-$1"
+        ;;
     *) bindir="$1" ;;
     esac
     shift 1
@@ -2101,9 +2122,12 @@ create_extra_skeleton() {
     local overwrite
     while true; do
         case $1 in
-            -f) overwrite=y && shift;;
-            --) shift; break;;
-            *) break;;
+        -f) overwrite=y && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
         esac
     done
     local extraName="$1"
