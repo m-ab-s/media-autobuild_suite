@@ -1838,7 +1838,7 @@ create_winpty_exe() {
 create_ab_pkgconfig() {
     # from https://stackoverflow.com/a/8088167
     local script_file
-    IFS=$'\n' read -r -d '' script_file <<'EOF' || true
+    IFS=$'\n' read -r -d '' script_file << 'EOF' || true
 #!/bin/sh
 
 while true; do
@@ -2142,7 +2142,7 @@ create_extra_skeleton() {
     [[ -f "$LOCALBUILDDIR/$extraName"_extra.sh && -z $overwrite ]] &&
         echo "$LOCALBUILDDIR/$extraName_extra.sh already exists. Use -f if you are sure you want to overwrite it." && return 1
 
-    IFS=$'\n' read -r -d '' script_file <<'EOF' || true
+    IFS=$'\n' read -r -d '' script_file << 'EOF' || true
 #!/bin/bash
 
 # Force to the suite to think the package has updates to recompile.
