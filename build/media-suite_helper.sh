@@ -1079,10 +1079,10 @@ do_removeOptions() {
 
 do_patch() {
     local binarypatch="--binary"
-    case $1 in -p) binarypatch="" && shift;; esac
-    local patch=${1%% *} # Location or link to patch.
-    local am=$2          # Use git am to apply patch. Use with .patch files
-    local strip=${3:-1}  # Leading directories to strip. "patch -p${strip}"
+    case $1 in -p) binarypatch="" && shift ;; esac
+    local patch=${1%% *}       # Location or link to patch.
+    local am=$2                # Use git am to apply patch. Use with .patch files
+    local strip=${3:-1}        # Leading directories to strip. "patch -p${strip}"
     local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
     [[ $patchName == "$patch" ]] && patchName="${patch##*/}"
 
