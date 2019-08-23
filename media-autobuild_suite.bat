@@ -1597,7 +1597,6 @@ cd %instdir%
 
 title MABSbat
 if %noMintty%==y cls
-for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
