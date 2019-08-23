@@ -1,15 +1,33 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 
 while true; do
-  case $1 in
---build32=* ) build32="${1#*=}"; shift ;;
---build64=* ) build64="${1#*=}"; shift ;;
---update=* ) update="${1#*=}"; shift ;;
-    -- ) shift; break ;;
-    -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
-    * ) break ;;
-  esac
+    case $1 in
+    --build32=*)
+        build32="${1#*=}"
+        shift
+        ;;
+    --build64=*)
+        build64="${1#*=}"
+        shift
+        ;;
+    --update=*)
+        update="${1#*=}"
+        shift
+        ;;
+    --)
+        shift
+        break
+        ;;
+    -*)
+        echo "Error, unknown option: '$1'."
+        exit 1
+        ;;
+    *) break ;;
+    esac
 done
+
+[[ "$(uname)" == *6.1* ]] && nargs="-n 4"
 
 # start suite update
 if [[ -d "/trunk/build" ]]; then
@@ -23,14 +41,14 @@ fi
 # update suite
 # --------------------------------------------------
 
-if [[ "$update" = "yes" ]]; then
+if [[ $update == "yes" ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo "checking if suite has been updated..."
     echo "-------------------------------------------------------------------------------"
     echo
 
-    if [[ ! -d ../.git ]] && which git > /dev/null; then
+    if [[ ! -d ../.git ]] && command -v git > /dev/null; then
         if ! git clone "https://github.com/jb-alvarado/media-autobuild_suite.git" ab-git; then
             git -C ab-git fetch
         fi
@@ -38,7 +56,7 @@ if [[ "$update" = "yes" ]]; then
     fi
     cd_safe ..
     if [[ -d .git ]]; then
-        if [[ -n $(git status --short --untracked-files=no) ]]; then
+        if [[ -n "$(git diff --name-only)" ]]; then
             diffname="$(date +%F-%H.%M.%S)"
             git diff --diff-filter=M >> "build/user-changes-${diffname}.diff"
             echo "Your changes have been exported to build/user-changes-${diffname}.diff."
@@ -63,24 +81,23 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-/usr/bin/pacman-key -f EFD16019AE4FF531 >/dev/null || pacman-key -r EFD16019AE4FF531 >/dev/null
-/usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531 >/dev/null
+{ /usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531; } > /dev/null
+{ /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
 
 #always kill gpg-agent
-ps|grep gpg-agent|awk '{print $1}'|xargs -r kill -9
+gpgconf --kill gpg-agent
 
 # for some people the signature is broken
-printf 'Server = %s\nSigLevel = Optional\n' \
-    'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
+/usr/bin/grep -q Optional /etc/pacman.d/abrepo.conf ||
+    printf 'Server = %s\nSigLevel = Optional\n' \
+        'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
 
 # fix fuckup
 grep -q 'i.fsbn.eu/abrepo' /etc/pacman.conf &&
     sed -i '/\[abrepo\]/,+2d' /etc/pacman.conf
 
 /usr/bin/grep -q abrepo /etc/pacman.conf ||
-    sed -i '/\[mingw32\]/ i\[abrepo]\
-Include = /etc/pacman.d/abrepo.conf\
-' /etc/pacman.conf
+    sed -i '/\[mingw32\]/ i\[abrepo]\nInclude = /etc/pacman.d/abrepo.conf\n' /etc/pacman.conf
 
 echo
 echo "-------------------------------------------------------------------------------"
@@ -89,25 +106,44 @@ echo "--------------------------------------------------------------------------
 echo
 
 pacman -Sy --ask=20 --noconfirm
-pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex > /dev/null
+{ pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex; } > /dev/null
 do_unhide_all_sharedlibs
-if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
+
+if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     echo
     echo "-------------------------------------------------------------------------------"
     echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
+    printf -v new '%s\n' "$(tr -d '\r' < /etc/pac-base.pk)"
+    printf -v newmingw '%s\n' "$(tr -d '\r' < /etc/pac-mingw.pk)"
+    [[ -f /etc/pac-mingw-extra.pk ]] && printf -v newmingw '%s\n' "$newmingw" \
+        "$(tr -d '\r' < /etc/pac-mingw-extra.pk)"
+    [[ -f /etc/pac-msys-extra.pk ]] && printf -v newmsys '%s\n' "$(tr -d '\r' < /etc/pac-msys-extra.pk)"
+    new=$(echo -n "$new" | tr ' ' '\n' | sort -u)
+    newmingw=$(echo -n "$newmingw" | tr ' ' '\n' | sort -u)
+    newmsys=$(echo -n "$newmsys" | tr ' ' '\n' | sort -u)
+    for pkg in $newmingw; do
+        pkg=${pkg#mingw-w64-i686-}
+        pkg=${pkg#mingw-w64-x86_64-}
+        if [[ $build32 == "yes" ]] &&
+            pacman -Ss "mingw-w64-i686-$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\nmingw-w64-i686-$pkg"
+        fi
+        if [[ $build64 == "yes" ]] &&
+            pacman -Ss "mingw-w64-x86_64-$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\nmingw-w64-x86_64-$pkg"
+        fi
+    done
+    for pkg in $newmsys; do
+        pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf -v new '%b' "$new\\n$pkg"
+    done
     old=$(pacman -Qqe | sort)
-    new=$(dos2unix < /etc/pac-base.pk)
-    newmingw=$(dos2unix < /etc/pac-mingw.pk)
-    [[ -f /etc/pac-mingw-extra.pk ]] && newmingw+=$(printf "\n%s" "$(dos2unix < /etc/pac-mingw-extra.pk)")
-    [[ "$build32" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-i686-&/g')")
-    [[ "$build64" = "yes" ]] && new+=$(printf "\n%s" "$(echo "$newmingw" | sed 's/^/mingw-w64-x86_64-&/g')")
-    diff=$(diff <(echo "$old") <(echo "$new" | sed 's/ /\n/g' | sort -u) | grep '^[<>]')
-    install=$(echo "$diff" | sed -nr 's/> (.*)/\1/p')
-    uninstall=$(echo "$diff" | sed -nr 's/< (.*)/\1/p')
+    new=$(sort -u <<< "$new")
+    install=$(diff --changed-group-format='%>' --unchanged-group-format='' <(echo "$old") <(echo "$new"))
+    uninstall=$(diff --changed-group-format='%<' --unchanged-group-format='' <(echo "$old") <(echo "$new"))
 
-    if [[ ! -z "$uninstall" ]]; then
+    if [[ -n $uninstall ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You have more packages than needed!"
@@ -119,18 +155,24 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
         while true; do
             read -r -p "remove packs [y/n]? " yn
             case $yn in
-                [Yy]* )
-                    for pkg in $uninstall; do
-                        pacman -Rs --noconfirm --ask 20 "$pkg" 2>/dev/null
-                        pacman -Qs "^${pkg}$" >/dev/null && pacman -D --noconfirm --ask 20 --asdeps "$pkg" >/dev/null
-                    done
-                    break;;
-                [Nn]* ) pacman --noconfirm -D --asdeps $uninstall; break;;
-                * ) echo "Please answer yes or no";;
+            [Yy]*)
+                for pkg in $uninstall; do
+                    {
+                        pacman -Rs --noconfirm --ask 20 "$pkg" >&2 2> /dev/null
+                        pacman -Qs "^${pkg}$" && pacman -D --noconfirm --ask 20 --asdeps "$pkg"
+                    } > /dev/null
+                done
+                break
+                ;;
+            [Nn]*)
+                pacman --noconfirm -D --asdeps $uninstall
+                break
+                ;;
+            *) echo "Please answer yes or no" ;;
             esac
         done
     fi
-    if [[ ! -z "$install" ]]; then
+    if [[ -n $install ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You're missing some packages!"
@@ -142,13 +184,14 @@ if [[ -f /etc/pac-base.pk ]] && [[ -f /etc/pac-mingw.pk ]]; then
         while true; do
             read -r -p "install packs [y/n]? " yn
             case $yn in
-                [Yy]* )
-                    echo $install | xargs $nargs pacman -Sw --noconfirm --ask 20 --needed
-                    echo $install | xargs $nargs pacman -S --noconfirm --ask 20 --needed
-                    pacman -D --asexplicit $install
-                    break;;
-                [Nn]* ) exit;;
-                * ) echo "Please answer yes or no";;
+            [Yy]*)
+                xargs $nargs pacman -Sw --noconfirm --ask 20 --needed <<< "$install"
+                xargs $nargs pacman -S --noconfirm --ask 20 --needed <<< "$install"
+                pacman -D --asexplicit $install
+                break
+                ;;
+            [Nn]*) exit ;;
+            *) echo "Please answer yes or no" ;;
             esac
         done
     fi
@@ -161,7 +204,7 @@ else
     cd_safe "$(cygpath -w /).."
 fi
 
-if which rustup &> /dev/null; then
+if command -v rustup &> /dev/null; then
     echo "Updating rust..."
     rustup update
 fi
@@ -170,16 +213,16 @@ fi
 # packet msys2 system
 # --------------------------------------------------
 
-have_updates="$(pacman -Qu|grep -v ignored]$|awk '{print $1}')"
-if [[ -n "$have_updates" ]]; then
+have_updates="$(pacman -Qu | grep -v ignored]$ | cut -d' ' -f1)"
+if [[ -n $have_updates ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    echo "$have_updates" | /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' &&
-        touch build/update_core &&
-        have_updates="$(echo "$have_updates" | /usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$')"
-    echo $have_updates | xargs $nargs pacman -S --noconfirm --ask 20 \
-        --overwrite "/mingw64/*" --overwrite "/mingw32/*" --overwrite "/usr/*"
+    /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
+        touch /build/update_core &&
+        have_updates="$(/usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
+    xargs $nargs pacman -S --noconfirm --ask 20 --overwrite "/mingw64/*" \
+        --overwrite "/mingw32/*" --overwrite "/usr/*" <<< "$have_updates"
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&

@@ -1,8 +1,8 @@
 #!/bin/bash
-# shellcheck disable=SC2154,SC2120,SC2119
+# shellcheck disable=SC2154,SC2120,SC2119,SC2034,SC1090,SC1117
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
-    cpuCount="$(($(nproc)/2))"
+    cpuCount="$(($(nproc) / 2))"
 fi
 bits="${bits:-64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
@@ -22,31 +22,47 @@ ncols=72
 [[ -f "$LOCALBUILDDIR"/grep.exe ]] &&
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
 
+do_simple_print() {
+    local plain formatString='' dateValue
+    [[ $1 == -p ]] && plain=y && shift
+
+    if [[ $timeStamp == y ]]; then
+        formatString+="${purple}"'%(%H:%M:%S)T'"${reset}"' '
+        dateValue='-1'
+    else
+        [[ $plain == y ]] && formatString+='\t'
+    fi
+    if [[ -z $plain ]]; then
+        formatString+="${bold}├${reset} "
+    fi
+    printf "$formatString"'%b'"$reset"'\n' $dateValue "$*"
+}
+
 do_print_status() {
     local name="$1 "
     local color="$2"
     local status="$3"
     local pad
     printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
-    if [[ $timeStamp = y ]]; then
+    if [[ $timeStamp == y ]]; then
         printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s %s [%s]\n' -1 "${bold}$name${reset}" \
-        "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
+            "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
     else
         printf '%s %s [%s]\n' "${bold}$name${reset}" "${pad:0:$((ncols - ${#name} - ${#status} - 3))}" "${color}${status}${reset}"
     fi
 }
 
 do_print_progress() {
-    if [[ $logging = y ]]; then
-        if [[ $timeStamp = y ]]; then
+    if [[ $logging == y ]]; then
+        if [[ $timeStamp == y ]]; then
             [[ $1 =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
-            "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
+                "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
         else
             [[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
         fi
     else
         set_title "$* in $(get_first_subdir)"
-        if [[ $timeStamp = y ]]; then
+        if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
         else
             echo -e "${bold}$* in $(get_first_subdir)${reset}"
@@ -74,7 +90,7 @@ cd_safe() {
 }
 
 test_newer() {
-    [[ $1 = installed ]] && local installed=y && shift
+    [[ $1 == installed ]] && local installed=y && shift
     local file
     local files=("$@")
     local cmp="${files[-1]}"
@@ -84,7 +100,7 @@ test_newer() {
     for file in "${files[@]}"; do
         [[ $installed ]] && file="$(file_installed "$file")"
         [[ -f $file ]] &&
-            [[ $file -nt "$cmp" ]] && return
+            [[ $file -nt $cmp ]] && return
     done
     return 1
 }
@@ -92,14 +108,14 @@ test_newer() {
 check_valid_vcs() {
     local root="${1:-.}"
     local _type="${vcsType:-git}"
-    [[ "$_type" = "git" && -d "$root"/.git ]] ||
-    [[ "$_type" = "hg" && -d "$root"/.hg ]] ||
-    [[ "$_type" = "svn" && -d "$root"/.svn ]]
+    [[ $_type == "git" && -d "$root"/.git ]] ||
+        [[ $_type == "hg" && -d "$root"/.hg ]] ||
+        [[ $_type == "svn" && -d "$root"/.svn ]]
 }
 
 vcs_clone() {
     set -x
-    if [[ "$vcsType" = "svn" ]]; then
+    if [[ $vcsType == "svn" ]]; then
         svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
     else
         "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
@@ -112,14 +128,14 @@ vcs_reset() {
     local ref="$1"
     check_valid_vcs
     set -x
-    if [[ $vcsType = svn ]]; then
+    if [[ $vcsType == svn ]]; then
         svn revert --recursive .
         oldHead=$(svnversion)
-    elif [[ $vcsType = hg ]]; then
+    elif [[ $vcsType == hg ]]; then
         hg update -C -r "$ref"
         oldHead=$(hg id --id)
-    elif [[ $vcsType = git ]]; then
-        [[ -n "$vcsURL" ]] && git remote set-url origin "$vcsURL"
+    elif [[ $vcsType == git ]]; then
+        [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
         git checkout ab-suite
@@ -133,14 +149,14 @@ vcs_update() {
     local ref="$1"
     check_valid_vcs
     set -x
-    if [[ $vcsType = svn ]]; then
+    if [[ $vcsType == svn ]]; then
         svn update -r "$ref"
         newHead=$(svnversion)
-    elif [[ $vcsType = hg ]]; then
+    elif [[ $vcsType == hg ]]; then
         hg pull
         hg update -C -r "$ref"
         newHead=$(hg id --id)
-    elif [[ $vcsType = git ]]; then
+    elif [[ $vcsType == git ]]; then
         local unshallow
         [[ -f .git/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
@@ -153,10 +169,10 @@ vcs_update() {
 
 vcs_log() {
     check_valid_vcs
-    if [[ "$vcsType" = "git" ]]; then
+    if [[ $vcsType == "git" ]]; then
         git log --no-merges --pretty="%ci: %an - %h%n    %s" \
             "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
-    elif [[ "$vcsType" = "hg" ]]; then
+    elif [[ $vcsType == "hg" ]]; then
         hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
             -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
     fi
@@ -164,16 +180,16 @@ vcs_log() {
 
 vcs_getlatesttag() {
     local ref="$1"
-    if [[ -n "$vcsType" && "$vcsType" != git ]]; then
+    if [[ -n $vcsType && $vcsType != git ]]; then
         echo "$ref"
         return
     fi
     local tag
-    if [[ "$ref" = "LATEST" ]]; then
+    if [[ $ref == "LATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)")"
-    elif [[ "$ref" = "GREATEST" ]]; then
+    elif [[ $ref == "GREATEST" ]]; then
         tag="$(git describe --abbrev=0 --tags)"
-    elif [[ "${ref//\*}" != "$ref" ]]; then
+    elif [[ ${ref//\*/} != "$ref" ]]; then
         tag="$(git describe --abbrev=0 --tags "$(git tag -l "$ref" | sort -Vr | head -1)")"
     fi
     echo "${tag:-${ref}}"
@@ -185,9 +201,9 @@ vcs_getlatesttag() {
 do_vcs() {
     local vcsType="${1%::*}"
     local vcsURL="${1#*::}"
-    [[ "$vcsType" = "$vcsURL" ]] && vcsType="git"
+    [[ $vcsType == "$vcsURL" ]] && vcsType="git"
     local vcsBranch="${vcsURL#*#}"
-    [[ "$vcsBranch" = "$vcsURL" ]] && vcsBranch=""
+    [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
     local vcsFolder="$2"
     local vcsCheck=("${_check[@]}")
     local deps=("${_deps[@]}") && unset _deps
@@ -195,34 +211,34 @@ do_vcs() {
     if [[ $vcsBranch ]]; then
         vcsURL="${vcsURL%#*}"
         case ${vcsBranch%%=*} in
-            commit|tag|revision)
-                ref=${vcsBranch##*=}
-                ;;
-            branch)
-                ref=${vcsBranch##*=}
-                [[ $vcsType = git && $ref = "${ref%/*}" ]] && ref=origin/$ref
-                ;;
+        commit | tag | revision)
+            ref=${vcsBranch##*=}
+            ;;
+        branch)
+            ref=${vcsBranch##*=}
+            [[ $vcsType == git && $ref == "${ref%/*}" ]] && ref=origin/$ref
+            ;;
         esac
     else
-        if [[ $vcsType = git ]]; then
+        if [[ $vcsType == git ]]; then
             ref="origin/HEAD"
-        elif [[ $vcsType = hg ]]; then
-            ref="tip"
-        elif [[ $vcsType = svn ]]; then
+        elif [[ $vcsType == hg ]]; then
+            ref="default"
+        elif [[ $vcsType == svn ]]; then
             ref="HEAD"
         fi
     fi
-    [[ ! "$vcsFolder" ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
+    [[ ! $vcsFolder ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
 
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        if ! log quiet "$vcsType.clone" vcs_clone && [[ $vcsType = git ]] &&
-            [[ "$vcsURL" != *"media-autobuild_suite-dependencies"* ]]; then
+        if ! log quiet "$vcsType.clone" vcs_clone && [[ $vcsType == git ]] &&
+            [[ $vcsURL != *"media-autobuild_suite-dependencies"* ]]; then
             local repoName=${vcsURL##*/}
             vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
             log quiet "$vcsType.clone" vcs_clone ||
-            do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
+                do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
         fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
             cd_safe "$vcsFolder-$vcsType"
@@ -237,10 +253,10 @@ do_vcs() {
         cd_safe "$vcsFolder-$vcsType"
     fi
 
-    if [[ $ffmpegUpdate = onlyFFmpeg ]] &&
+    if [[ $ffmpegUpdate == onlyFFmpeg ]] &&
         [[ $vcsFolder != ffmpeg ]] && [[ $vcsFolder != mpv ]] &&
-        { { [[ -z "${vcsCheck[*]}" ]] && files_exist "$vcsFolder.pc"; } ||
-          { [[ -n "${vcsCheck[*]}" ]] && files_exist "${vcsCheck[@]}"; }; }; then
+        { { [[ -z ${vcsCheck[*]} ]] && files_exist "$vcsFolder.pc"; } ||
+            { [[ -n ${vcsCheck[*]} ]] && files_exist "${vcsCheck[@]}"; }; }; then
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
         return 1
     fi
@@ -257,10 +273,10 @@ do_vcs() {
     rm -f custom_updated
     check_custom_patches
 
-    if [[ "$oldHead" != "$newHead" || -f custom_updated ]]; then
+    if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
-        if [[ $build32 = "yes" && $build64 = "yes" && $bits = "64bit" ]]; then
+        if [[ $build32 == "yes" && $build64 == "yes" && $bits == "64bit" ]]; then
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$vcsFolder]"
         fi
@@ -269,13 +285,13 @@ do_vcs() {
         echo >> "$LOCALBUILDDIR"/newchangelog
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
     elif [[ -f recently_updated ]] && { [[ ! -f "build_successful$bits" ]] ||
-        [[ -n "$flavor" && ! -f "build_successful${bits}_${flavor}" ]]; }; then
+        [[ -n $flavor && ! -f "build_successful${bits}_${flavor}" ]]; }; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
-    elif [[ -z "${vcsCheck[*]}" ]] && ! files_exist "$vcsFolder.pc"; then
+    elif [[ -z ${vcsCheck[*]} ]] && ! files_exist "$vcsFolder.pc"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Missing pkg-config"
-    elif [[ -n "${vcsCheck[*]}" ]] && ! files_exist "${vcsCheck[@]}"; then
+    elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
-    elif [[ -n "${deps[*]}" ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
+    elif [[ -n ${deps[*]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
@@ -295,19 +311,23 @@ guess_dirname() {
 
 check_hash() {
     local file="$1" check="$2" md5sum sha256sum
-    if [[ -z "$file" || ! -f "$file" ]]; then
+    if [[ -z $file || ! -f $file ]]; then
         return 1
-    elif [[ -z "$check" ]]; then
+    elif [[ -z $check ]]; then
         # if no hash to check, just check if the file exists
         return 0
     fi
 
     sha256sum=$(sha256sum "$file" | cut -d' ' -f1)
-    if [[ $check = print ]]; then
+    if [[ $check == print ]]; then
         echo "$sha256sum"
     else
         md5sum=$(md5sum "$file" | cut -d' ' -f1)
-        test "$sha256sum" = "$check" || test "$md5sum" = "$check"
+        if [[ $sha256sum == "$check" || $md5sum == "$check" ]]; then
+            return 0
+        fi
+        do_simple_print "${orange}Hash mismatch, file may be broken: ${check} != ${sha256sum} || ${md5sum}"
+        return 1
     fi
 }
 
@@ -316,13 +336,16 @@ do_wget() {
     local nocd norm quiet hash notmodified
     while true; do
         case $1 in
-            -c) nocd=nocd && shift;;
-            -r) norm=y && shift;;
-            -q) quiet=y && shift;;
-            -h) hash="$2" && shift 2;;
-            -z) notmodified=y && shift;;
-            --) shift; break;;
-            *) break;;
+        -c) nocd=nocd && shift ;;
+        -r) norm=y && shift ;;
+        -q) quiet=y && shift ;;
+        -h) hash="$2" && shift 2 ;;
+        -z) notmodified=y && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
         esac
     done
     local url="$1" archive="$2" dirName="$3" response_code curlcmds tries=1
@@ -340,11 +363,11 @@ do_wget() {
         [[ $hash ]] && tries=3
         while [[ $tries -gt 0 ]]; do
             response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
-            (( tries-=1 ))
+            ((tries -= 1))
 
-            if [[ $response_code = "200" || $response_code = "226" ]]; then
+            if [[ $response_code == "200" || $response_code == "226" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
-            elif [[ $response_code = "304" ]]; then
+            elif [[ $response_code == "304" ]]; then
                 [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
             fi
             if check_hash "$archive" "$hash"; then
@@ -353,7 +376,7 @@ do_wget() {
                 rm -f "$archive"
             fi
         done
-        if [[ $response_code -gt 400 || $response_code = "000" ]]; then
+        if [[ $response_code -gt 400 || $response_code == "000" ]]; then
             if [[ -f $archive ]]; then
                 echo -e "${orange}${archive}${reset}"
                 echo -e '\tFile not found online. Using local copy.'
@@ -376,17 +399,17 @@ do_wget() {
 
 real_extract() {
     local archive="$1" dirName="$2" archive_type
-    [[ -z "$archive" ]] && return 1
+    [[ -z $archive ]] && return 1
     archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
     [[ ! $dirName ]] && dirName=$(guess_dirname "$archive" || echo "${archive}")
     case $archive_type in
-    zip|7z)
+    zip | 7z)
         7z x -aoa -o"$dirName" "$archive"
         ;;
     tar*)
-        [[ -n "$dirName" && ! -d "$dirName" ]] && mkdir -p "$dirName"
-        [[ $archive_type = tar.* ]] && 7z x -aoa "$archive"
-        [[ $(tar -tf "$archive" | cut -d'/' -f1 | sort -u | wc -l) = 1 ]] && strip_comp="--strip-components=1"
+        [[ -n $dirName && ! -d $dirName ]] && mkdir -p "$dirName"
+        [[ $archive_type == tar.* ]] && 7z x -aoa "$archive"
+        [[ $(tar -tf "$archive" | cut -d'/' -f1 | sort -u | wc -l) == 1 ]] && strip_comp="--strip-components=1"
         if ! tar $strip_comp -C "$dirName" -xf "${1%.tar*}.tar"; then
             7z x -aoa "${archive%.tar*}.tar" -o"$dirName"
         fi
@@ -395,9 +418,9 @@ real_extract() {
     esac
     local temp_dir
     temp_dir=$(find "$dirName/" -maxdepth 1 ! -wholename "$dirName/")
-    if [[ -n "$temp_dir" && $(wc -l <<< "$temp_dir" ) = 1 ]]; then
+    if [[ -n $temp_dir && $(wc -l <<< "$temp_dir") == 1 ]]; then
         find "$temp_dir" -maxdepth 1 ! -wholename "$temp_dir" -exec mv -t "$dirName/" {} +
-        rmdir "$temp_dir" 2>/dev/null
+        rmdir "$temp_dir" 2> /dev/null
     fi
 }
 
@@ -405,18 +428,19 @@ do_extract() {
     local nocd="${nocd:-}"
     local archive="$1" dirName="$2"
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
-    [[ -z "$dirName" ]] && dirName=$(guess_dirname "$archive")
-    if [[ $dirName != "." && -d "$dirName" ]] &&
-        { [[ $build32 = "yes" ]] && { [[ ! -f "$dirName"/build_successful32bit ]] ||
-            [[ -n "$flavor" && ! -f "$dirName/build_successful32bit_${flavor}" ]]; } ||
-          [[ $build64 = "yes" ]] && { [[ ! -f "$dirName"/build_successful64bit ]] ||
-            [[ -n "$flavor" && ! -f "$dirName/build_successful64bit_${flavor}" ]]; };
-        }; then
-        rm -rf "$dirName"
-    elif [[ -d "$dirName" ]]; then
+    [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
+    if [[ $dirName != "." && -d $dirName ]]; then
+        if [[ $build32 == "yes" ]] &&
+            [[ ! -f "$dirName"/build_successful32bit || -n $flavor && ! -f "$dirName/build_successful32bit_${flavor}" ]]; then
+            rm -rf "$dirName"
+        elif [[ $build64 == "yes" ]] &&
+            [[ ! -f "$dirName"/build_successful64bit || -n $flavor && ! -f "$dirName/build_successful64bit_${flavor}" ]]; then
+            rm -rf "$dirName"
+        fi
+    elif [[ -d $dirName ]]; then
         [[ $nocd ]] || cd_safe "$dirName"
         return 0
-    elif  ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
+    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
@@ -426,7 +450,7 @@ do_extract() {
 do_wget_sf() {
     # do_wget_sf "faac/faac-src/faac-1.28/faac-$_ver.tar.bz2" "faac-$_ver"
     local hash
-    [[ $1 = "-h" ]] && hash="$2" && shift 2
+    [[ $1 == "-h" ]] && hash="$2" && shift 2
     local url="https://download.sourceforge.net/$1"
     shift 1
     check_custom_patches
@@ -444,7 +468,7 @@ do_strip() {
     local exts="exe|dll|com|a"
     [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
     for file; do
-        if [[ "$file" =~ \.($exts)$ && ! "$file" =~ ($nostrip)\.exe$ ]]; then
+        if [[ $file =~ \.($exts)$ && ! $file =~ ($nostrip)\.exe$ ]]; then
             do_print_progress Stripping
             break
         fi
@@ -466,8 +490,8 @@ do_strip() {
             file=""
         fi
         [[ $file ]] &&
-            { eval "${cmd[@]}" "$file" 2>/dev/null ||
-              eval "${cmd[@]}" "$file" -o "$file.stripped" 2>/dev/null; }
+            { eval "${cmd[@]}" "$file" 2> /dev/null ||
+                eval "${cmd[@]}" "$file" -o "$file.stripped" 2> /dev/null; }
         [[ -f ${file}.stripped ]] && mv -f "${file}"{.stripped,}
     done
 }
@@ -477,9 +501,9 @@ do_pack() {
     local cmd=(/opt/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
-    [[ $bits = 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mplayer|mpv"
+    [[ $bits == 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mplayer|mpv"
     for file; do
-        if [[ "$file" =~ \.($exts)$ && ! "$file" =~ ($nopack)\.exe$ ]]; then
+        if [[ $file =~ \.($exts)$ && ! $file =~ ($nopack)\.exe$ ]]; then
             do_print_progress Packing with UPX
             break
         fi
@@ -490,8 +514,8 @@ do_pack() {
             continue
         fi
         if [[ $file =~ \.($exts)$ ]] &&
-            ! [[ -n "$nopack" && $file =~ ($nopack)\.exe$ ]]; then
-            [[ $stripping = y ]] && cmd+=("--strip-relocs=0")
+            ! [[ -n $nopack && $file =~ ($nopack)\.exe$ ]]; then
+            [[ $stripping == y ]] && cmd+=("--strip-relocs=0")
         else
             file=""
         fi
@@ -502,7 +526,7 @@ do_pack() {
 do_zipman() {
     local file files
     local man_dirs=(/local{32,64}/share/man)
-    files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2>/dev/null)
+    files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2> /dev/null)
     for file in $files; do
         gzip -9 -n -f "$file"
         rm -f "$file"
@@ -516,17 +540,17 @@ do_checkIfExist() {
     local dry="${dry:-n}"
     local check=("${_check[@]}")
     [[ -z ${check[*]} ]] && echo "No files to check" && exit 1
-    if [[ $dry = y ]]; then
+    if [[ $dry == y ]]; then
         files_exist -v -s "${check[@]}"
     else
         if files_exist -v "${check[@]}"; then
-            [[ $stripping = y ]] && do_strip "${check[@]}"
-            [[ $packing = y ]] && do_pack "${check[@]}"
+            [[ $stripping == y ]] && do_strip "${check[@]}"
+            [[ $packing == y ]] && do_pack "${check[@]}"
             do_print_status "└ $packetName" "$blue" "Updated"
-            [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
+            [[ $build32 == yes || $build64 == yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
         else
-            [[ $build32 = yes || $build64 = yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
+            [[ $build32 == yes || $build64 == yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
                 rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
             do_print_status "└ $packetName" "$red" "Failed"
             echo
@@ -542,18 +566,23 @@ do_checkIfExist() {
 file_installed() {
     local file
     local silent
-    [[ "$1" = "-s" ]] && silent=y
+    [[ $1 == "-s" ]] && silent=y
     case $1 in
-        /*|./* )
-            file="$1" ;;
-        *.pc )
-            file="lib/pkgconfig/$1" ;;
-        *.a|*.la|*.lib )
-            file="lib/$1" ;;
-        *.h|*.hpp|*.c )
-            file="include/$1" ;;
-        * )
-            file="$1" ;;
+    /* | ./*)
+        file="$1"
+        ;;
+    *.pc)
+        file="lib/pkgconfig/$1"
+        ;;
+    *.a | *.la | *.lib)
+        file="lib/$1"
+        ;;
+    *.h | *.hpp | *.c)
+        file="include/$1"
+        ;;
+    *)
+        file="$1"
+        ;;
     esac
     [[ ${file::1} != "/" ]] && file="$LOCALDESTDIR/$file"
     [[ -z $silent ]] && echo "$file"
@@ -564,13 +593,16 @@ files_exist() {
     local verbose list soft ignorebinaries term='\n' file
     while true; do
         case $1 in
-            -v) verbose=y && shift;;
-            -l) list=y && shift;;
-            -s) soft=y && shift;;
-            -b) ignorebinaries=y && shift;;
-            -l0) list=y && term='\0' && shift;;
-            --) shift; break;;
-            *) break;;
+        -v) verbose=y && shift ;;
+        -l) list=y && shift ;;
+        -s) soft=y && shift ;;
+        -b) ignorebinaries=y && shift ;;
+        -l0) list=y && term='\0' && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
         esac
     done
     [[ $list ]] && verbose= && soft=y
@@ -595,19 +627,19 @@ pc_exists() {
     for opt; do
         local _pkg=${opt%% *}
         local _check=${opt#$_pkg}
-        [[ $_pkg = "$_check" ]] && _check=""
-        [[ $_pkg = *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
+        [[ $_pkg == "$_check" ]] && _check=""
+        [[ $_pkg == *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
         pkg-config --exists --silence-errors "${_pkg}${_check}" || return
     done
 }
 
 do_install() {
-    [[ $1 = dry ]] && local dryrun=y && shift
+    [[ $1 == dry ]] && local dryrun=y && shift
     local files=("$@")
     local dest="${files[-1]}"
     [[ ${dest::1} != "/" ]] && dest="$(file_installed "$dest")"
     [[ ${#files[@]} -gt 1 ]] && unset 'files[-1]'
-    [[ ${dest: -1:1} = "/" ]] && mkdir -p "$dest"
+    [[ ${dest: -1:1} == "/" ]] && mkdir -p "$dest"
     if [[ -n $dryrun ]]; then
         echo install -D -p "${files[@]}" "$dest"
     else
@@ -619,15 +651,15 @@ do_install() {
 
 do_uninstall() {
     local dry quiet all files
-    [[ $1 = dry ]] && dry=y && shift
-    [[ $1 = q ]] && quiet=y && shift
-    [[ $1 = all ]] && all=y && shift
+    [[ $1 == dry ]] && dry=y && shift
+    [[ $1 == q ]] && quiet=y && shift
+    [[ $1 == all ]] && all=y && shift
     if [[ $all ]]; then
         mapfile -t files < <(files_exist -l "$@")
     else
         mapfile -t files < <(files_exist -l -b "$@")
     fi
-    if [[ -n "${files[*]}" ]]; then
+    if [[ -n ${files[*]} ]]; then
         [[ ! $quiet ]] && do_print_progress Running uninstall
         if [[ $dry ]]; then
             echo "rm -rf ${files[*]}"
@@ -641,18 +673,18 @@ do_pkgConfig() {
     local pkg="${1%% *}"
     local pc_check="${1#$pkg}"
     local pkg_and_version="$pkg"
-    [[ $pkg = "$pc_check" ]] && pc_check=""
+    [[ $pkg == "$pc_check" ]] && pc_check=""
     local version=$2
     local deps=("${_deps[@]}") && unset _deps
-    [[ ! "$version" && "$pc_check" ]] && version="${pc_check#*= }"
+    [[ ! $version && $pc_check ]] && version="${pc_check#*= }"
     [[ "$version" ]] && pkg_and_version="${pkg} ${version}"
     if ! pc_exists "${pkg}"; then
         do_print_status "${pkg_and_version}" "$red" "Not installed"
     elif ! pc_exists "${pkg}${pc_check}"; then
         do_print_status "${pkg_and_version}" "$orange" "Outdated"
-    elif [[ -n "${deps[*]}" ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
+    elif [[ -n ${deps[*]} ]] && test_newer installed "${deps[@]}" "${pkg}.pc"; then
         do_print_status "${pkg_and_version}" "$orange" "Newer dependencies"
-    elif [[ -n "${_check[*]}" ]] && ! files_exist "${_check[@]}"; then
+    elif [[ -n ${_check[*]} ]] && ! files_exist "${_check[@]}"; then
         do_print_status "${pkg_and_version}" "$orange" "Files missing"
     else
         do_print_status "${pkg_and_version}" "$green" "Up-to-date"
@@ -662,7 +694,7 @@ do_pkgConfig() {
 
 do_readoptionsfile() {
     local filename="$1"
-    if [[ -f "$filename" ]]; then
+    if [[ -f $filename ]]; then
         sed -r '# remove commented text
                 s/#.*//
                 # delete empty lines
@@ -696,9 +728,9 @@ do_getFFmpegConfig() {
         [[ $ffmpegChoice != n ]] && while read -r option; do
             FFMPEG_DEFAULT_OPTS+=("$option")
         done < <(do_readbatoptions "ffmpeg_options_zeranoe")
-        [[ $ffmpegChoice = f ]] && while read -r option; do
+        [[ $ffmpegChoice == f ]] && while read -r option; do
             FFMPEG_DEFAULT_OPTS+=("$option")
-        done < <(do_readbatoptions "ffmpeg_options_full")
+        done < <(do_readbatoptions "ffmpeg_options_full(|_shared)")
         echo "Imported default FFmpeg options from .bat"
     else
         local custom_opts_file="$LOCALBUILDDIR/ffmpeg_options.txt"
@@ -706,9 +738,19 @@ do_getFFmpegConfig() {
             custom_opts_file="$LOCALBUILDDIR/ffmpeg_options_$bits.txt"
         fi
         IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$custom_opts_file")
+        unset FFMPEG_DEFAULT_OPTS_SHARED
+        if [[ -f "$LOCALBUILDDIR/ffmpeg_options_shared.txt" ]]; then
+            IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < <(
+                do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_shared.txt"
+            )
+        fi
     fi
+
+    for opt in "${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}"; do
+        [[ -n $opt ]] && FFMPEG_OPTS+=("$opt")
+    done
+
     echo "License: $license"
-    FFMPEG_OPTS=("${FFMPEG_BASE_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS[@]}")
 
     # we set these accordingly for static or shared
     do_removeOption "--(en|dis)able-(shared|static)"
@@ -716,9 +758,9 @@ do_getFFmpegConfig() {
     # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
     # If nonfree will use SChannel if neither openssl/libtls or gnutls are in the options
     if ! enabled_any libtls openssl gnutls &&
-        { enabled librtmp || [[ $rtmpdump = y ]]; }; then
-        if [[ $license = nonfree ]] ||
-            [[ $license = lgpl* && $rtmpdump = n ]]; then
+        { enabled librtmp || [[ $rtmpdump == y ]]; }; then
+        if [[ $license == nonfree ]] ||
+            [[ $license == lgpl* && $rtmpdump == n ]]; then
             do_addOption --enable-openssl
         else
             do_addOption --enable-gnutls
@@ -753,7 +795,7 @@ do_getFFmpegConfig() {
     enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,ndi_newtek,ndi-newtek} netcdf &&
         do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf)" &&
         sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf);;g' \
-        "$LOCALBUILDDIR/ffmpeg_options.txt"
+            "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 
 do_changeFFmpegConfig() {
@@ -772,7 +814,7 @@ do_changeFFmpegConfig() {
     # get libs restricted by license
     local config_script=configure
     [[ $(get_first_subdir) != "ffmpeg-git" ]] && config_script="$LOCALBUILDDIR/ffmpeg-git/configure"
-    [[ -f "$config_script" ]] || do_exit_prompt "There's no configure script to retrieve libs from"
+    [[ -f $config_script ]] || do_exit_prompt "There's no configure script to retrieve libs from"
     eval "$(sed -n '/EXTERNAL_LIBRARY_GPL_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
     eval "$(sed -n '/HWACCEL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
     eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
@@ -781,7 +823,7 @@ do_changeFFmpegConfig() {
     # handle gpl libs
     local gpl
     read -ra gpl <<< "${EXTERNAL_LIBRARY_GPL_LIST//_/-} gpl"
-    if [[ $license = gpl* || $license = nonfree ]] &&
+    if [[ $license == gpl* || $license == nonfree ]] &&
         { enabled_any "${gpl[@]}" || ! disabled postproc; }; then
         do_addOption --enable-gpl
     else
@@ -791,7 +833,7 @@ do_changeFFmpegConfig() {
     # handle (l)gplv3 libs
     local version3
     read -ra version3 <<< "${EXTERNAL_LIBRARY_VERSION3_LIST//_/-}"
-    if [[ $license =~ (l|)gplv3 || $license = nonfree ]] && enabled_any "${version3[@]}"; then
+    if [[ $license =~ (l|)gplv3 || $license == nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
         do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
@@ -799,14 +841,14 @@ do_changeFFmpegConfig() {
 
     local nonfreehwaccel
     read -ra nonfreehwaccel <<< "(${HWACCEL_LIBRARY_NONFREE_LIST//_/-}"
-    if [[ $license = "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
+    if [[ $license == "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
         do_removeOptions "${nonfreehwaccel[*]/#/--enable-} --enable-nonfree"
     fi
 
     # cuda-only workarounds
-    if [[ $license = "nonfree" ]] && verify_cuda_deps; then
+    if verify_cuda_deps; then
         if enabled libnpp; then
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
             local fixed_CUDA_PATH
@@ -817,7 +859,7 @@ do_changeFFmpegConfig() {
         if enabled cuda-nvcc; then
             local fixed_CUDA_PATH_UNIX
             fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
-            command -v nvcc.exe &>/dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
+            command -v nvcc.exe &> /dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
     else
@@ -828,9 +870,9 @@ do_changeFFmpegConfig() {
     local nonfreegpl
     read -ra nonfreegpl <<< "${EXTERNAL_LIBRARY_NONFREE_LIST//_/-}"
     if enabled_any "${nonfreegpl[@]}"; then
-        if [[ $license = "nonfree" ]] && enabled gpl; then
+        if [[ $license == "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
-        elif [[ $license = gpl* ]]; then
+        elif [[ $license == gpl* ]]; then
             do_removeOptions "${nonfreegpl[*]/#/--enable-}"
         fi
         # no lgpl here because they are accepted with it
@@ -845,8 +887,14 @@ do_changeFFmpegConfig() {
     enabled_any openssl mbedtls && do_removeOption "--enable-(gcrypt|gmp)"
 
     # remove libs that don't work with shared
-    if [[ $ffmpeg =~ "shared" || $ffmpeg = "both" ]]; then
-        FFMPEG_OPTS_SHARED=("${FFMPEG_OPTS[@]}")
+    if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
+        FFMPEG_OPTS_SHARED=()
+        for opt in "${FFMPEG_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS_SHARED[@]}"; do
+            [[ -n $opt ]] && FFMPEG_OPTS_SHARED+=("$opt")
+        done
+    fi
+    if [[ $ffmpeg == "bothstatic" ]]; then
+        do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libnpp|libopenh264)"
     fi
 }
 
@@ -855,7 +903,7 @@ opt_exists() {
     local opt value
     for opt; do
         for value in "${!array}"; do
-            [[ "$value" =~ $opt ]] && return
+            [[ $value =~ $opt ]] && return
         done
     done
     return 1
@@ -902,41 +950,40 @@ disabled_all() {
 }
 
 do_getMpvConfig() {
+    local MPV_TEMP_OPTS=()
     MPV_OPTS=()
-    if [[ -f "/trunk/media-autobuild_suite.bat" && "$ffmpegChoice" =~ (n|z|f) ]]; then
+    if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
         IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
-        mapfile -t MPV_OPTS < <(do_readbatoptions "mpv_options_(builtin|basic)")
+        mapfile -t MPV_TEMP_OPTS < <(do_readbatoptions "mpv_options_(builtin|basic)")
         local option
-        [[ $ffmpegChoice = f ]] && while read -r option; do
-            MPV_OPTS+=("$option")
+        [[ $ffmpegChoice == f ]] && while read -r option; do
+            [[ -n $option ]] && MPV_TEMP_OPTS+=("$option")
         done < <(do_readbatoptions "mpv_options_full")
         echo "Imported default mpv options from .bat"
     else
-        IFS=$'\n' read -d '' -r -a MPV_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
+        IFS=$'\n' read -d '' -r -a MPV_TEMP_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
-    do_removeOption MPV_OPTS \
+    do_removeOption MPV_TEMP_OPTS \
         "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc)"
-    if [[ $mpv = "y" ]]; then
-        mpv_disabled vapoursynth || do_addOption MPV_OPTS --disable-vapoursynth
-    elif [[ $mpv = "v" ]] && ! mpv_disabled vapoursynth; then
-        do_addOption MPV_OPTS --enable-vapoursynth
-    fi
+    for opt in "${MPV_TEMP_OPTS[@]}"; do
+        [[ -n $opt ]] && MPV_OPTS+=("$opt")
+    done
 }
 
 mpv_enabled() {
     local option
-    [[ $mpv = n ]] && return 1
+    [[ $mpv == n ]] && return 1
     for option in "${MPV_OPTS[@]}"; do
-        [[ "$option" =~ "--enable-$1"$ ]] && return
+        [[ $option =~ "--enable-$1"$ ]] && return
     done
     return 1
 }
 
 mpv_disabled() {
     local option
-    [[ $mpv = n ]] && return 0
+    [[ $mpv == n ]] && return 0
     for option in "${MPV_OPTS[@]}"; do
-        [[ "$option" =~ "--disable-$1"$ ]] && return
+        [[ $option =~ "--disable-$1"$ ]] && return
     done
     return 1
 }
@@ -966,7 +1013,7 @@ mpv_disabled_all() {
 mpv_enable() {
     local opt newopts=()
     for opt in "${MPV_OPTS[@]}"; do
-        if [[ "$opt" =~ "--disable-$1"$ ]]; then
+        if [[ $opt =~ "--disable-$1"$ ]]; then
             newopts+=("--enable-$1")
         else
             newopts+=("$opt")
@@ -978,7 +1025,7 @@ mpv_enable() {
 mpv_disable() {
     local opt newopts=()
     for opt in "${MPV_OPTS[@]}"; do
-        if [[ "$opt" =~ "--enable-$1"$ ]]; then
+        if [[ $opt =~ "--enable-$1"$ ]]; then
             newopts+=("--disable-$1")
         else
             newopts+=("$opt")
@@ -989,7 +1036,7 @@ mpv_disable() {
 
 do_addOption() {
     local varname="$1" array opt
-    if [[ ${varname#--} = "$varname" ]]; then
+    if [[ ${varname#--} == "$varname" ]]; then
         array="$varname" && shift 1
     else
         array="FFMPEG_OPTS"
@@ -1002,7 +1049,7 @@ do_addOption() {
 do_removeOption() {
     local varname="$1"
     local arrayname
-    if [[ ${varname#--} = "$varname" ]]; then
+    if [[ ${varname#--} == "$varname" ]]; then
         arrayname="$varname" && shift 1
     else
         arrayname="FFMPEG_OPTS"
@@ -1014,7 +1061,7 @@ do_removeOption() {
     local orig=("${!basearray}")
 
     for ((i = 0; i < ${#orig[@]}; i++)); do
-        if [[ ! "${orig[$i]}" =~ ^${option}$ ]]; then
+        if [[ ! ${orig[$i]} =~ ^${option}$ ]]; then
             temp+=("${orig[$i]}")
         fi
     done
@@ -1032,17 +1079,17 @@ do_removeOptions() {
 
 do_patch() {
     local binarypatch="--binary"
-    case $1 in -p) binarypatch="" && shift;; esac
-    local patch=${1%% *} # Location or link to patch.
-    local am=$2          # Use git am to apply patch. Use with .patch files
-    local strip=${3:-1}  # Leading directories to strip. "patch -p${strip}"
+    case $1 in -p) binarypatch="" && shift ;; esac
+    local patch=${1%% *}       # Location or link to patch.
+    local am=$2                # Use git am to apply patch. Use with .patch files
+    local strip=${3:-1}        # Leading directories to strip. "patch -p${strip}"
     local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
-    [[ $patchName = "$patch" ]] && patchName="${patch##*/}"
+    [[ $patchName == "$patch" ]] && patchName="${patch##*/}"
 
-    if [[ -z "$patchName" ]]; then
+    if [[ -z $patchName ]]; then
         # hack for URLs without filename
         patchName="$(/usr/bin/curl -sI "$patch" | grep -Pio '(?<=filename=)(.+)')"
-        if [[ -z "$patchName" ]]; then
+        if [[ -z $patchName ]]; then
             echo -e "${red}Failed to apply patch '$patch'${reset}"
             echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}"
             return 1
@@ -1054,34 +1101,34 @@ do_patch() {
     # the helper and compile scripts. If you really need to, use patch instead.
     # Else create a patch file for the individual folders you want to apply
     # the patch to.
-    [[ "$PWD" = "$LOCALBUILDDIR" ]] &&
+    [[ $PWD == "$LOCALBUILDDIR" ]] &&
         do_exit_prompt "Running patches in the build folder is not supported.
         Please make a patch for individual folders or modify the script directly"
 
-    if [[ ${patch:0:4} = "http" ]] || [[ ${patch:0:3} = "ftp" ]]; then
+    if [[ ${patch:0:4} == "http" ]] || [[ ${patch:0:3} == "ftp" ]]; then
         # Filter out patches that would require curl
         do_wget -c -r -q "$patch" "$patchName"
-    elif [[ -f "$patch" ]]; then
+    elif [[ -f $patch ]]; then
         # Check if the patch is a local patch and copy it to the current dir
         patch="$(realpath "$patch")" # Resolve fullpatch
-        [[ "${patch%/*}" != "$PWD" ]] &&
-            cp -f "$patch" "$patchName" >/dev/null 2>&1
+        [[ ${patch%/*} != "$PWD" ]] &&
+            cp -f "$patch" "$patchName" > /dev/null 2>&1
     else
         # Fall through option if the patch is from some other protocol
         # I don't know why anyone would use this but just in case.
         do_wget -c -r -q "$patch" "$patchName"
     fi
 
-    if [[ -f "$patchName" ]]; then
-        if [[ "$am" = "am" ]]; then
-            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" >/dev/null 2>&1; then
+    if [[ -f $patchName ]]; then
+        if [[ $am == "am" ]]; then
+            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1; then
                 git am -q --abort
                 echo -e "${orange}${patchName}${reset}"
                 echo -e "\\tPatch couldn't be applied with 'git am'. Continuing without patching."
                 return 1
             fi
         else
-            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" >/dev/null 2>&1; then
+            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" > /dev/null 2>&1; then
                 patch $binarypatch -s -N -p"$strip" -i "$patchName"
             else
                 echo -e "${orange}${patchName}${reset}"
@@ -1091,7 +1138,7 @@ do_patch() {
         fi
     else
         echo -e "${orange}${patchName}${reset}"
-        echo -e "\\tPatch not found anywhere. Continuing without patching."
+        echo -e '\tPatch not found anywhere. Continuing without patching.'
         return 1
     fi
     return 0
@@ -1100,8 +1147,8 @@ do_patch() {
 do_custom_patches() {
     local patch
     for patch in "$@"; do
-        [[ "${patch##*.}" = "patch" ]] && do_patch "$patch" am
-        [[ "${patch##*.}" = "diff" ]] && do_patch "$patch"
+        [[ ${patch##*.} == "patch" ]] && do_patch "$patch" am
+        [[ ${patch##*.} == "diff" ]] && do_patch "$patch"
     done
 }
 
@@ -1109,25 +1156,32 @@ do_cmake() {
     local bindir=""
     local root=".."
     local cmake_build_dir=""
-    while [[ -n "$*" ]]; do
+    while [[ -n $* ]]; do
         case "$1" in
-        global|audio|video)
-            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"; shift ;;
+        global | audio | video)
+            bindir="-DCMAKE_INSTALL_BINDIR=$LOCALDESTDIR/bin-$1"
+            shift
+            ;;
         builddir=*)
-            cmake_build_dir="${1#*=}"; shift ;;
+            cmake_build_dir="${1#*=}"
+            shift
+            ;;
         skip_build_dir)
-            local skip_build_dir=y; shift ;;
+            local skip_build_dir=y
+            shift
+            ;;
         *)
             if [[ -d "./$1" ]]; then
-                [[ -n "$skip_build_dir" ]] && root="./$1" || root="../$1"
+                [[ -n $skip_build_dir ]] && root="./$1" || root="../$1"
                 shift
             fi
-            break ;;
+            break
+            ;;
         esac
     done
 
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
-    [[ -z "$skip_build_dir" ]] && create_build_dir "$cmake_build_dir"
+    [[ -z $skip_build_dir ]] && create_build_dir "$cmake_build_dir"
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
@@ -1140,13 +1194,13 @@ do_cmake() {
     unset cmake_extras
 }
 
-do_ninja(){
+do_ninja() {
     extra_script pre ninja
     log "build" ninja "$@"
     extra_script post ninja
 }
 
-do_ninjainstall(){
+do_ninjainstall() {
     extra_script pre install
     cpuCount=1 log "install" ninja install "$@"
     extra_script post install
@@ -1162,10 +1216,12 @@ do_meson() {
     local bindir=""
     local root=".."
     case "$1" in
-    global|audio|video)
-        bindir="--bindir=bin-$1" ;;
+    global | audio | video)
+        bindir="--bindir=bin-$1"
+        ;;
     *)
-        [[ -d "./$1" ]] && root="../$1" || bindir="$1" ;;
+        [[ -d "./$1" ]] && root="../$1" || bindir="$1"
+        ;;
     esac
     shift 1
 
@@ -1190,7 +1246,7 @@ compilation_fail() {
     local operation
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
     if [[ $_notrequired ]]; then
-        if [[ $logging = y ]]; then
+        if [[ $logging == y ]]; then
             echo "Likely error:"
             tail "ab-suite.${operation}.log"
             echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
@@ -1198,12 +1254,12 @@ compilation_fail() {
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        if [[ $noMintty = y ]]; then
+        if [[ $noMintty == y ]]; then
             diff --changed-group-format='%>' --unchanged-group-format='' "$LOCALBUILDDIR/old.var" <(declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/fail.var"
             printf '%s\n%s\n%s\n' "$PWD" "$reasons" "$operation" > "$LOCALBUILDDIR/compilation_failed"
             exit
         else
-            if [[ $logging = y ]]; then
+            if [[ $logging == y ]]; then
                 echo "Likely error:"
                 tail "ab-suite.${operation}.log"
                 echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
@@ -1232,20 +1288,22 @@ strip_ansi() {
 zip_logs() {
     local failed url files
     failed="$(get_first_subdir)"
-    pushd "$LOCALBUILDDIR" >/dev/null || do_exit_prompt "Did you delete /build?"
+    pushd "$LOCALBUILDDIR" > /dev/null || do_exit_prompt "Did you delete /build?"
     rm -f logs.zip
     strip_ansi ./*.log
     files=(/trunk/media-autobuild_suite.bat)
     local option
-    [[ $failed ]] && mapfile -t -O "${#files[@]}" files < \
-        <(find "$failed" -name "*.log")
-    mapfile -t -O "${#files[@]}" files < \
-        <(find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
-        -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders")
-    7za -mx=9 a logs.zip "${files[@]}" >/dev/null
+    [[ $failed ]] && mapfile -t -O "${#files[@]}" files < <(
+        find "$failed" -name "*.log"
+    )
+    mapfile -t -O "${#files[@]}" files < <(
+        find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
+            -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"
+    )
+    7za -mx=9 a logs.zip "${files[@]}" > /dev/null
     [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ -n "$build32$build64" ]] &&
         url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
-    popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
+    popd > /dev/null || do_exit_prompt "Did you delete the previous folder?"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
@@ -1256,14 +1314,14 @@ zip_logs() {
 }
 
 log() {
-    [[ $1 = quiet ]] && local quiet=y && shift
+    [[ $1 == quiet ]] && local quiet=y && shift
     local name="${1// /.}"
     local _cmd="$2"
     shift 2
     local extra
     [[ $quiet ]] || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
-    if [[ $logging = "y" ]]; then
+    if [[ $logging == "y" ]]; then
         printf 'CFLAGS: %s\nLDFLAGS: %s\n%s %s\n' "$CFLAGS" "$LDFLAGS" "$_cmd" "$*" > "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
             { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
@@ -1277,13 +1335,13 @@ log() {
 create_build_dir() {
     local build_dir="build${1:+-$1}-$bits"
     if [[ ! -f "$(get_first_subdir)/do_not_clean" ]]; then
-        if [[ "$(basename "$(pwd)")" = "$build_dir" ]]; then
+        if [[ "$(basename "$(pwd)")" == "$build_dir" ]]; then
             rm -rf ./* && cd_safe ".."
-        elif [[ -d "$build_dir" ]] && ! rm -rf ./"$build_dir"; then
+        elif [[ -d $build_dir ]] && ! rm -rf ./"$build_dir"; then
             cd_safe "$build_dir" && rm -rf ./* && cd_safe ".."
         fi
     fi
-    [[ ! -d "$build_dir" ]] && mkdir "$build_dir"
+    [[ ! -d $build_dir ]] && mkdir "$build_dir"
     cd_safe "$build_dir"
 }
 
@@ -1305,8 +1363,9 @@ do_separate_conf() {
     local bindir=""
     local last config_path
     case "$1" in
-    global|audio|video)
-        bindir="--bindir=$LOCALDESTDIR/bin-$1" ;;
+    global | audio | video)
+        bindir="--bindir=$LOCALDESTDIR/bin-$1"
+        ;;
     *) bindir="$1" ;;
     esac
     shift 1
@@ -1351,15 +1410,15 @@ do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
     local files
-    files="$(pacman -Qql "$packages" 2>/dev/null | /usr/bin/grep .dll.a)"
+    files="$(pacman -Qql "$packages" 2> /dev/null | /usr/bin/grep .dll.a)"
 
     for file in $files; do
         if [[ -f "${file%*.dll.a}.a" ]]; then
-            if [[ -z "$revert" ]]; then
+            if [[ -z $revert ]]; then
                 mv -f "${file}" "${file}.dyn"
-            elif [[ -n "$revert" && -f "${file}.dyn" && ! -f "${file}" ]]; then
+            elif [[ -n $revert && -f "${file}.dyn" && ! -f ${file} ]]; then
                 mv -f "${file}.dyn" "${file}"
-            elif [[ -n "$revert" && -f "${file}.dyn" ]]; then
+            elif [[ -n $revert && -f "${file}.dyn" ]]; then
                 rm -f "${file}.dyn"
             fi
         fi
@@ -1369,12 +1428,12 @@ do_hide_pacman_sharedlibs() {
 do_hide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2>/dev/null)"
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
     done
-    if [[ $dryrun = "n" ]]; then
+    if [[ $dryrun == "n" ]]; then
         printf '%s\n' "${tomove[@]}" | xargs -ri mv -f '{}' '{}.dyn'
     else
         printf '%s\n' "${tomove[@]}"
@@ -1384,17 +1443,17 @@ do_hide_all_sharedlibs() {
 do_unhide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2>/dev/null)"
+    files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
     local tomove=()
     local todelete=()
     for file in $files; do
-        if [[ -f "${file%*.dyn}" ]]; then
+        if [[ -f ${file%*.dyn} ]]; then
             todelete+=("$file")
         else
             tomove+=("${file%*.dyn}")
         fi
     done
-    if [[ $dryrun = "n" ]]; then
+    if [[ $dryrun == "n" ]]; then
         printf '%s\n' "${todelete[@]}" | xargs -ri rm -f '{}'
         printf '%s\n' "${tomove[@]}" | xargs -ri mv -f '{}.dyn' '{}'
     else
@@ -1404,21 +1463,33 @@ do_unhide_all_sharedlibs() {
 }
 
 do_pacman_install() {
-    local installed
-    local pkg
-    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
+    local pkg msyspackage
+    while [ -n "$*" ]; do
+        case "$1" in
+        -m) msyspackage=y ;;
+        *) break ;;
+        esac
+    done
     for pkg; do
-        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") && continue
-        if [[ $timeStamp = y ]]; then
+        [[ $msyspackage != "y" && $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
+            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 && continue
+        if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
             echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         fi
-        if pacman -S --force --noconfirm --needed "$pkg" >/dev/null 2>&1; then
-            pacman -D --asexplicit "$pkg" >/dev/null
-            /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk >/dev/null 2>&1 ||
-                echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+        if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" > /dev/null 2>&1; then
+            pacman -D --asexplicit "$pkg" > /dev/null
+            if [[ $msyspackage == "y" ]]; then
+                /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk > /dev/null 2>&1 ||
+                    echo "${pkg}" >> /etc/pac-msys-extra.pk
+            else
+                /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk > /dev/null 2>&1 ||
+                    echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+            fi
+            sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
+            sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
             echo "done"
         else
             echo "failed"
@@ -1428,24 +1499,36 @@ do_pacman_install() {
 }
 
 do_pacman_remove() {
-    local installed
-    local pkg
-    installed="$(pacman -Qqe | /usr/bin/grep "^${MINGW_PACKAGE_PREFIX}-")"
+    local pkg msyspackage
+    while [ -n "$*" ]; do
+        case "$1" in
+        -m) msyspackage=y ;;
+        *) break ;;
+        esac
+    done
     for pkg; do
-        [[ "$pkg" != "${MINGW_PACKAGE_PREFIX}-"* ]] && pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        [[ -f /etc/pac-mingw-extra.pk ]] &&
-            sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk >/dev/null 2>&1
-        /usr/bin/grep -q "^${pkg}$" <(echo "$installed") || continue
-        if [[ $timeStamp = y ]]; then
+        [[ $msyspackage != "y" && $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
+            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
+        if [[ $msyspackage == "y" ]]; then
+            [[ -f /etc/pac-msys-extra.pk ]] &&
+                sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk > /dev/null 2>&1
+        else
+            [[ -f /etc/pac-mingw-extra.pk ]] &&
+                sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk > /dev/null 2>&1
+        fi
+        sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
+        sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
+        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 || continue
+        if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         else
             echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         fi
         do_hide_pacman_sharedlibs "$pkg" revert
-        if pacman -Rs --noconfirm "$pkg" >/dev/null 2>&1; then
+        if pacman -Rs --noconfirm --ask=20 "$pkg" > /dev/null 2>&1; then
             echo "done"
         else
-            pacman -D --asdeps "$pkg" >/dev/null 2>&1
+            pacman -D --asdeps "$pkg" > /dev/null 2>&1
             echo "failed"
         fi
     done
@@ -1454,15 +1537,14 @@ do_pacman_remove() {
 
 do_prompt() {
     # from http://superuser.com/a/608509
-    while read -r -s -e -t 0.1; do : ; done
+    while read -r -s -e -t 0.1; do :; done
     read -r -p "$1" ret
 }
 
 do_autoreconf() {
     local basedir="$LOCALBUILDDIR"
     basedir+="/$(get_first_subdir)" || basedir="."
-    if { [[ -f "$basedir"/recently_updated &&
-        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
+    if [[ -f "$basedir"/recently_updated && -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]] ||
         [[ ! -f configure ]]; then
         extra_script pre autoreconf
         log "autoreconf" autoreconf -fiv "$@"
@@ -1473,8 +1555,7 @@ do_autoreconf() {
 do_autogen() {
     local basedir="$LOCALBUILDDIR"
     basedir+="/$(get_first_subdir)" || basedir="."
-    if { [[ -f "$basedir"/recently_updated &&
-        -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]]; } ||
+    if [[ -f "$basedir"/recently_updated && -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]] ||
         [[ ! -f configure ]]; then
         safe_git_clean -q
         extra_script pre autogen
@@ -1485,7 +1566,7 @@ do_autogen() {
 
 get_first_subdir() {
     local subdir="${PWD#*build/}"
-    if [[ "$subdir" != "$PWD" ]]; then
+    if [[ $subdir != "$PWD" ]]; then
         subdir="${subdir%%/*}"
         echo "$subdir"
     else
@@ -1505,16 +1586,16 @@ get_last_version() {
     local version="$3"
     local ret
     ret="$(/usr/bin/grep -E "$filter" <<< "$filelist" | sort -V | tail -1)"
-    [[ -n "$version" ]] && ret="$(/usr/bin/grep -oP "$version" <<< "$ret")"
+    [[ -n $version ]] && ret="$(/usr/bin/grep -oP "$version" <<< "$ret")"
     echo "$ret"
 }
 
 create_debug_link() {
     for file; do
-        if [[ -f "$file" && ! -f "$file".debug ]]; then
+        if [[ -f $file && ! -f "$file".debug ]]; then
             echo "Stripping and creating debug link for ${file##*/}..."
             objcopy --only-keep-debug "$file" "$file".debug
-            if [[ ${file: -3} = "dll" ]]; then
+            if [[ ${file: -3} == "dll" ]]; then
                 strip --strip-debug "$file"
             else
                 strip --strip-all "$file"
@@ -1530,26 +1611,26 @@ get_vs_prefix() {
     local regkey="/HKLM/software/vapoursynth/path"
     local embedded
     embedded="$(find "$LOCALDESTDIR"/bin-video -iname vspipe.exe)"
-    if [[ -n "$embedded" ]]; then
+    if [[ -n $embedded ]]; then
         # look for .dlls in bin-video
         vsprefix="${embedded%/*}"
-    elif [[ $bits = 64bit ]] && winvsprefix="$(regtool -q get "$regkey")"; then
+    elif [[ $bits == 64bit ]] && winvsprefix="$(regtool -q get "$regkey")"; then
         # check in native HKLM for installed VS (R31+)
-        [[ -n "$winvsprefix" && -f "$winvsprefix/core64/vspipe.exe" ]] &&
+        [[ -n $winvsprefix && -f "$winvsprefix/core64/vspipe.exe" ]] &&
             vsprefix="$(cygpath -u "$winvsprefix")/core64"
     elif winvsprefix="$(regtool -qW get "$regkey")"; then
         # check in 32-bit registry for installed VS
-        [[ -n "$winvsprefix" && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
+        [[ -n $winvsprefix && -f "$winvsprefix/core${bits%bit}/vspipe.exe" ]] &&
             vsprefix="$(cygpath -u "$winvsprefix/core${bits%bit}")"
-    elif [[ -n $(command -v vspipe.exe 2>/dev/null) ]]; then
+    elif [[ -n $(command -v vspipe.exe 2> /dev/null) ]]; then
         # last resort, check if vspipe is in path
         vsprefix="$(dirname "$(command -v vspipe.exe)")"
     fi
-    if [[ -n "$vsprefix" && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
+    if [[ -n $vsprefix && -f "$vsprefix/vapoursynth.dll" && -f "$vsprefix/vsscript.dll" ]]; then
         local bitness
         bitness="$(file "$vsprefix/vapoursynth.dll")"
-        { [[ $bits = 64bit && $bitness = *x86-64* ]] ||
-            [[ $bits = 32bit && $bitness = *80386* ]]; } &&
+        { [[ $bits == 64bit && $bitness == *x86-64* ]] ||
+            [[ $bits == 32bit && $bitness == *80386* ]]; } &&
             return 0
     else
         return 1
@@ -1557,34 +1638,34 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    command -v cl.exe &>/dev/null && return 0
+    command -v cl.exe &> /dev/null && return 0
 
     local _sys_vswhere
     local _suite_vswhere="/opt/bin/vswhere.exe"
     _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
-    if [[ -f "$_sys_vswhere" ]]; then
+    if [[ -f $_sys_vswhere ]]; then
         vswhere=$_sys_vswhere
-    elif [[ -f "$_suite_vswhere" ]]; then
+    elif [[ -f $_suite_vswhere ]]; then
         vswhere=$_suite_vswhere
     else
-        pushd "$LOCALBUILDDIR" 2>/dev/null || do_exit_prompt "Did you delete /build?"
+        pushd "$LOCALBUILDDIR" 2> /dev/null || do_exit_prompt "Did you delete /build?"
         do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
         [[ -f vswhere.exe ]] || return 1
         do_install vswhere.exe /opt/bin/
         vswhere=$_suite_vswhere
-        popd 2>/dev/null || do_exit_prompt "Did you delete the previous folder?"
+        popd 2> /dev/null || do_exit_prompt "Did you delete the previous folder?"
     fi
 
     local installationpath
     installationpath="$("$vswhere" -latest -property installationPath | tail -n1)"
-    [[ -z "$installationpath" ]] && return 1
+    [[ -z $installationpath ]] && return 1
     # apparently this is MS's official way of knowing the default version ???
     local _version
     _version="$(cat "$installationpath/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")"
     local _hostbits=HostX64
     [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
     local _arch=x64
-    [[ $bits = 32bit ]] && _arch=x86
+    [[ $bits == 32bit ]] && _arch=x86
 
     local basepath
     basepath="$(cygpath -u "$installationpath/VC/Tools/MSVC/$_version/bin/$_hostbits/$_arch")"
@@ -1620,17 +1701,17 @@ get_api_version() {
     [[ -n $(file_installed "$header") ]] && header="$(file_installed "$header")"
     local line="$2"
     local column="$3"
-    [[ ! -f "$header" ]] && printf '' && return
+    [[ ! -f $header ]] && printf '' && return
     /usr/bin/grep "${line:-VERSION}" "$header" | awk '{ print $c }' c="${column:-3}" | sed 's|"||g'
 }
 
 hide_files() {
     local reverse=n echo_cmd
-    [[ $1 = "-R" ]] && reverse=y && shift
-    [[ $dryrun = y ]] && echo_cmd="echo"
+    [[ $1 == "-R" ]] && reverse=y && shift
+    [[ $dryrun == y ]] && echo_cmd="echo"
     for opt; do
-        if [[ $reverse = n ]]; then
-            [[ -f "$opt" ]] && $echo_cmd mv -f "$opt" "$opt.bak"
+        if [[ $reverse == n ]]; then
+            [[ -f $opt ]] && $echo_cmd mv -f "$opt" "$opt.bak"
         else
             [[ -f "$opt.bak" ]] && $echo_cmd mv -f "$opt.bak" "$opt"
         fi
@@ -1640,19 +1721,19 @@ hide_files() {
 hide_conflicting_libs() {
     # meant for rude build systems
     local reverse=n
-    [[ $1 = "-R" ]] && reverse=y && shift
+    [[ $1 == "-R" ]] && reverse=y && shift
     local priority_prefix
     local -a installed
     mapfile -t installed < <(find "$LOCALDESTDIR/lib" -maxdepth 1 -name "*.a")
-    if [[ $reverse = n ]]; then
+    if [[ $reverse == n ]]; then
         hide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     else
         hide_files -R "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     fi
-    if [[ -n "$1" ]]; then
+    if [[ -n $1 ]]; then
         priority_prefix="$1"
         mapfile -t installed < <(find "$priority_prefix/lib" -maxdepth 1 -name "*.a")
-        if [[ $reverse = n ]]; then
+        if [[ $reverse == n ]]; then
             hide_files "${installed[@]//$1/$LOCALDESTDIR}"
         else
             hide_files -R "${installed[@]//$1/$LOCALDESTDIR}"
@@ -1667,11 +1748,11 @@ hide_libressl() {
         lib/pkgconfig/lib{crypto,ssl,tls}.pc)
     local reverse=n
     local _f
-    [[ $1 = "-R" ]] && reverse=y && shift
+    [[ $1 == "-R" ]] && reverse=y && shift
     for _f in ${_hide_files[*]}; do
         _f="$LOCALDESTDIR/$_f"
-        if [[ $reverse = n ]]; then
-            [[ -e "$_f" ]] && mv -f "$_f" "$_f.bak"
+        if [[ $reverse == n ]]; then
+            [[ -e $_f ]] && mv -f "$_f" "$_f.bak"
         else
             [[ -e "$_f.bak" ]] && mv -f "$_f.bak" "$_f"
         fi
@@ -1685,18 +1766,18 @@ add_to_remove() {
 }
 
 clean_suite() {
-    if [[ $timeStamp = y ]]; then
+    if [[ $timeStamp == y ]]; then
         printf "\\n${purple}%(%H:%M:%S)T${reset} %s\\n" -1 "${orange}Deleting status files...${reset}"
     else
         echo -e "\\n\\t${orange}Deleting status files...${reset}"
     fi
-    cd_safe "$LOCALBUILDDIR" >/dev/null
+    cd_safe "$LOCALBUILDDIR" > /dev/null
     find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
     echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
 
-    if [[ $deleteSource = y ]]; then
+    if [[ $deleteSource == y ]]; then
         echo -e "\\t${orange}Deleting temporary build dirs...${reset}"
         find . -maxdepth 5 -name "ab-suite.*.log" -delete
         find . -maxdepth 5 -type d -name "build-*bit" -exec rm -rf {} +
@@ -1728,13 +1809,13 @@ create_diagnostic() {
     do_print_progress "  Creating diagnostics file"
     [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
     rm -f "$LOCALBUILDDIR/diagnostics.txt"
-    echo "Env variables:" >>"$LOCALBUILDDIR/diagnostics.txt"
+    echo "Env variables:" >> "$LOCALBUILDDIR/diagnostics.txt"
     for _env in "${envs[@]}"; do
-        printf '\t%s=%s\n' "$_env" "${!_env}" >>"$LOCALBUILDDIR/diagnostics.txt"
+        printf '\t%s=%s\n' "$_env" "${!_env}" >> "$LOCALBUILDDIR/diagnostics.txt"
     done
-    echo >>"$LOCALBUILDDIR/diagnostics.txt"
+    echo >> "$LOCALBUILDDIR/diagnostics.txt"
     for cmd in "${cmds[@]}"; do
-        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >>"$LOCALBUILDDIR/diagnostics.txt"
+        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >> "$LOCALBUILDDIR/diagnostics.txt"
     done
 }
 
@@ -1755,7 +1836,7 @@ create_winpty_exe() {
 create_ab_pkgconfig() {
     # from https://stackoverflow.com/a/8088167
     local script_file
-    IFS=$'\n' read -r -d '' script_file <<'EOF' || true
+    IFS=$'\n' read -r -d '' script_file << 'EOF' || true
 #!/bin/sh
 
 while true; do
@@ -1796,7 +1877,7 @@ else
 fi
 EOF
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config ]] &&
-        diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config >/dev/null ||
+        diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config > /dev/null ||
         printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config.bat ]] ||
         printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config %*" > "$LOCALDESTDIR"/bin/ab-pkg-config.bat
@@ -1819,18 +1900,18 @@ create_cmake_toolchain() {
     )
 
     [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
-        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake >/dev/null ||
+        diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake > /dev/null ||
         printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
 }
 
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
-    [[ ! -f "$grep_file" ]] && return
+    [[ ! -f $grep_file ]] && return
     local sed_re="$3"
     shift 3
     local sed_files=("$grep_file")
-    [[ -n "$1" ]] && sed_files=("$@")
+    [[ -n $1 ]] && sed_files=("$@")
 
     /usr/bin/grep -q -- "$grep_re" "$grep_file" ||
         /usr/bin/sed -ri -- "$sed_re" "${sed_files[@]}"
@@ -1846,16 +1927,16 @@ compare_with_zeranoe() {
         sed -n '/Configuration/,/Libraries/{/\s*--/{s/\s*//gp}}' | sort)"
     local localopts32=""
     local localopts64=""
-    if [[ "$comparison" = "custom" ]]; then
+    if [[ $comparison == "custom" ]]; then
         local custom32="$LOCALBUILDDIR/ffmpeg_options_32bit.txt"
         local custom64="$LOCALBUILDDIR/ffmpeg_options_64bit.txt"
         local custom="$LOCALBUILDDIR/ffmpeg_options.txt"
-        [[ -f "$custom32" ]] || custom32="$custom"
-        [[ -f "$custom64" ]] || custom64="$custom"
-        if [[ -f "$custom32" ]]; then
+        [[ -f $custom32 ]] || custom32="$custom"
+        [[ -f $custom64 ]] || custom64="$custom"
+        if [[ -f $custom32 ]]; then
             IFS=$'\n' read -d '' -r -a localopts32 < <(do_readoptionsfile "$custom32")
         fi
-        if [[ -f "$custom64" ]]; then
+        if [[ -f $custom64 ]]; then
             IFS=$'\n' read -d '' -r -a localopts64 < <(do_readoptionsfile "$custom64")
         fi
     else
@@ -1885,7 +1966,7 @@ fix_libtiff_pc() {
     local _pkgconfLoc
     _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 |
         sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
-    [[ ! -f "$_pkgconfLoc" ]] && return
+    [[ ! -f $_pkgconfLoc ]] && return
     grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
 }
 
@@ -1908,9 +1989,9 @@ fix_cmake_crap_exports() {
         _oldDestDir="$(grep -oP -m1 '\w:/[\w/]*local(?:32|64)' "$_cmakefile")"
 
         # noop if there's no expected install prefix found
-        [[ -z "$_oldDestDir" ]] && continue
+        [[ -z $_oldDestDir ]] && continue
         # noop if old and current install prefix are equal
-        [[ "$_mixeddestdir" = "$_oldDestDir" ]] && continue
+        [[ $_mixeddestdir == "$_oldDestDir" ]] && continue
 
         # use perl for the matching and replacing, a bit simpler than with sed
         perl -i -p -e 's;([A-Z]:/.*?)local(?:32|64);'"$_mixeddestdir"'\2;' "$_cmakefile"
@@ -1918,39 +1999,46 @@ fix_cmake_crap_exports() {
 }
 
 verify_cuda_deps() {
-    enabled_any libnpp cuda-nvcc cuda-sdk || return 1
-    enabled cuda-sdk && do_removeOption --enable-cuda-sdk &&
-        do_addOption --enable-cuda-nvcc
-    if [[ $bits = 32bit ]]; then
+    enabled cuda-sdk && do_removeOption --enable-cuda-sdk && do_addOption --enable-cuda-nvcc
+    if enabled_any libnpp cuda-nvcc && [[ $license != "nonfree" ]]; then
+        do_removeOption "--enable-(cuda-nvcc|libnpp)"
+    fi
+    if enabled libnpp && [[ $bits == 32bit ]]; then
         echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
         do_removeOption --enable-libnpp
     fi
-    if [[ -z "$CUDA_PATH" || ! -d "$CUDA_PATH" ]]; then
+    if enabled_any libnpp cuda-nvcc && [[ -z $CUDA_PATH || ! -d $CUDA_PATH ]]; then
         echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
         do_removeOption "--enable-(cuda-nvcc|libnpp)"
     fi
     if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
         do_removeOption --enable-libnpp
     fi
+    if ! disabled cuda-llvm && do_pacman_install clang; then
+        do_removeOption --enable-cuda-nvcc
+    else
+        do_removeOption --enable-cuda-llvm
+        do_addOption --disable-cuda-llvm
+    fi
     if enabled cuda-nvcc; then
         if ! get_cl_path; then
             echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere; needed by nvcc.${reset}"
             do_removeOption --enable-cuda-nvcc
-        elif enabled cuda-nvcc && ! command -v nvcc.exe &>/dev/null &&
-            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &>/dev/null; then
+        elif enabled cuda-nvcc && ! command -v nvcc.exe &> /dev/null &&
+            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &> /dev/null; then
             echo -e "${orange}nvcc.exe not found in PATH or installed in CUDA_PATH.${reset}"
             do_removeOption --enable-cuda-nvcc
         fi
     fi
-    enabled_any libnpp cuda-nvcc
+    enabled_any libnpp cuda-nvcc || ! disabled cuda-llvm
 }
 
-check_custom_patches(){
+check_custom_patches() {
     local _basedir
     _basedir="$(get_first_subdir)"
     local vcsFolder="${_basedir%-*}"
     local vcsType="${_basedir##*-}"
-   if [[ -d "$LOCALBUILDDIR" && -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]]; then
+    if [[ -d $LOCALBUILDDIR && -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]]; then
         export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
         export REPO_NAME="${vcsFolder}"
         do_print_progress "Found ${vcsFolder}_extra.sh. Sourcing script"
@@ -1960,26 +2048,26 @@ check_custom_patches(){
     fi
 }
 
-extra_script(){
+extra_script() {
     local stage="$1"
     local commandname="$2"
     local vcsFolder="${REPO_DIR%-*}"
     vcsFolder="${vcsFolder#*build/}"
     if [[ $commandname =~ ^(make|meson|ninja)$ ]] &&
-        type "_${stage}_build" >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null || true
+        type "_${stage}_build" > /dev/null 2>&1; then
+        pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
         log quiet "${stage}_build" "_${stage}_build"
-        popd >/dev/null || true
-    elif type "_${stage}_${commandname}" >/dev/null 2>&1; then
-        pushd "${REPO_DIR}" >/dev/null || true
+        popd > /dev/null || true
+    elif type "_${stage}_${commandname}" > /dev/null 2>&1; then
+        pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
         log quiet "${stage}_${commandname}" "_${stage}_${commandname}"
-        popd >/dev/null || true
+        popd > /dev/null || true
     fi
 }
 
-unset_extra_script(){
+unset_extra_script() {
     # The current repository folder (/build/ffmpeg-git)
     unset REPO_DIR
     # The repository name (ffmpeg)
@@ -2029,6 +2117,157 @@ unset_extra_script(){
     # or make install or using install
     # (do_makeinstall, do_ninjainstall, do_install)
     unset _{pre,post}_install
+}
+
+create_extra_skeleton() {
+    local overwrite
+    while true; do
+        case $1 in
+        -f) overwrite=y && shift ;;
+        --)
+            shift
+            break
+            ;;
+        *) break ;;
+        esac
+    done
+    local extraName="$1"
+    [[ -z $extraName ]] &&
+        printf '%s\n' \
+            'Usage: create_extra_skeleton [-f] <vcs folder name without the vcs type suffix>' \
+            'For example, to create a ffmpeg_extra.sh skeleton file in '"$LOCALBUILDDIR"':' \
+            '> create_extra_skeleton ffmpeg' && return 1
+    [[ -f "$LOCALBUILDDIR/$extraName"_extra.sh && -z $overwrite ]] &&
+        echo "$LOCALBUILDDIR/$extraName_extra.sh already exists. Use -f if you are sure you want to overwrite it." && return 1
+
+    IFS=$'\n' read -r -d '' script_file << 'EOF' || true
+#!/bin/bash
+
+# Force to the suite to think the package has updates to recompile.
+# Alternatively, you can use "touch recompile" for a similar effect.
+#touch custom_updated
+
+# Runs before and after building rust packages (do_rust)
+_pre_rust() {
+    true
+}
+_post_rust() {
+    true
+}
+
+# Runs before and after running autoreconf -fiv (do_autoreconf)
+_pre_autoreconf() {
+    true
+}
+_post_autoreconf() {
+    true
+}
+
+# Runs before and after running ./autogen.sh (do_autogen)
+_pre_autogen() {
+    true
+}
+_post_autogen() {
+    true
+}
+
+# Commands to run before and after running configure on a Autoconf/Automake/configure-using package
+_pre_configure(){
+    true
+    #
+    # Apply a patch from ffmpeg's patchwork site.
+    #do_patch "https://patchwork.ffmpeg.org/patch/12563/mbox/" am
+    #
+    # Apply a local patch inside the directory where is "ffmpeg_extra.sh"
+    #patch -p1 -i "$LOCALBUILDDIR/ffmpeg-0001-my_patch.patch"
+    #
+    # Add extra configure options to ffmpeg (ffmpeg specific)
+    # If you want to add something to ffmpeg not within the suite already
+    # you will need to install it yourself, either through pacman
+    # or compiling from source.
+    #FFMPEG_OPTS+=(--enable-libsvthevc)
+    #
+}
+_post_configure(){
+    true
+}
+
+# Commands to run before and after running cmake (do_cmake)
+_pre_cmake(){
+    true
+    # Installs libwebp
+    #do_pacman_install libwebp
+    # Downloads the patch and then applies the patch
+    #do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
+    # Change directory to the build folder
+    #cd_safe "build-${bits}"
+    # Add additional options to suite's cmake execution
+    #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
+}
+
+_post_cmake(){
+    true
+    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
+    #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
+    #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
+    #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+    # You can also do the same thing in _pre_cmake after creating a 'do_not_reconfigure'
+    # file in the source directory. This way you can avoid running cmake twice.
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+}
+
+# Runs before and after runing make (do_make)
+_pre_make(){
+    true
+}
+_post_make(){
+    true
+    # Don't run configure again.
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+    # Don't clean the build folder on each successive run.
+    # This is for if you want to keep the current build folder as is and just recompile only.
+    #touch "$(get_first_subdir)/do_not_clean"
+}
+
+# Runs before and after running meson (do_meson)
+_pre_meson() {
+    true
+}
+_post_meson() {
+    true
+}
+
+# Runs before and after running ninja (do_ninja)
+_pre_ninja() {
+    true
+}
+_post_ninja() {
+    true
+}
+
+# Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
+# If this is present, it will override the other hooks
+# Use for mpv and python waf based stuff.
+_pre_build() {
+    true
+}
+_post_build() {
+    true
+}
+
+# Runs before and after either ninja install
+# or make install or using install
+# (do_makeinstall, do_ninjainstall, do_install)
+_pre_install() {
+    true
+}
+_post_install() {
+    true
+}
+
+EOF
+    printf '%s' "$script_file" > "${LOCALBUILDDIR}/${extraName}_extra.sh"
+    echo "Created skeleton file ${LOCALBUILDDIR}/${extraName}_extra.sh"
 }
 
 # if you absolutely need to remove some of these,

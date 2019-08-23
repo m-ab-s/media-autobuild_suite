@@ -78,11 +78,11 @@ set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-conf
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
-iconv lzma nvenc schannel zlib sdl2 --disable-debug ffnvcodec nvdec
+iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm
 
 :: common external libs
 set ffmpeg_options_basic=gmp libmp3lame libopus libvorbis libvpx libx264 libx265 ^
-libdav1d
+libdav1d --disable-debug
 
 :: options used in zeranoe builds and not present above
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
@@ -92,28 +92,30 @@ libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
 libaom libopenmpt version3
 
 :: options also available with the suite
-set ffmpeg_options_full=chromaprint cuda-nvcc decklink frei0r libbs2b libcaca ^
-libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libkvazaar ^
-libmodplug libnpp libopenh264 librtmp librubberband libssh ^
-libtesseract libxavs libzmq libzvbi opencl opengl libvmaf libcodec2 ^
-libsrt ladspa libsvthevc #vapoursynth #liblensfun #librav1e
+set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
+libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libsvthevc libsvtav1 ^
+libkvazaar libmodplug librtmp librubberband libssh libtesseract libxavs libzmq ^
+libzvbi openal libvmaf libcodec2 libsrt ladspa #vapoursynth #liblensfun #librav1e
+
+:: options also available with the suite that add shared dependencies
+set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #spirv-cross #d3d11 #jpeg
+#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
 
 :: all supported options
-set mpv_options_full=dvdread dvdnav cdda egl-angle vapoursynth html-build ^
-pdf-build libmpv-shared
+set mpv_options_full=dvdread dvdnav cdda #egl-angle #html-build ^
+#pdf-build libmpv-shared openal
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty svthevc
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty svthevc svtav1
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -425,9 +427,6 @@ if %svthevcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: 64-bit only and requires a CPU with AVX2 instruction set support to run.
-    echo. [Intel Haswell or later, AMD Ryzen or later]
-    echo.
     echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -459,6 +458,29 @@ if %buildvvc%==1 set "vvc=y"
 if %buildvvc%==2 set "vvc=n"
 if %buildvvc% GTR 2 GOTO vvc
 if %deleteINI%==1 echo.vvc=^%buildvvc%>>%ini%
+
+:svtav1
+if %svtav1INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build SVT-AV1? [AV1 encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Look at the link for hardware requirements
+    echo. https://github.com/OpenVisualCloud/SVT-AV1/blob/master/README.md#Hardware
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsvtav1="Build SVT-AV1: "
+) else set buildsvtav1=%svtav1INI%
+
+if "%buildsvtav1%"=="" GOTO svtav1
+if %buildsvtav1%==1 set "svtav1=y"
+if %buildsvtav1%==2 set "svtav1=n"
+if %buildsvtav1% GTR 2 GOTO svtav1
+if %deleteINI%==1 echo.svtav1=^%buildsvtav1%>>%ini%
 
 :flac
 if %flacINI%==0 (
@@ -576,6 +598,7 @@ if %ffmpegB2INI%==0 (
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
     echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
+    echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
     echo. compiled shared so they take less space. This one isn't tested a lot and
@@ -592,7 +615,8 @@ if %buildffmpeg%==2 set "ffmpeg=no"
 if %buildffmpeg%==3 set "ffmpeg=shared"
 if %buildffmpeg%==4 set "ffmpeg=both"
 if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
-if %buildffmpeg% GTR 5 GOTO ffmpeg
+if %buildffmpeg%==6 set "ffmpeg=bothstatic"
+if %buildffmpeg% GTR 6 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
 :ffmpegUp
@@ -649,6 +673,7 @@ if %buildffmpegChoice%==1 (
     if not exist %build%\ffmpeg_options.txt (
         (
             echo.# Lines starting with this character are ignored
+            echo.# To override some options specifically for the shared build, create a ffmpeg_options_shared.txt file.
             echo.
             echo.# Basic built-in options, can be removed if you delete "--disable-autodetect"
             call :writeOption %ffmpeg_options_builtin%
@@ -661,6 +686,9 @@ if %buildffmpegChoice%==1 (
             echo.
             echo.# Full
             call :writeOption %ffmpeg_options_full%
+            echo.
+            echo.# Full plus options that add shared dependencies
+            call :writeOption %ffmpeg_options_full_shared%
             )>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default FFmpeg options has been created in
@@ -772,13 +800,10 @@ if %mpvINI%==0 (
     echo. Build mpv?
     echo. 1 = Yes
     echo. 2 = No
-    echo. 3 = compile with Vapoursynth, if installed [see Warning]
     echo.
     echo. Note: when built with shared-only FFmpeg, mpv is also shared.
-    echo. Note: Requires at least Windows Vista.
-    echo. Warning: the third option isn't completely static. There's no way to include
-    echo. a library dependant on Python statically. All users of the compiled binary
-    echo. will need VapourSynth installed using the official package to even open mpv!
+    echo. Note: the third option was removed since vapoursynth is now a delay-import
+    echo. dependency that is only required if you try to use the corresponding filter.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
@@ -787,8 +812,7 @@ if %mpvINI%==0 (
 if "%buildmpv%"=="" GOTO mpv
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
-if %buildmpv%==3 set "mpv=v"
-if %buildmpv% GTR 3 GOTO mpv
+if %buildmpv% GTR 2 GOTO mpv
 if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
 
 :bmx
@@ -1189,7 +1213,13 @@ if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 ::------------------------------------------------------------------
 ::download and install basic msys2 system:
 ::------------------------------------------------------------------
-cd build
+cd %build%
+set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
+for %%s in (%scripts%) do (
+    if not exist "%build%\%%s" (
+        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+    )
+)
 if exist %build%\msys2-base.tar.xz GOTO unpack
 
 :checkmsys2
@@ -1441,13 +1471,6 @@ echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
 
 cd %build%
-set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
-for %%s in (%scripts%) do (
-    if not exist "%build%\%%s" (
-        %instdir%\%msys2%\usr\bin\wget.exe -t 20 --retry-connrefused --waitretry=2 -c ^
-        https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s
-    )
-)
 if %updateSuite%==y (
     if not exist %instdir%\update_suite.sh (
         echo -------------------------------------------------------------------------------
@@ -1579,6 +1602,16 @@ for /f "tokens=2" %%P in ('tasklist /v ^|findstr MABSbat') do set ourPID=%%P
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
+REM Test mklink availability
+set symlinkSupport=""
+mkdir testmklink
+mklink /d linkedtestmklink testmklink 2>NUL
+if %ERRORLEVEL%==0 (
+    set symlinkSupported="winsymlinks:nativestrict"
+    rmdir /q linkedtestmklink
+)
+rmdir /q testmklink
+
 endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
@@ -1588,11 +1621,12 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --svthevc=%svthevc%
+--noMintty=%noMintty% --svthevc=%svthevc% --svtav1=%svtav1%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
+    set "MSYS=%symlinkSupported%"
 )
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
@@ -1600,7 +1634,8 @@ if %noMintty%==y (
 ) else (
     if exist %CD%\build\compile.log del %CD%\build\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit /usr/bin/bash ^
+    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
+    MSYS=%symlinkSupported% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
 endlocal

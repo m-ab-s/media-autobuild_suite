@@ -34,7 +34,7 @@ For information about the compiler environment see the wiki, there you also have
         - schannel with gmp (mingw)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
             - gmp can be switched by gcrypt (mingw) with --enable-gcrypt
-        - sdl2 (2.0.9) (needed for ffplay)
+        - sdl2 (2.0.10) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - avisynth (needs avisynth dll installed)
@@ -105,6 +105,7 @@ For information about the compiler environment see the wiki, there you also have
         - librubberband (git snapshot)
         - libsrt (git)
         - libssh (mingw)
+        - libsvtav1 (git) (using non-upstream patch)
         - libsvthevc (git) (using non-upstream patch)
         - libtesseract (git)
         - libvmaf (git)
@@ -112,8 +113,10 @@ For information about the compiler environment see the wiki, there you also have
         - libxavs2 (git)
         - libzmq (mingw)
         - libzvbi (0.2.35)
+        - openal (git)
         - opencl (from system)
         - opengl (from system)
+        - vapoursynth (R46)
 
 - other tools
     - aom (git)
@@ -153,7 +156,8 @@ For information about the compiler environment see the wiki, there you also have
             - dvdnav (git)
             - libarchive (mingw)
             - shared libmpv
-            - vapoursynth (if installed or standalone inside /local(32|64))
+            - openal (git)
+            - vapoursynth (R46)
     - opus-tools (git)
     - rav1e (git)
     - redshift (git)
@@ -182,7 +186,8 @@ For information about the compiler environment see the wiki, there you also have
 - NTFS drive
 - 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
 - 4GB+ RAM
-
+- At least Powershell 4, Powershell core is not supported at this time
+  - Powershell 5.1 can be downloaded [here](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 --------
 
 ## Information

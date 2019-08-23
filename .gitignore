@@ -36,3 +36,6 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+
+# Ignore extra files
+*_extra.sh
