@@ -1992,30 +1992,30 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
 
     _check=(libvulkan.a vulkan.pc)
     if ! mpv_disabled vulkan &&
-        do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git#tag=v1.1.114" vulkan-loader; then
-        _shinchiro_patches="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/b1f8bc13/packages"
+        do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
+        _DeadSix27="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master"
         do_uninstall "${_check[@]}"
-        do_patch "$_shinchiro_patches/vulkan-0001-cross-compile-static-linking-hacks.patch"
+        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch"
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
         cd_safe Vulkan-Headers
-            _check=(vulkan/vulkan.h)
+            _check=(vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
             do_uninstall include/vulkan
             do_cmakeinstall
+            do_wget -c -r -q "$_DeadSix27/additional_headers/d3dkmthk.h"
+            do_wget -c -r -q "$_DeadSix27/additional_headers/d3dukmdt.h"
+            do_install d3d{kmthk,ukmdt}.h include/
             do_checkIfExist
             _check=(libvulkan.a vulkan.pc)
         cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
-        CFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-            CPPFLAGS+=" -D_WIN32_WINNT=0x0600 -D__STDC_FORMAT_MACROS" \
-            CXXFLAGS+=" -D__USE_MINGW_ANSI_STDIO -D__STDC_FORMAT_MACROS -fpermissive -D_WIN32_WINNT=0x0600" \
-            do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows  \
-            -DCMAKE_ASM-ATT_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
-            -DENABLE_STATIC_LOADER=ON -DUNIX=off
+        do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows \
+        -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
+        -DENABLE_STATIC_LOADER=ON -DUNIX=off
         log make ninja
         do_install loader/libvulkan.a lib/
         do_install loader/vulkan.pc lib/pkgconfig/
         do_checkIfExist
-        unset _shinchiro_patches
+        unset _DeadSix27
     fi
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
