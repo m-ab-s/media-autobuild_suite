@@ -1445,7 +1445,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
         log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
-        -DENABLE_HDR10_PLUS=ON $xpsupport "$@"
+        -DENABLE_HDR10_PLUS=ON -DCMAKE_CXX_COMPILER="${CXX#ccache }" $xpsupport "$@"
         extra_script post cmake
         do_ninja
     }
