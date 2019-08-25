@@ -1745,6 +1745,10 @@ if [[ $ffmpeg != "no" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
+        if enabled libsvthevc; then
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
+                do_removeOption --enable-libsvthevc
+        fi
 
         # -- SVT-AV1 patches for ffmpeg --
 
@@ -1755,14 +1759,7 @@ if [[ $ffmpeg != "no" ]]; then
 		    do_removeOption --enable-libsvtav1
             #do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch" am ||
             #    do_removeOption --enable-libsvtav1
-        fi
-		
-        if enabled libsvthevc; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
-                do_removeOption --enable-libsvthevc
-        fi
-
-        if enabled libsvtav1; then
+        elif enabled libsvtav1; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch" am ||
                 do_removeOption --enable-libsvtav1
         fi
