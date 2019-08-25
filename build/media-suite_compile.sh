@@ -1745,19 +1745,40 @@ if [[ $ffmpeg != "no" ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
+
+        # -- SVT-AV1 patches for ffmpeg --
+
+        # See issue https://github.com/OpenVisualCloud/SVT-AV1/issues/567 for the reasons behind the changes below.
+        # This is broken in the meantime. Either libsvthevc or libsvtav1 can be enabled, but not both at the same time.
+        # remove the do_removeOption line and uncomment the patch once the issue have been fixed.
+        if enabled libsvthevc && enabled libsvtav1; then
+		    do_removeOption --enable-libsvtav1
+            #do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch" am ||
+            #    do_removeOption --enable-libsvtav1
+        fi
+		
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
         fi
 
-        if enabled libsvthevc && enabled libsvtav1; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch" am ||
-                do_removeOption --enable-libsvtav1
-        elif enabled libsvtav1; then
+        if enabled libsvtav1; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch" am ||
                 do_removeOption --enable-libsvtav1
         fi
 
+        # We are temporarily disabling libaom and libopencore-amrwb due to some conflicts with libsvtav1, if they have been enabled..
+        # These lines can be removed once the problems have been fixed.
+        if enabled libsvtav1 && enabled libaom; then
+            do_removeOption --enable-libaom
+        fi
+
+        if enabled libsvtav1 && enabled libopencore-amrwb; then
+            do_removeOption --enable-libopencore-amrwb
+        fi
+
+        # end of SVT-AV1 patches
+		
         enabled vapoursynth &&
             do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
 
