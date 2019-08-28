@@ -1750,16 +1750,9 @@ if [[ $ffmpeg != "no" ]]; then
             do_removeOption --enable-libsvtav1
         fi
         if enabled libsvtav1; then
-            if enabled libaom && enabled libopencore-amrwb; then
-                do_print_progress "Until SVT-AV1 issues a fix, libaom & libopencore-amrwb must be disabled while libsvtav1 is enabled."
-                do_removeOption --enable-libaom
-                do_removeOption --enable-libopencore-amrwb
-            elif enabled libaom; then
+            if enabled libaom; then
                 do_print_progress "Until SVT-AV1 issues a fix, libaom must be disabled while libsvtav1 is enabled."
                 do_removeOption --enable-libaom
-            elif enabled libopencore-amrwb; then
-                do_print_progress "Until SVT-AV1 issues a fix, libopencore-amrwb must be disabled while libsvtav1 is enabled."
-                do_removeOption --enable-libopencore-amrwb
             fi
         fi
         # end of SVT-AV1 temporary measures
