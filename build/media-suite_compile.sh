@@ -1302,6 +1302,7 @@ elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-AV1.git"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
     do_patch "https://patch-diff.githubusercontent.com/raw/OpenVisualCloud/SVT-AV1/pull/558.patch" am
+    do_patch "https://patch-diff.githubusercontent.com/raw/OpenVisualCloud/SVT-AV1/pull/573.patch" am
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi
