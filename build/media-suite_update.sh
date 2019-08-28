@@ -85,10 +85,10 @@ fi # end suite update
 { /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
 
 #always kill gpg-agent
-gpgconf --kill gpg-agent
+command -v gpgconf.exe && gpgconf --kill gpg-agent
 
 # for some people the signature is broken
-/usr/bin/grep -q Optional /etc/pacman.d/abrepo.conf ||
+test -f /etc/pacman.d/abrepo.conf && /usr/bin/grep -q Optional /etc/pacman.d/abrepo.conf ||
     printf 'Server = %s\nSigLevel = Optional\n' \
         'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
 
