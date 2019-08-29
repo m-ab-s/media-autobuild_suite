@@ -1604,7 +1604,7 @@ if exist %build%\fail_comp del %build%\compilation_failed
 
 REM Test mklink availability
 set symlinkSupport=""
-mkdir testmklink
+mkdir testmklink 2>NUL
 mklink /d linkedtestmklink testmklink 2>NUL >NUL
 if %ERRORLEVEL%==0 (
     set symlinkSupported="winsymlinks:nativestrict"
@@ -1646,16 +1646,16 @@ if not exist %instdir%\%1\share (
     echo.-------------------------------------------------------------------------------
     echo.creating %1-bit install folders
     echo.-------------------------------------------------------------------------------
-    mkdir %instdir%\%1
-    mkdir %instdir%\%1\bin
-    mkdir %instdir%\%1\bin-audio
-    mkdir %instdir%\%1\bin-global
-    mkdir %instdir%\%1\bin-video
-    mkdir %instdir%\%1\etc
-    mkdir %instdir%\%1\include
-    mkdir %instdir%\%1\lib
-    mkdir %instdir%\%1\lib\pkgconfig
-    mkdir %instdir%\%1\share
+    mkdir %instdir%\%1 2>NUL
+    mkdir %instdir%\%1\bin 2>NUL
+    mkdir %instdir%\%1\bin-audio 2>NUL
+    mkdir %instdir%\%1\bin-global 2>NUL
+    mkdir %instdir%\%1\bin-video 2>NUL
+    mkdir %instdir%\%1\etc 2>NUL
+    mkdir %instdir%\%1\include 2>NUL
+    mkdir %instdir%\%1\lib 2>NUL
+    mkdir %instdir%\%1\lib\pkgconfig 2>NUL
+    mkdir %instdir%\%1\share 2>NUL
 )
 goto :EOF
 
