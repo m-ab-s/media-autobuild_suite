@@ -1605,7 +1605,7 @@ if exist %build%\fail_comp del %build%\compilation_failed
 REM Test mklink availability
 set symlinkSupport=""
 mkdir testmklink
-mklink /d linkedtestmklink testmklink 2>NUL
+mklink /d linkedtestmklink testmklink 2>NUL >NUL
 if %ERRORLEVEL%==0 (
     set symlinkSupported="winsymlinks:nativestrict"
     rmdir /q linkedtestmklink
