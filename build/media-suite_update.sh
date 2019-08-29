@@ -81,7 +81,7 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-{ /usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531; } > /dev/null
+{ /usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531 --keyserver 'hkp://keys.gnupg.net/'; } > /dev/null
 { /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
 
 #always kill gpg-agent
