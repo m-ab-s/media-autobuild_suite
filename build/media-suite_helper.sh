@@ -1246,11 +1246,11 @@ do_mesoninstall() {
 }
 
 do_rust() {
-    log "update" "$RUSTUP_HOME/bin/cargo.exe" update
+    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
     # use this array to pass additional parameters to cargo
     rust_extras=()
     extra_script pre rust
-    log "build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
+    log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@" "${rust_extras[@]}"
     extra_script post rust
