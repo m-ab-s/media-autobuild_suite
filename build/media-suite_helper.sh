@@ -1240,6 +1240,18 @@ do_mesoninstall() {
     do_ninjainstall
 }
 
+do_rust() {
+    log "update" "$RUSTUP_HOME/bin/cargo.exe" update
+    # use this array to pass additional parameters to cargo
+    rust_extras=()
+    extra_script pre rust
+    log "build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
+        --target="$CARCH"-pc-windows-gnu \
+        --jobs="$cpuCount" "$@" "${rust_extras[@]}"
+    extra_script post rust
+    unset rust_extras
+}
+
 compilation_fail() {
     [[ -z $build32 || -z $build64 ]] && return 1
     local reason="$1"
@@ -1950,15 +1962,6 @@ compare_with_zeranoe() {
     echo "Missing options from zeranoe 64-bits in $comparison options:"
     comm -23 <(echo "$zeranoe64") <(echo "$localopts64")
     printf '\n'
-}
-
-do_rust() {
-    log "update" "$RUSTUP_HOME/bin/cargo.exe" update
-    extra_script pre rust
-    log "build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
-        --target="$CARCH"-pc-windows-gnu \
-        --jobs="$cpuCount" "$@"
-    extra_script post rust
 }
 
 fix_libtiff_pc() {
