@@ -1182,6 +1182,8 @@ do_cmake() {
 
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     [[ -z $skip_build_dir ]] && create_build_dir "$cmake_build_dir"
+    # use this array to pass additional parameters to cmake
+    cmake_extras=()
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
@@ -1189,7 +1191,7 @@ do_cmake() {
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
-        -DCMAKE_BUILD_TYPE=Release $bindir "${cmake_extras[@]}" "$@"
+        -DCMAKE_BUILD_TYPE=Release $bindir "$@" "${cmake_extras[@]}"
     extra_script post cmake
     unset cmake_extras
 }
@@ -1226,12 +1228,15 @@ do_meson() {
     shift 1
 
     create_build_dir
+    # use this array to pass additional parameters to meson
+    meson_extras=()
     extra_script pre meson
     # shellcheck disable=SC2086
     PKG_CONFIG=pkg-config CC=gcc CXX=g++ \
         log "meson" meson "$root" --default-library=static --buildtype=release \
-        --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@"
+        --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@" "${meson_extras[@]}"
     extra_script post meson
+    unset meson_extras
 }
 
 do_mesoninstall() {
