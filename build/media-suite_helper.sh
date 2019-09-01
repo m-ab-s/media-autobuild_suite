@@ -1231,6 +1231,8 @@ do_meson() {
     # use this array to pass additional parameters to meson
     local meson_extras=()
     extra_script pre meson
+    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+        return
     # shellcheck disable=SC2086
     PKG_CONFIG=pkg-config CC=gcc CXX=g++ \
         log "meson" meson "$root" --default-library=static --buildtype=release \
@@ -1250,6 +1252,8 @@ do_rust() {
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
+    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+        return
     log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@" "${rust_extras[@]}"
