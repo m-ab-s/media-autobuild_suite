@@ -1183,7 +1183,7 @@ do_cmake() {
     local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     [[ -z $skip_build_dir ]] && create_build_dir "$cmake_build_dir"
     # use this array to pass additional parameters to cmake
-    cmake_extras=()
+    local cmake_extras=()
     extra_script pre cmake
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
@@ -1229,7 +1229,7 @@ do_meson() {
 
     create_build_dir
     # use this array to pass additional parameters to meson
-    meson_extras=()
+    local meson_extras=()
     extra_script pre meson
     # shellcheck disable=SC2086
     PKG_CONFIG=pkg-config CC=gcc CXX=g++ \
@@ -1248,7 +1248,7 @@ do_mesoninstall() {
 do_rust() {
     log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
     # use this array to pass additional parameters to cargo
-    rust_extras=()
+    local rust_extras=()
     extra_script pre rust
     log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
