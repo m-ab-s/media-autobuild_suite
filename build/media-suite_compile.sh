@@ -971,7 +971,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
 
     # standalone binary
     if [[ $rav1e = y || $standalone = y ]]; then
-        do_rust
+        do_rust --no-default-features --features=binaries
         do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
     fi
 

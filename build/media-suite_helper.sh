@@ -1957,9 +1957,7 @@ do_rust() {
     extra_script pre rust
     log "build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
-        --jobs="$cpuCount" "$@" \
-		--no-default-features \
-		--features=binaries
+        --jobs="$cpuCount" "$@"
     extra_script post rust
 }
 
