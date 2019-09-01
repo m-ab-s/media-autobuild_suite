@@ -2159,11 +2159,57 @@ create_extra_skeleton() {
 # Alternatively, you can use "touch recompile" for a similar effect.
 #touch custom_updated
 
+# Commands to run before and after running cmake (do_cmake)
+_pre_cmake(){
+    # Installs libwebp
+    #do_pacman_install libwebp
+    # Downloads the patch and then applies the patch
+    #do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
+    # Change directory to the build folder
+    #cd_safe "build-${bits}"
+
+    # Add additional options to suite's cmake execution
+    #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
+
+    # To bypass the suite's cmake execution completely, create a do_not_configure file in the repository root:
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+
+    true
+}
+
+_post_cmake(){
+    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
+    #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
+    #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
+    #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
+    true
+}
+
 # Runs before and after building rust packages (do_rust)
 _pre_rust() {
+    # Add additional options to suite's rust (cargo) execution
+    #rust_extras=(--no-default-features --features=binaries)
+
+    # To bypass the suite's cargo execution completely, create a do_not_configure file in the repository root:
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+
     true
 }
 _post_rust() {
+    true
+}
+
+# Runs before and after running meson (do_meson)
+_pre_meson() {
+    # Add additional options to suite's rust (cargo) execution
+    #meson_extras=(-Denable_tools=true)
+
+    # To bypass the suite's meson execution completely, create a do_not_configure file in the repository root:
+    #touch "$(get_first_subdir)/do_not_reconfigure"
+
+    true
+}
+_post_meson() {
     true
 }
 
@@ -2204,30 +2250,6 @@ _post_configure(){
     true
 }
 
-# Commands to run before and after running cmake (do_cmake)
-_pre_cmake(){
-    true
-    # Installs libwebp
-    #do_pacman_install libwebp
-    # Downloads the patch and then applies the patch
-    #do_patch "https://gist.githubusercontent.com/1480c1/9fa9292afedadcea2b3a3e067e96dca2/raw/50a3ed39543d3cf21160f9ad38df45d9843d8dc5/0001-Example-patch-for-learning-purpose.patch"
-    # Change directory to the build folder
-    #cd_safe "build-${bits}"
-    # Add additional options to suite's cmake execution
-    #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
-}
-
-_post_cmake(){
-    true
-    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
-    #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
-    #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
-    #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
-    # You can also do the same thing in _pre_cmake after creating a 'do_not_reconfigure'
-    # file in the source directory. This way you can avoid running cmake twice.
-    #touch "$(get_first_subdir)/do_not_reconfigure"
-}
-
 # Runs before and after runing make (do_make)
 _pre_make(){
     true
@@ -2239,14 +2261,6 @@ _post_make(){
     # Don't clean the build folder on each successive run.
     # This is for if you want to keep the current build folder as is and just recompile only.
     #touch "$(get_first_subdir)/do_not_clean"
-}
-
-# Runs before and after running meson (do_meson)
-_pre_meson() {
-    true
-}
-_post_meson() {
-    true
 }
 
 # Runs before and after running ninja (do_ninja)
