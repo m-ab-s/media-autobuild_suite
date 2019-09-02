@@ -1240,7 +1240,7 @@ do_meson() {
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
     # shellcheck disable=SC2086
-    PKG_CONFIG=pkg-config CC=gcc CXX=g++ \
+    PKG_CONFIG=pkg-config CC=gcc.bat CXX=g++.bat \
         log "meson" meson "$root" --default-library=static --buildtype=release \
         --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@" "${meson_extras[@]}"
     extra_script post meson
@@ -1912,6 +1912,44 @@ EOF
         printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
 }
 
+create_ab_ccache() {
+    local bin
+    for bin in {$MINGW_CHOST-,}{gcc,g++} clang{,++} cc cpp c++; do
+        if [[ ! -f "$LOCALDESTDIR/bin/$bin.bat" ]] || ! "$LOCALDESTDIR/bin/$bin.bat" --help > /dev/null 2>&1; then
+            printf '%s\r\n' \
+                '@echo off >nul 2>&1' \
+                'rem() { "$@"; }' \
+                'rem test -f nul && rm nul' \
+                'rem ccache > /dev/null 2>&1' \
+                "rem test \$? -ne 127 && ccache $bin \"\$@\"" \
+                'rem exit $?' \
+                "$(cygpath -m "$MINGW_PREFIX/bin/ccache") $bin %*" \
+                'exit %ERRORLEVEL%' \
+                'goto :EOF' \
+                ':args' \
+                'if -%1-==-- (' \
+                '    exit /b' \
+                ')' \
+                'test -f %1' \
+                'if %ERRORLEVEL%==0 (' \
+                '    for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
+                '    shift' \
+                ') else (' \
+                '    test -d %1' \
+                '    if %ERRORLEVEL%==0 (' \
+                '        for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
+                '        shift' \
+                '    ) else (' \
+                '        set "ARGS=%ARGS% %1"' \
+                '        shift' \
+                '    )' \
+                ')' \
+                'goto :args' > "$LOCALDESTDIR/bin/$bin.bat"
+        fi
+        chmod +x "$LOCALDESTDIR/bin/$bin.bat"
+    done
+}
+
 create_cmake_toolchain() {
     local _win_path_LOCALDESTDIR _win_path_MINGW_PREFIX
     _win_path_LOCALDESTDIR="$(cygpath -m "$LOCALDESTDIR")"
@@ -1924,8 +1962,8 @@ create_cmake_toolchain() {
         "SET(CMAKE_PREFIX_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
-        "SET(CMAKE_CXX_COMPILER_LAUNCHER ccache)"
-        "SET(CMAKE_C_COMPILER_LAUNCHER ccache)"
+        "SET(CMAKE_C_COMPILER $_win_path_LOCALDESTDIR/bin/gcc.bat)"
+        "SET(CMAKE_CXX_COMPILER $_win_path_LOCALDESTDIR/bin/g++.bat)"
     )
 
     [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
