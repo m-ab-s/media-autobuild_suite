@@ -1174,6 +1174,9 @@ do_cmake() {
             if [[ -d "./$1" ]]; then
                 [[ -n $skip_build_dir ]] && root="./$1" || root="../$1"
                 shift
+            elif [[ -d "../$1" ]]; then
+                root="../$1"
+                shift
             fi
             break
             ;;
