@@ -2000,7 +2000,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_checkIfExist
     fi
 
-    _check=(libvulkan.a vulkan.pc)
+    _check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
     if ! mpv_disabled vulkan &&
         do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
         _DeadSix27="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master"
@@ -2009,16 +2009,15 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
         cd_safe Vulkan-Headers
-            _check=(vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
+            do_print_progress "Installing Vulkan-Headers"
             do_uninstall include/vulkan
             do_cmakeinstall
             do_wget -c -r -q "$_DeadSix27/additional_headers/d3dkmthk.h"
             do_wget -c -r -q "$_DeadSix27/additional_headers/d3dukmdt.h"
             do_install d3d{kmthk,ukmdt}.h include/
-            do_checkIfExist
-            _check=(libvulkan.a vulkan.pc)
         cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
-        do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows \
+        do_print_progress "Building Vulkan-Loader"
+        do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
         -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
         -DENABLE_STATIC_LOADER=ON -DUNIX=off
         log make ninja
