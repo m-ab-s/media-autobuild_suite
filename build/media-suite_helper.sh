@@ -1093,21 +1093,19 @@ do_removeOptions() {
 do_patch() {
     local binarypatch="--binary"
     case $1 in -p) binarypatch="" && shift ;; esac
-    local patch=${1%% *}       # Location or link to patch.
-    local am=$2                # Use git am to apply patch. Use with .patch files
-    local strip=${3:-1}        # Leading directories to strip. "patch -p${strip}"
+    local patch="${1%% *}"     # Location or link to patch.
     local patchName="${1##* }" # Basename of file. (test-diff-files.diff)
+    local am=false             # Use git am to apply patch. Use with .patch files
+    local strip=${3:-1}        # Leading directories to strip. "patch -p${strip}"
     [[ $patchName == "$patch" ]] && patchName="${patch##*/}"
+    [[ $2 == am ]] && am=true
 
-    if [[ -z $patchName ]]; then
-        # hack for URLs without filename
-        patchName="$(/usr/bin/curl -sI "$patch" | grep -Pio '(?<=filename=)(.+)')"
-        if [[ -z $patchName ]]; then
-            echo -e "${red}Failed to apply patch '$patch'${reset}"
-            echo -e "${red}Patch without filename, ignoring. Specify an explicit filename.${reset}"
-            return 1
-        fi
-    fi
+    # hack for URLs without filename
+    patchName=${patchName:-"$(/usr/bin/curl -sI "$patch" | grep -Eo 'filename=.*$' | sed 's/filename=//')"}
+    [[ -z $patchName ]] &&
+        printf '%b\n' "${red}Failed to apply patch '$patch'" \
+            "Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
+        return 1
 
     # Just don't. Make a fork or use the suite's directory as the root for
     # your diffs or manually edit the scripts if you are trying to modify
@@ -1118,43 +1116,35 @@ do_patch() {
         do_exit_prompt "Running patches in the build folder is not supported.
         Please make a patch for individual folders or modify the script directly"
 
-    if [[ ${patch:0:4} == "http" ]] || [[ ${patch:0:3} == "ftp" ]]; then
-        # Filter out patches that would require curl
-        do_wget -c -r -q "$patch" "$patchName"
-    elif [[ -f $patch ]]; then
-        # Check if the patch is a local patch and copy it to the current dir
-        patch="$(realpath "$patch")" # Resolve fullpatch
-        [[ ${patch%/*} != "$PWD" ]] &&
-            cp -f "$patch" "$patchName" > /dev/null 2>&1
-    else
-        # Fall through option if the patch is from some other protocol
-        # I don't know why anyone would use this but just in case.
-        do_wget -c -r -q "$patch" "$patchName"
+    # Filter out patches that would require curl; else
+    # check if the patch is a local patch and copy it to the current dir
+    if ! do_wget -c -r -q "$patch" "$patchName" && [[ -f $patch ]]; then
+        patch="$(
+            cd_safe "$(dirname "$patch")"
+            printf '%s' "$(pwd -P)" '/' "$(basename -- "$patch")"
+
+        )" # Resolve fullpath
+        [[ ${patch%/*} != "$PWD" ]] && cp -f "$patch" "$patchName" > /dev/null 2>&1
     fi
 
     if [[ -f $patchName ]]; then
-        if [[ $am == "am" ]]; then
-            if ! git am -q --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1; then
-                git am -q --abort
-                echo -e "${orange}${patchName}${reset}"
-                echo -e "\\tPatch couldn't be applied with 'git am'. Continuing without patching."
-                return 1
-            fi
+        if $am; then
+            git apply --check --ignore-space-change --ignore-whitespace "$patchName" > /dev/null 2>&1 &&
+                git am -q --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1 &&
+                return 0
+            git am -q --abort > /dev/null 2>&1
         else
-            if patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" > /dev/null 2>&1; then
-                patch $binarypatch -s -N -p"$strip" -i "$patchName"
-            else
-                echo -e "${orange}${patchName}${reset}"
-                echo -e "\\tPatch couldn't be applied with 'patch'. Continuing without patching."
-                return 1
-            fi
+            patch --dry-run $binarypatch -s -N -p"$strip" -i "$patchName" > /dev/null 2>&1 &&
+                patch $binarypatch -s -N -p"$strip" -i "$patchName" &&
+                return 0
         fi
+        printf '%b\n' "${orange}${patchName}${reset}" \
+            '\tPatch could not be applied with `'"$($am && echo "git am" || echo "patch")"'`. Continuing without patching.'
     else
-        echo -e "${orange}${patchName}${reset}"
-        echo -e '\tPatch not found anywhere. Continuing without patching.'
-        return 1
+        printf '%b\n' "${orange}${patchName}${reset}" \
+            '\tPatch not found anywhere. Continuing without patching.'
     fi
-    return 0
+    return 1
 }
 
 do_custom_patches() {
