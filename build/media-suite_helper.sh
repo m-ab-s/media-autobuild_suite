@@ -333,14 +333,14 @@ check_hash() {
 
 # get wget download
 do_wget() {
-    local nocd norm quiet hash notmodified
+    local nocd=false norm=false quiet=false notmodified=false hash
     while true; do
         case $1 in
-        -c) nocd=nocd && shift ;;
-        -r) norm=y && shift ;;
-        -q) quiet=y && shift ;;
+        -c) nocd=true && shift ;;
+        -r) norm=true && shift ;;
+        -q) quiet=true && shift ;;
         -h) hash="$2" && shift 2 ;;
-        -z) notmodified=y && shift ;;
+        -z) notmodified=true && shift ;;
         --)
             shift
             break
@@ -348,52 +348,65 @@ do_wget() {
         *) break ;;
         esac
     done
-    local url="$1" archive="$2" dirName="$3" response_code curlcmds tries=1
+    local url="$1" archive="$2" dirName="$3" response_code=000 curlcmds=("${curl_opts[@]}") tries=1 temp_file
     if [[ -z $archive ]]; then
         # remove arguments and filepath
         archive=${url%%\?*}
         archive=${archive##*/}
     fi
-    [[ ! $dirName ]] && dirName=$(guess_dirname "$archive")
-
-    [[ ! $nocd ]] && cd_safe "$LOCALBUILDDIR"
-    if ! check_hash "$archive" "$hash"; then
-        curlcmds=("${curl_opts[@]}")
-        [[ $notmodified && -f $archive ]] && curlcmds+=(-z "$archive" -R)
-        [[ $hash ]] && tries=3
-        while [[ $tries -gt 0 ]]; do
-            response_code="$("${curlcmds[@]}" -w "%{response_code}" -o "$archive" "$url")"
-            ((tries -= 1))
-
-            if [[ $response_code == "200" || $response_code == "226" ]]; then
-                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
-            elif [[ $response_code == "304" ]]; then
-                [[ $quiet ]] || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
-            fi
-            if check_hash "$archive" "$hash"; then
-                tries=0
-            else
-                rm -f "$archive"
-            fi
-        done
-        if [[ $response_code -gt 400 || $response_code == "000" ]]; then
-            if [[ -f $archive ]]; then
-                echo -e "${orange}${archive}${reset}"
-                echo -e '\tFile not found online. Using local copy.'
-            else
-                do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
-                echo "Error $response_code while downloading $url"
-                echo "<Ctrl+c> to cancel build or <Enter> to continue"
-                do_prompt "if you're sure nothing depends on it."
-                return 1
-            fi
-        fi
-    else
-        [[ $quiet ]] || do_print_status "${bold}├${reset} ${dirName:-$archive}" "$green" "File up-to-date"
+    if [[ -f $url ]]; then
+        return 1
     fi
-    [[ $norm ]] || add_to_remove "$(pwd)/$archive"
+    archive=${archive:-"$(/usr/bin/curl -sI "$url" | grep -Eo 'filename=.*$' | sed 's/filename=//')"}
+    [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
+
+    $nocd || cd_safe "$LOCALBUILDDIR"
+    $notmodified && [[ -f $archive ]] && curlcmds+=(-z "$archive" -R)
+    [[ $hash ]] && tries=3
+
+    while [[ $tries -gt 0 ]]; do
+        temp_file=$(mktemp)
+        response_code=$("${curlcmds[@]}" -w "%{http_code}" -o "$temp_file" "$url")
+
+        if diff "$archive" "$temp_file" > /dev/null 2>&1 ||
+            [[ -n $hash ]] && check_hash "$archive" "$hash"; then
+            $quiet || do_print_status "${bold}├${reset} ${dirName:-$archive}" "$green" "File up-to-date"
+            rm -f "$temp_file"
+            break
+        fi
+
+        ((tries -= 1))
+
+        case $response_code in
+        2**)
+            $quiet || do_print_status "┌ ${dirName:-$archive}" "$orange" "Downloaded"
+            check_hash "$temp_file" "$hash" && cp -f "$temp_file" "$archive"
+            rm -f "$temp_file"
+            break
+            ;;
+        304)
+            $quiet || do_print_status "┌ ${dirName:-$archive}" "$orange" "File up-to-date"
+            rm -f "$temp_file"
+            break
+            ;;
+        esac
+
+        if check_hash "$archive" "$hash"; then
+            printf '%b\n' "${orange}${archive}${reset}" \
+                '\tFile not found online. Using local copy.'
+        else
+            do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
+            printf '%s\n' "Error $response_code while downloading $url" \
+                "<Ctrl+c> to cancel build or <Enter> to continue"
+            do_prompt "if you're sure nothing depends on it."
+            rm -f "$temp_file"
+            return 1
+        fi
+    done
+
+    $norm || add_to_remove "$(pwd)/$archive"
     do_extract "$archive" "$dirName"
-    [[ ! $norm && $dirName && ! $nocd ]] && add_to_remove
+    ! $norm && [[ -n $dirName ]] && ! $nocd && add_to_remove
     [[ -z $response_code || $response_code != "304" ]] && return 0
 }
 
