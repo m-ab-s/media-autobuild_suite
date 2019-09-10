@@ -438,7 +438,7 @@ real_extract() {
 }
 
 do_extract() {
-    local nocd="${nocd:-}"
+    local nocd="${nocd:-false}"
     local archive="$1" dirName="$2"
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
@@ -451,13 +451,13 @@ do_extract() {
             rm -rf "$dirName"
         fi
     elif [[ -d $dirName ]]; then
-        [[ $nocd ]] || cd_safe "$dirName"
+        $nocd || cd_safe "$dirName"
         return 0
     elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
-    [[ $nocd ]] || cd_safe "$dirName"
+    $nocd || cd_safe "$dirName"
 }
 
 do_wget_sf() {
