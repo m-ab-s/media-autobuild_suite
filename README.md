@@ -117,7 +117,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R47)
+        - vapoursynth (R47.2)
 
 - other tools
     - aom (git)
@@ -153,7 +153,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git snapshot)
             - uchardet (mingw)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R47)
+            - vapoursynth (R47.2)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw)
