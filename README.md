@@ -20,6 +20,7 @@ For information about the compiler environment see the wiki, there you also have
     - Light build:
         - amd amf encoders (built-in)
         - cuda (built-in)
+        - cuda-llvm (built-in)
         - cuvid (built-in)
         - ffnvcodec (git)
         - libdav1d (git)
@@ -116,7 +117,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R46)
+        - vapoursynth (R47)
 
 - other tools
     - aom (git)
@@ -140,7 +141,8 @@ For information about the compiler environment see the wiki, there you also have
     - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - Base build (ffmpegChoice=2 or 3)
-            - ANGLE (from <https://i.fsbn.eu/pub/angle/>)
+            - ANGLE Headers (git)
+                - requires ANGLE shared libraries from somewhere else (i.e. Chrome, Firefox) for gpu-context=angle support
             - lcms2 (mingw)
             - libass (git)
             - libbluray (git)
@@ -150,13 +152,13 @@ For information about the compiler environment see the wiki, there you also have
             - mujs (git)
             - rubberband (git snapshot)
             - uchardet (mingw)
-            - vulkan, shaderc, crossc (git)
+            - vulkan, shaderc, spirv-cross, libplacebo (git)
+            - vapoursynth (R47)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw)
             - shared libmpv
             - openal (git)
-            - vapoursynth (R46)
     - opus-tools (git)
     - rav1e (git)
     - redshift (git)
