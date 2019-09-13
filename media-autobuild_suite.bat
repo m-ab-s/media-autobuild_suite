@@ -109,7 +109,7 @@ set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
 
 :: all supported options
-set mpv_options_full=dvdread dvdnav cdda #egl-angle #html-build ^
+set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build libmpv-shared openal
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^

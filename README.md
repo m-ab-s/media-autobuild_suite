@@ -152,7 +152,6 @@ For information about the compiler environment see the wiki, there you also have
             - uchardet (mingw)
             - vulkan, shaderc, crossc (git)
         - Full build (ffmpegChoice=4)
-            - dvdread (git)
             - dvdnav (git)
             - libarchive (mingw)
             - shared libmpv

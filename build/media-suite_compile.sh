@@ -1018,7 +1018,7 @@ if { { [[ $ffmpeg != "no" ]] &&
 fi
 
 _check=(libdvdread.{l,}a dvdread.pc)
-if { [[ $mplayer = "y" ]] || mpv_enabled_any dvdread dvdnav; } &&
+if { [[ $mplayer = "y" ]] || mpv_enabled dvdnav; } &&
     do_vcs "https://code.videolan.org/videolan/libdvdread.git" dvdread; then
     do_autoreconf
     do_uninstall include/dvdread "${_check[@]}"
