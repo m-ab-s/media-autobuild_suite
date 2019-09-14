@@ -2352,7 +2352,7 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 clean_suite
-if [[ -f "$LOCALBUILDDIR"/post_suite.sh ]];
+if [[ -f "$LOCALBUILDDIR"/post_suite.sh ]]; then
     do_simple_print -p "${green}Executing post_suite.sh${reset}"
     source "$LOCALBUILDDIR"/post_suite.sh || true
 fi
