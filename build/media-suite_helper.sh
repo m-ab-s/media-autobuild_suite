@@ -39,16 +39,22 @@ do_simple_print() {
 }
 
 do_print_status() {
+    local _prefix _prefixpad=0
+    if [[ $1 == prefix ]]; then
+        _prefix="$2" && shift 2
+        _prefixpad=2
+    fi
     local name="$1 "
     local color="$2"
     local status="$3"
     local pad
     printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
     if [[ $timeStamp == y ]]; then
-        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s %s [%s]\n' -1 "${bold}$name${reset}" \
-            "${pad:0:$((ncols - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
+        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%s %s [%s]\n' -1 "$_prefix" "${bold}$name${reset}" \
+            "${pad:0:$((ncols - ${_prefixpad} - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
     else
-        printf '%s %s [%s]\n' "${bold}$name${reset}" "${pad:0:$((ncols - ${#name} - ${#status} - 3))}" "${color}${status}${reset}"
+        printf '%s%s %s [%s]\n' "$_prefix" "${bold}$name${reset}" \
+            "${pad:0:$((ncols - ${_prefixpad} - ${#name} - ${#status} - 2))}" "${color}${status}${reset}"
     fi
 }
 
@@ -297,7 +303,7 @@ do_vcs() {
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
         if [[ -f recompile ]]; then
             do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
-            do_print_status "${bold}├${reset} Found recompile flag" "$orange" "Recompiling"
+            do_print_status prefix "${bold}├${reset} " "Found recompile flag" "$orange" "Recompiling"
         else
             return 1
         fi
@@ -370,7 +376,7 @@ do_wget() {
 
         if diff "$archive" "$temp_file" > /dev/null 2>&1 ||
             [[ -n $hash ]] && check_hash "$archive" "$hash"; then
-            $quiet || do_print_status "${bold}├${reset} ${dirName:-$archive}" "$green" "File up-to-date"
+            $quiet || do_print_status prefix "${bold}├${reset} " "${dirName:-$archive}" "$green" "File up-to-date"
             rm -f "$temp_file"
             break
         fi
@@ -633,7 +639,7 @@ files_exist() {
     [[ $list ]] && verbose= && soft=y
     for opt; do
         if file=$(file_installed "$opt"); then
-            [[ $verbose && $soft ]] && do_print_status "${bold}├${reset} $file" "${green}" "Found"
+            [[ $verbose && $soft ]] && do_print_status "├ $file" "${green}" "Found"
             if [[ $list ]]; then
                 if [[ $ignorebinaries && $file =~ .(exe|com)$ ]]; then
                     continue
@@ -641,7 +647,7 @@ files_exist() {
                 printf "%s%b" "$file" "$term"
             fi
         else
-            [[ $verbose ]] && do_print_status "${bold}├${reset} $file" "${red}" "Not found"
+            [[ $verbose ]] && do_print_status prefix "${bold}├${reset} " "$file" "${red}" "Not found"
             [[ ! $soft ]] && return 1
         fi
     done
@@ -1286,7 +1292,7 @@ compilation_fail() {
     operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
     if [[ $_notrequired ]]; then
         if [[ $logging == y ]]; then
-            echo "Likely error:"
+            echo "Likely error (tail of the failed operation logfile):"
             tail "ab-suite.${operation}.log"
             echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
         fi
@@ -1299,7 +1305,7 @@ compilation_fail() {
             exit
         else
             if [[ $logging == y ]]; then
-                echo "Likely error:"
+                echo "Likely error (tail of the failed operation logfile):"
                 tail "ab-suite.${operation}.log"
                 echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
             fi
