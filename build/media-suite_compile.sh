@@ -1777,6 +1777,8 @@ if [[ $ffmpeg != "no" ]]; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch" am ||
                 do_removeOption --enable-libsvtav1
         fi
+        enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
+        enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
 
         enabled vapoursynth &&
             do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
@@ -1784,7 +1786,8 @@ if [[ $ffmpeg != "no" ]]; then
         # librav1e
         if enabled librav1e; then
             # do_patch "https://patchwork.ffmpeg.org/patch/13874/mbox/" am ||
-                do_removeOption "--enable-librav1e"
+            do_removeOption "--enable-librav1e"
+            do_removeOption FFMPEG_OPTS_SHARED "--enable-librav1e"
         fi
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
@@ -1794,7 +1797,10 @@ if [[ $ffmpeg != "no" ]]; then
 
         if enabled openal; then
             do_patch "https://gist.githubusercontent.com/Helenerineium/406d836f81f99a0656bdaf885265ca2e/raw/openal-pkgconfig.patch" ||
-                do_removeOption "--enable-openal"
+                {
+                    do_removeOption "--enable-openal"
+                    do_removeOption FFMPEG_OPTS_SHARED "--enable-openal"
+                }
         fi
 
         _patches="$(git rev-list origin/master.. --count)"
