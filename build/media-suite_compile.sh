@@ -2352,6 +2352,10 @@ while [[ $new_updates = "yes" ]]; do
 done
 
 clean_suite
+if [[ -f "$LOCALBUILDDIR"/post_suite.sh ]];
+    do_simple_print -p "${green}Executing post_suite.sh${reset}"
+    source "$LOCALBUILDDIR"/post_suite.sh || true
+fi
 do_simple_print -p "${green}Compilation successful.${reset}"
 do_simple_print -p "${green}This window will close automatically in 5 seconds.${reset}"
 sleep 5
