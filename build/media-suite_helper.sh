@@ -550,30 +550,42 @@ do_zipman() {
 do_checkIfExist() {
     local packetName
     packetName="$(get_first_subdir)"
+    local packageDir="${LOCALBUILDDIR}/${packetName}"
+    local buildSuccessFile="${packageDir}/build_successful${bits}"
     local dry="${dry:-n}"
-    local check=("${_check[@]}")
+    local check=()
+    if [[ -n $1 ]]; then
+        check+=("$@")
+    else
+        check+=("${_check[@]}")
+        unset _check
+    fi
+    unset_extra_script
     [[ -z ${check[*]} ]] && echo "No files to check" && exit 1
     if [[ $dry == y ]]; then
         files_exist -v -s "${check[@]}"
+        return $?
+    fi
+    if files_exist -v "${check[@]}"; then
+        [[ $stripping == y ]] && do_strip "${check[@]}"
+        [[ $packing == y ]] && do_pack "${check[@]}"
+        do_print_status "└ $packetName" "$blue" "Updated"
+        [[ $build32 == yes || $build64 == yes ]] && [[ -d "$packageDir" ]] &&
+            touch "$buildSuccessFile"
     else
-        if files_exist -v "${check[@]}"; then
-            [[ $stripping == y ]] && do_strip "${check[@]}"
-            [[ $packing == y ]] && do_pack "${check[@]}"
-            do_print_status "└ $packetName" "$blue" "Updated"
-            [[ $build32 == yes || $build64 == yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-                touch "$LOCALBUILDDIR/$packetName/build_successful$bits"
+        [[ $build32 == yes || $build64 == yes ]] && [[ -d "$packageDir" ]] &&
+            rm -f "$buildSuccessFile"
+        do_print_status "└ $packetName" "$red" "Failed"
+        if [[ $_notrequired ]]; then
+            printf '%s\n' \
+                "$orange"'Package failed to build, but is not required; proceeding with compilation.'"$reset"
         else
-            [[ $build32 == yes || $build64 == yes ]] && [[ -d "$LOCALBUILDDIR/$packetName" ]] &&
-                rm -f "$LOCALBUILDDIR/$packetName/build_successful$bits"
-            do_print_status "└ $packetName" "$red" "Failed"
-            echo
-            echo "Try deleting '$LOCALBUILDDIR/$packetName' and start the script again."
-            echo "If you're sure there are no dependencies <Enter> to continue building."
+            printf '%s\n' \
+                '' "Try deleting '$packageDir' and start the script again." \
+                'If you are sure there are no dependencies, <Enter> to continue building.'
             do_prompt "Close this window if you wish to stop building."
         fi
     fi
-    unset _check
-    unset_extra_script
 }
 
 file_installed() {
