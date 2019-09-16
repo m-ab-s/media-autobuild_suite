@@ -1379,16 +1379,35 @@ log() {
 }
 
 create_build_dir() {
-    local build_dir="build${1:+-$1}-$bits"
-    if [[ ! -f "$(get_first_subdir)/do_not_clean" ]]; then
-        if [[ "$(basename "$(pwd)")" == "$build_dir" ]]; then
-            rm -rf ./* && cd_safe ".."
-        elif [[ -d $build_dir ]] && ! rm -rf ./"$build_dir"; then
-            cd_safe "$build_dir" && rm -rf ./* && cd_safe ".."
-        fi
+    local print_build_dir=false nocd=${nocd:-false} norm=false build_root build_dir getoptopt OPTARG OPTIND
+    build_root="$LOCALBUILDDIR/$(get_first_subdir)"
+    while getopts ":pcrC:" getoptopt; do
+        case $getoptopt in
+        p) print_build_dir=true ;;
+        c) nocd=true ;;
+        r) norm=true ;;
+        C) build_root="$OPTARG" ;;
+        \?)
+            echo "Invalid Option: -$OPTARG" 1>&2
+            return 1
+            ;;
+        :)
+            echo "Invalid option: $OPTARG requires an argument" 1>&2
+            return 1
+            ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+
+    build_dir="$build_root/build${1:+-$1}-$bits"
+
+    if [[ -d $build_dir && ! -f $LOCALBUILDDIR/$(get_first_subdir)/do_not_clean ]]; then
+        $norm || rm -rf "$build_dir" ||
+            (cd_safe "$build_dir" && rm -rf ./*)
     fi
-    [[ ! -d $build_dir ]] && mkdir "$build_dir"
-    cd_safe "$build_dir"
+    [[ ! -d $build_dir ]] && mkdir -p "$build_dir"
+    $nocd || cd_safe "$build_dir"
+    $print_build_dir && printf '%s\n' "$build_dir"
 }
 
 get_external_opts() {
