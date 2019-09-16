@@ -1240,7 +1240,7 @@ if [[ $ffmpeg != "no" ]] && enabled_any frei0r ladspa; then
         do_uninstall "${_check[@]}"
         [[ -f config.mak ]] && log clean make distclean
         sed -i 's|__declspec(dllexport)||g' dlfcn.h
-        do_configure --prefix="$LOCALDESTDIR" --disable-shared
+        do_configure --disable-shared
         do_make && do_makeinstall
         do_checkIfExist
     fi
