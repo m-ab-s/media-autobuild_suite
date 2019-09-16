@@ -1133,7 +1133,7 @@ if [[ $ffmpeg != "no" ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" 
     [[ -f "libxavs.a" ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
     sed -i 's|"NUL"|"/dev/null"|g' configure
-    do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR"
+    do_configure
     do_make libxavs.a
     for _file in xavs.h libxavs.a xavs.pc; do do_install "$_file"; done
     do_checkIfExist
