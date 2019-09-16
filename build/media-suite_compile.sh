@@ -1846,12 +1846,10 @@ if [[ $ffmpeg != "no" ]]; then
             do_uninstall bin-video/ffmpegSHARED "${_uninstall[@]}"
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir shared
-            extra_script pre configure
-            CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
+            config_path=.. CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
             LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
-                log configure ../configure \
+                do_configure \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
-            extra_script post configure
             # cosmetics
             sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
             do_make && do_makeinstall
