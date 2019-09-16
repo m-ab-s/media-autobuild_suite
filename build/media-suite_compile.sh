@@ -2257,7 +2257,7 @@ if [[ $cyanrip = y ]]; then
                 fi
             )
             create_build_dir cyan
-            log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+            config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
