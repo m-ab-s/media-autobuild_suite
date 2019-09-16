@@ -1342,24 +1342,20 @@ if [[ $x264 != no ]]; then
                 mapfile -t audio_codecs < <(
                     sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c |
                     sed -n 's/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p')
-                extra_script pre configure
-                LDFLAGS+=" -L$MINGW_PREFIX/lib" \
-                    log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                config_path=.. LDFLAGS+=" -L$MINGW_PREFIX/lib" \
+                    do_configure "${FFMPEG_BASE_OPTS[@]}" \
                     --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
                     --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,network,protocols,doc} \
                     --enable-protocol=file,pipe \
                     --disable-decoder="$(IFS=, ; echo "${audio_codecs[*]}")" --enable-gpl \
                     --disable-bsf=aac_adtstoasc,text2movsub,noise,dca_core,mov2textsub,mp3_header_decompress \
                     --disable-autodetect --enable-{lzma,bzlib,zlib}
-                extra_script post configure
                 unset audio_codecs
             else
-                extra_script pre configure
-                LDFLAGS+=" -L$MINGW_PREFIX/lib" \
-                    log configure ../configure "${FFMPEG_BASE_OPTS[@]}" \
+                config_path=.. LDFLAGS+=" -L$MINGW_PREFIX/lib" \
+                    do_configure "${FFMPEG_BASE_OPTS[@]}" \
                     --prefix="$LOCALDESTDIR/opt/lightffmpeg" \
                     --disable-{programs,devices,filters,encoders,muxers,debug,sdl2,doc} --enable-gpl
-                    extra_script post configure
             fi
             do_makeinstall
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
