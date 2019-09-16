@@ -576,10 +576,10 @@ do_checkIfExist() {
         [[ $stripping == y ]] && do_strip "${check[@]}"
         [[ $packing == y ]] && do_pack "${check[@]}"
         do_print_status "└ $packetName" "$blue" "Updated"
-        [[ $build32 == yes || $build64 == yes ]] && [[ -d "$packageDir" ]] &&
+        [[ $build32 == yes || $build64 == yes ]] && [[ -d $packageDir ]] &&
             touch "$buildSuccessFile"
     else
-        [[ $build32 == yes || $build64 == yes ]] && [[ -d "$packageDir" ]] &&
+        [[ $build32 == yes || $build64 == yes ]] && [[ -d $packageDir ]] &&
             rm -f "$buildSuccessFile"
         do_print_status "└ $packetName" "$red" "Failed"
         if [[ $_notrequired ]]; then
