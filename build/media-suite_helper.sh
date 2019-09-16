@@ -51,10 +51,10 @@ do_print_status() {
     printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
     if [[ $timeStamp == y ]]; then
         printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%s %s [%s]\n' -1 "$_prefix" "${bold}$name${reset}" \
-            "${pad:0:$((ncols - ${_prefixpad} - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
+            "${pad:0:$((ncols - _prefixpad - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
     else
         printf '%s%s %s [%s]\n' "$_prefix" "${bold}$name${reset}" \
-            "${pad:0:$((ncols - ${_prefixpad} - ${#name} - ${#status} - 2))}" "${color}${status}${reset}"
+            "${pad:0:$((ncols - _prefixpad - ${#name} - ${#status} - 2))}" "${color}${status}${reset}"
     fi
 }
 
