@@ -841,7 +841,7 @@ if enabled libflite && do_vcs "https://github.com/kubo/flite.git"; then
         libflite_cmu_us_{awb,kal,kal16,rms,slt}.a \
         libflite_{cmulex,usenglish,cmu_time_awb}.a "${_check[@]}" include/flite
     log clean make clean
-    do_configure --prefix="$LOCALDESTDIR" --bindir="$LOCALDESTDIR"/bin-audio --disable-shared \
+    do_configure --bindir="$LOCALDESTDIR"/bin-audio --disable-shared \
         --with-audio=none
     do_make && do_makeinstall
     do_checkIfExist
