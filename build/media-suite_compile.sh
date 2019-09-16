@@ -1192,12 +1192,12 @@ if [[ $mediainfo = "y" ]]; then
 
     _check=(bin-video/mediainfo.exe)
     _deps=(libmediainfo.a)
-    if do_vcs "https://github.com/MediaArea/MediaInfo" mediainfo; then
+    if do_vcs "https://github.com/MediaArea/MediaInfo.git" mediainfo; then
         cd_safe Project/GNU/CLI
         do_autogen
         do_uninstall "${_check[@]}"
         [[ -f Makefile ]] && log distclean make distclean
-        do_configure --build="$MINGW_CHOST" --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
+        do_configure --disable-shared --bindir="$LOCALDESTDIR/bin-video" \
             --enable-staticlibs
         do_makeinstall
         do_checkIfExist
