@@ -1519,7 +1519,7 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
     cd_safe build/generic
-    do_configure --prefix="$LOCALDESTDIR" --{build,host}="$MINGW_CHOST"
+    do_configure
     do_make
     do_install ../../src/xvid.h include/
     do_install '=build/xvidcore.a' libxvidcore.a
