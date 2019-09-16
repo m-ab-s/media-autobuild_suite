@@ -1164,8 +1164,7 @@ elif { [[ $avs2 = y ]] || { [[ $ffmpeg != "no" ]] && enabled libdavs2; }; } &&
     cd_safe build/linux
     [[ -f "config.mak" ]] && log "distclean" make distclean
     do_uninstall all "${_check[@]}"
-    do_configure --host="$MINGW_CHOST" --prefix="$LOCALDESTDIR" \
-        --bindir="$LOCALDESTDIR"/bin-video --enable-strip
+    do_configure --bindir="$LOCALDESTDIR"/bin-video --enable-strip
     do_makeinstall
     do_checkIfExist
 fi
