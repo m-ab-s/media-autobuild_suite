@@ -1,0 +1,40 @@
+name: mabs-x84_64
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  push:
+
+jobs:
+  x86_64:
+    name: "mingw-w64-x86_64 All"
+    runs-on: [self-hosted, windows, x64]
+    timeout-minutes: 960
+    steps:
+      - uses: actions/checkout@v2.0.0
+      - name: Extract Cache
+        run: |
+          if (Test-Path "D:/cache.tar.xz") {
+            New-Item -ItemType Directory -Path msys64/home/CCOM-9020M$/.ccache
+            tar -xf D:/cache.tar.xz -C $(Resolve-Path msys64/home/CCOM-9020M$/.ccache)
+          }
+
+      - name: Get ini file
+        run: Invoke-WebRequest https://pastebin.com/raw/07hLkLza -OutFile build/media-autobuild_suite.ini
+
+      - name: Replace do_prompt
+        run: sed -i 's/do_prompt /echo /g' build/media-suite_helper.sh build/media-suite_compile.sh
+
+      - name: Compile the suite
+        shell: cmd
+        run: media-autobuild_suite.bat
+
+      - name: Tar cache
+        run: |
+          if (Test-Path "msys64/home/CCOM-9020M$/.ccache") {
+            tar -cf D:/cache.tar.xz --no-acls -C $(Resolve-Path msys64/home/CCOM-9020M$/.ccache) .
+          }
+      #- uses: actions/upload-artifact@v1 # Only on distributable builds
+      #  with:
+      #    name: mabs-x84_64
+      #    path: local64
