@@ -1,0 +1,75 @@
+name: x86_64
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  push:
+    branches: "*"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  x86_64:
+    name: "mingw-w64-x86_64 All"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Get ini file
+        shell: pwsh
+        run: Invoke-WebRequest https://pastebin.com/raw/07hLkLza -OutFile build/media-autobuild_suite.ini
+
+      - name: Download and unpack msys2
+        shell: pwsh
+        run: |
+          Invoke-WebRequest http://repo.msys2.org/distrib/msys2-x86_64-latest.tar.xz -OutFile msys2-base.tar.xz
+          tar -xf msys2-base.tar.xz
+          Remove-Item msys2-base.tar.xz
+
+      - name: First run
+        run: |
+          set MSYSTEM=MINGW64
+          set MSYS2_PATH_TYPE=inherit
+          set "PATH=D:/a/media-autobuild_suite/media-autobuild_suite/msys64/mingw64/bin;D:/a/media-autobuild_suite/media-autobuild_suite/msys64/usr/bin;%PATH%"
+          bash.exe -lc exit
+          exit %ERRORLEVEL%
+
+      - name: Download and unpack ccache cache
+        run: |
+          rem curl "https://dl.bintray.com/1480c1/media-autobuild_suite/ccache.7z" -o ccache.7z || true
+          curl "https://dl.bintray.com/1480c1/media-autobuild_suite/ccache.tar.xz" -o ccache.tar.xz || true
+          tar -xf ccache.tar.xz || true
+          rm ccache.tar.xz || true
+
+      - name: Download and unpack build directory
+        run: |
+          curl "https://dl.bintray.com/1480c1/media-autobuild_suite/build.7z" -o build.7z || true
+          7z x -aoa build.7z || true
+          rm build.7z || true
+
+      - name: Compile the suite
+        run: media-autobuild_suite.bat
+
+      - name: Compress the build directory
+        run: 7z a -mx=9 -myx=9 build.7z build/
+
+      - name: Upload build to artifactory
+        if: github.repository == 'm-ab-s/media-autobuild_suite' || github.repository == '1480c1/media-autobuild_suite'
+        run: |
+          set url=https://api.bintray.com/content/1480c1/media-autobuild_suite
+          curl -u1480c1:%artifactory_api% %url%/build.7z -X DELETE || true
+          curl -u1480c1:%artifactory_api% %url%/build/master/build.7z -T build.7z || true
+          curl -u1480c1:%artifactory_api% %url%/build/master/publish -X POST || true
+
+      - name: Compress the ccache cache
+        run: 7z a -mx=9 -myx=9 ccache.7z msys64/home/runneradmin/.ccache
+
+      - name: Upload ccache to artifactory
+        if: github.repository == 'm-ab-s/media-autobuild_suite' || github.repository == '1480c1/media-autobuild_suite'
+        run: |
+          set url=https://api.bintray.com/content/1480c1/media-autobuild_suite
+          curl -u1480c1:%artifactory_api% %url%/ccache.7z -X DELETE || true
+          curl -u1480c1:%artifactory_api% %url%/ccache/master/ccache.7z -T ccache.7z || true
+          curl -u1480c1:%artifactory_api% %url%/ccache/master/publish -X POST || true
+        env:
+          artifactory_api: ${{ secrets.artifactory_api }}
