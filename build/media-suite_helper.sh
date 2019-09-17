@@ -1273,6 +1273,7 @@ do_mesoninstall() {
 
 do_rust() {
     log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    command -v sccache > /dev/null 2>&1 && export RUSTC_WRAPPER=sccache
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust

@@ -169,6 +169,15 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
     log rustup_update "$RUSTUP_HOME/bin/rustup.exe" update
     log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
         "stable-$CARCH-pc-windows-gnu"
+
+    _check=(bin/sccache.exe)
+    if do_vcs "https://github.com/mozilla/sccache.git"; then
+        do_uninstall "${_check[@]}"
+        do_rust
+        do_install "target/$CARCH-pc-windows-gnu/release/sccache.exe" bin/
+        do_checkIfExist
+        export RUSTC_WRAPPER=sccache
+    fi
 fi
 
 _check=(bin-global/rg.exe)
