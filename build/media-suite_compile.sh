@@ -2142,7 +2142,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
-            --disable-vapoursynth-lazy "${MPV_OPTS[@]}"
+            "${MPV_OPTS[@]}"
         extra_script post configure
 
         extra_script pre build
