@@ -2023,7 +2023,6 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         -DENABLE_STATIC_LOADER=ON -DUNIX=off
         log make ninja
         do_install loader/libvulkan.a lib/
-        grep_or_sed dxgi loader/vulkan.pc 's;Libs.private.*;& -ldxgi;'
         do_install loader/vulkan.pc lib/pkgconfig/
         do_checkIfExist
         unset _DeadSix27
