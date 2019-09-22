@@ -448,6 +448,8 @@ if %xvcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Any issues with this will be considered low-priority due to lack of
+    echo. potential stability
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildxvc="Build xvc: "
