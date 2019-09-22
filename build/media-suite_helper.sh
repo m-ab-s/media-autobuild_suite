@@ -1380,7 +1380,6 @@ log() {
 
 create_build_dir() {
     local print_build_dir=false nocd=${nocd:-false} norm=false build_root build_dir getoptopt OPTARG OPTIND
-    build_root="$LOCALBUILDDIR/$(get_first_subdir)"
     while getopts ":pcrC:" getoptopt; do
         case $getoptopt in
         p) print_build_dir=true ;;
@@ -1399,7 +1398,7 @@ create_build_dir() {
     done
     shift $((OPTIND - 1))
 
-    build_dir="$build_root/build${1:+-$1}-$bits"
+    build_dir="${build_root:+$build_root/}build${1:+-$1}-$bits"
 
     if [[ -d $build_dir && ! -f $LOCALBUILDDIR/$(get_first_subdir)/do_not_clean ]]; then
         $norm || rm -rf "$build_dir" ||
