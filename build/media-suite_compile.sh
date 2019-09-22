@@ -2018,12 +2018,9 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             do_install d3d{kmthk,ukmdt}.h include/
         cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
         do_print_progress "Building Vulkan-Loader"
-        do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
+        do_cmakeinstall -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
         -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
         -DENABLE_STATIC_LOADER=ON -DUNIX=off
-        log make ninja
-        do_install loader/libvulkan.a lib/
-        do_install loader/vulkan.pc lib/pkgconfig/
         do_checkIfExist
         unset _DeadSix27
     fi
