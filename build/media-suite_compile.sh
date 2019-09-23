@@ -173,8 +173,8 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
 
     _check=(bin/sccache.exe)
     if do_vcs "https://github.com/mozilla/sccache.git"; then
-        do_uninstall "${_check[@]}"
         do_rust
+        sccache --stop-server >/dev/null 2>&1 || true
         do_install "target/$CARCH-pc-windows-gnu/release/sccache.exe" bin/
         do_checkIfExist
         export RUSTC_WRAPPER=sccache
