@@ -374,7 +374,7 @@ do_wget() {
         temp_file=$(mktemp)
         response_code=$("${curlcmds[@]}" -w "%{http_code}" -o "$temp_file" "$url")
 
-        if diff "$archive" "$temp_file" > /dev/null 2>&1 ||
+        if diff -q "$archive" "$temp_file" > /dev/null 2>&1 ||
             [[ -n $hash ]] && check_hash "$archive" "$hash"; then
             $quiet || do_print_status prefix "${bold}├${reset} " "${dirName:-$archive}" "$green" "File up-to-date"
             rm -f "$temp_file"
