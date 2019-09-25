@@ -1320,7 +1320,6 @@ _check=(xvc.pc xvc{enc,dec}.h libxvc{enc,dec}.a bin-video/xvc{enc,dec}.exe)
 if [[ $xvc == y ]] &&
     do_vcs "https://github.com/divideon/xvc.git"; then
     do_uninstall "${_check[@]}"
-    do_patch "https://github.com/divideon/xvc/pull/15.patch" am
     do_cmakeinstall video -DBUILD_TESTS=OFF -DENABLE_ASSERTIONS=OFF
     do_checkIfExist
 fi
