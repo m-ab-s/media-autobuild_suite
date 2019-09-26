@@ -1463,39 +1463,30 @@ rem installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
 for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base.pk
 
-if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
-echo.-------------------------------------------------------------------------------
-echo.install msys2 base system
-echo.-------------------------------------------------------------------------------
-if exist %build%\install_base_failed del %build%\install_base_failed
-(
-    echo.echo -ne "\033]0;install base system\007"
-    echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
-    echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
-    echo.sleep ^3
-    echo.exit
-)>%build%\pacman.sh
-call :runBash pacman.log "%build%\pacman.sh"
-del %build%\pacman.sh
-
-for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
-    if %%~zi==0 (
-        (
-            echo.update-ca-trust
-            echo.sleep ^3
-            echo.exit
-        )>%build%\cert.sh
-        call :runBash cert.log "%build%\cert.sh"
-        del %build%\cert.sh
-    )
+if not exist %instdir%\%msys2%\usr\bin\make.exe (
+    echo.-------------------------------------------------------------------------------
+    echo.install msys2 base system
+    echo.-------------------------------------------------------------------------------
+    if exist %build%\install_base_failed del %build%\install_base_failed
+    title install base system
+    (
+        echo.echo -ne "\033]0;install base system\007"
+        echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
+        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
+        echo.sleep ^3
+        echo.exit
+    )>%build%\pacman.sh
+    call :runBash pacman.log /build/pacman.sh
+    del %build%\pacman.sh
 )
 
-:sethgBat
-if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
-(
+for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert.log update-ca-trust
+
+rem sethgBat
+if not exist %instdir%\%msys2%\usr\bin\hg.bat (
     echo.@echo off
     echo.
     echo.setlocal
@@ -1507,7 +1498,7 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
     echo.set out=^%%out:^} =^}^" ^%%
     echo.
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
-)>>%instdir%\%msys2%\usr\bin\hg.bat
+)>%instdir%\%msys2%\usr\bin\hg.bat
 
 rem installmingw
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
