@@ -1572,11 +1572,10 @@ findstr /C:"profile2.local" %instdir%\%msys2%\etc\profile.d\Zab-suite.sh >nul 2>
     echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
 
-:compileLocals
+rem compileLocals
 cd %instdir%
 
 title MABSbat
-if %noMintty%==y cls
 
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
