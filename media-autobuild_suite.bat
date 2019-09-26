@@ -1581,11 +1581,10 @@ if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
 REM Test mklink availability
-set symlinkSupport=""
-mkdir testmklink 2>NUL
-mklink /d linkedtestmklink testmklink 2>NUL >NUL
-if %ERRORLEVEL%==0 (
-    set symlinkSupported="winsymlinks:nativestrict"
+set "MSYS="
+mkdir testmklink 2>nul
+mklink /d linkedtestmklink testmklink >nul 2>&1 && (
+    set MSYS="winsymlinks:nativestrict"
     rmdir /q linkedtestmklink
 )
 rmdir /q testmklink
@@ -1604,7 +1603,9 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
-    set "MSYS=%symlinkSupported%"
+    set "MSYS=%MSYS%"
+    if %noMintty%==y set "PATH=%PATH%"
+    set "build=%build%"
 )
 if %noMintty%==y (
     powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
