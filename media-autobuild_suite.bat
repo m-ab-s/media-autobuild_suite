@@ -1257,88 +1257,70 @@ if %noMinttyF%==2 set "noMintty=n"
 if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 
-::------------------------------------------------------------------
-::download and install basic msys2 system:
-::------------------------------------------------------------------
+rem ------------------------------------------------------------------
+rem download and install basic msys2 system:
+rem ------------------------------------------------------------------
 cd %build%
 set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
     if not exist "%build%\%%s" (
-        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
     )
 )
-if exist %build%\msys2-base.tar.xz GOTO unpack
 
-:checkmsys2
-if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
+rem checkmsys2
+if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
+if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download and install msys2 basic system
     echo.
     echo -------------------------------------------------------------------------------
-    if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
-    (
-        echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-        echo.$wc = New-Object System.Net.WebClient
-        echo.while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
+    echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
+        $wc = New-Object System.Net.WebClient; ^
+        while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
         ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
         -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
         {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
-        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}}
-    )>msys.ps1
-    powershell -noprofile -executionpolicy bypass .\msys.ps1
-    If %ERRORLEVEL%==1 GOTO errorMsys
-    del msys.ps1
+        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}} | powershell -NoProfile -Command - || goto :errorMsys
 
-:unpack
-if exist %build%\msys2-base.tar.xz (
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.- Downloading Pscx and unpacking msys2 basic system
-    echo.
-    echo -------------------------------------------------------------------------------
-    (
-        echo if ^(!^(Get-ChildItem 'HKLM:^\SOFTWARE^\Microsoft^\NET Framework Setup^\NDP' ^
-        -Recurse ^| Get-ItemProperty -name Version -ErrorAction Ignore ^| Select-Object ^
-        -Property PSChildName, Version ^| Where-Object {$_.PSChildName -match "Client"} ^| ^
-        Where-Object {$_.Version -ge 4.5}^)^) {
-        echo.Write-Output "You lack a dotnet version greater than or equal to 4.5, thus this script cannot automatically extract the msys2 system"
-        echo.Write-Output "Please upgrade your dotnet either by updating your OS or by downloading the latest version at:"
-        echo.Write-Output "https://dotnet.microsoft.com/download/dotnet-framework-runtime"
-        echo.exit 3
-        echo.}
-        echo.$wc = New-Object System.Net.WebClient
-        echo.$wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^)
-        echo.Add-Type -assembly "System.IO.Compression.FileSystem"
-        echo.[System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^)
-        echo.Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package
-        echo.powershell -noprofile -command {
-        echo.Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za
-        echo.Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz
-        echo.Remove-Item $PWD\msys2-base.tar.xz
-        echo.Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar
-        echo.Remove-Item $PWD\msys2-base.tar
-        echo.}
-        echo.Remove-Item -Recurse $PWD\pscx
-    )>7z.ps1
-    powershell -noprofile -executionpolicy bypass .\7z.ps1
-    del 7z.ps1
-)
+    :unpack
+    if exist %build%\msys2-base.tar.xz (
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.- Downloading Pscx and unpacking msys2 basic system
+        echo.
+        echo -------------------------------------------------------------------------------
+        echo $wc = New-Object System.Net.WebClient; ^
+            $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
+            Add-Type -assembly "System.IO.Compression.FileSystem"; ^
+            [System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^); ^
+            Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package; ^
+            powershell -noprofile -command { ^
+                Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za; ^
+                Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz; ^
+                Remove-Item $PWD\msys2-base.tar.xz; ^
+                Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
+                Remove-Item $PWD\msys2-base.tar; ^
+            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -Command -
 
-if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-    :errorMsys
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.- Download msys2 basic system failed,
-    echo.- please download it manually from:
-    echo.- http://repo.msys2.org/distrib/
-    echo.- and copy the uncompressed folder to:
-    echo.- %build%
-    echo.- and start the batch script again!
-    echo.
-    echo -------------------------------------------------------------------------------
-    pause
-    GOTO unpack
+    )
+
+    if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
+        :errorMsys
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.- Download msys2 basic system failed,
+        echo.- please download it manually from:
+        echo.- http://repo.msys2.org/distrib/
+        echo.- and copy the uncompressed folder to:
+        echo.- %build%
+        echo.- and start the batch script again!
+        echo.
+        echo -------------------------------------------------------------------------------
+        pause
+        GOTO :unpack
+    )
 )
 
 :getMintty
