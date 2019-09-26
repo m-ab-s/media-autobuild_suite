@@ -128,8 +128,10 @@ set deleteIni=1
 if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
 if NOT DEFINED msys2Arch set msys2Arch=2
 
-echo.[compiler list]>%ini%
-echo.msys2Arch=^%msys2Arch%>>%ini%
+(
+    echo.[compiler list]
+    echo.msys2Arch=%msys2Arch%
+)>"%ini%"
 
 if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
 set msys2ArchINI=%msys2Arch%
