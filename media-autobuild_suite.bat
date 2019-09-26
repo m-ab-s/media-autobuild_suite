@@ -1323,10 +1323,9 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     )
 )
 
-:getMintty
+rem getMintty
 set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
-
-if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
+set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
         echo.-------------------------------------------------------------------------------
