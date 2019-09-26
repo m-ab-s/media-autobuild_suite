@@ -1409,9 +1409,10 @@ if not [%removefstab%]==[no] (
 
 if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
 set "TERM="
+type nul >>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
 if not defined TERM (
-    %bash% -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" ^
+    printf %%s\n Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color ^
     > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
     set "TERM=xterm-256color"
 )
