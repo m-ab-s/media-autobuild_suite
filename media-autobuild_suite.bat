@@ -1715,18 +1715,19 @@ endlocal
 goto :EOF
 
 :runBash
-setlocal
-set log=%1
+setlocal enabledelayedexpansion
+set "log=%1"
 shift
-set "command1=%1 %2 %3 %4 %5 %6 %7 %8 %9"
-set command=%command1:"=%
+set "command=%1"
+shift
+set args=%*
+set arg=!args:%log% %command%=!
 if %noMintty%==y (
-    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
-    -Logfile "%build%\%log%" -BashCommand \"%command%\"
+    script -e -q --command "exec /usr/bin/bash -lc '%command% $@' -- %arg%" /dev/null | tee "%build%\%log%"
 ) else (
     if exist %build%\%log% del %build%\%log%
     start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
-    --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+    --log 2>&1 %build%\%log% /usr/bin/bash -lc "%command% %arg%"
 )
 endlocal
 goto :EOF
@@ -1746,7 +1747,7 @@ echo.---------------------------------------------------------------------------
     echo.sleep ^3
     echo.exit
 )>%build%\mingw.sh
-call :runBash mingw%1.log "%build%\mingw.sh"
+call :runBash mingw%1.log /build/mingw.sh
 
 if not exist %instdir%\%msys2%\mingw%1\bin\gcc.exe (
     echo -------------------------------------------------------------------------------
