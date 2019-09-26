@@ -1417,51 +1417,49 @@ if not defined TERM (
     set "TERM=xterm-256color"
 )
 
-:hgsettings
-if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
-    (
-        echo.[ui]
-        echo.username = %USERNAME%
-        echo.verbose = True
-        echo.editor = vim
-        echo.
-        echo.[web]
-        echo.cacerts=/usr/ssl/cert.pem
-        echo.
-        echo.[extensions]
-        echo.color =
-        echo.
-        echo.[color]
-        echo.status.modified = magenta bold
-        echo.status.added = green bold
-        echo.status.removed = red bold
-        echo.status.deleted = cyan bold
-        echo.status.unknown = blue bold
-        echo.status.ignored = black bold
-    )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
+rem hgsettings
+if not exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" (
+    echo.[ui]
+    echo.username = %USERNAME%
+    echo.verbose = True
+    echo.editor = vim
+    echo.
+    echo.[web]
+    echo.cacerts=/usr/ssl/cert.pem
+    echo.
+    echo.[extensions]
+    echo.color =
+    echo.
+    echo.[color]
+    echo.status.modified = magenta bold
+    echo.status.added = green bold
+    echo.status.removed = red bold
+    echo.status.deleted = cyan bold
+    echo.status.unknown = blue bold
+    echo.status.ignored = black bold
+)>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
 
-:gitsettings
-if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO installBase
-    (
-        echo.[user]
-        echo.name = %USERNAME%
-        echo.email = %USERNAME%@%COMPUTERNAME%
-        echo.
-        echo.[color]
-        echo.ui = true
-        echo.
-        echo.[core]
-        echo.editor = vim
-        echo.autocrlf =
-        echo.
-        echo.[merge]
-        echo.tool = vimdiff
-        echo.
-        echo.[push]
-        echo.default = simple
-    )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
+rem gitsettings
+if not exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" (
+    echo.[user]
+    echo.name = %USERNAME%
+    echo.email = %USERNAME%@%COMPUTERNAME%
+    echo.
+    echo.[color]
+    echo.ui = true
+    echo.
+    echo.[core]
+    echo.editor = vim
+    echo.autocrlf =
+    echo.
+    echo.[merge]
+    echo.tool = vimdiff
+    echo.
+    echo.[push]
+    echo.default = simple
+)>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
 
-:installbase
+rem installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
 for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base.pk
 
