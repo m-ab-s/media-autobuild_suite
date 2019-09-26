@@ -1337,36 +1337,26 @@ if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.- make a first run
     echo -------------------------------------------------------------------------------
-    call :runBash firstrun.log "-c exit"
+    call :runBash firstrun.log exit
+
+    sed -i "s/#Color/Color/;s/^^IgnorePkg.*/#&/" %instdir%\%msys2%\etc\pacman.conf
 
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm -Sy --asdeps pacman-mirrors
-        echo.sed -i "s;^^IgnorePkg.*;#&;" /etc/pacman.conf
-        echo.sleep ^4
-        echo.exit
-    )>%build%\firstUpdate.sh
-    call :runBash firstUpdate.log "%build%\firstUpdate.sh"
-    del %build%\firstUpdate.sh
+    title first msys2 update
+    call :runBash firstUpdate.log pacman --noconfirm -Sy --asdeps pacman-mirrors
 
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %bash% -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
+    pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime
 
     echo.-------------------------------------------------------------------------------
     echo.second update
     echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --asdeps
-        echo.exit
-    )>%build%\secondUpdate.sh
-    call :runBash secondUpdate.log "%build%\secondUpdate.sh"
-    del %build%\secondUpdate.sh
+    title second msys2 update
+    call :runBash secondUpdate.log pacman --noconfirm -Syu --asdeps
 
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
@@ -1374,12 +1364,12 @@ if not exist %instdir%\mintty.lnk (
         echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\%msys2%\msys2_shell.cmd"
-        echo.link.WindowStyle = ^1
+        echo.link.WindowStyle = 1
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%"
         echo.link.Save
     )>%build%\setlink.vbs
-    cscript /nologo %build%\setlink.vbs
+    cscript /B /Nologo %build%\setlink.vbs
     del %build%\setlink.vbs
 )
 
