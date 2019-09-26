@@ -1554,17 +1554,17 @@ if %msys2%==msys32 (
     call %instdir%\%msys2%\autorebase.bat
 )
 
-::------------------------------------------------------------------
-:: write config profiles:
-::------------------------------------------------------------------
+rem ------------------------------------------------------------------
+rem write config profiles:
+rem ------------------------------------------------------------------
 
 if %build32%==yes call :writeProfile 32
 if %build64%==yes call :writeProfile 64
 
-:loginProfile
+rem loginProfile
 if exist %instdir%\%msys2%\etc\profile.pacnew ^
-move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
-%instdir%\%msys2%\usr\bin\grep -q -e 'profile2.local' %instdir%\%msys2%\etc\profile || (
+    move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
+findstr /C:"profile2.local" %instdir%\%msys2%\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
     echo.if [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW64 ]]; then
     echo.   source /local64/etc/profile2.local
     echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
