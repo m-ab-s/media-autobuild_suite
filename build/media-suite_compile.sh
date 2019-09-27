@@ -2272,6 +2272,7 @@ if [[ $cyanrip = y ]]; then
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \
                 --enable-{bzlib,zlib,lzma,iconv} \
+                --enable-filter=hdcd \
                 "${cyan_ffmpeg_opts[@]}"
             do_makeinstall
             files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
