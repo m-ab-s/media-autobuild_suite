@@ -1373,6 +1373,40 @@ if not exist %instdir%\mintty.lnk (
     del %build%\setlink.vbs
 )
 
+rem createFolders
+if %build32%==yes call :createBaseFolders local32
+if %build64%==yes call :createBaseFolders local64
+
+rem checkFstab
+set "removefstab=no"
+set "fstab=%instdir%\%msys2%\etc\fstab"
+if exist %fstab%. (
+    findstr build32 %fstab% >nul 2>&1 && set "removefstab=yes"
+    findstr trunk %fstab% >nul 2>&1 || set "removefstab=yes"
+    for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
+    findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
+    findstr local64 %fstab% >nul 2>&1 && ( if [%build64%]==[no] set "removefstab=yes" ) || if [%build64%]==[yes] set "removefstab=yes"
+)
+
+if not [%removefstab%]==[no] (
+    rem writeFstab
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.- write fstab mount file
+    echo.
+    echo -------------------------------------------------------------------------------
+    (
+        echo.none / cygdrive binary,posix=0,noacl,user 0 0
+        echo.
+        echo.%instdir%\ /trunk
+        echo.%instdir%\build\ /build
+        echo.%instdir%\%msys2%\mingw32\ /mingw32
+        echo.%instdir%\%msys2%\mingw64\ /mingw64
+        if "%build32%"=="yes" echo.%instdir%\local32\ /local32
+        if "%build64%"=="yes" echo.%instdir%\local64\ /local64
+    )>"%instdir%\%msys2%\etc\fstab."
+)
+
 if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
 set "TERM="
 for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
@@ -1476,14 +1510,14 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
 )>>%instdir%\%msys2%\usr\bin\hg.bat
 
-:installmingw
+rem installmingw
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 if %build32%==yes call :getmingw 32 i
 if %build64%==yes call :getmingw 64 x
 if exist "%build%\mingw.sh" del %build%\mingw.sh
 
-:updatebase
+rem updatebase
 echo.-------------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
@@ -1511,68 +1545,6 @@ if %updateSuite%==y (
             %build%/media-suite_update.sh
     )>%instdir%\update_suite.sh
 )
-
-:createFolders
-if %build32%==yes call :createBaseFolders local32
-if %build64%==yes call :createBaseFolders local64
-
-:checkFstab
-if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
-set "removefstab=no"
-
-set "grep=%instdir%\%msys2%\usr\bin\grep.exe"
-set "fstab=%instdir%\%msys2%\etc\fstab"
-
-%grep% -q build32 %fstab% && set "removefstab=yes"
-%grep% -q trunk %fstab% || set "removefstab=yes"
-
-for /f "tokens=1 delims= " %%a in ('%grep% trunk %fstab%') do ^
-if not [%%a]==[%instdir%\] set "removefstab=yes"
-
-
-%grep% -q local32 %fstab%
-if not errorlevel 1 (
-    if [%build32%]==[no] set "removefstab=yes"
-) else (
-    if [%build32%]==[yes] set "removefstab=yes"
-)
-
-%grep% -q local64 %fstab%
-if not errorlevel 1 (
-    if [%build64%]==[no] set "removefstab=yes"
-) else (
-    if [%build64%]==[yes] set "removefstab=yes"
-)
-
-if [%removefstab%]==[yes] (
-    del %instdir%\%msys2%\etc\fstab.
-    GOTO writeFstab
-) else (
-    GOTO update
-)
-
-:writeFstab
-echo -------------------------------------------------------------------------------
-echo.
-echo.- write fstab mount file
-echo.
-echo -------------------------------------------------------------------------------
-
-set cygdrive=no
-
-if exist %instdir%\%msys2%\etc\fstab. (
-    for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
-)
-if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
-(
-    echo.
-    echo.%instdir%\ /trunk
-    echo.%instdir%\build\ /build
-    echo.%instdir%\%msys2%\mingw32\ /mingw32
-    echo.%instdir%\%msys2%\mingw64\ /mingw64
-)>>%instdir%\%msys2%\etc\fstab.
-if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
-if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
 
 :update
 call :runBash update.log "/build/media-suite_update.sh --build32=%build32% --build64=%build64%"
