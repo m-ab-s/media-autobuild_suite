@@ -2267,8 +2267,8 @@ if [[ $cyanrip = y ]]; then
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
                 --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file \
-                --enable-encoder=flac,tta,aac,wavpack,alac \
-                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
+                --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
+                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le \
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \
                 --enable-{bzlib,zlib,lzma,iconv} \
