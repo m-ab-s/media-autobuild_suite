@@ -2265,7 +2265,7 @@ if [[ $cyanrip = y ]]; then
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
-                --disable-{avdevice,avfilter,autodetect} \
+                --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file \
                 --enable-encoder=flac,tta,aac,wavpack,alac \
                 --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
