@@ -2014,7 +2014,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
         _DeadSix27="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master"
         do_uninstall "${_check[@]}"
-        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch"
+        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch" am
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
         cd_safe Vulkan-Headers
