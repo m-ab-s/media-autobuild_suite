@@ -1546,14 +1546,14 @@ if %updateSuite%==y (
     )>%instdir%\update_suite.sh
 )
 
-:update
-call :runBash update.log "/build/media-suite_update.sh --build32=%build32% --build64=%build64%"
+rem update
+call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64%
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime"
+    pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime
     del "%build%\update_core"
 )
 
