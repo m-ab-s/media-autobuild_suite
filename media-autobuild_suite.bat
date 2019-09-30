@@ -1302,7 +1302,7 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
                 Remove-Item $PWD\msys2-base.tar.xz; ^
                 Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
                 Remove-Item $PWD\msys2-base.tar; ^
-            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -Command -
+            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -NonInteractive -Command -
 
     )
 
