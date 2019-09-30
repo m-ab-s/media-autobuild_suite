@@ -1293,6 +1293,8 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo -------------------------------------------------------------------------------
         7z >nul 2>&1 && (
             7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o..
+        ) || 7za >nul 2>&1 && (
+            7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
         ) || echo $wc = New-Object System.Net.WebClient; ^
             $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
             Add-Type -assembly "System.IO.Compression.FileSystem"; ^
