@@ -374,7 +374,7 @@ do_wget() {
         temp_file=$(mktemp)
         response_code=$("${curlcmds[@]}" -w "%{http_code}" -o "$temp_file" "$url")
 
-        if diff "$archive" "$temp_file" > /dev/null 2>&1 ||
+        if diff -q "$archive" "$temp_file" > /dev/null 2>&1 ||
             [[ -n $hash ]] && check_hash "$archive" "$hash"; then
             $quiet || do_print_status prefix "${bold}├${reset} " "${dirName:-$archive}" "$green" "File up-to-date"
             rm -f "$temp_file"
@@ -1273,7 +1273,11 @@ do_mesoninstall() {
 
 do_rust() {
     log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
-    command -v sccache > /dev/null 2>&1 && export RUSTC_WRAPPER=sccache
+    {
+        command -v sccache > /dev/null 2>&1 &&
+            export RUSTC_WRAPPER=sccache &&
+            sccache --start-server
+    } || unset RUSTC_WRAPPER
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
@@ -1300,23 +1304,17 @@ compilation_fail() {
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        if [[ $noMintty == y ]]; then
-            diff --changed-group-format='%>' --unchanged-group-format='' "$LOCALBUILDDIR/old.var" <(declare -p | grep -vE "BASH|LINES|COLUMNS|CommonProgramFiles") > "$LOCALBUILDDIR/fail.var"
-            printf '%s\n%s\n%s\n' "$PWD" "$reasons" "$operation" > "$LOCALBUILDDIR/compilation_failed"
-            exit
-        else
-            if [[ $logging == y ]]; then
-                echo "Likely error (tail of the failed operation logfile):"
-                tail "ab-suite.${operation}.log"
-                echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
-            fi
-            echo "${red}This is required for other packages, so this script will exit.${reset}"
-            create_diagnostic
-            zip_logs
-            echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
-            do_prompt "Try running the build again at a later time."
-            exit 1
+        if [[ $logging == y ]]; then
+            echo "Likely error (tail of the failed operation logfile):"
+            tail "ab-suite.${operation}.log"
+            echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
         fi
+        echo "${red}This is required for other packages, so this script will exit.${reset}"
+        create_diagnostic
+        zip_logs
+        echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
+        do_prompt "Try running the build again at a later time."
+        exit 1
     fi
 }
 
@@ -1379,16 +1377,34 @@ log() {
 }
 
 create_build_dir() {
-    local build_dir="build${1:+-$1}-$bits"
-    if [[ ! -f "$(get_first_subdir)/do_not_clean" ]]; then
-        if [[ "$(basename "$(pwd)")" == "$build_dir" ]]; then
-            rm -rf ./* && cd_safe ".."
-        elif [[ -d $build_dir ]] && ! rm -rf ./"$build_dir"; then
-            cd_safe "$build_dir" && rm -rf ./* && cd_safe ".."
-        fi
+    local print_build_dir=false nocd=${nocd:-false} norm=false build_root build_dir getoptopt OPTARG OPTIND
+    while getopts ":pcrC:" getoptopt; do
+        case $getoptopt in
+        p) print_build_dir=true ;;
+        c) nocd=true ;;
+        r) norm=true ;;
+        C) build_root="$OPTARG" ;;
+        \?)
+            echo "Invalid Option: -$OPTARG" 1>&2
+            return 1
+            ;;
+        :)
+            echo "Invalid option: $OPTARG requires an argument" 1>&2
+            return 1
+            ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+
+    build_dir="${build_root:+$build_root/}build${1:+-$1}-$bits"
+
+    if [[ -d $build_dir && ! -f $LOCALBUILDDIR/$(get_first_subdir)/do_not_clean ]]; then
+        $norm || rm -rf "$build_dir" ||
+            (cd_safe "$build_dir" && rm -rf ./*)
     fi
-    [[ ! -d $build_dir ]] && mkdir "$build_dir"
-    cd_safe "$build_dir"
+    [[ ! -d $build_dir ]] && mkdir -p "$build_dir"
+    $nocd || cd_safe "$build_dir"
+    $print_build_dir && printf '%s\n' "$build_dir"
 }
 
 get_external_opts() {

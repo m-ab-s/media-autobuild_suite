@@ -1,26 +1,26 @@
-::-----------------------------------------------------------------------------
-:: LICENSE --------------------------------------------------------------------
-::-----------------------------------------------------------------------------
-::  This Windows Batchscript is for setup a compiler environment for building
-::  ffmpeg and other media tools under Windows.
-::
-::    Copyright (C) 2013  jb_alvarado
-::
-::    This program is free software: you can redistribute it and/or modify
-::    it under the terms of the GNU General Public License as published by
-::    the Free Software Foundation, either version 3 of the License, or
-::    (at your option) any later version.
-::
-::    This program is distributed in the hope that it will be useful,
-::    but WITHOUT ANY WARRANTY; without even the implied warranty of
-::    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-::    GNU General Public License for more details.
-::
-::    You should have received a copy of the GNU General Public License
-::    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-::-----------------------------------------------------------------------------
-
 @echo off
+rem -----------------------------------------------------------------------------
+rem LICENSE --------------------------------------------------------------------
+rem -----------------------------------------------------------------------------
+rem  This Windows Batchscript is for setup a compiler environment for building
+rem  ffmpeg and other media tools under Windows.
+rem
+rem    Copyright (C) 2013  jb_alvarado
+rem
+rem    This program is free software: you can redistribute it and/or modify
+rem    it under the terms of the GNU General Public License as published by
+rem    the Free Software Foundation, either version 3 of the License, or
+rem    (at your option) any later version.
+rem
+rem    This program is distributed in the hope that it will be useful,
+rem    but WITHOUT ANY WARRANTY; without even the implied warranty of
+rem    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+rem    GNU General Public License for more details.
+rem
+rem    You should have received a copy of the GNU General Public License
+rem    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+rem -----------------------------------------------------------------------------
+
 color 70
 title media-autobuild_suite
 
@@ -115,7 +115,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 xvc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -128,8 +128,10 @@ set deleteIni=1
 if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
 if NOT DEFINED msys2Arch set msys2Arch=2
 
-echo.[compiler list]>%ini%
-echo.msys2Arch=^%msys2Arch%>>%ini%
+(
+    echo.[compiler list]
+    echo.msys2Arch=%msys2Arch%
+)>"%ini%"
 
 if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
 set msys2ArchINI=%msys2Arch%
@@ -153,7 +155,7 @@ if %deleteINI%==1 (
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
-if %msys2Arch%==1 ( set "msys2=msys32") else set "msys2=msys64"
+if %msys2Arch%==1 ( set "msys2=msys32" ) else set "msys2=msys64"
 
 :selectSystem
 if %archINI%==0 (
@@ -438,6 +440,28 @@ if %buildsvthevc%==1 set "svthevc=y"
 if %buildsvthevc%==2 set "svthevc=n"
 if %buildsvthevc% GTR 2 GOTO svthevc
 if %deleteINI%==1 echo.svthevc=^%buildsvthevc%>>%ini%
+
+:xvc
+if %xvcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build xvc? [HEVC and AV1 competitor]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Any issues with this will be considered low-priority due to lack of
+    echo. potential stability
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildxvc="Build xvc: "
+) else set buildxvc=%xvcINI%
+
+if "%buildxvc%"=="" GOTO xvc
+if %buildxvc%==1 set "xvc=y"
+if %buildxvc%==2 set "xvc=n"
+if %buildxvc% GTR 2 GOTO xvc
+if %deleteINI%==1 echo.xvc=^%buildxvc%>>%ini%
 
 :vvc
 if %vvcINI%==0 (
@@ -1233,94 +1257,76 @@ if %noMinttyF%==2 set "noMintty=n"
 if %noMinttyF% GTR 2 GOTO noMintty
 if %deleteINI%==1 echo.noMintty=^%noMinttyF%>>%ini%
 
-::------------------------------------------------------------------
-::download and install basic msys2 system:
-::------------------------------------------------------------------
+rem ------------------------------------------------------------------
+rem download and install basic msys2 system:
+rem ------------------------------------------------------------------
 cd %build%
 set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
     if not exist "%build%\%%s" (
-        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/jb-alvarado/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
     )
 )
-if exist %build%\msys2-base.tar.xz GOTO unpack
 
-:checkmsys2
-if exist "%instdir%\%msys2%\msys2_shell.cmd" GOTO getMintty
+rem checkmsys2
+if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
+if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo -------------------------------------------------------------------------------
     echo.
     echo.- Download and install msys2 basic system
     echo.
     echo -------------------------------------------------------------------------------
-    if %msys2%==msys32 ( set "msysprefix=i686" ) else set "msysprefix=x86_64"
-    (
-        echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'
-        echo.$wc = New-Object System.Net.WebClient
-        echo.while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
+    echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
+        $wc = New-Object System.Net.WebClient; ^
+        while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
         ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
         -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
         {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
-        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}}
-    )>msys.ps1
-    powershell -noprofile -executionpolicy bypass .\msys.ps1
-    If %ERRORLEVEL%==1 GOTO errorMsys
-    del msys.ps1
+        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}} | powershell -NoProfile -Command - || goto :errorMsys
 
-:unpack
-if exist %build%\msys2-base.tar.xz (
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.- Downloading Pscx and unpacking msys2 basic system
-    echo.
-    echo -------------------------------------------------------------------------------
-    (
-        echo if ^(!^(Get-ChildItem 'HKLM:^\SOFTWARE^\Microsoft^\NET Framework Setup^\NDP' ^
-        -Recurse ^| Get-ItemProperty -name Version -ErrorAction Ignore ^| Select-Object ^
-        -Property PSChildName, Version ^| Where-Object {$_.PSChildName -match "Client"} ^| ^
-        Where-Object {$_.Version -ge 4.5}^)^) {
-        echo.Write-Output "You lack a dotnet version greater than or equal to 4.5, thus this script cannot automatically extract the msys2 system"
-        echo.Write-Output "Please upgrade your dotnet either by updating your OS or by downloading the latest version at:"
-        echo.Write-Output "https://dotnet.microsoft.com/download/dotnet-framework-runtime"
-        echo.exit 3
-        echo.}
-        echo.$wc = New-Object System.Net.WebClient
-        echo.$wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^)
-        echo.Add-Type -assembly "System.IO.Compression.FileSystem"
-        echo.[System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^)
-        echo.Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package
-        echo.powershell -noprofile -command {
-        echo.Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za
-        echo.Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz
-        echo.Remove-Item $PWD\msys2-base.tar.xz
-        echo.Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar
-        echo.Remove-Item $PWD\msys2-base.tar
-        echo.}
-        echo.Remove-Item -Recurse $PWD\pscx
-    )>7z.ps1
-    powershell -noprofile -executionpolicy bypass .\7z.ps1
-    del 7z.ps1
+    :unpack
+    if exist %build%\msys2-base.tar.xz (
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.- Downloading and unpacking msys2 basic system
+        echo.
+        echo -------------------------------------------------------------------------------
+        7z >nul 2>&1 && (
+            7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o..
+        ) || echo $wc = New-Object System.Net.WebClient; ^
+            $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
+            Add-Type -assembly "System.IO.Compression.FileSystem"; ^
+            [System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^); ^
+            Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package; ^
+            powershell -noprofile -command { ^
+                Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za; ^
+                Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz; ^
+                Remove-Item $PWD\msys2-base.tar.xz; ^
+                Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
+                Remove-Item $PWD\msys2-base.tar; ^
+            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -NonInteractive -Command -
+    )
+
+    if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
+        :errorMsys
+        echo -------------------------------------------------------------------------------
+        echo.
+        echo.- Download msys2 basic system failed,
+        echo.- please download it manually from:
+        echo.- http://repo.msys2.org/distrib/
+        echo.- and copy the uncompressed folder to:
+        echo.- %build%
+        echo.- and start the batch script again!
+        echo.
+        echo -------------------------------------------------------------------------------
+        pause
+        GOTO :unpack
+    )
 )
 
-if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
-    :errorMsys
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo.- Download msys2 basic system failed,
-    echo.- please download it manually from:
-    echo.- http://repo.msys2.org/distrib/
-    echo.- and copy the uncompressed folder to:
-    echo.- %build%
-    echo.- and start the batch script again!
-    echo.
-    echo -------------------------------------------------------------------------------
-    pause
-    GOTO unpack
-)
-
-:getMintty
+rem getMintty
 set "bash=%instdir%\%msys2%\usr\bin\bash.exe"
-
-if %noMintty%==y set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
+set "PATH=%instdir%\%msys2%\opt\bin;%instdir%\%msys2%\usr\bin;%PATH%"
 if not exist %instdir%\mintty.lnk (
     if %msys2%==msys32 (
         echo.-------------------------------------------------------------------------------
@@ -1332,36 +1338,26 @@ if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.- make a first run
     echo -------------------------------------------------------------------------------
-    call :runBash firstrun.log "-c exit"
+    call :runBash firstrun.log exit
+
+    sed -i "s/#Color/Color/;s/^^IgnorePkg.*/#&/" %instdir%\%msys2%\etc\pacman.conf
 
     echo.-------------------------------------------------------------------------------
     echo.first update
     echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;first msys2 update\007"
-        echo.pacman --noconfirm -Sy --asdeps pacman-mirrors
-        echo.sed -i "s;^^IgnorePkg.*;#&;" /etc/pacman.conf
-        echo.sleep ^4
-        echo.exit
-    )>%build%\firstUpdate.sh
-    call :runBash firstUpdate.log "%build%\firstUpdate.sh"
-    del %build%\firstUpdate.sh
+    title first msys2 update
+    call :runBash firstUpdate.log pacman --noconfirm -Sy --asdeps pacman-mirrors
 
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %bash% -lc "pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime"
+    pacman -S --needed --ask=20 --noconfirm --asdeps bash pacman msys2-runtime
 
     echo.-------------------------------------------------------------------------------
     echo.second update
     echo.-------------------------------------------------------------------------------
-    (
-        echo.echo -ne "\033]0;second msys2 update\007"
-        echo.pacman --noconfirm -Syu --asdeps
-        echo.exit
-    )>%build%\secondUpdate.sh
-    call :runBash secondUpdate.log "%build%\secondUpdate.sh"
-    del %build%\secondUpdate.sh
+    title second msys2 update
+    call :runBash secondUpdate.log pacman --noconfirm -Syu --asdeps
 
     (
         echo.Set Shell = CreateObject^("WScript.Shell"^)
@@ -1369,105 +1365,129 @@ if not exist %instdir%\mintty.lnk (
         echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\%msys2%\msys2_shell.cmd"
-        echo.link.WindowStyle = ^1
+        echo.link.WindowStyle = 1
         echo.link.IconLocation = "%instdir%\%msys2%\msys2.ico"
         echo.link.WorkingDirectory = "%instdir%\%msys2%"
         echo.link.Save
     )>%build%\setlink.vbs
-    cscript /nologo %build%\setlink.vbs
+    cscript /B /Nologo %build%\setlink.vbs
     del %build%\setlink.vbs
+)
+
+rem createFolders
+if %build32%==yes call :createBaseFolders local32
+if %build64%==yes call :createBaseFolders local64
+
+rem checkFstab
+set "removefstab=no"
+set "fstab=%instdir%\%msys2%\etc\fstab"
+if exist %fstab%. (
+    findstr build32 %fstab% >nul 2>&1 && set "removefstab=yes"
+    findstr trunk %fstab% >nul 2>&1 || set "removefstab=yes"
+    for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
+    findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
+    findstr local64 %fstab% >nul 2>&1 && ( if [%build64%]==[no] set "removefstab=yes" ) || if [%build64%]==[yes] set "removefstab=yes"
+)
+
+if not [%removefstab%]==[no] (
+    rem writeFstab
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo.- write fstab mount file
+    echo.
+    echo -------------------------------------------------------------------------------
+    (
+        echo.none / cygdrive binary,posix=0,noacl,user 0 0
+        echo.
+        echo.%instdir%\ /trunk
+        echo.%instdir%\build\ /build
+        echo.%instdir%\%msys2%\mingw32\ /mingw32
+        echo.%instdir%\%msys2%\mingw64\ /mingw64
+        if "%build32%"=="yes" echo.%instdir%\local32\ /local32
+        if "%build64%"=="yes" echo.%instdir%\local64\ /local64
+    )>"%instdir%\%msys2%\etc\fstab."
 )
 
 if not exist "%instdir%\%msys2%\home\%USERNAME%" mkdir "%instdir%\%msys2%\home\%USERNAME%"
 set "TERM="
+type nul >>"%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
 for /F "tokens=2 delims==" %%b in ('findstr /i TERM "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"') do set TERM=%%b
 if not defined TERM (
-    %bash% -lc "printf '%%s\n' Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color" ^
+    printf %%s\n Locale=en_US Charset=UTF-8 Font=Consolas Columns=120 Rows=30 TERM=xterm-256color ^
     > "%instdir%\%msys2%\home\%USERNAME%\.minttyrc"
     set "TERM=xterm-256color"
 )
 
-:hgsettings
-if exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" GOTO gitsettings
-    (
-        echo.[ui]
-        echo.username = %USERNAME%
-        echo.verbose = True
-        echo.editor = vim
-        echo.
-        echo.[web]
-        echo.cacerts=/usr/ssl/cert.pem
-        echo.
-        echo.[extensions]
-        echo.color =
-        echo.
-        echo.[color]
-        echo.status.modified = magenta bold
-        echo.status.added = green bold
-        echo.status.removed = red bold
-        echo.status.deleted = cyan bold
-        echo.status.unknown = blue bold
-        echo.status.ignored = black bold
-    )>>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
+rem hgsettings
+if not exist "%instdir%\%msys2%\home\%USERNAME%\.hgrc" (
+    echo.[ui]
+    echo.username = %USERNAME%
+    echo.verbose = True
+    echo.editor = vim
+    echo.
+    echo.[web]
+    echo.cacerts=/usr/ssl/cert.pem
+    echo.
+    echo.[extensions]
+    echo.color =
+    echo.
+    echo.[color]
+    echo.status.modified = magenta bold
+    echo.status.added = green bold
+    echo.status.removed = red bold
+    echo.status.deleted = cyan bold
+    echo.status.unknown = blue bold
+    echo.status.ignored = black bold
+)>"%instdir%\%msys2%\home\%USERNAME%\.hgrc"
 
-:gitsettings
-if exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" GOTO installBase
-    (
-        echo.[user]
-        echo.name = %USERNAME%
-        echo.email = %USERNAME%@%COMPUTERNAME%
-        echo.
-        echo.[color]
-        echo.ui = true
-        echo.
-        echo.[core]
-        echo.editor = vim
-        echo.autocrlf =
-        echo.
-        echo.[merge]
-        echo.tool = vimdiff
-        echo.
-        echo.[push]
-        echo.default = simple
-    )>>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
+rem gitsettings
+if not exist "%instdir%\%msys2%\home\%USERNAME%\.gitconfig" (
+    echo.[user]
+    echo.name = %USERNAME%
+    echo.email = %USERNAME%@%COMPUTERNAME%
+    echo.
+    echo.[color]
+    echo.ui = true
+    echo.
+    echo.[core]
+    echo.editor = vim
+    echo.autocrlf =
+    echo.
+    echo.[merge]
+    echo.tool = vimdiff
+    echo.
+    echo.[push]
+    echo.default = simple
+)>"%instdir%\%msys2%\home\%USERNAME%\.gitconfig"
 
-:installbase
+rem installbase
 if exist "%instdir%\%msys2%\etc\pac-base.pk" del "%instdir%\%msys2%\etc\pac-base.pk"
 for %%i in (%msyspackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-base.pk
 
-if exist %instdir%\%msys2%\usr\bin\make.exe GOTO sethgBat
-echo.-------------------------------------------------------------------------------
-echo.install msys2 base system
-echo.-------------------------------------------------------------------------------
-if exist %build%\install_base_failed del %build%\install_base_failed
-(
-    echo.echo -ne "\033]0;install base system\007"
-    echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
-    echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
-    echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
-    echo.sleep ^3
-    echo.exit
-)>%build%\pacman.sh
-call :runBash pacman.log "%build%\pacman.sh"
-del %build%\pacman.sh
-
-for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do (
-    if %%~zi==0 (
-        (
-            echo.update-ca-trust
-            echo.sleep ^3
-            echo.exit
-        )>%build%\cert.sh
-        call :runBash cert.log "%build%\cert.sh"
-        del %build%\cert.sh
-    )
+if not exist %instdir%\%msys2%\usr\bin\make.exe (
+    echo.-------------------------------------------------------------------------------
+    echo.install msys2 base system
+    echo.-------------------------------------------------------------------------------
+    if exist %build%\install_base_failed del %build%\install_base_failed
+    title install base system
+    (
+        echo.echo -ne "\033]0;install base system\007"
+        echo.msysbasesystem="$(cat /etc/pac-base.pk | tr '\n\r' '  ')"
+        echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
+        echo.echo $msysbasesystem ^| xargs $nargs pacman -D --asexplicit
+        echo.sleep ^3
+        echo.exit
+    )>%build%\pacman.sh
+    call :runBash pacman.log /build/pacman.sh
+    del %build%\pacman.sh
 )
 
-:sethgBat
-if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
-(
+for %%i in (%instdir%\%msys2%\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert.log update-ca-trust
+
+rem sethgBat
+if not exist %instdir%\%msys2%\usr\bin\hg.bat (
     echo.@echo off
     echo.
     echo.setlocal
@@ -1479,16 +1499,16 @@ if exist %instdir%\%msys2%\usr\bin\hg.bat GOTO installmingw
     echo.set out=^%%out:^} =^}^" ^%%
     echo.
     echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
-)>>%instdir%\%msys2%\usr\bin\hg.bat
+)>%instdir%\%msys2%\usr\bin\hg.bat
 
-:installmingw
+rem installmingw
 if exist "%instdir%\%msys2%\etc\pac-mingw.pk" del "%instdir%\%msys2%\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\%msys2%\etc\pac-mingw.pk
 if %build32%==yes call :getmingw 32 i
 if %build64%==yes call :getmingw 64 x
 if exist "%build%\mingw.sh" del %build%\mingw.sh
 
-:updatebase
+rem updatebase
 echo.-------------------------------------------------------------------------------
 echo.update autobuild suite
 echo.-------------------------------------------------------------------------------
@@ -1517,76 +1537,14 @@ if %updateSuite%==y (
     )>%instdir%\update_suite.sh
 )
 
-:createFolders
-if %build32%==yes call :createBaseFolders local32
-if %build64%==yes call :createBaseFolders local64
-
-:checkFstab
-if not exist %instdir%\%msys2%\etc\fstab. GOTO writeFstab
-set "removefstab=no"
-
-set "grep=%instdir%\%msys2%\usr\bin\grep.exe"
-set "fstab=%instdir%\%msys2%\etc\fstab"
-
-%grep% -q build32 %fstab% && set "removefstab=yes"
-%grep% -q trunk %fstab% || set "removefstab=yes"
-
-for /f "tokens=1 delims= " %%a in ('%grep% trunk %fstab%') do ^
-if not [%%a]==[%instdir%\] set "removefstab=yes"
-
-
-%grep% -q local32 %fstab%
-if not errorlevel 1 (
-    if [%build32%]==[no] set "removefstab=yes"
-) else (
-    if [%build32%]==[yes] set "removefstab=yes"
-)
-
-%grep% -q local64 %fstab%
-if not errorlevel 1 (
-    if [%build64%]==[no] set "removefstab=yes"
-) else (
-    if [%build64%]==[yes] set "removefstab=yes"
-)
-
-if [%removefstab%]==[yes] (
-    del %instdir%\%msys2%\etc\fstab.
-    GOTO writeFstab
-) else (
-    GOTO update
-)
-
-:writeFstab
-echo -------------------------------------------------------------------------------
-echo.
-echo.- write fstab mount file
-echo.
-echo -------------------------------------------------------------------------------
-
-set cygdrive=no
-
-if exist %instdir%\%msys2%\etc\fstab. (
-    for /f %%b in ('findstr /i binary %instdir%\%msys2%\etc\fstab.') do set cygdrive=yes
-)
-if "%cygdrive%"=="no" echo.none / cygdrive binary,posix=0,noacl,user 0 ^0>>%instdir%\%msys2%\etc\fstab.
-(
-    echo.
-    echo.%instdir%\ /trunk
-    echo.%instdir%\build\ /build
-    echo.%instdir%\%msys2%\mingw32\ /mingw32
-    echo.%instdir%\%msys2%\mingw64\ /mingw64
-)>>%instdir%\%msys2%\etc\fstab.
-if "%build32%"=="yes" echo.%instdir%\local32\ /local32>>%instdir%\%msys2%\etc\fstab.
-if "%build64%"=="yes" echo.%instdir%\local64\ /local64>>%instdir%\%msys2%\etc\fstab.
-
-:update
-call :runBash update.log "/build/media-suite_update.sh --build32=%build32% --build64=%build64%"
+rem update
+call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64%
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
     echo.critical updates
     echo.-------------------------------------------------------------------------------
-    %instdir%\%msys2%\usr\bin\sh.exe -l -c "pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime"
+    pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime
     del "%build%\update_core"
 )
 
@@ -1597,17 +1555,17 @@ if %msys2%==msys32 (
     call %instdir%\%msys2%\autorebase.bat
 )
 
-::------------------------------------------------------------------
-:: write config profiles:
-::------------------------------------------------------------------
+rem ------------------------------------------------------------------
+rem write config profiles:
+rem ------------------------------------------------------------------
 
 if %build32%==yes call :writeProfile 32
 if %build64%==yes call :writeProfile 64
 
-:loginProfile
+rem loginProfile
 if exist %instdir%\%msys2%\etc\profile.pacnew ^
-move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
-%instdir%\%msys2%\usr\bin\grep -q -e 'profile2.local' %instdir%\%msys2%\etc\profile || (
+    move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
+findstr /C:"profile2.local" %instdir%\%msys2%\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
     echo.if [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW64 ]]; then
     echo.   source /local64/etc/profile2.local
     echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
@@ -1615,21 +1573,19 @@ move /y %instdir%\%msys2%\etc\profile.pacnew %instdir%\%msys2%\etc\profile
     echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
 
-:compileLocals
+rem compileLocals
 cd %instdir%
 
 title MABSbat
-if %noMintty%==y cls
 
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
 REM Test mklink availability
-set symlinkSupport=""
-mkdir testmklink 2>NUL
-mklink /d linkedtestmklink testmklink 2>NUL >NUL
-if %ERRORLEVEL%==0 (
-    set symlinkSupported="winsymlinks:nativestrict"
+set "MSYS="
+mkdir testmklink 2>nul
+mklink /d linkedtestmklink testmklink >nul 2>&1 && (
+    set MSYS="winsymlinks:nativestrict"
     rmdir /q linkedtestmklink
 )
 rmdir /q testmklink
@@ -1643,16 +1599,17 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1%
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --xvc=%xvc%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
-    set "MSYS=%symlinkSupported%"
+    set "MSYS=%MSYS%"
+    if %noMintty%==y set "PATH=%PATH%"
+    set "build=%build%"
 )
 if %noMintty%==y (
-    powershell -noprofile -executionpolicy bypass "%CD%\build\bash.ps1" -Bash "%CD%\%msys2%\usr\bin\bash.exe" ^
-    -Logfile "%CD%\build\compile.log" -BashCommand \"/build/media-suite_compile.sh %compileArgs%\"
+    call :runBash compile.log /build/media-suite_compile.sh %compileArgs%
     exit /B %ERRORLEVEL%
 ) else (
     if exist %CD%\build\compile.log del %CD%\build\compile.log
@@ -1759,18 +1716,19 @@ endlocal
 goto :EOF
 
 :runBash
-setlocal
-set log=%1
+setlocal enabledelayedexpansion
+set "log=%1"
 shift
-set "command1=%1 %2 %3 %4 %5 %6 %7 %8 %9"
-set command=%command1:"=%
+set "command=%1"
+shift
+set args=%*
+set arg=!args:%log% %command%=!
 if %noMintty%==y (
-    powershell -noprofile -executionpolicy bypass "%build%\bash.ps1" -Bash "%bash%" ^
-    -Logfile "%build%\%log%" -BashCommand \"%command%\"
+    script -e -q --command "exec /usr/bin/bash -lc '%command% $@' -- %arg%" /dev/null | tee "%build%\%log%"
 ) else (
     if exist %build%\%log% del %build%\%log%
     start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
-    --log 2>&1 %build%\%log% /usr/bin/bash -l %command%
+    --log 2>&1 %build%\%log% /usr/bin/bash -lc "%command% %arg%"
 )
 endlocal
 goto :EOF
@@ -1790,7 +1748,7 @@ echo.---------------------------------------------------------------------------
     echo.sleep ^3
     echo.exit
 )>%build%\mingw.sh
-call :runBash mingw%1.log "%build%\mingw.sh"
+call :runBash mingw%1.log /build/mingw.sh
 
 if not exist %instdir%\%msys2%\mingw%1\bin\gcc.exe (
     echo -------------------------------------------------------------------------------

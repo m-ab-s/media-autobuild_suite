@@ -167,6 +167,7 @@ For information about the compiler environment see the wiki, there you also have
     - sox (14.4.2)
     - speex (git)
     - svt-hevc (git)
+    - svt-av1 (git)
     - tesseract (git)
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
@@ -175,6 +176,7 @@ For information about the compiler environment see the wiki, there you also have
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
         - includes svt-hevc encoder if enabled
+    - xvc (git) (unsupported)
     - xvid (1.3.5)
 
 --------

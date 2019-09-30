@@ -63,6 +63,7 @@ while true; do
 --ccache=* ) ccache="${1#*=}"; shift ;;
 --svthevc=* ) svthevc="${1#*=}"; shift ;;
 --svtav1=* ) svtav1="${1#*=}"; shift ;;
+--xvc=* ) xvc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -172,8 +173,8 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y ]]; then
 
     _check=(bin/sccache.exe)
     if do_vcs "https://github.com/mozilla/sccache.git"; then
-        do_uninstall "${_check[@]}"
         do_rust
+        sccache --stop-server >/dev/null 2>&1 || true
         do_install "target/$CARCH-pc-windows-gnu/release/sccache.exe" bin/
         do_checkIfExist
         export RUSTC_WRAPPER=sccache
@@ -332,8 +333,8 @@ fi
 _check=(libgnutls.{,l}a gnutls.pc)
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
     ! files_exist "${_check[@]}" &&
-    do_wget -h aa81944e5635de981171772857e72be231a7e0f559ae0292d2737de475383e83 \
-    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz"; then
+    do_wget -h 4331fca55817ecdd74450b908a6c29b4f05bb24dd13144c6284aa34d872e1fcb \
+    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.9.tar.xz"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
@@ -1311,8 +1312,15 @@ if [[ $bits = "32bit" ]]; then
 elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-AV1.git"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
-    do_patch "https://patch-diff.githubusercontent.com/raw/OpenVisualCloud/SVT-AV1/pull/558.patch" am
     do_cmakeinstall video -DUNIX=OFF
+    do_checkIfExist
+fi
+
+_check=(xvc.pc xvc{enc,dec}.h libxvc{enc,dec}.a bin-video/xvc{enc,dec}.exe)
+if [[ $xvc == y ]] &&
+    do_vcs "https://github.com/divideon/xvc.git"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall video -DBUILD_TESTS=OFF -DENABLE_ASSERTIONS=OFF
     do_checkIfExist
 fi
 
@@ -2006,7 +2014,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
         _DeadSix27="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master"
         do_uninstall "${_check[@]}"
-        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch"
+        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch" am
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
         cd_safe Vulkan-Headers
@@ -2018,12 +2026,9 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             do_install d3d{kmthk,ukmdt}.h include/
         cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
         do_print_progress "Building Vulkan-Loader"
-        do_cmake -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
+        do_cmakeinstall -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
         -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \
         -DENABLE_STATIC_LOADER=ON -DUNIX=off
-        log make ninja
-        do_install loader/libvulkan.a lib/
-        do_install loader/vulkan.pc lib/pkgconfig/
         do_checkIfExist
         unset _DeadSix27
     fi
@@ -2260,13 +2265,14 @@ if [[ $cyanrip = y ]]; then
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
-                --disable-{avdevice,avfilter,autodetect} \
+                --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file \
-                --enable-encoder=flac,tta,aac,wavpack,alac \
-                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg \
+                --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
+                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le \
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \
                 --enable-{bzlib,zlib,lzma,iconv} \
+                --enable-filter=hdcd \
                 "${cyan_ffmpeg_opts[@]}"
             do_makeinstall
             files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
