@@ -1288,10 +1288,12 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     if exist %build%\msys2-base.tar.xz (
         echo -------------------------------------------------------------------------------
         echo.
-        echo.- Downloading Pscx and unpacking msys2 basic system
+        echo.- Downloading and unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        echo $wc = New-Object System.Net.WebClient; ^
+        7z >nul 2>&1 && (
+            7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o..
+        ) || echo $wc = New-Object System.Net.WebClient; ^
             $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
             Add-Type -assembly "System.IO.Compression.FileSystem"; ^
             [System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^); ^
@@ -1303,7 +1305,6 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
                 Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
                 Remove-Item $PWD\msys2-base.tar; ^
             }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -NonInteractive -Command -
-
     )
 
     if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
