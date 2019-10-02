@@ -500,8 +500,8 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i -e 's|Libs.private.*|& -lstdc++|' \
-               -e 's|Requires.private.*|& libarchive iconv|' tesseract.pc.in
+        sed -i -e 's|Libs.private.*|& -lstdc++ -DNGHTTP2_STATICLIB|' \
+               -e 's|Requires.private.*|& libarchive iconv libcurl|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs iconv lept)" --datadir="$LOCALDESTDIR/bin-global"
