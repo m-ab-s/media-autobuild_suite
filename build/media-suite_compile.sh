@@ -2241,7 +2241,6 @@ if [[ $cyanrip = y ]]; then
     _deps=(libdiscid.a libmusicbrainz5.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/atomnuker/cyanrip.git"; then
-        do_patch "https://patch-diff.githubusercontent.com/raw/cyanreg/cyanrip/pull/10.patch" am
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
         if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
