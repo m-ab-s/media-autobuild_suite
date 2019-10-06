@@ -1617,7 +1617,7 @@ if %noMintty%==y (
     if exist %CD%\build\compile.log del %CD%\build\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
     --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
-    MSYS=%symlinkSupported% /usr/bin/bash ^
+    MSYS=%MSYS% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
     exit /B %ERRORLEVEL%
 )
