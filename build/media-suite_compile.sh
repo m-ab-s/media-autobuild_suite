@@ -63,6 +63,7 @@ while true; do
 --ccache=* ) ccache="${1#*=}"; shift ;;
 --svthevc=* ) svthevc="${1#*=}"; shift ;;
 --svtav1=* ) svtav1="${1#*=}"; shift ;;
+--svtvp9=* ) svtvp9="${1#*=}"; shift ;;
 --xvc=* ) xvc="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
@@ -1312,6 +1313,17 @@ if [[ $bits = "32bit" ]]; then
 elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "https://github.com/OpenVisualCloud/SVT-AV1.git"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
+    do_cmakeinstall video -DUNIX=OFF
+    do_checkIfExist
+fi
+
+_check=(bin-video/SvtVp9EncApp.exe
+    libSvtVp9Enc.a SvtVp9Enc.pc)
+if [[ $bits = "32bit" ]]; then
+    do_removeOption --enable-libsvtvp9
+elif { [[ $svtvp9 = y ]] || enabled libsvtvp9; } &&
+    do_vcs "https://github.com/OpenVisualCloud/SVT-VP9.git"; then
+    do_uninstall include/svt-vp9 "${_check[@]}" include/svt-vp9
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi

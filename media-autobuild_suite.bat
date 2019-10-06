@@ -115,7 +115,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 xvc
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -505,6 +505,29 @@ if %buildsvtav1%==1 set "svtav1=y"
 if %buildsvtav1%==2 set "svtav1=n"
 if %buildsvtav1% GTR 2 GOTO svtav1
 if %deleteINI%==1 echo.svtav1=^%buildsvtav1%>>%ini%
+
+:svtvp9
+if %svtvp9INI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build SVT-VP9? [VP9 encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Look at the link for hardware requirements
+    echo. https://github.com/OpenVisualCloud/SVT-VP9#Hardware
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildsvtvp9="Build SVT-VP9: "
+) else set buildsvtvp9=%svtvp9INI%
+
+if "%buildsvtvp9%"=="" GOTO svtvp9
+if %buildsvtvp9%==1 set "svtvp9=y"
+if %buildsvtvp9%==2 set "svtvp9=n"
+if %buildsvtvp9% GTR 2 GOTO svtvp9
+if %deleteINI%==1 echo.svtvp9=^%buildsvtvp9%>>%ini%
 
 :flac
 if %flacINI%==0 (
@@ -1601,7 +1624,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --xvc=%xvc%
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
