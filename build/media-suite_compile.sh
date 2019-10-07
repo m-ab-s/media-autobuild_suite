@@ -1553,6 +1553,7 @@ if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libvmaf
 elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
+    do_patch "https://patch-diff.githubusercontent.com/raw/Netflix/vmaf/pull/372.patch" am
     do_uninstall share/model "${_check[@]}"
     log clean make clean
     do_make INSTALL_PREFIX="$LOCALDESTDIR"
