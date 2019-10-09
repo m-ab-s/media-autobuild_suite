@@ -330,6 +330,35 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
+
+_check=(libunistring.{,l}a)
+if [[ $mediainfo = y || $bmx = y || $curl != n ]] && ! files_exist "${_check[@]}" &&
+    do_wget -h a82e5b333339a88ea4608e4635479a1cfb2e01aafb925e1290b65710d43f610b \
+    "https://ftp.gnu.org/gnu/libunistring/libunistring-0.9.10.tar.xz"; then
+    do_uninstall include/unistring "${_check[@]}"
+    do_separate_confmakeinstall --enable-threads=win32
+    do_checkIfExist
+fi
+
+_check=(libidn2.{{,l}a,pc} idn2.h)
+if [[ $mediainfo = y || $bmx = y || $curl != n ]] && ! files_exist "${_check[@]}" &&
+    do_wget -h fc734732b506d878753ec6606982bf7b936e868c25c30ddb0d83f7d7056381fe \
+    "https://ftp.gnu.org/gnu/libidn/libidn2-2.2.0.tar.gz"; then
+    do_uninstall "${_check[@]}"
+    do_separate_confmakeinstall --disable-{doc,rpath}
+    do_checkIfExist
+fi
+
+_check=(libpsl.{{,l}a,h,pc})
+if [[ $mediainfo = y || $bmx = y || $curl != n ]] && ! files_exist "${_check[@]}" &&
+    do_wget -h 41bd1c75a375b85c337b59783f5deb93dbb443fb0a52d257f403df7bd653ee12 \
+    "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.21.0/libpsl-0.21.0.tar.gz"; then
+    do_uninstall "${_check[@]}"
+    do_separate_confmakeinstall --enable-runtime=libidn2
+    do_checkIfExist
+    grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/libpsl.pc "/Libs:/ a\Libs.private: -lidn2 -lunistring -liconv"
+fi
+
 _check=(libgnutls.{,l}a gnutls.pc)
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
     ! files_exist "${_check[@]}" &&
@@ -377,6 +406,7 @@ _deps=()
 if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
     do_pacman_install nghttp2 brotli
+    do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
 
     # fix retarded google naming schemes for brotli
     ! /usr/bin/grep -q -- "-static" "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc &&
@@ -405,9 +435,8 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn2} \
-        --with-brotli \
-        --enable-sspi --disable-{debug,manual}
+        --without-{libssh2,random,ca-bundle,ca-path,librtmp} \
+        --with-brotli --enable-sspi --disable-{debug,manual}
     hide_conflicting_libs -R
     [[ $curl = openssl ]] && hide_libressl -R
     if [[ $curl != schannel ]]; then
