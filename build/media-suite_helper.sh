@@ -293,8 +293,6 @@ do_vcs() {
     elif [[ -f recently_updated ]] && { [[ ! -f "build_successful$bits" ]] ||
         [[ -n $flavor && ! -f "build_successful${bits}_${flavor}" ]]; }; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
-    elif [[ -z ${vcsCheck[*]} ]] && ! files_exist "$vcsFolder.pc"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Missing pkg-config"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
     elif [[ -n ${deps[*]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then

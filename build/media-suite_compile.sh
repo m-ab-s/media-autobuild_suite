@@ -828,7 +828,7 @@ if [[ $ffmpeg != "no" ]] && enabled libopenmpt &&
     do_checkIfExist
 fi
 
-_check=(libmysofa.a mysofa.h)
+_check=(libmysofa.{a,pc} mysofa.h)
 if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
     do_vcs "https://github.com/hoene/libmysofa.git"; then
     do_uninstall "${_check[@]}"
@@ -1215,7 +1215,7 @@ if [[ $ffmpeg != "no" ]] && enabled libvidstab && do_pkgConfig "vidstab = 1.10" 
     add_to_remove
 fi
 
-_check=(libzvbi.{h,{l,}a})
+_check=(libzvbi.{h,{l,}a,pc})
 if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
     do_pkgConfig "zvbi-0.2 = 0.2.35" &&
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
@@ -1560,7 +1560,7 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_checkIfExist
 fi
 
-_check=(ffnvcodec/nvEncodeAPI.h)
+_check=(ffnvcodec/nvEncodeAPI.h ffnvcodec.pc)
 if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||
     ! disabled_any ffnvcodec autodetect || ! mpv_disabled cuda-hwaccel; } &&
     do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git" ffnvcodec; then
@@ -1987,7 +1987,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         do_simple_print "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
     fi
 
-    _check=(mujs.h libmujs.a)
+    _check=(mujs.{h,pc} libmujs.a)
     if ! mpv_disabled javascript &&
         do_vcs "https://github.com/ccxvii/mujs.git"; then
         do_uninstall bin-global/mujs.exe "${_check[@]}"
