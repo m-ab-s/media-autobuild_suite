@@ -1560,7 +1560,7 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_checkIfExist
 fi
 
-_check=(ffnvcodec/nvEncodeAPI.h)
+_check=(ffnvcodec/nvEncodeAPI.h ffnvcodec.pc)
 if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||
     ! disabled_any ffnvcodec autodetect || ! mpv_disabled cuda-hwaccel; } &&
     do_vcs "https://git.videolan.org/git/ffmpeg/nv-codec-headers.git" ffnvcodec; then
