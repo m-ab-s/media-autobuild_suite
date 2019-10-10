@@ -1215,7 +1215,7 @@ if [[ $ffmpeg != "no" ]] && enabled libvidstab && do_pkgConfig "vidstab = 1.10" 
     add_to_remove
 fi
 
-_check=(libzvbi.{h,{l,}a,pc})
+_check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
 if [[ $ffmpeg != "no" ]] && enabled libzvbi &&
     do_pkgConfig "zvbi-0.2 = 0.2.35" &&
     do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
