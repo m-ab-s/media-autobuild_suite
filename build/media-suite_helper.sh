@@ -1448,11 +1448,15 @@ do_separate_confmakeinstall() {
 }
 
 do_configure() {
+    # use this array to pass additional parameters to configure
+    local conf_extras=()
     extra_script pre configure
     [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
         return
-    log "configure" ${config_path:-.}/configure --prefix="$LOCALDESTDIR" "$@"
+    log "configure" ${config_path:-.}/configure --prefix="$LOCALDESTDIR" "$@" \
+        "${conf_extras[@]}"
     extra_script post configure
+    unset conf_extras
 }
 
 do_make() {
