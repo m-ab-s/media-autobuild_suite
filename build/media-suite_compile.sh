@@ -653,6 +653,7 @@ if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
     do_uninstall "${_check[@]}"
     extracommands=()
     enabled libspeex || extracommands+=(--without-speex)
+    [[ $flac = y ]] || extracommands+=(--without-flac)
     do_separate_conf --disable-{ogg123,vorbiscomment,vcut,ogginfo} \
         --with-lib{iconv,intl}-prefix="$MINGW_PREFIX" "${extracommands[@]}"
     do_make
