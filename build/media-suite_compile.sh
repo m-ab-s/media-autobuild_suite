@@ -590,6 +590,7 @@ if [[ $flac = y ]] && do_vcs "https://github.com/xiph/flac.git"; then
     else
         sed -i "/^SUBDIRS/,/[^\\]$/{/flac/d;}" src/Makefile.in
     fi
+    sed -i 's|__declspec(dllexport)||g' include/FLAC{,++}/export.h
     do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
     do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
