@@ -330,11 +330,16 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
-_check=(libgnutls.{,l}a gnutls.pc)
-if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
-    ! files_exist "${_check[@]}" &&
-    do_wget -h b1f3ca67673b05b746a961acf2243eaae0ffe658b6a6494265c648e7c7812293 \
-    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.10.tar.xz"; then
+
+if [[ $ffmpeg != no ]] && enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]]; then
+   [[ -z "$gnutls_ver" ]] &&
+        gnutls_ver="$(clean_html_index "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/")" &&
+        gnutls_ver="$(get_last_version "$gnutls_ver" "xz$" '3\.6\.\d+(\.\d+)?')"
+    gnutls_ver="${gnutls_ver:-3.6.10}"
+   _check=(libgnutls.{,l}a gnutls.pc) 
+    if do_pkgConfig "gnutls = $gnutls_ver"; then    
+        do_wget -h b1f3ca67673b05b746a961acf2243eaae0ffe658b6a6494265c648e7c7812293 \
+        "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.10.tar.xz"
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
@@ -344,6 +349,7 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
+    fi    
 fi
 
 if { [[ $ffmpeg != "no" ]] && enabled openssl; } || [[ $curl = openssl ]]; then
