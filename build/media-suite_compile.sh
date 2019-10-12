@@ -333,7 +333,7 @@ if [[ $curl = y ]]; then
 fi
 _check=(libgnutls.{,l}a gnutls.pc)
 if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
-    ! files_exist "${_check[@]}" &&
+    do_pkgConfig "gnutls = 3.6.10" &&
     do_wget -h b1f3ca67673b05b746a961acf2243eaae0ffe658b6a6494265c648e7c7812293 \
     "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.10.tar.xz"; then
         do_pacman_install nettle
