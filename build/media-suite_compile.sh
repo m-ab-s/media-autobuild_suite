@@ -590,13 +590,17 @@ if [[ $flac = y ]] && do_vcs "https://github.com/xiph/flac.git"; then
     else
         sed -i "/^SUBDIRS/,/[^\\]$/{/flac/d;}" src/Makefile.in
     fi
-    sed -i 's|__declspec(dllexport)||g' include/FLAC{,++}/export.h
+    sed -i 's|__declspec(dllimport)||g' include/FLAC{,++}/export.h
     do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
     do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
     do_checkIfExist
 elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
+    grep_or_sed dllimport "$MINGW_PREFIX"/include/FLAC++/export.h \
+        's|__declspec(dllimport)||g' "$MINGW_PREFIX"/include/FLAC{,++}/export.h
 fi
+grep_or_sed dllimport "$LOCALDESTDIR"/include/FLAC++/export.h \
+        's|__declspec(dllimport)||g' "$LOCALDESTDIR"/include/FLAC{,++}/export.h
 
 _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
 if [[ $ffmpeg != "no" ]] && enabled libvo-amrwbenc &&
