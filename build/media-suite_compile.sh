@@ -368,6 +368,38 @@ fi
 
 { enabled mbedtls || [[ $curl = mbedtls ]]; } && do_pacman_install mbedtls
 
+if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
+    do_pacman_install libunistring
+    grep_and_sed dllimport "$MINGW_PREFIX"/include/unistring/woe32dll.h \
+        's|__declspec \(dllimport\)||g' "$MINGW_PREFIX"/include/unistring/woe32dll.h
+    _deps=("$MINGW_PREFIX/lib/libunistring.a")
+    _check=(libidn2.{{,l}a,pc} idn2.h)
+    [[ $standalone == y ]] && _check+=(bin-global/idn2.exe)
+    if do_pkgConfig "libidn2 = 2.2.0" &&
+        do_wget -h fc734732b506d878753ec6606982bf7b936e868c25c30ddb0d83f7d7056381fe \
+        "https://ftp.gnu.org/gnu/libidn/libidn2-2.2.0.tar.gz"; then
+        do_uninstall "${_check[@]}"
+        [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.am
+        # unistring also depends on iconv
+        grep_or_sed '@LTLIBUNISTRING@ @LTLIBICONV@' libidn2.pc.in \
+            's|(@LTLIBICONV@) (@LTLIBUNISTRING@)|\2 \1|'
+        do_separate_confmakeinstall global --disable-{doc,rpath,nls}
+        do_checkIfExist
+    fi
+    _deps=(libidn2.a)
+    _check=(libpsl.{{,l}a,h,pc})
+    [[ $standalone == y ]] && _check+=(bin-global/psl.exe)
+    if do_pkgConfig "libpsl = 0.21.0" &&
+        do_wget -h 41bd1c75a375b85c337b59783f5deb93dbb443fb0a52d257f403df7bd653ee12 \
+        "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.21.0/libpsl-0.21.0.tar.gz"; then
+        do_uninstall "${_check[@]}"
+        [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' tools/Makefile.am
+        grep_or_sed "Requires.private" libpsl.pc.in "/Libs:/ i\Requires.private: libidn2"
+        do_separate_confmakeinstall global --disable-{nls,rpath,gtk-doc-html,man,runtime}
+        do_checkIfExist
+    fi
+fi
+
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 _deps=()
 [[ $curl = libressl ]] && _deps+=(libssl.a)
@@ -377,14 +409,13 @@ _deps=()
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
+    do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
     do_pacman_install nghttp2 brotli
 
     # fix retarded google naming schemes for brotli
-    ! /usr/bin/grep -q -- "-static" "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc &&
-        sed -i 's;-lbrotli.*;&-static;' \
-            "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
-    ! /usr/bin/grep -q -- brotlidec-static configure.ac &&
-        sed -i 's;CHECK_LIB(brotlidec;&-static;' configure.ac
+    grep_or_sed '-static' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc 's;-lbrotli.*;&-static;' \
+        "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
+    grep_or_sed brotlidec-static configure.ac 's;CHECK_LIB\(brotlidec;&-static;'
 
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
     [[ $standalone = y || $curl != n ]] ||
@@ -397,7 +428,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     elif [[ $curl = gnutls ]]; then
         extra_opts+=(--with-gnutls --without-{ssl,nghttp2,mbedtls})
     else
-        extra_opts+=(--with-{winssl,winidn,nghttp2} --without-{ssl,gnutls,mbedtls})
+        extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{ssl,gnutls,mbedtls})
     fi
     grep_or_sed NGHTTP2_STATICLIB libcurl.pc.in 's;Cflags.*;& -DNGHTTP2_STATICLIB;'
     grep_or_sed NGHTTP2_STATICLIB curl-config.in 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;'
@@ -406,9 +437,8 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     hide_conflicting_libs
     CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path,librtmp,libidn2} \
-        --with-brotli \
-        --enable-sspi --disable-{debug,manual}
+        --without-{libssh2,random,ca-bundle,ca-path,librtmp} \
+        --with-brotli --enable-sspi --disable-debug
     hide_conflicting_libs -R
     [[ $curl = openssl ]] && hide_libressl -R
     if [[ $curl != schannel ]]; then
