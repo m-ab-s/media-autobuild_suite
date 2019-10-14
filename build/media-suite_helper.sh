@@ -1275,7 +1275,7 @@ do_rust() {
     {
         command -v sccache > /dev/null 2>&1 &&
             export RUSTC_WRAPPER=sccache &&
-            sccache --start-server
+            { sccache --start-server > /dev/null 2>&1 || true; }
     } || unset RUSTC_WRAPPER
     # use this array to pass additional parameters to cargo
     local rust_extras=()
