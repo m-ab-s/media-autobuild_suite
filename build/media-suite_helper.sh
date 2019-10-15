@@ -2026,6 +2026,19 @@ grep_or_sed() {
         /usr/bin/sed -ri -- "$sed_re" "${sed_files[@]}"
 }
 
+grep_and_sed() {
+    local grep_re="$1"
+    local grep_file="$2"
+    [[ ! -f $grep_file ]] && return
+    local sed_re="$3"
+    shift 3
+    local sed_files=("$grep_file")
+    [[ -n $1 ]] && sed_files=("$@")
+
+    /usr/bin/grep -q -- "$grep_re" "$grep_file" &&
+        /usr/bin/sed -ri -- "$sed_re" "${sed_files[@]}"
+}
+
 compare_with_zeranoe() {
     local comparison="${1:-builtin}"
     local zeranoebase="https://ffmpeg.zeranoe.com/builds/readme"
