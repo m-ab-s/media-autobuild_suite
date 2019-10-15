@@ -368,12 +368,16 @@ do_wget() {
     $notmodified && [[ -f $archive ]] && curlcmds+=(-z "$archive" -R)
     [[ $hash ]] && tries=3
 
+    if [[ -f $archive ]] && [[ $hash ]] && check_hash "$archive" "$hash"; then
+        $quiet || do_print_status prefix "${bold}├${reset} " "${dirName:-$archive}" "$green" "File up-to-date"
+        tries=0
+    fi
+
     while [[ $tries -gt 0 ]]; do
         temp_file=$(mktemp)
         response_code=$("${curlcmds[@]}" -w "%{http_code}" -o "$temp_file" "$url")
 
-        if diff -q "$archive" "$temp_file" > /dev/null 2>&1 ||
-            [[ -n $hash ]] && check_hash "$archive" "$hash"; then
+        if [[ -f $archive ]] && diff -q "$archive" "$temp_file" > /dev/null 2>&1; then
             $quiet || do_print_status prefix "${bold}├${reset} " "${dirName:-$archive}" "$green" "File up-to-date"
             rm -f "$temp_file"
             break
