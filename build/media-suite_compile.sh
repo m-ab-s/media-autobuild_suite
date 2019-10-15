@@ -597,10 +597,10 @@ if [[ $flac = y ]] && do_vcs "https://github.com/xiph/flac.git"; then
 elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
     grep_and_sed dllimport "$MINGW_PREFIX"/include/FLAC++/export.h \
-        's|__declspec(dllimport)||g' "$MINGW_PREFIX"/include/FLAC{,++}/export.h
+        's|__declspec\(dllimport\)||g' "$MINGW_PREFIX"/include/FLAC{,++}/export.h
 fi
 grep_and_sed dllimport "$LOCALDESTDIR"/include/FLAC++/export.h \
-        's|__declspec(dllimport)||g' "$LOCALDESTDIR"/include/FLAC{,++}/export.h
+        's|__declspec\(dllimport\)||g' "$LOCALDESTDIR"/include/FLAC{,++}/export.h
 
 _check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
 if [[ $ffmpeg != "no" ]] && enabled libvo-amrwbenc &&
