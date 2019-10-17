@@ -471,7 +471,7 @@ _check=(libwebp{,mux}.{{,l}a,pc})
 if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     if [[ $standalone = y ]]; then
-        extracommands=(--enable-{experimental,libwebp{demux,decoder,extras}}
+        extracommands=(--enable-libwebp{demux,decoder,extras}
             "LIBS=$($PKG_CONFIG --libs libpng libtiff-4)")
     else
         extracommands=()
