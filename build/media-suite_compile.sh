@@ -989,9 +989,8 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     fi
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
-    do_cmakeinstall video -DENABLE_{DOCS,TOOLS,TESTS}=off -DENABLE_NASM=on \
-        -DENABLE_TEST{S,DATA}=OFF -DCONFIG_LOWBITDEPTH=1 \
-        "${extracommands[@]}"
+    do_cmakeinstall video -DENABLE_{DOCS,TOOLS}=off -DENABLE_TEST{S,DATA}=OFF \
+        -DENABLE_NASM=on -DFORCE_HIGHBITDEPTH_DECODING=0 "${extracommands[@]}"
     do_checkIfExist
     unset extracommands
 fi
