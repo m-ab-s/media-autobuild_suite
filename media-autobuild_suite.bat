@@ -74,7 +74,7 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2u
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache
+set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
