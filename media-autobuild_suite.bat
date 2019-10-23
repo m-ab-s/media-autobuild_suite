@@ -103,14 +103,14 @@ set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo #d3d11
+#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
 
 :: all supported options
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
-#pdf-build libmpv-shared openal
+#pdf-build libmpv-shared openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
