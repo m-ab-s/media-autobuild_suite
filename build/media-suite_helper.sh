@@ -2067,6 +2067,24 @@ check_signature() {
     esac
 }
 
+do_jq() {
+    local jq_file="$jq_file" output_raw_string=true
+    # Detect if in pipe, useful for curling github api
+    if [[ ! -t 0 ]]; then
+        jq_file=/dev/stdin
+    elif [[ -f $1 ]]; then
+        jq_file="$1" && shift
+    fi
+    for a in "$@"; do
+        grep -q -- ^- <<< "$a" && output_raw_string=false
+    done
+    if $output_raw_string; then
+        jq -r "$*" < "$jq_file"
+    else
+        jq "$@" < "$jq_file"
+    fi
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
