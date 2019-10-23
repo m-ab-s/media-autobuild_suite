@@ -125,6 +125,7 @@ _clean_old_builds=(j{config,error,morecfg,peglib}.h
     bin-global/libgcrypt-config libgcrypt.a gcrypt.h
     lib/libgcrypt.def bin-global/{dumpsexp,hmac256,mpicalc}.exe
     crossc.{h,pc} libcrossc.a
+    include/onig{uruma,gnu,posix}.h libonig.a oniguruma.pc
 )
 
 do_uninstall q all "${_clean_old_builds[@]}"
@@ -191,23 +192,16 @@ if [[ $ripgrep = y ]] &&
     do_checkIfExist
 fi
 
-_check=(libonig.a oniguruma.pc)
-if [[ "$jq" = y ]] &&
-    do_vcs "https://github.com/kkos/oniguruma.git"; then
-    do_pacman_remove oniguruma
-    do_uninstall include/onig{uruma,gnu,posix}.h "${_check[@]}"
-    do_cmakeinstall
-    do_checkIfExist
-fi
-
-_deps=(oniguruma.pc)
+_deps=("$MINGW_PREFIX"/lib/pkgconfig/oniguruma.pc)
 _check=(bin-global/jq.exe)
 if [[ "$jq" = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
+    do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
     CFLAGS+=' -D_POSIX_C_SOURCE' YFLAGS='--warnings=no-yacc' \
-        do_separate_confmakeinstall global --enable-all-static --enable-pthread-tls --disable-docs
+        do_separate_conf global --enable-all-static --enable-pthread-tls --disable-docs
+    do_make && do_install jq.exe bin-global/
     do_checkIfExist
 fi
 
