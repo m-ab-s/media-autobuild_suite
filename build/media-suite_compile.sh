@@ -56,6 +56,7 @@ while true; do
 --dav1d=* ) dav1d="${1#*=}"; shift ;;
 --vvc=* ) vvc="${1#*=}"; shift ;;
 --jq=* ) jq="${1#*=}"; shift ;;
+--jo=* ) jo="${1#*=}"; shift ;;
 --dssim=* ) dssim="${1#*=}"; shift ;;
 --avs2=* ) avs2="${1#*=}"; shift ;;
 --timeStamp=* ) timeStamp="${1#*=}"; shift ;;
@@ -189,6 +190,13 @@ if [[ $ripgrep = y ]] &&
     do_uninstall "${_check[@]}"
     do_rust --features 'pcre2'
     do_install "target/$CARCH-pc-windows-gnu/release/rg.exe" bin-global/
+    do_checkIfExist
+fi
+
+_check=(bin-global/jo.exe)
+if [[ "$jo" = y ]] && do_vcs "https://github.com/jpmens/jo.git"; then
+    do_autoreconf
+    do_separate_confmakeinstall global
     do_checkIfExist
 fi
 

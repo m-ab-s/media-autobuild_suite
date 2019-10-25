@@ -131,6 +131,7 @@ For information about the compiler environment see the wiki, there you also have
     - ffmbc (git) (unsupported)
     - flac (git)
     - haisrt tools (git)
+    - jo (git)
     - jq (git)
     - kvazaar (git)
     - lame (3.100)

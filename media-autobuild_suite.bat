@@ -115,7 +115,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
 
 set previousOptions=0
 set msys2ArchINI=0
@@ -1021,6 +1021,26 @@ if %buildjq%==1 set "jq=y"
 if %buildjq%==2 set "jq=n"
 if %buildjq% GTR 2 GOTO jq
 if %deleteINI%==1 echo.jq=^%buildjq%>>%ini%
+
+:jo
+if %joINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build jo ^(CLI JSON from shell^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildjo="Build jo: "
+) else set buildjo=%joINI%
+
+if "%buildjo%"=="" GOTO jo
+if %buildjo%==1 set "jo=y"
+if %buildjo%==2 set "jo=n"
+if %buildjo% GTR 2 GOTO jo
+if %deleteINI%==1 echo.jo=^%buildjo%>>%ini%
 
 :dssim
 if %dssimINI%==0 (
