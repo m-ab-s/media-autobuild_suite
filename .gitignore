@@ -17,6 +17,7 @@ update_suite.sh
 !build/patches/
 !build/extras/
 /build/post_suite.sh
+!build/files.json
 
 ## VS Code
 .vscode

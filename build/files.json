@@ -1,0 +1,171 @@
+{
+    "upx": {
+        "version": "3.95",
+        "url": {
+            "64": "https://github.com/upx/upx/releases/download/v3.95/upx-3.95-win64.zip",
+            "32": "https://github.com/upx/upx/releases/download/v3.95/upx-3.95-win32.zip"
+        },
+        "hash": {
+            "64": "5c076f87ba64d82f11513f4af0ceb07246a3540aa3c72ca3ffc2d53971fa56e3",
+            "32": "f94ff30b175d125d1c238458716f5808aee222547a813918b44d0f67035c0054"
+        },
+        "vcsUrl": "https://github.com/upx/upx.git"
+    },
+    "sccache": {
+        "version": "0.2.12",
+        "url": "https://github.com/mozilla/sccache/releases/download/0.2.12/sccache-0.2.12-x86_64-pc-windows-msvc.tar.gz",
+        "hash": "fd05e91c59b9497d4ebae311b47a982f2a6eb942dca3c9c314cc1fb36f8bc64d",
+        "vcsUrl": "https://github.com/mozilla/sccache.git"
+    },
+    "dssim": {
+        "version": "2.9.7",
+        "url": "https://github.com/kornelski/dssim/releases/download/2.9.7/dssim-2.9.7.zip",
+        "hash": "1ca091dfdf595f2f0cda722a8515899be6a40ae8c8eb2b2904a440498398650a",
+        "vcsUrl": "https://github.com/kornelski/dssim.git"
+    },
+    "ripgrep": {
+        "version": "11.0.2",
+        "keys": [
+            "B2E3A4923F8B0D44"
+        ],
+        "url": "https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep-11.0.2-i686-pc-windows-gnu.zip",
+        "hash": "27260def278e7cfef35ce5d3125e48e24934d1f22024dc82479b640e6f8fc603",
+        "vcsUrl": "https://github.com/BurntSushi/ripgrep.git"
+    },
+    "freetype2": {
+        "version": "2.10.1",
+        "keys": [
+            "58E0C111E39F5408C5D3EC76C1A60EACE707FDA5"
+        ],
+        "sigFile": "https://download.savannah.gnu.org/releases/freetype/freetype-2.10.1.tar.xz.sig",
+        "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.10.1.tar.xz",
+        "hash": "16dbfa488a21fe827dc27eaf708f42f7aa3bb997d745d31a19781628c36ba26f",
+        "vcsUrl": "https://git.savannah.gnu.org/git/freetype/freetype2.git",
+        "commit": "LATEST"
+    },
+    "fontconfig": {
+        "version": "2.13.92",
+        "url": "https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.92.tar.xz",
+        "hash": "506e61283878c1726550bc94f2af26168f1e9f2106eac77eaaf0b2cdfad66e4e",
+        "vcsUrl": "https://gitlab.freedesktop.org/fontconfig/fontconfig.git",
+        "commit": "LATEST"
+    },
+    "harfbuzz": {
+        "version": "2.6.2",
+        "keys": [
+            "2277650A4E8BDFE4B7F6BE419FEE04E5D3531115"
+        ],
+        "url": "https://github.com/harfbuzz/harfbuzz/releases/download/2.6.2/harfbuzz-2.6.2.tar.xz"
+    },
+    "gnutls": {
+        "version": "3.6.8",
+        "keys": [
+            "1F42418905D8206AA754CCDC29EE58B996865171"
+        ],
+        "sigFile": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz.sig",
+        "url": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.8.tar.xz",
+        "hash": "aa81944e5635de981171772857e72be231a7e0f559ae0292d2737de475383e83"
+    },
+    "vo-armrwbenc": {
+        "version": "0.1.3",
+        "url": "https://sourceforge.net/projects/opencore-amr/files/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz",
+        "hash": "5652b391e0f0e296417b841b02987d3fd33e6c0af342c69542cbb016a71d9d4e"
+    },
+    "faac": {
+        "version": "1.29.9.2",
+        "url": "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz",
+        "hash": "e23a05f13f9695a81f250c30bd30e5bd636a0f6891a9ea9093ce4bfbf758217b"
+    },
+    "lame": {
+        "version": "3.100",
+        "url": "https://sourceforge.net/projects/lame/files/lame/3.100/lame-3.100.tar.gz",
+        "hash": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
+    },
+    "game-music-emu": {
+        "version": "0.6.2",
+        "keys": [
+            "5406ECE83665DA9D201D35720BAF0C9C7B6AE9F2"
+        ],
+        "sigFile": "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.2.tar.xz.asc",
+        "url": "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.2.tar.xz",
+        "hash": "5046cb471d422dbe948b5f5dd4e5552aaef52a0899c4b2688e5a68a556af7342"
+    },
+    "libbs2b": {
+        "version": "3.1.0",
+        "url": "https://sourceforge.net/projects/bs2b/files/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2",
+        "hash": "4799974becdeeedf0db00115bc63f60ea3fe4b25f1dfdb6903505839a720e46f"
+    },
+    "sox": {
+        "version": "14.4.2",
+        "url": "https://sourceforge.net/projects/sox/files/sox/14.4.2/sox-14.4.2.tar.bz2",
+        "hash": "81a6956d4330e75b5827316e44ae381e6f1e8928003c6aa45896da9041ea149c"
+    },
+    "shine": {
+        "version": "3.1.1",
+        "url": "https://github.com/toots/shine/releases/download/3.1.1/shine-3.1.1.tar.gz",
+        "hash": "58e61e70128cf73f88635db495bfc17f0dde3ce9c9ac070d505a0cd75b93d384"
+    },
+    "SDL2": {
+        "version": "2.0.8",
+        "keys": [
+            "1528635D8053A57F77D1E08630A59377A7763BE6"
+        ],
+        "sigFile": "http://libsdl.org/release/SDL2-2.0.9.tar.gz.sig",
+        "url": "http://libsdl.org/release/SDL2-2.0.9.tar.gz",
+        "hash": "255186dc676ecd0c1dbf10ec8a2cc5d6869b5079d8a38194c2aecdff54b324b1"
+    },
+    "apache-ant": {
+        "version": "1.10.6",
+        "keys": [
+            "8DA70C00DF7AF1B0D2F9DC74DDBCC1270A29D081"
+        ],
+        "sigFile": "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.6-bin.tar.xz.asc",
+        "url": "https://www.apache.org/dist/ant/binaries/apache-ant-1.10.6-bin.tar.xz",
+        "hash": "9fc0aef3247485cc406f7bb24d922706e627fca53aed00f2c76810536045d5ec"
+    },
+    "zvbi": {
+        "version": "0.2.35",
+        "url": "https://sourceforge.net/projects/zapping/files/zvbi/0.2.35/zvbi-0.2.35.tar.bz2",
+        "hash": "fc883c34111a487c4a783f91b1b2bb5610d8d8e58dcba80c7ab31e67e4765318"
+    },
+    "xvid": {
+        "version": "1.3.5",
+        "url": "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz",
+        "hash": "165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894cf0"
+    },
+    "openh264": {
+        "version": "1.8.0",
+        "url": {
+            "64": "https://github.com/cisco/openh264/releases/download/v1.8.0/openh264-1.8.0-win64.dll.bz2",
+            "32": "https://github.com/cisco/openh264/releases/download/v1.8.0/openh264-1.8.0-win32.dll.bz2"
+        },
+        "hash": {
+            "64": "427e3dfb264f6aab23d6057ce26d3f4f87a3c53bec40e48ddbcbcb6ac71f3bb2",
+            "32": "86c025ef302dcb56482e5b43d3de778ea4d4ddd02180a3b858a653a25e00390d"
+        }
+    },
+    "angle": {
+        "version": "latest",
+        "url": {
+            "64": "https://i.fsbn.eu/pub/angle/angle-latest-win64.7z",
+            "32": "https://i.fsbn.eu/pub/angle/angle-latest-win32.7z"
+        },
+        "hash": null
+    },
+    "d3dcompiler": {
+        "version": "47",
+        "url": {
+            "64": "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win64.7z",
+            "32": "https://i.fsbn.eu/pub/angle/d3dcompiler_47-win32.7z"
+        },
+        "hash": {
+            "64": "481235f516ed39a89e00f65d9f5bd64462da76ccb15a71664cf4f4d3da77fc40",
+            "32": "cdd95488ebc5b9a7f6c9b81945aa8fbef53d6a575135023071533212404d9667"
+        }
+    },
+    "neon": {
+        "version": "0.30.2",
+        "url": "http://download.openpkg.org/components/cache/neon/neon-0.30.2.tar.gz",
+        "hash": "db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca"
+    }
+}
