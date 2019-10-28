@@ -2080,6 +2080,21 @@ do_jq() {
     fi
 }
 
+get_jq() {
+    # Valid filters: version, keys, sigFile, url, hash
+    local filter="$1"
+    shift
+    for d in "$@"; do
+        case "$filter" in
+        keys) do_jq ".\"${d}\".keys[]?" ;;
+        url) do_jq ".\"${d}\".url? | if [.\"64\"?] != [] then .\"64\"? else . end" ;;
+        hash) do_jq ".\"${d}\".hash? | if [.\"64\"?] != [] then .\"64\"? else . end" ;;
+        *) do_jq ".\"${d}\".\"${filter}\"?" ;;
+        esac
+        shift
+    done
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
