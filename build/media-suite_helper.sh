@@ -2095,6 +2095,21 @@ get_jq() {
     done
 }
 
+get_github_api() {
+    local filter="$1"
+    local github_api="https://api.github.com/repos/"
+    shift
+    for slug in "$@"; do
+        case "$filter" in
+        release)
+            curl -s "${github_api}${slug}/releases/latest" | do_jq '.assets[]'
+            ;;
+
+        *) ;;
+        esac
+    done
+}
+
 grep_or_sed() {
     local grep_re="$1"
     local grep_file="$2"
