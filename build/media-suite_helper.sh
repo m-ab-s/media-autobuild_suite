@@ -406,13 +406,15 @@ do_wget() {
         esac
 
         if check_hash "$archive" "$hash"; then
-            printf '%b\n' "${orange}${archive}${reset}" \
+            $quiet || printf '%b\n' "${orange}${archive}${reset}" \
                 '\tFile not found online. Using local copy.'
         else
-            do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
-            printf '%s\n' "Error $response_code while downloading $url" \
-                "<Ctrl+c> to cancel build or <Enter> to continue"
-            do_prompt "if you're sure nothing depends on it."
+            $quiet || {
+                do_print_status "└ ${dirName:-$archive}" "$red" "Failed"
+                printf '%s\n' "Error $response_code while downloading $url" \
+                    "<Ctrl+c> to cancel build or <Enter> to continue"
+                do_prompt "if you're sure nothing depends on it."
+            }
             rm -f "$temp_file"
             return 1
         fi
