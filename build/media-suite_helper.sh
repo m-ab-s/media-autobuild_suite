@@ -23,8 +23,14 @@ ncols=72
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
 
 do_simple_print() {
-    local plain formatString='' dateValue
-    [[ $1 == -p ]] && plain=y && shift
+    local plain formatString='' dateValue newline='\n'
+    while true; do
+        case "$1" in
+        -n) newline='' && shift ;;
+        -p) plain=y && shift ;;
+        *) break ;;
+        esac
+    done
 
     if [[ $timeStamp == y ]]; then
         formatString+="${purple}"'%(%H:%M:%S)T'"${reset}"' '
@@ -35,7 +41,7 @@ do_simple_print() {
     if [[ -z $plain ]]; then
         formatString+="${bold}├${reset} "
     fi
-    printf "$formatString"'%b'"$reset"'\n' $dateValue "$*"
+    printf "$formatString"'%b'"${reset}${newline}" $dateValue "$*"
 }
 
 do_print_status() {
