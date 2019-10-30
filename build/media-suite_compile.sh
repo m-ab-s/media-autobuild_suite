@@ -66,6 +66,7 @@ while true; do
 --svtav1=* ) svtav1="${1#*=}"; shift ;;
 --svtvp9=* ) svtvp9="${1#*=}"; shift ;;
 --xvc=* ) xvc="${1#*=}"; shift ;;
+--gst=* ) gst="${1#*=}"; shift ;;
     -- ) shift; break ;;
     -* ) echo "Error, unknown option: '$1'."; exit 1 ;;
     * ) break ;;
@@ -1735,6 +1736,129 @@ if [[ $bits = 64bits && $vvc = y ]] &&
         -DUSE_CCACHE=OFF
     do_checkIfExist
     unset _notrequired
+fi
+
+if [[ $gst = y ]]; then
+
+    # It seems that glib-2.0 needs iconv, but is not listed
+    grep_or_sed iconv "$MINGW_PREFIX"/lib/pkgconfig/glib-2.0.pc 's/-lm/& -liconv/'
+
+    # Since it seems all of the gstreamer builds require the flags for static compilation.
+    # It does not seem that gnome tools and gstreamer handle static compilation well.
+    (
+        # shellcheck disable=SC2030
+        CFLAGS+=" -DGLIB_STATIC_COMPILATION -DGOBJECT_STATIC_COMPILATION -DLIBICONV_PLUG -DORC_STATIC_COMPILATION -DGST_STATIC_COMPILATION $($PKG_CONFIG --libs glib-2.0 gobject-2.0 gio-2.0 orc-0.4)"
+        export CFLAGS
+        # Don't use introspection. Only works with shared libs and fails to do anything related to static.
+        _check=(
+            bin-video/gst-{inspect,stats,launch}-1.0.exe
+            gstreamer-1.0/gst/gst{,config,version}.h
+            libgst{reamer,base,controller,net}-1.0.a
+            gstreamer{,-base,-net,-controller}-1.0.pc
+        )
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gstreamer.git"; then
+            do_pacman_install gtk3 pcre2 orc iso-codes mpg123 libshout libsoup taglib
+            do_uninstall include/gstreamer-1.0 lib/gstreamer-1.0/pkgconfig "${_check[@]}"
+            do_mesoninstall video \
+                -D{check,tests,doc,examples}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+
+        # For base plugin repository
+        # Currently does not build on windows due to small errors.
+        #if do_vcs "https://github.com/Libvisual/libvisual.git"; then
+        #    do_pacman_install SDL
+        #    cd_safe libvisual
+        #    do_patch "https://github.com/Libvisual/libvisual/compare/master...1480c1:longlong.patch" am
+        #    do_cmake -DENABLE_EXTRA_OPTIMIZATIONS=ON -DENABLE_EXAMPLES=OFF
+        #fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(
+            bin-video/gst-{device-monitor,discoverer,play}-1.0.exe
+            gstreamer-1.0/gst/video/video.h
+            gstreamer-1.0/libgstencoding.a
+            gstreamer-plugins-base-1.0.pc
+        )
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-plugins-base.git"; then
+            do_pacman_install gcc-objc glew graphene libvorbisidec-svn
+            do_uninstall lib/gstreamer-1.0/ "${_check[@]}"
+            do_mesoninstall video -D{examples,tests,doc}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite" \
+                -Dgl_{winsys=win32,api=opengl,platform=wgl}
+            do_checkIfExist
+        fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(gstreamer-1.0/libgstvideofilter.a)
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-plugins-good.git"; then
+            do_uninstall "${_check[@]}"
+            do_mesoninstall -D{examples,tests,doc}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+
+        # For plugins bad repository
+        _check=(bin/stun{d,bdc}.exe nice/nice.h stun/win32_common.h gstreamer-1.0/libgstnice.a libnice.a nice.pc)
+        if do_vcs "https://gitlab.freedesktop.org/libnice/libnice.git"; then
+            do_uninstall include/nice include/stun "${_check[@]}"
+            CFLAGS+=" -DASN1_STATIC $(pkg-config --static --libs gnutls)" \
+                do_mesoninstall -D{examples,tests,gtk_doc}=disabled
+            do_checkIfExist
+        fi
+
+        _check=(bin-audio/wildmidi-static.exe wildmidi_lib.h libWildMidi.a wildmidi.pc)
+        if do_vcs "https://github.com/Mindwerks/wildmidi.git"; then
+            do_uninstall "${_check[@]}"
+            do_cmakeinstall audio -DWANT_STATIC=ON
+            do_checkIfExist
+        fi
+
+        # Currently does not build due to assuming msvc extensions for windows.
+        #if do_vcs "https://gitlab.freedesktop.org/pulseaudio/webrtc-audio-processing.git"; then
+        #    do_mesoninstall
+        #fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(bin-video/gst-transcoder-1.0.exe gstreamer-1.0/gst/audio/audio-bad-prelude.h gstreamer-1.0/libgstd3d11.a libgstbadaudio-1.0.a gstreamer-plugins-bad-1.0.pc)
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad.git"; then
+            do_pacman_install chromaprint faad2 fluidsynth gsm ladspa-sdk lcms2 libdca libexif libmodplug libmpcdec libsrtp libssh2 libxml2 opencv openexr openjpeg2 soundtouch zbar libusb libmicrodns
+            # dssim-c: Additional optional plugin based on dssim dssim-c branch.
+            do_uninstall "${_check[@]}"
+            VK_SDK_PATH="$LOCALDESTDIR" \
+                do_mesoninstall video -D{examples,tests,doc}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(gstreamer-1.0/libgstrealmedia.a)
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-plugins-ugly.git"; then
+            do_pacman_install a52dec
+            do_uninstall "${_check[@]}"
+            do_mesoninstall -D{tests,doc}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(gstreamer-1.0/libgstlibav.a)
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-libav.git"; then
+            do_uninstall "${_check[@]}"
+            do_mesoninstall -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+
+        _deps=(libgst{reamer,base,controller,net}-1.0.a)
+        _check=(gstreamer-1.0/gst/rtsp-server/rtsp-client.h libgstrtspserver-1.0.a gstreamer-rtsp-server-1.0.pc)
+        if do_vcs "https://gitlab.freedesktop.org/gstreamer/gst-rtsp-server.git"; then
+            do_uninstall "${_check[@]}"
+            do_mesoninstall -D{examples,tests,doc}=disabled \
+                -Dpackage-origin="https://github.com/m-ab-s/media-autobuild_suite"
+            do_checkIfExist
+        fi
+    )
 fi
 
 enabled openssl && hide_libressl
