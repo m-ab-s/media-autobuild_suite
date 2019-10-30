@@ -1965,39 +1965,18 @@ EOF
 }
 
 create_ab_ccache() {
-    local bin
+    local bin temp_file
+    temp_file=$(mktemp)
     for bin in {$MINGW_CHOST-,}{gcc,g++} clang{,++} cc cpp c++; do
-        if [[ ! -f "$LOCALDESTDIR/bin/$bin.bat" ]] || ! "$LOCALDESTDIR/bin/$bin.bat" --help > /dev/null 2>&1; then
-            printf '%s\r\n' \
-                '@echo off >nul 2>&1' \
-                'rem() { "$@"; }' \
-                'rem test -f nul && rm nul' \
-                'rem ccache > /dev/null 2>&1' \
-                "rem test \$? -ne 127 && ccache $bin \"\$@\"" \
-                'rem exit $?' \
-                "$(cygpath -m "$MINGW_PREFIX/bin/ccache") $bin %*" \
-                'exit %ERRORLEVEL%' \
-                'goto :EOF' \
-                ':args' \
-                'if -%1-==-- (' \
-                '    exit /b' \
-                ')' \
-                'test -f %1' \
-                'if %ERRORLEVEL%==0 (' \
-                '    for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
-                '    shift' \
-                ') else (' \
-                '    test -d %1' \
-                '    if %ERRORLEVEL%==0 (' \
-                '        for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
-                '        shift' \
-                '    ) else (' \
-                '        set "ARGS=%ARGS% %1"' \
-                '        shift' \
-                '    )' \
-                ')' \
-                'goto :args' > "$LOCALDESTDIR/bin/$bin.bat"
-        fi
+        cat << EOF > "$temp_file"
+@echo off >nul 2>&1
+rem() { "\$@"; }
+rem test -f nul && rm nul
+rem $(command -v ccache) --help > /dev/null 2>&1 && $(command -v ccache) $(command -v $bin) "\$@" || $(command -v $bin) "\$@"
+rem exit \$?
+$(cygpath -m "$(command -v ccache)") $(cygpath -m "$(command -v $bin)") %*
+EOF
+        diff -q "$temp_file" "$LOCALDESTDIR/bin/$bin.bat" > /dev/null || cp -f "$temp_file" "$LOCALDESTDIR/bin/$bin.bat"
         chmod +x "$LOCALDESTDIR/bin/$bin.bat"
     done
 }
