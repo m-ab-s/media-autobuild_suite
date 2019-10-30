@@ -1538,67 +1538,69 @@ do_unhide_all_sharedlibs() {
 }
 
 do_pacman_install() {
-    local pkg msyspackage
-    while [ -n "$*" ]; do
+    local pkg msyspackage=false pkgs
+    while true; do
         case "$1" in
-        -m) msyspackage=y ;;
+        -m) msyspackage=true && shift ;;
         *) break ;;
         esac
     done
     for pkg; do
-        [[ $msyspackage != "y" && $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
-            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 && continue
-        if [[ $timeStamp == y ]]; then
-            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+        if ! $msyspackage && [[ $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]]; then
+            pkgs="${pkgs:+$pkgs }${MINGW_PACKAGE_PREFIX}-${pkg}"
         else
-            echo -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
+            pkgs="${pkgs:+$pkgs }${pkg}"
         fi
+    done
+
+    for pkg in $pkgs; do
+        pacman -Qqe "$pkg" > /dev/null 2>&1 && continue
+        do_simple_print -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" > /dev/null 2>&1; then
             pacman -D --asexplicit "$pkg" > /dev/null
-            if [[ $msyspackage == "y" ]]; then
+            if $msyspackage; then
                 /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk > /dev/null 2>&1 ||
                     echo "${pkg}" >> /etc/pac-msys-extra.pk
             else
                 /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk > /dev/null 2>&1 ||
                     echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
             fi
-            sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
-            sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
             echo "done"
         else
             echo "failed"
         fi
     done
+    sort -uo /etc/pac-mingw-extra.pk{,} > /dev/null 2>&1
+    sort -uo /etc/pac-msys-extra.pk{,} > /dev/null 2>&1
     do_hide_all_sharedlibs
 }
 
 do_pacman_remove() {
-    local pkg msyspackage
-    while [ -n "$*" ]; do
+    local pkg msyspackage=false pkgs
+    while true; do
         case "$1" in
-        -m) msyspackage=y ;;
+        -m) msyspackage=true ;;
         *) break ;;
         esac
     done
     for pkg; do
-        [[ $msyspackage != "y" && $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]] &&
-            pkg="${MINGW_PACKAGE_PREFIX}-${pkg}"
-        if [[ $msyspackage == "y" ]]; then
+        if ! $msyspackage && [[ $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]]; then
+            pkgs="${pkgs:+$pkgs }${MINGW_PACKAGE_PREFIX}-${pkg}"
+        else
+            pkgs="${pkgs:+$pkgs }${pkg}"
+        fi
+    done
+
+    for pkg in $pkgs; do
+        if $msyspackage; then
             [[ -f /etc/pac-msys-extra.pk ]] &&
                 sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk > /dev/null 2>&1
         else
             [[ -f /etc/pac-mingw-extra.pk ]] &&
                 sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk > /dev/null 2>&1
         fi
-        sort -uo /etc/pac-mingw-extra.pk{,} 2> /dev/null >&2
-        sort -uo /etc/pac-msys-extra.pk{,} 2> /dev/null >&2
-        pacman -Qqe "^${pkg}$" > /dev/null 2>&1 || continue
-        if [[ $timeStamp == y ]]; then
-            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s' -1 "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
-        else
-            echo -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
-        fi
+        pacman -Qqe "$pkg" > /dev/null 2>&1 || continue
+        do_simple_print -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         do_hide_pacman_sharedlibs "$pkg" revert
         if pacman -Rs --noconfirm --ask=20 "$pkg" > /dev/null 2>&1; then
             echo "done"
@@ -1607,6 +1609,8 @@ do_pacman_remove() {
             echo "failed"
         fi
     done
+    sort -uo /etc/pac-mingw-extra.pk{,} > /dev/null 2>&1
+    sort -uo /etc/pac-msys-extra.pk{,} > /dev/null 2>&1
     do_hide_all_sharedlibs
 }
 
