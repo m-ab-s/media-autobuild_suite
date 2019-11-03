@@ -1808,7 +1808,7 @@ if [[ $gst = y ]]; then
             do_checkIfExist
         fi
 
-        _check=(bin-audio/wildmidi-static.exe wildmidi_lib.h libWildMidi.a wildmidi.pc)
+        _check=(bin/wildmidi-static.exe wildmidi_lib.h libWildMidi.a wildmidi.pc)
         if do_vcs "https://github.com/Mindwerks/wildmidi.git"; then
             do_uninstall "${_check[@]}"
             do_cmakeinstall audio -DWANT_STATIC=ON
