@@ -25,6 +25,7 @@ color 70
 title media-autobuild_suite
 
 setlocal
+chcp 65001
 cd /d "%~dp0"
 set "TERM=xterm-256color"
 setlocal
