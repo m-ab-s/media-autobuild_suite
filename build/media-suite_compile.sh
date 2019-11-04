@@ -667,8 +667,8 @@ fi
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac{,gui}.exe)
 if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
-    do_wget -h e23a05f13f9695a81f250c30bd30e5bd636a0f6891a9ea9093ce4bfbf758217b \
-        "https://github.com/knik0/faac/archive/1_29_9_2.tar.gz" "faac-1_29_9_2.tar.gz"; then
+    do_wget -h adc387ce588cca16d98c03b6ec1e58f0ffd9fc6eadb00e254157d6b16203b2d2 \
+        "https://github.com/knik0/faac/archive/1_30.tar.gz" "faac-1_30.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     # autoconf: frontend compilation optional
     # blockswitch: add missing stdint include
