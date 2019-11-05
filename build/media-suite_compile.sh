@@ -961,7 +961,7 @@ if [[ $vpx = y ]] && do_vcs "https://chromium.googlesource.com/webm/libvpx" vpx;
     [[ $ffmpeg = "sharedlibs" ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
     get_external_opts extracommands
     log "configure" ../configure --target="${arch}-win${bits%bit}-gcc" --prefix="$LOCALDESTDIR" \
-        --disable-{shared,unit-tests,docs,install-bins,avx512} \
+        --disable-{shared,unit-tests,docs,install-bins} \
         "${extracommands[@]}"
     for _ff in *.mk; do
         sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' "$_ff"
