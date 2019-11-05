@@ -463,7 +463,7 @@ if [[ $standalone = y ]] && enabled_any libtesseract libwebp &&
     do_uninstall "${_check[@]}"
     grep_or_sed 'Requires.private' libtiff-4.pc.in \
         '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
-    do_cmakeinstall global -Dwebp=OFF -DUNIX=OFF
+    do_cmakeinstall global -Dwebp=OFF -DUNIX=OFF -Djbig=OFF
     do_checkIfExist
 fi
 
