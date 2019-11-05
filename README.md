@@ -39,7 +39,7 @@ For information about the compiler environment see the wiki, there you also have
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - avisynth (needs avisynth dll installed)
-        - fontconfig (2.13.1)
+        - fontconfig (latest release)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw)
                 - preferred to gnutls and to libtls if all three are in options
@@ -53,11 +53,11 @@ For information about the compiler environment see the wiki, there you also have
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig, fontconfig backend included
-            - with harfbuzz (git)
+            - with harfbuzz (latest release)
         - libbluray (git)
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
-        - libfreetype (git)
+        - libfreetype (latest release)
         - libmfx (git)
         - libmodplug (mingw)
         - libopencore-amr(nb/wb) (mingw)
@@ -91,7 +91,7 @@ For information about the compiler environment see the wiki, there you also have
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libflite (git)
-        - libfribidi (git)
+        - libfribidi (latest release)
         - libgme (git snapshot)
         - libgsm (mingw)
         - libilbc (git snapshot)
@@ -117,7 +117,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R47.2)
+        - vapoursynth (R48)
 
 - other tools
     - aom (git)
@@ -126,7 +126,7 @@ For information about the compiler environment see the wiki, there you also have
     - cyanrip (git)
     - dav1d (git)
     - dssim (git)
-    - faac (1.29.9.2)
+    - faac (1.30)
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
     - flac (git)
@@ -154,7 +154,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git snapshot)
             - uchardet (mingw)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R47.2)
+            - vapoursynth (R48)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw)
