@@ -68,6 +68,26 @@ do if %%f lss 4 (
     exit
 )
 
+(
+    where lib.exe || ^
+    where cl.exe || ^
+    if DEFINED VSINSTALLDIR cd .
+) >nul 2>&1 && goto MSVCINSTALLED
+goto MSVCNOTINSTALLED
+:MSVCINSTALLED
+echo ----------------------------------------------------------------------
+echo. You are running in a MSVC environment ^(cl.exe or lib.exe detected^)
+echo. This is not supported.
+echo. Please run the script through a normal cmd.exe some other way.
+echo.
+echo. Detected Paths:
+where lib.exe 2>nul
+where cl.exe 2>nul
+echo %VSINSTALLDIR%
+pause
+exit
+:MSVCNOTINSTALLED
+
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
