@@ -1965,30 +1965,39 @@ EOF
 }
 
 create_ab_ccache() {
-    local bin temp_file
-    temp_file=$(mktemp)
+    local bin
     for bin in {$MINGW_CHOST-,}{gcc,g++} clang{,++} cc cpp c++; do
-        cat << EOF > "$temp_file"
-@echo off >nul 2>&1
-rem() { "\$@"; }
-rem test -f nul && rm nul
-rem $(command -v ccache) --help > /dev/null 2>&1 && $(command -v ccache) $(command -v $bin) "\$@" || $(command -v $bin) "\$@"
-rem exit \$?
-:args
-if -%1-==-- goto :compile
-if EXIST %1 (
-    for /f "usebackq tokens=*" %%a in (\`$(cygpath -m "$(command -v cygpath)") -m %1\`) do set "ARGS=%ARGS% %%a"
-) else (
-    if EXIST %1\ (
-        for /f "usebackq tokens=*" %%a in (\`$(cygpath -m "$(command -v cygpath)") -m %1\`) do set "ARGS=%ARGS% %%a"
-    ) else set "ARGS=%ARGS% %1"
-)
-shift
-goto :args
-:compile
-$(cygpath -m "$(command -v ccache)") $(cygpath -m "$(command -v $bin)") %ARGS%
-EOF
-        diff -q "$temp_file" "$LOCALDESTDIR/bin/$bin.bat" > /dev/null || cp -f "$temp_file" "$LOCALDESTDIR/bin/$bin.bat"
+        if [[ ! -f "$LOCALDESTDIR/bin/$bin.bat" ]] || ! "$LOCALDESTDIR/bin/$bin.bat" --help > /dev/null 2>&1; then
+            printf '%s\r\n' \
+                '@echo off >nul 2>&1' \
+                'rem() { "$@"; }' \
+                'rem test -f nul && rm nul' \
+                'rem ccache > /dev/null 2>&1' \
+                "rem test \$? -ne 127 && ccache $bin \"\$@\"" \
+                'rem exit $?' \
+                "$(cygpath -m "$MINGW_PREFIX/bin/ccache") $bin %*" \
+                'exit %ERRORLEVEL%' \
+                'goto :EOF' \
+                ':args' \
+                'if -%1-==-- (' \
+                '    exit /b' \
+                ')' \
+                'test -f %1' \
+                'if %ERRORLEVEL%==0 (' \
+                '    for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
+                '    shift' \
+                ') else (' \
+                '    test -d %1' \
+                '    if %ERRORLEVEL%==0 (' \
+                '        for /f "tokens=1 delims=" %%a in ("cygpath -m %1") do set "ARGS=%ARGS% %%a"' \
+                '        shift' \
+                '    ) else (' \
+                '        set "ARGS=%ARGS% %1"' \
+                '        shift' \
+                '    )' \
+                ')' \
+                'goto :args' > "$LOCALDESTDIR/bin/$bin.bat"
+        fi
         chmod +x "$LOCALDESTDIR/bin/$bin.bat"
     done
 }
