@@ -115,7 +115,7 @@ libaom libopenmpt version3
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libgsm libilbc libsvthevc libsvtav1 ^
-libkvazaar libmodplug librtmp librubberband libssh libtesseract libxavs libzmq ^
+libkvazaar libmodplug librtmp librubberband #libssh libtesseract libxavs libzmq ^
 libzvbi openal libvmaf libcodec2 libsrt ladspa librav1e #vapoursynth #liblensfun
 
 :: options also available with the suite that add shared dependencies

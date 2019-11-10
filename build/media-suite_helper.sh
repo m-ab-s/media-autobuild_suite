@@ -832,9 +832,9 @@ do_getFFmpegConfig() {
         do_addOption --enable-schannel
     fi
 
-    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,ndi_newtek,ndi-newtek} netcdf &&
-        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf)" &&
-        sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek)|netcdf);;g' \
+    enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,ndi_newtek,ndi-newtek,ssh} netcdf &&
+        do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek|ssh)|netcdf)" &&
+        sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|ndi_newtek|ndi-newtek|ssh)|netcdf);;g' \
             "$LOCALBUILDDIR/ffmpeg_options.txt"
 }
 

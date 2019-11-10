@@ -105,7 +105,7 @@ For information about the compiler environment see the wiki, there you also have
         - librtmp (git)
         - librubberband (git snapshot)
         - libsrt (git)
-        - libssh (mingw)
+        - libssh (broken)
         - libsvtav1 (git) (using non-upstream patch)
         - libsvthevc (git) (using non-upstream patch)
         - libtesseract (git)
