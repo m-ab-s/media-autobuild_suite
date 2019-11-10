@@ -1976,7 +1976,7 @@ rem $(command -v ccache) --help > /dev/null 2>&1 && $(command -v ccache) $(comma
 rem exit \$?
 $(cygpath -m "$(command -v ccache)") $(cygpath -m "$(command -v $bin)") %*
 EOF
-        diff -q "$temp_file" "$LOCALDESTDIR/bin/$bin.bat" > /dev/null || cp -f "$temp_file" "$LOCALDESTDIR/bin/$bin.bat"
+        diff -q "$temp_file" "$LOCALDESTDIR/bin/$bin.bat" > /dev/null 2>&1 || cp -f "$temp_file" "$LOCALDESTDIR/bin/$bin.bat"
         chmod +x "$LOCALDESTDIR/bin/$bin.bat"
     done
 }
