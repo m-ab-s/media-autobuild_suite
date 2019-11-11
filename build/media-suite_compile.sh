@@ -35,6 +35,7 @@ while true; do
 --sox=* ) sox="${1#*=}"; shift ;;
 --ffmpeg=* ) ffmpeg="${1#*=}"; shift ;;
 --ffmpegUpdate=* ) ffmpegUpdate="${1#*=}"; shift ;;
+--ffmpegVersion=* ) ffmpegVersion="${1#*=}"; shift ;;
 --ffmpegChoice=* ) ffmpegChoice="${1#*=}"; shift ;;
 --mplayer=* ) mplayer="${1#*=}"; shift ;;
 --mpv=* ) mpv="${1#*=}"; shift ;;
@@ -1391,6 +1392,11 @@ if [[ $x264 != no ]]; then
         if [[ $standalone = y && $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
+            if [[ $ffmpegVersion == latest ]]; then
+                echo > VERSION
+            else
+                echo $ffmpegVersion > VERSION
+            fi
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
             create_build_dir light
@@ -1806,6 +1812,11 @@ if [[ $ffmpeg != "no" ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+        if [[ $ffmpegVersion == latest ]]; then
+            echo > VERSION
+        else
+            echo $ffmpegVersion > VERSION
+        fi
 
         # See issue https://github.com/OpenVisualCloud/SVT-AV1/issues/567 for the reasons behind the follow codeblock:
         # start of SVT-AV1 temporary measures
@@ -1883,7 +1894,7 @@ if [[ $ffmpeg != "no" ]]; then
             "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}.lib
             )
         _check=()
-        sedflags="prefix|bindir|extra-version|pkg-config-flags"
+        sedflags="prefix|bindir|extra-\w*|pkg-config-flags|disable-debug|shlibdir"
 
         # --build-suffix handling
         opt_exists FFMPEG_OPTS "^--build-suffix=[a-zA-Z0-9-]+$" &&
@@ -1914,7 +1925,7 @@ if [[ $ffmpeg != "no" ]]; then
                 do_configure \
                 --disable-static --enable-shared "${FFMPEG_OPTS_SHARED[@]}"
             # cosmetics
-            sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
+            sed -ri "s/ ?--($sedflags)(=(\S+[^\" ]|'[^']+'))?//g" config.h
             do_make && do_makeinstall
             cd_safe ..
             files_exist "${_check[@]}" && touch "build_successful${bits}_shared"
@@ -1941,7 +1952,7 @@ if [[ $ffmpeg != "no" ]]; then
                 do_configure \
                 --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
             # cosmetics
-            sed -ri "s/ ?--($sedflags)=(\S+[^\" ]|'[^']+')//g" config.h
+            sed -ri "s/ ?--($sedflags)(=(\S+[^\" ]|'[^']+'))?//g" config.h
             do_make && do_makeinstall
             ! disabled_any debug "debug=gdb" &&
                 create_debug_link "$LOCALDESTDIR"/bin-video/ff{mpeg,probe,play}.exe
@@ -2290,6 +2301,11 @@ if [[ $cyanrip = y ]]; then
         old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
         _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
         if flavor=cyan do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
+            if [[ $ffmpegVersion == latest ]]; then
+                echo > VERSION
+            else
+                echo $ffmpegVersion > VERSION
+            fi
             do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
             [[ -f "config.mak" ]] && log "distclean" make distclean
             mapfile -t cyan_ffmpeg_opts < <(

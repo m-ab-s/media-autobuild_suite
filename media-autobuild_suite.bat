@@ -134,7 +134,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build libmpv-shared openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
-soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
+soxB ffmpegB2 ffmpegUpdate ffmpegVersion ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
 ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
 
@@ -711,6 +711,26 @@ if %buildffmpegUp%==2 set "ffmpegUpdate=n"
 if %buildffmpegUp%==3 set "ffmpegUpdate=onlyFFmpeg"
 if %buildffmpegUp% GTR 3 GOTO ffmpegUp
 if %deleteINI%==1 echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
+
+:ffmpegVer
+if %ffmpegVersionINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Always build latest FFmpeg?
+    echo. 1 = Yes
+    echo. x.y.z = Specific FFmpeg version ^(the git tag^)
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildffmpegVersion="Specific ffmpeg version: "
+) else set buildffmpegVersion=%ffmpegVersionINI%
+
+if "%buildffmpegVersion%"=="" GOTO ffmpegVer
+if %buildffmpegVersion%==1 (
+    set "ffmpegVersion=latest"
+) else set "ffmpegVersion=%buildffmpegVersion%"
+if %deleteINI%==1 echo.ffmpegVersion=^%buildffmpegVersion%>>%ini%
 
 :ffmpegChoice
 if %ffmpegChoiceINI%==0 (
@@ -1659,10 +1679,11 @@ mklink /d linkedtestmklink testmklink >nul 2>&1 && (
 rmdir /q testmklink
 
 endlocal & (
+set configArgs=--ffmpegVersion=%ffmpegVersion%
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
---ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
+--ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegVersion=%ffmpegVersion% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
@@ -1677,9 +1698,16 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "build=%build%"
 )
 if %noMintty%==y (
+    call :runBash config.log /build/media-suite_config.sh %configArgs%
     call :runBash compile.log /build/media-suite_compile.sh %compileArgs%
     exit /B %ERRORLEVEL%
 ) else (
+    if exist %CD%\build\config.log del %CD%\build\config.log
+    start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    --log 2>&1 %CD%\build\config.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
+    MSYS=%MSYS% /usr/bin/bash ^
+    --login /build/media-suite_config.sh %configArgs%
+
     if exist %CD%\build\compile.log del %CD%\build\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
     --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
