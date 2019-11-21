@@ -1596,15 +1596,14 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     do_checkIfExist
 fi
 
-_check=(libvmaf.{a,h,pc})
+_check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libvmaf
 elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
-    log clean make clean
-    do_make INSTALL_PREFIX="$LOCALDESTDIR"
-    do_makeinstall INSTALL_PREFIX="$LOCALDESTDIR"
+    do_patch "https://github.com/Netflix/vmaf/compare/master...1480c1:cmake.patch" am
+    do_cmakeinstall
     do_checkIfExist
 fi
 
