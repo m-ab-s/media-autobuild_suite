@@ -1302,8 +1302,7 @@ do_rust() {
 compilation_fail() {
     [[ -z $build32 || -z $build64 ]] && return 1
     local reason="$1"
-    local operation
-    operation="$(echo "$reason" | tr '[:upper:]' '[:lower:]')"
+    local operation="${reason,,}"
     if [[ $_notrequired ]]; then
         if [[ $logging == y ]]; then
             echo "Likely error (tail of the failed operation logfile):"
