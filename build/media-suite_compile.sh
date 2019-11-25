@@ -2059,8 +2059,9 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
     if ! mpv_disabled vulkan &&
         do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
         _DeadSix27="https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master"
+        _shinchiro="https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master"
         do_uninstall "${_check[@]}"
-        do_patch "$_DeadSix27/patches/vulkan/0001-fix-cross-compiling.patch" am
+        do_patch "$_shinchiro/packages/vulkan-0001-cross-compile-static-linking-hacks.patch" am
         create_build_dir
         log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
         cd_safe Vulkan-Headers
