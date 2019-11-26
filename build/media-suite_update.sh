@@ -81,23 +81,9 @@ fi # end suite update
 # packet update system
 # --------------------------------------------------
 
-{ /usr/bin/pacman-key -f EFD16019AE4FF531 || pacman-key -r EFD16019AE4FF531 --keyserver 'hkp://keys.gnupg.net/'; } > /dev/null
-{ /usr/bin/pacman-key --list-sigs AE4FF531 | grep -q pacman@localhost || pacman-key --lsign AE4FF531; } > /dev/null
-
-#always kill gpg-agent
-command -v gpgconf.exe > /dev/null && gpgconf --kill gpg-agent
-
-# for some people the signature is broken
-test -f /etc/pacman.d/abrepo.conf && /usr/bin/grep -q Optional /etc/pacman.d/abrepo.conf ||
-    printf 'Server = %s\nSigLevel = Optional\n' \
-        'https://i.fsbn.eu/abrepo/' > /etc/pacman.d/abrepo.conf
-
-# fix fuckup
-grep -q 'i.fsbn.eu/abrepo' /etc/pacman.conf &&
-    sed -i '/\[abrepo\]/,+2d' /etc/pacman.conf
-
-/usr/bin/grep -q abrepo /etc/pacman.conf ||
-    sed -i '/\[mingw32\]/ i\[abrepo]\nInclude = /etc/pacman.d/abrepo.conf\n' /etc/pacman.conf
+# remove buggy crap
+grep -q abrepo /etc/pacman.conf && sed -i '/abrepo/d' /etc/pacman.conf
+rm -f /etc/pacman.d/abrepo.conf
 
 echo
 echo "-------------------------------------------------------------------------------"
