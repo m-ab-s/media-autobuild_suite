@@ -1282,7 +1282,7 @@ do_mesoninstall() {
 
 do_rust() {
     log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
-    {
+    [[ $ccache = y ]] && {
         command -v sccache > /dev/null 2>&1 &&
             export RUSTC_WRAPPER=sccache &&
             { sccache --start-server > /dev/null 2>&1 || true; }

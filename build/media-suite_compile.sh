@@ -175,7 +175,7 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y ]] || enabled librav1e; then
         "stable-$CARCH-pc-windows-gnu"
 
     _check=(bin/sccache.exe)
-    if do_vcs "https://github.com/mozilla/sccache.git"; then
+    if [[ $ccache = y ]] && do_vcs "https://github.com/mozilla/sccache.git"; then
         do_rust
         sccache --stop-server >/dev/null 2>&1 || true
         do_install "target/$CARCH-pc-windows-gnu/release/sccache.exe" bin/
