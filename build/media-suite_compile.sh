@@ -1728,6 +1728,7 @@ enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
+    ffmpeg_conflicting_def_libs=("libxml2 openssl")
     if enabled libxvid && [[ $standalone = n ]]; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
@@ -1739,6 +1740,12 @@ if [[ $ffmpeg != "no" ]]; then
         grep_or_sed "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc \
             "/Libs:/ i\Requires.private: zlib libssl"
     fi
+    for conflicting_libs in "${ffmpeg_conflicting_def_libs[@]}"; do
+        # shellcheck disable=SC2086
+        if enabled_all $conflicting_libs; then
+            do_addOption "--extra-ldflags=-Wl,--allow-multiple-definition"
+        fi
+    done
     enabled libtheora && do_pacman_install libtheora
     if enabled libcdio; then
         do_pacman_install libcdio-paranoia
