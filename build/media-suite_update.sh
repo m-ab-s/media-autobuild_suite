@@ -229,7 +229,7 @@ fi
     pacman -S --noconfirm --ask 20 --asdeps ca-certificates
 
 # do a final overall installation for potential downgrades
-pacman -Syyuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
+pacman -Syuu --noconfirm --ask 20 --overwrite "/mingw64/*" \
     --overwrite "/mingw32/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
