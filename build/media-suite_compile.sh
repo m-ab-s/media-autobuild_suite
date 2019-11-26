@@ -457,7 +457,7 @@ fi
 unset _deps
 
 _check=(libtiff{.a,-4.pc})
-if enabled_any libwebp libtesseract &&
+if [[ $standalone = y ]] && enabled_any libtesseract libwebp &&
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
     do_pacman_install libjpeg-turbo xz zlib zstd
     do_uninstall "${_check[@]}"
@@ -476,7 +476,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libwebp &&
         extracommands=(--enable-libwebp{demux,decoder,extras}
             "LIBS=$($PKG_CONFIG --libs libpng libtiff-4)")
     else
-        extracommands=()
+        extracommands=(--disable-tiff)
         sed -i -e '/examples/d' -e 's/ man//' Makefile.am
     fi
     do_autoreconf
