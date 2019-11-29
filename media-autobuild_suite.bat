@@ -1355,22 +1355,11 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Downloading and unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        7z >nul 2>&1 && (
-            7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o..
-        ) || 7za >nul 2>&1 && (
-            7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
-        ) || echo $wc = New-Object System.Net.WebClient; ^
-            $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
-            Add-Type -assembly "System.IO.Compression.FileSystem"; ^
-            [System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^); ^
-            Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package; ^
-            powershell -noprofile -command { ^
-                Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za; ^
-                Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz; ^
-                Remove-Item $PWD\msys2-base.tar.xz; ^
-                Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
-                Remove-Item $PWD\msys2-base.tar; ^
-            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -NonInteractive -Command -
+        7z >nul 2>&1 && set mabs7z=7z || set mabs7z=7za
+        7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command ^
+                ^(New-Object System.Net.WebClient^).DownloadFile^('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
+        %mabs7z% x msys2-base.tar.xz -so | %mabs7z% x -aoa -si -ttar -o..
+        if exist 7za.exe del 7za.exe
     )
 
     if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
