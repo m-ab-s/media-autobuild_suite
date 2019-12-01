@@ -1607,6 +1607,7 @@ if %msys2%==msys32 (
     echo.-------------------------------------------------------------------------------
     call %instdir%\%msys2%\autorebase.bat
 )
+del "%build%\msys2-base.tar.xz" 2>nul
 
 rem ------------------------------------------------------------------
 rem write config profiles:
