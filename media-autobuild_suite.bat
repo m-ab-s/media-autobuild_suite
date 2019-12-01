@@ -1355,10 +1355,8 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Downloading and unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        7z >nul 2>&1 && set mabs7z=7z || set mabs7z=7za
-        7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command ^
-                ^(New-Object System.Net.WebClient^).DownloadFile^('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
-        %mabs7z% x msys2-base.tar.xz -so | %mabs7z% x -aoa -si -ttar -o..
+        7z >nul 2>&1 || 7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command ^(New-Object System.Net.WebClient^).DownloadFile^('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
+        7z >nul 2>&1 && 7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o.. || 7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
         if exist 7za.exe del 7za.exe
     )
 
@@ -1369,8 +1367,8 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Download msys2 basic system failed,
         echo.- please download it manually from:
         echo.- http://repo.msys2.org/distrib/
-        echo.- and copy the uncompressed folder to:
-        echo.- %build%
+        echo.- extract and put the msys2 folder into
+        echo.- the root media-autobuid_suite folder
         echo.- and start the batch script again!
         echo.
         echo -------------------------------------------------------------------------------
