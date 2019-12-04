@@ -535,7 +535,7 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
         sed -i -e 's|Libs.private.*|& -lstdc++|' \
                -e 's|Requires.private.*|& libarchive libcurl iconv|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
-            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
+            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" CXXFLAGS="$CXXFLAGS -DCURL_STATICLIB" \
             LIBS="$($PKG_CONFIG --libs iconv lept)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
