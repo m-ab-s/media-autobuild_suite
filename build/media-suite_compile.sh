@@ -432,8 +432,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     else
         extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{ssl,gnutls,mbedtls})
     fi
-    grep_or_sed NGHTTP2_STATICLIB libcurl.pc.in 's;Cflags.*;& -DNGHTTP2_STATICLIB;'
-    grep_or_sed NGHTTP2_STATICLIB curl-config.in 's;-DCURL_STATICLIB ;&-DNGHTTP2_STATICLIB ;'
+
     [[ ! -f configure || configure.ac -nt configure ]] && log autogen ./buildconf
     [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
