@@ -402,9 +402,6 @@ if %x2652INI%==0 (
     echo.
     echo. Binaries being built depends on "standalone=y"
     echo.
-    echo. Note: To include SVT-HEVC in x265, you need to enable it, not just add its
-    echo. flag to ffmpeg_options.txt
-    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
@@ -450,7 +447,6 @@ if %svthevcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsvthevc="Build SVT-HEVC: "
