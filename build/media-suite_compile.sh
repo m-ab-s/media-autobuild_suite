@@ -1959,30 +1959,23 @@ if [[ $mplayer = "y" ]] &&
     [[ $license != "nonfree" || $faac = n ]] && faac_opts=(--disable-faac)
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
-    if [[ ! -d ffmpeg ]]; then
-        if [[ "$ffmpeg" != "no" && -d "$LOCALBUILDDIR/ffmpeg-git" ]] &&
-            git clone -q "$LOCALBUILDDIR/ffmpeg-git" ffmpeg; then
-            cd_safe ffmpeg
-            git checkout -qf --no-track -B master origin/HEAD
-            cd_safe ..
-        elif ! git clone "https://git.ffmpeg.org/ffmpeg.git" ffmpeg; then
-            rm -rf ffmpeg
-            printf '%s\n' \
-                "Failed to get a FFmpeg checkout" \
-                "Please try again or put FFmpeg source code copy into ffmpeg/ manually." \
-                "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2" \
-                "Either re-run the script or extract above to inside /build/mplayer-svn."
-            do_prompt "<Enter> to continue or <Ctrl+c> to exit the script"
-        fi
+    if [[ ! -d ffmpeg ]] &&
+        ! { [[ -d $LOCALBUILDDIR/ffmpeg-git ]] &&
+        git clone -q "$LOCALBUILDDIR/ffmpeg-git" ffmpeg; } &&
+        ! git clone "https://git.ffmpeg.org/ffmpeg.git" ffmpeg; then
+        rm -rf ffmpeg
+        printf '%s\n' \
+            "Failed to get a FFmpeg checkout" \
+            "Please try again or put FFmpeg source code copy into ffmpeg/ manually." \
+            "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2" \
+            "Either re-run the script or extract above to inside /build/mplayer-svn."
+        do_prompt "<Enter> to continue or <Ctrl+c> to exit the script"
     fi
-    if [[ -d ffmpeg ]]; then
-        cd_safe ffmpeg
-        git fetch -q origin
-        git checkout -qf --no-track -B master origin/HEAD
-        cd_safe ..
-    else
-        compilation_fail "Finding valid ffmpeg dir"
-    fi
+    [[ ! -d ffmpeg ]] && compilation_fail "Finding valid ffmpeg dir"
+    [[ -d ffmpeg/.git ]] && {
+        git -C ffmpeg fetch -q origin
+        git -C ffmpeg checkout -qf --no-track -B master origin/HEAD
+    }
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
 
