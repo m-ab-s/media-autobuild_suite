@@ -1503,10 +1503,12 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     [[ $bits = "32bit" ]] && assembly="-DENABLE_ASSEMBLY=OFF"
     [[ $x265 = d ]] && xpsupport="-DWINXP_SUPPORT=ON"
 
+    # Fix hg.bat using python2 still
+    grep_and_sed python2 /usr/bin/hg.bat 's/python2/python3/'
+
     build_x265() {
         create_build_dir
-        local build_root
-        build_root="$(pwd)"
+        local build_root="$PWD"
         mkdir -p {8,10,12}bit
 
     do_x265_cmake() {
