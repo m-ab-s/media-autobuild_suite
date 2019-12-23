@@ -1821,10 +1821,6 @@ if [[ $ffmpeg != "no" ]]; then
 
         # See issue https://github.com/OpenVisualCloud/SVT-AV1/issues/567 for the reasons behind the follow codeblock:
         # start of SVT-AV1 temporary measures
-        if enabled libsvtav1 && enabled libsvthevc; then
-            do_print_progress "Until SVT-AV1 issues a fix, libsvtav1 must be disabled while libsvthevc is enabled."
-            do_removeOption --enable-libsvtav1
-        fi
         if enabled libsvtav1; then
             if enabled libaom && enabled libopencore-amrwb; then
                 do_print_progress "Until SVT-AV1 issues a fix, libaom & libopencore-amrwb must be disabled while libsvtav1 is enabled."
