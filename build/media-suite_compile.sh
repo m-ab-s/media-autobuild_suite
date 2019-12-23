@@ -1875,6 +1875,10 @@ if [[ $ffmpeg != "no" ]]; then
                 }
         fi
 
+        # Replace default hard-coded model path with generated one based on where it's installed converted for ifstream to find
+        grep_and_sed '/usr/local/share/model/vmaf_v0.6.1.pkl' libavfilter/vf_libvmaf.c \
+            "s;/usr/local/share/model/vmaf_v0.6.1.pkl;$(cygpath -m "$LOCALDESTDIR/share/model/vmaf_v0.6.1.pkl");g"
+
         _patches="$(git rev-list origin/master.. --count)"
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
