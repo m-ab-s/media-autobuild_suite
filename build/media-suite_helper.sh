@@ -899,7 +899,7 @@ do_changeFFmpegConfig() {
         if enabled cuda-nvcc; then
             local fixed_CUDA_PATH_UNIX
             fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
-            command -v nvcc.exe &> /dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
+            nvcc.exe --help &> /dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
     else
@@ -2192,8 +2192,8 @@ verify_cuda_deps() {
         if ! get_cl_path; then
             echo -e "${orange}MSVC cl.exe not found in PATH or through vswhere; needed by nvcc.${reset}"
             do_removeOption --enable-cuda-nvcc
-        elif enabled cuda-nvcc && ! command -v nvcc.exe &> /dev/null &&
-            ! command -v "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" &> /dev/null; then
+        elif enabled cuda-nvcc && ! nvcc.exe --help &> /dev/null &&
+            ! "$(cygpath -sm "$CUDA_PATH")/bin/nvcc.exe" --help &> /dev/null; then
             echo -e "${orange}nvcc.exe not found in PATH or installed in CUDA_PATH.${reset}"
             do_removeOption --enable-cuda-nvcc
         fi
