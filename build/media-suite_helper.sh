@@ -63,20 +63,29 @@ do_print_status() {
 }
 
 do_print_progress() {
-    if [[ $logging == y ]]; then
-        if [[ $timeStamp == y ]]; then
-            [[ $1 =~ ^[a-zA-Z] ]] && printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 \
-                "${bold}├${reset} $*..." || printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
+    case $logging$timeStamp in
+    n*) set_title "$* in $(get_first_subdir)" ;;
+    yy)
+        if [[ $1 =~ ^[a-zA-Z] ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}├${reset} $*..."
         else
-            [[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} $*..." || echo -e "$*..."
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
         fi
+        return
+        ;;
+    yn)
+        if [[ $1 =~ ^[a-zA-Z] ]]; then
+            echo "${bold}├${reset} $*..."
+        else
+            echo -e "$*..."
+        fi
+        return
+        ;;
+    esac
+    if [[ $timeStamp == y ]]; then
+        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
     else
-        set_title "$* in $(get_first_subdir)"
-        if [[ $timeStamp == y ]]; then
-            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
-        else
-            echo -e "${bold}$* in $(get_first_subdir)${reset}"
-        fi
+        echo -e "${bold}$* in $(get_first_subdir)${reset}"
     fi
 }
 
