@@ -51,11 +51,8 @@ do_print_status() {
         _prefix="$2" && shift 2
         _prefixpad=2
     fi
-    local name="$1 "
-    local color="$2"
-    local status="$3"
-    local pad
-    printf -v pad ".%.0s" $(seq -s ' ' 1 $ncols)
+    local name="$1 " color="$2" status="$3" pad
+    eval printf -v pad ".%.s" "{1..$ncols}"
     if [[ $timeStamp == y ]]; then
         printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s%s %s [%s]\n' -1 "$_prefix" "${bold}$name${reset}" \
             "${pad:0:$((ncols - _prefixpad - ${#name} - ${#status} - 12))}" "${color}${status}${reset}"
