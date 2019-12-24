@@ -930,7 +930,7 @@ do_changeFFmpegConfig() {
     if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
         FFMPEG_OPTS_SHARED=()
         for opt in "${FFMPEG_OPTS[@]}" "${FFMPEG_DEFAULT_OPTS_SHARED[@]}"; do
-            [[ -n $opt ]] && FFMPEG_OPTS_SHARED+=("$opt")
+            FFMPEG_OPTS_SHARED+=("$opt")
         done
     fi
     if [[ $ffmpeg == "bothstatic" ]]; then
