@@ -23,22 +23,23 @@ ncols=72
     rm -f "$LOCALBUILDDIR"/{7za,wget,grep}.exe
 
 do_simple_print() {
-    local plain formatString='' dateValue newline='\n'
-    while true; do
-        case "$1" in
-        -n) newline='' && shift ;;
-        -p) plain=y && shift ;;
+    local plain=false formatString dateValue newline='\n' OPTION OPTIND
+    while getopts ':np' OPTION; do
+        case "$OPTION" in
+        n) newline='' ;;
+        p) plain=true ;;
         *) break ;;
         esac
     done
+    shift "$((OPTIND - 1))"
 
     if [[ $timeStamp == y ]]; then
-        formatString+="${purple}"'%(%H:%M:%S)T'"${reset}"' '
+        formatString="${purple}"'%(%H:%M:%S)T'"${reset}"' '
         dateValue='-1'
-    else
-        [[ $plain == y ]] && formatString+='\t'
+    elif $plain; then
+        formatString='\t'
     fi
-    if [[ -z $plain ]]; then
+    if ! $plain; then
         formatString+="${bold}├${reset} "
     fi
     printf "$formatString"'%b'"${reset}${newline}" $dateValue "$*"
