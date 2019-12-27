@@ -1315,10 +1315,10 @@ if [[ $ffmpeg != "no" ]] && enabled libmfx &&
     do_vcs "https://github.com/lu-zero/mfx_dispatch.git" libmfx; then
     do_autoreconf
     do_uninstall include/mfx "${_check[@]}"
-    if [[ ! -f "mfx/mfxvideo++.h" ]]; then
-        do_wget -r -c -q "https://raw.githubusercontent.com/Intel-Media-SDK/MediaSDK/master/api/include/mfxvideo%2B%2B.h" \
-            "mfx/mfxvideo++.h"
-    fi
+    for _mfx_header in mfx{video,audio,plugin}++ mfx{adapter,pcp,scd,dispatcherprefixedfunctions}; do
+        [[ -f "mfx/$_mfx_header.h" ]] || do_wget -r -c -q "https://raw.githubusercontent.com/Intel-Media-SDK/MediaSDK/master/api/include/$_mfx_header.h" \
+            "mfx/$_mfx_header.h"
+    done
     do_separate_confmakeinstall
     do_checkIfExist
 fi
