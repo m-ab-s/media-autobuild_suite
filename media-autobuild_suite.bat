@@ -137,41 +137,34 @@ soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores delet
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
 ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
 
-set previousOptions=0
+set deleteIni=0
 set msys2ArchINI=0
 set ini=%build%\media-autobuild_suite.ini
 
-if exist %ini% GOTO checkINI
-:selectmsys2Arch
-set deleteIni=1
+rem Set all INI options to 0
+for %%a in (%iniOptions%) do set %%aINI=0
 
+if exist %ini% (
+    rem Set INI options to what's found in the inifile
+    for %%a in (%iniOptions%) do for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+) else set deleteIni=1
+
+setlocal EnableDelayedExpansion
+rem Check if any of the *INI options are still unset (0)
+for %%a in (%iniOptions%) do if [!%%aINI!]==[0] set deleteIni=1 && goto :endINIcheck
+:endINIcheck
+endlocal & set deleteIni=%deleteIni%
+
+rem case msys2Arch in 1) msys32;; *) msys64;; esac
 if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
 if NOT DEFINED msys2Arch set msys2Arch=2
 
-(
+if %msys2ArchINI%==0 set msys2ArchINI=%msys2Arch%
+
+if %deleteINI%==1 (
     echo.[compiler list]
     echo.msys2Arch=%msys2Arch%
 )>"%ini%"
-
-if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
-set msys2ArchINI=%msys2Arch%
-
-GOTO systemVars
-
-:checkINI
-set deleteIni=0
-for %%a in (%iniOptions%) do (
-    for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
-    if not defined %%aINI (
-        set %%aINI=0
-        set deleteIni=1
-    )
-)
-if %deleteINI%==1 (
-    del %ini%
-    set previousOptions=1
-    GOTO selectmsys2Arch
-)
 
 :systemVars
 set msys2Arch=%msys2ArchINI%
