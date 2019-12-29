@@ -44,7 +44,7 @@ if not exist %instdir% (
 
 if not ["%instdir:~60,1%"]==[""] (
     echo -------------------------------------------------------------------------------
-    echo. The total filepath to the suite seems too large ^(larger than 60 characters^):
+    echo. The total filepath to the suite seems too large (larger than 60 characters^):
     echo. %instdir%
     echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
@@ -75,7 +75,7 @@ do if %%f lss 4 (
 ) >nul 2>&1 && (
     rem MSVCINSTALLED
     echo ----------------------------------------------------------------------
-    echo. You are running in a MSVC environment ^(cl.exe or lib.exe detected^)
+    echo. You are running in a MSVC environment (cl.exe or lib.exe detected^)
     echo. This is not supported.
     echo. Please run the script through a normal cmd.exe some other way.
     echo.
@@ -355,7 +355,7 @@ if %x2643INI%==0 (
     echo. 3 = Lib/binary with only 10-bit
     echo. 4 = Lib/binary with 8 and 10-bit, and libavformat and ffms2
     echo. 5 = Shared lib/binary with 8 and 10-bit
-    echo. 6 = Same as 4 with video codecs only ^(can reduce size by ~3MB^)
+    echo. 6 = Same as 4 with video codecs only (can reduce size by ~3MB^)
     echo. 7 = Lib/binary with only 8-bit
     echo.
     echo. Binaries being built depends on "standalone=y" and are always static.
@@ -651,7 +651,7 @@ if %ffmpegB2INI%==0 (
     echo. 2 = No
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
-    echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
+    echo. 5 = Shared-only with some shared libs (libass, freetype and fribidi^)
     echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
@@ -705,9 +705,9 @@ if %ffmpegChoiceINI%==0 (
     echo.
     echo. Choose ffmpeg and mpv optional libraries?
     echo. 1 = Yes
-    echo. 2 = No ^(Light build^)
-    echo. 3 = No ^(Mimic Zeranoe^)
-    echo. 4 = No ^(All available external libs^)
+    echo. 2 = No (Light build^)
+    echo. 3 = No (Mimic Zeranoe^)
+    echo. 4 = No (All available external libs^)
     echo.
     echo. Avoid the last two unless you really want useless libraries you'll never use.
     echo. Just because you can include a shitty codec no one uses doesn't mean you should.
@@ -895,7 +895,7 @@ if %curlINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build static curl?
-    echo. 1 = Yes ^(same backend as FFmpeg's^)
+    echo. 1 = Yes (same backend as FFmpeg's^)
     echo. 2 = No
     echo. 3 = SChannel backend
     echo. 4 = GnuTLS backend
@@ -954,7 +954,7 @@ if %cyanrip2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build cyanrip ^(CLI CD ripper^)?
+    echo. Build cyanrip (CLI CD ripper^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -974,7 +974,7 @@ if %redshiftINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build redshift ^(f.lux FOSS clone^)?
+    echo. Build redshift (f.lux FOSS clone^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -994,7 +994,7 @@ if %ripgrepINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build ripgrep ^(faster grep in Rust^)?
+    echo. Build ripgrep (faster grep in Rust^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1014,7 +1014,7 @@ if %jqINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build jq ^(CLI JSON processor^)?
+    echo. Build jq (CLI JSON processor^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1034,7 +1034,7 @@ if %joINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build jo ^(CLI JSON from shell^)?
+    echo. Build jo (CLI JSON from shell^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1054,7 +1054,7 @@ if %dssimINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build dssim ^(multiscale SSIM in Rust^)?
+    echo. Build dssim (multiscale SSIM in Rust^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1074,7 +1074,7 @@ if %avs2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build avs2 ^(Audio Video Coding Standard Gen2 encoder/decoder^)?
+    echo. Build avs2 (Audio Video Coding Standard Gen2 encoder/decoder^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1284,7 +1284,7 @@ if %noMinttyINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Are you running this script through ssh or similar?
-    echo. ^(Can't open another window outside of this terminal^)
+    echo. (Can't open another window outside of this terminal^)
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1314,7 +1314,7 @@ cd %build%
 set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
 for %%s in (%scripts%) do (
     if not exist "%build%\%%s" (
-        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+        powershell -Command (New-Object System.Net.WebClient^).DownloadFile('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
     )
 )
 
@@ -1328,10 +1328,10 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo -------------------------------------------------------------------------------
     echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
         $wc = New-Object System.Net.WebClient; ^
-        while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
-        ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
-        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
-        {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
+        while ((Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
+        (Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
+        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ($i -le 5^) {try ^
+        {$wc.DownloadFile('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
         "$PWD\msys2-base.tar.xz"^)} catch {$i++}}} | powershell -NoProfile -Command - || goto :errorMsys
 
     :unpack
@@ -1341,7 +1341,7 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Downloading and unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        7z >nul 2>&1 || 7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command ^(New-Object System.Net.WebClient^).DownloadFile^('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
+        7z >nul 2>&1 || 7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command (New-Object System.Net.WebClient^).DownloadFile('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
         7z >nul 2>&1 && 7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o.. || 7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
         if exist 7za.exe del 7za.exe
     )
@@ -1399,8 +1399,8 @@ if not exist %instdir%\mintty.lnk (
     call :runBash secondUpdate.log pacman --noconfirm -Syu --asdeps
 
     (
-        echo.Set Shell = CreateObject^("WScript.Shell"^)
-        echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
+        echo.Set Shell = CreateObject("WScript.Shell"^)
+        echo.Set link = Shell.CreateShortcut("%instdir%\mintty.lnk"^)
         echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\%msys2%\msys2_shell.cmd"
