@@ -72,21 +72,20 @@ do if %%f lss 4 (
     where lib.exe || ^
     where cl.exe || ^
     if DEFINED VSINSTALLDIR cd .
-) >nul 2>&1 && goto MSVCINSTALLED
-goto MSVCNOTINSTALLED
-:MSVCINSTALLED
-echo ----------------------------------------------------------------------
-echo. You are running in a MSVC environment ^(cl.exe or lib.exe detected^)
-echo. This is not supported.
-echo. Please run the script through a normal cmd.exe some other way.
-echo.
-echo. Detected Paths:
-where lib.exe 2>nul
-where cl.exe 2>nul
-echo %VSINSTALLDIR%
-pause
-exit
-:MSVCNOTINSTALLED
+) >nul 2>&1 && (
+    rem MSVCINSTALLED
+    echo ----------------------------------------------------------------------
+    echo. You are running in a MSVC environment ^(cl.exe or lib.exe detected^)
+    echo. This is not supported.
+    echo. Please run the script through a normal cmd.exe some other way.
+    echo.
+    echo. Detected Paths:
+    where lib.exe 2>nul
+    where cl.exe 2>nul
+    echo %VSINSTALLDIR%
+    pause
+    exit
+)
 
 set build=%instdir%\build
 if not exist %build% mkdir %build%
@@ -1659,18 +1658,18 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "MSYS=%MSYS%"
     if %noMintty%==y set "PATH=%PATH%"
     set "build=%build%"
+    set "instdir=%instdir%"
 )
 if %noMintty%==y (
     call :runBash compile.log /build/media-suite_compile.sh %compileArgs%
-    exit /B %ERRORLEVEL%
 ) else (
-    if exist %CD%\build\compile.log del %CD%\build\compile.log
+    if exist %build%\compile.log del %build%\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
+    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
     MSYS=%MSYS% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
-    exit /B %ERRORLEVEL%
 )
+exit /B %ERRORLEVEL%
 endlocal
 goto :EOF
 
@@ -1779,8 +1778,9 @@ if %noMintty%==y (
     script -e -q --command "exec /usr/bin/bash -lc '%command% $@' -- %arg%" /dev/null | tee "%build%\%log%"
 ) else (
     if exist %build%\%log% del %build%\%log%
-    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
-    --log 2>&1 %build%\%log% /usr/bin/bash -lc "%command% %arg%"
+    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico ^
+    -t "media-autobuild_suite" --log 2>&1 %build%\%log% /usr/bin/bash -lc ^
+    "%command% %arg%"
 )
 endlocal
 goto :EOF
