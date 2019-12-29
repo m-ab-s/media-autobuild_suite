@@ -193,18 +193,9 @@ if %archINI%==0 (
 ) else set buildEnv=%archINI%
 
 if "%buildEnv%"=="" GOTO selectSystem
-if %buildEnv%==1 (
-    set "build32=yes"
-    set "build64=yes"
-)
-if %buildEnv%==2 (
-    set "build32=yes"
-    set "build64=no"
-)
-if %buildEnv%==3 (
-    set "build32=no"
-    set "build64=yes"
-)
+if %buildEnv%==1 set "build32=yes" && set "build64=yes"
+if %buildEnv%==2 set "build32=yes" && set "build64=no"
+if %buildEnv%==3 set "build32=no" && set "build64=yes"
 if %buildEnv% GTR 3 GOTO selectSystem
 if %deleteINI%==1 echo.arch=^%buildEnv%>>%ini%
 
