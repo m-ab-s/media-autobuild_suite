@@ -378,10 +378,10 @@ _pre_configure(){
 
 _post_make(){
     # Don't run configure again.
-    touch "$(get_first_subdir)/do_not_reconfigure"
+    touch "$LOCALBUILDDIR/$(get_first_subdir)/do_not_reconfigure"
     # Don't clean the build folder on each successive run.
     # This is for if you want to keep the current build folder as is and just recompile only.
-    touch "$(get_first_subdir)/do_not_clean"
+    touch "$LOCALBUILDDIR/$(get_first_subdir)/do_not_clean"
 }
 ```
 
