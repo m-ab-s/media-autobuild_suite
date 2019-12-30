@@ -2158,7 +2158,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
         enabled libtesseract && mpv_cflags+=("-fopenmp") mpv_ldflags+=("-lgomp")
         enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
-            do_pacman_install python3-docutils
+            do_pacman_install python-docutils
         fi
         # do_pacman_remove python3-rst2pdf
         # mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
