@@ -1651,12 +1651,20 @@ do_autogen() {
 }
 
 get_first_subdir() {
-    local subdir="${PWD#*build/}"
+    local subdir="${PWD#*$LOCALBUILDDIR/}" fullpath=false OPTION OPTIND
+    while getopts ':f' OPTION; do
+        case "$OPTION" in
+        f) fullpath=true ;;
+        *) break ;;
+        esac
+    done
+    shift "$((OPTIND - 1))"
+
     if [[ $subdir != "$PWD" ]]; then
-        subdir="${subdir%%/*}"
-        echo "$subdir"
+        $fullpath && printf '%s' "$LOCALBUILDDIR/"
+        echo "${subdir%%/*}"
     else
-        echo "."
+        $fullpath && echo "$PWD" || echo "."
     fi
 }
 
