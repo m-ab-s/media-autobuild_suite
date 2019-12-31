@@ -1514,7 +1514,7 @@ if [[ ! $x265 = "n" ]] && do_vcs "hg::https://bitbucket.org/multicoreware/x265";
     do_x265_cmake() {
         do_print_progress "Building $1" && shift 1
         extra_script pre cmake
-        log "cmake" cmake "$LOCALBUILDDIR/$(get_first_subdir)/source" -G Ninja \
+        log "cmake" cmake "$(get_first_subdir -f)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
         -DENABLE_HDR10_PLUS=ON $xpsupport -DCMAKE_CXX_COMPILER="$LOCALDESTDIR/bin/g++.bat" \
@@ -1574,7 +1574,7 @@ EOF
     build_x265
     cpuCount=1 log "install" ninja install
     if [[ $standalone = y && $x265 = d ]]; then
-        cd_safe "${LOCALBUILDDIR}/$(get_first_subdir)"
+        cd_safe "$(get_first_subdir -f)"
         do_uninstall bin-video/x265-numa.exe
         do_print_progress "Building NUMA version of binary"
         xpsupport="" build_x265
@@ -2072,7 +2072,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             do_wget -c -r -q "$_DeadSix27/additional_headers/d3dkmthk.h"
             do_wget -c -r -q "$_DeadSix27/additional_headers/d3dukmdt.h"
             do_install d3d{kmthk,ukmdt}.h include/
-        cd_safe "$LOCALBUILDDIR/$(get_first_subdir)"
+        cd_safe "$(get_first_subdir -f)"
         do_print_progress "Building Vulkan-Loader"
         do_cmakeinstall -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
         -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="${LOCALDESTDIR}" \

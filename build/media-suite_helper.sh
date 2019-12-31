@@ -1225,7 +1225,7 @@ do_cmake() {
     # use this array to pass additional parameters to cmake
     local cmake_extras=()
     extra_script pre cmake
-    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     # shellcheck disable=SC2086
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
@@ -1271,7 +1271,7 @@ do_meson() {
     # use this array to pass additional parameters to meson
     local meson_extras=()
     extra_script pre meson
-    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     # shellcheck disable=SC2086
     PKG_CONFIG=pkg-config CC=gcc.bat CXX=g++.bat \
@@ -1298,7 +1298,7 @@ do_rust() {
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
-    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
@@ -1414,7 +1414,7 @@ create_build_dir() {
 
     build_dir="${build_root:+$build_root/}build${1:+-$1}-$bits"
 
-    if [[ -d $build_dir && ! -f $LOCALBUILDDIR/$(get_first_subdir)/do_not_clean ]]; then
+    if [[ -d $build_dir && ! -f $(get_first_subdir -f)/do_not_clean ]]; then
         $norm || rm -rf "$build_dir" ||
             (cd_safe "$build_dir" && rm -rf ./*)
     fi
@@ -1468,7 +1468,7 @@ do_configure() {
     # use this array to pass additional parameters to configure
     local conf_extras=()
     extra_script pre configure
-    [[ -f "$(get_first_subdir)/do_not_reconfigure" ]] &&
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     log "configure" ${config_path:-.}/configure --prefix="$LOCALDESTDIR" "$@" \
         "${conf_extras[@]}"
@@ -1628,9 +1628,10 @@ do_prompt() {
 }
 
 do_autoreconf() {
-    local basedir="$LOCALBUILDDIR"
-    basedir+="/$(get_first_subdir)" || basedir="."
-    if [[ -f "$basedir"/recently_updated && -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]] ||
+    local basedir
+    basedir=$(get_first_subdir -f)
+    if { [[ -f $basedir/recently_updated ]] &&
+        find "$basedir" -name "build_successful*" -exec false {} +; } ||
         [[ ! -f configure ]]; then
         extra_script pre autoreconf
         log "autoreconf" autoreconf -fiv "$@"
@@ -1639,9 +1640,10 @@ do_autoreconf() {
 }
 
 do_autogen() {
-    local basedir="$LOCALBUILDDIR"
-    basedir+="/$(get_first_subdir)" || basedir="."
-    if [[ -f "$basedir"/recently_updated && -z "$(ls "$basedir"/build_successful* 2> /dev/null)" ]] ||
+    local basedir
+    basedir=$(get_first_subdir -f)
+    if { [[ -f $basedir/recently_updated ]] &&
+        find "$basedir" -name "build_successful*" -exec false {} +; } ||
         [[ ! -f configure ]]; then
         safe_git_clean -q
         extra_script pre autogen
@@ -1844,9 +1846,7 @@ hide_libressl() {
 }
 
 add_to_remove() {
-    local garbage="$1"
-    [[ ! $garbage ]] && garbage="$LOCALBUILDDIR/$(get_first_subdir)"
-    echo "$garbage" >> "$LOCALBUILDDIR/_to_remove"
+    echo "${1:-$(get_first_subdir -f)}" >> "$LOCALBUILDDIR/_to_remove"
 }
 
 clean_suite() {
@@ -2339,7 +2339,7 @@ _pre_cmake(){
     #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
 
     # To bypass the suite's cmake execution completely, create a do_not_configure file in the repository root:
-    #touch "$(get_first_subdir)/do_not_reconfigure"
+    #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
 }
@@ -2358,7 +2358,7 @@ _pre_rust() {
     #rust_extras=(--no-default-features --features=binaries)
 
     # To bypass the suite's cargo execution completely, create a do_not_configure file in the repository root:
-    #touch "$(get_first_subdir)/do_not_reconfigure"
+    #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
 }
@@ -2372,7 +2372,7 @@ _pre_meson() {
     #meson_extras=(-Denable_tools=true)
 
     # To bypass the suite's meson execution completely, create a do_not_configure file in the repository root:
-    #touch "$(get_first_subdir)/do_not_reconfigure"
+    #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
 }
@@ -2424,10 +2424,10 @@ _pre_make(){
 _post_make(){
     true
     # Don't run configure again.
-    #touch "$(get_first_subdir)/do_not_reconfigure"
+    #touch "$(get_first_subdir -f)/do_not_reconfigure"
     # Don't clean the build folder on each successive run.
     # This is for if you want to keep the current build folder as is and just recompile only.
-    #touch "$(get_first_subdir)/do_not_clean"
+    #touch "$(get_first_subdir -f)/do_not_clean"
 }
 
 # Runs before and after running ninja (do_ninja)
