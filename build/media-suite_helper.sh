@@ -252,11 +252,11 @@ do_vcs() {
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d "$vcsFolder-$vcsType" ]]; then
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        if ! log quiet "$vcsType.clone" vcs_clone && [[ $vcsType == git ]] &&
+        if ! log -q "$vcsType.clone" vcs_clone && [[ $vcsType == git ]] &&
             [[ $vcsURL != *"media-autobuild_suite-dependencies"* ]]; then
             local repoName=${vcsURL##*/}
             vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
-            log quiet "$vcsType.clone" vcs_clone ||
+            log -q "$vcsType.clone" vcs_clone ||
                 do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
         fi
         if [[ -d "$vcsFolder-$vcsType" ]]; then
@@ -280,10 +280,10 @@ do_vcs() {
         return 1
     fi
 
-    log quiet "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
+    log -q "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
-        log quiet "$vcsType.update" vcs_update "$ref" || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
+        log -q "$vcsType.update" vcs_update "$ref" || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
         touch recently_checked
     else
         newHead="$oldHead"
@@ -1374,22 +1374,34 @@ zip_logs() {
 }
 
 log() {
-    [[ $1 == quiet ]] && local quiet=y && shift
-    local name="${1// /.}"
-    local _cmd="$2"
+    local errorOut=true quiet=false ret OPTION OPTIND
+    while getopts ':qe' OPTION; do
+        case "$OPTION" in
+        e) errorOut=false ;;
+        q) quiet=true ;;
+        *) break ;;
+        esac
+    done
+    shift "$((OPTIND - 1))"
+
+    [[ $1 == quiet ]] && quiet=true && shift # Temp compat with old style just in case
+    local name="${1// /.}" _cmd="$2" extra
     shift 2
-    local extra
-    [[ $quiet ]] || do_print_progress Running "$name"
+    $quiet || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
+
     if [[ $logging == "y" ]]; then
         printf 'CPPFLAGS: %s\nCFLAGS: %s\nCXXFLAGS: %s\nLDFLAGS: %s\n%s %s\n' "$CPPFLAGS" "$CFLAGS" "$CXXFLAGS" "$LDFLAGS" "$_cmd${extra:+ $extra}" "$*" > "ab-suite.$name.log"
         $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
-            { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; } ||
-            compilation_fail "$name"
+            { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; }
     else
-        $_cmd $extra "$@" || { [[ $extra ]] && $_cmd -j1 "$@"; } ||
-            compilation_fail "$name"
+        $_cmd $extra "$@" || { [[ $extra ]] && $_cmd -j1 "$@"; }
     fi
+
+    case ${ret:=$?} in
+    0) return 0 ;;
+    *) $errorOut && compilation_fail "$name" || return $ret ;;
+    esac
 }
 
 create_build_dir() {
@@ -2236,12 +2248,12 @@ extra_script() {
         type "_${stage}_build" > /dev/null 2>&1; then
         pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_build" "_${stage}_build"
+        log -q "${stage}_build" "_${stage}_build"
         popd > /dev/null || true
     elif type "_${stage}_${commandname}" > /dev/null 2>&1; then
         pushd "${REPO_DIR}" > /dev/null || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
-        log quiet "${stage}_${commandname}" "_${stage}_${commandname}"
+        log -q "${stage}_${commandname}" "_${stage}_${commandname}"
         popd > /dev/null || true
     fi
 }
