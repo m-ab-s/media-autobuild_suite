@@ -169,6 +169,16 @@ vcs_get_current_head() {
     esac
 }
 
+# vcs_test_remote "svn://svn.mplayerhq.hu/mplayer/trunk" svn
+vcs_test_remote() {
+    case $2 in # Need to find a good way to detect remote vcs type. GitHub provides svn and git from the same url.
+    git) GIT_TERMINAL_PROMPT=0 git ls-remote --refs "$1" ;;
+    hg) hg --noninteractive identify "$1" ;;
+    svn) svn --non-interactive ls "$1" ;;
+    *) return 1 ;;
+    esac > /dev/null 2>&1
+}
+
 vcs_clone() {
     set -x
     if [[ $vcsType == "svn" ]]; then
