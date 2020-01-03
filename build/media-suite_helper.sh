@@ -159,6 +159,16 @@ check_valid_vcs() {
     esac
 }
 
+# vcs_get_current_head /build/ffmpeg-git git
+vcs_get_current_head() {
+    case ${2:-$(vcs_get_current_type "$1")} in
+    git) git -C "${1:-$PWD}" rev-parse HEAD ;;
+    hg) hg -R "${1:-$PWD}" identify --id ;;
+    svn) svn info --show-item last-changed-revision "${1:-$PWD}" ;;
+    *) return 1 ;;
+    esac
+}
+
 vcs_clone() {
     set -x
     if [[ $vcsType == "svn" ]]; then
