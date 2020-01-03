@@ -124,6 +124,15 @@ test_newer() {
     return 1
 }
 
+# vcs_get_default_ref git
+vcs_get_default_ref() {
+    case ${1:-$(vcs_get_current_type)} in
+    git | svn) echo "HEAD" ;;
+    hg) echo "default" ;;
+    *) return 1 ;;
+    esac
+}
+
 check_valid_vcs() {
     local root="${1:-.}"
     local _type="${vcsType:-git}"
