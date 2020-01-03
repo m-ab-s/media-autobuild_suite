@@ -257,22 +257,20 @@ vcs_log() {
     esac
 }
 
-vcs_getlatesttag() {
-    local ref="$1"
-    if [[ -n $vcsType && $vcsType != git ]]; then
-        echo "$ref"
-        return
+# vcs_get_latest_tag "libopenmpt-*"
+vcs_get_latest_tag() (
+    if ! {
+        [[ ${vcsType:=${2:-$(vcs_get_current_type)}} == git ]] &&
+            case ${1:-unknown} in
+            LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" ;;
+            GREATEST) git describe --abbrev=0 --tags ;;
+            *\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" ;;
+            *) false ;;
+            esac 2> /dev/null
+    } then
+        echo "$1"
     fi
-    local tag
-    if [[ $ref == "LATEST" ]]; then
-        tag="$(git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)")"
-    elif [[ $ref == "GREATEST" ]]; then
-        tag="$(git describe --abbrev=0 --tags)"
-    elif [[ ${ref//\*/} != "$ref" ]]; then
-        tag="$(git describe --abbrev=0 --tags "$(git tag -l "$ref" | sort -Vr | head -1)")"
-    fi
-    echo "${tag:-${ref}}"
-}
+)
 
 # get source from VCS
 # example:
