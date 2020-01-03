@@ -225,27 +225,23 @@ vcs_reset() (
     esac
 )
 
-vcs_update() {
-    local ref="$1"
-    check_valid_vcs
+vcs_update() (
     set -x
-    if [[ $vcsType == svn ]]; then
-        svn update -r "$ref"
-        newHead=$(svnversion)
-    elif [[ $vcsType == hg ]]; then
-        hg pull
-        hg update -C -r "$ref"
-        newHead=$(hg id --id)
-    elif [[ $vcsType == git ]]; then
+    case ${2:-$(vcs_get_current_type)} in
+    git)
         local unshallow
-        [[ -f .git/shallow ]] && unshallow="--unshallow"
+        [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow"
         git fetch -t $unshallow origin
-        ref="$(vcs_getlatesttag "$ref")"
-        git reset --hard "$ref"
-        newHead=$(git rev-parse HEAD)
-    fi
-    set +x
-}
+        git reset --hard "$(vcs_get_latest_tag "$1")"
+        ;;
+    hg)
+        hg pull
+        hg update -C -r "$1"
+        ;;
+    svn) svn update -r "$1" ;;
+    *) return 1 ;;
+    esac
+)
 
 vcs_log() {
     check_valid_vcs
