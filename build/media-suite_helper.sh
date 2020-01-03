@@ -209,26 +209,21 @@ vcs_clone() (
     check_valid_vcs "$PWD/$vcsFolder-$vcsType" "$vcsType"
 )
 
-vcs_reset() {
-    local ref="$1"
-    check_valid_vcs
+vcs_reset() (
     set -x
-    if [[ $vcsType == svn ]]; then
-        svn revert --recursive .
-        oldHead=$(svnversion)
-    elif [[ $vcsType == hg ]]; then
-        hg update -C -r "$ref"
-        oldHead=$(hg id --id)
-    elif [[ $vcsType == git ]]; then
-        [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
+    case ${2:-$(vcs_get_current_type)} in
+    git)
+        git config remote.origin.url > /dev/null 2>&1 ||
+            [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-        [[ -f .git/refs/heads/ab-suite ]] || git branch -f --no-track ab-suite
-        git checkout ab-suite
-        git reset --hard "$(vcs_getlatesttag "$ref")"
-        oldHead=$(git rev-parse HEAD)
-    fi
-    set +x
-}
+        git checkout --no-track -fB ab-suite
+        git reset --hard "$(vcs_get_latest_tag "$1")"
+        ;;
+    hg) hg update -C -r "$1" ;;
+    svn) svn revert --recursive . ;;
+    *) return 1 ;;
+    esac
+)
 
 vcs_update() {
     local ref="$1"
