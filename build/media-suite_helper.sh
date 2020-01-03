@@ -286,72 +286,49 @@ do_mabs_clone() {
 # example:
 #   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
 do_vcs() {
-    local vcsType="${1%::*}"
-    local vcsURL="${1#*::}"
-    [[ $vcsType == "$vcsURL" ]] && vcsType="git"
-    local vcsBranch="${vcsURL#*#}"
-    [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
-    local vcsFolder="$2"
-    local vcsCheck=("${_check[@]}")
+    local vcsType="${1%::*}" vcsURL="${1#*::}" vcsFolder="$2" vcsCheck=("${_check[@]}") vcsBranch="${vcsURL#*#}" ref
     local deps=("${_deps[@]}") && unset _deps
-    local ref
-    if [[ $vcsBranch ]]; then
-        vcsURL="${vcsURL%#*}"
-        case ${vcsBranch%%=*} in
-        commit | tag | revision)
-            ref=${vcsBranch##*=}
-            ;;
-        branch)
-            ref=${vcsBranch##*=}
-            [[ $vcsType == git && $ref == "${ref%/*}" ]] && ref=origin/$ref
-            ;;
-        esac
-    else
-        if [[ $vcsType == git ]]; then
-            ref="origin/HEAD"
-        elif [[ $vcsType == hg ]]; then
-            ref="default"
-        elif [[ $vcsType == svn ]]; then
-            ref="HEAD"
-        fi
+    [[ $vcsType == "$vcsURL" ]] && vcsType="git"
+    [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
+    ref=$(vcs_get_default_ref "$vcsType")
+    vcsURL="${vcsURL%#*}"
+    [[ -z $vcsFolder ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
+
+    if [[ -n $vcsBranch ]]; then
+        ref=${vcsBranch##*=}
+        [[ ${vcsBranch%%=*} == branch && $vcsType == git && $ref == "${ref%/*}" ]] && ref=origin/$ref
     fi
-    [[ ! $vcsFolder ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
 
     cd_safe "$LOCALBUILDDIR"
-    if [[ ! -d "$vcsFolder-$vcsType" ]]; then
+
+    if ! check_valid_vcs "$vcsFolder-$vcsType" "$vcsType"; then
+        rm -rf "$vcsFolder-$vcsType"
         do_print_progress "  Running $vcsType clone for $vcsFolder"
-        if ! log -q "$vcsType.clone" vcs_clone && [[ $vcsType == git ]] &&
-            [[ $vcsURL != *"media-autobuild_suite-dependencies"* ]]; then
-            local repoName=${vcsURL##*/}
-            vcsURL="https://gitlab.com/media-autobuild_suite-dependencies/${repoName}"
-            log -q "$vcsType.clone" vcs_clone ||
-                do_exit_prompt "Failed cloning to $vcsFolder-$vcsType"
-        fi
-        if [[ -d "$vcsFolder-$vcsType" ]]; then
-            cd_safe "$vcsFolder-$vcsType"
-            touch recently_updated recently_checked
+        if do_mabs_clone "$vcsURL" "$vcsFolder" "$ref" "$vcsType"; then
+            touch "$vcsFolder-$vcsType"/recently_{updated,checked}
         else
             echo "$vcsFolder $vcsType seems to be down"
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
             return
         fi
-    else
-        cd_safe "$vcsFolder-$vcsType"
     fi
 
-    if [[ $ffmpegUpdate == onlyFFmpeg ]] &&
-        [[ $vcsFolder != ffmpeg ]] && [[ $vcsFolder != mpv ]] &&
+    cd_safe "$vcsFolder-$vcsType"
+
+    if [[ $ffmpegUpdate == onlyFFmpeg && $vcsFolder != ffmpeg && $vcsFolder != mpv ]] &&
         { { [[ -z ${vcsCheck[*]} ]] && files_exist "$vcsFolder.pc"; } ||
             { [[ -n ${vcsCheck[*]} ]] && files_exist "${vcsCheck[@]}"; }; }; then
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
         return 1
     fi
 
-    log -q "$vcsType.reset" vcs_reset "$ref" || do_exit_prompt "Failed resetting in $vcsFolder-$vcsType"
+    log -q "$vcsType.reset" vcs_reset "$ref"
+    oldHead=$(vcs_get_current_head)
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
-        log -q "$vcsType.update" vcs_update "$ref" || do_exit_prompt "Failed updating in $vcsFolder-$vcsType"
+        log -q "$vcsType.update" vcs_update "$ref"
+        newHead=$(vcs_get_current_head)
         touch recently_checked
     else
         newHead="$oldHead"
@@ -363,16 +340,18 @@ do_vcs() {
     if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
-        if [[ $build32 == "yes" && $build64 == "yes" && $bits == "64bit" ]]; then
+        if [[ $build32$build64$bits == "yesyes64bit" ]]; then
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$vcsFolder]"
         fi
-        echo "$vcsFolder" >> "$LOCALBUILDDIR"/newchangelog
-        vcs_log
-        echo >> "$LOCALBUILDDIR"/newchangelog
+        {
+            echo "$vcsFolder"
+            vcs_log "$oldHead" "$newHead"
+            echo
+        } >> "$LOCALBUILDDIR"/newchangelog
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
-    elif [[ -f recently_updated ]] && { [[ ! -f "build_successful$bits" ]] ||
-        [[ -n $flavor && ! -f "build_successful${bits}_${flavor}" ]]; }; then
+    elif [[ -f recently_updated ]] &&
+        [[ ! -f build_successful$bits || -n $flavor && ! -f build_successful${bits}_${flavor} ]]; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
