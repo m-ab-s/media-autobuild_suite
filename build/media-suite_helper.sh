@@ -133,6 +133,22 @@ vcs_get_default_ref() {
     esac
 }
 
+# vcs_get_current_type /build/myrepo
+vcs_get_current_type() {
+    local basedir
+    basedir=${1:-$(get_first_subdir -f)}
+    if [[ -d $basedir/.git ]] && git -C "$basedir" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        echo "git"
+    elif [[ -d $basedir/.hg ]] && hg -R "$basedir" id --id > /dev/null 2>&1; then
+        echo "hg"
+    elif [[ -d $basedir/.svn ]] && svn info --depth empty "$basedir@HEAD" > /dev/null 2>&1; then
+        echo "svn"
+    else
+        echo "unknown"
+        return 1
+    fi
+}
+
 check_valid_vcs() {
     local root="${1:-.}"
     local _type="${vcsType:-git}"
