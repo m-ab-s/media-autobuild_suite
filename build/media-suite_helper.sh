@@ -179,16 +179,35 @@ vcs_test_remote() {
     esac > /dev/null 2>&1
 }
 
-vcs_clone() {
+# vcs_clone https://gitlab.com/libtiff/libtiff.git tiff v4.1.0
+vcs_clone() (
     set -x
-    if [[ $vcsType == "svn" ]]; then
-        svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn
+    vcsURL=${1:-$vcsURL} vcsFolder=${2:-$vcsFolder} ref=${3:-$ref} vcsType="${4:-${vcsType:-git}}"
+    [[ -z $vcsURL ]] && return 1
+    [[ -z $vcsFolder ]] && vcsFolder=${vcsURL##*/} && vcsFolder=${vcsFolder%.git}
+    : "${ref:=$(vcs_get_default_ref "$vcsType")}"
+
+    if (check_valid_vcs "$vcsFolder-$vcsType" "$vcsType") > /dev/null 2>&1; then
+        return 0
     else
-        "$vcsType" clone "$vcsURL" "$vcsFolder-$vcsType"
+        rm -rf "$vcsFolder-$vcsType"
+        case $vcsType in
+        git)
+            if [[ $- == *i* ]]; then
+                unset GIT_TERMINAL_PROMPT
+            else
+                export GIT_TERMINAL_PROMPT=0
+            fi
+            git clone "$vcsURL" "$vcsFolder-$vcsType"
+            git -C "$vcsFolder-$vcsType" reset --hard "$ref"
+            ;;
+        hg) hg clone -r "$ref" "$vcsURL" "$vcsFolder-$vcsType" ;;
+        svn) svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn ;;
+        *) return 1 ;;
+        esac
     fi
-    set +x
-    check_valid_vcs "$vcsFolder-$vcsType"
-}
+    check_valid_vcs "$PWD/$vcsFolder-$vcsType" "$vcsType"
+)
 
 vcs_reset() {
     local ref="$1"
