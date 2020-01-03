@@ -243,15 +243,18 @@ vcs_update() (
     esac
 )
 
+# vcs_log d4996a600ca0334235a4b66beae5b5c3474535c4 81172b5e3ac0d3130ff7b639ed7efed5baa1195c
+# Defaults to last 5 commits
 vcs_log() {
-    check_valid_vcs
-    if [[ $vcsType == "git" ]]; then
-        git log --no-merges --pretty="%ci: %an - %h%n    %s" \
-            "$oldHead".."$newHead" >> "$LOCALBUILDDIR"/newchangelog
-    elif [[ $vcsType == "hg" ]]; then
-        hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
-            -r "reverse($oldHead:$newHead)" >> "$LOCALBUILDDIR"/newchangelog
-    fi
+    case ${3:-$(vcs_get_current_type)} in
+    git) git log --no-merges --pretty="%ci: %an - %h%n    %s" \
+        "${1:-HEAD~5}".."${2:-HEAD}" ;;
+    hg) hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
+        -r "reverse(${1:--5}:${2:-tip})" ;;
+    svn) ;; # No easy way to generate a svn changelog with the same format. Plus it's really only mplayer.
+    # Maybe use svn log --xml and format xml
+    *) return 1 ;;
+    esac
 }
 
 vcs_getlatesttag() {
