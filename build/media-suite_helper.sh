@@ -1894,16 +1894,18 @@ create_diagnostic() {
     local _env envs=(MINGW_{PACKAGE_PREFIX,CHOST,PREFIX} MSYSTEM CPATH
         LIBRARY_PATH {LD,C,CPP,CXX}FLAGS)
     do_print_progress "  Creating diagnostics file"
-    [[ -d /trunk/.git ]] && cmds+=("git -C /trunk log -1 --pretty=%h")
-    rm -f "$LOCALBUILDDIR/diagnostics.txt"
-    echo "Env variables:" >> "$LOCALBUILDDIR/diagnostics.txt"
-    for _env in "${envs[@]}"; do
-        printf '\t%s=%s\n' "$_env" "${!_env}" >> "$LOCALBUILDDIR/diagnostics.txt"
-    done
-    echo >> "$LOCALBUILDDIR/diagnostics.txt"
-    for cmd in "${cmds[@]}"; do
-        printf '\t%s\n%s\n\n' "$cmd" "$($cmd)" >> "$LOCALBUILDDIR/diagnostics.txt"
-    done
+    git -C /trunk rev-parse --is-inside-work-tree > /dev/null 2>&1 &&
+        cmds+=("git -C /trunk log -1 --pretty=%h")
+    {
+        echo "Env variables:"
+        for _env in "${envs[@]}"; do
+            printf '\t%s=%s\n' "$_env" "${!_env}"
+        done
+        echo
+        for cmd in "${cmds[@]}"; do
+            printf '\t%s\n%s\n\n' "$cmd": "$($cmd)"
+        done
+    } > "$LOCALBUILDDIR/diagnostics.txt"
 }
 
 create_winpty_exe() {
