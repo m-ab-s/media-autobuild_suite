@@ -1754,7 +1754,7 @@ shift
 set args=%*
 set arg=!args:%log% %command%=!
 if %noMintty%==y (
-    script -e -q --command "exec /usr/bin/bash -lc '%command% $@' -- %arg%" /dev/null | tee "%build%\%log%"
+    bash %build%\bash.sh "%build%\%log%" "%command%" "%arg%"
 ) else (
     if exist %build%\%log% del %build%\%log%
     start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico ^
