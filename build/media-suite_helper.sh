@@ -1308,23 +1308,18 @@ do_rust() {
 }
 
 compilation_fail() {
-    [[ -z $build32 || -z $build64 ]] && return 1
+    [[ -z $build32$build64 ]] && return 1
     local reason="$1"
     local operation="${reason,,}"
+    if [[ $logging == y ]]; then
+        echo "Likely error (tail of the failed operation logfile):"
+        tail "ab-suite.${operation}.log"
+        echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
+    fi
     if ${_notrequired:-false}; then
-        if [[ $logging == y ]]; then
-            echo "Likely error (tail of the failed operation logfile):"
-            tail "ab-suite.${operation}.log"
-            echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
-        fi
         echo "This isn't required for anything so we can move on."
         return 1
     else
-        if [[ $logging == y ]]; then
-            echo "Likely error (tail of the failed operation logfile):"
-            tail "ab-suite.${operation}.log"
-            echo "${red}$reason failed. Check $(pwd -W)/ab-suite.$operation.log${reset}"
-        fi
         echo "${red}This is required for other packages, so this script will exit.${reset}"
         create_diagnostic
         zip_logs
