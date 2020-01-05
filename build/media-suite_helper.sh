@@ -1333,10 +1333,10 @@ strip_ansi() {
     local txtfile newfile
     for txtfile; do
         [[ $txtfile != "${txtfile//stripped/}" ]] && continue
-        local name="${txtfile%.*}"
-        local ext="${txtfile##*.}"
-        [[ $txtfile != "$name" ]] && newfile="${name}.stripped.${ext}" || newfile="${txtfile}-stripped"
-        sed -r 's#(\x1B[\[\(]([0-9][0-9]?)?[mBHJ]|\x07|\x1B]0;)##g;s/^[0-9]{2}:[0-9]{2}:[0-9]{2}//' "$txtfile" > "${newfile}"
+        local name="${txtfile%.*}" ext="${txtfile##*.}"
+        [[ $txtfile != "$name" ]] &&
+            newfile="$name.stripped.$ext" || newfile="$txtfile-stripped"
+        sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$txtfile" > "$newfile"
     done
 }
 
