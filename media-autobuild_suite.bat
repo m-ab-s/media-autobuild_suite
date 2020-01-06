@@ -138,7 +138,6 @@ strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redsh
 ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
 
 set deleteIni=0
-set msys2ArchINI=0
 set ini=%build%\media-autobuild_suite.ini
 
 rem Set all INI options to 0
@@ -158,16 +157,12 @@ endlocal & set deleteIni=%deleteIni%
 rem case msys2Arch in 1) msys32;; *) msys64;; esac
 if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
 if NOT DEFINED msys2Arch set msys2Arch=2
-
-if %msys2ArchINI%==0 set msys2ArchINI=%msys2Arch%
-
 if %deleteINI%==1 (
     echo.[compiler list]
     echo.msys2Arch=%msys2Arch%
 )>"%ini%"
 
 :systemVars
-set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 ( set "msys2=msys32" ) else set "msys2=msys64"
 
 :selectSystem
