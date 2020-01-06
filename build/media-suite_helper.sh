@@ -597,7 +597,7 @@ do_checkIfExist() {
         [[ $build32 == yes || $build64 == yes ]] && [[ -d $packageDir ]] &&
             rm -f "$buildSuccessFile"
         do_print_status "└ $packetName" "$red" "Failed"
-        if [[ $_notrequired ]]; then
+        if ${_notrequired:-false}; then
             printf '%s\n' \
                 "$orange"'Package failed to build, but is not required; proceeding with compilation.'"$reset"
         else
@@ -1311,7 +1311,7 @@ compilation_fail() {
     [[ -z $build32 || -z $build64 ]] && return 1
     local reason="$1"
     local operation="${reason,,}"
-    if [[ $_notrequired ]]; then
+    if ${_notrequired:-false}; then
         if [[ $logging == y ]]; then
             echo "Likely error (tail of the failed operation logfile):"
             tail "ab-suite.${operation}.log"

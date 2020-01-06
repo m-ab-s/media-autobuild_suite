@@ -455,7 +455,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     hide_conflicting_libs -R
     [[ $curl = openssl ]] && hide_libressl -R
     if [[ $curl != schannel ]]; then
-        _notrequired=yes
+        _notrequired=true
         cd_safe "build-$bits"
         PATH=/usr/bin log ca-bundle make ca-bundle
         unset _notrequired
@@ -1728,7 +1728,7 @@ if [[ $bits = 64bits && $vvc = y ]] &&
     # probably not of upstream's interest because of how experimental the codec is
     do_patch "https://0x0.st/sG0V.txt" am
     do_patch "https://0x0.st/zJG_.patch" am
-    _notrequired="true"
+    _notrequired=true
     # install to own dir because the binaries' names are too generic
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
         -DBUILD_STATIC=on -DSET_ENABLE_SPLIT_PARALLELISM=ON -DENABLE_SPLIT_PARALLELISM=OFF \
@@ -1988,7 +1988,7 @@ if [[ $mplayer = "y" ]] &&
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
 
-    _notrequired="true"
+    _notrequired=true
     do_configure --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
     --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
     --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
@@ -2347,7 +2347,7 @@ fi
 
 _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
-    _notrequired=yes
+    _notrequired=true
     do_patch https://0x0.st/zM5A.patch
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
