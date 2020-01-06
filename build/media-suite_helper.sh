@@ -1341,30 +1341,30 @@ strip_ansi() {
 }
 
 zip_logs() {
-    local failed url files
-    failed="$(get_first_subdir)"
-    pushd "$LOCALBUILDDIR" > /dev/null || do_exit_prompt "Did you delete /build?"
-    rm -f logs.zip
-    strip_ansi ./*.log
-    files=(/trunk/media-autobuild_suite.bat)
-    local option
-    [[ $failed ]] && mapfile -t -O "${#files[@]}" files < <(
-        find "$failed" -name "*.log"
+    local failed url
+    failed=$(get_first_subdir)
+    strip_ansi "$LOCALBUILDDIR"/*.log
+    rm -f "$LOCALBUILDDIR/logs.zip"
+    (
+        cd "$LOCALBUILDDIR" > /dev/null || do_exit_prompt "Did you delete /build?"
+        {
+            echo /trunk/media-autobuild_suite.bat
+            [[ $failed != . ]] && find "$failed" -name "*.log"
+            find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
+                -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"
+        } | sort -uo failedFiles
+        7za -mx=9 a logs.zip -- @failedFiles > /dev/null && rm failedFiles
     )
-    mapfile -t -O "${#files[@]}" files < <(
-        find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
-            -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"
-    )
-    7za -mx=9 a logs.zip "${files[@]}" > /dev/null
-    [[ ! -f "$LOCALBUILDDIR/no_logs" ]] && [[ -n "$build32$build64" ]] &&
-        url="$(/usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
-    popd > /dev/null || do_exit_prompt "Did you delete the previous folder?"
+    [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 ]] &&
+        url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
         echo "${green}Copy and paste ${red}[logs.zip]($url)${green} in the GitHub issue.${reset}"
     elif [[ -f "$LOCALBUILDDIR/logs.zip" ]]; then
         echo "${green}Attach $(cygpath -w "$LOCALBUILDDIR/logs.zip") to the GitHub issue.${reset}"
+    else
+        echo "${red}Failed to generate logs.zip!${reset}"
     fi
 }
 
