@@ -986,6 +986,18 @@ else
     pc_exists vpx || do_removeOption --enable-libvpx
 fi
 
+_check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libvmaf
+elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
+    do_vcs "https://github.com/Netflix/vmaf.git"; then
+    do_uninstall share/model "${_check[@]}"
+    cd_safe libvmaf
+    do_mesoninstall video
+    do_checkIfExist
+fi
+file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
+
 [[ $aom = y || $standalone = y ]] && _aom_bins=y
 _check=(libaom.a aom.pc)
 [[ -n $_aom_bins ]] && _check+=(bin-video/aomenc.exe)
@@ -1607,19 +1619,6 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     do_install xvid_encraw.exe bin-video/
     do_checkIfExist
 fi
-
-_check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libvmaf
-elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
-    do_vcs "https://github.com/Netflix/vmaf.git"; then
-    do_uninstall share/model "${_check[@]}"
-    cd_safe libvmaf
-    do_mesoninstall video
-    do_checkIfExist
-fi
-grep_or_sed lstdc "$(file_installed libvmaf.pc)" 's;Libs.private.*;& -lstdc++;'
-file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
 
 _check=(ffnvcodec/nvEncodeAPI.h ffnvcodec.pc)
 if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||
