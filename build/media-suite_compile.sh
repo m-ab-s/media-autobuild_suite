@@ -1012,6 +1012,7 @@ if { [[ $aom = y ]] || { [[ $ffmpeg != "no" ]] && enabled libaom; }; } &&
     else
         extracommands+=("-DENABLE_EXAMPLES=off")
     fi
+    [[ $ffmpeg != "no" ]] && enabled libvmaf && extracommands+=("-DCONFIG_TUNE_VMAF=1")
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
     do_cmakeinstall video -DENABLE_{DOCS,TOOLS}=off -DENABLE_TEST{S,DATA}=OFF \
