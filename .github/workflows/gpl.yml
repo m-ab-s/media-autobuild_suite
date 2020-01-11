@@ -1,0 +1,131 @@
+name: gpl build
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  push:
+
+jobs:
+  gpl:
+    name: "mingw-w64-x86_64 gpl build"
+    runs-on:
+      - self-hosted
+      - windows
+      - x64
+    timeout-minutes: 960
+    steps:
+      - uses: actions/checkout@v2.0.0
+      - name: Extract Cache
+        run: |
+          if (Test-Path "D:/cache.tar.xz") {
+            New-Item -ItemType Directory -Path msys64/home/CCOM-9020M$/.ccache
+            tar -xf D:/cache.tar.xz -C $(Resolve-Path msys64/home/CCOM-9020M$/.ccache)
+          }
+
+      - name: Get ini file
+        shell: pwsh
+        run: Invoke-WebRequest https://pastebin.com/raw/xnDBmVQq -OutFile build/media-autobuild_suite.ini
+
+      - name: Replace do_prompt
+        shell: pwsh
+        run: sed -i 's/do_prompt /echo /g' build/media-suite_helper.sh build/media-suite_compile.sh
+
+      - name: Compile the suite
+        shell: cmd
+        run: media-autobuild_suite.bat
+
+      - name: Tar cache
+        run: |
+          if (Test-Path "msys64/home/CCOM-9020M$/.ccache") {
+            tar -cf D:/cache.tar.xz --no-acls -C $(Resolve-Path msys64/home/CCOM-9020M$/.ccache) .
+          }
+
+      - uses: actions/upload-artifact@v1 # Only on distributable builds
+        with:
+          name: ffmpeg
+          path: local64/bin-video/ffmpeg.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ffplay
+          path: local64/bin-video/ffplay.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ffprobe
+          path: local64/bin-video/ffprobe.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: mpv
+          path: local64/bin-video/mpv.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: aomenc
+          path: local64/bin-video/aomenc.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: aomdec
+          path: local64/bin-video/aomdec.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: rav1e
+          path: local64/bin-video/rav1e.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: dav1d
+          path: local64/bin-video/dav1d.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: x264
+          path: local64/bin-video/x264.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: x265
+          path: local64/bin-video/x265.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: c2enc
+          path: local64/bin-audio/c2enc.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: c2dec
+          path: local64/bin-audio/c2dec.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: flac
+          path: local64/bin-audio/flac.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: metaflac
+          path: local64/bin-audio/metaflac.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: lame
+          path: local64/bin-audio/lame.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: opusenc
+          path: local64/bin-audio/opusenc.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: opusdec
+          path: local64/bin-audio/opusdec.exe
+
+      - uses: actions/upload-artifact@v1
+        with:
+          name: opusinfo
+          path: local64/bin-audio/opusinfo.exe
