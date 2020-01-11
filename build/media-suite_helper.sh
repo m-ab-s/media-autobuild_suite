@@ -169,6 +169,16 @@ vcs_test_remote() {
     esac
 }
 
+vcs_clean() (
+    cd "${1:-$PWD}" 2> /dev/null || return 1
+    case ${2:-$(vcs_get_current_type "$1")} in
+    git) GIT_TERMINAL_PROMPT=0 git clean -dffxq ;;
+    hg) hg --noninteractive purge --config extensions.purge= ;;
+    svn) svn --non-interactive cleanup --remove-unversioned -q ;;
+    *) false ;;
+    esac
+)
+
 # vcs_clone https://gitlab.com/libtiff/libtiff.git tiff v4.1.0
 vcs_clone() (
     set -x
