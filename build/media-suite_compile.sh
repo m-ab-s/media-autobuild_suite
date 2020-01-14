@@ -1614,8 +1614,7 @@ if [[ $bits = 32bit ]]; then
 elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
-    do_patch "https://github.com/Netflix/vmaf/compare/master...1480c1:cmake.patch cmake.patch" am
-    do_cmakeinstall
+    do_mesoninstall video
     do_checkIfExist
 fi
 grep_or_sed lstdc "$(file_installed libvmaf.pc)" 's;Libs.private.*;& -lstdc++;'
