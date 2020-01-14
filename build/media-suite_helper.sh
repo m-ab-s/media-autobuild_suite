@@ -287,7 +287,8 @@ do_mabs_clone() {
 # example:
 #   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
 do_vcs() {
-    local vcsType="${1%::*}" vcsURL="${1#*::}" vcsFolder="$2" vcsCheck=("${_check[@]}") vcsBranch="${vcsURL#*#}" ref
+    local vcsType="${1%::*}" vcsURL="${1#*::}" vcsFolder="$2" vcsCheck=("${_check[@]}")
+    local vcsBranch="${vcsURL#*#}" ref
     local deps=("${_deps[@]}") && unset _deps
     [[ $vcsType == "$vcsURL" ]] && vcsType="git"
     [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
