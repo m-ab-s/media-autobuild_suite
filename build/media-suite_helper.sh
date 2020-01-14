@@ -127,7 +127,8 @@ test_newer() {
 # vcs_get_default_ref git
 vcs_get_default_ref() {
     case ${1:-$(vcs_get_current_type)} in
-    git | svn) echo "HEAD" ;;
+    git) echo "origin/head" ;;
+    svn) echo "HEAD" ;;
     hg) echo "default" ;;
     *) return 1 ;;
     esac
