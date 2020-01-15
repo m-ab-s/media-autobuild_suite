@@ -1614,6 +1614,7 @@ if [[ $bits = 32bit ]]; then
 elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
+    cd_safe libvmaf
     do_mesoninstall video
     do_checkIfExist
 fi
