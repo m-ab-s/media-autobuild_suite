@@ -1619,6 +1619,7 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_checkIfExist
 fi
 grep_or_sed lstdc "$(file_installed libvmaf.pc)" 's;Libs.private.*;& -lstdc++;'
+file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
 
 _check=(ffnvcodec/nvEncodeAPI.h ffnvcodec.pc)
 if [[ $ffmpeg != "no" ]] && { enabled ffnvcodec ||

@@ -659,9 +659,8 @@ do_checkIfExist() {
 }
 
 file_installed() {
-    local file
-    local silent
-    [[ $1 == "-s" ]] && silent=y
+    local file silent
+    [[ $1 == "-s" ]] && silent=true && shift
     case $1 in
     /* | ./*)
         file="$1"
@@ -680,7 +679,7 @@ file_installed() {
         ;;
     esac
     [[ ${file::1} != "/" ]] && file="$LOCALDESTDIR/$file"
-    [[ -z $silent ]] && echo "$file"
+    ${silent:-false} || echo "$file"
     test -e "$file"
 }
 
