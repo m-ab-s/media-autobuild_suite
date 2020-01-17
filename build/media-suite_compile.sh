@@ -1869,7 +1869,7 @@ if [[ $ffmpeg != "no" ]]; then
         fi
 
         if enabled openal; then
-            do_patch "https://gist.githubusercontent.com/Helenerineium/406d836f81f99a0656bdaf885265ca2e/raw/openal-pkgconfig.patch" ||
+            do_patch "https://gist.githubusercontent.com/1480c1/7c0f77957bd8ec8a03987dee95651029/raw/openal-pkgconfig.patch" ||
                 {
                     do_removeOption "--enable-openal"
                     do_removeOption FFMPEG_OPTS_SHARED "--enable-openal"
