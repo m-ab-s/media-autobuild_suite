@@ -1812,6 +1812,7 @@ get_cl_path() {
 
     local basepath
     basepath="$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/$_hostbits/$_arch")"
+    basepath=$(cygpath -u "$basepath")
     "$basepath/cl.exe" /? &> /dev/null &&
         export PATH="$basepath:$PATH" ||
         return 1
