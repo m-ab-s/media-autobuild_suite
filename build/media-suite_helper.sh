@@ -1811,9 +1811,9 @@ get_cl_path() {
     [[ $bits == 32bit ]] && _arch=x86
 
     local basepath
-    basepath="$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/$_hostbits/$_arch")"
+    basepath="$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/$_hostbits/$_arch" | sort -uV | tail -1)" || return 1
     basepath=$(cygpath -u "$basepath")
-    "$basepath/cl.exe" /? &> /dev/null &&
+    "$basepath/cl.exe" /? > /dev/null 2>&1 &&
         export PATH="$basepath:$PATH" ||
         return 1
 }
