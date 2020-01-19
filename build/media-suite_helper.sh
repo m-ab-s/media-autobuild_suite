@@ -1789,33 +1789,38 @@ get_vs_prefix() {
 }
 
 get_cl_path() {
-    type cl.exe &> /dev/null && return 0
+    { type cl.exe && cl --help; } > /dev/null 2>&1 && return 0
 
-    local _suite_vswhere="/opt/bin/vswhere.exe" _sys_vswhere
-    _sys_vswhere="$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe")"
-    if "$_sys_vswhere" -help &> /dev/null; then
+    local _suite_vswhere=/opt/bin/vswhere.exe _sys_vswhere
+    if _sys_vswhere=$(cygpath -u "$(cygpath -F 0x002a)/Microsoft Visual Studio/Installer/vswhere.exe") &&
+        "$_sys_vswhere" -help > /dev/null 2>&1; then
         vswhere=$_sys_vswhere
-    elif "$_suite_vswhere" -help &> /dev/null; then
+    elif [[ -e $_suite_vswhere ]] &&
+        $_suite_vswhere -help > /dev/null 2>&1; then
+        vswhere=$_suite_vswhere
+    elif (
+        cd "$LOCALBUILDDIR" 2> /dev/null || return 1
+        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
+        ./vswhere.exe -help > /dev/null 2>&1 || return 1
+        do_install vswhere.exe /opt/bin/
+    ); then
         vswhere=$_suite_vswhere
     else
-        pushd "$LOCALBUILDDIR" 2> /dev/null || do_exit_prompt "Did you delete /build?"
-        do_wget -c -r -q "https://github.com/Microsoft/vswhere/releases/latest/download/vswhere.exe"
-        ./vswhere.exe -help &> /dev/null || return 1
-        do_install vswhere.exe /opt/bin/
-        vswhere=$_suite_vswhere
-        popd 2> /dev/null || do_exit_prompt "Did you delete the previous folder?"
+        return 1
     fi
 
     local _hostbits=HostX64 _arch=x64
-    [[ "$(uname -m)" != x86_64 ]] && _hostbits=HostX86
+    [[ $(uname -m) != x86_64 ]] && _hostbits=HostX86
     [[ $bits == 32bit ]] && _arch=x86
 
     local basepath
-    basepath="$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/$_hostbits/$_arch" | sort -uV | tail -1)" || return 1
-    basepath=$(cygpath -u "$basepath")
-    "$basepath/cl.exe" /? > /dev/null 2>&1 &&
-        export PATH="$basepath:$PATH" ||
+    if basepath=$(cygpath -u "$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/${_hostbits:-HostX64}/${_arch:-x64}" | sort -uV | tail -1)") &&
+        "$basepath/cl.exe" /? > /dev/null 2>&1; then
+        export PATH="$basepath:$PATH"
+        return 0
+    else
         return 1
+    fi
 }
 
 get_java_home() {
