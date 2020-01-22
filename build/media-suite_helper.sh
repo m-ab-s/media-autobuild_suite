@@ -135,20 +135,19 @@ vcs_get_default_ref() {
 }
 
 # vcs_get_current_type /build/myrepo
-vcs_get_current_type() {
-    local basedir
-    basedir=${1:-$(get_first_subdir -f)}
-    if [[ -d $basedir/.git ]] && git -C "$basedir" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-        echo "git"
-    elif [[ -d $basedir/.hg ]] && hg -R "$basedir" id --id > /dev/null 2>&1; then
-        echo "hg"
-    elif [[ -d $basedir/.svn ]] && svn info --depth empty "$basedir@HEAD" > /dev/null 2>&1; then
-        echo "svn"
-    else
-        echo "unknown"
-        return 1
-    fi
-}
+vcs_get_current_type() (
+    cd "${1:-$(get_first_subdir -f)}" 2> /dev/null || return 1
+    for file in .*; do
+        case $file in
+        \.git) git rev-parse --is-inside-work-tree > /dev/null 2>&1 && echo "git" ;;
+        \.hg) hg id --id > /dev/null 2>&1 && echo "hg" ;;
+        \.svn) svn info --depth empty > /dev/null 2>&1 && echo "svn" ;;
+        *) false ;;
+        esac && return 0
+    done
+    echo "unknown"
+    return 1
+)
 
 # check_valid_vcs /build/ffmpeg-git git
 check_valid_vcs() {
