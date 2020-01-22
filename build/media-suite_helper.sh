@@ -252,15 +252,12 @@ vcs_log() {
 
 # vcs_get_latest_tag "libopenmpt-*"
 vcs_get_latest_tag() (
-    if ! {
-        [[ ${vcsType:=${2:-$(vcs_get_current_type)}} == git ]] &&
-            case ${1:-unknown} in
-            LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" ;;
-            GREATEST) git describe --abbrev=0 --tags ;;
-            *\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" ;;
-            *) false ;;
-            esac 2> /dev/null
-    } then
+    if ! case ${2:-$(vcs_get_current_type)}/${1:-unknown} in
+    git/LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null ;;
+    git/GREATEST) git describe --abbrev=0 --tags 2> /dev/null ;;
+    git/*\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" 2> /dev/null ;;
+    *) false ;;
+    esac then
         echo "$1"
     fi
 )
