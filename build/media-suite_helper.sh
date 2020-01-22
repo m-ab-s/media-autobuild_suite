@@ -218,7 +218,7 @@ vcs_reset() (
             [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
         git checkout --no-track -fB ab-suite
-        git reset --hard "$(vcs_get_latest_tag "$1")"
+        git reset --hard "$(vcs_get_latest_tag "$1" git)"
         ;;
     hg) hg update -C -r "$1" ;;
     svn) svn revert --recursive . ;;
