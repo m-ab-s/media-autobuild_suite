@@ -247,8 +247,7 @@ vcs_update() (
 # Defaults to last 5 commits
 vcs_log() {
     case ${3:-$(vcs_get_current_type)} in
-    git) git log --no-merges --pretty="%ci: %an - %h%n    %s" \
-        "${1:-HEAD~5}".."${2:-HEAD}" ;;
+    git) git log --no-merges --pretty="%ci: %an - %h%n    %s" "${1:-HEAD~5}".."${2:-HEAD}" ;;
     hg) hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
         -r "reverse(${1:--5}:${2:-tip})" ;;
     svn) ;; # No easy way to generate a svn changelog with the same format. Plus it's really only mplayer.
