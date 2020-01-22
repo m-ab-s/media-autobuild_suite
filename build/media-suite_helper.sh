@@ -265,10 +265,13 @@ vcs_get_latest_tag() (
 # do_mabs_clone "$vcsURL" "$vcsFolder" "$ref" "$vcsType"
 # For internal use for fallback links
 do_mabs_clone() {
-    vcs_test_remote "$1" "$4" &&
-        log -qe "$4.clone" vcs_clone "$1" "$2" "$3" "$4" ||
-        vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}" "$4" &&
-        log -qe "$4.clone" vcs_clone "https://gitlab.com/m-ab-s/${1##*/}" "$2" "$3" "git"
+    {
+        vcs_test_remote "$1" "$4" &&
+            log -qe "$4.clone" vcs_clone "$1" "$2" "$3" "$4"
+    } || {
+        vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}" git &&
+            log -qe "$4.clone" vcs_clone "https://gitlab.com/m-ab-s/${1##*/}" "$2" "$3" git
+    }
     check_valid_vcs "$2-$4" "$4"
 }
 
