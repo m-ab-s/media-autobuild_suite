@@ -152,7 +152,7 @@ vcs_get_current_type() {
 
 # check_valid_vcs /build/ffmpeg-git git
 check_valid_vcs() {
-    case ${2:-$(vcs_get_current_type "$1")} in
+    case ${2:-$(vcs_get_current_type "${1:-$PWD}")} in
     git) [[ -d ${1:-$PWD}/.git ]] ;; # && git -C "${1:-$PWD}" fsck --no-progress ;;
     hg) [[ -d ${1:-$PWD}/.hg ]] ;;   # && hg verify -q ;;
     svn) [[ -d ${1:-$PWD}/.svn ]] ;;
