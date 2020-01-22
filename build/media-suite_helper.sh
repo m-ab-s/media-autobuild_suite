@@ -324,11 +324,11 @@ do_vcs() {
     fi
 
     log -q "$vcsType.reset" vcs_reset "$ref"
-    oldHead=$(vcs_get_current_head)
+    oldHead=$(vcs_get_current_head "$PWD" "$vcsType")
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
         do_print_progress "  Running $vcsType update for $vcsFolder"
         log -q "$vcsType.update" vcs_update "$ref"
-        newHead=$(vcs_get_current_head)
+        newHead=$(vcs_get_current_head "$PWD" "$vcsType")
         touch recently_checked
     else
         newHead="$oldHead"
