@@ -355,12 +355,10 @@ do_vcs() {
         do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
     else
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
-        if [[ -f recompile ]]; then
-            do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
-            do_print_status prefix "${bold}├${reset} " "Found recompile flag" "$orange" "Recompiling"
-        else
+        [[ ! -f recompile ]] &&
             return 1
-        fi
+        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
+        do_print_status prefix "${bold}├${reset} " "Found recompile flag" "$orange" "Recompiling"
     fi
     return 0
 }
