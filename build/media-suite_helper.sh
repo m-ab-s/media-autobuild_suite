@@ -286,11 +286,11 @@ do_vcs() {
     [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
     ref=$(vcs_get_default_ref "$vcsType")
     vcsURL="${vcsURL%#*}"
-    [[ -z $vcsFolder ]] && vcsFolder="${vcsURL##*/}" && vcsFolder="${vcsFolder%.*}"
+    : "${vcsFolder:=$(basename "$vcsURL" .git)}"
 
     if [[ -n $vcsBranch ]]; then
         ref=${vcsBranch##*=}
-        [[ ${vcsBranch%%=*} == branch && $vcsType == git && $ref == "${ref%/*}" ]] && ref=origin/$ref
+        [[ $vcsType/${vcsBranch%%=*}/$ref == git/branch/${ref%/*} ]] && ref=origin/$ref
     fi
 
     cd_safe "$LOCALBUILDDIR"
@@ -311,8 +311,7 @@ do_vcs() {
     cd_safe "$vcsFolder-$vcsType"
 
     if [[ $ffmpegUpdate == onlyFFmpeg && $vcsFolder != ffmpeg && $vcsFolder != mpv ]] &&
-        { { [[ -z ${vcsCheck[*]} ]] && files_exist "$vcsFolder.pc"; } ||
-            { [[ -n ${vcsCheck[*]} ]] && files_exist "${vcsCheck[@]}"; }; }; then
+        files_exist "${vcsCheck[@]:-$vcsFolder.pc}"; then
         do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
         return 1
     fi
@@ -334,7 +333,7 @@ do_vcs() {
     if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
-        if [[ $build32$build64$bits == "yesyes64bit" ]]; then
+        if [[ $build32$build64$bits == yesyes64bit ]]; then
             new_updates="yes"
             new_updates_packages="$new_updates_packages [$vcsFolder]"
         fi
