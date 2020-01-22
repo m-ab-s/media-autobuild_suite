@@ -182,10 +182,9 @@ vcs_test_remote() {
 # vcs_clone https://gitlab.com/libtiff/libtiff.git tiff v4.1.0
 vcs_clone() (
     set -x
-    vcsURL=${1:-$vcsURL} vcsFolder=${2:-$vcsFolder} ref=${3:-$ref} vcsType="${4:-${vcsType:-git}}"
+    vcsURL=$1 vcsFolder=$2 ref=$3 vcsType=${4:-git}
     [[ -z $vcsURL ]] && return 1
-    [[ -z $vcsFolder ]] && vcsFolder=${vcsURL##*/} && vcsFolder=${vcsFolder%.git}
-    : "${ref:=$(vcs_get_default_ref "$vcsType")}"
+    : "${vcsFolder:=$(basename "$vcsURL" .git)}" "${ref:=$(vcs_get_default_ref "$vcsType")}"
 
     check_valid_vcs "$vcsFolder-$vcsType" "$vcsType" && return 0
     rm -rf "$vcsFolder-$vcsType"
