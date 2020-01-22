@@ -188,26 +188,22 @@ vcs_clone() (
     [[ -z $vcsFolder ]] && vcsFolder=${vcsURL##*/} && vcsFolder=${vcsFolder%.git}
     : "${ref:=$(vcs_get_default_ref "$vcsType")}"
 
-    if (check_valid_vcs "$vcsFolder-$vcsType" "$vcsType") > /dev/null 2>&1; then
-        return 0
-    else
-        rm -rf "$vcsFolder-$vcsType"
-        case $vcsType in
-        git)
-            if [[ $- == *i* ]]; then
-                unset GIT_TERMINAL_PROMPT
-            else
-                export GIT_TERMINAL_PROMPT=0
-            fi
-            git clone "$vcsURL" "$vcsFolder-$vcsType"
-            git -C "$vcsFolder-$vcsType" reset --hard "$ref"
-            ;;
-        hg) hg clone -r "$ref" "$vcsURL" "$vcsFolder-$vcsType" ;;
-        svn) svn checkout -r "$ref" "$vcsURL" "$vcsFolder"-svn ;;
-        *) return 1 ;;
+    check_valid_vcs "$vcsFolder-$vcsType" "$vcsType" && return 0
+    rm -rf "$vcsFolder-$vcsType"
+    case $vcsType in
+    git)
+        case $- in
+        *i*) unset GIT_TERMINAL_PROMPT ;;
+        *) export GIT_TERMINAL_PROMPT=0 ;;
         esac
-    fi
-    check_valid_vcs "$PWD/$vcsFolder-$vcsType" "$vcsType"
+        git clone "$vcsURL" "$vcsFolder-git"
+        git -C "$vcsFolder-git" reset --hard "$ref"
+        ;;
+    hg) hg --noninteractive clone -u "$ref" "$vcsURL" "$vcsFolder-hg" ;;
+    svn) svn --non-interactive checkout -r "$ref" "$vcsURL" "$vcsFolder-svn" ;;
+    *) return 1 ;;
+    esac
+    check_valid_vcs "$vcsFolder-$vcsType" "$vcsType"
 )
 
 vcs_reset() (
