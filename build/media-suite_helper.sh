@@ -230,10 +230,9 @@ vcs_update() (
     set -x
     case ${2:-$(vcs_get_current_type)} in
     git)
-        local unshallow
-        [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow"
+        [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow" || unshallow=''
         git fetch -t $unshallow origin
-        git reset --hard "$(vcs_get_latest_tag "$1")"
+        git reset --hard "$(vcs_get_latest_tag "$1" git)"
         ;;
     hg)
         hg pull
