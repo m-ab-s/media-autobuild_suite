@@ -130,7 +130,7 @@ vcs_get_default_ref() {
     git) echo "origin/HEAD" ;;
     svn) echo "HEAD" ;;
     hg) echo "default" ;;
-    *) return 1 ;;
+    *) echo "unknown" && return 1 ;;
     esac
 }
 
