@@ -1260,6 +1260,7 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/ZenLib.git" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config \
             "${_check[@]}" libzen.la lib/cmake/zenlib
+        do_patch "https://github.com/MediaArea/ZenLib/pull/105.patch" am
         do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
@@ -1270,6 +1271,7 @@ if [[ $mediainfo = "y" ]]; then
     if do_vcs "https://github.com/MediaArea/MediaInfoLib.git" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
+        do_patch "https://github.com/MediaArea/MediaInfoLib/pull/1209.patch" am
         do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
         do_checkIfExist
     fi
