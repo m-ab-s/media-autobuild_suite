@@ -1774,7 +1774,7 @@ if [[ $ffmpeg != "no" ]]; then
               _sha256="7be41e496f43272b707e4d9bafdfc27d53b00aaf9468667a4a2107c192b27249"
             fi
             do_wget -c -r -q -h $_sha256 \
-            "http://ciscobinary.openh264.org/openh264-2.0.0-win${bits%bit}.dll.bz2" \
+            "https://github.com/cisco/openh264/releases/download/v2.0.0/openh264-2.0.0-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
             unset _sha256
