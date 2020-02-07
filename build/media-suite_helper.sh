@@ -620,7 +620,7 @@ do_checkIfExist() {
         unset _check
     fi
     unset_extra_script
-    [[ -z ${check[*]} ]] && echo "No files to check" && exit 1
+    [[ -z ${check[*]} ]] && echo "No files to check" && return 1
     if [[ $dry == y ]]; then
         files_exist -v -s "${check[@]}"
         return $?
