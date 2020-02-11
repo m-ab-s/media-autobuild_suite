@@ -1055,6 +1055,13 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         [[ -f $CARGO_HOME/config ]] && rm -f "$CARGO_HOME/config"
         log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
             cinstall --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
+
+        compiler_builtins=$(ar t "install-$bits/lib/librav1e.a" | grep -xG compiler_builtins-.*compiler_builtins.*-cgu.0.rcgu.o)
+        ar x "install-$bits/lib/librav1e.a" "$compiler_builtins"
+        objcopy -W ___chkstk_ms "$compiler_builtins"
+        ar r "install-$bits/lib/librav1e.a" "$compiler_builtins"
+        rm "$compiler_builtins"
+
         # do_install "install-$bits/bin/rav1e.dll" bin-video/
         # do_install "install-$bits/lib/librav1e.dll.a" lib/
         do_install "install-$bits/lib/librav1e.a" lib/
