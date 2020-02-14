@@ -64,29 +64,21 @@ do_print_status() {
 
 do_print_progress() {
     case $logging$timeStamp in
-    n*) set_title "$* in $(get_first_subdir)" ;;
-    yy)
-        if [[ $1 =~ ^[a-zA-Z] ]]; then
-            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}├${reset} $*..."
+    n*)
+        set_title "$* in $(get_first_subdir)"
+        if [[ $timeStamp == y ]]; then
+            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
         else
-            printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$*..."
+            echo -e "${bold}$* in $(get_first_subdir)${reset}"
         fi
-        return
         ;;
+    yy) printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$([[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} ")$*..." ;;
     yn)
-        if [[ $1 =~ ^[a-zA-Z] ]]; then
-            echo "${bold}├${reset} $*..."
-        else
-            echo -e "$*..."
-        fi
-        return
+        [[ $1 =~ ^[a-zA-Z] ]] &&
+            printf '%s' "${bold}├${reset} "
+        echo -e "$*..."
         ;;
     esac
-    if [[ $timeStamp == y ]]; then
-        printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
-    else
-        echo -e "${bold}$* in $(get_first_subdir)${reset}"
-    fi
 }
 
 set_title() {
@@ -94,12 +86,12 @@ set_title() {
 }
 
 do_exit_prompt() {
-    if [[ -n "$build32$build64" ]]; then # meaning "executing this in the suite's context"
+    if [[ -n $build32$build64 ]]; then # meaning "executing this in the suite's context"
         create_diagnostic
         zip_logs
     fi
     do_prompt "$*"
-    [[ -n "$build32$build64" ]] && exit 1
+    [[ -n $build32$build64 ]] && exit 1
 }
 
 cd_safe() {
