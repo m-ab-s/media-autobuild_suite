@@ -90,9 +90,7 @@ do_print_progress() {
 }
 
 set_title() {
-    local title="media-autobuild_suite ($bits)"
-    [[ -z $1 ]] || title="$title: $1"
-    printf '\033]0;%s\a' "$title"
+    printf '\033]0;media-autobuild_suite  %s\a' "($bits)${1:+: $1}"
 }
 
 do_exit_prompt() {
