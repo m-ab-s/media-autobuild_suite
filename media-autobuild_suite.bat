@@ -1601,6 +1601,9 @@ findstr /C:"profile2.local" %instdir%\%msys2%\etc\profile.d\Zab-suite.sh >nul 2>
     echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
     echo.   source /local32/etc/profile2.local
     echo.fi
+    echo.if [[ -f /build/media-suite_helper.sh ]]; then
+    echo.   source /build/media-suite_helper.sh
+    echo.fi
 )>%instdir%\%msys2%\etc\profile.d\Zab-suite.sh
 
 rem compileLocals
