@@ -1944,7 +1944,7 @@ if [[ $ffmpeg != "no" ]]; then
             do_uninstall bin-video/ff{mpeg,play,probe}.exe{,.debug} "${_uninstall[@]}"
             create_build_dir static
             config_path=.. CFLAGS="${ffmpeg_cflags:-$CFLAGS}" \
-            LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
+            cc=$CC cxx=$CXX LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
                 do_configure \
                 --bindir="$LOCALDESTDIR/bin-video" "${FFMPEG_OPTS[@]}"
             # cosmetics
