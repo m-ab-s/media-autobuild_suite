@@ -94,7 +94,8 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2u
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq
+set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq ^
+clang
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -135,7 +136,8 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo ^
+CC
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -1079,6 +1081,28 @@ if %buildavs2%==2 set "avs2=n"
 if %buildavs2% GTR 2 GOTO avs2
 if %deleteINI%==1 echo.avs2=^%buildavs2%>>%ini%
 
+:CC
+if %CCINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Use clang instead of gcc (C compiler^)?
+    echo. Experimental and possibly broken due to gcc assumptions
+    echo. 1 = Yes
+    echo. 2 = No [Recommended]
+    echo.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildCC="Build using clang: "
+) else set buildCC=%CCINI%
+
+if "%buildCC%"=="" GOTO CC
+if %buildCC%==1 set "CC=clang"
+if %buildCC%==2 set "CC=gcc"
+if %buildCC% GTR 2 GOTO CC
+if %deleteINI%==1 echo.CC=^%buildCC%>>%ini%
+
 :numCores
 if %NUMBER_OF_PROCESSORS% EQU 1 ( set coreHalf=1 ) else set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
 if %coresINI%==0 (
@@ -1685,8 +1709,13 @@ goto :EOF
     echo.
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
-    echo.export CC="ccache gcc"
-    echo.export CXX="ccache g++"
+    if %CC%==clang (
+        echo.export CC="ccache clang"
+        echo.export CXX="ccache clang++"
+    ) else (
+        echo.export CC="ccache gcc"
+        echo.export CXX="ccache g++"
+    )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
