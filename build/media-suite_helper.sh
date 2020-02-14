@@ -1326,12 +1326,6 @@ do_mesoninstall() {
 
 do_rust() {
     log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
-    if [[ $ccache == y ]]; then
-        type sccache > /dev/null 2>&1 &&
-            export RUSTC_WRAPPER=sccache
-    else
-        unset RUSTC_WRAPPER
-    fi
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
