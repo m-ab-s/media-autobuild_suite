@@ -2,9 +2,9 @@
 # shellcheck disable=SC2154,SC2120,SC2119,SC2034,SC1090,SC1117,SC2030,SC2031
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
-    cpuCount="$(($(nproc) / 2))"
+    cpuCount=$(($(nproc) / 2))
 fi
-bits="${bits:-64bit}"
+: "${bits:=64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
     --retry-delay 5 --silent --location --insecure --fail)
 
