@@ -66,6 +66,7 @@ while true; do
     --svtav1=* ) svtav1=${1#*=} && shift ;;
     --svtvp9=* ) svtvp9=${1#*=} && shift ;;
     --xvc=* ) xvc=${1#*=} && shift ;;
+    --vlc=* ) vlc=${1#*=} && shift ;;
     -- ) shift && break ;;
     -* ) echo "Error, unknown option: '$1'." && exit 1 ;;
     * ) break ;;
@@ -221,8 +222,7 @@ if { enabled libxml2 || [[ $cyanrip = y ]]; } &&
     [[ -f config.mak ]] && log "distclean" make distclean
     sed -ri 's|(bin_PROGRAMS = ).*|\1|g;/^runtest_SOURCES.*/,/We create xml2Conf.*/d' Makefile.am
     CFLAGS+=" -DLIBXML_STATIC_FOR_DLL -DNOLIBTOOL" \
-        do_separate_conf --without-python --without-catalog
-    do_makeinstall
+        do_separate_confmakeinstall --without-python
     do_checkIfExist
 fi
 
@@ -2342,6 +2342,218 @@ if [[ $cyanrip = y ]]; then
         do_checkIfExist
         PKG_CONFIG_PATH="$old_PKG_CONFIG_PATH"
         unset old_PKG_CONFIG_PATH _extra_ldflags _extra_cflags
+    fi
+fi
+
+if [[ $vlc == y ]]; then
+    do_pacman_install lib{nfs,shout,samplerate,microdns,secret} \
+        a52dec taglib gtk3 lua perl
+
+    # Remove useless shell scripts file that causes errors when stdout is not a tty.
+    find "$MINGW_PREFIX/bin/" -name "luac" -delete
+
+    # Taken from https://code.videolan.org/videolan/vlc/blob/master/contrib/src/qt/AddStaticLink.sh
+    _add_static_link() {
+        local PRL_SOURCE=$LOCALDESTDIR/$2/lib$3.prl LIBS
+        [[ -f $PRL_SOURCE ]] || PRL_SOURCE=$LOCALDESTDIR/$2/$3.prl
+        [[ ! -f $PRL_SOURCE ]] && return 1
+        LIBS=$(sed -e "
+            /QMAKE_PRL_LIBS/ {
+                s@QMAKE_PRL_LIBS =@@
+                s@$LOCALDESTDIR/lib@\${libdir}@g
+                s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g
+                p
+            }
+            d" "$PRL_SOURCE" | grep -v QMAKE_PRL_LIBS_FOR_CMAKE)
+        sed -i.bak "
+            s# -l$1# -l$3 -l$1#
+            s#Libs.private:.*#& $LIBS -L\${prefix}/$2#
+            " "$LOCALDESTDIR/lib/pkgconfig/$1.pc"
+    }
+
+    _qt_version=5.14 # Version that vlc uses it seems. + 2 since it seems something's broken in it
+    # $PKG_CONFIG --exists Qt5{Core,Widgets,Gui,Quick{,Widgets,Controls2},Svg}
+
+    # Qt compilation takes ages.
+    export QMAKE_CXX="$CXX" QMAKE_CC="$CC"
+    _check=(bin/qmake.exe Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc)
+    if do_vcs "https://github.com/qt/qtbase.git#branch=${_qt_version:=5.14}"; then
+        do_uninstall include/QtCore share/mkspecs "${_check[@]}"
+        # Enable ccache on !unix and use cygpath to fix certain issues
+        do_patch "http://gist.githubusercontent.com/1480c1/65512f45c343919299697aa778dc50b8/raw/0001-qtbase-mabs.patch" am
+        grep_and_sed " create_libtool" mkspecs/features/qt_module.prf \
+            "s/ create_libtool/ -create_libtool/g"
+        QT5Base_config=(
+            -prefix "$LOCALDESTDIR"
+            -datadir "$LOCALDESTDIR"
+            -archdatadir "$LOCALDESTDIR"
+            -opensource
+            -confirm-license
+            -release
+            -static
+            -platform win32-g++
+            -make-tool make
+            -opengl desktop
+            -qt-{libjpeg,freetype}
+            -no-{fontconfig,pkg-config,sql-sqlite,gif,openssl,dbus,vulkan,sql-odbc,pch,compile-examples,glib}
+            -nomake examples
+            -nomake tests
+        )
+        if [[ $strip == y ]]; then
+            QT5Base_config+=(-strip)
+        fi
+        if [[ $ccache == y ]]; then
+            QT5Base_config+=(-ccache)
+        fi
+        # can't use regular do_configure since their configure doesn't follow
+        # standard and uses single dash args
+        log "configure" ./configure "${QT5Base_config[@]}"
+
+        do_makeinstall
+
+        _add_static_link Qt5Gui plugins/imageformats qjpeg
+        grep_or_sed "QtGui/$(qmake -query QT_VERSION)/QtGui" "$LOCALDESTDIR/lib/pkgconfig/Qt5Gui.pc" \
+            "s;Cflags:.*;& -I\${includedir}/QtGui/$(qmake -query QT_VERSION)/QtGui;"
+        _add_static_link Qt5Gui plugins/platforms qwindows
+        _add_static_link Qt5Widgets plugins/styles qwindowsvistastyle
+        do_checkIfExist
+    fi
+
+    _deps=(Qt5Core.pc)
+    _check=(Qt5Quick.pc Qt5Qml.pc)
+    if do_vcs "https://github.com/qt/qtdeclarative.git#branch=$_qt_version"; then
+        do_uninstall "${_check[@]}"
+        do_qmake
+        do_makeinstall
+        _add_static_link Qt5Quick qml/QtQuick.2 qtquick2plugin
+        _add_static_link Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
+        _add_static_link Qt5Quick qml/QtQuick/Window.2 windowplugin
+        _add_static_link Qt5Qml qml/QtQml/Models.2 modelsplugin
+        do_checkIfExist
+    fi
+
+    _deps=(Qt5Core.pc)
+    _check=(Qt5Svg.pc)
+    if do_vcs "https://github.com/qt/qtsvg.git#branch=$_qt_version"; then
+        do_uninstall "${_check[@]}"
+        do_qmake
+        do_makeinstall
+        _add_static_link Qt5Svg plugins/iconengines qsvgicon
+        _add_static_link Qt5Svg plugins/imageformats qsvg
+        do_checkIfExist
+    fi
+
+    _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
+    _check=("$LOCALDESTDIR/qml/QtGraphicalEffects/libqtgraphicaleffectsplugin.a")
+    if do_vcs "https://github.com/qt/qtgraphicaleffects.git#branch=$_qt_version"; then
+        do_uninstall "${_check[@]}"
+        do_qmake
+        do_makeinstall
+        _add_static_link Qt5QuickWidgets qml/QtGraphicalEffects qtgraphicaleffectsplugin
+	    _add_static_link Qt5QuickWidgets qml/QtGraphicalEffects/private qtgraphicaleffectsprivate
+        do_checkIfExist
+    fi
+
+    _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
+    _check=(Qt5QuickControls2.pc)
+    if do_vcs "https://github.com/qt/qtquickcontrols2.git#branch=$_qt_version"; then
+        do_uninstall "${_check[@]}"
+        do_qmake
+        do_makeinstall
+        _add_static_link Qt5QuickControls2 qml/QtQuick/Controls.2 qtquickcontrols2plugin
+        _add_static_link Qt5QuickControls2 qml/QtQuick/Templates.2 qtquicktemplates2plugin
+        do_checkIfExist
+    fi
+
+    _check=(libspatialaudio.a spatialaudio/Ambisonics.h spatialaudio.pc)
+    if do_vcs "https://github.com/videolabs/libspatialaudio.git"; then
+        do_uninstall include/spatialaudio "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(libshout.{,l}a shout.pc shout/shout.h)
+    if do_vcs "https://gitlab.xiph.org/xiph/icecast-libshout.git" libshout; then
+        do_uninstall "${_check[@]}"
+        log -q "git.submodule" git submodule update --init
+        do_autoreconf
+        do_separate_confmakeinstall --disable-examples
+        do_checkIfExist
+    fi
+
+    _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
+    if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
+        do_uninstall include/google/protobuf "${_check[@]}"
+        do_autogen
+        do_separate_confmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(pixman-1.pc libpixman-1.a pixman-1/pixman.h)
+    if do_vcs "https://gitlab.freedesktop.org/pixman/pixman.git"; then
+        do_uninstall include/pixman-1 "${_check[@]}"
+        NOCONFIGURE=y do_autogen
+        do_separate_confmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(libmedialibrary.{,l}a medialibrary.pc medialibrary/IAlbum.h)
+    if do_vcs "https://code.videolan.org/videolan/medialibrary.git"; then
+        do_uninstall include/medialibrary "${_check[@]}"
+        do_autoreconf
+        do_separate_confmakeinstall --disable-tests --without-libvlc
+        do_checkIfExist
+    fi
+
+    _check=(libthai.pc libthai.{,l}a thai/thailib.h)
+    if do_vcs "https://github.com/tlwg/libthai.git"; then
+        do_uninstall include/thai "${_check[@]}"
+        do_autogen
+        do_separate_confmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(libebml.a ebml/ebml_export.h libebml.pc lib/cmake/EBML/EBMLTargets.cmake)
+    if do_vcs "https://github.com/Matroska-Org/libebml.git"; then
+        do_uninstall include/ebml lib/cmake/EBML "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(libmatroska.a libmatroska.pc matroska/KaxTypes.h lib/cmake/Matroska/MatroskaTargets.cmake)
+    if do_vcs "https://github.com/Matroska-Org/libmatroska.git"; then
+        do_uninstall include/matroska lib/cmake/Matroska "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(bin-video/{cvlc,rvlc,vlc.exe} libexec/vlc/vlc-cache-gen.exe bin-video/libvlc.dll libvlc.pc vlc/libvlc_version.h)
+    if do_vcs "https://code.videolan.org/videolan/vlc.git"; then
+        do_uninstall bin/plugins lib/vlc "${_check[@]}"
+        # https://code.videolan.org/videolan/medialibrary/issues/220
+        # msys2's patches
+        # Issues due to conflicting `vlc_module_name` between libvlc and libvlccore when linking vlc-static.exe and undefines.
+        # having gpg-error after GCRYPT_LIBS causes some issues, and since it's already included in GCRYPT_LIBS
+        do_patch "https://gist.githubusercontent.com/1480c1/8c50a0867aa1afceac064d2162120dde/raw/vlc-mabs.patch" am
+
+        do_autoreconf
+        # All of the disabled are because of multiple issues both on the installed libs and on vlc's side.
+        # Maybe set up vlc_options.txt
+
+        # Can't disable shared since vlc will error out. I don't think enabling static will really do anything for us other than breaking builds.
+        do_separate_conf video \
+            --sysconfdir="$LOCALDESTDIR/etc" \
+            --{build,host,target}="${MINGW_CHOST}" \
+            --enable-{shared,avcodec,merge-ffmpeg,qt,nls} \
+            --disable-{static,dbus,fluidsynth,svgdec,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode} \
+            --with-binary-version="MABS" BUILDCC="$CC" \
+            CFLAGS="$CFLAGS -DGLIB_STATIC_COMPILATION -DQT_STATIC -DGNUTLS_INTERNAL_BUILD -DLIBXML_STATIC -DLIBXML_CATALOG_ENABLED" \
+            LIBS="$($PKG_CONFIG --libs libcddb regex iconv) -lwsock32 -lws2_32 -lpthread -liphlpapi"
+        do_makeinstall
+        mv -f "$LOCALDESTDIR/bin/libvlc"* "$LOCALDESTDIR/bin-video"
+        do_checkIfExist
+
+        "$LOCALDESTDIR/libexec/vlc/vlc-cache-gen" "$LOCALDESTDIR/lib/plugins"
     fi
 fi
 

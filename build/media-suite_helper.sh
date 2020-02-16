@@ -1504,6 +1504,12 @@ do_configure() {
     unset conf_extras
 }
 
+do_qmake() {
+    extra_script pre qmake
+    log "qmake" qmake "$@"
+    extra_script post qmake
+}
+
 do_make() {
     extra_script pre make
     log "make" make "$@"
@@ -2320,6 +2326,8 @@ unset_extra_script() {
 
     # Runs before and after running ninja (do_ninja)
     unset _{pre,post}_ninja
+
+    unset _{pre,post}_qmake
 
     # Runs before and after running make, meson, ninja, and waf (Generic hook for the previous build hooks)
     # If this is present, it will override the other hooks

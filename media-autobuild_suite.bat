@@ -135,7 +135,8 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo ^
+vlc
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -856,6 +857,28 @@ if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
 if %buildmpv% GTR 2 GOTO mpv
 if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
+
+:vlc
+if %vlcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vlc?
+    echo. Takes a long time because of qt5 and wouldn't recommend it if you
+    echo. don't have ccache enabled.
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvlc="Build vlc: "
+) else set buildvlc=%vlcINI%
+
+if "%buildvlc%"=="" GOTO vlc
+if %buildvlc%==1 set "vlc=y"
+if %buildvlc%==2 set "vlc=n"
+if %buildvlc% GTR 2 GOTO vlc
+if %deleteINI%==1 echo.vlc=^%buildvlc%>>%ini%
 
 :bmx
 if %bmxINI%==0 (
@@ -1629,7 +1652,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc%
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
+--vlc=%vlc%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
