@@ -459,7 +459,8 @@ fi
 unset _deps
 
 _check=(libtiff{.a,-4.pc})
-if [[ $ffmpeg != "no" || $standalone = y ]] && enabled_any libtesseract libwebp &&
+if { { [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; } ||
+    { [[ $standalone = y ]] && enabled libwebp; }; } &&
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
     do_pacman_install libjpeg-turbo xz zlib zstd
     do_uninstall "${_check[@]}"
