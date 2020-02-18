@@ -64,19 +64,19 @@ do_print_status() {
 
 do_print_progress() {
     case $logging$timeStamp in
-    n*)
+    yy) printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$([[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} ")$*..." ;;
+    yn)
+        [[ $1 =~ ^[a-zA-Z] ]] &&
+            printf '%s' "${bold}├${reset} "
+        echo -e "$*..."
+        ;;
+    *)
         set_title "$* in $(get_first_subdir)"
         if [[ $timeStamp == y ]]; then
             printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "${bold}$* in $(get_first_subdir)${reset}"
         else
             echo -e "${bold}$* in $(get_first_subdir)${reset}"
         fi
-        ;;
-    yy) printf "${purple}"'%(%H:%M:%S)T'"${reset}"' %s\n' -1 "$([[ $1 =~ ^[a-zA-Z] ]] && echo "${bold}├${reset} ")$*..." ;;
-    yn)
-        [[ $1 =~ ^[a-zA-Z] ]] &&
-            printf '%s' "${bold}├${reset} "
-        echo -e "$*..."
         ;;
     esac
 }
