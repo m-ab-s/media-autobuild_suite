@@ -988,6 +988,7 @@ elif [[ $ffmpeg != "no" ]] && enabled libvmaf &&
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
+grep_or_sed stdc++ "$(file_installed libvmaf.pc)" 's;Libs.private.*;& -lstdc++;'
 
 [[ $aom = y || $standalone = y ]] && _aom_bins=y
 _check=(libaom.a aom.pc)
