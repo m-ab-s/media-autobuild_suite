@@ -872,7 +872,7 @@ _check=(libmysofa.{a,pc} mysofa.h)
 if [[ $ffmpeg != "no" ]] && enabled libmysofa &&
     do_vcs "https://github.com/hoene/libmysofa.git"; then
     do_uninstall "${_check[@]}"
-    do_cmakeinstall -DBUILD_TESTS=no
+    do_cmakeinstall -DBUILD_TESTS=no -DCODE_COVERAGE=OFF
     do_checkIfExist
 fi
 
