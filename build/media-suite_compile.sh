@@ -2019,7 +2019,7 @@ if [[ $mpv != "n" ]] && pc_exists libavcodec libavformat libswscale libavfilter;
             lib{GLESv2,EGL}.a "${_check[@]}"
         cp -rf include/{EGL,KHR} "$LOCALDESTDIR/include/"
         do_checkIfExist
-    elif ! mpv_disabled egl-angle; then
+    elif ! mpv_disabled egl-angle && ! files_exist "${_check[@]}"; then
         mpv_disable egl-angle
     fi
 
