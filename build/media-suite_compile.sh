@@ -439,7 +439,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     [[ ! -f configure || configure.ac -nt configure ]] && log autogen ./buildconf
     [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
-    CPPFLAGS+=" -DNGHTTP2_STATICLIB" \
+    CPPFLAGS+=" -DNGHTTP2_STATICLIB -DPSL_STATIC" \
         do_separate_confmakeinstall global "${extra_opts[@]}" \
         --without-{libssh2,random,ca-bundle,ca-path,librtmp} \
         --with-brotli --enable-sspi --disable-debug
