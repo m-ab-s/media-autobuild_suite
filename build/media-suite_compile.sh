@@ -307,6 +307,7 @@ if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
     _deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
     [[ $ffmpeg = "sharedlibs" ]] && _check+=(bin-video/libass-9.dll libass.dll.a)
     if do_vcs "https://github.com/libass/libass.git"; then
+        grep_and_sed ".asm.lo:" libass/Makefile.am 's/asm.lo/asm.o/'
         do_autoreconf
         do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
         extracommands=()
