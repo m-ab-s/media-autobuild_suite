@@ -870,7 +870,7 @@ if %vlcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: the resuling vlc is extra buggy, do not expect it to work the first time
+    echo. Note: the resulting vlc is extra buggy, do not expect it to work smoothly
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
