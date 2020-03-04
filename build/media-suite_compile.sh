@@ -2409,6 +2409,7 @@ if [[ $vlc == y ]]; then
         # standard and uses single dash args
         log "configure" ./configure "${QT5Base_config[@]}"
 
+        do_make
         do_makeinstall
 
         _add_static_link Qt5Gui plugins/imageformats qjpeg
