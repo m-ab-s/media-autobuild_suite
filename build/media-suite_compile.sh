@@ -2378,6 +2378,7 @@ if [[ $vlc == y ]]; then
     _check=(bin/qmake.exe Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc)
     if do_vcs "https://github.com/qt/qtbase.git#branch=${_qt_version:=5.14}"; then
         do_uninstall include/QtCore share/mkspecs "${_check[@]}"
+        vcs_clean "$PWD" git
         # Enable ccache on !unix and use cygpath to fix certain issues
         do_patch "http://gist.githubusercontent.com/1480c1/65512f45c343919299697aa778dc50b8/raw/0001-qtbase-mabs.patch" am
         grep_and_sed " create_libtool" mkspecs/features/qt_module.prf \
@@ -2422,6 +2423,7 @@ if [[ $vlc == y ]]; then
     _deps=(Qt5Core.pc)
     _check=(Qt5Quick.pc Qt5Qml.pc)
     if do_vcs "https://github.com/qt/qtdeclarative.git#branch=$_qt_version"; then
+        vcs_clean "$PWD" git
         do_uninstall "${_check[@]}"
         do_qmake
         do_makeinstall
@@ -2435,6 +2437,7 @@ if [[ $vlc == y ]]; then
     _deps=(Qt5Core.pc)
     _check=(Qt5Svg.pc)
     if do_vcs "https://github.com/qt/qtsvg.git#branch=$_qt_version"; then
+        vcs_clean "$PWD" git
         do_uninstall "${_check[@]}"
         do_qmake
         do_makeinstall
@@ -2446,6 +2449,7 @@ if [[ $vlc == y ]]; then
     _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
     _check=("$LOCALDESTDIR/qml/QtGraphicalEffects/libqtgraphicaleffectsplugin.a")
     if do_vcs "https://github.com/qt/qtgraphicaleffects.git#branch=$_qt_version"; then
+        vcs_clean "$PWD" git
         do_uninstall "${_check[@]}"
         do_qmake
         do_makeinstall
@@ -2457,6 +2461,7 @@ if [[ $vlc == y ]]; then
     _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
     _check=(Qt5QuickControls2.pc)
     if do_vcs "https://github.com/qt/qtquickcontrols2.git#branch=$_qt_version"; then
+        vcs_clean "$PWD" git
         do_uninstall "${_check[@]}"
         do_qmake
         do_makeinstall
