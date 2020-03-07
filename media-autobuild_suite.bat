@@ -1363,12 +1363,9 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo.
     echo -------------------------------------------------------------------------------
     echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
-        $wc = New-Object System.Net.WebClient; ^
-        while ((Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
-        (Invoke-WebRequest -Uri "https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.tar.xz" ^
-        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ($i -le 5^) {try ^
-        {$wc.DownloadFile('https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.tar.xz', ^
-        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}} | powershell -NoProfile -Command - || goto :errorMsys
+        (New-Object System.Net.WebClient^).DownloadFile(^
+        'https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.tar.xz', ^
+        "$PWD\msys2-base.tar.xz"^) | powershell -NoProfile -Command - || goto :errorMsys
 rem used to be http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz
     :unpack
     if exist %build%\msys2-base.tar.xz (
