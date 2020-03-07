@@ -1050,7 +1050,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
 
         compiler_builtins=$(ar t "install-$bits/lib/librav1e.a" | grep -xG "compiler_builtins-.*compiler_builtins.*-cgu.0.rcgu.o")
         ar x "install-$bits/lib/librav1e.a" "$compiler_builtins"
-        objcopy -W ___chkstk_ms "$compiler_builtins"
+        objcopy -W{___chkstk_ms,__udivmoddi4,__divmoddi4} "$compiler_builtins"
         ar r "install-$bits/lib/librav1e.a" "$compiler_builtins"
         rm "$compiler_builtins"
 
