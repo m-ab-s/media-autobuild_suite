@@ -172,9 +172,9 @@ vcs_test_remote() {
 vcs_clean() (
     cd "${1:-$PWD}" 2> /dev/null || return 1
     case ${2:-$(vcs_get_current_type "$1")} in
-    git) GIT_TERMINAL_PROMPT=0 git clean -dffxq ;;
-    hg) hg --noninteractive purge --config extensions.purge= ;;
-    svn) svn --non-interactive cleanup --remove-unversioned -q ;;
+    git) GIT_TERMINAL_PROMPT=0 git clean -dffxq -e{recently_{updated,checked},build_successful{32,64}bit} "$@" ;;
+    hg) hg --noninteractive purge --config extensions.purge= -X{recently_{updated,checked},build_successful{32,64}bit} "$@" ;;
+    svn) svn --non-interactive cleanup --remove-unversioned -q "$@" ;;
     *) false ;;
     esac
 )
