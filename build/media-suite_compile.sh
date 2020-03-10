@@ -1064,9 +1064,13 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
             cinstall --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
 
-        compiler_builtins=$(ar t "install-$bits/lib/librav1e.a" | grep -xG "compiler_builtins-.*compiler_builtins.*-cgu.0.rcgu.o")
+        compiler_builtins=$(
+            for a in {___chkstk_ms,__udivmoddi4,__divmoddi4,__udivti3}; do
+                nm -CAg --defined-only "install-$bits/lib/librav1e.a" | grep -- "$a" | cut -d: -f2
+            done | sort -u
+        )
         ar x "install-$bits/lib/librav1e.a" "$compiler_builtins"
-        objcopy -W{___chkstk_ms,__udivmoddi4,__divmoddi4} "$compiler_builtins"
+        objcopy --weaken "$compiler_builtins" # Just weaken the whole object, the symbols probably exist in libgcc
         ar r "install-$bits/lib/librav1e.a" "$compiler_builtins"
         rm "$compiler_builtins"
 
