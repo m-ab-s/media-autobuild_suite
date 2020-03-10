@@ -457,6 +457,21 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
 fi
 unset _deps
 
+_check=(
+    libglut.a
+    GL/freeglut{,_ucall,_ext,_std}.h
+    GL/glut.h
+    glut.pc
+    lib/cmake/FreeGLUT/FreeGLUT{Targets{,-release},Config{,Version}}.cmake
+)
+if { { [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; } || # Same conditionals as libtiff
+    { [[ $standalone = y ]] && enabled libwebp; }; } &&
+    do_vcs "https://github.com/dcnieho/FreeGLUT.git" freeglut; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall ../freeglut/freeglut -D{UNIX,FREEGLUT_BUILD_DEMOS,FREEGLUT_BUILD_SHARED_LIBS}=OFF -DFREEGLUT_REPLACE_GLUT=ON
+    do_checkIfExist
+fi
+
 _check=(libtiff{.a,-4.pc})
 if { { [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; } ||
     { [[ $standalone = y ]] && enabled libwebp; }; } &&
