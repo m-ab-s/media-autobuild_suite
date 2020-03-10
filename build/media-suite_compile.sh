@@ -2552,7 +2552,10 @@ if [[ $vlc == y ]]; then
         do_checkIfExist
     fi
 
-    _check=(bin-video/{cvlc,rvlc,vlc.exe} libexec/vlc/vlc-cache-gen.exe bin-video/libvlc.dll libvlc.pc vlc/libvlc_version.h)
+    _check=("$LOCALDESTDIR"/vlc/bin/{{c,r}vlc,vlc.exe,libvlc.dll}
+            "$LOCALDESTDIR"/vlc/libexec/vlc/vlc-cache-gen.exe
+            "$LOCALDESTDIR"/vlc/lib/pkgconfig/libvlc.pc
+            "$LOCALDESTDIR"/vlc/include/vlc/libvlc_version.h)
     if do_vcs "https://code.videolan.org/videolan/vlc.git"; then
         do_uninstall bin/plugins lib/vlc "${_check[@]}"
         # https://code.videolan.org/videolan/medialibrary/issues/220
@@ -2566,19 +2569,19 @@ if [[ $vlc == y ]]; then
         # Maybe set up vlc_options.txt
 
         # Can't disable shared since vlc will error out. I don't think enabling static will really do anything for us other than breaking builds.
-        do_separate_conf video \
-            --sysconfdir="$LOCALDESTDIR/etc" \
-            --{build,host,target}="${MINGW_CHOST}" \
+        create_build_dir
+        config_path=".." do_configure \
+            --prefix="$LOCALDESTDIR/vlc" \
+            --sysconfdir="$LOCALDESTDIR/vlc/etc" \
+            --{build,host,target}="$MINGW_CHOST" \
             --enable-{shared,avcodec,merge-ffmpeg,qt,nls} \
-            --disable-{static,dbus,fluidsynth,svgdec,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode} \
+            --disable-{static,dbus,fluidsynth,svgdec,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode,nvdec} \
             --with-binary-version="MABS" BUILDCC="$CC" \
             CFLAGS="$CFLAGS -DGLIB_STATIC_COMPILATION -DQT_STATIC -DGNUTLS_INTERNAL_BUILD -DLIBXML_STATIC -DLIBXML_CATALOG_ENABLED" \
             LIBS="$($PKG_CONFIG --libs libcddb regex iconv) -lwsock32 -lws2_32 -lpthread -liphlpapi"
         do_makeinstall
-        mv -f "$LOCALDESTDIR/bin/libvlc"* "$LOCALDESTDIR/bin-video"
         do_checkIfExist
-
-        "$LOCALDESTDIR/libexec/vlc/vlc-cache-gen" "$LOCALDESTDIR/lib/plugins"
+        "$LOCALDESTDIR/vlc/libexec/vlc/vlc-cache-gen" "$LOCALDESTDIR/vlc/lib/plugins"
     fi
 fi
 
