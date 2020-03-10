@@ -478,9 +478,10 @@ if { { [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; } ||
     do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
     do_pacman_install libjpeg-turbo xz zlib zstd
     do_uninstall "${_check[@]}"
+    do_patch "https://gist.githubusercontent.com/1480c1/03d92119a4beaf1fda5eb95effb14419/raw/0001-tiffgt-Link-winmm-if-windows.patch" am
     grep_or_sed 'Requires.private' libtiff-4.pc.in \
         '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
-    do_cmakeinstall global -Dwebp=OFF -DUNIX=OFF -Djbig=OFF
+    CFLAGS+=" -DFREEGLUT_STATIC" do_cmakeinstall global -Dwebp=OFF -DUNIX=OFF -Djbig=OFF
     do_checkIfExist
 fi
 
