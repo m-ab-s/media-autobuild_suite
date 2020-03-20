@@ -1048,7 +1048,7 @@ do_getMpvConfig() {
         IFS=$'\n' read -d '' -r -a MPV_TEMP_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
     do_removeOption MPV_TEMP_OPTS \
-        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc|dvdread)"
+        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc|dvdread|libass)"
     for opt in "${MPV_TEMP_OPTS[@]}"; do
         [[ -n $opt ]] && MPV_OPTS+=("$opt")
     done

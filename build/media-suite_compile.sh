@@ -225,7 +225,7 @@ if { enabled libxml2 || [[ $cyanrip = y ]]; } &&
     do_checkIfExist
 fi
 
-if [[ "$mplayer" = "y" ]] || ! mpv_disabled libass ||
+if [[ "$mplayer" = "y" ]] || [[ $mpv = y ]] ||
     { [[ $ffmpeg != "no" ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 

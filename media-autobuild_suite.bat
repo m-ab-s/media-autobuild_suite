@@ -122,7 +122,7 @@ libzvbi openal libvmaf libcodec2 libsrt ladspa librav1e #vapoursynth #liblensfun
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
-set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
+set mpv_options_builtin=#cplayer #manpage-build #lua #javascript ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
 #shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo
 
