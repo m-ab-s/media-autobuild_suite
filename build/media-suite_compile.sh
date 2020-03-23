@@ -1057,6 +1057,12 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
 
     # C lib
     if enabled librav1e; then
+        old_cpath="$CPATH"
+        old_libpath="$LIBRARY_PATH"
+        CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`;`cygpath -m $MINGW_PREFIX/$MINGW_CHOST/include`"
+        LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`;`cygpath -m $MINGW_PREFIX/$MINGW_CHOST/lib`"
+        export CPATH LIBRARY_PATH
+
         log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
             --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount"
         [[ -f $CARGO_HOME/config ]] && rm -f "$CARGO_HOME/config"
@@ -1078,6 +1084,8 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         do_install "install-$bits/lib/librav1e.a" lib/
         do_install "install-$bits/lib/pkgconfig/rav1e.pc" lib/pkgconfig/
         do_install "install-$bits/include/rav1e"/*.h include/rav1e/
+        export CPATH="$old_cpath" LIBRARY_PATH="$old_libpath"
+        unset old_cpath old_libpath
     fi
 
     do_checkIfExist
