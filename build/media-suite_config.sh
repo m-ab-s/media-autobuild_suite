@@ -23,7 +23,7 @@ while true; do
   esac
 done
 
-[ "$ffmpegVersion" == '' ] &&  ffmpegVersion='latest'
+[ "$ffmpegVersion" == '' ] && ffmpegVersion='latest'
 sed -ri '/readme.txt/{s/(ffmpeg-).*(-win)/\1'$ffmpegVersion'\2/g}' "$LOCALBUILDDIR"/media-suite_helper.sh
 
 [ "$ffmpegVersion" == 'latest' ] && ffmpeg_tag='' || ffmpeg_tag='#tag=n'$ffmpegVersion

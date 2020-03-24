@@ -695,7 +695,7 @@ if %ffmpegVersionINI%==0 (
     echo.
     echo. Always build latest FFmpeg?
     echo. 1 = Yes
-    echo. x.y.z = Specific FFmpeg version ^(the git tag^)
+    echo. x.y.z = Specific FFmpeg version (the git tag, e.g. 4.2.2 for n4.2.2^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
