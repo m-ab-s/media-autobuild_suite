@@ -44,7 +44,7 @@ if not exist %instdir% (
 
 if not ["%instdir:~60,1%"]==[""] (
     echo -------------------------------------------------------------------------------
-    echo. The total filepath to the suite seems too large ^(larger than 60 characters^):
+    echo. The total filepath to the suite seems too large (larger than 60 characters^):
     echo. %instdir%
     echo. Some packages might fail building because of it.
     echo. Please move the suite directory closer to the root of your drive and maybe
@@ -72,21 +72,20 @@ do if %%f lss 4 (
     where lib.exe || ^
     where cl.exe || ^
     if DEFINED VSINSTALLDIR cd .
-) >nul 2>&1 && goto MSVCINSTALLED
-goto MSVCNOTINSTALLED
-:MSVCINSTALLED
-echo ----------------------------------------------------------------------
-echo. You are running in a MSVC environment ^(cl.exe or lib.exe detected^)
-echo. This is not supported.
-echo. Please run the script through a normal cmd.exe some other way.
-echo.
-echo. Detected Paths:
-where lib.exe 2>nul
-where cl.exe 2>nul
-echo %VSINSTALLDIR%
-pause
-exit
-:MSVCNOTINSTALLED
+) >nul 2>&1 && (
+    rem MSVCINSTALLED
+    echo ----------------------------------------------------------------------
+    echo. You are running in a MSVC environment (cl.exe or lib.exe detected^)
+    echo. This is not supported.
+    echo. Please run the script through a normal cmd.exe some other way.
+    echo.
+    echo. Detected Paths:
+    where lib.exe 2>nul
+    where cl.exe 2>nul
+    echo %VSINSTALLDIR%
+    pause
+    exit
+)
 
 set build=%instdir%\build
 if not exist %build% mkdir %build%
@@ -95,7 +94,8 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2u
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq
+set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq ^
+clang
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -122,7 +122,7 @@ libzvbi openal libvmaf libcodec2 libsrt ladspa librav1e #vapoursynth #liblensfun
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
-set mpv_options_builtin=#cplayer #manpage-build #lua #javascript #libass ^
+set mpv_options_builtin=#cplayer #manpage-build #lua #javascript ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
 #shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo
 
@@ -136,46 +136,35 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegVersion ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo
+ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo ^
+vlc CC
 
-set previousOptions=0
-set msys2ArchINI=0
+set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
 
-if exist %ini% GOTO checkINI
-:selectmsys2Arch
-set deleteIni=1
+rem Set all INI options to 0
+for %%a in (%iniOptions%) do set %%aINI=0
 
+if exist %ini% (
+    rem Set INI options to what's found in the inifile
+    for %%a in (%iniOptions%) do for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
+) else set deleteIni=1
+
+setlocal EnableDelayedExpansion
+rem Check if any of the *INI options are still unset (0)
+for %%a in (%iniOptions%) do if [!%%aINI!]==[0] set deleteIni=1 && goto :endINIcheck
+:endINIcheck
+endlocal & set deleteIni=%deleteIni%
+
+rem case msys2Arch in 1) msys32;; *) msys64;; esac
 if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 set msys2Arch=1
 if NOT DEFINED msys2Arch set msys2Arch=2
-
-(
+if %deleteINI%==1 (
     echo.[compiler list]
     echo.msys2Arch=%msys2Arch%
 )>"%ini%"
 
-if %previousOptions%==0 for %%a in (%iniOptions%) do set %%aINI=0
-set msys2ArchINI=%msys2Arch%
-
-GOTO systemVars
-
-:checkINI
-set deleteIni=0
-for %%a in (%iniOptions%) do (
-    for /F "tokens=2 delims==" %%b in ('findstr %%a %ini%') do set %%aINI=%%b
-    if not defined %%aINI (
-        set %%aINI=0
-        set deleteIni=1
-    )
-)
-if %deleteINI%==1 (
-    del %ini%
-    set previousOptions=1
-    GOTO selectmsys2Arch
-)
-
 :systemVars
-set msys2Arch=%msys2ArchINI%
 if %msys2Arch%==1 ( set "msys2=msys32" ) else set "msys2=msys64"
 
 :selectSystem
@@ -194,18 +183,9 @@ if %archINI%==0 (
 ) else set buildEnv=%archINI%
 
 if "%buildEnv%"=="" GOTO selectSystem
-if %buildEnv%==1 (
-    set "build32=yes"
-    set "build64=yes"
-)
-if %buildEnv%==2 (
-    set "build32=yes"
-    set "build64=no"
-)
-if %buildEnv%==3 (
-    set "build32=no"
-    set "build64=yes"
-)
+if %buildEnv%==1 set "build32=yes" && set "build64=yes"
+if %buildEnv%==2 set "build32=yes" && set "build64=no"
+if %buildEnv%==3 set "build32=no" && set "build64=yes"
 if %buildEnv% GTR 3 GOTO selectSystem
 if %deleteINI%==1 echo.arch=^%buildEnv%>>%ini%
 
@@ -365,7 +345,7 @@ if %x2643INI%==0 (
     echo. 3 = Lib/binary with only 10-bit
     echo. 4 = Lib/binary with 8 and 10-bit, and libavformat and ffms2
     echo. 5 = Shared lib/binary with 8 and 10-bit
-    echo. 6 = Same as 4 with video codecs only ^(can reduce size by ~3MB^)
+    echo. 6 = Same as 4 with video codecs only (can reduce size by ~3MB^)
     echo. 7 = Lib/binary with only 8-bit
     echo.
     echo. Binaries being built depends on "standalone=y" and are always static.
@@ -401,9 +381,6 @@ if %x2652INI%==0 (
     echo. 7 = Lib/binary with Main12 only
     echo.
     echo. Binaries being built depends on "standalone=y"
-    echo.
-    echo. Note: To include SVT-HEVC in x265, you need to enable it, not just add its
-    echo. flag to ffmpeg_options.txt
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -450,7 +427,6 @@ if %svthevcINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Needs to be enabled for it to be included in x265.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildsvthevc="Build SVT-HEVC: "
@@ -665,7 +641,7 @@ if %ffmpegB2INI%==0 (
     echo. 2 = No
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
-    echo. 5 = Shared-only with some shared libs ^(libass, freetype and fribidi^)
+    echo. 5 = Shared-only with some shared libs (libass, freetype and fribidi^)
     echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
@@ -739,9 +715,9 @@ if %ffmpegChoiceINI%==0 (
     echo.
     echo. Choose ffmpeg and mpv optional libraries?
     echo. 1 = Yes
-    echo. 2 = No ^(Light build^)
-    echo. 3 = No ^(Mimic Zeranoe^)
-    echo. 4 = No ^(All available external libs^)
+    echo. 2 = No (Light build^)
+    echo. 3 = No (Mimic Zeranoe^)
+    echo. 4 = No (All available external libs^)
     echo.
     echo. Avoid the last two unless you really want useless libraries you'll never use.
     echo. Just because you can include a shitty codec no one uses doesn't mean you should.
@@ -903,6 +879,30 @@ if %buildmpv%==2 set "mpv=n"
 if %buildmpv% GTR 2 GOTO mpv
 if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
 
+:vlc
+if %vlcINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vlc?
+    echo. Takes a long time because of qt5 and wouldn't recommend it if you
+    echo. don't have ccache enabled.
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Note: the resulting vlc is extra buggy, do not expect it to work smoothly
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvlc="Build vlc: "
+) else set buildvlc=%vlcINI%
+
+if "%buildvlc%"=="" GOTO vlc
+if %buildvlc%==1 set "vlc=y"
+if %buildvlc%==2 set "vlc=n"
+if %buildvlc% GTR 2 GOTO vlc
+if %deleteINI%==1 echo.vlc=^%buildvlc%>>%ini%
+
 :bmx
 if %bmxINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -929,7 +929,7 @@ if %curlINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build static curl?
-    echo. 1 = Yes ^(same backend as FFmpeg's^)
+    echo. 1 = Yes (same backend as FFmpeg's^)
     echo. 2 = No
     echo. 3 = SChannel backend
     echo. 4 = GnuTLS backend
@@ -988,7 +988,7 @@ if %cyanrip2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build cyanrip ^(CLI CD ripper^)?
+    echo. Build cyanrip (CLI CD ripper^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1008,7 +1008,7 @@ if %redshiftINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build redshift ^(f.lux FOSS clone^)?
+    echo. Build redshift (f.lux FOSS clone^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1028,7 +1028,7 @@ if %ripgrepINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build ripgrep ^(faster grep in Rust^)?
+    echo. Build ripgrep (faster grep in Rust^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1048,7 +1048,7 @@ if %jqINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build jq ^(CLI JSON processor^)?
+    echo. Build jq (CLI JSON processor^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1068,7 +1068,7 @@ if %joINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build jo ^(CLI JSON from shell^)?
+    echo. Build jo (CLI JSON from shell^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1088,7 +1088,7 @@ if %dssimINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build dssim ^(multiscale SSIM in Rust^)?
+    echo. Build dssim (multiscale SSIM in Rust^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1108,7 +1108,7 @@ if %avs2INI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build avs2 ^(Audio Video Coding Standard Gen2 encoder/decoder^)?
+    echo. Build avs2 (Audio Video Coding Standard Gen2 encoder/decoder^)?
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1125,8 +1125,30 @@ if %buildavs2%==2 set "avs2=n"
 if %buildavs2% GTR 2 GOTO avs2
 if %deleteINI%==1 echo.avs2=^%buildavs2%>>%ini%
 
+:CC
+if %CCINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Use clang instead of gcc (C compiler^)?
+    echo. Experimental and possibly broken due to gcc assumptions
+    echo. 1 = Yes
+    echo. 2 = No [Recommended]
+    echo.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildCC="Build using clang: "
+) else set buildCC=%CCINI%
+
+if "%buildCC%"=="" GOTO CC
+if %buildCC%==1 set "CC=clang"
+if %buildCC%==2 set "CC=gcc"
+if %buildCC% GTR 2 GOTO CC
+if %deleteINI%==1 echo.CC=^%buildCC%>>%ini%
+
 :numCores
-if %NUMBER_OF_PROCESSORS% GTR 1 set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
+if %NUMBER_OF_PROCESSORS% EQU 1 ( set coreHalf=1 ) else set /a coreHalf=%NUMBER_OF_PROCESSORS%/2
 if %coresINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1318,7 +1340,7 @@ if %noMinttyINI%==0 (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Are you running this script through ssh or similar?
-    echo. ^(Can't open another window outside of this terminal^)
+    echo. (Can't open another window outside of this terminal^)
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1345,10 +1367,10 @@ rem ------------------------------------------------------------------
 rem download and install basic msys2 system:
 rem ------------------------------------------------------------------
 cd %build%
-set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh bash.ps1
+set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh
 for %%s in (%scripts%) do (
     if not exist "%build%\%%s" (
-        powershell -Command ^(New-Object System.Net.WebClient^).DownloadFile^('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
+        powershell -Command (New-Object System.Net.WebClient^).DownloadFile('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
     )
 )
 
@@ -1361,13 +1383,10 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo.
     echo -------------------------------------------------------------------------------
     echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
-        $wc = New-Object System.Net.WebClient; ^
-        while ^(^(Get-Item $PWD\msys2-base.tar.xz -ErrorAction Ignore^).Length -ne ^
-        ^(Invoke-WebRequest -Uri "http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz" ^
-        -UseBasicParsing -Method Head^).headers.'Content-Length'^) {if ^($i -le 5^) {try ^
-        {$wc.DownloadFile^('http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz', ^
-        "$PWD\msys2-base.tar.xz"^)} catch {$i++}}} | powershell -NoProfile -Command - || goto :errorMsys
-
+        (New-Object System.Net.WebClient^).DownloadFile(^
+        'https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.tar.xz', ^
+        "$PWD\msys2-base.tar.xz"^) | powershell -NoProfile -Command - || goto :errorMsys
+rem used to be http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz
     :unpack
     if exist %build%\msys2-base.tar.xz (
         echo -------------------------------------------------------------------------------
@@ -1375,22 +1394,9 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Downloading and unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        7z >nul 2>&1 && (
-            7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o..
-        ) || 7za >nul 2>&1 && (
-            7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
-        ) || echo $wc = New-Object System.Net.WebClient; ^
-            $wc.DownloadFile^(^(Invoke-RestMethod "https://www.powershellgallery.com/api/v2/Packages?`$filter=Id eq 'pscx' and IsLatestVersion"^).content.src, "$PWD\pscx.zip"^); ^
-            Add-Type -assembly "System.IO.Compression.FileSystem"; ^
-            [System.IO.Compression.ZipFile]::ExtractToDirectory^("$PWD\pscx.zip", "$PWD\pscx"^); ^
-            Remove-Item -Recurse $PWD\pscx.zip, $PWD\pscx\_rels, $PWD\pscx\package; ^
-            powershell -noprofile -command { ^
-                Import-Module $PWD\pscx\Pscx.psd1 -Force -Cmdlet Expand-Archive -Prefix 7za; ^
-                Expand-7zaArchive -Force -ShowProgress $PWD\msys2-base.tar.xz; ^
-                Remove-Item $PWD\msys2-base.tar.xz; ^
-                Expand-7zaArchive -Force -ShowProgress -OutputPath .. $PWD\msys2-base.tar; ^
-                Remove-Item $PWD\msys2-base.tar; ^
-            }; Remove-Item -Recurse $PWD\pscx | powershell -NoProfile -NonInteractive -Command -
+        7z >nul 2>&1 || 7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command (New-Object System.Net.WebClient^).DownloadFile('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
+        7z >nul 2>&1 && 7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o.. || 7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
+        if exist 7za.exe del 7za.exe
     )
 
     if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
@@ -1400,8 +1406,8 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
         echo.- Download msys2 basic system failed,
         echo.- please download it manually from:
         echo.- http://repo.msys2.org/distrib/
-        echo.- and copy the uncompressed folder to:
-        echo.- %build%
+        echo.- extract and put the msys2 folder into
+        echo.- the root media-autobuid_suite folder
         echo.- and start the batch script again!
         echo.
         echo -------------------------------------------------------------------------------
@@ -1446,8 +1452,8 @@ if not exist %instdir%\mintty.lnk (
     call :runBash secondUpdate.log pacman --noconfirm -Syu --asdeps
 
     (
-        echo.Set Shell = CreateObject^("WScript.Shell"^)
-        echo.Set link = Shell.CreateShortcut^("%instdir%\mintty.lnk"^)
+        echo.Set Shell = CreateObject("WScript.Shell"^)
+        echo.Set link = Shell.CreateShortcut("%instdir%\mintty.lnk"^)
         echo.link.Arguments = "-full-path -mingw"
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\%msys2%\msys2_shell.cmd"
@@ -1473,7 +1479,7 @@ if exist %fstab%. (
     for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
     findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
     findstr local64 %fstab% >nul 2>&1 && ( if [%build64%]==[no] set "removefstab=yes" ) || if [%build64%]==[yes] set "removefstab=yes"
-)
+) else set removefstab=yes
 
 if not [%removefstab%]==[no] (
     rem writeFstab
@@ -1640,6 +1646,7 @@ if %msys2%==msys32 (
     echo.-------------------------------------------------------------------------------
     call %instdir%\%msys2%\autorebase.bat
 )
+del "%build%\msys2-base.tar.xz" 2>nul
 
 rem ------------------------------------------------------------------
 rem write config profiles:
@@ -1688,7 +1695,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
 --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc%
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
+--vlc=%vlc%
     set "msys2=%msys2%"
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
@@ -1696,11 +1704,11 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "MSYS=%MSYS%"
     if %noMintty%==y set "PATH=%PATH%"
     set "build=%build%"
+    set "instdir=%instdir%"
 )
 if %noMintty%==y (
     call :runBash config.log /build/media-suite_config.sh %configArgs%
     call :runBash compile.log /build/media-suite_compile.sh %compileArgs%
-    exit /B %ERRORLEVEL%
 ) else (
     if exist %CD%\build\config.log del %CD%\build\config.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
@@ -1708,13 +1716,13 @@ if %noMintty%==y (
     MSYS=%MSYS% /usr/bin/bash ^
     --login /build/media-suite_config.sh %configArgs%
 
-    if exist %CD%\build\compile.log del %CD%\build\compile.log
+    if exist %build%\compile.log del %build%\compile.log
     start /I %CD%\%msys2%\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
-    --log 2>&1 %CD%\build\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
+    --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
     MSYS=%MSYS% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
-    exit /B %ERRORLEVEL%
 )
+exit /B %ERRORLEVEL%
 endlocal
 goto :EOF
 
@@ -1751,8 +1759,13 @@ goto :EOF
     echo.
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
-    echo.export CC="ccache gcc"
-    echo.export CXX="ccache g++"
+    if %CC%==clang (
+        echo.export CC="ccache clang"
+        echo.export CXX="ccache clang++"
+    ) else (
+        echo.export CC="ccache gcc"
+        echo.export CXX="ccache g++"
+    )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
     echo.CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`"
@@ -1773,7 +1786,6 @@ goto :EOF
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
-    echo.export SCCACHE_DIR="$HOME/.sccache"
     echo.export CCACHE_DIR="$HOME/.ccache"
     echo.
     echo.export PYTHONPATH=
@@ -1820,11 +1832,12 @@ shift
 set args=%*
 set arg=!args:%log% %command%=!
 if %noMintty%==y (
-    script -e -q --command "exec /usr/bin/bash -lc '%command% $@' -- %arg%" /dev/null | tee "%build%\%log%"
+    bash %build%\bash.sh "%build%\%log%" "%command%" "%arg%"
 ) else (
     if exist %build%\%log% del %build%\%log%
-    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico^
-    --log 2>&1 %build%\%log% /usr/bin/bash -lc "%command% %arg%"
+    start /I /WAIT %instdir%\%msys2%\usr\bin\mintty.exe -d -i /msys2.ico ^
+    -t "media-autobuild_suite" --log 2>&1 %build%\%log% /usr/bin/bash -lc ^
+    "%command% %arg%"
 )
 endlocal
 goto :EOF
