@@ -1627,9 +1627,9 @@ pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
 _check=(xvid.h libxvidcore.a bin-video/xvid{_encraw.exe,core.dll})
 if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
-    grep -q '1.3.5' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; } &&
-    do_wget -h 165ba6a2a447a8375f7b06db5a3c91810181f2898166e7c8137401d7fc894cf0 \
-        "https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz" "xvidcore.tar.gz"; then
+    grep -q '1.3.7' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; } &&
+    do_wget -h abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d \
+        "https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz" "xvidcore.tar.gz"; then
     do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
     cd_safe build/generic
