@@ -1059,8 +1059,8 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
     if enabled librav1e; then
         old_cpath="$CPATH"
         old_libpath="$LIBRARY_PATH"
-        CPATH="`cygpath -m $LOCALDESTDIR/include`;`cygpath -m $MINGW_PREFIX/include`;`cygpath -m $MINGW_PREFIX/$MINGW_CHOST/include`"
-        LIBRARY_PATH="`cygpath -m $LOCALDESTDIR/lib`;`cygpath -m $MINGW_PREFIX/lib`;`cygpath -m $MINGW_PREFIX/$MINGW_CHOST/lib`"
+        CPATH=$(cygpath -m "$LOCALDESTDIR/include" "$MINGW_PREFIX/include" "$MINGW_PREFIX/$MINGW_CHOST/include" | tr '\n' ' ')
+        LIBRARY_PATH=$(cygpath -m "$LOCALDESTDIR/lib" "$MINGW_PREFIX/lib" "$MINGW_PREFIX/$MINGW_CHOST/lib" | tr '\n' ' ')
         export CPATH LIBRARY_PATH
 
         log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
