@@ -1666,8 +1666,8 @@ fi
 
 
 if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    _python_ver=3.7.5
-    _python_lib=python37
+    _python_ver=3.8.2
+    _python_lib=python38
     [[ $bits = 64bit ]] && _arch=amd64 || _arch=win32
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
@@ -1679,7 +1679,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
         do_checkIfExist
     fi
 
-    _vsver=48
+    _vsver=49
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
