@@ -145,9 +145,9 @@ set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
 if [[ $packing = y ]] &&
-    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.95" ]] &&
-    do_wget -h f94ff30b175d125d1c238458716f5808aee222547a813918b44d0f67035c0054 \
-        "https://github.com/upx/upx/releases/download/v3.95/upx-3.95-win32.zip"; then
+    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.96" ]] &&
+    do_wget -h 014912ea363e2d491587534c1e7efd5bc516520d8f2cdb76bb0aaf915c5db961 \
+        "https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip"; then
     do_install upx.exe /opt/bin/upx.exe
 fi
 
