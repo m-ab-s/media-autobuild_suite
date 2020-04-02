@@ -1064,7 +1064,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         export CPATH LIBRARY_PATH
 
         log "install-cargo-c" "$RUSTUP_HOME/bin/cargo.exe" install cargo-c \
-            --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount"
+            --target="$CARCH"-pc-windows-gnu --jobs "$cpuCount" --vers 0.5.3
         [[ -f $CARGO_HOME/config ]] && rm -f "$CARGO_HOME/config"
         log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
             cinstall --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
