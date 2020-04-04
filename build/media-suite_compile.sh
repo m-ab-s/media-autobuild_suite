@@ -548,13 +548,18 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "https://github.com/tesseract-ocr/tesseract.git"; then
         do_pacman_install docbook-xsl libarchive pango asciidoc-py3-git
+        # Don't include curl in tesseract. We aren't mainly using the executable with links.
+        # tesseract doesn't have a --disable-curl option or something so it's dumb.
+        for _curl_pc in {"$MINGW_PREFIX","$LOCALDESTDIR"}"/lib/pkgconfig/libcurl.pc"; do
+            test -f "$_curl_pc" && mv "$_curl_pc"{,.bak}
+        done
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
         sed -i -e 's|Libs.private.*|& -lstdc++|' \
-               -e 's|Requires.private.*|& libarchive libcurl iconv|' tesseract.pc.in
+               -e 's|Requires.private.*|& libarchive iconv|' tesseract.pc.in
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
-            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" CXXFLAGS="$CXXFLAGS -DCURL_STATICLIB" \
+            LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs iconv lept)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
@@ -566,6 +571,9 @@ if [[ $ffmpeg != "no" || $standalone = y ]] && enabled libtesseract; then
                 "Just download <lang you want>.traineddata and copy it to this directory." \
                 > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
+        for _curl_pc in {"$MINGW_PREFIX","$LOCALDESTDIR"}"/lib/pkgconfig/libcurl.pc"; do
+            test -f "$_curl_pc".bak && mv "$_curl_pc"{.bak,}
+        done
         do_checkIfExist
     fi
     do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
