@@ -109,7 +109,7 @@ libdav1d --disable-debug
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
-libwebp libxml2 libzimg libshine gpl openssl libtls #avisynth mbedtls libxvid ^
+libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
 libaom libopenmpt version3
 
 :: options also available with the suite
