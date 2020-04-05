@@ -176,7 +176,6 @@ For information about the compiler environment see the wiki, there you also have
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (hg)
-        - includes svt-hevc encoder if enabled
     - xvc (git) (unsupported)
     - xvid (1.3.5)
 
