@@ -1771,6 +1771,15 @@ if [[ $bits = 64bits && $vvc = y ]] &&
     unset _notrequired
 fi
 
+_check=(avisynth/avisynth{,_c}.h
+        avisynth/avs/{alignment,capi,config,cpuid,minmax,posix,types,win}.h)
+if [[ $ffmpeg != "no" ]] && enabled avisynth &&
+    do_vcs "https://github.com/AviSynth/AviSynthPlus.git"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall -DHEADERS_ONLY=ON
+    do_checkIfExist
+fi
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != "no" ]]; then
     enabled libgsm && do_pacman_install gsm
