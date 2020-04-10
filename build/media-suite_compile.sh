@@ -582,7 +582,7 @@ fi
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != "no" ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1" &&
-    do_vcs "https://github.com/lachs0r/rubberband.git"; then
+    do_vcs "https://github.com/m-ab-s/rubberband.git"; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
