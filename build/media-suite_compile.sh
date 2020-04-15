@@ -1883,19 +1883,21 @@ if [[ $ffmpeg != "no" ]]; then
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         if enabled libsvthevc; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
+            do_patch "https://gist.githubusercontent.com/1480c1/ecc1dd3a15093398492c86f2314f4a67/raw/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
         fi
-
-        if enabled libsvthevc && enabled libsvtav1; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1-with-svt-hevc.patch" am ||
-                do_removeOption --enable-libsvtav1
-        elif enabled libsvtav1; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-AV1/master/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch" am ||
+        if enabled libsvtav1; then
+            do_patch "https://gist.githubusercontent.com/1480c1/ecc1dd3a15093398492c86f2314f4a67/raw/0001-Add-ability-for-ffmpeg-to-run-svt-av1.patch" am ||
                 do_removeOption --enable-libsvtav1
         fi
+        if enabled libsvtvp9; then
+            do_patch "https://gist.githubusercontent.com/1480c1/ecc1dd3a15093398492c86f2314f4a67/raw/0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch" am ||
+                do_removeOption --enable-libsvtvp9
+        fi
+
         enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
         enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
+        enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
         enabled vapoursynth &&
             do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
