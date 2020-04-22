@@ -803,7 +803,7 @@ do_readbatoptions() {
 do_getFFmpegConfig() {
     local license="${1:-nonfree}"
 
-    FFMPEG_DEFAULT_OPTS=()
+    FFMPEG_DEFAULT_OPTS=("--cc=$CC" "--cxx=$CXX")
     if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
         IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
         mapfile -t FFMPEG_DEFAULT_OPTS < <(do_readbatoptions "ffmpeg_options_(builtin|basic)")
