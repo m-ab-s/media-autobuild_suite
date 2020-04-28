@@ -709,7 +709,7 @@ fi
 
 _check=(bin-audio/oggenc.exe)
 _deps=("$MINGW_PREFIX"/lib/libvorbis.a)
-if [[ $standalone = y ]] && enabled libvorbis && ! files_exist "${_check[@]}" &&
+if [[ $standalone = y ]] && enabled libvorbis &&
     do_vcs "https://github.com/xiph/vorbis-tools.git"; then
     _check+=(bin-audio/oggdec.exe)
     do_autoreconf
