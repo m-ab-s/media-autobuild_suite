@@ -2590,7 +2590,8 @@ if [[ $vlc == y ]]; then
         # msys2's patches
         # Issues due to conflicting `vlc_module_name` between libvlc and libvlccore when linking vlc-static.exe and undefines.
         # having gpg-error after GCRYPT_LIBS causes some issues, and since it's already included in GCRYPT_LIBS
-        do_patch "https://gist.githubusercontent.com/1480c1/8c50a0867aa1afceac064d2162120dde/raw/vlc-mabs.patch" am
+        do_patch "https://gist.githubusercontent.com/moisespr123/2369978dc603ed1e67bdf7aba7304416/raw/f83d6cd9171765ee87140bfc1555529aa029f240/vlc-corrected-patch" am
+        do_patch "https://gist.githubusercontent.com/moisespr123/70e16f70f5d016c3d0f0dacbf97526f0/raw/ad70ecd5db0b6349cb47c85932ce5e408cbb7004/medialib-patch"
 
         do_autoreconf
         # All of the disabled are because of multiple issues both on the installed libs and on vlc's side.
