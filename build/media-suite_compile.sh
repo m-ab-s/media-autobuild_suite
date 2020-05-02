@@ -710,11 +710,11 @@ fi
 
 _check=(bin-audio/exhale.exe)
 if [[ $standalone = y && $exhale = y ]] &&
-    do_vcs "https://gitlab.com/ecodis/exhale"; then
-	do_patch "https://gist.githubusercontent.com/moisespr123/abac078f080cca10d605ea0390323bc1/raw/exhale-patch"
+    do_vcs "https://gitlab.com/ecodis/exhale.git"; then
+    do_patch "https://gist.githubusercontent.com/moisespr123/abac078f080cca10d605ea0390323bc1/raw/exhale-patch"
     do_uninstall "${_check[@]}"
-	do_make release
-	do_install bin/exhale.exe bin-audio/
+    do_make release
+    do_install bin/exhale.exe bin-audio/
     do_checkIfExist
 fi
 
