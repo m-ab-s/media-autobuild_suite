@@ -2392,7 +2392,7 @@ if [[ $cyanrip = y ]]; then
 fi
 
 if [[ $vlc == y ]]; then
-    do_pacman_install lib{nfs,shout,samplerate,microdns,secret} \
+    do_pacman_install lib{cddb,nfs,shout,samplerate,microdns,secret} \
         a52dec taglib gtk3 lua perl
 
     # Remove useless shell scripts file that causes errors when stdout is not a tty.
