@@ -135,9 +135,9 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 
 set iniOptions=msys2Arch arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
-strip pack logging bmx standalone updateSuite aom faac ffmbc curl cyanrip2 redshift rav1e ^
-ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo ^
-vlc CC
+strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 redshift ^
+rav1e ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc ^
+jo vlc CC
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -590,6 +590,28 @@ if %buildfaac%==1 set "faac=y"
 if %buildfaac%==2 set "faac=n"
 if %buildfaac% GTR 2 GOTO faac
 if %deleteINI%==1 echo.faac=^%buildfaac%>>%ini%
+
+:exhale
+if %exhaleINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build exhale binary? [open-source ISO/IEC 23003-3 USAC, xHE-AAC encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built do not depend on "standalone=y"
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildexhale="Build exhale: "
+) else set buildexhale=%exhaleINI%
+
+if "%buildexhale%"=="" GOTO exhale
+if %buildexhale%==1 set "exhale=y"
+if %buildexhale%==2 set "exhale=n"
+if %buildexhale% GTR 2 GOTO exhale
+if %deleteINI%==1 echo.exhale=^%buildexhale%>>%ini%
 
 :mediainfo
 if %mediainfoINI%==0 (
@@ -1671,8 +1693,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
 --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
---logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --ffmbc=%ffmbc% ^
---curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
+--logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
+--ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
 --vlc=%vlc%

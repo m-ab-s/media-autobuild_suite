@@ -47,6 +47,7 @@ while true; do
     --bmx=* ) bmx=${1#*=} && shift ;;
     --aom=* ) aom=${1#*=} && shift ;;
     --faac=* ) faac=${1#*=} && shift ;;
+    --exhale=* ) exhale=${1#*=} && shift ;;
     --ffmbc=* ) ffmbc=${1#*=} && shift ;;
     --curl=* ) curl=${1#*=} && shift ;;
     --cyanrip=* ) cyanrip=${1#*=} && shift ;;
@@ -704,6 +705,15 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     extracommands=()
     [[ $standalone = n ]] && extracommands+=(--disable-frontend)
     do_separate_confmakeinstall audio "${extracommands[@]}"
+    do_checkIfExist
+fi
+
+_check=(bin-audio/exhale.exe)
+if [[ $exhale = y ]] &&
+    do_vcs "https://gitlab.com/ecodis/exhale.git"; then
+    do_uninstall "${_check[@]}"
+    do_make release ADDITIONAL_LDFLAGS="$LDFLAGS"
+    do_install bin/exhale.exe bin-audio/
     do_checkIfExist
 fi
 
