@@ -47,6 +47,7 @@ while true; do
     --bmx=* ) bmx=${1#*=} && shift ;;
     --aom=* ) aom=${1#*=} && shift ;;
     --faac=* ) faac=${1#*=} && shift ;;
+    --exhale=* ) exhale=${1#*=} && shift ;;
     --ffmbc=* ) ffmbc=${1#*=} && shift ;;
     --curl=* ) curl=${1#*=} && shift ;;
     --cyanrip=* ) cyanrip=${1#*=} && shift ;;
@@ -704,6 +705,15 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
     extracommands=()
     [[ $standalone = n ]] && extracommands+=(--disable-frontend)
     do_separate_confmakeinstall audio "${extracommands[@]}"
+    do_checkIfExist
+fi
+
+_check=(bin-audio/exhale.exe)
+if [[ $exhale = y ]] &&
+    do_vcs "https://gitlab.com/ecodis/exhale.git"; then
+    do_uninstall "${_check[@]}"
+    do_make release ADDITIONAL_LDFLAGS="$LDFLAGS"
+    do_install bin/exhale.exe bin-audio/
     do_checkIfExist
 fi
 
@@ -2392,7 +2402,7 @@ if [[ $cyanrip = y ]]; then
 fi
 
 if [[ $vlc == y ]]; then
-    do_pacman_install lib{nfs,shout,samplerate,microdns,secret} \
+    do_pacman_install lib{cddb,nfs,shout,samplerate,microdns,secret} \
         a52dec taglib gtk3 lua perl
 
     # Remove useless shell scripts file that causes errors when stdout is not a tty.
@@ -2590,8 +2600,8 @@ if [[ $vlc == y ]]; then
         # msys2's patches
         # Issues due to conflicting `vlc_module_name` between libvlc and libvlccore when linking vlc-static.exe and undefines.
         # having gpg-error after GCRYPT_LIBS causes some issues, and since it's already included in GCRYPT_LIBS
-        do_patch "https://gist.githubusercontent.com/moisespr123/2369978dc603ed1e67bdf7aba7304416/raw/f83d6cd9171765ee87140bfc1555529aa029f240/vlc-corrected-patch" am
-		do_patch "https://gist.githubusercontent.com/moisespr123/70e16f70f5d016c3d0f0dacbf97526f0/raw/ad70ecd5db0b6349cb47c85932ce5e408cbb7004/medialib-patch"
+        do_patch "https://gist.githubusercontent.com/moisespr123/2369978dc603ed1e67bdf7aba7304416/raw/vlc-corrected-patch" am
+        do_patch "https://gist.githubusercontent.com/moisespr123/70e16f70f5d016c3d0f0dacbf97526f0/raw/medialib-patch"
 
         do_autoreconf
         # All of the disabled are because of multiple issues both on the installed libs and on vlc's side.
