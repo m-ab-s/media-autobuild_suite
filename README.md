@@ -126,6 +126,7 @@ For information about the compiler environment see the wiki, there you also have
     - cyanrip (git)
     - dav1d (git)
     - dssim (git)
+    - exhale (git)
     - faac (1.30)
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
