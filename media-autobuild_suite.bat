@@ -600,6 +600,8 @@ if %exhaleINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
+    echo. Binaries being built do not depend on "standalone=y"
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildexhale="Build exhale: "

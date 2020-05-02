@@ -709,7 +709,7 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
 fi
 
 _check=(bin-audio/exhale.exe)
-if [[ $standalone = y && $exhale = y ]] &&
+if [[ $exhale = y ]] &&
     do_vcs "https://gitlab.com/ecodis/exhale.git"; then
     do_patch "https://gist.githubusercontent.com/moisespr123/abac078f080cca10d605ea0390323bc1/raw/exhale-patch"
     do_uninstall "${_check[@]}"
