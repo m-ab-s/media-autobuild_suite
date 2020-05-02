@@ -711,9 +711,8 @@ fi
 _check=(bin-audio/exhale.exe)
 if [[ $exhale = y ]] &&
     do_vcs "https://gitlab.com/ecodis/exhale.git"; then
-    do_patch "https://gist.githubusercontent.com/moisespr123/abac078f080cca10d605ea0390323bc1/raw/exhale-patch"
     do_uninstall "${_check[@]}"
-    do_make release
+    do_make release ADDITIONAL_LDFLAGS="$LDFLAGS"
     do_install bin/exhale.exe bin-audio/
     do_checkIfExist
 fi
