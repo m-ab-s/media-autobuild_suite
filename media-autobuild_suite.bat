@@ -1694,7 +1694,7 @@ if %noMintty%==y (
     call :runBash compile.log /build/media-suite_compile.sh %compileArgs%
 ) else (
     if exist %build%\compile.log del %build%\compile.log
-    start /I %CD%\msys64\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
+    start "compile" /I /LOW %CD%\msys64\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
     --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
     MSYS=%MSYS% /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
@@ -1813,10 +1813,10 @@ shift
 set args=%*
 set arg=!args:%log% %command%=!
 if %noMintty%==y (
-    bash %build%\bash.sh "%build%\%log%" "%command%" "%arg%"
+    start "bash" /B /LOW /WAIT bash %build%\bash.sh "%build%\%log%" "%command%" "%arg%"
 ) else (
     if exist %build%\%log% del %build%\%log%
-    start /I /WAIT %instdir%\msys64\usr\bin\mintty.exe -d -i /msys2.ico ^
+    start /I /LOW /WAIT %instdir%\msys64\usr\bin\mintty.exe -d -i /msys2.ico ^
     -t "media-autobuild_suite" --log 2>&1 %build%\%log% /usr/bin/bash -lc ^
     "%command% %arg%"
 )
