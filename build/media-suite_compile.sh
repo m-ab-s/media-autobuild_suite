@@ -712,8 +712,7 @@ _check=(bin-audio/exhale.exe)
 if [[ $exhale = y ]] &&
     do_vcs "https://gitlab.com/ecodis/exhale.git"; then
     do_uninstall "${_check[@]}"
-    do_make release ADDITIONAL_LDFLAGS="$LDFLAGS"
-    do_install bin/exhale.exe bin-audio/
+    do_cmakeinstall audio
     do_checkIfExist
 fi
 
