@@ -361,7 +361,7 @@ do_vcs() {
 }
 
 guess_dirname() {
-    expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$'
+    expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$'
 }
 
 check_hash() {
@@ -470,9 +470,9 @@ do_wget() {
 }
 
 real_extract() {
-    local archive="$1" dirName="$2" archive_type
+    local archive="$1" dirName="$2" archive_type strip_comp=''
     [[ -z $archive ]] && return 1
-    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$')
+    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$')
     [[ ! $dirName ]] && dirName=$(guess_dirname "$archive" || echo "${archive}")
     case $archive_type in
     zip | 7z)
@@ -480,8 +480,14 @@ real_extract() {
         ;;
     tar*)
         [[ -n $dirName && ! -d $dirName ]] && mkdir -p "$dirName"
-        [[ $archive_type == tar.* ]] && 7z x -aoa "$archive"
-        [[ $(tar -tf "$archive" | cut -d'/' -f1 | sort -u | wc -l) == 1 ]] && strip_comp="--strip-components=1"
+        case $archive_type in
+        tar\.lz)
+            do_pacman_install -m lzip
+            lzip -d "$archive"
+            ;;
+        tar\.*) 7z x -aoa "$archive" ;;
+        esac
+        [[ $(tar -tf "${archive%.tar*}.tar" | cut -d'/' -f1 | sort -u | wc -l) == 1 ]] && strip_comp="--strip-components=1"
         if ! tar $strip_comp -C "$dirName" -xf "${1%.tar*}.tar"; then
             7z x -aoa "${archive%.tar*}.tar" -o"$dirName"
         fi
@@ -512,7 +518,7 @@ do_extract() {
     elif [[ -d $dirName ]]; then
         $nocd || cd_safe "$dirName"
         return 0
-    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\)\)\?\|7z\|zip\)$' > /dev/null; then
+    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"

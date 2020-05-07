@@ -2318,9 +2318,10 @@ if [[ $cyanrip = y ]]; then
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
     if do_pkgConfig "neon = 0.30.2" &&
-        do_wget -h db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca \
-            "https://fossies.org/linux/www/neon-0.30.2.tar.gz"; then
+        do_vcs "https://github.com/notroj/neon.git#tag=0.30.2"; then
+        do_patch "https://gist.githubusercontent.com/1480c1/a99dc2c11036eadc4de9953c55be29e2/raw/0001-Makefile-Fix-doc-issue-in-out-of-source-builds.patch" am
         do_uninstall include/neon "${_check[@]}"
+        do_autogen
         do_separate_confmakeinstall --disable-{nls,debug,webdav}
         do_checkIfExist
     fi
