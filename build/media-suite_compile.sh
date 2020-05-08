@@ -145,8 +145,8 @@ create_ab_ccache
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
-if [[ $packing = y ]] &&
-    ! [[ -e /opt/bin/upx.exe && "$(/opt/bin/upx -V | head -1)" = "upx 3.96" ]] &&
+if [[ $packing = y &&
+    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 3.96" ]] &&
     do_wget -h 014912ea363e2d491587534c1e7efd5bc516520d8f2cdb76bb0aaf915c5db961 \
         "https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win32.zip"; then
     do_install upx.exe /opt/bin/upx.exe
