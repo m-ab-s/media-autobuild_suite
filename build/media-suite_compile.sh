@@ -336,10 +336,10 @@ if [[ $curl = y ]]; then
     [[ $curl = y ]] && curl=schannel
 fi
 _check=(libgnutls.{,l}a gnutls.pc)
-if enabled_any gnutls librtmp || [[ $rtmpdump = y ]] || [[ $curl = gnutls ]] &&
-    do_pkgConfig "gnutls = 3.6.10" &&
-    do_wget -h b1f3ca67673b05b746a961acf2243eaae0ffe658b6a6494265c648e7c7812293 \
-    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.10.tar.xz"; then
+if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]] &&
+    do_pkgConfig "gnutls = 3.6.13" &&
+    do_wget -h 32041df447d9f4644570cf573c9f60358e865637d69b7e59d1159b7240b52f38 \
+    "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.6/gnutls-3.6.13.tar.xz"; then
         do_pacman_install nettle
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
