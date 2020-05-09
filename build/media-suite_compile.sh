@@ -427,15 +427,14 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     [[ $standalone = y || $curl != n ]] ||
         sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
     extra_opts=()
-    if [[ $curl =~ (libre|open)ssl ]]; then
+    case $curl in
+    libressl|openssl)
         extra_opts+=(--with-{ssl,nghttp2} --without-{gnutls,mbedtls})
-    elif [[ $curl =~ mbedtls ]]; then
-        extra_opts+=(--with-{mbedtls,nghttp2} --without-ssl)
-    elif [[ $curl = gnutls ]]; then
-        extra_opts+=(--with-gnutls --without-{ssl,nghttp2,mbedtls})
-    else
-        extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{ssl,gnutls,mbedtls})
-    fi
+        ;;
+    mbedtls) extra_opts+=(--with-{mbedtls,nghttp2} --without-ssl) ;;
+    gnutls) extra_opts+=(--with-gnutls --without-{ssl,nghttp2,mbedtls}) ;;
+    *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{ssl,gnutls,mbedtls});;
+    esac
 
     [[ ! -f configure || configure.ac -nt configure ]] &&
         log autogen ./buildconf
