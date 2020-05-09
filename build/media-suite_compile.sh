@@ -497,14 +497,16 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_checkIfExist
 fi
 
-syspath=$(cygpath -S)
-[[ $bits = 32bit && -d $syspath/../SysWOW64 ]] && syspath=$syspath/../SysWOW64
-opencldll=$syspath/OpenCL.dll
-if files_exist "$LOCALDESTDIR/bin-video/OpenCL.dll"; then
+if files_exist bin-video/OpenCL.dll; then
     opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
+else
+    syspath=$(cygpath -S)
+    [[ $bits = 32bit && -d $syspath/../SysWOW64 ]] && syspath+=/../SysWOW64
+    opencldll=$syspath/OpenCL.dll
+    unset syspath
 fi
-if [[ $ffmpeg != no ]] && enabled opencl && [[ -f $opencldll ]]; then
-    do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll${reset}"
+if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
+    do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll$reset"
     do_pacman_remove opencl-headers
     _check=(CL/cl.h)
     if do_vcs "https://github.com/KhronosGroup/OpenCL-Headers.git"; then
@@ -526,7 +528,7 @@ if [[ $ffmpeg != no ]] && enabled opencl && [[ -f $opencldll ]]; then
 else
     do_removeOption --enable-opencl
 fi
-unset syspath opencldll
+unset opencldll
 
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
