@@ -405,11 +405,13 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
 fi
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
-_deps=()
-[[ $curl = libressl ]] && _deps+=(libssl.a)
-[[ $curl = openssl ]] && _deps+=("$MINGW_PREFIX/lib/libssl.a")
-[[ $curl = gnutls ]] && _deps+=(libgnutls.a)
-[[ $curl = mbedtls ]] && _deps+=("$MINGW_PREFIX/lib/libmbedtls.a")
+case $curl in
+libressl) _deps=(libssl.a) ;;
+openssl) _deps=("$MINGW_PREFIX/lib/libssl.a") ;;
+gnutls) _deps=(libgnutls.a) ;;
+mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
+*) _deps=() ;;
+esac
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
