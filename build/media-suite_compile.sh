@@ -379,9 +379,9 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     _deps=("$MINGW_PREFIX/lib/libunistring.a")
     _check=(libidn2.{{,l}a,pc} idn2.h)
     [[ $standalone == y ]] && _check+=(bin-global/idn2.exe)
-    if do_pkgConfig "libidn2 = 2.2.0" &&
-        do_wget -h fc734732b506d878753ec6606982bf7b936e868c25c30ddb0d83f7d7056381fe \
-        "https://ftp.gnu.org/gnu/libidn/libidn2-2.2.0.tar.gz"; then
+    if do_pkgConfig "libidn2 = 2.3.0" &&
+        do_wget -h e1cb1db3d2e249a6a3eb6f0946777c2e892d5c5dc7bd91c74394fc3a01cab8b5 \
+        "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"; then
         do_uninstall "${_check[@]}"
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.am
         # unistring also depends on iconv
