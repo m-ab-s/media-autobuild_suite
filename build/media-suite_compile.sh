@@ -1517,13 +1517,11 @@ if [[ $x264 != no ]]; then
             _check+=(libx264.a)
         fi
 
-        if [[ $x264 = high ]]; then
-            extracommands+=("--bit-depth=10")
-        elif [[ $x264 = o8 ]]; then
-            extracommands+=("--bit-depth=8")
-        else
-            extracommands+=("--bit-depth=all")
-        fi
+        case $x264 in
+        high) extracommands+=("--bit-depth=10") ;;
+        o8) extracommands+=("--bit-depth=8") ;;
+        *) extracommands+=("--bit-depth=all") ;;
+        esac
 
         do_uninstall "${_check[@]}"
         check_custom_patches
