@@ -1441,7 +1441,7 @@ if [[ $x264 != no ]]; then
             "--bindir=$LOCALDESTDIR/bin-video")
 
         # light ffmpeg build
-        old_PKG_CONFIG_PATH$PKG_CONFIG_PATH
+        old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
         PKG_CONFIG_PATH=$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig
         unset_extra_script
         if [[ $standalone = y && $x264 =~ (full|fullv) ]]; then
