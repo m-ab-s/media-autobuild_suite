@@ -902,6 +902,7 @@ fi
 
 _check=(libflite.a flite/flite.h)
 if enabled libflite && do_vcs "https://github.com/festvox/flite.git"; then
+    do_patch "https://github.com/festvox/flite/pull/15.patch" am
     do_patch "https://patch-diff.githubusercontent.com/raw/festvox/flite/pull/43.patch" am
     do_uninstall libflite_cmu_{grapheme,indic}_{lang,lex}.a \
         libflite_cmu_us_{awb,kal,kal16,rms,slt}.a \
