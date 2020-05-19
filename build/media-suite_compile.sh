@@ -1761,7 +1761,7 @@ if [[ $bits = 64bit && $vvc = y ]] &&
     do_uninstall bin-video/vvc
     # patch for easier install of apps
     # probably not of upstream's interest because of how experimental the codec is
-    do_patch "https://0x0.st/sG0V.txt" am
+    do_patch "https://gist.githubusercontent.com/1480c1/36ad70c1acbfdfdd2652caf07aa3508f/raw/cmake-allow-installing-apps.patch" am
     do_patch "https://0x0.st/zJG_.patch" am
     _notrequired=true
     # install to own dir because the binaries' names are too generic
