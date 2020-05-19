@@ -1756,7 +1756,7 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
 fi
 
 _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
-if [[ $bits = 64bits && $vvc = y ]] &&
+if [[ $bits = 64bit && $vvc = y ]] &&
     do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/VVCSoftware_VTM.git" vvc; then
     do_uninstall bin-video/vvc
     # patch for easier install of apps
