@@ -186,7 +186,8 @@ For information about the compiler environment see the wiki, there you also have
 
 --------
 
-- Windows 32/64-bits (tested with Win10 64-bits; 32-bits is not tested at all by anyone, avoid)
+- Windows 64-bits (tested with Win10 64-bits)
+  - 32-bit hosts are no longer supported.
 - NTFS drive
 - 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
 - 4GB+ RAM
