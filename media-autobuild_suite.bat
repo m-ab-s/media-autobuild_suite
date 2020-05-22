@@ -1386,19 +1386,17 @@ if not exist "%instdir%\%msys2%\msys2_shell.cmd" (
     echo -------------------------------------------------------------------------------
     echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
         (New-Object System.Net.WebClient^).DownloadFile(^
-        'https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.tar.xz', ^
-        "$PWD\msys2-base.tar.xz"^) | powershell -NoProfile -Command - || goto :errorMsys
-rem used to be http://repo.msys2.org/distrib/msys2-%msysprefix%-latest.tar.xz
+        'https://github.com/msys2/msys2-installer/releases/download/nightly-%msysprefix%/msys2-base-%msysprefix%-latest.sfx.exe', ^
+        "$PWD\msys2-base.sfx.exe"^) | powershell -NoProfile -Command - || goto :errorMsys
     :unpack
-    if exist %build%\msys2-base.tar.xz (
+    if exist %build%\msys2-base.sfx.exe (
         echo -------------------------------------------------------------------------------
         echo.
-        echo.- Downloading and unpacking msys2 basic system
+        echo.- unpacking msys2 basic system
         echo.
         echo -------------------------------------------------------------------------------
-        7z >nul 2>&1 || 7za >nul 2>&1 || powershell -NoProfile -NonInteractive -Command (New-Object System.Net.WebClient^).DownloadFile('https://github.com/chocolatey/chocolatey.org/raw/master/chocolatey/Website/7za.exe', '7za.exe'^)
-        7z >nul 2>&1 && 7z x msys2-base.tar.xz -so | 7z x -aoa -si -ttar -o.. || 7za x msys2-base.tar.xz -so | 7za x -aoa -si -ttar -o..
-        if exist 7za.exe del 7za.exe
+        .\msys2-base.sfx.exe x -y -o".."
+        if exist msys2-base.sfx.exe del msys2-base.sfx.exe
     )
 
     if not exist %instdir%\%msys2%\usr\bin\msys-2.0.dll (
