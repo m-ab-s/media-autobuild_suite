@@ -31,6 +31,17 @@ set "TERM=xterm-256color"
 setlocal
 set instdir=%CD%
 
+if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 (
+    echo ----------------------------------------------------------------------
+    echo. 32-bit host machine and OS are no longer supported by the suite
+    echo. nor upstream for building.
+    echo. Please consider either moving to a 64-bit machine and OS or use
+    echo. a 64-bit machine to compile the binaries you need.
+    pause
+    exit
+)
+
+
 if not exist %instdir% (
     echo ----------------------------------------------------------------------
     echo. You have probably run the script in a path with spaces.
