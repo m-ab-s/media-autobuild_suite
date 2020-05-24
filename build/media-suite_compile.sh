@@ -1060,6 +1060,7 @@ enabled librav1e && _check+=(librav1e.a rav1e.pc rav1e/rav1e.h)
 if { [[ $rav1e = y ]] || enabled librav1e; } &&
     do_vcs "https://github.com/xiph/rav1e.git"; then
     log submodule git submodule update --init
+    do_patch "https://github.com/xiph/rav1e/pull/2324.patch" am
     do_uninstall "${_check[@]}" include/rav1e
 
     # standalone binary
