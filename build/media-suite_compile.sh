@@ -1903,11 +1903,6 @@ if [[ $ffmpeg != no ]]; then
         enabled vapoursynth &&
             do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-Add-Alternative-VapourSynth-demuxer.patch" am
 
-        # librav1e
-        if enabled librav1e; then
-            do_removeOption FFMPEG_OPTS_SHARED "--enable-librav1e"
-        fi
-
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-configure-deduplicate-linking-flags.patch" am
