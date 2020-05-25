@@ -399,7 +399,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
         do_uninstall "${_check[@]}"
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' tools/Makefile.am
         grep_or_sed "Requires.private" libpsl.pc.in "/Libs:/ i\Requires.private: libidn2"
-        do_separate_confmakeinstall global --disable-{nls,rpath,gtk-doc-html,man,runtime}
+        CFLAGS+=" -DPSL_STATIC" do_separate_confmakeinstall global --disable-{nls,rpath,gtk-doc-html,man,runtime}
         do_checkIfExist
     fi
 fi
