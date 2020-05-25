@@ -1903,11 +1903,6 @@ if [[ $ffmpeg != no ]]; then
         enabled vapoursynth &&
             do_patch "https://0x0.st/zp4W.txt vapoursynth_alt.patch" am
 
-        # librav1e
-        if enabled librav1e; then
-            do_removeOption FFMPEG_OPTS_SHARED "--enable-librav1e"
-        fi
-
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://0x0.st/zLsN.txt" am
