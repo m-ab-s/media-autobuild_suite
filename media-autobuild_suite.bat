@@ -101,7 +101,7 @@ do if %%f lss 4 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=asciidoc autoconf automake-wrapper autogen bison diffstat dos2unix help2man ^
+set msyspackages=asciidoc autoconf automake-wrapper autogen base bison diffstat dos2unix help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
@@ -1485,12 +1485,12 @@ if not [%removefstab%]==[no] (
     (
         echo.none / cygdrive binary,posix=0,noacl,user 0 0
         echo.
-        echo.%instdir%\ /trunk
-        echo.%instdir%\build\ /build
-        echo.%instdir%\msys64\mingw32\ /mingw32
-        echo.%instdir%\msys64\mingw64\ /mingw64
-        if "%build32%"=="yes" echo.%instdir%\local32\ /local32
-        if "%build64%"=="yes" echo.%instdir%\local64\ /local64
+        echo.%instdir%\ /trunk ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\build\ /build ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\msys64\mingw32\ /mingw32 ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\msys64\mingw64\ /mingw64 ntfs binary,posix=0,noacl,user 0 0
+        if "%build32%"=="yes" echo.%instdir%\local32\ /local32 ntfs binary,posix=0,noacl,user 0 0
+        if "%build64%"=="yes" echo.%instdir%\local64\ /local64 ntfs binary,posix=0,noacl,user 0 0
     )>"%instdir%\msys64\etc\fstab."
 )
 
@@ -1590,8 +1590,8 @@ if not exist %instdir%\msys64\usr\bin\hg.bat (
 rem installmingw
 if exist "%instdir%\msys64\etc\pac-mingw.pk" del "%instdir%\msys64\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\msys64\etc\pac-mingw.pk
-if %build32%==yes call :getmingw 32 i
-if %build64%==yes call :getmingw 64 x
+if %build32%==yes call :getmingw 32
+if %build64%==yes call :getmingw 64
 if exist "%build%\mingw.sh" del %build%\mingw.sh
 
 rem updatebase
@@ -1829,13 +1829,15 @@ if exist %instdir%\msys64\mingw%1\bin\gcc.exe GOTO :EOF
 echo.-------------------------------------------------------------------------------
 echo.install %1 bit compiler
 echo.-------------------------------------------------------------------------------
+if "%1"=="32" (
+    set prefix=mingw-w64-i686-
+) else set prefix=mingw-w64-x86_64-
 (
-    echo.echo -ne "\033]0;install %1 bit compiler\007"
-    echo.mingwcompiler="$(cat /etc/pac-mingw.pk | sed 's;.*;&:%2;g' | tr '\n\r' '  ')"
+    echo.printf '\033]0;install %1 bit compiler\007'
     echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
-    echo.echo $mingwcompiler ^| xargs $nargs pacboy -Sw --noconfirm --ask=20 --needed
-    echo.echo $mingwcompiler ^| xargs $nargs pacboy -S --noconfirm --ask=20 --needed
-    echo.sleep ^3
+    echo.sed 's/^^/%prefix%/g' /etc/pac-mingw.pk ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
+    echo.sed 's/^^/%prefix%/g' /etc/pac-mingw.pk ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
+    echo.sleep 3
     echo.exit
 )>%build%\mingw.sh
 call :runBash mingw%1.log /build/mingw.sh
@@ -1849,7 +1851,7 @@ if not exist %instdir%\msys64\mingw%1\bin\gcc.exe (
     echo -------------------------------------------------------------------------------
     set /P try="try again [y/n]: "
 
-    if [%try%]==[y] GOTO getmingw %1 %2
+    if [%try%]==[y] GOTO getmingw %1
     exit
 )
 endlocal
