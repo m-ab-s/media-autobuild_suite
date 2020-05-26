@@ -418,11 +418,3 @@ export CUDA_PATH=$(cygpath -sm "${_cuda_basepath}")/${_cuda_version}
 export PATH=$PATH:$(dirname "$(cygpath -u "\\${_msvc_basepath}\\${_msvc_version}\bin\Host\\${_msvc_hostarch}\\${_msvc_targetarch}\cl.exe")")
 export PATH=$PATH:$CUDA_PATH/bin
 ```
-
-## References
-
---------
-
-<http://ingar.satgnu.net/devenv/mingw32/base.html>
-
-<http://kemovitra.blogspot.co.at/2009/08/mingw-to-compile-ffmpeg.html>
