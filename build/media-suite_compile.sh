@@ -404,6 +404,11 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     fi
 fi
 
+# fix retarded google naming schemes for brotli
+pacman -Qs "$MINGW_PACKAGE_PREFIX-brotli" > /dev/null 2>&1 &&
+    grep_or_sed '-static' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc 's;-lbrotli.*;&-static;' \
+        "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
+
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 case $curl in
 libressl) _deps=(libssl.a) ;;
@@ -418,9 +423,6 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
     do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
     do_pacman_install nghttp2 brotli
 
-    # fix retarded google naming schemes for brotli
-    grep_or_sed '-static' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc 's;-lbrotli.*;&-static;' \
-        "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
     grep_or_sed brotlidec-static configure.ac 's;CHECK_LIB\(brotlidec;&-static;'
 
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
