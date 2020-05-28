@@ -2045,8 +2045,25 @@ fi
 if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
         do_pacman_install lua51
-    elif ! mpv_disabled lua; then
-        do_pacman_install luajit
+    elif ! mpv_disabled lua &&
+        _check=(bin-global/luajit.exe libluajit-5.1.a luajit.pc luajit-2.1/lua.h) &&
+        do_vcs "https://github.com/LuaJIT/LuaJIT.git" luajit; then
+        do_pacman_remove luajit lua51
+        do_uninstall include/luajit-2.1 lib/lua "${_check[@]}"
+        [[ -f src/luajit.exe ]] && log "clean" make clean
+        do_patch "https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages/luajit-0001-add-win32-utf-8-filesystem-functions.patch" am
+        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0001-win32-UTF-8-Remove-va-arg-and-.-and-unused-functions.patch" am
+        do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-luajit/002-fix-pkg-config-file.patch"
+        sed -i "s|export PREFIX= /usr/local|export PREFIX=${LOCALDESTDIR}|g" Makefile
+        sed -i "s|^prefix=.*|prefix=$LOCALDESTDIR|" etc/luajit.pc
+        _luajit_args=("PREFIX=$LOCALDESTDIR" "INSTALL_BIN=$LOCALDESTDIR/bin-global" "INSTALL_TNAME=luajit.exe")
+        do_make amalg HOST_CC="$CC" BUILDMODE=static \
+            CFLAGS='-D_WIN32_WINNT=0x0602 -DUNICODE' \
+            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT$([[ $bits = 64bit ]] && echo " -DLUAJIT_ENABLE_GC64")" \
+            "${_luajit_args[@]}"
+        do_makeinstall "${_luajit_args[@]}"
+        do_checkIfExist
+        unset _luajit_args
     fi
 
     do_pacman_remove uchardet-git
