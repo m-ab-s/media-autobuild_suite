@@ -2179,7 +2179,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
         do_pacman_install python-mako
         do_uninstall "${_check[@]}"
-        do_mesoninstall -Dvulkan-registry=$MINGW_PREFIX/share/vulkan/registry/vk.xml
+        do_mesoninstall -Dvulkan-registry="$MINGW_PREFIX/share/vulkan/registry/vk.xml"
         do_checkIfExist
     fi
 
