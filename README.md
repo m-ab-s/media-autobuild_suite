@@ -92,6 +92,7 @@ For information about the compiler environment see the wiki, there you also have
             - needs non-free license if not LGPL
         - libflite (git)
         - libfribidi (latest release)
+        - libglslang (git)
         - libgme (git snapshot)
         - libgsm (mingw-w64)
         - libilbc (git snapshot)
@@ -119,6 +120,7 @@ For information about the compiler environment see the wiki, there you also have
         - opencl (from system)
         - opengl (from system)
         - vapoursynth (R50)
+        - vulkan (git)
 
 - other tools
     - aom (git)
