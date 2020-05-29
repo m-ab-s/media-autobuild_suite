@@ -1779,6 +1779,42 @@ if [[ $ffmpeg != no ]] && enabled avisynth &&
     do_checkIfExist
 fi
 
+_check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
+if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
+    do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
+    _DeadSix27=https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master
+    _shinchiro=https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master
+    do_uninstall "${_check[@]}"
+    do_patch "$_shinchiro/packages/vulkan-0001-cross-compile-static-linking-hacks.patch" am
+    create_build_dir
+    log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
+    cd_safe Vulkan-Headers
+        do_print_progress "Installing Vulkan-Headers"
+        do_uninstall include/vulkan
+        do_cmakeinstall
+        do_wget -c -r -q "$_DeadSix27/additional_headers/d3dkmthk.h"
+        do_wget -c -r -q "$_DeadSix27/additional_headers/d3dukmdt.h"
+        do_install d3d{kmthk,ukmdt}.h include/
+    cd_safe "$(get_first_subdir -f)"
+    do_print_progress "Building Vulkan-Loader"
+    do_cmakeinstall -DBUILD_TESTS=OFF -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
+    -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
+    -DENABLE_STATIC_LOADER=ON -DUNIX=OFF
+    do_checkIfExist
+    unset _DeadSix27 _shinchiro
+fi
+
+_check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
+        libSPIRV{,-Tools{,-opt,-link,-reduce}}.a)
+if [[ $ffmpeg != no ]] && enabled libglslang &&
+    do_vcs "https://github.com/KhronosGroup/glslang.git"; then
+    do_uninstall "${_check[@]}"
+    log dependencies /usr/bin/python ./update_glslang_sources.py
+    do_patch "https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages/glslang-0001-fix-gcc-10.1-error.patch" am
+    do_cmakeinstall -DUNIX=OFF
+    do_checkIfExist
+fi
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != no ]]; then
     enabled libgsm && do_pacman_install gsm
@@ -2110,31 +2146,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_install build/host/lib/*.a lib/
         cmake -E copy_directory include "$LOCALDESTDIR/include"
         do_checkIfExist
-    fi
-
-    _check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
-    if ! mpv_disabled vulkan &&
-        do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
-        _DeadSix27=https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master
-        _shinchiro=https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master
-        do_uninstall "${_check[@]}"
-        do_patch "$_shinchiro/packages/vulkan-0001-cross-compile-static-linking-hacks.patch" am
-        create_build_dir
-        log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
-        cd_safe Vulkan-Headers
-            do_print_progress "Installing Vulkan-Headers"
-            do_uninstall include/vulkan
-            do_cmakeinstall
-            do_wget -c -r -q "$_DeadSix27/additional_headers/d3dkmthk.h"
-            do_wget -c -r -q "$_DeadSix27/additional_headers/d3dukmdt.h"
-            do_install d3d{kmthk,ukmdt}.h include/
-        cd_safe "$(get_first_subdir -f)"
-        do_print_progress "Building Vulkan-Loader"
-        do_cmakeinstall -DBUILD_TESTS=no -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
-        -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
-        -DENABLE_STATIC_LOADER=ON -DUNIX=off
-        do_checkIfExist
-        unset _DeadSix27
     fi
 
     _check=(shaderc/shaderc.h libshaderc_combined.a)
