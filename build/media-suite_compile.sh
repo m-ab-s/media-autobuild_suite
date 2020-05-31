@@ -783,7 +783,6 @@ fi
 
 _check=(libcodec2.a codec2.pc codec2/codec2.h)
 if [[ $ffmpeg != no ]] && enabled libcodec2; then
-    [[ $standalone = y ]] && _check+=(bin-audio/c2{enc,dec}.exe)
     if do_vcs "https://github.com/drowe67/codec2.git"; then
         do_uninstall all include/codec2 "${_check[@]}"
         sed -i 's|if(WIN32)|if(FALSE)|g' CMakeLists.txt
@@ -794,9 +793,6 @@ if [[ $ffmpeg != no ]] && enabled libcodec2; then
         fi
         do_cmakeinstall -D{UNITTEST,INSTALL_EXAMPLES}=off \
             -DCMAKE_INSTALL_BINDIR="$(pwd)/build-$bits/_bin"
-        if [[ $standalone = y ]]; then
-            do_install _bin/c2{enc,dec}.exe bin-audio/
-        fi
         do_checkIfExist
     fi
 fi
