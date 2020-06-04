@@ -826,8 +826,7 @@ if [[ $ffmpeg != no ]] && enabled libgme && do_pkgConfig "libgme = 0.6.3" &&
     do_wget -h aba34e53ef0ec6a34b58b84e28bf8cfbccee6585cebca25333604c35db3e051d \
         "https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.3.tar.xz"; then
     do_uninstall include/gme "${_check[@]}"
-    sed -i 's|__declspec(dllexport)||g' gme/blargg_source.h
-    do_cmakeinstall
+    do_cmakeinstall -DENABLE_UBSAN=OFF
     do_checkIfExist
 fi
 
