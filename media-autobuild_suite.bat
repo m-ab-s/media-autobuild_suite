@@ -1654,6 +1654,14 @@ findstr /C:"profile2.local" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&
     echo.fi
 )>%instdir%\msys64\etc\profile.d\Zab-suite.sh
 
+
+findstr /C:"LANG" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
+    echo.case $- in
+    echo.*i*^) ;;
+    echo.*^) export LANG=en_US.UTF-8 ;;
+    echo.esac
+)>>%instdir%\msys64\etc\profile.d\Zab-suite.sh
+
 rem compileLocals
 cd %instdir%
 
