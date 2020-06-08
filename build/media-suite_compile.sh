@@ -2582,7 +2582,6 @@ if [[ $vlc == y ]]; then
     _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
     if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
         do_uninstall include/google/protobuf "${_check[@]}"
-        do_patch "https://gist.githubusercontent.com/1480c1/859bf3c0491784e49ed8074d599d37b2/raw/0001-port_def-define-out-stuff-not-needed-on-mingw-w64.patch" am
         do_autogen
         do_separate_confmakeinstall
         do_checkIfExist
