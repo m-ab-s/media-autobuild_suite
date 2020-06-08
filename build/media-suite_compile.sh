@@ -1051,7 +1051,7 @@ fi
 
 _check=(/opt/cargo/bin/cargo-c{build,install}.exe)
 if enabled librav1e &&
-    [[ ! -x /opt/cargo/bin/cargo-cbuild || $(/opt/cargo/bin/cargo-cbuild --version) =~ 0.6* ]]
+    [[ ! -x /opt/cargo/bin/cargo-cbuild || $(/opt/cargo/bin/cargo-cbuild --version) =~ 0.6* ]] &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
     [[ -x /opt/cargo/bin/cargo-cbuild ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
