@@ -1915,22 +1915,15 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
 
-        # See issue https://github.com/OpenVisualCloud/SVT-AV1/issues/567 for the reasons behind the follow codeblock:
-        # start of SVT-AV1 temporary measures
+        # ((TEMPORARY SVT-AV1 MEASURES))
+        # Reasons for this codeblock = https://github.com/OpenVisualCloud/SVT-AV1/issues/567
         if enabled libsvtav1; then
-            if enabled libaom && enabled libopencore-amrwb; then
-                do_print_progress "Until SVT-AV1 issues a fix, libaom & libopencore-amrwb must be disabled while libsvtav1 is enabled."
-                do_removeOption --enable-libaom
-                do_removeOption --enable-libopencore-amrwb
-            elif enabled libaom; then
-                do_print_progress "Until SVT-AV1 issues a fix, libaom must be disabled while libsvtav1 is enabled."
-                do_removeOption --enable-libaom
-            elif enabled libopencore-amrwb; then
-                do_print_progress "Until SVT-AV1 issues a fix, libopencore-amrwb must be disabled while libsvtav1 is enabled."
-                do_removeOption --enable-libopencore-amrwb
-            fi
+            enabled libaom && do_removeOption --enable-libaom &&
+                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libaom."
+            enabled libopencore-amrwb && do_removeOption --enable-libopencore-amrwb &&
+                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libopencore-amrwb."
         fi
-        # end of SVT-AV1 temporary measures
+        # (/(TEMPORARY SVT-AV1 MEASURES))
 
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
