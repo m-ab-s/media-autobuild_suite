@@ -1206,8 +1206,8 @@ do_patch() {
 
     if [[ -f $patchName ]]; then
         if $am; then
-            git apply --check --ignore-space-change --ignore-whitespace "$patchName" > /dev/null 2>&1 &&
-                git am -q --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1 &&
+            git apply -3 --check --ignore-space-change --ignore-whitespace "$patchName" > /dev/null 2>&1 &&
+                git am -q -3 --ignore-whitespace --no-gpg-sign "$patchName" > /dev/null 2>&1 &&
                 return 0
             git am -q --abort > /dev/null 2>&1
         else
@@ -1340,6 +1340,20 @@ do_rust() {
     log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@" "${rust_extras[@]}"
+    extra_script post rust
+    unset rust_extras
+}
+
+do_rustinstall() {
+    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    # use this array to pass additional parameters to cargo
+    local rust_extras=()
+    extra_script pre rust
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
+        return
+    log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
+        --target="$CARCH"-pc-windows-gnu \
+        --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
 }
