@@ -708,8 +708,10 @@ _check=(bin-audio/exhale.exe)
 if [[ $exhale = y ]] &&
     do_vcs "https://gitlab.com/ecodis/exhale.git"; then
     do_uninstall "${_check[@]}"
+    _notrequired=true
     do_cmakeinstall audio
     do_checkIfExist
+    unset _notrequired
 fi
 
 _check=(bin-audio/oggenc.exe)
