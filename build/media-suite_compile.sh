@@ -2106,8 +2106,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_pacman_remove luajit lua51
         do_uninstall include/luajit-2.1 lib/lua "${_check[@]}"
         [[ -f src/luajit.exe ]] && log "clean" make clean
-        do_patch "https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages/luajit-0001-add-win32-utf-8-filesystem-functions.patch" am
-        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0001-win32-UTF-8-Remove-va-arg-and-.-and-unused-functions.patch" am
+        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0001-Add-win32-UTF-8-filesystem-functions.patch" am
+        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0002-win32-UTF-8-Remove-va-arg-and-.-and-unused-functions.patch" am
         do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-luajit/002-fix-pkg-config-file.patch"
         sed -i "s|export PREFIX= /usr/local|export PREFIX=${LOCALDESTDIR}|g" Makefile
         sed -i "s|^prefix=.*|prefix=$LOCALDESTDIR|" etc/luajit.pc
