@@ -694,9 +694,9 @@ if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
         "https://github.com/knik0/faac/archive/1_30.tar.gz" "faac-1_30.tar.gz"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     # autoconf: frontend compilation optional
-    # blockswitch: add missing stdint include
     # frontend: fix out-of-root build
-    do_patch https://0x0.st/zMuQ.txt
+    do_patch "https://github.com/1480c1/faac/commit/6f4a16677546c01e93712dcc0f43e1cff8ab76e6.patch" am
+    do_patch "https://github.com/knik0/faac/commit/c8d12a5c7c5b6f1c4593f0a6c1eeceacc4d7c941.patch" am
     log bootstrap ./bootstrap
     extracommands=()
     [[ $standalone = n ]] && extracommands+=(--disable-frontend)
