@@ -689,14 +689,12 @@ fi
 
 [[ $faac = y ]] && do_pacman_install faac
 _check=(bin-audio/faac{,gui}.exe)
-if [[ $standalone = y && $faac = y ]] && ! files_exist "${_check[@]}" &&
-    do_wget -h adc387ce588cca16d98c03b6ec1e58f0ffd9fc6eadb00e254157d6b16203b2d2 \
-        "https://github.com/knik0/faac/archive/1_30.tar.gz" "faac-1_30.tar.gz"; then
+if [[ $standalone = y && $faac = y ]] &&
+    do_vcs "https://github.com/knik0/faac.git"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
     # autoconf: frontend compilation optional
     # frontend: fix out-of-root build
-    do_patch "https://github.com/1480c1/faac/commit/6f4a16677546c01e93712dcc0f43e1cff8ab76e6.patch" am
-    do_patch "https://github.com/knik0/faac/commit/c8d12a5c7c5b6f1c4593f0a6c1eeceacc4d7c941.patch" am
+    do_patch "https://github.com/1480c1/faac/commit/897af7717c514b04a86889b27a2f3922decccbac.patch" am
     log bootstrap ./bootstrap
     extracommands=()
     [[ $standalone = n ]] && extracommands+=(--disable-frontend)
