@@ -110,16 +110,16 @@ unset _keys _root
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,ogg,vorbis{,enc,file},gnurx,regex}.{,l}a
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,luajit-5.1,uchardet}.{l,}a
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} lib/lua
+    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
+    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} 
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
-    {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,luajit,uchardet}.pc
+    {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,uchardet}.pc
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
     share/aclocal/{ogg,vorbis}.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
-    bin-global/{{file,uchardet}.exe,sdl-config,luajit{,-2.0.4.exe}}
+    bin-global/{{file,uchardet}.exe,sdl-config,luajit-2.0.4.exe}
     libebur128.a ebur128.h
     libopenh264.a
     liburiparser.{{,l}a,pc}
@@ -1824,7 +1824,7 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
 fi
 
 _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
-        libSPIRV{,-Tools{,-opt,-link,-reduce}}.a)
+        libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if [[ $ffmpeg != no ]] && enabled libglslang &&
     do_vcs "https://github.com/KhronosGroup/glslang.git"; then
     do_uninstall "${_check[@]}"
@@ -2130,7 +2130,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     if mpv_enabled egl-angle && do_vcs "https://chromium.googlesource.com/angle/angle"; then
         do_simple_print "${orange}mpv will need libGLESv2.dll and libEGL.dll to use gpu-context=angle"'!'
         do_simple_print "You can find these in your browser's installation directory, usually."
-        do_uninstall include/{EGL,GLES{2,3},GLSLANG,KHR,platform} angle_gl.h \
+        do_uninstall include/{EGL,GLES{2,3},KHR,platform} angle_gl.h \
             lib{GLESv2,EGL}.a "${_check[@]}"
         cp -rf include/{EGL,KHR} "$LOCALDESTDIR/include/"
         do_checkIfExist
