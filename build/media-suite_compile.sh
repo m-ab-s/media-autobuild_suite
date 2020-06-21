@@ -111,7 +111,7 @@ unset _keys _root
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,ogg,vorbis{,enc,file},gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc} 
+    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
     {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,uchardet}.pc
@@ -258,6 +258,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         done
         unset _s
         do_autogen --noconf
+        do_autoreconf
         extracommands=(--disable-docs --enable-iconv
             "--with-libiconv-prefix=$MINGW_PREFIX"
             "--with-libiconv-lib=$MINGW_PREFIX/lib" "--with-libiconv-includes=$MINGW_PREFIX/include"
