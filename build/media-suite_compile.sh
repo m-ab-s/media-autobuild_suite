@@ -1923,9 +1923,9 @@ if [[ $ffmpeg != no ]]; then
         # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
         if enabled libsvtvp9; then
             enabled libxvid && do_removeOption --enable-libxvid &&
-                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libxvid."
+                do_print_progress "Until an upstream fix is issued, libxvid must be disabled when compiling with libsvtvp9."
             enabled libsvtav1 && do_removeOption --enable-libsvtav1 &&
-                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libsvtav1."
+                do_print_progress "Until an upstream fix is issued, libsvtav1 must be disabled when compiling with libsvtvp9."
         fi
         # (/(TEMPORARY SVT-VP9 MEASURES))
 
@@ -1933,9 +1933,9 @@ if [[ $ffmpeg != no ]]; then
         # Reasons for this codeblock = https://github.com/OpenVisualCloud/SVT-AV1/issues/567
         if enabled libsvtav1; then
             enabled libaom && do_removeOption --enable-libaom &&
-                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libaom."
+                do_print_progress "Until an upstream fix is issued, libaom must be disabled when compiling with libsvtav1."
             enabled libopencore-amrwb && do_removeOption --enable-libopencore-amrwb &&
-                do_print_progress "Until an upstream fix is issued, compiling with libsvtvp9 must disable libopencore-amrwb."
+                do_print_progress "Until an upstream fix is issued, libopencore-amrwb must be disabled when compiling with libsvtav1."
         fi
         # (/(TEMPORARY SVT-AV1 MEASURES))
 
