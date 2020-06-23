@@ -298,9 +298,10 @@ Using custom patches is not officially supported, if you do use custom patches, 
 
 --------
 
-- To use a custom patch, create a script within the build folder named `<repository's name>_extra.sh`.
-  - For ffmpeg, the folder name would be ffmpeg-git, but the repository's name would be ffmpeg.
-  - For game-music-emu, the folder name would be game-music-emu-0.6.2 and the repository's name would be game-music-emu
+- To use a custom patch, within the build folder, create a script with the filename: `<repository's name>_extra.sh`.
+  - For ffmpeg, the folder name is ffmpeg-git, but the repository's name would be ffmpeg: `ffmpeg_extra.sh`.
+  - For game-music-emu, the folder name is game-music-emu-0.6.2, but the repository's name would be game-music-emu: `game-music-emu_extra.sh`
+  - Case-sensitivity applies, so for the folder name SVT-VP9-git (repo name SVT-VP9), the script filename would be: `SVT-VP9_extra.sh`
 
 - The commands will run in the cloned/unzipped folder unless otherwise stated. (flac_extra.sh would run commands within flac-git)
 
