@@ -1642,6 +1642,7 @@ rem ------------------------------------------------------------------
 if %build32%==yes call :writeProfile 32
 if %build64%==yes call :writeProfile 64
 
+mkdir "%instdir%\msys64\home\%USERNAME%\.gnupg" > nul 2>&1
 findstr hkps://keys.openpgp.org "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.conf" >nul 2>&1 || echo keyserver hkps://keys.openpgp.org >> "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.conf"
 
 rem loginProfile
