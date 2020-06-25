@@ -1053,7 +1053,7 @@ if { [[ $dav1d = y ]] || { [[ $ffmpeg != no ]] && enabled libdav1d; }; } &&
     do_checkIfExist
 fi
 
-_check=(/opt/cargo/bin/cargo-c{build,install}.exe)
+_check=(/opt/cargo/bin/cargo-c{build,inst}.exe)
 if enabled librav1e &&
     [[ ! -x /opt/cargo/bin/cargo-cbuild || $(/opt/cargo/bin/cargo-cbuild --version) =~ 0.6* ]] &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
@@ -1067,6 +1067,8 @@ if enabled librav1e &&
     fi
     # Replace libssh2-sys with a more up to date one since libssh2 had an issue that was not merged in the main libssh2-sys crate
     printf '%s\n' "" "[patch.crates-io]" 'libssh2-sys = { path = "ssh2-rs-git/libssh2-sys" }' >> Cargo.toml
+    grep_and_sed cargo-cinstall Cargo.toml 's/cargo-cinstall/cargo-cinst/g'
+    grep_and_sed cinstall src/cinstall.rs 's/cinstall/cinst/g'
     do_rustinstall
     do_checkIfExist
 fi
@@ -1095,8 +1097,9 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         export CPATH LIBRARY_PATH
 
         rm -f "$CARGO_HOME/config" 2> /dev/null
-        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" \
-            cinstall --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
+        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo-cinst.exe" \
+            cinst --release --prefix "$LOCALDESTDIR" \
+            --destdir "$PWD/install-$bits" --jobs "$cpuCount"
 
         mapfile -t compiler_builtins < <(
             for a in ___chkstk_ms __udivmoddi4 __divmoddi4 __udivti3; do
