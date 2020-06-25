@@ -1055,7 +1055,7 @@ fi
 
 _check=(/opt/cargo/bin/cargo-c{build,inst}.exe)
 if enabled librav1e &&
-    [[ ! -x /opt/cargo/bin/cargo-cbuild || $(/opt/cargo/bin/cargo-cbuild --version) =~ 0.6* ]] &&
+    [[ ! -x /opt/cargo/bin/cargo-cinst || $(/opt/cargo/bin/cargo-cbuild --version) != 0.6* ]] &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
     [[ -x /opt/cargo/bin/cargo-cbuild ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
@@ -1098,8 +1098,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
 
         rm -f "$CARGO_HOME/config" 2> /dev/null
         log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo-cinst.exe" \
-            cinst --release --prefix "$LOCALDESTDIR" \
-            --destdir "$PWD/install-$bits" --jobs "$cpuCount"
+            cinst --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
 
         mapfile -t compiler_builtins < <(
             for a in ___chkstk_ms __udivmoddi4 __divmoddi4 __udivti3; do
@@ -1113,6 +1112,12 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         done
         ar r "install-$bits/lib/librav1e.a" "${compiler_builtins[@]}"
         rm "${compiler_builtins[@]}"
+
+        (
+            _rav1e_install_win_path=$(cygpath -m "$PWD/install-$bits")
+            _rav1e_dest_win_path=$(cygpath -m "$LOCALDESTDIR")
+            grep_and_sed "$_rav1e_install_win_path" "install-$bits/lib/pkgconfig/rav1e.pc" "s#$_rav1e_install_win_path#$_rav1e_dest_win_path#"
+        )
 
         # do_install "install-$bits/bin/rav1e.dll" bin-video/
         # do_install "install-$bits/lib/librav1e.dll.a" lib/
