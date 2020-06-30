@@ -695,13 +695,8 @@ _check=(bin-audio/faac{,gui}.exe)
 if [[ $standalone = y && $faac = y ]] &&
     do_vcs "https://github.com/knik0/faac.git"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
-    # autoconf: frontend compilation optional
-    # frontend: fix out-of-root build
-    do_patch "https://github.com/1480c1/faac/commit/897af7717c514b04a86889b27a2f3922decccbac.patch" am
     log bootstrap ./bootstrap
-    extracommands=()
-    [[ $standalone = n ]] && extracommands+=(--disable-frontend)
-    do_separate_confmakeinstall audio "${extracommands[@]}"
+    do_separate_confmakeinstall audio
     do_checkIfExist
 fi
 
