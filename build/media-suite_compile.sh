@@ -1054,14 +1054,6 @@ if enabled librav1e &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
     [[ -x /opt/cargo/bin/cargo-cbuild ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
-    if [[ -d ssh2-rs-git ]]; then
-        log submodule.pull git -C ssh2-rs-git pull --recurse-submodules --autostash --rebase=true -j"$cpuCount"
-    else
-        # Temp fork until main repo updates their libssh2
-        log ssh2-clone git clone --recurse-submodules -j"$cpuCount" "https://github.com/1480c1/ssh2-rs.git" ssh2-rs-git
-    fi
-    # Replace libssh2-sys with a more up to date one since libssh2 had an issue that was not merged in the main libssh2-sys crate
-    printf '%s\n' "" "[patch.crates-io]" 'libssh2-sys = { path = "ssh2-rs-git/libssh2-sys" }' >> Cargo.toml
     grep_and_sed cargo-cinstall Cargo.toml 's/cargo-cinstall/cargo-cinst/g'
     grep_and_sed cinstall src/cinstall.rs 's/cinstall/cinst/g'
     do_rustinstall
