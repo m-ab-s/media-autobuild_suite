@@ -211,6 +211,7 @@ vcs_reset() (
         git config remote.origin.url > /dev/null 2>&1 ||
             [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
         git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+        git fetch --all -Ppft
         git checkout --no-track -fB ab-suite
         git reset --hard "$(vcs_get_latest_tag "$1" git)"
         ;;
