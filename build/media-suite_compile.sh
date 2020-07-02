@@ -1914,16 +1914,6 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
 
-        # ((TEMPORARY SVT-VP9 MEASURES))
-        # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
-        if enabled libsvtvp9; then
-            enabled libxvid && do_removeOption --enable-libxvid &&
-                do_print_progress "Until an upstream fix is issued, libxvid must be disabled when compiling with libsvtvp9."
-            enabled libsvtav1 && do_removeOption --enable-libsvtav1 &&
-                do_print_progress "Until an upstream fix is issued, libsvtav1 must be disabled when compiling with libsvtvp9."
-        fi
-        # (/(TEMPORARY SVT-VP9 MEASURES))
-
         # ((TEMPORARY SVT-AV1 MEASURES))
         # Reasons for this codeblock = https://github.com/OpenVisualCloud/SVT-AV1/issues/567
         if enabled libsvtav1; then
