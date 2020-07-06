@@ -288,18 +288,18 @@ if [[ $mplayer = y || $mpv = y ]] ||
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
-        extracommands=("--bindir=bin-video" "-Ddocs=false" "-Dglib=false")
-        [[ $standalone = n ]] && sed -i "/subdir('bin')/d" meson.build
-        sed -i "/subdir('test')/d" meson.build
+        do_patch "https://github.com/fribidi/fribidi/pull/151.patch" am
+        extracommands=("-Ddocs=false" "-Dtests=false")
+        [[ $standalone = n ]] && extracommands+=("-Dbin=false")
         if [[ $ffmpeg = sharedlibs ]]; then
             create_build_dir shared
-            log meson meson .. --default-library=shared \
-                --prefix="$LOCALDESTDIR" "${extracommands[@]}"
+            log meson meson .. --default-library=shared --bindir=bin-video \
+                --prefix="$LOCALDESTDIR" -Dbin=false "${extracommands[@]}"
             do_ninja
             do_ninjainstall
             cd_safe ..
         fi
-        do_mesoninstall "${extracommands[@]}"
+        do_mesoninstall video "${extracommands[@]}"
         do_checkIfExist
     fi
 
