@@ -275,7 +275,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
 
     _deps=(libfreetype.a)
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
-    if [[ $ffmpeg != sharedlibs ]] && do_vcs "https://github.com/behdad/harfbuzz.git#tag=LATEST"; then
+    if [[ $ffmpeg != sharedlibs ]] && do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
         do_pacman_install ragel
         NOCONFIGURE=y do_autogen
         do_uninstall include/harfbuzz "${_check[@]}"
