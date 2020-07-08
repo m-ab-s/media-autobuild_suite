@@ -210,7 +210,7 @@ _check=(bin-global/dssim.exe)
 if [[ $dssim = y ]] &&
     do_vcs "https://github.com/kornelski/dssim.git"; then
     do_uninstall "${_check[@]}"
-    do_rust
+    CFLAGS+=" -fno-PIC" do_rust
     do_install "target/$CARCH-pc-windows-gnu/release/dssim.exe" bin-global/
     do_checkIfExist
 fi
