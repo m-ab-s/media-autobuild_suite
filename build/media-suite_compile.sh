@@ -1823,7 +1823,6 @@ if [[ $ffmpeg != no ]] && enabled libglslang &&
     do_vcs "https://github.com/KhronosGroup/glslang.git"; then
     do_uninstall "${_check[@]}"
     log dependencies /usr/bin/python ./update_glslang_sources.py
-    do_patch "https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages/glslang-0001-fix-gcc-10.1-error.patch" am
     do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
 fi
@@ -2187,10 +2186,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         add_third_party "https://github.com/KhronosGroup/SPIRV-Tools.git" spirv-tools
         add_third_party "https://github.com/KhronosGroup/SPIRV-Headers.git" spirv-headers
         add_third_party "https://github.com/KhronosGroup/SPIRV-Cross.git" spirv-cross
-        (
-            cd_safe third_party/glslang
-            do_patch "https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master/packages/glslang-0001-fix-gcc-10.1-error.patch" am
-        )
 
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
