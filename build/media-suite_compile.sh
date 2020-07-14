@@ -1049,12 +1049,9 @@ fi
 
 _check=(/opt/cargo/bin/cargo-c{build,inst}.exe)
 if enabled librav1e &&
-    [[ ! -x /opt/cargo/bin/cargo-cinst || $(/opt/cargo/bin/cargo-cbuild --version) != 0.6* ]] &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
-    [[ -x /opt/cargo/bin/cargo-cbuild ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
-    grep_and_sed cargo-cinstall Cargo.toml 's/cargo-cinstall/cargo-cinst/g'
-    grep_and_sed cinstall src/cinstall.rs 's/cinstall/cinst/g'
+    log uninstall.cargo-c cargo uninstall -q cargo-c
     do_rustinstall
     do_checkIfExist
 fi
@@ -1083,8 +1080,8 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         export CPATH LIBRARY_PATH
 
         rm -f "$CARGO_HOME/config" 2> /dev/null
-        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo-cinst.exe" \
-            cinst --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
+        log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" capi install \
+            --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
 
         mapfile -t compiler_builtins < <(
             for a in ___chkstk_ms __udivmoddi4 __divmoddi4 __udivti3; do
