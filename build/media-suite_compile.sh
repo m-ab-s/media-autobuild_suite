@@ -1047,7 +1047,7 @@ if { [[ $dav1d = y ]] || { [[ $ffmpeg != no ]] && enabled libdav1d; }; } &&
     do_checkIfExist
 fi
 
-_check=(/opt/cargo/bin/cargo-c{build,inst}.exe)
+_check=(/opt/cargo/bin/cargo-c{build,api}.exe)
 if enabled librav1e &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
