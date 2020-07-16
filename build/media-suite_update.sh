@@ -37,6 +37,8 @@ else
 fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 
+do_pacman_remove -m mercurial
+
 # --------------------------------------------------
 # update suite
 # --------------------------------------------------

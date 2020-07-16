@@ -233,7 +233,7 @@ Building everything from scratch takes about ~3 hours depending on what is enabl
 
 Check [forcing-recompilations](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
 
-To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git", "-svn" or "-hg" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
+To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git" or "-svn" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
 
 Have fun!
 
@@ -256,7 +256,7 @@ If there's some error during compilation follow these steps:
 
 `media-autobuild_suite.bat`
 
-- This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git/hg.
+- This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git.
 
 `/build/media-autobuild_suite.ini`
 

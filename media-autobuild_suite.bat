@@ -102,7 +102,7 @@ set build=%instdir%\build
 if not exist %build% mkdir %build%
 
 set msyspackages=asciidoc autoconf automake-wrapper autogen base bison diffstat dos2unix filesystem help2man ^
-intltool libtool patch python xmlto make zip unzip git subversion wget p7zip mercurial man-db ^
+intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq ^
@@ -1186,7 +1186,7 @@ if %deleteSourceINI%==0 (
     echo. 1 = Yes [recommended]
     echo. 2 = No
     echo.
-    echo. This will save a bit of space for libraries not compiled from git/hg/svn.
+    echo. This will save a bit of space for libraries not compiled from git/svn.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1505,28 +1505,6 @@ if not defined TERM (
     set "TERM=xterm-256color"
 )
 
-rem hgsettings
-if not exist "%instdir%\msys64\home\%USERNAME%\.hgrc" (
-    echo.[ui]
-    echo.username = %USERNAME%
-    echo.verbose = True
-    echo.editor = vim
-    echo.
-    echo.[web]
-    echo.cacerts=/usr/ssl/cert.pem
-    echo.
-    echo.[extensions]
-    echo.color =
-    echo.
-    echo.[color]
-    echo.status.modified = magenta bold
-    echo.status.added = green bold
-    echo.status.removed = red bold
-    echo.status.deleted = cyan bold
-    echo.status.unknown = blue bold
-    echo.status.ignored = black bold
-)>"%instdir%\msys64\home\%USERNAME%\.hgrc"
-
 rem gitsettings
 if not exist "%instdir%\msys64\home\%USERNAME%\.gitconfig" (
     echo.[user]
@@ -1572,21 +1550,6 @@ if not exist %instdir%\msys64\usr\bin\make.exe (
 )
 
 for %%i in (%instdir%\msys64\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert.log update-ca-trust
-
-rem sethgBat
-if not exist %instdir%\msys64\usr\bin\hg.bat (
-    echo.@echo off
-    echo.
-    echo.setlocal
-    echo.set HG=^%%~f0
-    echo.
-    echo.set PYTHONHOME=
-    echo.set in=^%%*
-    echo.set out=^%%in: ^{= ^"^{^%%
-    echo.set out=^%%out:^} =^}^" ^%%
-    echo.
-    echo.^%%~dp0python2 ^%%~dp0hg ^%%out^%%
-)>%instdir%\msys64\usr\bin\hg.bat
 
 rem installmingw
 if exist "%instdir%\msys64\etc\pac-mingw.pk" del "%instdir%\msys64\etc\pac-mingw.pk"

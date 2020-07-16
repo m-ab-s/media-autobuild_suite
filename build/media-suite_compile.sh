@@ -1556,9 +1556,6 @@ if [[ ! $x265 = n ]] && do_vcs "https://bitbucket.org/multicoreware/x265_git.git
     [[ $bits = 32bit ]] && assembly=-DENABLE_ASSEMBLY=OFF
     [[ $x265 = d ]] && xpsupport=-DWINXP_SUPPORT=ON
 
-    # Fix hg.bat using python2 still
-    grep_and_sed python2 /usr/bin/hg.bat 's/python2/python3/'
-
     build_x265() {
         create_build_dir
         local build_root=$PWD
@@ -1569,7 +1566,7 @@ if [[ ! $x265 = n ]] && do_vcs "https://bitbucket.org/multicoreware/x265_git.git
         extra_script pre cmake
         log "cmake" cmake "$(get_first_subdir -f)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
-        -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON -DHG_EXECUTABLE=/usr/bin/hg.bat \
+        -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON \
         -DENABLE_HDR10_PLUS=ON $xpsupport -DCMAKE_CXX_COMPILER="$LOCALDESTDIR/bin/g++.bat" \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" "$@"
         extra_script post cmake

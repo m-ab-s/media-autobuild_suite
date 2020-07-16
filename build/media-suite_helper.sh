@@ -119,7 +119,6 @@ vcs_get_default_ref() {
     case ${1:-$(vcs_get_current_type)} in
     git) echo "origin/HEAD" ;;
     svn) echo "HEAD" ;;
-    hg) echo "default" ;;
     *) echo "unknown" && return 1 ;;
     esac
 }
@@ -130,7 +129,6 @@ vcs_get_current_type() (
     for file in .*; do
         case $file in
         \.git) git rev-parse --is-inside-work-tree > /dev/null 2>&1 && echo "git" ;;
-        \.hg) hg id --id > /dev/null 2>&1 && echo "hg" ;;
         \.svn) svn info --depth empty > /dev/null 2>&1 && echo "svn" ;;
         *) false ;;
         esac && return 0
@@ -143,7 +141,6 @@ vcs_get_current_type() (
 check_valid_vcs() {
     case ${2:-$(vcs_get_current_type "${1:-$PWD}")} in
     git) [[ -d ${1:-$PWD}/.git ]] ;; # && git -C "${1:-$PWD}" fsck --no-progress ;;
-    hg) [[ -d ${1:-$PWD}/.hg ]] ;;   # && hg verify -q ;;
     svn) [[ -d ${1:-$PWD}/.svn ]] ;;
     *) return 1 ;;
     esac
@@ -153,7 +150,6 @@ check_valid_vcs() {
 vcs_get_current_head() {
     case ${2:-$(vcs_get_current_type "$1")} in
     git) git -C "${1:-$PWD}" rev-parse HEAD ;;
-    hg) hg -R "${1:-$PWD}" identify --id ;;
     svn) svn info --show-item last-changed-revision "${1:-$PWD}" ;;
     *) return 1 ;;
     esac
@@ -163,7 +159,6 @@ vcs_get_current_head() {
 vcs_test_remote() {
     case $2 in # Need to find a good way to detect remote vcs type. GitHub provides svn and git from the same url.
     git) GIT_TERMINAL_PROMPT=0 git ls-remote -q --refs "$1" > /dev/null 2>&1 ;;
-    hg) hg --noninteractive identify "$1" > /dev/null 2>&1 ;;
     svn) svn --non-interactive ls "$1" > /dev/null 2>&1 ;;
     *) return 1 ;;
     esac
@@ -173,7 +168,6 @@ vcs_clean() (
     cd "${1:-$PWD}" 2> /dev/null || return 1
     case ${2:-$(vcs_get_current_type "$1")} in
     git) GIT_TERMINAL_PROMPT=0 git clean -dffxq -e{recently_{updated,checked},build_successful{32,64}bit} "$@" ;;
-    hg) hg --noninteractive purge --config extensions.purge= -X{recently_{updated,checked},build_successful{32,64}bit} "$@" ;;
     svn) svn --non-interactive cleanup --remove-unversioned -q "$@" ;;
     *) false ;;
     esac
@@ -197,7 +191,6 @@ vcs_clone() (
         git clone "$vcsURL" "$vcsFolder-git"
         git -C "$vcsFolder-git" reset --hard "$ref"
         ;;
-    hg) hg --noninteractive clone -u "$ref" "$vcsURL" "$vcsFolder-hg" ;;
     svn) svn --non-interactive checkout -r "$ref" "$vcsURL" "$vcsFolder-svn" ;;
     *) return 1 ;;
     esac
@@ -215,7 +208,6 @@ vcs_reset() (
         git checkout --no-track -fB ab-suite
         git reset --hard "$(vcs_get_latest_tag "$1" git)"
         ;;
-    hg) hg update -C -r "$1" ;;
     svn) svn revert --recursive . ;;
     *) return 1 ;;
     esac
@@ -229,10 +221,6 @@ vcs_update() (
         git fetch -t $unshallow origin
         git reset --hard "$(vcs_get_latest_tag "$1" git)"
         ;;
-    hg)
-        hg pull
-        hg update -C -r "$1"
-        ;;
     svn) svn update -r "$1" ;;
     *) return 1 ;;
     esac
@@ -243,8 +231,6 @@ vcs_update() (
 vcs_log() {
     case ${3:-$(vcs_get_current_type)} in
     git) git log --no-merges --pretty="%ci: %an - %h%n    %s" "${1:-HEAD~5}".."${2:-HEAD}" ;;
-    hg) hg log --template '{date|localdate|isodatesec}: {author|person} - {node|short}\n    {desc|firstline}\n' \
-        -r "reverse(${1:--5}:${2:-tip})" ;;
     svn) ;; # No easy way to generate a svn changelog with the same format. Plus it's really only mplayer.
     # Maybe use svn log --xml and format xml
     *) return 1 ;;
