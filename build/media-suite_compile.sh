@@ -1051,7 +1051,7 @@ _check=(/opt/cargo/bin/cargo-c{build,api}.exe)
 if enabled librav1e &&
     do_vcs "https://github.com/lu-zero/cargo-c.git"; then
     # Delete any old cargo-cbuilds
-    log uninstall.cargo-c cargo uninstall -q cargo-c
+    [[ -x /opt/cargo/bin/cargo-cbuild.exe ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
     do_rustinstall
     do_checkIfExist
 fi
