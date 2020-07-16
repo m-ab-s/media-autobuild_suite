@@ -2048,10 +2048,71 @@ if [[ $ffmpeg != no ]]; then
     fi
 fi
 
+# static do_vcs just for svn
+do_svn() {
+    cd_safe "$LOCALBUILDDIR"
+    if [[ ! -d mplayer-svn/.svn ]]; then
+        rm -rf mplayer-svn
+        do_print_progress "  Running svn clone for mplayer"
+        svn_clone() (
+            set -x
+            svn --non-interactive checkout -r HEAD svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn &&
+                [[ -d mplayer-svn/.svn ]]
+        )
+        if svn --non-interactive ls svn://svn.mplayerhq.hu/mplayer/trunk > /dev/null 2>&1 &&
+            log -q "svn.clone" svn_clone; then
+            touch mplayer-svn/recently_{updated,checked}
+        else
+            echo "mplayer svn seems to be down"
+            echo "Try again later or <Enter> to continue"
+            do_prompt "if you're sure nothing depends on it."
+            return
+        fi
+        unset svn_clone
+    fi
+
+    cd_safe mplayer-svn
+
+    oldHead=$(svn info --show-item last-changed-revision .)
+    log -q "svn.reset" svn revert --recursive .
+    if ! [[ -f recently_checked && recently_checked -nt $LOCALBUILDDIR/last_run ]]; then
+        do_print_progress "  Running svn update for mplayer"
+        log -q "svn.update" svn update -r HEAD
+        newHead=$(svn info --show-item last-changed-revision .)
+        touch recently_checked
+    else
+        newHead="$oldHead"
+    fi
+
+    rm -f custom_updated
+    check_custom_patches
+
+    if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
+        touch recently_updated
+        rm -f ./build_successful{32,64}bit{,_*}
+        if [[ $build32$build64$bits == yesyes64bit ]]; then
+            new_updates="yes"
+            new_updates_packages="$new_updates_packages [mplayer]"
+        fi
+        printf 'mplayer\n' >> "$LOCALBUILDDIR"/newchangelog
+        do_print_status "┌ mplayer svn" "$orange" "Updates found"
+    elif [[ -f recently_updated && ! -f build_successful$bits ]]; then
+        do_print_status "┌ mplayer svn" "$orange" "Recently updated"
+    elif ! files_exist "${_check[@]}"; then
+        do_print_status "┌ mplayer svn" "$orange" "Files missing"
+    else
+        do_print_status "mplayer svn" "$green" "Up-to-date"
+        [[ ! -f recompile ]] &&
+            return 1
+        do_print_status "┌ mplayer svn" "$orange" "Forcing recompile"
+        do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
+    fi
+    return 0
+}
+
 _check=(bin-video/m{player,encoder}.exe)
-if [[ $mplayer = y ]] &&
-    do_vcs "svn::svn://svn.mplayerhq.hu/mplayer/trunk" mplayer; then
-    [[ $license != nonfree || $faac = n ]] && faac_opts=(--disable-faac)
+if [[ $mplayer = y ]] && do_svn; then
+    [[ $license != nonfree || $faac == n ]] && faac_opts=(--disable-faac)
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
     if [[ ! -d ffmpeg ]] &&
