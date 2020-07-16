@@ -62,7 +62,7 @@ For information about the compiler environment see the wiki, there you also have
         - libmodplug (mingw-w64)
         - libopencore-amr(nb/wb) (mingw-w64)
         - libopenjpeg2 (mingw-w64)
-        - libopenmpt (svn from beta release)
+        - libopenmpt (git tag)
         - libsnappy (mingw-w64)
         - libsoxr (git)
         - libspeex (mingw-w64)
@@ -112,7 +112,7 @@ For information about the compiler environment see the wiki, there you also have
         - libsvtvp9 (git) (using non-upstream patch)
         - libtesseract (git)
         - libvmaf (git)
-        - libxavs (svn snapshot)
+        - libxavs (git)
         - libxavs2 (git)
         - libzmq (mingw-w64)
         - libzvbi (0.2.35)
@@ -256,7 +256,7 @@ If there's some error during compilation follow these steps:
 
 `media-autobuild_suite.bat`
 
-- This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from svn/git.
+- This file sets up the msys2 system and the compiler environment. For normal use you only have to start this file. Every time you start this batch file it runs through the process, but after the first time it only checks some variables and run updates to the MinGW environment. After that it only compiles the tools that get updates from git.
 
 `/build/media-autobuild_suite.ini`
 

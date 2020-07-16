@@ -1186,7 +1186,7 @@ if %deleteSourceINI%==0 (
     echo. 1 = Yes [recommended]
     echo. 2 = No
     echo.
-    echo. This will save a bit of space for libraries not compiled from git/svn.
+    echo. This will save a bit of space for libraries not compiled from git.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------

@@ -114,201 +114,156 @@ test_newer() {
     return 1
 }
 
-# vcs_get_default_ref git
+# vcs_get_default_ref
+# no longer supports anything but git
 vcs_get_default_ref() {
-    case ${1:-$(vcs_get_current_type)} in
-    git) echo "origin/HEAD" ;;
-    svn) echo "HEAD" ;;
-    *) echo "unknown" && return 1 ;;
-    esac
+    echo "origin/HEAD"
 }
 
 # vcs_get_current_type /build/myrepo
-vcs_get_current_type() (
-    cd "${1:-$(get_first_subdir -f)}" 2> /dev/null || return 1
-    for file in .*; do
-        case $file in
-        \.git) git rev-parse --is-inside-work-tree > /dev/null 2>&1 && echo "git" ;;
-        \.svn) svn info --depth empty > /dev/null 2>&1 && echo "svn" ;;
-        *) false ;;
-        esac && return 0
-    done
+vcs_get_current_type() {
+    git -C "${1:-$PWD}" rev-parse --is-inside-work-tree > /dev/null 2>&1 &&
+        echo "git" &&
+        return 0
     echo "unknown"
     return 1
-)
+}
 
-# check_valid_vcs /build/ffmpeg-git git
+# check_valid_vcs /build/ffmpeg-git
 check_valid_vcs() {
-    case ${2:-$(vcs_get_current_type "${1:-$PWD}")} in
-    git) [[ -d ${1:-$PWD}/.git ]] ;; # && git -C "${1:-$PWD}" fsck --no-progress ;;
-    svn) [[ -d ${1:-$PWD}/.svn ]] ;;
-    *) return 1 ;;
-    esac
+    [[ -d ${1:-$PWD}/.git ]]
 }
 
-# vcs_get_current_head /build/ffmpeg-git git
+# vcs_get_current_head /build/ffmpeg-git
 vcs_get_current_head() {
-    case ${2:-$(vcs_get_current_type "$1")} in
-    git) git -C "${1:-$PWD}" rev-parse HEAD ;;
-    svn) svn info --show-item last-changed-revision "${1:-$PWD}" ;;
-    *) return 1 ;;
-    esac
+    git -C "${1:-$PWD}" rev-parse HEAD
 }
 
-# vcs_test_remote "svn://svn.mplayerhq.hu/mplayer/trunk" svn
+# vcs_test_remote "https://github.com/m-ab-s/media-autobuild_suite.git"
 vcs_test_remote() {
-    case $2 in # Need to find a good way to detect remote vcs type. GitHub provides svn and git from the same url.
-    git) GIT_TERMINAL_PROMPT=0 git ls-remote -q --refs "$1" > /dev/null 2>&1 ;;
-    svn) svn --non-interactive ls "$1" > /dev/null 2>&1 ;;
-    *) return 1 ;;
-    esac
+    GIT_TERMINAL_PROMPT=0 git ls-remote -q --refs "$1" > /dev/null 2>&1
 }
 
-vcs_clean() (
-    cd "${1:-$PWD}" 2> /dev/null || return 1
-    case ${2:-$(vcs_get_current_type "$1")} in
-    git) GIT_TERMINAL_PROMPT=0 git clean -dffxq -e{recently_{updated,checked},build_successful{32,64}bit} "$@" ;;
-    svn) svn --non-interactive cleanup --remove-unversioned -q "$@" ;;
+vcs_clean() {
+    GIT_TERMINAL_PROMPT=0 git -C "${1:-$PWD}" clean -dffxq -e{recently_{updated,checked},build_successful{32,64}bit} "$@"
+}
+
+# vcs_get_latest_tag "libopenmpt-*"
+vcs_get_latest_tag() {
+    if ! case $1 in
+    LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null ;;
+    GREATEST) git describe --abbrev=0 --tags 2> /dev/null ;;
+    *\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" 2> /dev/null ;;
     *) false ;;
-    esac
-)
+    esac then
+        echo "$1"
+    fi
+}
+
+# vcs_set_url https://github.com/FFmpeg/FFmpeg.git
+vcs_set_url() {
+    git remote set-url origin "$1"
+    git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+}
 
 # vcs_clone https://gitlab.com/libtiff/libtiff.git tiff v4.1.0
 vcs_clone() (
     set -x
-    vcsURL=$1 vcsFolder=$2 ref=$3 vcsType=${4:-git}
+    vcsURL=$1 vcsFolder=${2:-$(basename "$vcsURL" .git)}
     [[ -z $vcsURL ]] && return 1
-    : "${vcsFolder:=$(basename "$vcsURL" .git)}" "${ref:=$(vcs_get_default_ref "$vcsType")}"
 
-    check_valid_vcs "$vcsFolder-$vcsType" "$vcsType" && return 0
-    rm -rf "$vcsFolder-$vcsType"
-    case $vcsType in
-    git)
-        case $- in
-        *i*) unset GIT_TERMINAL_PROMPT ;;
-        *) export GIT_TERMINAL_PROMPT=0 ;;
-        esac
-        git clone "$vcsURL" "$vcsFolder-git"
-        git -C "$vcsFolder-git" reset --hard "$ref"
-        ;;
-    svn) svn --non-interactive checkout -r "$ref" "$vcsURL" "$vcsFolder-svn" ;;
-    *) return 1 ;;
+    check_valid_vcs "$vcsFolder-git" && return 0
+    rm -rf "$vcsFolder-git"
+    case $- in
+    *i*) unset GIT_TERMINAL_PROMPT ;;
+    *) export GIT_TERMINAL_PROMPT=0 ;;
     esac
-    check_valid_vcs "$vcsFolder-$vcsType" "$vcsType"
-)
-
-vcs_reset() (
-    set -x
-    case ${2:-$(vcs_get_current_type)} in
-    git)
-        git config remote.origin.url > /dev/null 2>&1 ||
-            [[ -n $vcsURL ]] && git remote set-url origin "$vcsURL"
-        git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-        git fetch --all -Ppft
-        git checkout --no-track -fB ab-suite
-        git reset --hard "$(vcs_get_latest_tag "$1" git)"
-        ;;
-    svn) svn revert --recursive . ;;
-    *) return 1 ;;
-    esac
-)
-
-vcs_update() (
-    set -x
-    case ${2:-$(vcs_get_current_type)} in
-    git)
-        [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow" || unshallow=''
-        git fetch -t $unshallow origin
-        git reset --hard "$(vcs_get_latest_tag "$1" git)"
-        ;;
-    svn) svn update -r "$1" ;;
-    *) return 1 ;;
-    esac
+    git clone "$vcsURL" "$vcsFolder-git"
+    git -C "$vcsFolder-git" reset --hard "${3:-origin/HEAD}"
+    check_valid_vcs "$vcsFolder-git"
 )
 
 # vcs_log d4996a600ca0334235a4b66beae5b5c3474535c4 81172b5e3ac0d3130ff7b639ed7efed5baa1195c
 # Defaults to last 5 commits
 vcs_log() {
-    case ${3:-$(vcs_get_current_type)} in
-    git) git log --no-merges --pretty="%ci: %an - %h%n    %s" "${1:-HEAD~5}".."${2:-HEAD}" ;;
-    svn) ;; # No easy way to generate a svn changelog with the same format. Plus it's really only mplayer.
-    # Maybe use svn log --xml and format xml
-    *) return 1 ;;
-    esac
+    git log --no-merges --pretty="%ci: %an - %h%n    %s" "${1:-HEAD~5}".."${2:-HEAD}"
 }
 
-# vcs_get_latest_tag "libopenmpt-*"
-vcs_get_latest_tag() (
-    if ! case ${2:-$(vcs_get_current_type)}/${1:-unknown} in
-    git/LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null ;;
-    git/GREATEST) git describe --abbrev=0 --tags 2> /dev/null ;;
-    git/*\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" 2> /dev/null ;;
-    *) false ;;
-    esac then
-        echo "$1"
-    fi
+vcs_get_merge_base() {
+    git merge-base HEAD "$(vcs_get_latest_tag "$1")"
+}
+
+vcs_reset() (
+    set -x
+    git checkout --no-track -fB ab-suite "$(vcs_get_latest_tag "$1")"
 )
 
-# do_mabs_clone "$vcsURL" "$vcsFolder" "$ref" "$vcsType"
+vcs_fetch() (
+    set -x
+    [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow" || unshallow=''
+    git fetch --all -Ppft $unshallow
+)
+
+# do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"
 # For internal use for fallback links
 do_mabs_clone() {
     {
-        vcs_test_remote "$1" "$4" &&
-            log -qe "$4.clone" vcs_clone "$1" "$2" "$3" "$4"
+        vcs_test_remote "$1" &&
+            log -qe git.clone vcs_clone "$1" "$2" "$3"
     } || {
-        vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}" git &&
-            log -qe "$4.clone" vcs_clone "https://gitlab.com/m-ab-s/${1##*/}" "$2" "$3" git
+        vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}" &&
+            log -qe git.clone vcs_clone "https://gitlab.com/m-ab-s/${1##*/}" "$2" "$3"
     }
-    check_valid_vcs "$2-$4" "$4"
+    check_valid_vcs "$2-git"
 }
 
 # get source from VCS
 # example:
 #   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
 do_vcs() {
-    local vcsType="${1%::*}" vcsURL="${1#*::}" vcsFolder="$2" vcsCheck=("${_check[@]}")
-    local vcsBranch="${vcsURL#*#}" ref
+    local vcsURL=${1#*::} vcsFolder=$2 vcsCheck=("${_check[@]}")
+    local vcsBranch=${vcsURL#*#} ref=origin/HEAD
     local deps=("${_deps[@]}") && unset _deps
-    [[ $vcsType == "$vcsURL" ]] && vcsType="git"
-    [[ $vcsBranch == "$vcsURL" ]] && vcsBranch=""
-    ref=$(vcs_get_default_ref "$vcsType")
-    vcsURL="${vcsURL%#*}"
+    [[ $vcsBranch == "$vcsURL" ]] && unset vcsBranch
+    vcsURL=${vcsURL%#*}
     : "${vcsFolder:=$(basename "$vcsURL" .git)}"
 
     if [[ -n $vcsBranch ]]; then
         ref=${vcsBranch##*=}
-        [[ $vcsType/${vcsBranch%%=*}/$ref == git/branch/${ref%/*} ]] && ref=origin/$ref
+        [[ ${vcsBranch%%=*}/$ref == branch/${ref%/*} ]] && ref=origin/$ref
     fi
 
     cd_safe "$LOCALBUILDDIR"
 
-    if ! check_valid_vcs "$vcsFolder-$vcsType" "$vcsType"; then
-        rm -rf "$vcsFolder-$vcsType"
-        do_print_progress "  Running $vcsType clone for $vcsFolder"
-        if do_mabs_clone "$vcsURL" "$vcsFolder" "$ref" "$vcsType"; then
-            touch "$vcsFolder-$vcsType"/recently_{updated,checked}
+    if ! check_valid_vcs "$vcsFolder-git"; then
+        rm -rf "$vcsFolder-git"
+        do_print_progress "  Running git clone for $vcsFolder"
+        if do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
+            touch "$vcsFolder-git"/recently_{updated,checked}
         else
-            echo "$vcsFolder $vcsType seems to be down"
+            echo "$vcsFolder git seems to be down"
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
             return
         fi
     fi
 
-    cd_safe "$vcsFolder-$vcsType"
+    cd_safe "$vcsFolder-git"
 
     if [[ $ffmpegUpdate == onlyFFmpeg && $vcsFolder != ffmpeg && $vcsFolder != mpv ]] &&
         files_exist "${vcsCheck[@]:-$vcsFolder.pc}"; then
-        do_print_status "${vcsFolder} ${vcsType}" "$green" "Already built"
+        do_print_status "${vcsFolder} git" "$green" "Already built"
         return 1
     fi
 
-    oldHead=$(vcs_get_current_head "$PWD" "$vcsType")
-    log -q "$vcsType.reset" vcs_reset "$ref"
+    vcs_set_url "$vcsURL"
+    log -q git.fetch vcs_fetch
+    oldHead=$(vcs_get_merge_base "$ref")
+
     if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
-        do_print_progress "  Running $vcsType update for $vcsFolder"
-        log -q "$vcsType.update" vcs_update "$ref"
-        newHead=$(vcs_get_current_head "$PWD" "$vcsType")
+        do_print_progress "  Running git update for $vcsFolder"
+        log -q git.reset vcs_reset "$ref"
+        newHead=$(vcs_get_current_head "$PWD")
         touch recently_checked
     else
         newHead="$oldHead"
@@ -329,20 +284,20 @@ do_vcs() {
             vcs_log "$oldHead" "$newHead"
             echo
         } >> "$LOCALBUILDDIR"/newchangelog
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Updates found"
+        do_print_status "┌ $vcsFolder git" "$orange" "Updates found"
     elif [[ -f recently_updated ]] &&
-        [[ ! -f build_successful$bits || -n $flavor && ! -f build_successful${bits}_${flavor} ]]; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Recently updated"
+        [[ ! -f build_successful$bits || -n $flavor && ! -f build_successful${bits}_$flavor ]]; then
+        do_print_status "┌ $vcsFolder git" "$orange" "Recently updated"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Files missing"
+        do_print_status "┌ $vcsFolder git" "$orange" "Files missing"
     elif [[ -n ${deps[*]} ]] && test_newer installed "${deps[@]}" "${vcsCheck[0]}"; then
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Newer dependencies"
+        do_print_status "┌ $vcsFolder git" "$orange" "Newer dependencies"
     else
-        do_print_status "${vcsFolder} ${vcsType}" "$green" "Up-to-date"
+        do_print_status "$vcsFolder git" "$green" "Up-to-date"
         [[ ! -f recompile ]] &&
             return 1
-        do_print_status "┌ ${vcsFolder} ${vcsType}" "$orange" "Forcing recompile"
-        do_print_status prefix "${bold}├${reset} " "Found recompile flag" "$orange" "Recompiling"
+        do_print_status "┌ $vcsFolder git" "$orange" "Forcing recompile"
+        do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
     fi
     return 0
 }

@@ -2049,7 +2049,7 @@ if [[ $ffmpeg != no ]]; then
 fi
 
 # static do_vcs just for svn
-do_svn() {
+check_mplayer_updates() {
     cd_safe "$LOCALBUILDDIR"
     if [[ ! -d mplayer-svn/.svn ]]; then
         rm -rf mplayer-svn
@@ -2111,7 +2111,7 @@ do_svn() {
 }
 
 _check=(bin-video/m{player,encoder}.exe)
-if [[ $mplayer = y ]] && do_svn; then
+if [[ $mplayer = y ]] && check_mplayer_updates; then
     [[ $license != nonfree || $faac == n ]] && faac_opts=(--disable-faac)
     do_uninstall "${_check[@]}"
     [[ -f config.mak ]] && log "distclean" make distclean
