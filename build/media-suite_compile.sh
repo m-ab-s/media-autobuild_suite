@@ -1909,6 +1909,9 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
 
+        grep -q SRTO_STRICTENC libavformat/libsrt.c &&
+            do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/1594533783-28695-1-git-send-email-mypopydev@gmail.com/mbox/" am
+
         # ((TEMPORARY SVT-VP9 MEASURES))
         # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
         if enabled libsvtvp9; then
