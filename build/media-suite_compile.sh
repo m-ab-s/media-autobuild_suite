@@ -1912,6 +1912,8 @@ if [[ $ffmpeg != no ]]; then
         grep -q SRTO_STRICTENC libavformat/libsrt.c &&
             do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/1594533783-28695-1-git-send-email-mypopydev@gmail.com/mbox/" am
 
+        do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-glslang-add-MachineIndependent.patch" am
+
         # ((TEMPORARY SVT-VP9 MEASURES))
         # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
         if enabled libsvtvp9; then
