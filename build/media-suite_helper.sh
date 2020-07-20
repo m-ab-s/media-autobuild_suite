@@ -450,11 +450,11 @@ do_extract() {
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
     if [[ $dirName != "." && -d $dirName ]]; then
-        if [[ $build32 == "yes" ]] &&
-            [[ ! -f "$dirName"/build_successful32bit || -n $flavor && ! -f "$dirName/build_successful32bit_${flavor}" ]]; then
+        if [[ $build32 == "yes" &&
+            ! -f "$dirName/build_successful32bit${flavor:+_$flavor}" ]]; then
             rm -rf "$dirName"
-        elif [[ $build64 == "yes" ]] &&
-            [[ ! -f "$dirName"/build_successful64bit || -n $flavor && ! -f "$dirName/build_successful64bit_${flavor}" ]]; then
+        elif [[ $build64 == "yes" &&
+            ! -f "$dirName/build_successful64bit${flavor:+_$flavor}" ]]; then
             rm -rf "$dirName"
         fi
     elif [[ -d $dirName ]]; then
