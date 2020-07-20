@@ -476,7 +476,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     if do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
         do_pacman_install libjpeg-turbo xz zlib zstd
         do_uninstall "${_check[@]}"
-        do_patch "https://gist.githubusercontent.com/1480c1/03d92119a4beaf1fda5eb95effb14419/raw/0001-tiffgt-Link-winmm-if-windows.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0001-tiffgt-Link-winmm-if-windows.patch" am
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
             '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
         CFLAGS+=" -DFREEGLUT_STATIC" do_cmakeinstall global -D{webp,jbig,UNIX}=OFF
@@ -743,8 +743,8 @@ if [[ $standalone = y ]] && enabled libopus; then
     _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
     if do_vcs "https://github.com/xiph/opusfile.git"; then
         do_uninstall "${_check[@]}"
-        do_patch "https://gist.githubusercontent.com/1480c1/beb86dbd8f79e3c1e06d6e9053804f52/raw/0001-Disable-cert-store-integration-if-OPENSSL_VERSION_NU.patch" am
-        do_patch "https://gist.githubusercontent.com/1480c1/beb86dbd8f79e3c1e06d6e9053804f52/raw/0002-configure-Only-add-std-c89-if-not-mingw-because-of-c.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/opusfile/0001-Disable-cert-store-integration-if-OPENSSL_VERSION_NU.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/opusfile/0002-configure-Only-add-std-c89-if-not-mingw-because-of-c.patch" am
         do_autogen
         do_separate_confmakeinstall --disable-{examples,doc}
         do_checkIfExist
@@ -931,11 +931,7 @@ if { { [[ $ffmpeg != no ]] &&
     enabled openal; } || mpv_enabled openal; } &&
     do_vcs "https://github.com/kcat/openal-soft.git"; then
     do_uninstall "${_check[@]}"
-    #_mingw_patches=https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-openal
-    #do_patch "$_mingw_patches/0003-openal-not-32.mingw.patch"
-    #do_patch "$_mingw_patches/0004-disable-OSS-windows.patch"
-    #do_patch "https://gist.githubusercontent.com/1480c1/3857c205b7f63de3b21135307b2f2d4f/raw/0003-Fix-winmm-inclusion-in-pkgconfig.patch"
-    do_patch "https://github.com/m-ab-s/media-autobuild_suite/files/4777022/patch_openal.diff.txt"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch"
     do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
     sed -i 's/Libs.private.*/& -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
     do_checkIfExist
@@ -1490,7 +1486,7 @@ if [[ $x264 != no ]]; then
             if do_vcs "https://github.com/FFMS/ffms2.git"; then
                 do_uninstall "${_check[@]}"
                 sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
-                do_patch "https://gist.githubusercontent.com/1480c1/8881966fa8151bc5e17d5a898b2d447f/raw/0001-ffmsindex-fix-linking-issues.patch" am
+                do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffms2/0001-ffmsindex-fix-linking-issues.patch" am
                 mkdir -p src/config
                 do_autoreconf
                 do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg"
@@ -1769,11 +1765,11 @@ _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
 if [[ $bits = 64bit && $vvc = y ]] &&
     do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/VVCSoftware_VTM.git" vvc; then
     do_uninstall bin-video/vvc
-    do_patch "https://gist.githubusercontent.com/1480c1/36ad70c1acbfdfdd2652caf07aa3508f/raw/0001-BBuildEnc.cmake-Remove-Werror-for-gcc-and-clang.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0001-BBuildEnc.cmake-Remove-Werror-for-gcc-and-clang.patch" am
     # patch for easier install of apps
     # probably not of upstream's interest because of how experimental the codec is
-    do_patch "https://gist.githubusercontent.com/1480c1/36ad70c1acbfdfdd2652caf07aa3508f/raw/cmake-allow-installing-apps.patch" am
-    do_patch "https://gist.githubusercontent.com/1480c1/36ad70c1acbfdfdd2652caf07aa3508f/raw/0001-CMake-add-USE_CCACHE-variable-to-disable-using-found.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0002-cmake-allow-installing-apps.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0003-CMake-add-USE_CCACHE-variable-to-disable-using-found.patch" am
     _notrequired=true
     # install to own dir because the binaries' names are too generic
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
@@ -1912,7 +1908,7 @@ if [[ $ffmpeg != no ]]; then
         grep -q SRTO_STRICTENC libavformat/libsrt.c &&
             do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/1594533783-28695-1-git-send-email-mypopydev@gmail.com/mbox/" am
 
-        do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-glslang-add-MachineIndependent.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-add-MachineIndependent.patch" am
 
         # ((TEMPORARY SVT-VP9 MEASURES))
         # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
@@ -1955,19 +1951,17 @@ if [[ $ffmpeg != no ]]; then
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
         enabled vapoursynth &&
-            do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-Add-Alternative-VapourSynth-demuxer.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-Add-Alternative-VapourSynth-demuxer.patch" am
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
-            do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-configure-deduplicate-linking-flags.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
 
-        if enabled openal; then
-            do_patch "https://gist.githubusercontent.com/1480c1/18f251a03b7657241c98cc8baf93a223/raw/0001-openal-use-check_pkg_config.patch" ||
-                {
-                    do_removeOption "--enable-openal"
-                    do_removeOption FFMPEG_OPTS_SHARED "--enable-openal"
-                }
+        if enabled openal &&
+            ! do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-openal-use-check_pkg_config.patch" am; then
+            do_removeOption "--enable-openal"
+            do_removeOption FFMPEG_OPTS_SHARED "--enable-openal"
         fi
 
         _patches=$(git rev-list origin/master.. --count)
@@ -2103,8 +2097,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_pacman_remove luajit lua51
         do_uninstall include/luajit-2.1 lib/lua "${_check[@]}"
         [[ -f src/luajit.exe ]] && log "clean" make clean
-        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0001-Add-win32-UTF-8-filesystem-functions.patch" am
-        do_patch "https://gist.githubusercontent.com/1480c1/71bbcf94bb0994647c622c4b710ac3cf/raw/0002-win32-UTF-8-Remove-va-arg-and-.-and-unused-functions.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/LuaJIT/0001-Add-win32-UTF-8-filesystem-functions.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/LuaJIT/0002-win32-UTF-8-Remove-va-arg-and-.-and-unused-functions.patch" am
         do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-luajit/002-fix-pkg-config-file.patch"
         sed -i "s|export PREFIX= /usr/local|export PREFIX=${LOCALDESTDIR}|g" Makefile
         sed -i "s|^prefix=.*|prefix=$LOCALDESTDIR|" etc/luajit.pc
@@ -2470,7 +2464,7 @@ if [[ $vlc == y ]]; then
         do_uninstall include/QtCore share/mkspecs "${_check[@]}"
         vcs_clean "$PWD" git
         # Enable ccache on !unix and use cygpath to fix certain issues
-        do_patch "http://gist.githubusercontent.com/1480c1/65512f45c343919299697aa778dc50b8/raw/0001-qtbase-mabs.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0001-qtbase-mabs.patch" am
         grep_and_sed " create_libtool" mkspecs/features/qt_module.prf \
             "s/ create_libtool/ -create_libtool/g"
         QT5Base_config=(
@@ -2659,7 +2653,6 @@ fi
 _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
     _notrequired=true
-    do_patch https://0x0.st/zM5A.patch
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
