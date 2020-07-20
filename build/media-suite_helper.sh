@@ -1651,7 +1651,7 @@ do_pacman_remove() {
     local pkg msyspackage=false pkgs
     while true; do
         case "$1" in
-        -m) msyspackage=true ;;
+        -m) msyspackage=true && shift;;
         *) break ;;
         esac
     done
