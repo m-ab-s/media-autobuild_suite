@@ -286,7 +286,7 @@ do_vcs() {
         } >> "$LOCALBUILDDIR"/newchangelog
         do_print_status "┌ $vcsFolder git" "$orange" "Updates found"
     elif [[ -f recently_updated ]] &&
-        [[ ! -f build_successful$bits || -n $flavor && ! -f build_successful${bits}_$flavor ]]; then
+        [[ ! -f build_successful$bits${flavor:+_$flavor} ]]; then
         do_print_status "┌ $vcsFolder git" "$orange" "Recently updated"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ $vcsFolder git" "$orange" "Files missing"
