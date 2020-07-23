@@ -2361,7 +2361,6 @@ if [[ $cyanrip = y ]]; then
     _deps=(libneon.a libxml2.a)
     _check=(musicbrainz5/mb5_c.h libmusicbrainz5{,cc}.{a,pc})
     if do_vcs "https://github.com/wiiaboo/libmusicbrainz.git"; then
-        do_patch "https://github.com/wiiaboo/libmusicbrainz/pull/2.patch"
         do_uninstall "${_check[@]}" include/musicbrainz5
         do_cmake -G "MSYS Makefiles"
         do_makeinstall
