@@ -2344,9 +2344,7 @@ if [[ $cyanrip = y ]]; then
     sed -ri 's;-R[^ ]*;;g' "$MINGW_PREFIX/lib/pkgconfig/libcdio.pc"
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
-    if do_pkgConfig "neon = 0.30.2" &&
-        do_vcs "https://github.com/notroj/neon.git"; then
-        do_patch "https://github.com/notroj/neon/pull/34.patch" am
+    if do_vcs "https://github.com/notroj/neon.git"; then
         do_uninstall include/neon "${_check[@]}"
         do_autogen
         do_separate_confmakeinstall --disable-{nls,debug,webdav}
