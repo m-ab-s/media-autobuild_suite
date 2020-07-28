@@ -1903,9 +1903,6 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
 
-        grep -q SRTO_STRICTENC libavformat/libsrt.c &&
-            do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/1594533783-28695-1-git-send-email-mypopydev@gmail.com/mbox/" am
-
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-add-MachineIndependent.patch" am
 
         # ((TEMPORARY SVT-VP9 MEASURES))
@@ -1917,16 +1914,6 @@ if [[ $ffmpeg != no ]]; then
                 do_print_progress "Until an upstream fix is issued, libsvtav1 must be disabled when compiling with libsvtvp9."
         fi
         # (/(TEMPORARY SVT-VP9 MEASURES))
-
-        # ((TEMPORARY SVT-AV1 MEASURES))
-        # Reasons for this codeblock = https://github.com/OpenVisualCloud/SVT-AV1/issues/567
-        if enabled libsvtav1; then
-            enabled libaom && do_removeOption --enable-libaom &&
-                do_print_progress "Until an upstream fix is issued, libaom must be disabled when compiling with libsvtav1."
-            enabled libopencore-amrwb && do_removeOption --enable-libopencore-amrwb &&
-                do_print_progress "Until an upstream fix is issued, libopencore-amrwb must be disabled when compiling with libsvtav1."
-        fi
-        # (/(TEMPORARY SVT-AV1 MEASURES))
 
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
