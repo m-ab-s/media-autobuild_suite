@@ -2132,10 +2132,10 @@ compare_with_zeranoe() {
         [[ -f $custom32 ]] || custom32="$custom"
         [[ -f $custom64 ]] || custom64="$custom"
         if [[ -f $custom32 ]]; then
-            IFS=$'\n' read -d '' -r -a localopts32 < <(do_readoptionsfile "$custom32")
+            IFS=$'\n' read -d '' -r localopts32 < <(do_readoptionsfile "$custom32")
         fi
         if [[ -f $custom64 ]]; then
-            IFS=$'\n' read -d '' -r -a localopts64 < <(do_readoptionsfile "$custom64")
+            IFS=$'\n' read -d '' -r localopts64 < <(do_readoptionsfile "$custom64")
         fi
     else
         IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat

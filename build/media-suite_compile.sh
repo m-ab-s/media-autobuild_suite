@@ -361,7 +361,7 @@ if [[ $curl = libressl ]] || { [[ $ffmpeg != no ]] && enabled libtls; }; then
     [[ $standalone = y ]] && _check+=(bin-global/openssl.exe)
     if do_vcs "https://github.com/libressl-portable/portable.git#tag=LATEST" libressl; then
         do_uninstall etc/ssl include/openssl "${_check[@]}"
-        _sed=man
+        _sed="man"
         [[ $standalone = y ]] || _sed="apps tests $_sed"
         sed -ri "s;(^SUBDIRS .*) $_sed;\1;" Makefile.am
         do_autogen
