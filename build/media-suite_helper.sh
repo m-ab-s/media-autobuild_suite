@@ -2013,6 +2013,8 @@ create_cmake_toolchain() {
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
         "SET(PKG_CONFIG_EXECUTABLE $_win_path_LOCALDESTDIR/bin/ab-pkg-config-static.bat)"
+        "SET(CMAKE_BUILD_TYPE Release)"
+        "SET(BUILD_SHARED_LIBS OFF)"
     )
 
     mkdir -p "$LOCALDESTDIR"/etc > /dev/null 2>&1
