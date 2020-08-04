@@ -1966,6 +1966,7 @@ else
     run_pkgcfg $static $base_args $libs_args "$@"
 fi
 EOF
+    mkdir -p "$LOCALDESTDIR"/bin > /dev/null 2>&1
     [[ -f "$LOCALDESTDIR"/bin/ab-pkg-config ]] &&
         diff -q <(printf '%s' "$script_file") "$LOCALDESTDIR"/bin/ab-pkg-config > /dev/null ||
         printf '%s' "$script_file" > "$LOCALDESTDIR"/bin/ab-pkg-config
@@ -1982,6 +1983,7 @@ create_ab_ccache() {
         ccache_path="$(command -v ccache)"
         ccache_win_path=$(cygpath -m "$ccache_path")
     fi
+    mkdir -p "$LOCALDESTDIR"/bin > /dev/null 2>&1
     for bin in {$MINGW_CHOST-,}{gcc,g++} clang{,++} cc cpp c++; do
         type "$bin" > /dev/null 2>&1 || continue
         cat << EOF > "$temp_file"
@@ -2012,6 +2014,7 @@ create_cmake_toolchain() {
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
     )
 
+    mkdir -p "$LOCALDESTDIR"/etc > /dev/null 2>&1
     [[ -f "$LOCALDESTDIR"/etc/toolchain.cmake ]] &&
         diff -q <(printf '%s\n' "${toolchain_file[@]}") "$LOCALDESTDIR"/etc/toolchain.cmake > /dev/null ||
         printf '%s\n' "${toolchain_file[@]}" > "$LOCALDESTDIR"/etc/toolchain.cmake
