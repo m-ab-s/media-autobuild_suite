@@ -277,9 +277,8 @@ if [[ $mplayer = y || $mpv = y ]] ||
     _check=(libharfbuzz.{,l}a harfbuzz.pc)
     if [[ $ffmpeg != sharedlibs ]] && do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
         do_pacman_install ragel
-        NOCONFIGURE=y do_autogen
         do_uninstall include/harfbuzz "${_check[@]}"
-        do_separate_confmakeinstall --with-{icu,glib,gobject,cairo,fontconfig,uniscribe}=no
+        do_mesoninstall -D{glib,gobject,cairo,fontconfig,icu,tests,introspection,docs,benchmark}=disabled
         # directwrite shaper doesn't work with mingw headers, maybe too old
         do_checkIfExist
     fi
