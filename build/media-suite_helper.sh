@@ -202,6 +202,7 @@ vcs_fetch() (
     set -x
     [[ -f $(git rev-parse --git-dir)/shallow ]] && unshallow="--unshallow" || unshallow=''
     git fetch --all -Ppft $unshallow
+    git remote set-head -a origin
 )
 
 # do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"
