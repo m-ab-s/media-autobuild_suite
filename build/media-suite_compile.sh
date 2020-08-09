@@ -2258,8 +2258,10 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_checkIfExist
     fi
 
-    _check=(bin-video/mpv.{exe,com})
+    _check=()
+    ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
     mpv_enabled libmpv-shared && _check+=(bin-video/mpv-1.dll)
+    mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
         hide_conflicting_libs
