@@ -398,13 +398,24 @@ Beware as they may change in the future.
 
 ### This is for cuda-nvcc and libnpp, not for NVENC, it is built with ffmpeg by default
 
-For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide and VS2017 installed which should come with vswhere.exe. If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute cygpath-converted path to MSVC's `cl.exe`.
+For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide (Usually set by default on CUDA SDK install) and VS2017 or better installed which should come with `vswhere.exe`.\
+If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute `cygpath` converted path to MSVC's `cl.exe`.
 
-### You do not need to do the following if you installed the SDK with the default locations etc
+### You do not need to do the following if you installed the SDK with the default locations etc and you have 8.3 short paths enabled or if you installed to a directory without any spaces
+
+If you did not understand any of the words above, assume the best and hope the compilation will succeed the first time, else try reinstalling the SDK and MSVC to a path without any spaces.
+
+You will only need to be worried if running the following command in the mintty terminal produces a path with a space or if you have 8.3 short paths disabled.
+
+```bash
+cygpath -sm "$CUDA_PATH"
+```
+
+If running the above command produces a path with a space, you will need to either disable cuda/npp stuff or reinstall your cuda sdk to a path without spaces.
 
 ### Nothing should be disabled manually when installing CUDA SDK as disabling random things can cause the compilation to fail
 
-For example, if you need to manually set the CUDA_PATH and include in the PATH the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
+For example, if you need to manually set the `CUDA_PATH` and include in the `PATH` the binaries for MSVC `cl.exe` and `nvcc.exe`, add this bit of bash script inside a text file in `/local64/etc/custom_profile`:
 
 ```bash
 # adapt these to your environment

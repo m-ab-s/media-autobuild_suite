@@ -886,6 +886,12 @@ do_changeFFmpegConfig() {
             echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
             local fixed_CUDA_PATH
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
+            if [[ $fixed_CUDA_PATH != "${fixed_CUDA_PATH// /}" ]]; then
+                do_simple_print "${orange}Spaces detected in the short path returned by your system"'!'"${reset}"
+                do_simple_print "Path returned by windows: ${bold}$fixed_CUDA_PATH${reset}"
+                do_simple_print "${red}This will break FFmpeg compilation, so aborting early"'!'"${reset}"
+                logging=n compilation_fail "do_changeFFmpegConfig"
+            fi
             do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
             do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
         fi
