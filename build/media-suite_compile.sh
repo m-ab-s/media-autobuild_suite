@@ -931,7 +931,7 @@ if { { [[ $ffmpeg != no ]] &&
     enabled openal; } || mpv_enabled openal; } &&
     do_vcs "https://github.com/kcat/openal-soft.git"; then
     do_uninstall "${_check[@]}"
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch" am
     do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
     sed -i 's/Libs.private.*/& -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
     do_checkIfExist
