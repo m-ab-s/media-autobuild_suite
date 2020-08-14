@@ -151,11 +151,11 @@ vcs_clean() {
 # vcs_get_latest_tag "libopenmpt-*"
 vcs_get_latest_tag() {
     if ! case $1 in
-    LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null ;;
-    GREATEST) git describe --abbrev=0 --tags 2> /dev/null ;;
-    *\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" 2> /dev/null ;;
-    *) false ;;
-    esac then
+        LATEST) git describe --abbrev=0 --tags "$(git rev-list --tags --max-count=1)" 2> /dev/null ;;
+        GREATEST) git describe --abbrev=0 --tags 2> /dev/null ;;
+        *\**) git describe --abbrev=0 --tags "$(git tag -l "$1" --sort=-version:refname | head -1)" 2> /dev/null ;;
+        *) false ;;
+        esac then
         echo "$1"
     fi
 }
@@ -451,11 +451,11 @@ do_extract() {
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
     if [[ $dirName != "." && -d $dirName ]]; then
-        if [[ $build32 == "yes" &&
-            ! -f "$dirName/build_successful32bit${flavor:+_$flavor}" ]]; then
+        if [[ $build32 == "yes" && ! -f \
+            "$dirName/build_successful32bit${flavor:+_$flavor}" ]]; then
             rm -rf "$dirName"
-        elif [[ $build64 == "yes" &&
-            ! -f "$dirName/build_successful64bit${flavor:+_$flavor}" ]]; then
+        elif [[ $build64 == "yes" && ! -f \
+            "$dirName/build_successful64bit${flavor:+_$flavor}" ]]; then
             rm -rf "$dirName"
         fi
     elif [[ -d $dirName ]]; then
@@ -1599,7 +1599,7 @@ do_pacman_remove() {
     local pkg msyspackage=false pkgs
     while true; do
         case "$1" in
-        -m) msyspackage=true && shift;;
+        -m) msyspackage=true && shift ;;
         *) break ;;
         esac
     done
