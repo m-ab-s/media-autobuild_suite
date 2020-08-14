@@ -887,8 +887,24 @@ do_changeFFmpegConfig() {
             local fixed_CUDA_PATH
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             if [[ $fixed_CUDA_PATH != "${fixed_CUDA_PATH// /}" ]]; then
-                do_simple_print "${orange}Spaces detected in the CUDA path"'!'" Please install CUDA SDK in a path without spaces.${reset}"
+                # Assumes CUDA_PATH backwards is version/CUDA/NVIDIA GPU Computing Toolkit/rest of the path
+                # Strips the onion to the rest of the path
+                {
+                    cat << EOF
+@echo off
+fltmc > NUL 2>&1 || echo Elevation required, right click the script and click 'Run as administrator'. & echo/ & pause & exit /b 1
+cd /d "$(dirname "$(dirname "$(dirname "$(cygpath -sw "$CUDA_PATH")")")")"
+EOF
+                    # Generate up to 4 shortnames
+                    for _n in 1 2 3 4; do
+                        printf 'fsutil file setshortname "NVIDIA GPU Computing Toolkit" NVIDIA~%d || ' "$_n"
+                    done
+                    echo 'echo Failed to set a shortname for your CUDA_PATH'
+                } > "$LOCALBUILDDIR/cuda.bat"
+                do_simple_print "${orange}Spaces detected in the CUDA path"'!'"$reset"
                 do_simple_print "Path returned by windows: ${bold}$fixed_CUDA_PATH${reset}"
+                do_simple_print "A script was created at $(cygpath -m "$LOCALBUILDDIR/cuda.bat")"
+                do_simple_print "Please run that script as an administrator and rerun the suite"
                 do_simple_print "${red}This will break FFmpeg compilation, so aborting early"'!'"${reset}"
                 logging=n compilation_fail "do_changeFFmpegConfig"
             fi
