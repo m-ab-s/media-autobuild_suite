@@ -887,7 +887,7 @@ do_changeFFmpegConfig() {
             local fixed_CUDA_PATH
             fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
             if [[ $fixed_CUDA_PATH != "${fixed_CUDA_PATH// /}" ]]; then
-                do_simple_print "${orange}Spaces detected in the short path returned by your system"'!'"${reset}"
+                do_simple_print "${orange}Spaces detected in the CUDA path"'!'" Please install CUDA SDK in a path without spaces.${reset}"
                 do_simple_print "Path returned by windows: ${bold}$fixed_CUDA_PATH${reset}"
                 do_simple_print "${red}This will break FFmpeg compilation, so aborting early"'!'"${reset}"
                 logging=n compilation_fail "do_changeFFmpegConfig"
