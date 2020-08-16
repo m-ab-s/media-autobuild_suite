@@ -1803,7 +1803,7 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
         do_install d3d{kmthk,ukmdt}.h include/
     cd_safe "$(get_first_subdir -f)"
     do_print_progress "Building Vulkan-Loader"
-    do_cmakeinstall -DBUILD_TESTS=OFF -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
+    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
     -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
     -DENABLE_STATIC_LOADER=ON -DUNIX=OFF
     do_checkIfExist
