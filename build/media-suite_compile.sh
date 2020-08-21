@@ -1070,42 +1070,16 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
 
     # C lib
     if [[ $libavif = y ]] || enabled librav1e; then
-        old_cpath=$CPATH
-        old_libpath=$LIBRARY_PATH
-        CPATH=$(cygpath -m "$LOCALDESTDIR/include" "$MINGW_PREFIX/include" "$MINGW_PREFIX/$MINGW_CHOST/include" | tr '\n' ' ')
-        LIBRARY_PATH=$(cygpath -m "$LOCALDESTDIR/lib" "$MINGW_PREFIX/lib" "$MINGW_PREFIX/$MINGW_CHOST/lib" | tr '\n' ' ')
-        export CPATH LIBRARY_PATH
-
         rm -f "$CARGO_HOME/config" 2> /dev/null
         log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" capi install \
-            --release --prefix "$PWD/install-$bits" --jobs "$cpuCount"
-
-        mapfile -t compiler_builtins < <(
-            for a in ___chkstk_ms __udivmoddi4 __divmoddi4 __udivti3; do
-                nm -CAg --defined-only "install-$bits/lib/librav1e.a" | grep -- "$a" | cut -d: -f2
-            done | sort -u
-        )
-        ar x "install-$bits/lib/librav1e.a" "${compiler_builtins[@]}"
-        # Just weaken the whole object, the symbols probably exist in libgcc
-        for compiler_builtin in "${compiler_builtins[@]}"; do
-            objcopy --weaken "$compiler_builtin"
-        done
-        ar r "install-$bits/lib/librav1e.a" "${compiler_builtins[@]}"
-        rm "${compiler_builtins[@]}"
-
-        (
-            _rav1e_install_win_path=$(cygpath -m "$PWD/install-$bits")
-            _rav1e_dest_win_path=$(cygpath -m "$LOCALDESTDIR")
-            grep_and_sed "$_rav1e_install_win_path" "install-$bits/lib/pkgconfig/rav1e.pc" "s#$_rav1e_install_win_path#$_rav1e_dest_win_path#"
-        )
+            --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR" \
+            --destdir="$PWD/install-$bits"
 
         # do_install "install-$bits/bin/rav1e.dll" bin-video/
         # do_install "install-$bits/lib/librav1e.dll.a" lib/
-        do_install "install-$bits/lib/librav1e.a" lib/
-        do_install "install-$bits/lib/pkgconfig/rav1e.pc" lib/pkgconfig/
-        do_install "install-$bits/include/rav1e"/*.h include/rav1e/
-        export CPATH=$old_cpath LIBRARY_PATH=$old_libpath
-        unset old_cpath old_libpath
+        do_install "$(find install-64bit/ -name "librav1e.a")" lib/
+        do_install "$(find install-64bit/ -name "rav1e.pc")" lib/pkgconfig/
+        do_install "$(find install-64bit/ -name "rav1e")"/*.h include/rav1e/
     fi
 
     do_checkIfExist
