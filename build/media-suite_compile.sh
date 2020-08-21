@@ -55,6 +55,7 @@ while true; do
     --ripgrep=* ) ripgrep=${1#*=} && shift ;;
     --rav1e=* ) rav1e=${1#*=} && shift ;;
     --dav1d=* ) dav1d=${1#*=} && shift ;;
+    --libavif=* ) libavif=${1#*=} && shift ;;
     --vvc=* ) vvc=${1#*=} && shift ;;
     --jq=* ) jq=${1#*=} && shift ;;
     --jo=* ) jo=${1#*=} && shift ;;
@@ -1056,8 +1057,8 @@ _check=()
 { [[ $rav1e = y ]] ||
     enabled librav1e && [[ $standalone = y ]]; } &&
     _check+=(bin-video/rav1e.exe)
-enabled librav1e && _check+=(librav1e.a rav1e.pc rav1e/rav1e.h)
-if { [[ $rav1e = y ]] || enabled librav1e; } &&
+{ enabled librav1e || [[ $libavif = y ]]; } && _check+=(librav1e.a rav1e.pc rav1e/rav1e.h)
+if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     do_vcs "https://github.com/xiph/rav1e.git"; then
     do_uninstall "${_check[@]}" include/rav1e
 
@@ -1068,7 +1069,7 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
     fi
 
     # C lib
-    if enabled librav1e; then
+    if [[ $libavif = y ]] || enabled librav1e; then
         old_cpath=$CPATH
         old_libpath=$LIBRARY_PATH
         CPATH=$(cygpath -m "$LOCALDESTDIR/include" "$MINGW_PREFIX/include" "$MINGW_PREFIX/$MINGW_CHOST/include" | tr '\n' ' ')
@@ -1107,6 +1108,26 @@ if { [[ $rav1e = y ]] || enabled librav1e; } &&
         unset old_cpath old_libpath
     fi
 
+    do_checkIfExist
+fi
+
+_check=(libavif.{a,pc} avif/avif.h)
+[[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
+if [[ $libavif = y ]] && {
+        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
+    } &&
+    do_vcs "https://github.com/AOMediaCodec/libavif.git"; then
+    do_uninstall "${_check[@]}"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libavif/0001-CMake-Use-the-import-libraries-and-the-proper-variab.patch" am
+    extracommands=()
+    pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
+    pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
+    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
+    case $standalone in
+    y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
+    *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
+    esac
+    do_cmakeinstall video "${extracommands[@]}"
     do_checkIfExist
 fi
 

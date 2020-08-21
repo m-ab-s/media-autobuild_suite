@@ -148,7 +148,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 redshift ^
-rav1e ripgrep dav1d vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc ^
+rav1e ripgrep dav1d libavif vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc ^
 jo vlc CC
 
 set deleteIni=0
@@ -336,6 +336,29 @@ if %builddav1d%==1 set "dav1d=y"
 if %builddav1d%==2 set "dav1d=n"
 if %builddav1d% GTR 2 GOTO dav1d
 if %deleteINI%==1 echo.dav1d=^%builddav1d%>>%ini%
+
+:libavif
+if %libavifINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build libavif [AV1 image format encoder and decoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo. Will require libaom, but will use rav1e or dav1d if present
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildlibavif="Build libavif: "
+) else set buildlibavif=%libavifINI%
+
+if "%buildlibavif%"=="" GOTO libavif
+if %buildlibavif%==1 set "libavif=y"
+if %buildlibavif%==2 set "libavif=n"
+if %buildlibavif% GTR 2 GOTO libavif
+if %deleteINI%==1 echo.libavif=^%buildlibavif%>>%ini%
 
 :x264
 if %x2643INI%==0 (
@@ -1654,7 +1677,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
---vlc=%vlc%
+--vlc=%vlc% --libavif=%libavif%
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
