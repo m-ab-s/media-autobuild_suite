@@ -1924,9 +1924,13 @@ if [[ $ffmpeg != no ]]; then
         fi
 
         if enabled openal &&
-            ! do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-openal-use-check_pkg_config.patch" am; then
-            do_removeOption "--enable-openal"
-            do_removeOption FFMPEG_OPTS_SHARED "--enable-openal"
+            pc_exists "openal"; then
+            OPENAL_LIBS=$($PKG_CONFIG --libs openal)
+            export OPENAL_LIBS
+            for _openal_flag in $($PKG_CONFIG --cflags openal); do
+                do_addOption "--extra-cflags=$_openal_flag"
+            done
+            unset _openal_flag
         fi
 
         _patches=$(git rev-list origin/master.. --count)
