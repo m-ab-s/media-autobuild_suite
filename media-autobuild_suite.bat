@@ -126,7 +126,7 @@ libopenmpt version3 librav1e libsrt libgsm libvmaf
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
 libcdio libfdk-aac libflite libfribidi libgme libilbc libsvthevc libsvtav1 ^
-#libsvtvp9 libkvazaar libmodplug librtmp librubberband #libssh libtesseract libxavs ^
+libsvtvp9 libkvazaar libmodplug librtmp librubberband #libssh libtesseract libxavs ^
 libzmq libzvbi openal libcodec2 ladspa #vapoursynth #liblensfun ^
 libglslang vulkan
 

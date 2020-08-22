@@ -1899,16 +1899,6 @@ if [[ $ffmpeg != no ]]; then
 
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-add-MachineIndependent.patch" am
 
-        # ((TEMPORARY SVT-VP9 MEASURES))
-        # Reasons for this codeblock = https://github.com/m-ab-s/media-autobuild_suite/pull/1619#issuecomment-616206347
-        if enabled libsvtvp9; then
-            enabled libxvid && do_removeOption --enable-libxvid &&
-                do_print_progress "Until an upstream fix is issued, libxvid must be disabled when compiling with libsvtvp9."
-            enabled libsvtav1 && do_removeOption --enable-libsvtav1 &&
-                do_print_progress "Until an upstream fix is issued, libsvtav1 must be disabled when compiling with libsvtvp9."
-        fi
-        # (/(TEMPORARY SVT-VP9 MEASURES))
-
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
