@@ -347,7 +347,7 @@ if %libavifINI%==0 (
     echo. 2 = No
     echo.
     echo. Binaries being built depends on "standalone=y" and are always static.
-    echo. Will require libaom, but will use rav1e or dav1d if present
+    echo. Will build aom, dav1d, and rav1e if not already previously enabled
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
