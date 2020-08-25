@@ -196,6 +196,7 @@ vcs_get_merge_base() {
 vcs_reset() (
     set -x
     git checkout --no-track -fB ab-suite "$(vcs_get_latest_tag "$1")"
+    git log --oneline | head -n1
 )
 
 vcs_fetch() (
