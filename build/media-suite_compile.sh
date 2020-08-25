@@ -1928,6 +1928,7 @@ if [[ $ffmpeg != no ]]; then
             OPENAL_LIBS=$($PKG_CONFIG --libs openal)
             export OPENAL_LIBS
             do_addOption "--extra-cflags=-DAL_LIBTYPE_STATIC"
+            do_addOption FFMPEG_OPTS_SHARED "--extra-cflags=-DAL_LIBTYPE_STATIC"
             for _openal_flag in $($PKG_CONFIG --cflags openal); do
                 do_addOption "--extra-cflags=$_openal_flag"
             done
