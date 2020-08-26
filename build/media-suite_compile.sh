@@ -1755,7 +1755,7 @@ fi
 
 _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
 if [[ $bits = 64bit && $vvc = y ]] &&
-    do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/VVCSoftware_VTM.git" vvc; then
+    do_vcs "https://gitlab.com/m-ab-s/VVCSoftware_VTM.git" vvc; then
     do_uninstall bin-video/vvc
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0001-BBuildEnc.cmake-Remove-Werror-for-gcc-and-clang.patch" am
     # patch for easier install of apps
