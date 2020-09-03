@@ -1112,7 +1112,7 @@ if { [[ $other265 = y ]] || { [[ $ffmpeg != no ]] && enabled libkvazaar; }; } &&
     do_autogen
     [[ $standalone = y || $other265 = y ]] ||
         sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
-    do_separate_confmakeinstall video
+    CFLAGS+=" -fno-asynchronous-unwind-tables" do_separate_confmakeinstall video
     do_checkIfExist
 fi
 
