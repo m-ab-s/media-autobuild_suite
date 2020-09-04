@@ -1101,7 +1101,7 @@ if [[ $libavif = y ]] && {
     y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
     *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
     esac
-    do_cmakeinstall video "${extracommands[@]}"
+    do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
     do_checkIfExist
 fi
 
