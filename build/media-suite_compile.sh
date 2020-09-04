@@ -897,7 +897,6 @@ fi
 
 _check=(libflite.a flite/flite.h)
 if enabled libflite && do_vcs "https://github.com/festvox/flite.git"; then
-    do_patch "https://github.com/festvox/flite/pull/15.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/flite/0001-tools-find_sts_main.c-Include-windows.h-before-defin.patch" am
     do_uninstall libflite_cmu_{grapheme,indic}_{lang,lex}.a \
         libflite_cmu_us_{awb,kal,kal16,rms,slt}.a \
