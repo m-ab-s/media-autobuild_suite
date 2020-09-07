@@ -1896,9 +1896,6 @@ if [[ $ffmpeg != no ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
-
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-add-MachineIndependent.patch" am
-
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
