@@ -850,7 +850,7 @@ _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
 if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
     do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch"
     do_pacman_install libmad
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
     extracommands=()
