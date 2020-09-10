@@ -2261,6 +2261,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mpv/0001-Mingw-w64-Use-Wl-subsystem-console-instead-of-mconso.patch" am
         hide_conflicting_libs
         create_ab_pkgconfig
 
