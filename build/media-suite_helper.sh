@@ -145,7 +145,7 @@ vcs_test_remote() {
 }
 
 vcs_clean() {
-    GIT_TERMINAL_PROMPT=0 git -C "${1:-$PWD}" clean -dffxq -e{recently_{updated,checked},build_successful{32,64}bit} "$@"
+    GIT_TERMINAL_PROMPT=0 git -C "${1:-$PWD}" clean -dffxq -e{recently_{updated,checked},build_successful*,*.{patch,diff}} "$@"
 }
 
 # vcs_get_latest_tag "libopenmpt-*"
