@@ -284,6 +284,8 @@ do_vcs() {
         touch recently_checked
     fi
 
+    vcs_clean
+
     if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
