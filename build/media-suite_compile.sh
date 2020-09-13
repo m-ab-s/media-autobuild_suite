@@ -810,7 +810,6 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
             "lame/lame/3.100/lame-3.100.tar.gz"; then
         do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
         _mingw_patches_lame="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-lame"
-        do_patch "$_mingw_patches_lame/0002-07-field-width-fix.all.patch"
         do_patch "$_mingw_patches_lame/0005-no-gtk.all.patch"
         do_patch "$_mingw_patches_lame/0006-dont-use-outdated-symbol-list.patch"
         do_patch "$_mingw_patches_lame/0007-revert-posix-code.patch"
