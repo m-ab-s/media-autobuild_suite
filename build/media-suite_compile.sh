@@ -809,18 +809,18 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
             -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
             "lame/lame/3.100/lame-3.100.tar.gz"; then
         do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
-        _mingw_patches="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master"
-        do_patch "$_mingw_patches/mingw-w64-lame/0002-07-field-width-fix.all.patch"
-        do_patch "$_mingw_patches/mingw-w64-lame/0005-no-gtk.all.patch"
-        do_patch "$_mingw_patches/mingw-w64-lame/0006-dont-use-outdated-symbol-list.patch"
-        do_patch "$_mingw_patches/mingw-w64-lame/0007-revert-posix-code.patch"
-        do_patch "$_mingw_patches/mingw-w64-lame/0008-skip-termcap.patch"
+        _mingw_patches_lame="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-lame"
+        do_patch "$_mingw_patches_lame/0002-07-field-width-fix.all.patch"
+        do_patch "$_mingw_patches_lame/0005-no-gtk.all.patch"
+        do_patch "$_mingw_patches_lame/0006-dont-use-outdated-symbol-list.patch"
+        do_patch "$_mingw_patches_lame/0007-revert-posix-code.patch"
+        do_patch "$_mingw_patches_lame/0008-skip-termcap.patch"
         do_autoreconf
         do_separate_conf --enable-nasm
         do_make
         do_install frontend/lame.exe bin-audio/
         do_checkIfExist
-        unset _mingw_patches
+        unset _mingw_patches_lame
     fi
 fi
 
