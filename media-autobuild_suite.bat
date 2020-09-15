@@ -121,11 +121,11 @@ set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
 libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
-libopenmpt version3 librav1e libsrt libgsm libvmaf
+libopenmpt version3 librav1e libsrt libgsm libvmaf libsvtav1
 
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint decklink frei0r libbs2b libcaca ^
-libcdio libfdk-aac libflite libfribidi libgme libilbc libsvthevc libsvtav1 ^
+libcdio libfdk-aac libflite libfribidi libgme libilbc libsvthevc ^
 libsvtvp9 libkvazaar libmodplug librtmp librubberband #libssh libtesseract libxavs ^
 libzmq libzvbi openal libcodec2 ladspa #vapoursynth #liblensfun ^
 libglslang vulkan
