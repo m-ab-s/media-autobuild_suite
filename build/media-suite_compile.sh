@@ -2664,6 +2664,7 @@ if [[ $vlc == y ]]; then
             "$LOCALDESTDIR"/vlc/include/vlc/libvlc_version.h)
     if do_vcs "https://code.videolan.org/videolan/vlc.git"; then
         do_uninstall bin/plugins lib/vlc "${_check[@]}"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vlc/0001-srt-Replace-SRTO_TSBPDDELAY-with-SRTO_LATENCY.patch" am
         # https://code.videolan.org/videolan/medialibrary/issues/220
         # msys2's patches
         # Issues due to conflicting `vlc_module_name` between libvlc and libvlccore when linking vlc-static.exe and undefines.
