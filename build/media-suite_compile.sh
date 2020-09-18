@@ -2523,7 +2523,7 @@ if [[ $vlc == y ]]; then
         [[ -f $PRL_SOURCE ]] || PRL_SOURCE=$LOCALDESTDIR/$2/$3.prl
         [[ ! -f $PRL_SOURCE ]] && return 1
         LIBS=$(sed -e "
-            /QMAKE_PRL_LIBS/ {
+            /QMAKE_PRL_LIBS =/ {
                 s@QMAKE_PRL_LIBS =@@
                 s@$LOCALDESTDIR/lib@\${libdir}@g
                 s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g
@@ -2536,18 +2536,27 @@ if [[ $vlc == y ]]; then
             " "$LOCALDESTDIR/lib/pkgconfig/$1.pc"
     }
 
-    _qt_version=5.14 # Version that vlc uses it seems. + 2 since it seems something's broken in it
+    _qt_version=5.15 # Version that vlc uses
     # $PKG_CONFIG --exists Qt5{Core,Widgets,Gui,Quick{,Widgets,Controls2},Svg}
 
     # Qt compilation takes ages.
     export QMAKE_CXX=$CXX QMAKE_CC=$CC
+    export MSYS2_ARG_CONV_EXCL="--foreign-types="
     _check=(bin/qmake.exe Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc)
-    if do_vcs "https://github.com/qt/qtbase.git#branch=${_qt_version:=5.14}"; then
+    if do_vcs "https://github.com/qt/qtbase.git#branch=${_qt_version:=5.15}"; then
         do_uninstall include/QtCore share/mkspecs "${_check[@]}"
         # Enable ccache on !unix and use cygpath to fix certain issues
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0001-qtbase-mabs.patch" am
-        grep_and_sed " create_libtool" mkspecs/features/qt_module.prf \
-            "s/ create_libtool/ -create_libtool/g"
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0003-allow-cross-compilation-of-angle-with-wine.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0003-Remove-wine-prefix-before-fxc2.patch" am
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0006-ANGLE-don-t-use-msvc-intrinsics-when-crosscompiling-.patch" am
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0009-Add-KHRONOS_STATIC-to-allow-static-linking-on-Windows.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0006-qt_module.prf-don-t-create-libtool-if-not-unix.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0007-qmake-Patch-win32-g-for-static-builds.patch" am
+        cp -f src/3rdparty/angle/src/libANGLE/{,libANGLE}Debug.cpp
+        grep_and_sed "src/libANGLE/Debug.cpp" src/angle/src/common/gles_common.pri \
+            "s#src/libANGLE/Debug.cpp#src/libANGLE/libANGLEDebug.cpp#g"
+
         QT5Base_config=(
             -prefix "$LOCALDESTDIR"
             -datadir "$LOCALDESTDIR"
@@ -2556,11 +2565,17 @@ if [[ $vlc == y ]]; then
             -confirm-license
             -release
             -static
-            -platform win32-g++
+            -platform "$(
+                case $CC in
+                *clang) echo win32-clang-g++ ;;
+                *) echo win32-g++ ;;
+                esac
+            )"
             -make-tool make
-            -opengl desktop
-            -qt-{libjpeg,freetype}
-            -no-{fontconfig,pkg-config,sql-sqlite,gif,openssl,dbus,vulkan,sql-odbc,pch,compile-examples,glib}
+            -qt-{libjpeg,freetype,zlib}
+            -angle
+            -no-{shared,fontconfig,pkg-config,sql-sqlite,gif,openssl,dbus,vulkan,sql-odbc,pch,compile-examples,glib,direct2d,feature-testlib}
+            -skip qtsql
             -nomake examples
             -nomake tests
         )
@@ -2582,6 +2597,10 @@ if [[ $vlc == y ]]; then
             "s;Cflags:.*;& -I\${includedir}/QtGui/$(qmake -query QT_VERSION)/QtGui;"
         _add_static_link Qt5Gui plugins/platforms qwindows
         _add_static_link Qt5Widgets plugins/styles qwindowsvistastyle
+
+        cat >> "$LOCALDESTDIR/mkspecs/win32-g++/qmake.conf" <<'EOF'
+CONFIG += static
+EOF
         do_checkIfExist
     fi
 
