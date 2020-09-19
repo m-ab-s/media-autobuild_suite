@@ -2503,6 +2503,20 @@ if [[ $vlc == y ]]; then
     # Remove useless shell scripts file that causes errors when stdout is not a tty.
     find "$MINGW_PREFIX/bin/" -name "luac" -delete
 
+    _check=("$DXSDK_DIR/fxc2.exe" "$DXSDK_DIR/d3dcompiler_47.dll")
+    if do_vcs "https://github.com/mozilla/fxc2.git"; then
+        do_uninstall "${_check[@]}"
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0001-make-Vn-argument-as-optional-and-provide-default-var.patch" am
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch" am
+        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch" am
+        $CXX $CFLAGS -static -static-libgcc -static-libstdc++ -o "$DXSDK_DIR/fxc2.exe" fxc2.cpp -ld3dcompiler $LDFLAGS
+        case $bits in
+        32*) cp -f "dll/d3dcompiler_47_32.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
+        *) cp -f "dll/d3dcompiler_47.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
+        esac
+        do_checkIfExist
+    fi
+
     # Taken from https://code.videolan.org/videolan/vlc/blob/master/contrib/src/qt/AddStaticLink.sh
     _add_static_link() {
         local PRL_SOURCE=$LOCALDESTDIR/$2/lib$3.prl LIBS
