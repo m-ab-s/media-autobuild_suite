@@ -69,6 +69,7 @@ For information about the compiler environment see the wiki, there you also have
         - libsoxr (git)
         - libspeex (mingw-w64)
         - libsrt (git)
+        - libsvtav1 (git)
         - libtheora (mingw-w64)
         - libtwolame (mingw-w64)
         - libvidstab (git snapshot)
@@ -83,7 +84,7 @@ For information about the compiler environment see the wiki, there you also have
         - chromaprint (mingw-w64)
         - cuda filters (needs CUDA SDK installed)
             - needs non-free license
-        - decklink (10.9.3)
+        - decklink (11.6)
             - needs non-free license
         - frei0r (git)
         - ladspa (mingw-w64)
@@ -108,7 +109,6 @@ For information about the compiler environment see the wiki, there you also have
         - librtmp (git)
         - librubberband (git snapshot)
         - libssh (broken)
-        - libsvtav1 (git)
         - libsvthevc (git) (using non-upstream patch)
         - libsvtvp9 (git) (using non-upstream patch)
         - libtesseract (git)
