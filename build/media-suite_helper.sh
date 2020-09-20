@@ -1544,10 +1544,10 @@ do_hide_all_sharedlibs() {
     files="$(find /mingw{32,64}/lib /mingw{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
     local tomove=()
     for file in $files; do
-        [[ -f "${file%*.dll.a}.a" ]] && tomove+=("$file")
+        [[ -f ${file%*.dll.a}.a ]] && tomove+=("$file")
     done
     if [[ $dryrun == "n" ]]; then
-        printf '%s\n' "${tomove[@]}" | xargs -ri mv -f '{}' '{}.dyn'
+        printf '%s\0' "${tomove[@]}" | xargs -0ri mv -f '{}' '{}.dyn'
     else
         printf '%s\n' "${tomove[@]}"
     fi
@@ -1825,11 +1825,11 @@ get_api_version() {
 }
 
 hide_files() {
-    local reverse=n echo_cmd
-    [[ $1 == "-R" ]] && reverse=y && shift
+    local reverse=false echo_cmd
+    [[ $1 == "-R" ]] && reverse=true && shift
     [[ $dryrun == y ]] && echo_cmd="echo"
     for opt; do
-        if [[ $reverse == n ]]; then
+        if ! $reverse; then
             [[ -f $opt ]] && $echo_cmd mv -f "$opt" "$opt.bak"
         else
             [[ -f "$opt.bak" ]] && $echo_cmd mv -f "$opt.bak" "$opt"
@@ -1839,12 +1839,12 @@ hide_files() {
 
 hide_conflicting_libs() {
     # meant for rude build systems
-    local reverse=n
-    [[ $1 == "-R" ]] && reverse=y && shift
+    local reverse=false
+    [[ $1 == "-R" ]] && reverse=true && shift
     local priority_prefix
     local -a installed
     mapfile -t installed < <(find "$LOCALDESTDIR/lib" -maxdepth 1 -name "*.a")
-    if [[ $reverse == n ]]; then
+    if ! $reverse; then
         hide_files "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
     else
         hide_files -R "${installed[@]//$LOCALDESTDIR/$MINGW_PREFIX}"
@@ -1852,7 +1852,7 @@ hide_conflicting_libs() {
     if [[ -n $1 ]]; then
         priority_prefix="$1"
         mapfile -t installed < <(find "$priority_prefix/lib" -maxdepth 1 -name "*.a")
-        if [[ $reverse == n ]]; then
+        if ! $reverse; then
             hide_files "${installed[@]//$1/$LOCALDESTDIR}"
         else
             hide_files -R "${installed[@]//$1/$LOCALDESTDIR}"
@@ -2026,15 +2026,13 @@ EOF
 }
 
 create_cmake_toolchain() {
-    local _win_path_LOCALDESTDIR _win_path_MINGW_PREFIX
-    _win_path_LOCALDESTDIR="$(cygpath -m "$LOCALDESTDIR")"
-    _win_path_MINGW_PREFIX="$(cygpath -m "$MINGW_PREFIX")"
+    local _win_paths="$(cygpath -pm  "$LOCALDESTDIR":"$MINGW_PREFIX":"$MINGW_PREFIX/$MINGW_CHOST")"
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         ""
-        "LIST(APPEND CMAKE_PROGRAM_PATH $_win_path_LOCALDESTDIR/bin)"
-        "SET(CMAKE_FIND_ROOT_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
-        "SET(CMAKE_PREFIX_PATH $_win_path_LOCALDESTDIR $_win_path_MINGW_PREFIX $_win_path_MINGW_PREFIX/$MINGW_CHOST)"
+        "LIST(APPEND CMAKE_PROGRAM_PATH $(cygpath -m "$LOCALDESTDIR/bin"))"
+        "SET(CMAKE_FIND_ROOT_PATH $_win_paths)"
+        "SET(CMAKE_PREFIX_PATH $_win_paths)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
         "SET(CMAKE_BUILD_TYPE Release)"
