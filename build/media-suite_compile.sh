@@ -421,7 +421,7 @@ mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
 *) _deps=() ;;
 esac
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
-if [[ $mediainfo = y || $bmx = y || $curl != n ]] &&
+if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
     do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
     do_pacman_install nghttp2 brotli
@@ -2385,7 +2385,7 @@ fi
 enabled openssl && hide_libressl -R
 
 if [[ $cyanrip = y ]]; then
-    do_pacman_install libcdio-paranoia
+    do_pacman_install libcdio-paranoia jansson
     sed -ri 's;-R[^ ]*;;g' "$MINGW_PREFIX/lib/pkgconfig/libcdio.pc"
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
@@ -2396,23 +2396,23 @@ if [[ $cyanrip = y ]]; then
         do_checkIfExist
     fi
 
-    _check=(discid/discid.h libdiscid.{a,pc})
-    if do_vcs "https://github.com/wiiaboo/libdiscid.git"; then
-        do_uninstall "${_check[@]}"
-        do_cmakeinstall
-        do_checkIfExist
-    fi
-
     _deps=(libneon.a libxml2.a)
     _check=(musicbrainz5/mb5_c.h libmusicbrainz5{,cc}.{a,pc})
     if do_vcs "https://github.com/wiiaboo/libmusicbrainz.git"; then
         do_uninstall "${_check[@]}" include/musicbrainz5
-        do_cmake -G "MSYS Makefiles"
-        do_makeinstall
+        do_cmakeinstall
         do_checkIfExist
     fi
 
-    _deps=(libdiscid.a libmusicbrainz5.a)
+    # _deps=(libneon.a libxml2.a libjansson.a)
+    # _check=(coverart/CoverArt.h libcoverart{,cc}.{a,pc})
+    # if do_vcs "https://github.com/wiiaboo/libcoverart.git"; then
+    #     do_uninstall "${_check[@]}" include/coverart
+    #     do_cmakeinstall
+    #     do_checkIfExist
+    # fi
+
+    _deps=(libmusicbrainz5.a libcurl.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/cyanreg/cyanrip.git"; then
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
