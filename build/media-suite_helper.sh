@@ -1699,7 +1699,7 @@ do_autogen() {
     local basedir
     basedir=$(get_first_subdir -f)
     if { [[ -f $basedir/recently_updated ]] &&
-        find "$basedir" -name "build_successful*" -exec false {} +; } ||
+        find "$basedir" -name "build_successful$bits*" -exec false {} +; } ||
         [[ ! -f configure ]]; then
         safe_git_clean -q
         extra_script pre autogen
