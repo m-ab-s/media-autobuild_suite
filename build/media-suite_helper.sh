@@ -1546,10 +1546,12 @@ do_hide_all_sharedlibs() {
     for file in $files; do
         [[ -f ${file%*.dll.a}.a ]] && tomove+=("$file")
     done
-    if [[ $dryrun == "n" ]]; then
-        printf '%s\0' "${tomove[@]}" | xargs -0ri mv -f '{}' '{}.dyn'
-    else
-        printf '%s\n' "${tomove[@]}"
+    if [[ -n ${tomove[*]} ]]; then
+        if [[ $dryrun == "n" ]]; then
+            printf '%s\0' "${tomove[@]}" | xargs -0ri mv -f '{}' '{}.dyn'
+        else
+            printf '%s\n' "${tomove[@]}"
+        fi
     fi
 }
 
