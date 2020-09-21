@@ -1418,6 +1418,7 @@ if [[ $bits = 32bit ]]; then
 elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "https://github.com/AOMediaCodec/SVT-AV1.git"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
+    do_patch "https://github.com/AOMediaCodec/SVT-AV1/pull/1501.patch" am
     do_cmakeinstall video -DUNIX=OFF
     do_checkIfExist
 fi
