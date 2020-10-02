@@ -1690,24 +1690,15 @@ do_prompt() {
 }
 
 do_autoreconf() {
-    local basedir
-    basedir=$(get_first_subdir -f)
     extra_script pre autoreconf
     log "autoreconf" autoreconf -fiv "$@"
     extra_script post autoreconf
 }
 
 do_autogen() {
-    local basedir
-    basedir=$(get_first_subdir -f)
-    if { [[ -f $basedir/recently_updated ]] &&
-        find "$basedir" -name "build_successful$bits*" -exec false {} +; } ||
-        [[ ! -f configure ]]; then
-        safe_git_clean -q
-        extra_script pre autogen
-        log "autogen" ./autogen.sh "$@"
-        extra_script post autogen
-    fi
+    extra_script pre autogen
+    log "autogen" ./autogen.sh "$@"
+    extra_script post autogen
 }
 
 get_first_subdir() {
