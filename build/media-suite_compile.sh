@@ -609,6 +609,7 @@ set_title "compiling audio tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
 if [[ $ffmpeg != no || $sox = y ]]; then
+    do_pacman_install wavpack
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
         do_pacman_install twolame
@@ -2441,7 +2442,7 @@ if [[ $cyanrip = y ]]; then
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
                 --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file \
-                --enable-encoder=flac,tta,aac,alac,pcm_s16le,pcm_s32le \
+                --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
                 --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le \
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \
