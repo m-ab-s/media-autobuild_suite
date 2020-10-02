@@ -119,7 +119,7 @@ libdav1d libaom --disable-debug
 :: options used in zeranoe builds and not present above
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libmfx libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
-libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc libwavpack ^
+libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc ^
 libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
 libopenmpt version3 librav1e libsrt libgsm libvmaf libsvtav1
 

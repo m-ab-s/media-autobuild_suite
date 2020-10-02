@@ -609,7 +609,6 @@ set_title "compiling audio tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
 if [[ $ffmpeg != no || $sox = y ]]; then
-    enabled libwavpack && do_pacman_install wavpack
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
         do_pacman_install twolame
@@ -868,7 +867,6 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
     fi
     enabled libtwolame || extracommands+=(--without-twolame)
     enabled libvorbis || extracommands+=(--without-oggvorbis)
-    enabled libwavpack || extracommands+=(--without-wavpack)
     hide_conflicting_libs
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
     do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
@@ -2443,7 +2441,7 @@ if [[ $cyanrip = y ]]; then
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
                 --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file \
-                --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
+                --enable-encoder=flac,tta,aac,alac,pcm_s16le,pcm_s32le \
                 --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le \
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
                 --enable-demuxer=image2,png_pipe,bmp_pipe \

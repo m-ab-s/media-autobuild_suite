@@ -75,7 +75,6 @@ For information about the compiler environment see the wiki, there you also have
         - libvidstab (git snapshot)
         - libvmaf (git)
         - libvo-amrwbenc (0.1.3)
-        - libwavpack (mingw-w64)
         - libwebp (git)
         - libxml2 (mingw-w64)
         - libxvid (1.3.7)
