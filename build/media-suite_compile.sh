@@ -845,7 +845,7 @@ if [[ $ffmpeg != no ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
 fi
 
 _check=(libsndfile.a sndfile.{h,pc})
-if [[ $sox = y ]] && do_vcs "https://github.com/erikd/libsndfile.git" sndfile; then
+if [[ $sox = y ]] && do_vcs "https://github.com/libsndfile/libsndfile.git" sndfile; then
     do_uninstall include/sndfile.hh "${_check[@]}"
     do_cmakeinstall -DBUILD_EXAMPLES=off -DBUILD_TESTING=off -DBUILD_PROGRAMS=OFF
     do_checkIfExist
