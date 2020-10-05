@@ -1274,6 +1274,15 @@ elif { [[ $avs2 = y ]] || { [[ $ffmpeg != no ]] && enabled libdavs2; }; } &&
     do_checkIfExist
 fi
 
+_check=(libuavs3d.a uavs3d.{h,pc})
+[[ $standalone = y ]] && _check+=(bin-video/uavs3dec.exe)
+if [[ $ffmpeg != no ]] && enabled libuavs3d &&
+    do_vcs "https://github.com/uavs3/uavs3d.git"; then
+    do_cmakeinstall
+    [[ $standalone = y ]] && do_install uavs3dec.exe bin-video/
+    do_checkIfExist
+fi
+
 if [[ $mediainfo = y ]]; then
     [[ $curl = openssl ]] && hide_libressl
     _check=(libzen.{a,pc})

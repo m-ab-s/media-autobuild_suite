@@ -111,6 +111,7 @@ For information about the compiler environment see the wiki, there you also have
         - libsvthevc (git) (using non-upstream patch)
         - libsvtvp9 (git) (using non-upstream patch)
         - libtesseract (git)
+        - libuavs3d (git)
         - libxavs (git)
         - libxavs2 (git)
         - libzmq (mingw-w64)
