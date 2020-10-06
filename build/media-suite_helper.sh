@@ -1438,6 +1438,7 @@ create_build_dir() {
     shift $((OPTIND - 1))
 
     build_dir="${build_root:+$build_root/}build${1:+-$1}-$bits"
+    [[ -z $build_root && -d ../$build_dir ]] && cd_safe ..
 
     if [[ -d $build_dir && ! -f $(get_first_subdir -f)/do_not_clean ]]; then
         $norm || rm -rf "$build_dir" ||
