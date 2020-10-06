@@ -1802,9 +1802,10 @@ _check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
 if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
     do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
     _DeadSix27=https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master
+    _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master
     _shinchiro=https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master
     do_uninstall "${_check[@]}"
-    do_patch "$_shinchiro/packages/vulkan-0001-cross-compile-static-linking-hacks.patch" am
+    do_patch "$_mabs/vulkan-loader/vulkan-0001-cross-compile-static-linking-hacks.patch" am
     create_build_dir
     log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
     cd_safe Vulkan-Headers
@@ -1816,11 +1817,11 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
         do_install d3d{kmthk,ukmdt}.h include/
     cd_safe "$(get_first_subdir -f)"
     do_print_progress "Building Vulkan-Loader"
-    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DCMAKE_SYSTEM_NAME=Windows -DUSE_CCACHE=OFF \
+    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DUSE_CCACHE=OFF \
     -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
     -DENABLE_STATIC_LOADER=ON -DUNIX=OFF
     do_checkIfExist
-    unset _DeadSix27 _shinchiro
+    unset _DeadSix27 _mabs _shinchiro
 fi
 
 _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
