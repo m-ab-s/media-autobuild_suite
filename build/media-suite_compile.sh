@@ -998,13 +998,11 @@ else
 fi
 
 _check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libvmaf
-elif [[ $ffmpeg != no ]] && enabled libvmaf &&
+if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
     cd_safe libvmaf
-    do_mesoninstall video
+    CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" do_mesoninstall video
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
