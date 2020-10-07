@@ -2292,7 +2292,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             mapfile -d ' ' -t -O "${#mpv_cflags[@]}" mpv_cflags < <($PKG_CONFIG --libs vidstab)
             mapfile -d ' ' -t -O "${#mpv_cflags[@]}" mpv_ldflags < <($PKG_CONFIG --libs vidstab)
         }
-        enabled libssh && mpv_ldflags+=("-Wl,--allow-multiple-definition")
+        enabled_any libssh libxavs2 && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python-docutils
         fi
