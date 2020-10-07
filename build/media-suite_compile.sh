@@ -1372,7 +1372,7 @@ fi
 
 _check=(DeckLinkAPI.h DeckLinkAPIVersion.h DeckLinkAPI_i.c)
 if [[ $ffmpeg != no ]] && enabled decklink &&
-    do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/decklink-headers.git"; then
+    do_vcs "https://gitlab.com/media-autobuild_suite-dependencies/decklink-headers.git#commit=efb287366b"; then
     do_makeinstall PREFIX="$LOCALDESTDIR"
     do_checkIfExist
 fi
