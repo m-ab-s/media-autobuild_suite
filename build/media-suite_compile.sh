@@ -1468,6 +1468,7 @@ if [[ $x264 != no ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "https://git.ffmpeg.org/ffmpeg.git"
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-get_cabac_inline_x86-Don-t-inline-if-32-bit-clang-on.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-libavformat-dashdec-Fix-issue-with-dash-on-Windows.patch" am
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir light
@@ -1918,6 +1919,7 @@ if [[ $ffmpeg != no ]]; then
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
 
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-get_cabac_inline_x86-Don-t-inline-if-32-bit-clang-on.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-libavformat-dashdec-Fix-issue-with-dash-on-Windows.patch" am
 
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
