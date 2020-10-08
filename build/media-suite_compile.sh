@@ -1816,9 +1816,9 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
         do_install d3d{kmthk,ukmdt}.h include/
     cd_safe "$(get_first_subdir -f)"
     do_print_progress "Building Vulkan-Loader"
-    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DUSE_CCACHE=OFF \
-    -DCMAKE_ASM_COMPILER="$(command -v nasm.exe)" -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
-    -DENABLE_STATIC_LOADER=ON -DUNIX=OFF
+    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmake -DBUILD_TESTS=OFF -DUSE_CCACHE=OFF \
+    -DUSE_UNSAFE_C_GEN=ON -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
+    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF
     do_checkIfExist
     unset _DeadSix27 _mabs _shinchiro
 fi
