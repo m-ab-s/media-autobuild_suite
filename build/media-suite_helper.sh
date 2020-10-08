@@ -677,6 +677,8 @@ do_install() {
         echo install -D -p "${files[@]}" "$dest"
     else
         extra_script pre install
+        [[ -f "$(get_first_subdir -f)/do_not_install" ]] &&
+            return
         install -D -p "${files[@]}" "$dest"
         extra_script post install
     fi
@@ -1248,12 +1250,16 @@ do_cmake() {
 
 do_ninja() {
     extra_script pre ninja
+    [[ -f "$(get_first_subdir -f)/do_not_build" ]] &&
+        return
     log "build" ninja "$@"
     extra_script post ninja
 }
 
 do_ninjainstall() {
     extra_script pre install
+    [[ -f "$(get_first_subdir -f)/do_not_install" ]] &&
+        return
     cpuCount=1 log "install" ninja install "$@"
     extra_script post install
 }
@@ -1510,12 +1516,16 @@ do_qmake() {
 
 do_make() {
     extra_script pre make
+    [[ -f "$(get_first_subdir -f)/do_not_build" ]] &&
+        return
     log "make" make "$@"
     extra_script post make
 }
 
 do_makeinstall() {
     extra_script pre install
+    [[ -f "$(get_first_subdir -f)/do_not_install" ]] &&
+        return
     log "install" make install "$@"
     extra_script post install
 }
@@ -2380,7 +2390,7 @@ _pre_cmake(){
     # Add additional options to suite's cmake execution
     #cmake_extras=(-DENABLE_SWEET_BUT_BROKEN_FEATURE=on)
 
-    # To bypass the suite's cmake execution completely, create a do_not_configure file in the repository root:
+    # To bypass the suite's cmake execution completely, create a do_not_reconfigure file in the repository root:
     #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
@@ -2399,7 +2409,7 @@ _pre_rust() {
     # Add additional options to suite's rust (cargo) execution
     #rust_extras=(--no-default-features --features=binaries)
 
-    # To bypass the suite's cargo execution completely, create a do_not_configure file in the repository root:
+    # To bypass the suite's cargo execution completely, create a do_not_reconfigure file in the repository root:
     #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
@@ -2413,7 +2423,7 @@ _pre_meson() {
     # Add additional options to suite's rust (cargo) execution
     #meson_extras=(-Denable_tools=true)
 
-    # To bypass the suite's meson execution completely, create a do_not_configure file in the repository root:
+    # To bypass the suite's meson execution completely, create a do_not_reconfigure file in the repository root:
     #touch "$(get_first_subdir -f)/do_not_reconfigure"
 
     true
@@ -2461,6 +2471,8 @@ _post_configure(){
 
 # Runs before and after runing make (do_make)
 _pre_make(){
+    # To bypass the suite's make execution completely, create a do_not_build file in the repository root:
+    #touch "$(get_first_subdir -f)/do_not_build"
     true
 }
 _post_make(){
@@ -2474,6 +2486,8 @@ _post_make(){
 
 # Runs before and after running ninja (do_ninja)
 _pre_ninja() {
+    # To bypass the suite's ninja execution completely, create a do_not_build file in the repository root:
+    #touch "$(get_first_subdir -f)/do_not_build"
     true
 }
 _post_ninja() {
@@ -2484,6 +2498,8 @@ _post_ninja() {
 # If this is present, it will override the other hooks
 # Use for mpv and python waf based stuff.
 _pre_build() {
+    # To bypass the suite's build execution completely, create a do_not_build file in the repository root:
+    #touch "$(get_first_subdir -f)/do_not_build"
     true
 }
 _post_build() {
@@ -2494,6 +2510,8 @@ _post_build() {
 # or make install or using install
 # (do_makeinstall, do_ninjainstall, do_install)
 _pre_install() {
+    # To bypass the suite's install completely, create a do_not_install file in the repository root:
+    #touch "$(get_first_subdir -f)/do_not_install"
     true
 }
 _post_install() {
