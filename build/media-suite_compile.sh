@@ -1664,7 +1664,7 @@ if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
     do_install '=build/xvidcore.a' libxvidcore.a
     do_install '=build/xvidcore.dll' bin-video/
     cd_safe ../../examples
-    sed -ri "s;(#define MAX_ZONES\s*) \S.*$;\1 8192;" xvid_encraw.c
+    do_patch "https://www.ligh.de/software/xvid_encraw.c.mabs.patch"
     do_make xvid_encraw
     do_install xvid_encraw.exe bin-video/
     do_checkIfExist
