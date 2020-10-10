@@ -1651,21 +1651,19 @@ else
 fi
 pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 
-_check=(xvid.h libxvidcore.a bin-video/xvid{_encraw.exe,core.dll})
-if enabled libxvid && [[ $standalone = y ]] && ! { files_exist "${_check[@]}" &&
-    grep -q '1.3.7' "$LOCALDESTDIR/bin-video/xvid_encraw.exe"; } &&
-    do_wget -h abbdcbd39555691dd1c9b4d08f0a031376a3b211652c0d8b3b8aa9be1303ce2d \
-        "https://downloads.xvid.com/downloads/xvidcore-1.3.7.tar.gz" "xvidcore.tar.gz"; then
+_check=(xvid.h libxvidcore.a bin-video/xvid_encraw.exe)
+if enabled libxvid && [[ $standalone = y ]] &&
+    do_vcs "https://github.com/m-ab-s/xvid.git"; then
+    do_patch "https://github.com/m-ab-s/xvid/compare/lighde.patch" am
     do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
-    cd_safe build/generic
+    cd_safe xvidcore/build/generic
+    log "bootstrap" ./bootstrap.sh
     do_configure
     do_make
     do_install ../../src/xvid.h include/
-    do_install '=build/xvidcore.a' libxvidcore.a
-    do_install '=build/xvidcore.dll' bin-video/
+    do_install '=build/libxvidcore.a' libxvidcore.a
     cd_safe ../../examples
-    sed -ri "s;(#define MAX_ZONES\s*) \S.*$;\1 8192;" xvid_encraw.c
     do_make xvid_encraw
     do_install xvid_encraw.exe bin-video/
     do_checkIfExist
