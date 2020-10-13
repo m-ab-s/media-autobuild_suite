@@ -1658,15 +1658,6 @@ title MABSbat
 if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
-REM Test mklink availability
-set "MSYS="
-mkdir testmklink 2>nul
-mklink /d linkedtestmklink testmklink >nul 2>&1 && (
-    set MSYS="winsymlinks:nativestrict"
-    rmdir /q linkedtestmklink
-)
-rmdir /q testmklink
-
 endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
@@ -1681,7 +1672,6 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
-    set "MSYS=%MSYS%"
     if %noMintty%==y set "PATH=%PATH%"
     set "build=%build%"
     set "instdir=%instdir%"
@@ -1692,7 +1682,7 @@ if %noMintty%==y (
     if exist %build%\compile.log del %build%\compile.log
     start "compile" /I /LOW %CD%\msys64\usr\bin\mintty.exe -i /msys2.ico -t "media-autobuild_suite" ^
     --log 2>&1 %build%\compile.log /bin/env MSYSTEM=%MSYSTEM% MSYS2_PATH_TYPE=inherit ^
-    MSYS=%MSYS% /usr/bin/bash ^
+    /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
 exit /B %ERRORLEVEL%
