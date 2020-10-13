@@ -1663,6 +1663,7 @@ if enabled libxvid && [[ $standalone = y ]] &&
     do_make
     do_install ../../src/xvid.h include/
     do_install '=build/libxvidcore.a' libxvidcore.a
+    do_install '=build/libxvidcore.dll' bin-video/
     cd_safe ../../examples
     do_make xvid_encraw
     do_install xvid_encraw.exe bin-video/
