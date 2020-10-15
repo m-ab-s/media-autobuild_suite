@@ -154,7 +154,7 @@ if [[ $packing = y &&
 fi
 
 _check=("$RUSTUP_HOME"/bin/rustup.exe)
-if [[ $ripgrep = y || $rav1e = y || $dssim = y ]] || enabled librav1e; then
+if [[ $ripgrep = y || $rav1e = y || $dssim = y || $libavif = y ]] || enabled librav1e; then
     if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
         mkdir -p "$LOCALBUILDDIR/rustinstall"
         cd_safe "$LOCALBUILDDIR/rustinstall"
