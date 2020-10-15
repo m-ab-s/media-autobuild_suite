@@ -1,11 +1,12 @@
 #!/bin/bash
 # shellcheck disable=SC2154,SC2120,SC2119,SC2034,SC1090,SC1117,SC2030,SC2031
 
-export MSYS=winsymlinks:nativestrict
-echo > testmklink
-ln -s testmklink linkedtestmklink > /dev/null 2>&1
-test -h linkedtestmklink || unset MSYS
-rm -f testmklink linkedtestmklink
+if [[ -n ${MSYS+x} ]]; then
+    export MSYS=winsymlinks:nativestrict
+    ln -s <(echo) linkedtestmklink > /dev/null 2>&1
+    test -h linkedtestmklink || unset MSYS
+    rm -f linkedtestmklink
+fi
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
     cpuCount=$(($(nproc) / 2))
