@@ -3,9 +3,12 @@
 
 if [[ -z ${MSYS+x} ]]; then
     export MSYS=winsymlinks:nativestrict
-    ln -s <(echo) linkedtestmklink > /dev/null 2>&1
-    test -h linkedtestmklink || unset MSYS
-    rm -f linkedtestmklink
+    touch linktest
+    ln -s linktest symlinktest > /dev/null 2>&1
+    ln linktest hardlinktest > /dev/null 2>&1
+    test -h symlinktest || unset MSYS
+    [[ $(stat --printf '%h\n' hardlinktest) -eq 2 ]] || unset MSYS
+    rm -f symlinktest hardlinktest linktest
 fi
 
 if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
