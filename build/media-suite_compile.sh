@@ -1804,7 +1804,8 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
     _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master
     _shinchiro=https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master
     do_uninstall "${_check[@]}"
-    do_patch "$_mabs/vulkan-loader/vulkan-0001-cross-compile-static-linking-hacks.patch" am
+    do_patch "$_mabs/vulkan-loader/0001-loader-cross-compile-static-linking-hacks.patch" am
+    do_patch "$_mabs/vulkan-loader/0002-loader-vulkan.pc.in-use-the-normal-prefix-and-exec_p.patch" am
     create_build_dir
     log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
     cd_safe Vulkan-Headers
