@@ -2629,8 +2629,10 @@ if [[ $vlc == y ]]; then
     _check=(pixman-1.pc libpixman-1.a pixman-1/pixman.h)
     if do_vcs "https://gitlab.freedesktop.org/pixman/pixman.git"; then
         do_uninstall include/pixman-1 "${_check[@]}"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/pixman/0001-pixman-pixman-mmx-fix-redefinition-of-_mm_mulhi_pu16.patch" am
         NOCONFIGURE=y do_autogen
-        do_separate_confmakeinstall
+        CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" \
+            do_separate_confmakeinstall
         do_checkIfExist
     fi
 
