@@ -1323,7 +1323,6 @@ if [[ $ffmpeg != no ]] && enabled libvidstab &&
     do_vcs "https://github.com/georgmartius/vid.stab.git" vidstab; then
     do_pacman_install openmp
     do_uninstall include/vid.stab "${_check[@]}"
-    do_patch "https://github.com/georgmartius/vid.stab/pull/94.patch" am
     do_cmakeinstall
     do_checkIfExist
     add_to_remove
