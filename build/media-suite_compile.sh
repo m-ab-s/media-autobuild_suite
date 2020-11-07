@@ -2416,14 +2416,6 @@ if [[ $cyanrip = y ]]; then
         do_checkIfExist
     fi
 
-    # _deps=(libneon.a libxml2.a libjansson.a)
-    # _check=(coverart/CoverArt.h libcoverart{,cc}.{a,pc})
-    # if do_vcs "https://github.com/wiiaboo/libcoverart.git"; then
-    #     do_uninstall "${_check[@]}" include/coverart
-    #     do_cmakeinstall
-    #     do_checkIfExist
-    # fi
-
     _deps=(libmusicbrainz5.a libcurl.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "https://github.com/cyanreg/cyanrip.git"; then
