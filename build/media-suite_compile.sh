@@ -2452,11 +2452,11 @@ if [[ $cyanrip = y ]]; then
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
                 --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
                 --disable-{avdevice,autodetect} \
-                --disable-bsfs --enable-protocol=file \
+                --disable-bsfs --enable-protocol=file,data \
                 --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
-                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le \
+                --enable-muxer=flac,tta,ipod,wv,mp3,opus,ogg,wav,pcm_s16le,pcm_s32le,image2,singlejpeg \
                 --enable-parser=png,mjpeg --enable-decoder=mjpeg,png \
-                --enable-demuxer=image2,png_pipe,bmp_pipe \
+                --enable-demuxer=image2,singlejpeg \
                 --enable-{bzlib,zlib,lzma,iconv} \
                 --enable-filter=hdcd \
                 "${cyan_ffmpeg_opts[@]}"
