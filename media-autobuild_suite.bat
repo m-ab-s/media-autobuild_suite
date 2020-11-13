@@ -689,12 +689,15 @@ if %ffmpegB2INI%==0 (
     echo. 2 = No
     echo. 3 = Shared
     echo. 4 = Both static and shared [shared goes to an isolated directory]
-    echo. 5 = Shared-only with some shared libs (libass, freetype and fribidi^)
+    echo. 5 = Shared-only with some shared dependencies (libass, freetype and fribidi^)
     echo. 6 = Same as 4, but static compilation ignores shared dependencies
     echo.
     echo. Note: Option 5 differs from 3 in that libass, freetype and fribidi are
-    echo. compiled shared so they take less space. This one isn't tested a lot and
-    echo. will fail with fontconfig enabled.
+    echo. compiled shared so they take less space. Currently broken if libass or libass
+    echo. dependees are enabled.
+    echo. Option 6 produces static and shared ffmpeg and ffmpeg libs where the static
+    echo. one includes only strictly static dependencies (opencl, opengl, cuda-nvcc,
+    echo. libnpp, libopenh264 are hard disabled.^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
