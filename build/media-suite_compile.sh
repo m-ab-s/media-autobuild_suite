@@ -238,7 +238,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
-        extracommands=(--with-{harfbuzz,png,bzip2}"=no")
+        extracommands=(--with-{harfbuzz,png,bzip2,brotli,zlib}"=no")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--enable-shared)
         do_separate_confmakeinstall global "${extracommands[@]}"
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
@@ -276,11 +276,15 @@ if [[ $mplayer = y || $mpv = y ]] ||
 
     _deps=(libfreetype.a)
     _check=(libharfbuzz.a harfbuzz.pc)
-    if [[ $ffmpeg != sharedlibs ]] && do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
+    [[ $ffmpeg = sharedlibs ]] && _check+=(libharfbuzz.dll.a bin-video/libharfbuzz-{subset-,}0.dll)
+    if do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
         do_pacman_install ragel
-        do_uninstall include/harfbuzz "${_check[@]}"
-        do_mesoninstall -D{glib,gobject,cairo,fontconfig,icu,tests,introspection,docs,benchmark}=disabled
+        do_uninstall include/harfbuzz "${_check[@]}" libharfbuzz{-subset,}.la
+        extracommands=(-D{glib,gobject,cairo,fontconfig,icu,tests,introspection,docs,benchmark}=disabled)
+        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
+        do_mesoninstall global "${extracommands}"
         # directwrite shaper doesn't work with mingw headers, maybe too old
+        [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin-global/libharfbuzz-{subset-,}0.dll bin-video/
         do_checkIfExist
     fi
 
@@ -291,14 +295,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_patch "https://github.com/fribidi/fribidi/pull/151.patch" am
         extracommands=("-Ddocs=false" "-Dtests=false")
         [[ $standalone = n ]] && extracommands+=("-Dbin=false")
-        if [[ $ffmpeg = sharedlibs ]]; then
-            create_build_dir shared
-            log meson meson .. --default-library=shared --bindir=bin-video \
-                --prefix="$LOCALDESTDIR" -Dbin=false "${extracommands[@]}"
-            do_ninja
-            do_ninjainstall
-            cd_safe ..
-        fi
+        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
         do_mesoninstall video "${extracommands[@]}"
         do_checkIfExist
     fi
@@ -311,13 +308,12 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
         extracommands=()
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
-        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--disable-{harfbuzz,fontconfig} --enable-shared)
-        do_separate_confmakeinstall "${extracommands[@]}"
-        [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
+        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--disable-fontconfig --enable-shared)
+        do_separate_confmakeinstall video "${extracommands[@]}"
         do_checkIfExist
     fi
     if [[ $ffmpeg != sharedlibs && $ffmpeg != shared ]]; then
-        _libs=(lib{freetype,fribidi,ass}.dll.a
+        _libs=(lib{freetype,harfbuzz{-subset,},fribidi,ass}.dll.a
             libav{codec,device,filter,format,util,resample}.dll.a
             lib{sw{scale,resample},postproc}.dll.a)
         for _lib in "${_libs[@]}"; do
