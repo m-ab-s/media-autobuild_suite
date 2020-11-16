@@ -283,7 +283,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_uninstall include/harfbuzz "${_check[@]}" libharfbuzz{-subset,}.la
         extracommands=(-D{glib,gobject,cairo,fontconfig,icu,tests,introspection,docs,benchmark}=disabled)
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
-        do_mesoninstall global "${extracommands}"
+        do_mesoninstall global "${extracommands[@]}"
         # directwrite shaper doesn't work with mingw headers, maybe too old
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin-global/libharfbuzz-{subset-,}0.dll bin-video/
         do_checkIfExist
