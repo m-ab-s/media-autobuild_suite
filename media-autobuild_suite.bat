@@ -149,7 +149,7 @@ set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 redshift ^
 rav1e ripgrep dav1d libavif vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc ^
-jo vlc CC
+jo vlc CC jpegxl
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -359,6 +359,26 @@ if %buildlibavif%==1 set "libavif=y"
 if %buildlibavif%==2 set "libavif=n"
 if %buildlibavif% GTR 2 GOTO libavif
 if %deleteINI%==1 echo.libavif=^%buildlibavif%>>%ini%
+
+:jpegxl
+if %jpegxlINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build jpeg-xl tools [JPEG XL image format encoder and decoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildjpegxl="Build jpegxl: "
+) else set buildjpegxl=%jpegxlINI%
+
+if "%buildjpegxl%"=="" GOTO jpegxl
+if %buildjpegxl%==1 set "jpegxl=y"
+if %buildjpegxl%==2 set "jpegxl=n"
+if %buildjpegxl% GTR 2 GOTO jpegxl
+if %deleteINI%==1 echo.jpegxl=^%buildjpegxl%>>%ini%
 
 :x264
 if %x2643INI%==0 (
@@ -1671,7 +1691,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
---vlc=%vlc% --libavif=%libavif%
+--vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl%
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"

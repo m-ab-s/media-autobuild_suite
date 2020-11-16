@@ -56,6 +56,7 @@ while true; do
     --rav1e=* ) rav1e=${1#*=} && shift ;;
     --dav1d=* ) dav1d=${1#*=} && shift ;;
     --libavif=* ) libavif=${1#*=} && shift ;;
+    --jpegxl=* ) jpegxl=${1#*=} && shift ;;
     --vvc=* ) vvc=${1#*=} && shift ;;
     --jq=* ) jq=${1#*=} && shift ;;
     --jo=* ) jo=${1#*=} && shift ;;
@@ -1105,6 +1106,18 @@ if [[ $libavif = y ]] && {
     *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
     esac
     do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
+    do_checkIfExist
+fi
+
+_check=(bin-global/{c,d}jxl.exe)
+if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
+    do_uninstall "${_check[@]}"
+    do_pacman_install lcms2
+    log -q "git.submodule" git submodule update --init --recursive
+    do_cmake global -D{BUILD_TESTING,JPEGXL_{ENABLE_BENCHMARK,ENABLE_OPENEXR,ENABLE_SKCMS}}=OFF \
+        JPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON
+    do_ninja
+    do_install tools/{c,d}jxl.exe bin-global/
     do_checkIfExist
 fi
 

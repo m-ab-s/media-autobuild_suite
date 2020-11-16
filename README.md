@@ -136,6 +136,7 @@ For information about the compiler environment see the wiki, there you also have
     - flac (git)
     - haisrt tools (git)
     - jo (git)
+    - jpeg-xl tools (git)
     - jq (git)
     - kvazaar (git)
     - lame (3.100)
