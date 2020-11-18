@@ -1821,6 +1821,7 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
     do_uninstall "${_check[@]}"
     do_patch "$_mabs/vulkan-loader/0001-loader-cross-compile-static-linking-hacks.patch" am
     do_patch "$_mabs/vulkan-loader/0002-loader-vulkan.pc.in-use-the-normal-prefix-and-exec_p.patch" am
+    log "git.revert" git revert --no-edit 10c4ebadb9fc41e0abf5a32daa7263c6d1aff575 || git revert --abort
     create_build_dir
     log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
     cd_safe Vulkan-Headers
