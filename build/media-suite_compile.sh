@@ -1109,16 +1109,23 @@ if [[ $libavif = y ]] && {
     do_checkIfExist
 fi
 
-_check=(bin-global/{c,d}jxl.exe)
+_check=(bin-global/{{c,d}j,benchmark_}xl.exe)
 if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
     do_uninstall "${_check[@]}"
     do_pacman_install lcms2
     log -q "git.submodule" git submodule update --init --recursive
-    do_cmake global -D{BUILD_TESTING,JPEGXL_{ENABLE_BENCHMARK,ENABLE_OPENEXR,ENABLE_SKCMS}}=OFF \
-        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON
+    extra_cxxflags=()
+    if [[ ${CC##* } = gcc ]]; then
+        do_simple_print -p "${orange}Warning: JPEG-XL compiled with GCC will not use SIMD optimizations!$reset"
+        extra_cxxflags+=('-DHWY_COMPILE_ONLY_SCALAR')
+    fi
+    CXXFLAGS+=" ${extra_cxxflags[@]}" \
+        do_cmake global -D{BUILD_TESTING,JPEGXL_{ENABLE_OPENEXR,ENABLE_SKCMS}}=OFF \
+        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC,ENABLE_BENCHMARK}=ON
     do_ninja
-    do_install tools/{c,d}jxl.exe bin-global/
+    do_install tools/{{c,d}j,benchmark_}xl.exe bin-global/
     do_checkIfExist
+    unset extra_cxxflags
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
