@@ -124,12 +124,6 @@ test_newer() {
     return 1
 }
 
-# vcs_get_default_ref
-# no longer supports anything but git
-vcs_get_default_ref() {
-    echo "origin/HEAD"
-}
-
 # vcs_get_current_type /build/myrepo
 vcs_get_current_type() {
     git -C "${1:-$PWD}" rev-parse --is-inside-work-tree > /dev/null 2>&1 &&
@@ -193,12 +187,6 @@ vcs_clone() (
     check_valid_vcs "$vcsFolder-git"
 )
 
-# vcs_log d4996a600ca0334235a4b66beae5b5c3474535c4 81172b5e3ac0d3130ff7b639ed7efed5baa1195c
-# Defaults to last 5 commits
-vcs_log() {
-    git log --no-merges --pretty="%ci: %an - %h%n    %s" "${1:-HEAD~5}".."${2:-HEAD}"
-}
-
 vcs_get_merge_base() {
     git merge-base HEAD "$(vcs_get_latest_tag "$1")"
 }
@@ -206,7 +194,7 @@ vcs_get_merge_base() {
 vcs_reset() (
     set -x
     git checkout --no-track -fB ab-suite "$(vcs_get_latest_tag "$1")"
-    git log --oneline | head -n1
+    git log --oneline --no-merges --no-color -n 1 | tee /dev/null
 )
 
 vcs_fetch() (
@@ -247,17 +235,21 @@ do_vcs() {
 
     cd_safe "$LOCALBUILDDIR"
 
+    rm -f "$vcsFolder-git/custom_updated"
+    check_custom_patches
+
+    extra_script pre vcs
+
     if ! check_valid_vcs "$vcsFolder-git"; then
         rm -rf "$vcsFolder-git"
         do_print_progress "  Running git clone for $vcsFolder"
-        if do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
-            touch "$vcsFolder-git"/recently_{updated,checked}
-        else
+        if ! do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
             echo "$vcsFolder git seems to be down"
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
             return
         fi
+        touch "$vcsFolder-git"/recently_{updated,checked}
     fi
 
     cd_safe "$vcsFolder-git"
@@ -271,34 +263,29 @@ do_vcs() {
     vcs_set_url "$vcsURL"
     log -q git.fetch vcs_fetch
     oldHead=$(vcs_get_merge_base "$ref")
+    newHead="$oldHead"
 
-    if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR"/last_run ]]; then
+    if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR/last_run" ]]; then
         do_print_progress "  Running git update for $vcsFolder"
         log -q git.reset vcs_reset "$ref"
         newHead=$(vcs_get_current_head "$PWD")
         touch recently_checked
-    else
-        newHead="$oldHead"
     fi
-
-    rm -f custom_updated
-    check_custom_patches
 
     if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
         rm -f ./build_successful{32,64}bit{,_*}
         if [[ $build32$build64$bits == yesyes64bit ]]; then
-            new_updates="yes"
+            new_updates=yes
             new_updates_packages="$new_updates_packages [$vcsFolder]"
         fi
         {
             echo "$vcsFolder"
-            vcs_log "$oldHead" "$newHead"
+            git log --no-merges --pretty="%ci: %an - %h%n    %s" "$oldHead..$newHead"
             echo
-        } >> "$LOCALBUILDDIR"/newchangelog
+        } >> "$LOCALBUILDDIR/newchangelog"
         do_print_status "┌ $vcsFolder git" "$orange" "Updates found"
-    elif [[ -f recently_updated ]] &&
-        [[ ! -f build_successful$bits${flavor:+_$flavor} ]]; then
+    elif [[ -f recently_updated  && ! -f build_successful$bits${flavor:+_$flavor} ]]; then
         do_print_status "┌ $vcsFolder git" "$orange" "Recently updated"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ $vcsFolder git" "$orange" "Files missing"
@@ -311,6 +298,7 @@ do_vcs() {
         do_print_status "┌ $vcsFolder git" "$orange" "Forcing recompile"
         do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
     fi
+    extra_script post vcs
     return 0
 }
 
@@ -2276,14 +2264,13 @@ check_custom_patches() {
     local _basedir
     _basedir="$(get_first_subdir)"
     local vcsFolder="${_basedir%-*}"
-    if [[ -d $LOCALBUILDDIR && -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]]; then
-        export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
-        export REPO_NAME="${vcsFolder}"
-        do_print_progress "  Found ${vcsFolder}_extra.sh. Sourcing script"
-        source "$LOCALBUILDDIR/${vcsFolder}_extra.sh"
-        echo "${vcsFolder}" >> "$LOCALBUILDDIR/patchedFolders"
-        sort -uo "$LOCALBUILDDIR/patchedFolders"{,}
-    fi
+    [[ -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]] || return
+    export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
+    export REPO_NAME="${vcsFolder}"
+    do_print_progress "  Found ${vcsFolder}_extra.sh. Sourcing script"
+    source "$LOCALBUILDDIR/${vcsFolder}_extra.sh"
+    echo "$vcsFolder" >> "$LOCALBUILDDIR/patchedFolders"
+    sort -uo "$LOCALBUILDDIR/patchedFolders"{,}
 }
 
 extra_script() {
@@ -2313,6 +2300,9 @@ unset_extra_script() {
 
     # Each of the _{pre,post}_<Command> means that there is a "_pre_<Command>"
     # and "_post_<Command>"
+
+    # Runs before cloning or fetching a git repo and after
+    unset _{pre,post}_vcs
 
     # Runs before and after building rust packages (do_rust)
     unset _{pre,post}_rust
@@ -2386,6 +2376,12 @@ create_extra_skeleton() {
 # Force to the suite to think the package has updates to recompile.
 # Alternatively, you can use "touch recompile" for a similar effect.
 #touch custom_updated
+
+# Commands to run before and after cloning a repo
+_pre_vcs() {
+    # ref changes the branch/commit/tag that you want to clone
+    ref=research
+}
 
 # Commands to run before and after running cmake (do_cmake)
 _pre_cmake(){
