@@ -2293,15 +2293,15 @@ extra_script() {
     vcsFolder="${vcsFolder#*build/}"
     if [[ $commandname =~ ^(make|ninja)$ ]] &&
         type "_${stage}_build" > /dev/null 2>&1; then
-        pushd "${REPO_DIR}" > /dev/null || true
+        pushd "${REPO_DIR}" > /dev/null 2>&1 || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
         log -q "${stage}_build" "_${stage}_build"
-        popd > /dev/null || true
+        popd > /dev/null 2>&1 || true
     elif type "_${stage}_${commandname}" > /dev/null 2>&1; then
-        pushd "${REPO_DIR}" > /dev/null || true
+        pushd "${REPO_DIR}" > /dev/null 2>&1 || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
         log -q "${stage}_${commandname}" "_${stage}_${commandname}"
-        popd > /dev/null || true
+        popd > /dev/null 2>&1 || true
     fi
 }
 
