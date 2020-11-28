@@ -236,9 +236,19 @@ do_vcs() {
     cd_safe "$LOCALBUILDDIR"
 
     rm -f "$vcsFolder-git/custom_updated"
-    check_custom_patches
+
+    check_custom_patches "$vcsFolder-git"
 
     extra_script pre vcs
+
+    # try to see if we can "resolve" the currently provided ref, minus the origin/ part,
+    # if so, set ref to the ref on the origin, this might make it harder for people who
+    # want use multiple remotes other than origin. Converts ref=develop to ref=origin/develop
+    # ignore those that use the special tags/branches
+    case $ref in
+    LATEST | GREATEST | *\**) ;;
+    *) git ls-remote "$vcsURL" "${ref#origin/}" > /dev/null && ref=origin/${ref#origin/} ;;
+    esac
 
     if ! check_valid_vcs "$vcsFolder-git"; then
         rm -rf "$vcsFolder-git"
@@ -473,12 +483,12 @@ do_wget_sf() {
     [[ $1 == "-h" ]] && hash="$2" && shift 2
     local url="https://download.sourceforge.net/$1"
     shift 1
-    check_custom_patches
     if [[ -n $hash ]]; then
         do_wget -h "$hash" "$url" "$@"
     else
         do_wget "$url" "$@"
     fi
+    check_custom_patches
 }
 
 do_strip() {
@@ -2262,12 +2272,14 @@ verify_cuda_deps() {
 }
 
 check_custom_patches() {
-    local _basedir
-    _basedir="$(get_first_subdir)"
-    local vcsFolder="${_basedir%-*}"
-    [[ -f "$LOCALBUILDDIR/${vcsFolder}_extra.sh" ]] || return
-    export REPO_DIR="$LOCALBUILDDIR/${_basedir}"
-    export REPO_NAME="${vcsFolder}"
+    local _basedir=$1 vcsFolder=${1%-*}
+    if [[ -z $1 ]]; then
+        _basedir=$(get_first_subdir)
+        vcsFolder=${_basedir%-*}
+    fi
+    [[ -f $LOCALBUILDDIR/${vcsFolder}_extra.sh ]] || return
+    export REPO_DIR=$LOCALBUILDDIR/$_basedir
+    export REPO_NAME=$vcsFolder
     do_print_progress "  Found ${vcsFolder}_extra.sh. Sourcing script"
     source "$LOCALBUILDDIR/${vcsFolder}_extra.sh"
     echo "$vcsFolder" >> "$LOCALBUILDDIR/patchedFolders"
@@ -2298,6 +2310,8 @@ unset_extra_script() {
     unset REPO_DIR
     # The repository name (ffmpeg)
     unset REPO_NAME
+    # Should theoretically be the same as REPO_NAME with
+    unset vcsFolder
 
     # Each of the _{pre,post}_<Command> means that there is a "_pre_<Command>"
     # and "_post_<Command>"
