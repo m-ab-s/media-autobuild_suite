@@ -285,7 +285,7 @@ do_vcs() {
             echo
         } >> "$LOCALBUILDDIR/newchangelog"
         do_print_status "┌ $vcsFolder git" "$orange" "Updates found"
-    elif [[ -f recently_updated  && ! -f build_successful$bits${flavor:+_$flavor} ]]; then
+    elif [[ -f recently_updated && ! -f build_successful$bits${flavor:+_$flavor} ]]; then
         do_print_status "┌ $vcsFolder git" "$orange" "Recently updated"
     elif [[ -n ${vcsCheck[*]} ]] && ! files_exist "${vcsCheck[@]}"; then
         do_print_status "┌ $vcsFolder git" "$orange" "Files missing"
@@ -2037,7 +2037,8 @@ EOF
 }
 
 create_cmake_toolchain() {
-    local _win_paths="$(cygpath -pm  "$LOCALDESTDIR":"$MINGW_PREFIX":"$MINGW_PREFIX/$MINGW_CHOST")"
+    local _win_paths
+    _win_paths=$(cygpath -pm "$LOCALDESTDIR:$MINGW_PREFIX:$MINGW_PREFIX/$MINGW_CHOST")
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         ""
