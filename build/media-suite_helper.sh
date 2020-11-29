@@ -247,7 +247,7 @@ do_vcs() {
     # ignore those that use the special tags/branches
     case $ref in
     LATEST | GREATEST | *\**) ;;
-    *) git ls-remote "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
+    *) git ls-remote --exit-code "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
     esac
 
     if ! check_valid_vcs "$vcsFolder-git"; then
