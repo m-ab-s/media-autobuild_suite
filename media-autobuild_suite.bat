@@ -105,7 +105,7 @@ set msyspackages=asciidoc autoconf automake-wrapper autogen base bison diffstat 
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkg-config meson ccache jq ^
+set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
 clang
 
 :: built-ins
