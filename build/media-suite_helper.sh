@@ -2199,15 +2199,6 @@ compare_with_zeranoe() {
     printf '\n'
 }
 
-fix_libtiff_pc() {
-    pc_exists libtiff-4 || return
-    local _pkgconfLoc
-    _pkgconfLoc="$(cygpath -u "$(pkg-config --debug libtiff-4 2>&1 |
-        sed -rn "/Reading/{s/.*'(.*\.pc)'.*/\1/gp}")")"
-    [[ ! -f $_pkgconfLoc ]] && return
-    grep_or_sed zstd "$_pkgconfLoc" 's;Libs.private:.*;& -lzstd;'
-}
-
 fix_cmake_crap_exports() {
     local _dir="$1"
     # noop if passed directory is not valid
