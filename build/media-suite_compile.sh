@@ -13,7 +13,7 @@ if [[ -z $LOCALBUILDDIR ]]; then
     read -r -p "Enter to continue" ret
     exit 1
 fi
-FFMPEG_BASE_OPTS=("--pkg-config-flags=--static" "--cc=$CC" "--cxx=$CXX")
+FFMPEG_BASE_OPTS=("--pkg-config=pkgconf" "--pkg-config-flags=--static" "--cc=$CC" "--cxx=$CXX")
 printf '\nBuild start: %(%F %T %z)T\n' -1 >> "$LOCALBUILDDIR/newchangelog"
 
 printf '#!/bin/bash\nbash %s %s\n' "$LOCALBUILDDIR/media-suite_compile.sh" "$*" > "$LOCALBUILDDIR/last_run"
@@ -1907,7 +1907,7 @@ if [[ $ffmpeg != no ]]; then
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
     enabled ladspa && do_pacman_install ladspa-sdk
     if enabled vapoursynth && pc_exists "vapoursynth-script >= 42"; then
-        _ver=$(pkg-config --modversion vapoursynth-script)
+        _ver=$($PKG_CONFIG --modversion vapoursynth-script)
         do_simple_print "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
         do_simple_print "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers"'!'"${reset}"
         unset _ver
@@ -2197,7 +2197,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     fi
 
     if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
-        _ver=$(pkg-config --modversion vapoursynth-script)
+        _ver=$($PKG_CONFIG --modversion vapoursynth-script)
         do_simple_print "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
         do_simple_print "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter"'!'"${reset}"
         unset _ver

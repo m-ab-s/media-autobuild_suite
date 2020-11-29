@@ -670,7 +670,7 @@ pc_exists() {
         local _check=${opt#$_pkg}
         [[ $_pkg == "$_check" ]] && _check=""
         [[ $_pkg == *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
-        pkg-config --exists --silence-errors "${_pkg}${_check}" || return
+        $PKG_CONFIG --exists --silence-errors "${_pkg}${_check}" || return
     done
 }
 
@@ -1298,7 +1298,7 @@ do_meson() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     # shellcheck disable=SC2086
-    PKG_CONFIG=pkg-config CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
+    PKG_CONFIG=pkgconf CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
         log "meson" meson "$root" --default-library=static --buildtype=release \
         --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@" "${meson_extras[@]}"
     extra_script post meson
@@ -1987,7 +1987,7 @@ done
 [[ -n $PKGCONF_STATIC ]] && static="--static"
 
 run_pkgcfg() {
-    "$MINGW_PREFIX/bin/pkg-config" "$@" || exit 1
+    "$MINGW_PREFIX/bin/pkgconf" "$@" || exit 1
 }
 
 deduplicateLibs() {
