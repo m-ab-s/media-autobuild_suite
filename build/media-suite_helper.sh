@@ -488,7 +488,9 @@ do_wget_sf() {
     else
         do_wget "$url" "$@"
     fi
+    local ret=$?
     check_custom_patches
+    return $ret
 }
 
 do_strip() {
