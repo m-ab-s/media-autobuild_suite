@@ -2636,7 +2636,7 @@ if [[ $vlc == y ]]; then
     _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
     if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
         do_uninstall include/google/protobuf "${_check[@]}"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/protobuf/0001-src-google-protobuf-port_def-use-_WIN32-for-PROTOBUF.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/protobuf/0001-io-coded_stream-assume-Windows-is-little-endian.patch" am
         do_autogen
         do_separate_confmakeinstall
         do_checkIfExist
