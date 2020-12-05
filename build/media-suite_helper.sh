@@ -257,6 +257,7 @@ do_vcs() {
             echo "$vcsFolder git seems to be down"
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
+            unset_extra_script
             return
         fi
         touch "$vcsFolder-git"/recently_{updated,checked}
@@ -267,6 +268,7 @@ do_vcs() {
     if [[ $ffmpegUpdate == onlyFFmpeg && $vcsFolder != ffmpeg && $vcsFolder != mpv ]] &&
         files_exist "${vcsCheck[@]:-$vcsFolder.pc}"; then
         do_print_status "${vcsFolder} git" "$green" "Already built"
+        unset_extra_script
         return 1
     fi
 
@@ -303,8 +305,10 @@ do_vcs() {
         do_print_status "┌ $vcsFolder git" "$orange" "Newer dependencies"
     else
         do_print_status "$vcsFolder git" "$green" "Up-to-date"
-        [[ ! -f recompile ]] &&
+        [[ ! -f recompile ]] && {
+            unset_extra_script
             return 1
+        }
         do_print_status "┌ $vcsFolder git" "$orange" "Forcing recompile"
         do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
     fi
