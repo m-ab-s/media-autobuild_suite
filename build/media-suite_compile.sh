@@ -1018,7 +1018,6 @@ else
 fi
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/aom/0001-ScaleAddRow_SSE2-only-use-if-MSVC-is-defined.patch" am
     extracommands=()
     if $_aom_bins; then
         _check+=(bin-video/aomdec.exe)
