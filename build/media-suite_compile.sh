@@ -1119,7 +1119,7 @@ if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
         do_simple_print -p "${orange}Warning: JPEG-XL compiled with GCC will not use SIMD optimizations!$reset"
         extra_cxxflags+=('-DHWY_COMPILE_ONLY_SCALAR')
     fi
-    CXXFLAGS+=" ${extra_cxxflags[@]}" \
+    CXXFLAGS+=" ${extra_cxxflags[*]}" \
         do_cmake global -D{BUILD_TESTING,JPEGXL_{ENABLE_OPENEXR,ENABLE_SKCMS}}=OFF \
         -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC,ENABLE_BENCHMARK}=ON
     do_ninja
