@@ -601,11 +601,6 @@ if %fdkaacINI%==0 (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: FFmpeg's aac encoder is no longer experimental and considered equal or
-    echo. better in quality from 96kbps and above. It still doesn't support AAC-HE/HEv2
-    echo. so if you need that or want better quality at lower bitrates than 96kbps,
-    echo. use FDK-AAC.
-    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildfdkaac="Build fdkaac: "
