@@ -235,7 +235,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
 
     _check=(libfreetype.{l,}a freetype2.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
-    if do_vcs "https://git.savannah.gnu.org/git/freetype/freetype2.git#tag=LATEST"; then
+    if do_vcs "https://git.savannah.nongnu.org/r/freetype/freetype2.git#tag=LATEST"; then
         do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
