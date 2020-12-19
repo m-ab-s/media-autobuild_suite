@@ -620,7 +620,7 @@ if [[ $ffmpeg != no || $sox = y ]]; then
 fi
 
 _check=(ilbc.h libilbc.{a,pc})
-if [[ $ffmpeg != no ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev" &&
+if [[ $ffmpeg != no ]] && enabled libilbc &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
     do_uninstall "${_check[@]}"
     log -q "git.submodule" git submodule update --init --recursive
