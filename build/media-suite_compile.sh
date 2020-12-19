@@ -622,9 +622,9 @@ fi
 _check=(ilbc.h libilbc.{{l,}a,pc})
 if [[ $ffmpeg != no ]] && enabled libilbc && do_pkgConfig "libilbc = 2.0.3-dev" &&
     do_vcs "https://github.com/TimothyGu/libilbc.git"; then
-    do_autoreconf
     do_uninstall "${_check[@]}"
-    do_separate_confmakeinstall
+    log -q "git.submodule" git submodule update --init --recursive
+    do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
     add_to_remove
 fi
