@@ -1091,16 +1091,17 @@ fi
 _check=(libavif.{a,pc} avif/avif.h)
 [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
 if [[ $libavif = y ]] && {
-        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
+        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "libgav1"
     } &&
     do_vcs "https://github.com/AOMediaCodec/libavif.git"; then
     do_uninstall "${_check[@]}"
     do_pacman_install libjpeg-turbo
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libavif/0001-CMake-Use-the-import-libraries-and-the-proper-variab.patch" am
     extracommands=()
+    pc_exists "libgav1" && extracommands+=("-DAVIF_CODEC_LIBGAV1=ON")
     pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
     pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
-    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
+    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON -DAVIF_CODEC_AOM_DECODE=ON -DAVIF_CODEC_AOM_ENCODE=ON")
     case $standalone in
     y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
     *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
@@ -1113,6 +1114,7 @@ _check=(bin-global/{{c,d}j,benchmark_}xl.exe)
 if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
     do_uninstall "${_check[@]}"
     do_pacman_install lcms2
+    do_pacman_install libjpeg-turbo
     log -q "git.submodule" git submodule update --init --recursive
     extra_cxxflags=()
     if [[ ${CC##* } = gcc ]]; then
@@ -1121,7 +1123,7 @@ if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
     fi
     CXXFLAGS+=" ${extra_cxxflags[*]}" \
         do_cmake global -D{BUILD_TESTING,JPEGXL_{ENABLE_OPENEXR,ENABLE_SKCMS}}=OFF \
-        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC,ENABLE_BENCHMARK}=ON
+        -DJPEGXL_{FORCE_SYSTEM_HWY,FORCE_SYSTEM_BROTLI,STATIC,ENABLE_BENCHMARK}=ON
     do_ninja
     do_install tools/{{c,d}j,benchmark_}xl.exe bin-global/
     do_checkIfExist
