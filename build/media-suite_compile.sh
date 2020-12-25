@@ -1091,14 +1091,14 @@ fi
 _check=(libavif.{a,pc} avif/avif.h)
 [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
 if [[ $libavif = y ]] && {
-        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "libgav1"
+        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "svtav1"
     } &&
     do_vcs "https://github.com/AOMediaCodec/libavif.git"; then
     do_uninstall "${_check[@]}"
     do_pacman_install libjpeg-turbo
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libavif/0001-CMake-Use-the-import-libraries-and-the-proper-variab.patch" am
     extracommands=()
-    pc_exists "libgav1" && extracommands+=("-DAVIF_CODEC_LIBGAV1=ON")
+    pc_exists "svtav1" && extracommands+=("-DAVIF_CODEC_SVT=ON")
     pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
     pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
     pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON -DAVIF_CODEC_AOM_DECODE=ON -DAVIF_CODEC_AOM_ENCODE=ON")
