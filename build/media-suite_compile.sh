@@ -1101,7 +1101,7 @@ if [[ $libavif = y ]] && {
     pc_exists "svtav1" && extracommands+=("-DAVIF_CODEC_SVT=ON")
     pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
     pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
-    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON -DAVIF_CODEC_AOM_DECODE=ON -DAVIF_CODEC_AOM_ENCODE=ON")
+    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON -DAVIF_CODEC_AOM_DECODE=OFF -DAVIF_CODEC_AOM_ENCODE=ON")
     case $standalone in
     y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
     *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
