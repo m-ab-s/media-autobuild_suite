@@ -1758,7 +1758,7 @@ goto :EOF
     echo.
     echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
-    echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --static"
+    echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-libs --static"
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=0 -D__USE_MINGW_ANSI_STDIO=1"
     if %CC%==clang (
