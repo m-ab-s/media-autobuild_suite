@@ -1579,7 +1579,7 @@ fi
 
 _check=(x265{,_config}.h libx265.a x265.pc)
 [[ $standalone = y ]] && _check+=(bin-video/x265.exe)
-if [[ ! $x265 = n ]] && do_vcs "https://github.com/videolan/x265.git"; then
+if [[ ! $x265 = n ]] && do_vcs "https://bitbucket.org/multicoreware/x265_git.git"; then
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
     [[ $bits = 32bit ]] && assembly=-DENABLE_ASSEMBLY=OFF
     [[ $x265 = d ]] && xpsupport=-DWINXP_SUPPORT=ON
