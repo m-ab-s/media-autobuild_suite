@@ -11,9 +11,9 @@ if [[ -z ${MSYS+x} ]]; then
     rm -f symlinktest hardlinktest linktest
 fi
 
-if [[ ! $cpuCount =~ ^[0-9]+$ ]]; then
-    cpuCount=$(($(nproc) / 2))
-fi
+case $cpuCount in
+''|*[!0-9]*) cpuCount=$(($(nproc) / 2)) ;;
+esac
 : "${bits:=64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
     --retry-delay 5 --silent --location --insecure --fail)
