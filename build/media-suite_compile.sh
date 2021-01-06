@@ -2151,9 +2151,10 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
 
     _notrequired=true
-    do_configure --bindir="$LOCALDESTDIR"/bin-video --cc=gcc \
-    --extra-cflags='-DPTW32_STATIC_LIB -O3 -std=gnu99 -DMODPLUG_STATIC' \
-    --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
+    do_configure --bindir="$LOCALDESTDIR"/bin-video \
+    --extra-cflags='-fpermissive -DPTW32_STATIC_LIB -O3 -DMODPLUG_STATIC' \
+    --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $($PKG_CONFIG --libs libilbc) \
+        $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
     --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
