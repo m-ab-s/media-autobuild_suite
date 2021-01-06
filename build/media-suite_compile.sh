@@ -485,6 +485,10 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     fi
 fi
 
+file_installed -s libtiff-4.pc &&
+    grep_or_sed '-ldeflate' "$(file_installed libtiff-4.pc)" \
+        's/Libs.private:.*/& -ldeflate/'
+
 _check=(libwebp{,mux}.{{,l}a,pc})
 [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
