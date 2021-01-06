@@ -633,6 +633,8 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
     add_to_remove
 fi
 
+grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
+
 enabled libvorbis && do_pacman_install libvorbis
 enabled libspeex && do_pacman_install speex
 
