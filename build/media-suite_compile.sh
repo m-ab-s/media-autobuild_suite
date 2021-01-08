@@ -2640,7 +2640,7 @@ if [[ $vlc == y ]]; then
         do_uninstall "${_check[@]}"
         log -q "git.submodule" git submodule update --init
         do_autoreconf
-        do_separate_confmakeinstall --disable-examples LIBS="$($PKG_CONFIG --libs openssl)"
+        CFLAGS+=" -include ws2tcpip.h" do_separate_confmakeinstall --disable-examples LIBS="$($PKG_CONFIG --libs openssl)"
         do_checkIfExist
     fi
 
