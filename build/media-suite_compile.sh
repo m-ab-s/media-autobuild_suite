@@ -1940,10 +1940,8 @@ if [[ $ffmpeg != no ]]; then
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
-        _mabs_patches=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master
-        do_patch "$_mabs_patches/ffmpeg/0001-get_cabac_inline_x86-Don-t-inline-if-32-bit-clang-on.patch" am
-        do_patch "$_mabs_patches/ffmpeg/0001-libavdevice-decklink_dec-mark-get_bmd_timecode-stati.patch" am
-        do_patch "$_mabs_patches/ffmpeg/0002-libavdevice-decklink_dec-mark-get_frame_timecode-sta.patch" am
+
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-get_cabac_inline_x86-Don-t-inline-if-32-bit-clang-on.patch" am
 
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
@@ -1959,7 +1957,7 @@ if [[ $ffmpeg != no ]]; then
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
         enabled vapoursynth &&
-            do_patch "$_mabs_patches/ffmpeg/0001-Add-Alternative-VapourSynth-demuxer.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-Add-Alternative-VapourSynth-demuxer.patch" am
 
         if enabled openal &&
             pc_exists "openal"; then
@@ -1975,7 +1973,7 @@ if [[ $ffmpeg != no ]]; then
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
             # remove redundant -L and -l flags from extralibs
-            do_patch "$_mabs_patches/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
 
         _patches=$(git rev-list origin/master.. --count)
@@ -2064,8 +2062,6 @@ if [[ $ffmpeg != no ]]; then
         unset ffmpeg_cflags build_suffix
     fi
 fi
-
-unset _mabs_patches
 
 # static do_vcs just for svn
 check_mplayer_updates() {
