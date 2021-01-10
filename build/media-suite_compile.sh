@@ -474,7 +474,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     _deps=(libglut.a)
     _check=(libtiff{.a,-4.pc})
     if do_vcs "https://gitlab.com/libtiff/libtiff.git"; then
-        do_pacman_install libjpeg-turbo xz zlib zstd
+        do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
         do_uninstall "${_check[@]}"
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0001-tiffgt-Link-winmm-if-windows.patch" am
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0002-CMake-Set-CMP0060-to-NEW-for-glut-libs.patch" am
