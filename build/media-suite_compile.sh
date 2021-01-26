@@ -1783,8 +1783,7 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
     grep_or_sed Libs.private libs/lensfun/lensfun.pc.cmake '/Libs:/ a\Libs.private: -lstdc++'
     do_uninstall "bin-video/lensfun" "${_check[@]}"
-    do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/cmake-mingw.patch"
-    do_patch "https://github.com/Alexpux/MINGW-packages/raw/master/mingw-w64-lensfun/lenstool.patch"
+    do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/0ab14ea53ad1cf6f7eaca631ea07c99e2dbd4228/mingw-w64-lensfun/cmake-mingw.patch"
     CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
         do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
         -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
