@@ -1956,8 +1956,10 @@ if [[ $ffmpeg != no ]]; then
         enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
-        enabled vapoursynth &&
+        enabled vapoursynth && {
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-Add-Alternative-VapourSynth-demuxer.patch" am
+            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0002-vapoursynth_alt-use-atomic_int-for-async_pending.patch" am
+        }
 
         if enabled openal &&
             pc_exists "openal"; then
