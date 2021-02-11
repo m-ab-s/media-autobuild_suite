@@ -557,7 +557,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         # Don't include curl in tesseract. We aren't mainly using the executable with links.
         # tesseract doesn't have a --disable-curl option or something so it's dumb.
         for _curl_pc in {"$MINGW_PREFIX","$LOCALDESTDIR"}/lib/pkgconfig/libcurl.pc; do
-            [[ -f $_curl_pc ]] && mv "$_curl_pc"{,.bak}
+            [[ -f $_curl_pc.bak ]] && mv "$_curl_pc"{.bak,}
         done
         do_autogen
         _check+=(bin-global/tesseract.exe)
@@ -569,6 +569,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         *clang) sed -i -e 's|Libs.private.*|& -fopenmp=libomp|' tesseract.pc.in ;;
         esac
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
+            --without-curl \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
             LIBS="$($PKG_CONFIG --libs iconv lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
@@ -581,9 +582,6 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
                 "Just download <lang you want>.traineddata and copy it to this directory." \
                 > "$LOCALDESTDIR"/bin-global/tessdata/need_more_languages.txt
         fi
-        for _curl_pc in {"$MINGW_PREFIX","$LOCALDESTDIR"}/lib/pkgconfig/libcurl.pc; do
-            [[ -f $_curl_pc.bak ]] && mv "$_curl_pc"{.bak,}
-        done
         do_checkIfExist
     fi
     do_addOption --extra-cflags=-fopenmp --extra-libs=-lgomp
