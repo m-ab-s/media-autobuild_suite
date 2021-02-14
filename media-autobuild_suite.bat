@@ -1490,7 +1490,7 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.Set Shell = CreateObject("WScript.Shell"^)
         echo.Set link = Shell.CreateShortcut("%instdir%\mintty.lnk"^)
-        echo.link.Arguments = "-full-path -mingw"
+        echo.link.Arguments = "-full-path -mingw -where .."
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\msys64\msys2_shell.cmd"
         echo.link.WindowStyle = 1
@@ -1785,7 +1785,6 @@ goto :EOF
     echo.GIT_GUI_LIB_DIR=`cygpath -w /usr/share/git-gui/lib`
     echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
     echo.stty susp undef
-    echo.cd /trunk
     echo.test -f "$LOCALDESTDIR/etc/custom_profile" ^&^& source "$LOCALDESTDIR/etc/custom_profile"
 )>%instdir%\local%1\etc\profile2.local
 %instdir%\msys64\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
