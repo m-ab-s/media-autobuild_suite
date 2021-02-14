@@ -381,11 +381,10 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
         do_wget -h e1cb1db3d2e249a6a3eb6f0946777c2e892d5c5dc7bd91c74394fc3a01cab8b5 \
         "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"; then
         do_uninstall "${_check[@]}"
-        [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.am
+        [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.in
         # unistring also depends on iconv
         grep_or_sed '@LTLIBUNISTRING@ @LTLIBICONV@' libidn2.pc.in \
             's|(@LTLIBICONV@) (@LTLIBUNISTRING@)|\2 \1|'
-        do_autoreconf
         do_separate_confmakeinstall global --disable-{doc,rpath,nls}
         do_checkIfExist
     fi
