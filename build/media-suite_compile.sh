@@ -2636,7 +2636,6 @@ if [[ $vlc == y ]]; then
     _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
     if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
         do_uninstall include/google/protobuf "${_check[@]}"
-        do_patch "https://github.com/protocolbuffers/protobuf/pull/8299.patch" am
         do_autogen
         do_separate_confmakeinstall
         do_checkIfExist
