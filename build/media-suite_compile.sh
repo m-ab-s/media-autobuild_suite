@@ -2314,7 +2314,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         enabled libvidstab && {
             mapfile -d ' ' -t -O "${#mpv_cflags[@]}" mpv_cflags < <($PKG_CONFIG --libs vidstab)
-            mapfile -d ' ' -t -O "${#mpv_cflags[@]}" mpv_ldflags < <($PKG_CONFIG --libs vidstab)
+            mapfile -d ' ' -t -O "${#mpv_ldflags[@]}" mpv_ldflags < <($PKG_CONFIG --libs vidstab)
         }
         enabled_any libssh libxavs2 && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
