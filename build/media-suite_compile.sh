@@ -1416,9 +1416,9 @@ fi
 _check=(libgpac_static.a bin-video/MP4Box.exe)
 if [[ $mp4box = y ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_uninstall include/gpac "${_check[@]}"
+    do_patch "https://gist.github.com/1480c1/bafa226fdfc58b078276bc741fff82ca/raw/gpac.diff"
     git grep -PIl "\xC2\xA0" | xargs -r sed -i 's/\xC2\xA0/ /g'
     LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
-    CFLAGS+=" -DNGHTTP2_STATICLIB" \
         do_separate_conf --static-mp4box
     do_make
     log "install" make install-lib
