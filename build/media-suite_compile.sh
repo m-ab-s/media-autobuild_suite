@@ -1416,7 +1416,6 @@ fi
 _check=(libgpac_static.a bin-video/MP4Box.exe)
 if [[ $mp4box = y ]] && do_vcs "https://github.com/gpac/gpac.git"; then
     do_uninstall include/gpac "${_check[@]}"
-    do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/gpac/0001-downloader-always-define-NGHTTP2_STATICLIB-on-win.patch" am
     git grep -PIl "\xC2\xA0" | xargs -r sed -i 's/\xC2\xA0/ /g'
     LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
         do_separate_conf --static-mp4box
