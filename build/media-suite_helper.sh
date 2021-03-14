@@ -12,7 +12,7 @@ if [[ -z ${MSYS+x} ]]; then
 fi
 
 case $cpuCount in
-''|*[!0-9]*) cpuCount=$(($(nproc) / 2)) ;;
+'' | *[!0-9]*) cpuCount=$(($(nproc) / 2)) ;;
 esac
 : "${bits:=64bit}"
 curl_opts=(/usr/bin/curl --connect-timeout 15 --retry 3
