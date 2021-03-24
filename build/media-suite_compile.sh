@@ -1189,6 +1189,7 @@ fi
 if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "https://code.videolan.org/videolan/libaacs.git"; then
+        do_patch "https://code.videolan.org/videolan/libaacs/-/merge_requests/11.patch" am
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
