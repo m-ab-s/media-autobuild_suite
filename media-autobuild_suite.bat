@@ -1738,6 +1738,7 @@ goto :EOF
     echo.
     echo.bits='%1bit'
     echo.
+    echo.export CONFIG_SITE=/etc/config.site
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
     if %CC%==clang (
