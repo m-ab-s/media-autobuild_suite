@@ -698,7 +698,7 @@ if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
 fi
 
 [[ $faac = y ]] && do_pacman_install faac
-_check=(bin-audio/faac{,gui}.exe)
+_check=(bin-audio/faac.exe)
 if [[ $standalone = y && $faac = y ]] &&
     do_vcs "https://github.com/knik0/faac.git"; then
     do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
