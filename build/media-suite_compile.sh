@@ -1201,6 +1201,7 @@ if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; th
 
     _check=(bin-video/libbdplus.dll libbdplus.{{,l}a,pc} libbdplus/bdplus.h)
     if do_vcs "https://code.videolan.org/videolan/libbdplus.git"; then
+        do_patch "https://code.videolan.org/videolan/libbdplus/-/merge_requests/6.patch" am
         sed -ri 's;noinst_PROGRAMS.*;noinst_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libbdplus
