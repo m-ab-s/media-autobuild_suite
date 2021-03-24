@@ -1215,6 +1215,7 @@ _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://code.videolan.org/videolan/libbluray.git"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
+    do_patch "https://code.videolan.org/videolan/libbluray/-/merge_requests/26.patch" am
     do_autoreconf
     do_uninstall include/libbluray share/java "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
