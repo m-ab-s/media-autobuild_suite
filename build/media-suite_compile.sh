@@ -1189,7 +1189,6 @@ fi
 if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "https://code.videolan.org/videolan/libaacs.git"; then
-        do_patch "https://code.videolan.org/videolan/libaacs/-/merge_requests/11.patch" am
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
@@ -1201,7 +1200,6 @@ if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; th
 
     _check=(bin-video/libbdplus.dll libbdplus.{{,l}a,pc} libbdplus/bdplus.h)
     if do_vcs "https://code.videolan.org/videolan/libbdplus.git"; then
-        do_patch "https://code.videolan.org/videolan/libbdplus/-/merge_requests/6.patch" am
         sed -ri 's;noinst_PROGRAMS.*;noinst_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libbdplus
@@ -1215,7 +1213,6 @@ _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "https://code.videolan.org/videolan/libbluray.git"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
-    do_patch "https://code.videolan.org/videolan/libbluray/-/merge_requests/26.patch" am
     do_autoreconf
     do_uninstall include/libbluray share/java "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
