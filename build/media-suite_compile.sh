@@ -1114,7 +1114,7 @@ fi
 _check=(bin-global/{c,d}jxl.exe)
 if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
     do_uninstall "${_check[@]}"
-    do_pacman_install lcms2
+    do_pacman_install lcms2 asciidoc
     log -q "git.submodule" git submodule update --init --recursive
     extra_cxxflags=()
     if [[ ${CC##* } = gcc ]]; then
