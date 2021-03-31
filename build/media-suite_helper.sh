@@ -1681,6 +1681,7 @@ do_pacman_remove() {
     sort -uo /etc/pac-mingw-extra.pk{,} > /dev/null 2>&1
     sort -uo /etc/pac-msys-extra.pk{,} > /dev/null 2>&1
     do_hide_all_sharedlibs
+    return 0
 }
 
 do_prompt() {
