@@ -1897,7 +1897,7 @@ if [[ $ffmpeg != no ]]; then
         fi
     fi
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
-        do_pacman_remove fftw && do_pacman_install chromaprint
+        { do_pacman_remove fftw; do_pacman_install chromaprint; }
     if enabled libzmq; then
         do_pacman_install zeromq
         grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
