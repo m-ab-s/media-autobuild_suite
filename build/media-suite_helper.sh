@@ -168,7 +168,11 @@ vcs_get_latest_tag() {
 
 # vcs_set_url https://github.com/FFmpeg/FFmpeg.git
 vcs_set_url() {
-    git remote set-url origin "$1"
+    if vcs_test_remote "$1"; then
+        git remote set-url origin "$1"
+    elif vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}"; then
+        git remote set-url origin "https://gitlab.com/m-ab-s/${1##*/}"
+    fi
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 }
 
