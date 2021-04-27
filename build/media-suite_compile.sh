@@ -2654,8 +2654,7 @@ if [[ $vlc == y ]]; then
     _check=(libmedialibrary.{,l}a medialibrary.pc medialibrary/IAlbum.h)
     if do_vcs "https://code.videolan.org/videolan/medialibrary.git"; then
         do_uninstall include/medialibrary "${_check[@]}"
-        do_autoreconf
-        do_separate_confmakeinstall --disable-tests --without-libvlc
+        do_mesoninstall -Dtests=disabled -Dlibvlc=disabled
         do_checkIfExist
     fi
 
