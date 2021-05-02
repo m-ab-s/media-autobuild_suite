@@ -1939,7 +1939,7 @@ if [[ $ffmpeg != no ]]; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-get_cabac_inline_x86-Don-t-inline-if-32-bit-clang-on.patch" am
 
         if enabled libsvthevc; then
-            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
         fi
         if enabled libsvtvp9; then
