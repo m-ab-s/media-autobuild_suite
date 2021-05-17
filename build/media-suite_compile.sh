@@ -1124,7 +1124,7 @@ if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
     fi
     CXXFLAGS+=" ${extra_cxxflags[*]}" \
         do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{OPENEXR,SKCMS,BENCHMARK}}=OFF \
-        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON
+        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_ENABLE_MANPAGES=OFF
     do_ninja
     do_install tools/{c,d}jxl.exe bin-global/
     do_checkIfExist
