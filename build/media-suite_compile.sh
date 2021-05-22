@@ -1020,9 +1020,6 @@ else
 fi
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
-    git fetch https://aomedia.googlesource.com/aom refs/changes/61/138161/2 > /dev/null 2>&1
-    git format-patch origin/master..FETCH_HEAD > /dev/null 2>&1
-    do_patch "0001-pass2_strategy-Disable-usage-of-warn.patch" am
     extracommands=()
     if $_aom_bins; then
         _check+=(bin-video/aomdec.exe)
