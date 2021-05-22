@@ -475,7 +475,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         do_uninstall "${_check[@]}"
         do_patch "https://gitlab.com/libtiff/libtiff/-/merge_requests/233.patch" am
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
-            '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd'
+            '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd glut'
         CFLAGS+=" -DFREEGLUT_STATIC" do_cmakeinstall global -D{webp,jbig,UNIX}=OFF
         do_checkIfExist
     fi
@@ -485,22 +485,23 @@ file_installed -s libtiff-4.pc &&
     grep_or_sed '-ldeflate' "$(file_installed libtiff-4.pc)" \
         's/Libs.private:.*/& -ldeflate/'
 
-_check=(libwebp{,mux}.{{,l}a,pc})
-[[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{{,l}a,pc}
+_check=(libwebp{,mux}.{a,pc})
+[[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{a,pc}
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
-    if [[ $standalone = y ]]; then
-        extracommands=(--enable-libwebp{demux,decoder,extras}
-            "LIBS=$($PKG_CONFIG --libs libpng libtiff-4)")
-    else
-        extracommands=(--disable-tiff)
-        sed -i -e '/examples/d' -e 's/ man//' Makefile.am
-    fi
-    do_autoreconf
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-vwebp-Use-GLUT-and-opengl-import-targets.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-vwebp-link-winmm-if-windows.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-deps-link-libtiff-first.patch" am
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
-    do_separate_confmakeinstall global --enable-{swap-16bit-csp,libwebpmux} \
-        "${extracommands[@]}"
+    extracommands=("-DWEBP_BUILD_EXTRAS=OFF")
+    if [[ $standalone = y ]]; then
+        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS}"=ON")
+    else
+        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS}"=OFF")
+    fi
+    CFLAGS+=" -DFREEGLUT_STATIC" \
+        do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
     do_checkIfExist
 fi
 
