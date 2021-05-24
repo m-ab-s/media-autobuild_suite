@@ -292,7 +292,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
     _check=(libfribidi.a fribidi.pc)
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
-    if do_vcs "https://github.com/fribidi/fribidi.git#tag=LATEST"; then
+    if do_vcs "https://github.com/fribidi/fribidi.git"; then
         extracommands=("-Ddocs=false" "-Dtests=false")
         [[ $standalone = n ]] && extracommands+=("-Dbin=false")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
