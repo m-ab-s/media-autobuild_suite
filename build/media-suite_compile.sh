@@ -490,6 +490,7 @@ _check=(libwebp{,mux}.{a,pc})
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
+    do_pacman_install giflib
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-vwebp-Use-GLUT-and-opengl-import-targets.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-vwebp-link-winmm-if-windows.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-deps-link-libtiff-first.patch" am
