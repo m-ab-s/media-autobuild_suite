@@ -105,6 +105,7 @@ For information about the compiler environment see the wiki, there you also have
         - libnpp (needs CUDA SDK installed)
             - needs non-free license
         - libopenh264 (official binaries)
+        - librist (git)
         - librtmp (git)
         - librubberband (git snapshot)
         - libssh (broken)
