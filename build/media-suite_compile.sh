@@ -553,11 +553,6 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "https://github.com/tesseract-ocr/tesseract.git"; then
         do_pacman_install docbook-xsl libarchive pango asciidoc
-        # Don't include curl in tesseract. We aren't mainly using the executable with links.
-        # tesseract doesn't have a --disable-curl option or something so it's dumb.
-        for _curl_pc in {"$MINGW_PREFIX","$LOCALDESTDIR"}/lib/pkgconfig/libcurl.pc; do
-            [[ -f $_curl_pc.bak ]] && mv "$_curl_pc"{.bak,}
-        done
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
