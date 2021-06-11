@@ -1254,7 +1254,6 @@ do_cmake() {
         esac
     done
 
-    local PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat"
     [[ -z $skip_build_dir ]] && create_build_dir "$cmake_build_dir"
     # use this array to pass additional parameters to cmake
     local cmake_extras=()

@@ -490,6 +490,15 @@ _check=(libwebp{,mux}.{a,pc})
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
+    cd "$MINGW_PREFIX/share/cmake-3.20" && {
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0001-FindPkgConfig-split-args-if-loaded-from-environment.patch"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0002-FindTIFF-Use-pkg-config-for-finding-dependencies.patch"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0003-FindGLUT-Use-pkg-config-for-finding-dependencies.patch"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0004-FindZLIB-Use-pkg-config-for-finding-dependencies.patch"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0005-FindPNG-Use-pkg-config-for-finding-dependencies.patch"
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0006-FindJPEG-Use-pkg-config-for-finding-dependencies.patch"
+        cd - > /dev/null 2>&1 || true
+    }
     do_pacman_install giflib
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-vwebp-Use-GLUT-and-opengl-import-targets.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-vwebp-link-winmm-if-windows.patch" am
