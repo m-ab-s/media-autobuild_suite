@@ -513,9 +513,9 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     extracommands=("-DWEBP_BUILD_EXTRAS=OFF")
     if [[ $standalone = y ]]; then
-        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS}"=ON")
+        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=ON")
     else
-        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS}"=OFF")
+        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=OFF")
     fi
     CFLAGS+=" -DFREEGLUT_STATIC" \
         do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
