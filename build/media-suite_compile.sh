@@ -500,10 +500,15 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
         cd - > /dev/null 2>&1 || true
     }
     do_pacman_install giflib
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-vwebp-Use-GLUT-and-opengl-import-targets.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-vwebp-link-winmm-if-windows.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-deps-link-libtiff-first.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0004-CMake-include-src-along-with-binary_dir-src.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-CMake-set-CMP0072-to-NEW.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-deps.cmake-unroll-img-loop-and-use-import-libraries-.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0004-CMake-link-imageioutil-to-exampleutil-after-defined.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0005-CMake-build-libwebpmux-for-2-additional-flags.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0006-CMake-use-target_include_directories-instead-of-incl.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0007-CMake-use-import-libraries-if-possible-for-vwebp.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0008-CMake-use-import-library-for-SDL-if-available.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0009-CMake-include-src-along-with-binary_dir-src.patch" am
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     extracommands=("-DWEBP_BUILD_EXTRAS=OFF")
     if [[ $standalone = y ]]; then
