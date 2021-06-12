@@ -498,7 +498,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0005-FindPNG-Use-pkg-config-for-finding-dependencies.patch"
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0006-FindJPEG-Use-pkg-config-for-finding-dependencies.patch"
         cd - > /dev/null 2>&1 || true
-    }
+    } > /dev/null 2>&1
     do_pacman_install giflib
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-CMake-set-CMP0072-to-NEW.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
