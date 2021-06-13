@@ -143,6 +143,7 @@ do_hide_all_sharedlibs
 create_ab_pkgconfig
 create_cmake_toolchain
 create_ab_ccache
+pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
@@ -490,15 +491,6 @@ _check=(libwebp{,mux}.{a,pc})
     bin-global/{{c,d}webp,webpmux,img2webp}.exe)
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
-    cd "$MINGW_PREFIX/share/cmake-3.20" && {
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0001-FindPkgConfig-split-args-if-loaded-from-environment.patch"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0002-FindTIFF-Use-pkg-config-for-finding-dependencies.patch"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0003-FindGLUT-Use-pkg-config-for-finding-dependencies.patch"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0004-FindZLIB-Use-pkg-config-for-finding-dependencies.patch"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0005-FindPNG-Use-pkg-config-for-finding-dependencies.patch"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cmake/0006-FindJPEG-Use-pkg-config-for-finding-dependencies.patch"
-        cd - > /dev/null 2>&1 || true
-    } > /dev/null 2>&1
     do_pacman_install giflib
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-CMake-set-CMP0072-to-NEW.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
