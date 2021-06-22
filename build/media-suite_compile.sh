@@ -492,7 +492,6 @@ _check=(libwebp{,mux}.{a,pc})
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install giflib
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-CMake-add-WEBP_BUILD_LIBWEBPMUX.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-CMake-set-CMP0072-to-NEW.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0004-deps.cmake-unroll-img-loop-and-use-import-libraries-.patch" am
