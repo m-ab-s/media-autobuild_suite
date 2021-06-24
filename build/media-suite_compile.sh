@@ -502,6 +502,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0009-CMake-include-src-along-with-binary_dir-src.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0010-CMake-add-WEBP_BUILD_WEBPMUX-to-list-of-checks-for-e.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0011-CMake-add-WEBP_BUILD_WEBPINFO-to-list-of-checks-for-.patch" am
+    do_patch "https://gist.githubusercontent.com/1480c1/fe6eada300c0453da4db9f95967a0ac4/raw/0001-deps-use-pkg-config-instead-of-find_package.patch" am
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
     if [[ $standalone = y ]]; then
