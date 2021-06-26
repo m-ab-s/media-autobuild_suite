@@ -1087,6 +1087,7 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
         # do_install "install-$bits/lib/librav1e.dll.a" lib/
         do_install "$(find "install-$bits/" -name "librav1e.a")" lib/
         do_install "$(find "install-$bits/" -name "rav1e.pc")" lib/pkgconfig/
+        sed -i 's/\\/\//g' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
         do_install "$(find "install-$bits/" -name "rav1e")"/*.h include/rav1e/
     fi
 
