@@ -1711,7 +1711,8 @@ if enabled libsrt && do_vcs "https://github.com/Haivision/srt.git"; then
     do_checkIfExist
 fi
 
-_check=(librist.{a,pc} librist/librist.h bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
+_check=(librist.{a,pc} librist/librist.h)
+[[ $standalone = y ]] && _check+=(bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
 if enabled librist && do_vcs "https://code.videolan.org/rist/librist.git"; then
     do_patch "https://code.videolan.org/1480c1/librist/-/commit/67d4aafc2f580f354846f3e866b350a190539f9b.patch" am
     do_patch "https://code.videolan.org/rist/librist/-/merge_requests/176.patch" am
