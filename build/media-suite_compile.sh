@@ -1900,12 +1900,12 @@ if [[ $ffmpeg != no ]]; then
         if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264.dll"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
             if [[ $bits = 64bit ]]; then
-              _sha256=273f8f6f8e964ec26986efdf78fa17b7e344640987a64fd1f6ac9f3bec2bebad
+              _sha256=d629f6aa5a38ed12266c3acb4c9a433b2960e3f55934db5b9740e85cf16c196c
             else
-              _sha256=7be41e496f43272b707e4d9bafdfc27d53b00aaf9468667a4a2107c192b27249
+              _sha256=e0ca9dced2bffbe541730d4b31fa0c6c2407c2ce01eadccea90bf153d00ed595
             fi
             do_wget -c -r -q -h $_sha256 \
-            "https://github.com/cisco/openh264/releases/download/v2.0.0/openh264-2.0.0-win${bits%bit}.dll.bz2" \
+            "https://github.com/cisco/openh264/releases/download/v2.1.1/openh264-2.1.1-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
             [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
             unset _sha256
