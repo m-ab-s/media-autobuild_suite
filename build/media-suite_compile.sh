@@ -191,8 +191,7 @@ fi
 _check=(bin-global/jo.exe)
 if [[ $jo = y ]] &&
     do_vcs "https://github.com/jpmens/jo.git"; then
-    do_autoreconf
-    do_separate_confmakeinstall global
+    do_mesoninstall global
     do_checkIfExist
 fi
 
