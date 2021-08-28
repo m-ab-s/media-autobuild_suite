@@ -136,7 +136,8 @@ set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 :: built-ins
 set mpv_options_builtin=#cplayer #manpage-build #lua #javascript ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo
+#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo ^
+ffmpeg-strict-abi
 
 :: overriden defaults
 set mpv_options_basic=--disable-debug-build "--lua=luajit"
