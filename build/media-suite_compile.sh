@@ -1022,6 +1022,7 @@ else
 fi
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "https://aomedia.googlesource.com/aom"; then
+    { git fetch https://aomedia.googlesource.com/aom refs/changes/41/145041/1 && git cherry-pick FETCH_HEAD; } > /dev/null 2>&1
     extracommands=()
     if $_aom_bins; then
         _check+=(bin-video/aomdec.exe)
