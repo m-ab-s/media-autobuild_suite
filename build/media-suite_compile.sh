@@ -199,6 +199,7 @@ _deps=("$MINGW_PREFIX"/lib/pkgconfig/oniguruma.pc)
 _check=(bin-global/jq.exe)
 if [[ $jq = y ]] &&
     do_vcs "https://github.com/stedolan/jq.git"; then
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/jq/0001-jv_thread-try-using-HAVE_PTHREAD_KEY_CREATE-instead.patch" am
     do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
