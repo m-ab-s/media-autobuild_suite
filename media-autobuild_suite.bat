@@ -1462,6 +1462,20 @@ if not exist "%instdir%\msys64\msys2_shell.cmd" (
 rem getMintty
 set "bash=%instdir%\msys64\usr\bin\bash.exe"
 set "PATH=%instdir%\msys64\opt\bin;%instdir%\msys64\usr\bin;%PATH%"
+(
+    echo.# Begin /etc/nsswitch.conf
+    echo.
+    echo.passwd: files db
+    echo.group: files db
+    echo.
+    echo.db_enum: cache builtin
+    echo.
+    echo.db_home: cygwin desc /home/user
+    echo.db_shell: cygwin desc
+    echo.db_gecos: cygwin desc
+    echo.
+    echo.# End /etc/nsswitch.conf
+)>"%instdir%\msys64\etc\nsswitch.conf"
 if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     echo.- make a first run
