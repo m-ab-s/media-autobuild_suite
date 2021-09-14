@@ -2402,7 +2402,6 @@ if [[ $bmx = y ]]; then
 
     _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
     if do_vcs "https://gitlab.com/m-ab-s/libmxf.git" libMXF-1.0; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libmxf/0001-Add-spaces-between-quotes-and-literal.patch" am
         do_autogen
         do_uninstall include/libMXF-1.0 "${_check[@]}"
         do_separate_confmakeinstall video --disable-examples
