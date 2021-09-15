@@ -234,15 +234,14 @@ if [[ $mplayer = y || $mpv = y ]] ||
     { [[ $ffmpeg != no ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
-    _check=(libfreetype.{l,}a freetype2.pc)
+    _check=(libfreetype.a freetype2.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
     if do_vcs "https://gitlab.freedesktop.org/freetype/freetype.git#tag=LATEST"; then
-        do_autogen
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
-        extracommands=(--with-{harfbuzz,png,bzip2,brotli,zlib}"=no")
-        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--enable-shared)
-        do_separate_confmakeinstall global "${extracommands[@]}"
+        extracommands=(-D{harfbuzz,png,bzip2,brotli,zlib,tests}"=disabled")
+        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
+        do_mesoninstall global "${extracommands[@]}"
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
         do_checkIfExist
     fi
