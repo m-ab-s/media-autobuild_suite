@@ -401,15 +401,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     fi
 fi
 
-# fix retarded google naming schemes for brotli
 do_pacman_install brotli
-grep_and_sed '-static' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc 's;-static;;' \
-    "$MINGW_PREFIX"/lib/pkgconfig/libbrotli{enc,dec,common}.pc
-for lib in common dec enc; do
-    lib=$MINGW_PREFIX/lib/libbrotli$lib
-    ln -sf "$lib-static.a" "$lib.a"
-done
-unset lib
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
 case $curl in
