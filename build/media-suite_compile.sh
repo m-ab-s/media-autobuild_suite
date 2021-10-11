@@ -2425,6 +2425,7 @@ if [[ $cyanrip = y ]]; then
 
     _check=(neon/ne_utils.h libneon.a neon.pc)
     if do_vcs "https://github.com/notroj/neon.git"; then
+        do_patch "https://github.com/notroj/neon/pull/69.patch" am
         do_uninstall include/neon "${_check[@]}"
         do_autogen
         do_separate_confmakeinstall --disable-{nls,debug,webdav}
