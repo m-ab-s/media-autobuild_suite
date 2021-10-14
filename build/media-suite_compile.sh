@@ -1851,7 +1851,8 @@ fi
 
 _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
-if [[ $ffmpeg != no ]] && enabled libglslang &&
+if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+     { [[ $ffmpeg != no ]] && enabled libglslang; } } &&
     do_vcs "https://github.com/KhronosGroup/glslang.git"; then
     do_uninstall "${_check[@]}"
     log dependencies /usr/bin/python ./update_glslang_sources.py
