@@ -1772,7 +1772,7 @@ goto :EOF
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
-    echo.export CCACHE_DIR="$HOME/.ccache"
+    echo.export CCACHE_DIR="${LOCALBUILDDIR}/cache"
     echo.
     echo.export PYTHONPATH=
     echo.
