@@ -1313,6 +1313,7 @@ if [[ $mediainfo = y ]]; then
     _check=(libmediainfo.{a,pc})
     _deps=(lib{zen,curl}.a)
     if do_vcs "https://github.com/MediaArea/MediaInfoLib.git" libmediainfo; then
+        do_patch "https://github.com/g-maxime/MediaInfoLib/commit/18e9c5c9fc919632476a2fc9c1e2b2d35eb4c68a.patch" am
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
         do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
