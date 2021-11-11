@@ -281,7 +281,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
     if do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
         do_pacman_install ragel
         do_uninstall include/harfbuzz "${_check[@]}" libharfbuzz{-subset,}.la
-        extracommands=(-D{glib,gobject,cairo,fontconfig,icu,tests,introspection,docs,benchmark}"=disabled")
+        extracommands=(-D{glib,gobject,cairo,icu,tests,introspection,docs,benchmark}"=disabled")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
         do_mesoninstall global "${extracommands[@]}"
         # directwrite shaper doesn't work with mingw headers, maybe too old
