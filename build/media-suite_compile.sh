@@ -1114,18 +1114,11 @@ if [[ $jpegxl = y ]] && do_vcs "https://github.com/libjxl/libjxl.git"; then
     do_pacman_remove asciidoc-py3-git
     do_pacman_install lcms2 asciidoc
     log -q "git.submodule" git submodule update --init --recursive
-    extra_cxxflags=()
-    if [[ ${CC##* } = gcc ]]; then
-        do_simple_print -p "${orange}Warning: JPEG-XL compiled with GCC will not use SIMD optimizations!$reset"
-        extra_cxxflags+=('-DHWY_COMPILE_ONLY_SCALAR')
-    fi
-    CXXFLAGS+=" ${extra_cxxflags[*]}" \
-        do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{OPENEXR,SKCMS,BENCHMARK}}=OFF \
+    do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{OPENEXR,SKCMS,BENCHMARK}}=OFF \
         -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_ENABLE_MANPAGES=OFF
     do_ninja
     do_install tools/{c,d}jxl.exe bin-global/
     do_checkIfExist
-    unset extra_cxxflags
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
