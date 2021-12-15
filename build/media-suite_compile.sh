@@ -2283,7 +2283,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     _deps=(lib{vulkan,shaderc_combined}.a)
     if ! mpv_disabled libplacebo &&
         do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
-        do_patch "https://github.com/haasn/libplacebo/pull/115.patch" am
         do_pacman_install python-mako
         do_uninstall "${_check[@]}"
         do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false
