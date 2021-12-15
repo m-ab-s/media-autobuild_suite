@@ -1108,7 +1108,7 @@ if [[ $libavif = y ]] && {
 fi
 
 _check=(bin-global/{c,d}jxl.exe)
-if [[ $jpegxl = y ]] && do_vcs "https://gitlab.com/wg1/jpeg-xl.git"; then
+if [[ $jpegxl = y ]] && do_vcs "https://github.com/libjxl/libjxl.git"; then
     do_uninstall "${_check[@]}"
     do_pacman_remove asciidoc-py3-git
     do_pacman_install lcms2 asciidoc
