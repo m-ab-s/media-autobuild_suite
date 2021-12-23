@@ -2266,6 +2266,9 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         unset add_third_party
     fi
 
+    file_installed -s shaderc.pc && file_installed -s shaderc_static.pc &&
+        mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
+
     _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
     if ! mpv_disabled spirv-cross &&
         do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
