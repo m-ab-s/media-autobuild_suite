@@ -2291,7 +2291,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
     _check=()
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
-    mpv_enabled libmpv-shared && _check+=(bin-video/mpv-1.dll)
+    mpv_enabled libmpv-shared && _check+=(bin-video/mpv-2.dll)
     mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "https://github.com/mpv-player/mpv.git"; then
@@ -2301,7 +2301,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         log bootstrap /usr/bin/python bootstrap.py
         if [[ -d build ]]; then
             /usr/bin/python waf distclean >/dev/null 2>&1
-            do_uninstall bin-video/mpv{.exe,-1.dll}.debug "${_check[@]}"
+            do_uninstall bin-video/mpv{.exe,-2.dll}.debug "${_check[@]}"
         fi
 
         mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
@@ -2379,7 +2379,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
-            create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-1.dll}
+            create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-2.dll}
         create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
         do_checkIfExist
     fi
