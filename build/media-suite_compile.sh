@@ -2237,6 +2237,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     if ! mpv_disabled shaderc &&
         do_vcs "https://github.com/google/shaderc.git"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
         do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
         add_third_party() {
