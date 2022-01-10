@@ -236,7 +236,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
 
     _check=(libfreetype.a freetype2.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfreetype-6.dll libfreetype.dll.a)
-    if do_vcs "https://gitlab.freedesktop.org/freetype/freetype.git#tag=LATEST"; then
+    if do_vcs "https://github.com/freetype/freetype.git#tag=LATEST"; then
         do_uninstall include/freetype2 bin-global/freetype-config \
             bin{,-video}/libfreetype-6.dll libfreetype.dll.a "${_check[@]}"
         extracommands=(-D{harfbuzz,png,bzip2,brotli,zlib,tests}"=disabled")
