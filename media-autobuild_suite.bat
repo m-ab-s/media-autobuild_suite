@@ -101,7 +101,7 @@ do if %%f lss 4 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=asciidoc autoconf automake-wrapper autogen base bison diffstat dos2unix filesystem help2man ^
+set msyspackages=asciidoc autoconf-wrapper automake-wrapper autogen base bison diffstat dos2unix filesystem help2man ^
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man-db ^
 gperf winpty texinfo gyp-git doxygen autoconf-archive itstool ruby mintty flex
 
