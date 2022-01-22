@@ -1111,10 +1111,10 @@ if [[ $jpegxl = y ]] && do_vcs "https://github.com/libjxl/libjxl.git"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
     do_uninstall "${_check[@]}"
     do_pacman_remove asciidoc-py3-git
-    do_pacman_install lcms2 asciidoc gflags
+    do_pacman_install lcms2 asciidoc
     log -q "git.submodule" git submodule update --init --recursive
-    do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{OPENEXR,SKCMS,BENCHMARK}}=OFF \
-        -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_ENABLE_MANPAGES=OFF
+    do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS}}=OFF \
+        -DJPEGXL_{BUNDLE_GFLAGS,FORCE_SYSTEM_BROTLI,STATIC}=ON
     do_ninja
     do_install tools/{c,d}jxl.exe bin-global/
     do_checkIfExist
