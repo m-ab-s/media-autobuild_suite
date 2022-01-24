@@ -1860,6 +1860,7 @@ _deps=(lib{vulkan,shaderc_combined}.a)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0001-meson-use-shaderc_combined.patch" am
     do_pacman_install python-mako
     do_uninstall "${_check[@]}"
     do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false
