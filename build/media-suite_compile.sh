@@ -1855,6 +1855,17 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_checkIfExist
 fi
 
+_check=(libplacebo.{a,pc})
+_deps=(lib{vulkan,shaderc_combined}.a)
+if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+     { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
+    do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
+    do_pacman_install python-mako
+    do_uninstall "${_check[@]}"
+    do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false
+    do_checkIfExist
+fi
+
 enabled openssl && hide_libressl
 if [[ $ffmpeg != no ]]; then
     enabled libgsm && do_pacman_install gsm
@@ -2276,16 +2287,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
         do_mesoninstall
-        do_checkIfExist
-    fi
-
-    _check=(libplacebo.{a,pc})
-    _deps=(lib{vulkan,shaderc_combined}.a)
-    if ! mpv_disabled libplacebo &&
-        do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
-        do_pacman_install python-mako
-        do_uninstall "${_check[@]}"
-        do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false
         do_checkIfExist
     fi
 
