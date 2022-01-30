@@ -70,7 +70,6 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
     /bin-global
         dssim
         jq
-        redshift
         rg
 
     /bin-video

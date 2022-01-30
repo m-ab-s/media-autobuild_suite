@@ -172,7 +172,6 @@ For information about the compiler environment see the wiki, there you also have
             - openal (git)
     - opus-tools (git)
     - rav1e (git)
-    - redshift (git)
     - ripgrep (git)
     - rtmpdump (git)
     - sox (14.4.2)

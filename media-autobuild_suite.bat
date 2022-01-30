@@ -147,7 +147,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
-strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 redshift ^
+strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 ^
 rav1e ripgrep dav1d libavif vvc jq dssim avs2 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc ^
 jo vlc CC jpegxl
 
@@ -1049,26 +1049,6 @@ if %buildcyanrip%==2 set "cyanrip=n"
 if %buildcyanrip% GTR 2 GOTO cyanrip
 if %deleteINI%==1 echo.cyanrip2=^%buildcyanrip%>>%ini%
 
-:redshift
-if %redshiftINI%==0 (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build redshift (f.lux FOSS clone^)?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildredshift="Build redshift: "
-) else set buildredshift=%redshiftINI%
-
-if "%buildredshift%"=="" GOTO redshift
-if %buildredshift%==1 set "redshift=y"
-if %buildredshift%==2 set "redshift=n"
-if %buildredshift% GTR 2 GOTO redshift
-if %deleteINI%==1 echo.redshift=^%buildredshift%>>%ini%
-
 :ripgrep
 if %ripgrepINI%==0 (
     echo -------------------------------------------------------------------------------
@@ -1683,7 +1663,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
---ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --redshift=%redshift% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
+--ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% ^
 --dav1d=%dav1d% --vvc=%vvc% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
 --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl%

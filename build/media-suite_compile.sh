@@ -51,7 +51,6 @@ while true; do
     --ffmbc=* ) ffmbc=${1#*=} && shift ;;
     --curl=* ) curl=${1#*=} && shift ;;
     --cyanrip=* ) cyanrip=${1#*=} && shift ;;
-    --redshift=* ) redshift=${1#*=} && shift ;;
     --ripgrep=* ) ripgrep=${1#*=} && shift ;;
     --rav1e=* ) rav1e=${1#*=} && shift ;;
     --dav1d=* ) dav1d=${1#*=} && shift ;;
@@ -2769,16 +2768,6 @@ if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ff
     do_install ffmbc.exe bin-video/
     do_checkIfExist
     unset _notrequired
-fi
-
-_check=(bin-global/redshift.exe)
-if [[ $redshift = y ]] && do_vcs "https://github.com/jonls/redshift.git"; then
-    do_pacman_remove perl
-    [[ -f configure ]] || log bootstrap ./bootstrap
-    CFLAGS+=' -D_POSIX_C_SOURCE' \
-        do_separate_confmakeinstall global --enable-wingdi \
-        --disable-{nls,ubuntu,corelocation,quartz,drm,randr,vidmode,geoclue2,gui}
-    do_checkIfExist
 fi
 
 do_simple_print -p "${orange}Finished $bits compilation of all tools${reset}"
