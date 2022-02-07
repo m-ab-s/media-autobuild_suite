@@ -1847,6 +1847,7 @@ if { { [[ $mpv != n ]] && ! mpv_disabled libplacebo; } ||
     do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
     do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
+    sed -i 's/0.13.0/0.48.0/' meson.build
     do_mesoninstall
     do_checkIfExist
 fi
