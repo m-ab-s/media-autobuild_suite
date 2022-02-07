@@ -1840,6 +1840,17 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
     unset _DeadSix27 _mabs _shinchiro
 fi
 
+_check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
+if { { [[ $mpv != n ]] && ! mpv_disabled libplacebo; } ||
+     { [[ $mpv != n ]] && ! mpv_disabled spirv-cross; } ||
+     { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
+    do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
+    do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
+    do_mesoninstall
+    do_checkIfExist
+fi
+
 _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
@@ -1852,7 +1863,7 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
 fi
 
 _check=(libplacebo.{a,pc})
-_deps=(lib{vulkan,shaderc_combined}.a)
+_deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
@@ -2277,15 +2288,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
     file_installed -s shaderc.pc && file_installed -s shaderc_static.pc &&
         mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
-
-    _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
-    if ! mpv_disabled spirv-cross &&
-        do_vcs "https://github.com/KhronosGroup/SPIRV-Cross.git"; then
-        do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
-        do_mesoninstall
-        do_checkIfExist
-    fi
 
     _check=()
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
