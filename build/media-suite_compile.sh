@@ -1803,11 +1803,13 @@ if [[ $bits = 64bit && $vvc = y ]] &&
 fi
 
 _check=(avisynth/avisynth{,_c}.h
-        avisynth/avs/{alignment,capi,config,cpuid,minmax,posix,types,win}.h)
+        avisynth/avs/{alignment,arch,capi,config,cpuid,minmax,posix,types,win,version}.h)
 if [[ $ffmpeg != no ]] && enabled avisynth &&
     do_vcs "https://github.com/AviSynth/AviSynthPlus.git"; then
     do_uninstall "${_check[@]}"
-    do_cmakeinstall -DHEADERS_ONLY=ON
+    do_cmake -DHEADERS_ONLY=ON
+    do_ninja
+    do_ninjainstall VersionGen 
     do_checkIfExist
 fi
 
