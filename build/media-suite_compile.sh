@@ -1808,8 +1808,8 @@ if [[ $ffmpeg != no ]] && enabled avisynth &&
     do_vcs "https://github.com/AviSynth/AviSynthPlus.git"; then
     do_uninstall "${_check[@]}"
     do_cmake -DHEADERS_ONLY=ON
-    do_ninja
-    do_ninjainstall VersionGen 
+    do_ninja VersionGen
+    do_ninjainstall 
     do_checkIfExist
 fi
 
