@@ -1699,6 +1699,12 @@ do_autoreconf() {
     extra_script post autoreconf
 }
 
+do_autoupdate() {
+    extra_script pre autoupdate
+    log "autoupdate" autoupdate "$@"
+    extra_script post autoupdate
+}
+
 do_autogen() {
     extra_script pre autogen
     log "autogen" ./autogen.sh "$@"
