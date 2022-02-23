@@ -539,11 +539,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     _check=(liblept.{,l}a lept.pc)
     if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
         do_uninstall include/leptonica "${_check[@]}"
-        [[ -f configure ]] || {
-            do_autogen
-            do_autoupdate
-            do_autogen
-        }
+        [[ -f configure ]] || do_autogen
         do_separate_confmakeinstall --disable-programs --without-{lib{openjpeg,webp},giflib}
         do_checkIfExist
     fi
