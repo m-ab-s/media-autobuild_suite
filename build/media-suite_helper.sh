@@ -2058,8 +2058,9 @@ EOF
 }
 
 create_cmake_toolchain() {
-    local _win_paths
+    local _win_paths mingw_path
     _win_paths=$(cygpath -pm "$LOCALDESTDIR:$MINGW_PREFIX:$MINGW_PREFIX/$MINGW_CHOST")
+    mingw_path=$(cygpath -m "$MINGW_PREFIX/include")
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         ""
@@ -2069,6 +2070,8 @@ create_cmake_toolchain() {
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
         "SET(CMAKE_BUILD_TYPE Release)"
+        "LIST(APPEND CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
+        "LIST(APPEND CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
     )
 
     mkdir -p "$LOCALDESTDIR"/etc > /dev/null 2>&1
