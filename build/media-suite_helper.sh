@@ -2072,6 +2072,7 @@ create_cmake_toolchain() {
         "SET(CMAKE_BUILD_TYPE Release)"
         "LIST(APPEND CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
         "LIST(APPEND CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
+        "SET(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)"
     )
 
     mkdir -p "$LOCALDESTDIR"/etc > /dev/null 2>&1
