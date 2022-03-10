@@ -465,8 +465,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
         do_uninstall "${_check[@]}"
         do_patch "https://gitlab.com/libtiff/libtiff/-/merge_requests/233.patch" am
-        do_patch "https://gitlab.com/1480c1/libtiff/-/commit/ff3d7f8300b143903c7e9296a5be88ea6144ae88.patch" am
-        do_patch "https://gitlab.com/1480c1/libtiff/-/commit/2992ba372025f3bc273263391f6650148be7ae6c.patch" am
+        do_patch "https://gitlab.com/libtiff/libtiff/-/merge_requests/317.patch" am
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
             '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd glut'
         CFLAGS+=" -DFREEGLUT_STATIC" do_cmakeinstall global -D{webp,jbig,UNIX,lerc}=OFF
