@@ -456,7 +456,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     _check=(libglut.a glut.pc)
     if do_vcs "https://github.com/dcnieho/FreeGLUT.git" freeglut; then
         do_uninstall lib/cmake/FreeGLUT include/GL "${_check[@]}"
-        do_cmakeinstall ../freeglut/freeglut -D{UNIX,FREEGLUT_BUILD_DEMOS,FREEGLUT_BUILD_SHARED_LIBS}=OFF -DFREEGLUT_REPLACE_GLUT=ON
+        do_cmakeinstall -D{UNIX,FREEGLUT_BUILD_DEMOS,FREEGLUT_BUILD_SHARED_LIBS}=OFF -DFREEGLUT_REPLACE_GLUT=ON
         do_checkIfExist
     fi
     _deps=(libglut.a)
