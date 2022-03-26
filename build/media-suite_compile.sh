@@ -1773,7 +1773,6 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
     do_vcs "https://github.com/lensfun/lensfun.git"; then
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
-    grep_or_sed uuid "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's/Libs.private.*/& -luuid/'
     do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0001-CMake-exclude-mingw-w64-from-some-msvc-exclusive-thi.patch" am
     do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0002-CMake-don-t-add-glib2-s-includes-as-SYSTEM-dirs.patch" am
     grep_or_sed Libs.private libs/lensfun/lensfun.pc.cmake '/Libs:/ a\Libs.private: -lstdc++'
