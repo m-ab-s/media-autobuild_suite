@@ -1837,7 +1837,7 @@ if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
     do_print_progress "Building Vulkan-Loader"
     CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DUSE_CCACHE=OFF \
     -DUSE_UNSAFE_C_GEN=ON -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
-    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF
+    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF -DENABLE_WERROR=OFF
     do_checkIfExist
     unset _DeadSix27 _mabs _shinchiro
 fi
