@@ -9,7 +9,7 @@
 3. OS level  is Windows 8.1 or above.
     - Although Windows 7 could work, it is not supported.
 4. Powershell version 4 and above
-    - Do not run this script from a Powershell Core or version 6 console as it will fail to download the wget-pack.exe. See [Pull #1021](https://github.com/jb-alvarado/media-autobuild_suite/pull/1021)
+    - Do not run this script from Powershell Core prior to version 7 as it will fail to download the wget-pack.exe. See [Pull #1021](https://github.com/jb-alvarado/media-autobuild_suite/pull/1021)
 5. Make sure to get the latest version of the suite before running anything.
     - If you have cloned the repository using git, look at the `Using git` section of [updating.md](./updating.md#using-git)
     - If you have downloaded the suite through the zip, look at the `Using snapshots from Github` section of [updating.md](./updating.md#using-snapshots-from-github#using-snapshots-from-github)
