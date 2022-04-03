@@ -223,7 +223,7 @@ if { enabled libxml2 || [[ $cyanrip = y ]]; } &&
     do_uninstall include/libxml2/libxml "${_check[@]}"
     NOCONFIGURE=true do_autogen
     [[ -f config.mak ]] && log "distclean" make distclean
-    sed -ri 's|(bin_PROGRAMS = ).*|\1|g;/^runtest_SOURCES.*/,/We create xml2Conf.*/d' Makefile.am
+    sed -ri 's|(bin_PROGRAMS = ).*|\1|g' Makefile.am
     CFLAGS+=" -DLIBXML_STATIC_FOR_DLL -DNOLIBTOOL" \
         do_separate_confmakeinstall --without-python
     do_checkIfExist
