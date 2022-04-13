@@ -551,6 +551,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_uninstall include/tesseract "${_check[@]}"
         sed -i -e 's|Libs.private.*|& -lstdc++|' \
                -e 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
+        grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
         case $CC in
         *gcc) sed -i -e 's|Libs.private.*|& -fopenmp -lgomp|' tesseract.pc.in ;;
         *clang) sed -i -e 's|Libs.private.*|& -fopenmp=libomp|' tesseract.pc.in ;;
