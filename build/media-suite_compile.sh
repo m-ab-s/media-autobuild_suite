@@ -576,13 +576,12 @@ fi
 
 _check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
 if { { [[ $ffmpeg != no ]] && enabled librubberband; } ||
-    ! mpv_disabled rubberband; } && do_pkgConfig "rubberband = 1.8.1" &&
+    ! mpv_disabled rubberband; } &&
     do_vcs "https://github.com/m-ab-s/rubberband.git"; then
     do_uninstall "${_check[@]}"
     log "distclean" make distclean
     do_make PREFIX="$LOCALDESTDIR" install-static
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
@@ -615,7 +614,6 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
     log -q "git.submodule" git submodule update --init --recursive
     do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
-    add_to_remove
 fi
 
 grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
@@ -625,7 +623,6 @@ enabled libspeex && do_pacman_install speex
 
 _check=(bin-audio/speex{enc,dec}.exe)
 if [[ $standalone = y ]] && enabled libspeex &&
-    ! grep -q '1.2.0' "$LOCALDESTDIR/bin-audio/speexenc.exe" 2> /dev/null &&
     do_vcs "https://github.com/xiph/speex.git"; then
     do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
     do_autoreconf
@@ -633,7 +630,6 @@ if [[ $standalone = y ]] && enabled libspeex &&
     do_make
     do_install src/speex{enc,dec}.exe bin-audio/
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
@@ -721,7 +717,6 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     do_make
     do_install oggenc/oggenc.exe oggdec/oggdec.exe bin-audio/
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
@@ -1248,7 +1243,6 @@ if [[ $ffmpeg != no ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" &&
     do_make libxavs.a
     for _file in xavs.h libxavs.a xavs.pc; do do_install "$_file"; done
     do_checkIfExist
-    add_to_remove
     unset _file
 fi
 
@@ -1333,7 +1327,6 @@ if [[ $ffmpeg != no ]] && enabled libvidstab &&
     do_uninstall include/vid.stab "${_check[@]}"
     do_cmakeinstall
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
@@ -1770,7 +1763,6 @@ fi
 
 _check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
 if [[ $ffmpeg != no ]] && enabled liblensfun &&
-    do_pkgConfig "lensfun = 0.3.95.0" &&
     do_vcs "https://github.com/lensfun/lensfun.git"; then
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
@@ -1782,7 +1774,6 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
         do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
         -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
     do_checkIfExist
-    add_to_remove
 fi
 
 _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
