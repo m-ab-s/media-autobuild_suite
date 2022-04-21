@@ -484,7 +484,6 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-CMake-link-imageioutil-to-exampleutil-after-defined.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0004-CMake-use-import-library-for-SDL-if-available.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0005-CMake-add-WEBP_BUILD_WEBPMUX-to-list-of-checks-for-e.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0006-CMake-add-WEBP_BUILD_WEBPINFO-to-list-of-checks-for-.patch" am
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
