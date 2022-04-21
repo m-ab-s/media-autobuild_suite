@@ -1077,6 +1077,14 @@ mpv_enabled_any() {
     return 1
 }
 
+mpv_disabled_any() {
+    local opt
+    for opt; do
+        mpv_disabled "$opt" && return 0
+    done
+    return 1
+}
+
 mpv_enabled_all() {
     local opt
     for opt; do

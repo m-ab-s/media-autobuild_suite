@@ -1803,7 +1803,8 @@ if [[ $ffmpeg != no ]] && enabled avisynth &&
 fi
 
 _check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
-if { { [[ $ffmpeg != no ]] && enabled vulkan; } || ! mpv_disabled vulkan; } &&
+if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
+     { [[ $mpv != n ]] && ! mpv_disabled_any vulkan libplacebo; } } &&
     do_vcs "https://github.com/KhronosGroup/Vulkan-Loader.git" vulkan-loader; then
     _DeadSix27=https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master
     _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master
@@ -1846,7 +1847,7 @@ fi
 _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
-     { [[ $ffmpeg != no ]] && enabled libglslang; } } &&
+     { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
     do_vcs "https://github.com/KhronosGroup/glslang.git"; then
     do_uninstall "${_check[@]}"
     log dependencies /usr/bin/python ./update_glslang_sources.py
