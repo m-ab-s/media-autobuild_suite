@@ -1093,19 +1093,28 @@ if [[ $libavif = y ]] && {
     do_checkIfExist
 fi
 
-_check=(bin-global/{c,d}jxl.exe)
-if [[ $jpegxl = y ]] && do_vcs "https://github.com/libjxl/libjxl.git"; then
+_check=(libjxl{{,_dec}.a,.pc})
+[[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe)
+{ [[ $ffmpeg != no ]] && enabled libjxl; } && _check+=(libjxl_threads{.a,.pc})
+if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } && 
+    do_vcs "https://github.com/libjxl/libjxl.git"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
     do_uninstall "${_check[@]}"
     do_pacman_remove asciidoc-py3-git
     do_pacman_install lcms2 asciidoc
+    extracommands=()
     log -q "git.submodule" git submodule update --init --recursive
-    do_cmake global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
-        -DJPEGXL_{BUNDLE_GFLAGS,FORCE_SYSTEM_BROTLI,STATIC}=ON \
-        -DJPEGXL_FORCE_SYSTEM_HWY=OFF
-    do_ninja
-    do_install tools/{c,d}jxl.exe bin-global/
+    [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
+    do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+        -DJPEGXL_{BUNDLE_GFLAGS,FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_FORCE_SYSTEM_HWY=OFF "${extracommands[@]}"
+    [[ $jpegxl = y ]] && do_install tools/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe bin-global/
+    mv -f "$LOCALDESTDIR/lib/libjxl-static.a" "$LOCALDESTDIR/lib/libjxl.a"
+    mv -f "$LOCALDESTDIR/lib/libjxl_dec-static.a" "$LOCALDESTDIR/lib/libjxl_dec.a"
+    [[ $ffmpeg != no ]] && enabled libjxl && \
+        mv -f "$LOCALDESTDIR/lib/libjxl_threads-static.a" "$LOCALDESTDIR/lib/libjxl_threads.a"
+    sed -i 's|__declspec(dllimport)||g' "$LOCALDESTDIR/include/jxl/jxl_export.h"
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
