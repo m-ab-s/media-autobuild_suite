@@ -1112,7 +1112,7 @@ if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } &&
     mv -f "$LOCALDESTDIR/lib/libjxl_dec-static.a" "$LOCALDESTDIR/lib/libjxl_dec.a"
     [[ $ffmpeg != no ]] && enabled libjxl && \
         mv -f "$LOCALDESTDIR/lib/libjxl_threads-static.a" "$LOCALDESTDIR/lib/libjxl_threads.a"
-    sed -i 's|__declspec(dllimport)||g' "$LOCALDESTDIR/include/jxl/jxl_export.h"
+    grep_or_sed Cflags.private "$(file_installed libjxl.pc)" '/Cflags:/aCflags.private: -DJXL_STATIC_DEFINE'
     do_checkIfExist
     unset extracommands
 fi
