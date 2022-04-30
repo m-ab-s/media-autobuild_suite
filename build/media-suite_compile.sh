@@ -1105,8 +1105,11 @@ if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } &&
     extracommands=()
     log -q "git.submodule" git submodule update --init --recursive
     [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
-    do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+    do_cmake -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
         -DJPEGXL_{BUNDLE_GFLAGS,FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_FORCE_SYSTEM_HWY=OFF "${extracommands[@]}"
+    do_ninja
+    do_install {lib/libjxl{,_dec,_threads}-static,third_party/highway/libhwy}.a lib/
+    do_install {lib/libjxl{,_threads},third_party/highway/libhwy}.pc lib/pkgconfig/
     [[ $jpegxl = y ]] && do_install tools/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe bin-global/
     mv -f "$LOCALDESTDIR/lib/libjxl-static.a" "$LOCALDESTDIR/lib/libjxl.a"
     mv -f "$LOCALDESTDIR/lib/libjxl_dec-static.a" "$LOCALDESTDIR/lib/libjxl_dec.a"
