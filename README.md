@@ -99,6 +99,7 @@ For information about the compiler environment see the wiki, there you also have
         - libglslang (git)
         - libgme (git snapshot)
         - libilbc (git snapshot)
+        - libjxl (git)
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
@@ -120,7 +121,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R50)
+        - vapoursynth (R57)
         - vulkan (git)
 
 - other tools
