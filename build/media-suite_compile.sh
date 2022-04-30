@@ -1093,9 +1093,8 @@ if [[ $libavif = y ]] && {
     do_checkIfExist
 fi
 
-_check=(libjxl{{,_dec}.a,.pc})
+_check=(libjxl{{,_dec,_threads}.a,.pc})
 [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe)
-{ [[ $ffmpeg != no ]] && enabled libjxl; } && _check+=(libjxl_threads{.a,.pc})
 if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } && 
     do_vcs "https://github.com/libjxl/libjxl.git"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
@@ -1113,8 +1112,7 @@ if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } &&
     [[ $jpegxl = y ]] && do_install tools/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe bin-global/
     mv -f "$LOCALDESTDIR/lib/libjxl-static.a" "$LOCALDESTDIR/lib/libjxl.a"
     mv -f "$LOCALDESTDIR/lib/libjxl_dec-static.a" "$LOCALDESTDIR/lib/libjxl_dec.a"
-    [[ $ffmpeg != no ]] && enabled libjxl && \
-        mv -f "$LOCALDESTDIR/lib/libjxl_threads-static.a" "$LOCALDESTDIR/lib/libjxl_threads.a"
+    mv -f "$LOCALDESTDIR/lib/libjxl_threads-static.a" "$LOCALDESTDIR/lib/libjxl_threads.a"
     grep_or_sed Cflags.private "$(file_installed libjxl.pc)" '/Cflags:/aCflags.private: -DJXL_STATIC_DEFINE'
     do_checkIfExist
     unset extracommands
