@@ -1408,7 +1408,7 @@ zip_logs() {
         } | sort -uo failedFiles
         7za -mx=9 a logs.zip -- @failedFiles > /dev/null && rm failedFiles
     )
-    [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 ]] &&
+    [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 && $autouploadlogs = y ]] &&
         url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     echo
     if [[ $url ]]; then
