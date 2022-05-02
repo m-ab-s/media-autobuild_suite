@@ -412,7 +412,7 @@ mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
 esac
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
-    do_vcs "https://github.com/curl/curl.git#tag=LATEST"; then
+    do_vcs "https://github.com/curl/curl.git"; then
     do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
     do_pacman_install nghttp2
 
