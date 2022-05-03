@@ -987,9 +987,10 @@ _check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
 if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_vcs "https://github.com/Netflix/vmaf.git"; then
     do_uninstall share/model "${_check[@]}"
+    do_pacman_install vim # for built_in_models
     cd_safe libvmaf
     CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" do_mesoninstall video \
-        -Denable_float=true
+        -Denable_float=true -Dbuilt_in_models=true
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
