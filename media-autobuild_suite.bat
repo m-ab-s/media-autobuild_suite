@@ -1772,7 +1772,11 @@ goto :EOF
         echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
     )
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+    if %CC%==clang (
+        echo.LDFLAGS="-pipe -static-libgcc --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
+    ) else (
+        echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+    )
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
