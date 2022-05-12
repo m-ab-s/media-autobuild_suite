@@ -1963,9 +1963,6 @@ if [[ $ffmpeg != no ]]; then
     if do_vcs "https://git.ffmpeg.org/ffmpeg.git"; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
-
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-add-check-for-sdl2-2.23.0.patch" am
-
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/guojiansheng0925/SVT-HEVC/gjs_enc_cb/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
