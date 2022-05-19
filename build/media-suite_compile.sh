@@ -1096,29 +1096,41 @@ if [[ $libavif = y ]] && {
     do_checkIfExist
 fi
 
-_check=(libjxl{{,_dec,_threads}.a,.pc})
-[[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe)
-if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; } &&
-    do_vcs "https://github.com/libjxl/libjxl.git"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
-    do_uninstall "${_check[@]}"
-    do_pacman_remove asciidoc-py3-git
-    do_pacman_install lcms2 asciidoc
-    extracommands=()
-    log -q "git.submodule" git submodule update --init --recursive
-    [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
-    do_cmake -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
-        -DJPEGXL_{BUNDLE_GFLAGS,FORCE_SYSTEM_BROTLI,STATIC}=ON -DJPEGXL_FORCE_SYSTEM_HWY=OFF "${extracommands[@]}"
-    do_ninja
-    do_install {lib/libjxl{,_dec,_threads}-static,third_party/highway/libhwy}.a lib/
-    do_install {lib/libjxl{,_threads},third_party/highway/libhwy}.pc lib/pkgconfig/
-    [[ $jpegxl = y ]] && do_install tools/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe bin-global/
-    mv -f "$LOCALDESTDIR/lib/libjxl-static.a" "$LOCALDESTDIR/lib/libjxl.a"
-    mv -f "$LOCALDESTDIR/lib/libjxl_dec-static.a" "$LOCALDESTDIR/lib/libjxl_dec.a"
-    mv -f "$LOCALDESTDIR/lib/libjxl_threads-static.a" "$LOCALDESTDIR/lib/libjxl_threads.a"
-    grep_or_sed Cflags.private "$(file_installed libjxl.pc)" '/Cflags:/aCflags.private: -DJXL_STATIC_DEFINE'
-    do_checkIfExist
-    unset extracommands
+if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
+    _check=(libhwy{,_{contrib,test}}.a libhwy{,-{contrib,test}}.pc hwy/highway.h)
+    if do_vcs "https://github.com/google/highway.git"; then
+        do_uninstall "${_check[@]}" include/hwy
+        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
+    if do_vcs "https://github.com/gflags/gflags.git"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0002-cmake-limit-type-suffixing-libraries-to-msvc-only.patch" am
+        do_uninstall "${_check[@]}" lib/cmake/gflags include/gflags
+        do_cmakeinstall -D{BUILD,INSTALL}_STATIC_LIBS=ON -DBUILD_gflags_LIB=ON -DINSTALL_HEADERS=ON \
+            -DREGISTER_{BUILD_DIR,INSTALL_PREFIX}=OFF
+        do_checkIfExist
+    fi
+
+    _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
+    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe)
+    if do_vcs "https://github.com/libjxl/libjxl.git"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0002-jxl-limit-not-renaming-to-msvc.patch" am
+        do_uninstall "${_check[@]}" include/jxl
+        do_pacman_remove asciidoc-py3-git gflags
+        do_pacman_install lcms2 asciidoc highway
+        extracommands=()
+        log -q "git.submodule" git submodule update --init --recursive
+        [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
+        do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+            -DJPEGXL_{FORCE_SYSTEM_{BROTLI,HWY},STATIC}=ON -DJPEGXL_BUNDLE_GFLAGS=OFF "${extracommands[@]}"
+        grep_or_sed Cflags.private "$(file_installed libjxl.pc)" '/Cflags:/aCflags.private: -DJXL_STATIC_DEFINE'
+        do_checkIfExist
+        unset extracommands
+    fi
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
