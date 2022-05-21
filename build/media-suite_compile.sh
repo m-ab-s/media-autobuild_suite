@@ -2779,7 +2779,8 @@ if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ff
     _notrequired=true
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
-        --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE
+        --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE \
+        --cc="$CC" --ld="$CXX"
     do_make
     do_install ffmbc.exe bin-video/
     do_checkIfExist
