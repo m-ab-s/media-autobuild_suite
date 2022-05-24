@@ -511,7 +511,7 @@ if %vvcINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build Fraunhofer VVC? [H.265 successor enc/decoder]
+    echo. Build VVC Reference Software? [H.265 successor enc/decoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
