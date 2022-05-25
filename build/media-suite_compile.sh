@@ -1119,16 +1119,14 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl{,_ng},cjpeg_hdr,jxlinfo}.exe)
     if do_vcs "https://github.com/libjxl/libjxl.git"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0002-jxl-limit-not-renaming-to-msvc.patch" am
         do_uninstall "${_check[@]}" include/jxl
         do_pacman_remove asciidoc-py3-git gflags
         do_pacman_install lcms2 asciidoc highway
         extracommands=()
         log -q "git.submodule" git submodule update --init --recursive
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
-        do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+        do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
             -DJPEGXL_{FORCE_SYSTEM_{BROTLI,HWY},STATIC}=ON -DJPEGXL_BUNDLE_GFLAGS=OFF "${extracommands[@]}"
-        grep_or_sed Cflags.private "$(file_installed libjxl.pc)" '/Cflags:/aCflags.private: -DJXL_STATIC_DEFINE'
         do_checkIfExist
         unset extracommands
     fi
