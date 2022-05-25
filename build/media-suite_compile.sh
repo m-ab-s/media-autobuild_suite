@@ -183,7 +183,7 @@ _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git"; then
     do_uninstall "${_check[@]}"
-    do_rust --features 'pcre2'
+    do_rust
     do_install "target/$CARCH-pc-windows-gnu/release/rg.exe" bin-global/
     do_checkIfExist
 fi
