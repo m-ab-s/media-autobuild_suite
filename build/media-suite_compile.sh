@@ -57,6 +57,7 @@ while true; do
     --libavif=* ) libavif=${1#*=} && shift ;;
     --jpegxl=* ) jpegxl=${1#*=} && shift ;;
     --vvc=* ) vvc=${1#*=} && shift ;;
+    --uvg266=* ) uvg266=${1#*=} && shift ;;
     --jq=* ) jq=${1#*=} && shift ;;
     --jo=* ) jo=${1#*=} && shift ;;
     --dssim=* ) dssim=${1#*=} && shift ;;
@@ -1812,6 +1813,14 @@ if [[ $bits = 64bit && $vvc = y ]] &&
         -DUSE_CCACHE=OFF
     do_checkIfExist
     unset _notrequired
+fi
+
+_check=(libuvg266.a uvg266.pc uvg266.h)
+if [[ $bits = 64bit && $uvg266 = y ]] &&
+    do_vcs "https://github.com/ultravideo/uvg266.git"; then
+    do_uninstall version.h "${_check[@]}"
+    do_cmakeinstall video -DBUILD_TESTING=OFF
+    do_checkIfExist
 fi
 
 _check=(avisynth/avisynth{,_c}.h
