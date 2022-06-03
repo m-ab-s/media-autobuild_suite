@@ -1120,8 +1120,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     if do_vcs "https://github.com/libjxl/libjxl.git"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
         do_uninstall "${_check[@]}" include/jxl
-        do_pacman_remove asciidoc-py3-git gflags
-        do_pacman_install lcms2 asciidoc highway
+        do_pacman_install lcms2 asciidoc
         extracommands=()
         log -q "git.submodule" git submodule update --init --recursive
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
