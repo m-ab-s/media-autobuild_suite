@@ -1100,6 +1100,7 @@ fi
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(libhwy{,_{contrib,test}}.a libhwy{,-{contrib,test}}.pc hwy/highway.h)
     if do_vcs "https://github.com/google/highway.git"; then
+        do_patch "https://github.com/google/highway/pull/732.patch" am
         do_uninstall "${_check[@]}" include/hwy
         CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall
         do_checkIfExist
