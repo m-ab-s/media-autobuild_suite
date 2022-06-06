@@ -1768,6 +1768,7 @@ if %noMintty%==y (
     /usr/bin/bash ^
     --login /build/media-suite_compile.sh %compileArgs%
 )
+color
 exit /B %ERRORLEVEL%
 endlocal
 goto :EOF
