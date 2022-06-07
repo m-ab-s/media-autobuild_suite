@@ -1353,7 +1353,8 @@ do_rustinstall() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
-    log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
+    PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+        log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
     extra_script post rust
