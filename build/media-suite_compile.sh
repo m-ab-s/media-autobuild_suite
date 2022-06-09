@@ -1984,7 +1984,7 @@ if [[ $ffmpeg != no ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
         if enabled libsvthevc; then
-            do_patch "https://raw.githubusercontent.com/guojiansheng0925/SVT-HEVC/gjs_enc_cb/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
+            do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
         fi
         if enabled libsvtvp9; then
