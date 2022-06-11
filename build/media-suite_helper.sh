@@ -1339,7 +1339,8 @@ do_rust() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
-    log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
+    CC="ccache clang" \
+        log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "$@" "${rust_extras[@]}"
     extra_script post rust
@@ -1353,7 +1354,8 @@ do_rustinstall() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
-    PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+    CC="ccache clang" \
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
