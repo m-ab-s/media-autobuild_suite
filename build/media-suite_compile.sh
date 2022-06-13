@@ -58,6 +58,8 @@ while true; do
     --jpegxl=* ) jpegxl=${1#*=} && shift ;;
     --vvc=* ) vvc=${1#*=} && shift ;;
     --uvg266=* ) uvg266=${1#*=} && shift ;;
+    --vvenc=* ) vvenc=${1#*=} && shift ;;
+    --vvdec=* ) vvdec=${1#*=} && shift ;;
     --jq=* ) jq=${1#*=} && shift ;;
     --jo=* ) jo=${1#*=} && shift ;;
     --dssim=* ) dssim=${1#*=} && shift ;;
@@ -1820,6 +1822,24 @@ if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_vcs "https://github.com/ultravideo/uvg266.git"; then
     do_uninstall version.h "${_check[@]}"
     do_cmakeinstall video -DBUILD_TESTING=OFF
+    do_checkIfExist
+fi
+
+_check=(bin-video/vvenc/vvenc{app,FFapp,interfacetest,libtest}.exe)
+if [[ $bits = 64bit && $vvenc = y ]] &&
+    do_vcs "https://github.com/fraunhoferhhi/vvenc.git" vvenc; then
+    do_uninstall bin-video/vvenc
+    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvenc \
+        -DBUILD_STATIC=on
+    do_checkIfExist
+fi
+
+_check=(bin-video/vvdec/vvdecapp.exe)
+if [[ $bits = 64bit && $vvdec = y ]] &&
+    do_vcs "https://github.com/fraunhoferhhi/vvdec.git" vvdec; then
+    do_uninstall bin-video/vvdec
+    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvdec \
+        -DBUILD_STATIC=on
     do_checkIfExist
 fi
 
