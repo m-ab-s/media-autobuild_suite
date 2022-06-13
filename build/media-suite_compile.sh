@@ -1825,7 +1825,7 @@ if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/vvenc/vvenc{app,FFapp,interfacetest,libtest}.exe)
+_check=(bin-video/vvenc/vvenc{app,FFapp}.exe)
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvenc.git" vvenc; then
     do_uninstall bin-video/vvenc
