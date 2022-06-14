@@ -1838,7 +1838,10 @@ if [[ $bits = 64bit && $vvenc = y ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/vvdec/vvdecapp.exe)
+_check=(bin-video/vvdecapp.exe
+    vvdec/vvdec.h
+    libvvdec.{a,pc}
+    lib/cmake/vvdec/vvdecConfig.cmake)
 if [[ $bits = 64bit && $vvdec = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvdec.git" vvdec; then
     do_uninstall bin-video/vvdec
