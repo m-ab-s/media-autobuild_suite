@@ -1844,7 +1844,7 @@ _check=(bin-video/vvdecapp.exe
     lib/cmake/vvdec/vvdecConfig.cmake)
 if [[ $bits = 64bit && $vvdec = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvdec.git"; then
-    do_uninstall bin-video/vvdec
+    do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvdec \
         -DBUILD_STATIC=on
     do_checkIfExist
