@@ -1832,7 +1832,7 @@ _check=(bin-video/vvenc{,FF}.exe
     libapputils.a)
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvenc.git" vvenc; then
-    do_uninstall bin-video/vvenc
+    do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvenc \
         -DBUILD_STATIC=on
     do_checkIfExist
