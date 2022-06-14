@@ -1825,7 +1825,7 @@ if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/vvenc{,FF}.exe
+_check=(bin-video/vvenc{,FF}app.exe
     vvenc/vvenc.h
     libvvenc.{a,pc}
     lib/cmake/vvenc/vvencConfig.cmake
