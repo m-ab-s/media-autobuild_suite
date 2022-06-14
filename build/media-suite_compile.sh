@@ -1831,7 +1831,7 @@ _check=(bin-video/vvenc{,FF}.exe
     lib/cmake/vvenc/vvencConfig.cmake
     libapputils.a)
 if [[ $bits = 64bit && $vvenc = y ]] &&
-    do_vcs "https://github.com/fraunhoferhhi/vvenc.git" vvenc; then
+    do_vcs "https://github.com/fraunhoferhhi/vvenc.git"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall video \
         -DBUILD_STATIC=on
