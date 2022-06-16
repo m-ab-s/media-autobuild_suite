@@ -149,7 +149,7 @@ set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 ^
 rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 timeStamp noMintty ccache ^
-svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl autouploadlogs
+svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl autouploadlogs vvenc vvdec
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -545,6 +545,46 @@ if %builduvg266%==1 set "uvg266=y"
 if %builduvg266%==2 set "uvg266=n"
 if %builduvg266% GTR 2 GOTO uvg266
 if %deleteINI%==1 echo.uvg266=^%builduvg266%>>%ini%
+
+:vvenc
+if %vvencINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vvenc? [Fraunhoferhhi Versatile Video Encoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvvenc="Build vvenc: "
+) else set buildvvenc=%vvencINI%
+
+if "%buildvvenc%"=="" GOTO vvenc
+if %buildvvenc%==1 set "vvenc=y"
+if %buildvvenc%==2 set "vvenc=n"
+if %buildvvenc% GTR 2 GOTO vvenc
+if %deleteINI%==1 echo.vvenc=^%buildvvenc%>>%ini%
+
+:vvdec
+if %vvdecINI%==0 (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build vvdec? [Fraunhoferhhi Versatile Video Decoder]
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildvvdec="Build vvdec: "
+) else set buildvvdec=%vvdecINI%
+
+if "%buildvvdec%"=="" GOTO vvdec
+if %buildvvdec%==1 set "vvdec=y"
+if %buildvvdec%==2 set "vvdec=n"
+if %buildvvdec% GTR 2 GOTO vvdec
+if %deleteINI%==1 echo.vvdec=^%buildvvdec%>>%ini%
 
 :svtav1
 if %svtav1INI%==0 (
@@ -1708,9 +1748,10 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
---vvc=%vvc% --uvg266=%uvg266% --jq=%jq% --jo=%jo% --dssim=%dssim% --avs2=%avs2% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% ^
---vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% --autouploadlogs=%autouploadlogs%
+--vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
+--avs2=%avs2% --timeStamp=%timeStamp% --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% ^
+--svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% ^ 
+--autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
