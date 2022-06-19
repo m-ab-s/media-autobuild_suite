@@ -135,7 +135,8 @@ vcs_get_current_type() {
 
 # check_valid_vcs /build/ffmpeg-git
 check_valid_vcs() {
-    [[ -d ${1:-$PWD}/.git ]]
+    [[ -d ${1:-$PWD}/.git ]] &&
+        git -C "${1:-$PWD}/.git" rev-parse HEAD > /dev/null 2>&1
 }
 
 # vcs_get_current_head /build/ffmpeg-git
