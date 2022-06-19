@@ -537,7 +537,7 @@ unset opencldll
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     do_pacman_remove tesseract-ocr
     _check=(libleptonica.{,l}a lept.pc)
-    if do_vcs "https://github.com/DanBloomberg/leptonica.git#tag=LATEST"; then
+    if do_vcs "https://github.com/DanBloomberg/leptonica.git"; then
         do_uninstall include/leptonica "${_check[@]}"
         [[ -f configure ]] || do_autogen
         do_separate_confmakeinstall --disable-programs --without-{lib{openjpeg,webp},giflib}
