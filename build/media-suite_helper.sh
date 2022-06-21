@@ -282,14 +282,9 @@ do_vcs() {
     vcs_set_url "$vcsURL"
     log -q git.fetch vcs_fetch
     oldHead=$(vcs_get_merge_base "$ref")
-    newHead="$oldHead"
-
-    if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR/last_run" ]]; then
-        do_print_progress "  Running git update for $vcsFolder"
-        log -q git.reset vcs_reset "$ref"
-        newHead=$(vcs_get_current_head "$PWD")
-        touch recently_checked
-    fi
+    do_print_progress "  Running git update for $vcsFolder"
+    log -q git.reset vcs_reset "$ref"
+    newHead=$(vcs_get_current_head "$PWD")
 
     vcs_clean
 
@@ -1929,7 +1924,7 @@ add_to_remove() {
 clean_suite() {
     do_simple_print -p "${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" > /dev/null
-    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
+    find . -maxdepth 2 -name recently_updated -delete
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
     echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
@@ -2568,7 +2563,6 @@ safe_git_clean() {
     git clean -xfd \
         -e "/build_successful*" \
         -e "/recently_updated" \
-        -e '/recently_checked' \
         -e '/custom_updated' \
         -e '**/ab-suite.*.log' \
         "${@}"
