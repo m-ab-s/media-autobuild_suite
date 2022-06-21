@@ -869,13 +869,11 @@ unset _deps
 
 _check=(libopenmpt.{a,pc})
 if [[ $ffmpeg != no ]] && enabled libopenmpt &&
-    do_vcs "https://github.com/OpenMPT/openmpt.git#tag=libopenmpt-*"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openmpt/0001-make-try-using-PKG_CONFIG-if-provided.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openmpt/0002-mingw-w64.mk-don-t-override-the-compilers-etc-if-pro.patch" am
+    do_vcs "https://github.com/OpenMPT/openmpt.git#branch=OpenMPT-1.30"; then
     do_uninstall include/libopenmpt "${_check[@]}"
     mkdir bin 2> /dev/null
     extracommands=("CONFIG=mingw64-win${bits%bit}" "AR=ar" "STATIC_LIB=1" "EXAMPLES=0" "OPENMPT123=0"
-        "TEST=0" "OS=")
+        "TEST=0" "OS=" "CC=$CC" "CXX=$CXX")
     log clean make clean "${extracommands[@]}"
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
     sed -i 's/Libs.private.*/& -lrpcrt4 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
