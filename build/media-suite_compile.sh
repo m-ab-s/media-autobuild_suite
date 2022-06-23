@@ -1019,7 +1019,7 @@ if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled li
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
     do_cmakeinstall video -DENABLE_{DOCS,TOOLS,TEST{S,DATA}}=off \
-        -DENABLE_NASM=on -DFORCE_HIGHBITDEPTH_DECODING=0 "${extracommands[@]}"
+        -DCONFIG_TUNE_VMAF=1 -DENABLE_NASM=on -DFORCE_HIGHBITDEPTH_DECODING=0 "${extracommands[@]}"
     do_checkIfExist
     unset extracommands
 fi
