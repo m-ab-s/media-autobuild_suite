@@ -587,7 +587,7 @@ fi
 
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
 if [[ $ffmpeg != no ]] && enabled libzimg &&
-    do_vcs "https://github.com/sekrit-twc/zimg.git#commit=c9a15ec4f86adfef6c7cede8dae79762d34f2564"; then
+    do_vcs "https://github.com/sekrit-twc/zimg.git"; then
     do_uninstall "${_check[@]}"
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/zimg/0001-libm_wrapper-define-__CRT__NO_INLINE-before-math.h.patch" am
     do_autoreconf
