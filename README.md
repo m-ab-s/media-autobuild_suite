@@ -85,7 +85,7 @@ For information about the compiler environment see the wiki, there you also have
         - chromaprint (mingw-w64)
         - cuda filters (needs CUDA SDK installed)
             - needs non-free license
-        - decklink (11.6)
+        - decklink (12.3)
             - needs non-free license
         - frei0r (git)
         - ladspa (mingw-w64)
