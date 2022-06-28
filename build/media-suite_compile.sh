@@ -1858,8 +1858,7 @@ _check=(bin-video/vvenc{,FF}app.exe
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvenc.git"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
-    do_cmakeinstall video \
-        -DBUILD_STATIC=on
+    do_cmakeinstall video
     do_checkIfExist
 fi
 
@@ -1870,8 +1869,7 @@ _check=(bin-video/vvdecapp.exe
 if [[ $bits = 64bit && $vvdec = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvdec.git"; then
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
-    do_cmakeinstall video \
-        -DBUILD_STATIC=on
+    do_cmakeinstall video
     do_checkIfExist
 fi
 
