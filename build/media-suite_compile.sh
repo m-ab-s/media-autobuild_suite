@@ -501,6 +501,41 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_checkIfExist
 fi
 
+if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
+    _check=(libhwy{,_{contrib,test}}.a libhwy{,-{contrib,test}}.pc hwy/highway.h)
+    if do_vcs "https://github.com/google/highway.git"; then
+        do_uninstall "${_check[@]}" include/hwy
+        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
+    if do_vcs "https://github.com/gflags/gflags.git"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0002-cmake-limit-type-suffixing-libraries-to-msvc-only.patch" am
+        do_uninstall "${_check[@]}" lib/cmake/gflags include/gflags
+        do_cmakeinstall -D{BUILD,INSTALL}_STATIC_LIBS=ON -DBUILD_gflags_LIB=ON -DINSTALL_HEADERS=ON \
+            -DREGISTER_{BUILD_DIR,INSTALL_PREFIX}=OFF
+        do_checkIfExist
+    fi
+
+    _deps=(libhwy.a libgflags.a)
+    _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
+    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpeg_hdr,jxlinfo}.exe)
+    if do_vcs "https://github.com/libjxl/libjxl.git"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
+        do_uninstall "${_check[@]}" include/jxl
+        do_pacman_install lcms2 asciidoc
+        extracommands=()
+        log -q "git.submodule" git submodule update --init --recursive
+        [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
+        do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+            -DJPEGXL_{FORCE_SYSTEM_{BROTLI,HWY},STATIC}=ON -DJPEGXL_BUNDLE_GFLAGS=OFF "${extracommands[@]}"
+        do_checkIfExist
+        unset extracommands
+    fi
+fi
+
 if files_exist bin-video/OpenCL.dll; then
     opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
 else
@@ -1123,41 +1158,6 @@ if [[ $libavif = y ]] && {
     esac
     do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
     do_checkIfExist
-fi
-
-if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
-    _check=(libhwy{,_{contrib,test}}.a libhwy{,-{contrib,test}}.pc hwy/highway.h)
-    if do_vcs "https://github.com/google/highway.git"; then
-        do_uninstall "${_check[@]}" include/hwy
-        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
-    if do_vcs "https://github.com/gflags/gflags.git"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0002-cmake-limit-type-suffixing-libraries-to-msvc-only.patch" am
-        do_uninstall "${_check[@]}" lib/cmake/gflags include/gflags
-        do_cmakeinstall -D{BUILD,INSTALL}_STATIC_LIBS=ON -DBUILD_gflags_LIB=ON -DINSTALL_HEADERS=ON \
-            -DREGISTER_{BUILD_DIR,INSTALL_PREFIX}=OFF
-        do_checkIfExist
-    fi
-
-    _deps=(libhwy.a libgflags.a)
-    _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
-    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpeg_hdr,jxlinfo}.exe bin-global/cjxl_ng.exe)
-    if do_vcs "https://github.com/libjxl/libjxl.git"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
-        do_uninstall "${_check[@]}" include/jxl
-        do_pacman_install lcms2 asciidoc
-        extracommands=()
-        log -q "git.submodule" git submodule update --init --recursive
-        [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
-        do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
-            -DJPEGXL_{FORCE_SYSTEM_{BROTLI,HWY},STATIC}=ON -DJPEGXL_BUNDLE_GFLAGS=OFF "${extracommands[@]}"
-        do_checkIfExist
-        unset extracommands
-    fi
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
