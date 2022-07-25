@@ -163,7 +163,7 @@ if [[ $ripgrep = y || $rav1e = y || $dssim = y || $libavif = y ]] || enabled lib
     if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
         mkdir -p "$LOCALBUILDDIR/rustinstall"
         cd_safe "$LOCALBUILDDIR/rustinstall"
-        log download_rustup curl --proto '=https' --tlsv1.2 "https://sh.rustup.rs" -sSo rustup.sh
+        log download_rustup "${curl_opts[@]}" "https://sh.rustup.rs" -So rustup.sh
         log install_rust ./rustup.sh -v -y --no-modify-path \
             "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
             --default-toolchain=stable
