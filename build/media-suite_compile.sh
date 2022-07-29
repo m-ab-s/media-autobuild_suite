@@ -512,7 +512,6 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
     if do_vcs "https://github.com/gflags/gflags.git"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0002-cmake-limit-type-suffixing-libraries-to-msvc-only.patch" am
         do_uninstall "${_check[@]}" lib/cmake/gflags include/gflags
         do_cmakeinstall -D{BUILD,INSTALL}_STATIC_LIBS=ON -DBUILD_gflags_LIB=ON -DINSTALL_HEADERS=ON \
             -DREGISTER_{BUILD_DIR,INSTALL_PREFIX}=OFF
