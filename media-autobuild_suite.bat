@@ -551,7 +551,7 @@ if %vvencINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build vvenc? [Fraunhoferhhi Versatile Video Encoder]
+    echo. Build vvenc? [Fraunhofer HHI Versatile Video Encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -571,7 +571,7 @@ if %vvdecINI%==0 (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build vvdec? [Fraunhoferhhi Versatile Video Decoder]
+    echo. Build vvdec? [Fraunhofer HHI Versatile Video Decoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
