@@ -1841,7 +1841,7 @@ if [[ $bits = 64bit && $vvc = y ]] &&
     unset _notrequired
 fi
 
-_check=(libuvg266.a uvg266.pc uvg266.h)
+_check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266.h)
 if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_vcs "https://github.com/ultravideo/uvg266.git"; then
     do_uninstall version.h "${_check[@]}"
