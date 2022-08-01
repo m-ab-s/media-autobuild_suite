@@ -1943,7 +1943,7 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_vcs "https://code.videolan.org/videolan/libplacebo.git"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0001-meson-use-shaderc_combined.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0002-spirv-cross-use-spirv-cross-instead-of-c-shared.patch" am
-    do_pacman_install python-mako
+    do_pacman_install python-{mako,setuptools}
     do_uninstall "${_check[@]}"
     log -q "git.submodule" git submodule update --init --recursive
     do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false -Dd3d11=enabled
