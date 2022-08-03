@@ -485,10 +485,9 @@ _check=(libwebp{,mux}.{a,pc})
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
     do_vcs "https://chromium.googlesource.com/webm/libwebp"; then
     do_pacman_install giflib
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-WEBP_DEP_LIBRARIES-use-Threads-Threads.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-CMake-link-imageioutil-to-exampleutil-after-defined.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0004-CMake-use-import-library-for-SDL-if-available.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0006-CMake-add-WEBP_BUILD_WEBPINFO-to-list-of-checks-for-.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0001-vwebp-Use-GLUT-and-opengl-import-targets.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0002-vwebp-link-winmm-if-windows.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libwebp/0003-deps-link-libtiff-first.patch" am
     do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
     extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
     if [[ $standalone = y ]]; then
