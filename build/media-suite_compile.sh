@@ -1433,7 +1433,6 @@ fi
 _check=(AMF/core/Version.h)
 if [[ $ffmpeg != no ]] && { enabled amf || ! disabled_any autodetect amf; } &&
     do_vcs "https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git"; then
-    do_patch "https://github.com/GPUOpen-LibrariesAndSDKs/AMF/pull/286.patch" am
     do_uninstall include/AMF
     cd_safe amf/public/include
     install -D -p -t "$LOCALDESTDIR/include/AMF/core" core/*.h
