@@ -1493,7 +1493,8 @@ if [[ $xvc == y ]] &&
     do_checkIfExist
 fi
 
-if [[ $x264 != no ]]; then
+if [[ $x264 != no ]] ||
+    { [[ $ffmpeg != no ]] && enabled libx264; }; then
     _check=(x264{,_config}.h libx264.a x264.pc)
     [[ $standalone = y ]] && _check+=(bin-video/x264.exe)
     _bitdepth=$(get_api_version x264_config.h BIT_DEPTH)
