@@ -1116,8 +1116,10 @@ EOF
 
     # standalone binary
     if [[ $rav1e = y || $standalone = y ]]; then
-        do_rust
-        do_install "target/$CARCH-pc-windows-gnu/release/rav1e.exe" bin-video/
+        do_rust --profile release-no-lto
+        find "target/$CARCH-pc-windows-gnu" -name "rav1e.exe" | while read -r f; do
+            do_install "$f" bin-video/
+        done
     fi
 
     # C lib

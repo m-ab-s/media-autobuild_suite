@@ -1336,9 +1336,9 @@ do_rust() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     CC="ccache clang" \
-        log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
+        log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build \
         --target="$CARCH"-pc-windows-gnu \
-        --jobs="$cpuCount" "$@" "${rust_extras[@]}"
+        --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
 }
