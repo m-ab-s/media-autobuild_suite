@@ -1088,32 +1088,6 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     do_vcs "https://github.com/xiph/rav1e.git"; then
     do_uninstall "${_check[@]}" include/rav1e
 
-    # attempt at using a version of crossbeam that does not have some breaking changes
-    # ignore if it was already previously cloned
-    log -qe "crossbeam.clone" git clone "https://github.com/crossbeam-rs/crossbeam.git"
-    # before COLLECTOR change
-    log -q "crossbeam.reset" git -C crossbeam reset --hard "08e41e184832f9d0bd49d97e21be1d60c437a894~1"
-
-    # fix no_atomic.rs symlinks
-    for f in $(git -C crossbeam/ ls-files -s | grep no_atomic.rs | awk '/120000/{print $4}'); do
-        rm -f "crossbeam/$f"
-        cp crossbeam/no_atomic.rs "crossbeam/$f"
-    done
-
-    # patch Cargo.toml
-    log -q "crossbeam.patch" git apply --ignore-space-change --ignore-whitespace - <<EOF
-diff --git a/Cargo.toml b/Cargo.toml
-index 922ab034..e61d7064 100644
---- a/Cargo.toml
-+++ b/Cargo.toml
-@@ -180,3 +180,5 @@ no-default-features = true
-
- [patch.crates-io]
- v_frame = { path = "v_frame" }
-+crossbeam = { path = "./crossbeam" }
-+crossbeam-epoch = { path = "./crossbeam/crossbeam-epoch" }
-EOF
-
     # standalone binary
     if [[ $rav1e = y || $standalone = y ]]; then
         do_rust --profile release-no-lto
