@@ -2406,6 +2406,9 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             "${MPV_OPTS[@]}"
         extra_script post configure
 
+        replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
+        sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py	
+
         extra_script pre build
         log build /usr/bin/python waf -j "${cpuCount:-1}"
         extra_script post build
