@@ -233,6 +233,28 @@ if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbl
     do_checkIfExist
 fi
 
+if [[ $ffmpeg != no ]] && enabled libaribb24; then
+    _check=(libpng.{pc,{,l}a} libpng16.{pc,{,l}a} libpng16/png.h)
+    if do_vcs "https://github.com/glennrp/libpng.git"; then
+        do_uninstall include/libpng16 "${_check[@]}"
+        do_autoupdate
+        do_separate_confmakeinstall --with-pic
+        do_checkIfExist
+    fi
+
+    _deps=(libpng.{pc,a} libpng16.{pc,a})
+    _check=(aribb24.pc libaribb24.{,l}a)
+    if do_vcs "https://github.com/nkoriyama/aribb24.git"; then
+        do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/12.patch"
+        do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/13.patch"
+        do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/17.patch"
+        do_uninstall include/aribb24 "${_check[@]}"
+        do_autoreconf
+        do_separate_confmakeinstall --with-pic
+        do_checkIfExist
+    fi
+fi
+
 if [[ $mplayer = y || $mpv = y ]] ||
     { [[ $ffmpeg != no ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
