@@ -222,8 +222,8 @@ if [[ $dssim = y ]] &&
 fi
 
 _check=(libxml2.a libxml2/libxml/xmlIO.h libxml-2.0.pc)
-if { enabled libxml2 || [[ $cyanrip = y ]]; } &&
-    do_vcs "https://gitlab.gnome.org/GNOME/libxml2.git";then
+if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbluray; } &&
+    do_vcs "https://gitlab.gnome.org/GNOME/libxml2.git"; then
     do_uninstall include/libxml2/libxml "${_check[@]}"
     NOCONFIGURE=true do_autogen
     [[ -f config.mak ]] && log "distclean" make distclean
