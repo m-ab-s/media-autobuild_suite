@@ -426,11 +426,11 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     extra_opts=()
     case $curl in
     libressl|openssl)
-        extra_opts+=(--with-nghttp2 --without-{gnutls,mbedtls})
+        extra_opts+=(--with-{nghttp2,openssl} --without-{gnutls,mbedtls})
         ;;
-    mbedtls) extra_opts+=(--with-{mbedtls,nghttp2}) ;;
-    gnutls) extra_opts+=(--with-gnutls --without-{nghttp2,mbedtls}) ;;
-    *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{gnutls,mbedtls});;
+    mbedtls) extra_opts+=(--with-{mbedtls,nghttp2} --without-openssl) ;;
+    gnutls) extra_opts+=(--with-gnutls --without-{nghttp2,mbedtls,openssl}) ;;
+    *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{gnutls,mbedtls,openssl});;
     esac
 
     [[ ! -f configure || configure.ac -nt configure ]] &&
