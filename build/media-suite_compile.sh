@@ -1853,8 +1853,7 @@ fi
 _check=(bin-video/vvenc{,FF}app.exe
     vvenc/vvenc.h
     libvvenc.{a,pc}
-    lib/cmake/vvenc/vvencConfig.cmake
-    libapputils.a)
+    lib/cmake/vvenc/vvencConfig.cmake)
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "https://github.com/fraunhoferhhi/vvenc.git"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
