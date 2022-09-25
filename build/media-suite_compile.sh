@@ -1326,6 +1326,7 @@ _check=(libuavs3d.a uavs3d.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/uavs3dec.exe)
 if [[ $ffmpeg != no ]] && enabled libuavs3d &&
     do_vcs "https://github.com/uavs3/uavs3d.git"; then
+    do_patch "https://github.com/uavs3/uavs3d/pull/29.patch"
     do_cmakeinstall
     [[ $standalone = y ]] && do_install uavs3dec.exe bin-video/
     do_checkIfExist
