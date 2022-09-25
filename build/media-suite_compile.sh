@@ -368,7 +368,8 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]] &&
         do_patch "https://github.com/gnutls/gnutls/commit/88d79b964d88730e316919d6ccd17ca0fe9b3244.patch"
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
-        do_separate_confmakeinstall \
+        CFLAGS="-Wno-int-conversion" \
+            do_separate_confmakeinstall \
             --disable-{cxx,doc,tools,tests,nls,rpath,libdane,guile,gcc-warnings} \
             --without-{p11-kit,idn,tpm} --enable-local-libopts \
             --with-included-unistring --disable-code-coverage \
