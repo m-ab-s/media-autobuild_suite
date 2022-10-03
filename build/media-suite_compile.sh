@@ -123,15 +123,15 @@ grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
 unset _keys _root
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
-    lib{jpeg,nettle,ogg,vorbis{,enc,file},gnurx,regex}.{,l}a
+    lib{jpeg,nettle,ogg,gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
     include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
-    {nettle,ogg,vorbis{,enc,file},vo-aacenc,sdl,uchardet}.pc
+    {nettle,ogg,vo-aacenc,sdl,uchardet}.pc
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
-    share/aclocal/{ogg,vorbis}.m4
+    share/aclocal/ogg.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
     bin-global/{{file,uchardet}.exe,sdl-config,luajit-2.0.4.exe}
     libebur128.a ebur128.h
@@ -681,7 +681,13 @@ fi
 
 grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
 
-enabled libvorbis && do_pacman_install libvorbis
+_check=(libvorbis{,enc,file}.{,l}a vorbis{,enc,file}.pc vorbis/vorbisenc.h)
+if enabled libvorbis && do_vcs "$SOURCE_REPO_LIBVORBIS"; then
+    do_uninstall include/vorbis "${_check[@]}"
+    do_autogen
+    do_separate_confmakeinstall audio --disable-docs
+    do_checkIfExist
+fi
 
 _check=(libspeex.{l,}a speex.pc speex/speex.h)
 [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
@@ -766,12 +772,11 @@ if [[ $exhale = y ]] &&
     unset _notrequired
 fi
 
-_check=(bin-audio/oggenc.exe)
-_deps=("$MINGW_PREFIX"/lib/libvorbis.a)
+_check=(bin-audio/ogg{enc,dec}.exe)
+_deps=(vorbis.pc)
 if [[ $standalone = y ]] && enabled libvorbis &&
-    do_vcs "$SOURCE_REPO_LIBVORBIS"; then
+    do_vcs "$SOURCE_REPO_VORBIS_TOOLS"; then
     do_patch "https://github.com/xiph/vorbis-tools/pull/39.patch" am
-    _check+=(bin-audio/oggdec.exe)
     do_autoreconf
     do_uninstall "${_check[@]}"
     extracommands=()
