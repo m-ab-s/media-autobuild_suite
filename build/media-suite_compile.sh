@@ -682,16 +682,16 @@ fi
 grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
 
 enabled libvorbis && do_pacman_install libvorbis
-enabled libspeex && do_pacman_install speex
 
-_check=(bin-audio/speex{enc,dec}.exe)
-if [[ $standalone = y ]] && enabled libspeex &&
-    do_vcs "$SOURCE_REPO_SPEEX"; then
-    do_uninstall include/speex libspeex.{l,}a speex.pc "${_check[@]}"
-    do_autoreconf
-    do_separate_conf --enable-vorbis-psy --enable-binaries
-    do_make
-    do_install src/speex{enc,dec}.exe bin-audio/
+_check=(libspeex.{l,}a speex.pc speex/speex.h)
+[[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
+if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
+    do_pacman_remove speex
+    do_uninstall include/speex "${_check[@]}"
+    do_autogen
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(--disable-binaries)
+    do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
     do_checkIfExist
 fi
 
