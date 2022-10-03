@@ -51,6 +51,7 @@ SOURCE_REPO_LIBMUSICBRAINZ=https://github.com/wiiaboo/libmusicbrainz.git
 SOURCE_REPO_LIBMXF=https://gitlab.com/m-ab-s/libmxf.git
 SOURCE_REPO_LIBMXFPP=https://gitlab.com/m-ab-s/libmxfpp.git
 SOURCE_REPO_LIBMYSOFA=https://github.com/hoene/libmysofa.git
+SOURCE_REPO_LIBOGG=https://github.com/xiph/ogg.git
 SOURCE_REPO_LIBOPENMPT=https://github.com/OpenMPT/openmpt.git#branch=OpenMPT-1.30
 SOURCE_REPO_LIBOPUSENC=https://github.com/xiph/libopusenc.git
 SOURCE_REPO_LIBPLACEBO=https://code.videolan.org/videolan/libplacebo.git

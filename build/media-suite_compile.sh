@@ -123,15 +123,14 @@ grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
 unset _keys _root
 
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
-    lib{jpeg,nettle,ogg,gnurx,regex}.{,l}a
+    lib{jpeg,nettle,gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
     libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
-    include/{nettle,ogg,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
+    include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
-    {nettle,ogg,vo-aacenc,sdl,uchardet}.pc
+    {nettle,vo-aacenc,sdl,uchardet}.pc
     {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
     libcdio_{cdda,paranoia}.{{l,}a,pc}
-    share/aclocal/ogg.m4
     twolame.h bin-audio/{twolame,cd-paranoia}.exe
     bin-global/{{file,uchardet}.exe,sdl-config,luajit-2.0.4.exe}
     libebur128.a ebur128.h
@@ -701,10 +700,20 @@ if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
     do_checkIfExist
 fi
 
+_check=(libogg.{l,}a ogg/ogg.h ogg.pc)
+if {
+    [[ $flac = y ]] ||
+    { [[ $standalone = y ]] && enabled libvorbis; }
+    } && do_vcs "$SOURCE_REPO_LIBOGG"; then
+    do_uninstall include/ogg "${_check[@]}"
+    do_autogen
+    do_separate_confmakeinstall audio
+    do_checkIfExist
+fi
+
 _check=(libFLAC{,++}.{,l}a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
 if [[ $flac = y ]] && do_vcs "$SOURCE_REPO_FLAC"; then
-    do_pacman_install libogg
     do_autogen
     if [[ $standalone = y ]]; then
         _check+=(bin-audio/metaflac.exe)
@@ -773,7 +782,7 @@ if [[ $exhale = y ]] &&
 fi
 
 _check=(bin-audio/ogg{enc,dec}.exe)
-_deps=(vorbis.pc)
+_deps=(ogg.pc vorbis.pc)
 if [[ $standalone = y ]] && enabled libvorbis &&
     do_vcs "$SOURCE_REPO_VORBIS_TOOLS"; then
     do_patch "https://github.com/xiph/vorbis-tools/pull/39.patch" am
@@ -798,10 +807,10 @@ if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
 fi
 
 if [[ $standalone = y ]] && enabled libopus; then
-    do_pacman_install openssl libogg
+    do_pacman_install openssl
     hide_libressl
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
-    _deps=(opus.pc "$MINGW_PREFIX"/lib/pkgconfig/{libssl,ogg}.pc)
+    _deps=(ogg.pc opus.pc "$MINGW_PREFIX"/lib/pkgconfig/libssl.pc)
     if do_vcs "$SOURCE_REPO_OPUSFILE"; then
         do_uninstall "${_check[@]}"
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/opusfile/0001-Disable-cert-store-integration-if-OPENSSL_VERSION_NU.patch" am
