@@ -282,31 +282,16 @@ if [[ $mplayer = y || $mpv = y ]] ||
     fi
 
     _deps=(libfreetype.a)
-    _check=(libfontconfig.{,l}a fontconfig.pc)
+    _check=(libfontconfig.a fontconfig.pc)
     [[ $ffmpeg = sharedlibs ]] && enabled_any {lib,}fontconfig &&
         do_removeOption "--enable-(lib|)fontconfig"
     if enabled_any {lib,}fontconfig &&
         do_vcs "$SOURCE_REPO_FONTCONFIG"; then
         do_uninstall include/fontconfig "${_check[@]}"
-        sed -i 's| test$||' Makefile.am
-        sed -i 's|Libs.private:|& -lintl|' fontconfig.pc.in
-        for _s in printf fprintf snprintf vfprintf; do
-            grep -Rl "$_s" --include="*.[c]" | xargs sed -i "/__mingw_/! s/\b$_s/__mingw_&/g"
-        done
-        unset _s
-        do_autogen --noconf
-        do_autoreconf
-        extracommands=(--disable-docs --enable-iconv
-            "--with-libiconv-prefix=$MINGW_PREFIX"
-            "--with-libiconv-lib=$MINGW_PREFIX/lib" "--with-libiconv-includes=$MINGW_PREFIX/include"
-            "LDFLAGS=$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib")
-        if enabled libxml2; then
-            sed -i 's|Cflags:|& -DLIBXML_STATIC|' fontconfig.pc.in
-            extracommands+=(--enable-libxml2)
-        fi
-        CFLAGS+=" $(enabled libxml2 && echo -DLIBXML_STATIC)" \
-            do_separate_confmakeinstall global "${extracommands[@]}"
-        [[ $standalone = y ]] || rm -f "$LOCALDESTDIR"/bin-global/fc-*.exe
+        do_pacman_install gperf
+        extracommands=()
+        [[ $standalone = y ]] || extracommands+=(-Dtools=disabled)
+        do_mesoninstall global -Ddoc=disabled -Dtests=disabled "${extracommands[@]}"
         do_checkIfExist
     fi
 
