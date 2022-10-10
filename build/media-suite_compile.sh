@@ -304,7 +304,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
     _check=(libharfbuzz.a harfbuzz.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(libharfbuzz.dll.a bin-video/libharfbuzz-{subset-,}0.dll)
     if do_vcs "https://github.com/harfbuzz/harfbuzz.git"; then
-        do_pacman_install ragel
+        do_pacman_install ragel icu
         do_uninstall include/harfbuzz "${_check[@]}" libharfbuzz{-subset,}.la
         extracommands=(-D{glib,gobject,cairo,icu,tests,introspection,docs,benchmark}"=disabled")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
