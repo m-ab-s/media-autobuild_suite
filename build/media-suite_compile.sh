@@ -2426,7 +2426,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         fi
 
         extra_script pre configure
-        CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
+        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
