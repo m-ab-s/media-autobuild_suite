@@ -1847,6 +1847,15 @@ get_java_home() {
         export JAVA_HOME="$javahome"
 }
 
+# can only retrieve the dll version if it's actually in the ProductVersion field
+get_dll_version() (
+    dll=$1
+    [[ -f $dll ]] || return 1
+    version="$(7z l "$dll" | grep 'ProductVersion:' | sed 's/.*ProductVersion: //')"
+    [[ -n $version ]] || return 1
+    echo "$version"
+)
+
 get_api_version() {
     local header="$1"
     [[ -n $(file_installed "$header") ]] && header="$(file_installed "$header")"
