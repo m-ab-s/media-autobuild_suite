@@ -1983,9 +1983,10 @@ if [[ $ffmpeg != no ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264.dll"; then
+        _openh264_ver=2.3.1
+        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264.dll" ||
+            ! get_dll_version "$LOCALDESTDIR/bin-video/libopenh264.dll" | grep -q "$_openh264_ver"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
-            _openh264_ver=2.3.1
             if [[ $bits = 64bit ]]; then
               _sha256=3d5bc8ce7a57f956f445f9aa98015d49c59623d89d78a9139ed8728ed853e197
             else
@@ -1994,7 +1995,7 @@ if [[ $ffmpeg != no ]]; then
             do_wget -c -r -q -h $_sha256 \
             "http://ciscobinary.openh264.org/openh264-${_openh264_ver}-win${bits%bit}.dll.bz2" \
                 libopenh264.dll.bz2
-            [[ -f libopenh264.dll.bz2 ]] && bunzip2 libopenh264.dll.bz2
+            [[ -f libopenh264.dll.bz2 ]] && bunzip2 -f libopenh264.dll.bz2
             unset _sha256 _openh264_ver
             popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
         fi
