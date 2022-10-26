@@ -149,7 +149,7 @@ set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 ^
 rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 timeStamp noMintty ccache ^
-svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl autouploadlogs vvenc vvdec
+svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl autouploadlogs vvenc vvdec ffmpegPath
 
 set deleteIni=0
 set ini=%build%\media-autobuild_suite.ini
@@ -788,6 +788,49 @@ if %buildffmpeg%==5 set "ffmpeg=sharedlibs"
 if %buildffmpeg%==6 set "ffmpeg=bothstatic"
 if %buildffmpeg% GTR 6 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
+
+set defaultFFmpegPath=https://git.ffmpeg.org/ffmpeg.git
+
+:ffmpegPath
+if %ffmpegPathINI%==0 (
+    set ffmpegPath=%defaultFFmpegPath%
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Using default ffmpeg source path: https://git.ffmpeg.org/ffmpeg.git
+    echo.
+    echo. If you want to use a custom source repository, add a line like this 
+    echo. to media-autobuild_suite.ini:
+    echo.
+    echo.     ffmpegPath=https://github.com/username/FFmpeg.git#branch=branchname
+    echo. 
+    echo. or for a local repository like:
+    echo.
+    echo.     ffmpegPath=../myrepos/ffmpeg
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+) else set ffmpegPath=%ffmpegPathINI%
+
+if %deleteINI%==1 echo.ffmpegPath=%ffmpegPath%>>%ini%
+
+rem Handle relative paths and convert to absolute path
+rem after sanitizing: back- to forward-slashes, remove colon after drive letter
+call :resolvePath %ffmpegPath%
+setlocal EnableDelayedExpansion
+if exist %resolvePath% (
+    set nixdir=!resolvePath:\=/!
+    set "ffmpegPath=/!nixdir::=!"
+)
+endlocal & set "ffmpegPath=%ffmpegPath%"
+
+if not %ffmpegPath%==%defaultFFmpegPath% (
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Using ffmpeg path: %ffmpegPath%
+    echo.
+    echo -------------------------------------------------------------------------------
+)
 
 :ffmpegUp
 if %ffmpegUpdateINI%==0 (
@@ -1751,7 +1794,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --avs2=%avs2% --timeStamp=%timeStamp% --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% ^
 --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% ^
---autouploadlogs=%autouploadlogs%
+--autouploadlogs=%autouploadlogs% --ffmpegPath=%ffmpegPath% 
     set "noMintty=%noMintty%"
     if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
     set "MSYS2_PATH_TYPE=inherit"
@@ -1929,4 +1972,8 @@ if not exist %instdir%\msys64\mingw%1\bin\gcc.exe (
     exit
 )
 endlocal
+goto :EOF
+
+:resolvePath
+set "resolvePath=%~dpnx1"
 goto :EOF
