@@ -358,14 +358,13 @@ if [[ $curl = y ]]; then
     [[ $curl = y ]] && curl=schannel
 fi
 _check=(libgnutls.{,l}a gnutls.pc)
-_gnutls_ver=3.7.7
-_gnutls_hash=be9143d0d58eab64dba9b77114aaafac529b6c0d7e81de6bdf1c9b59027d2106
+_gnutls_ver=3.7.8
+_gnutls_hash=c58ad39af0670efe6a8aee5e3a8b2331a1200418b64b7c51977fb396d4617114
 if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]] &&
     do_pkgConfig "gnutls = $_gnutls_ver" &&
     do_wget -h $_gnutls_hash \
     "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
         do_pacman_install nettle
-        do_patch "https://github.com/gnutls/gnutls/commit/88d79b964d88730e316919d6ccd17ca0fe9b3244.patch"
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
         CFLAGS="-Wno-int-conversion" \
