@@ -1750,7 +1750,7 @@ if enabled librist && do_vcs "https://code.videolan.org/rist/librist.git"; then
 fi
 
 if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    _python_ver=3.10.7
+    _python_ver=3.10.8
     _python_lib=python310
     [[ $bits = 32bit ]] && _arch=win32 || _arch=amd64
     _check=("lib$_python_lib.a")
