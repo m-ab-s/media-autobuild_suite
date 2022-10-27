@@ -2052,9 +2052,6 @@ if [[ $ffmpeg != no ]]; then
 
         enabled vapoursynth && do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-Add-Alternative-VapourSynth-demuxer.patch" am
 
-        # https://trac.ffmpeg.org/ticket/9981 read_file() conflict
-        enabled libass && do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/20221020071228.8531-1-anton@khirnov.net/mbox/" am
-
         if enabled openal &&
             pc_exists "openal"; then
             OPENAL_LIBS=$($PKG_CONFIG --libs openal)
