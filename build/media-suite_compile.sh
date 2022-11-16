@@ -460,7 +460,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     esac
 
     [[ ! -f configure || configure.ac -nt configure ]] &&
-        log autogen ./buildconf
+        do_autoreconf
     [[ $curl = openssl ]] && hide_libressl
     hide_conflicting_libs
     CPPFLAGS+=" -DGNUTLS_INTERNAL_BUILD -DNGHTTP2_STATICLIB -DPSL_STATIC" \
