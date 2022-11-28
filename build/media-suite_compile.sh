@@ -1180,7 +1180,7 @@ _check=(libSDL2{,_test,main}.a sdl2.pc SDL2/SDL.h)
 if { { [[ $ffmpeg != no ]] &&
     { enabled sdl2 || ! disabled_any sdl2 autodetect; }; } ||
     mpv_enabled sdl2; } &&
-    do_vcs "https://github.com/libsdl-org/SDL.git"; then
+    do_vcs "https://github.com/libsdl-org/SDL.git#SDL2"; then
     do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config "${_check[@]}"
     do_autogen
     sed -i 's|__declspec(dllexport)||g' include/{begin_code,SDL_opengl}.h
