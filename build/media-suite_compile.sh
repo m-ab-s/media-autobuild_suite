@@ -73,7 +73,7 @@ while true; do
     --svtvp9=* ) svtvp9=${1#*=} && shift ;;
     --xvc=* ) xvc=${1#*=} && shift ;;
     --vlc=* ) vlc=${1#*=} && shift ;;
-    --autouploadlogs=* ) autouploadlogs=${1#*=} && shift ;;
+    # --autouploadlogs=* ) autouploadlogs=${1#*=} && shift ;;
     -- ) shift && break ;;
     -* ) echo "Error, unknown option: '$1'." && exit 1 ;;
     * ) break ;;
