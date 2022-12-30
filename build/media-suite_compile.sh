@@ -915,7 +915,11 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
     else
         extracommands+=(--without-opus)
     fi
-    enabled libtwolame || extracommands+=(--without-twolame)
+    if enabled libtwolame; then
+        extracommands+=(CFLAGS="$CFLAGS -DLIBTWOLAME_STATIC")
+    else
+        extracommands+=(--without-twolame)
+    fi
     enabled libvorbis || extracommands+=(--without-oggvorbis)
     hide_conflicting_libs
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
