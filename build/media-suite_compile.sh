@@ -2523,8 +2523,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-            mkdir build\
             PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat\
+            mkdir build\
             log "meson" meson setup build\
             cd build\
             log "meson" meson configure --default-library=static --buildtype=release --prefix="$LOCALDESTDIR" --backend=ninja --bindir=bin-video "${meson_opts[@]}"
