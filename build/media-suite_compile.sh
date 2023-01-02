@@ -2386,7 +2386,10 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         log bootstrap /usr/bin/python bootstrap.py
         if [[ -d build ]]; then
+            # Temporarily keep this until Waf is reasonably phased out.
+            # Not all users will run this weekly, so keep the cleanup for now.
             /usr/bin/python waf distclean >/dev/null 2>&1
+            rm -rf build  # Meson's recommended way to clean up previous runs!
             do_uninstall bin-video/mpv{.exe,-2.dll}.debug "${_check[@]}"
         fi
 
@@ -2415,9 +2418,13 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
-        mpv_enabled mruby &&
-            { git merge --no-edit --no-gpg-sign origin/mruby ||
-              git merge --abort && do_removeOption MPV_OPTS "--enable-mruby"; }
+        # The mruby branch cannot (currently) be built with Meson, and hasn't seen
+        # any activity in over 5 years; for now it's statically disabled.
+        # https://github.com/mpv-player/mpv/issues/11078
+        if mpv_enabled mruby; then
+            do_removeOption MPV_OPTS "--enable-mruby";
+            do_simple_print "${orange}mruby in mpv is no longer supported"'!'"${reset}"
+        fi
 
         if files_exist libavutil.a; then
             MPV_OPTS+=(--enable-static-build)
@@ -2432,6 +2439,88 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             done
         fi
 
+        # Translate the Waf flags to Meson options instead.
+        # It should be fairly easy to overwrite the mpv_options file,
+        # though differentiating would require ugly hacks like a header marker.
+        # This allows reusing old configs and doesn't rely on correctly formatted input,
+        # since users editing a config may easily slip up with `-D` prepended to every line.
+        # The alternative is having users only specify everything after it in the config, e.g.
+        # `lua=luajit` and `cdda=enabled` (optionally omitting `=enabled` for on/off features)
+        local meson_opts=()
+        local option
+        for option in "${MPV_OPTS[@]}"; do
+            # Process Waf flags into Meson options.
+            # starting with boolean flags
+            if [[ option =~ ^--enable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
+                meson_opts+=("${${option/--enable-/-D}/libmpv-shared/libmpv}"+"=true")
+            elif [[ option =~ ^--disable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
+                meson_opts+=("${${option/--disable-/-D}/libmpv-shared/libmpv}"+"=false")
+            # features in the misc section
+            elif [[ option =~ ^--enable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=enabled")
+            elif [[ option =~ ^--disable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            # Audio option time! This goes in twos; we're unconditionally disabling non-Windows options and warning the user.
+            elif [[ option =~ ^--enable-(alsa|audiounit|coreaudio|oss-audio|pipewire|pulse|sndio) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+                do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
+            elif [[ option =~ ^--enable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=enabled")
+            elif [[ option =~ ^--disable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            # Video corner, same as with audio
+            elif [[ option =~ ^--enable-(cocoa|drm|egl-android|*-drm|*-wayland|*-x11|*-cocoa|gbm|rpi|vdpau|vdpau-*|vaapi|vaapi-*|wayland|x11|xv) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+                do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
+            elif [[ option =~ ^--enable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=enabled")
+            elif [[ option =~ ^--disable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            # hwaccel features
+            elif [[ option =~ ^--enable-(android-media-ndk|ios-gl|rpi-mmal|videotoolbox-gl) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+                do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
+            elif [[ option =~ ^--enable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=enabled")
+            elif [[ option =~ ^--disable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            # Mac-only options, we might as well catch and squash them
+            elif [[ option =~ ^--enable-(macos-*|swift-*) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+                do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
+            # Manpages corner
+            elif [[ option =~ ^--enable-(html-build|manpage-build) ]]; then
+                meson_opts+=("${option/--enable-/-D}"+"=enabled")
+            elif [[ option =~ ^--disable-(html-build|manpage-build) ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ option =~ ^--enable-pdf-build ]]; then
+                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+                do_simple_print "${orange}Disabling PDF manual, currently broken"'!'"${reset}"
+            elif [[ option =~ ^--lua=lua* ]]; then
+                # `meson setup build` does not take kindly to a format not matching lua(jit|\d\.\d)
+                local luaver="${option/--lua=}"
+                if [[ luaver =~ ^(5|-5) ]]; then
+                    luaver='5.${luaver:-1}'
+                elif [[ luaver =~ ^-jit ]]; then
+                    luaver='jit'
+                fi
+                meson_opts+=("-Dlua=lua${luaver}")
+                # Remove the `-Dlua=enabled` flag if present, since the order of flags matters.
+                # - `-Dlua=lua5.2 -Dlua=enabled` makes Meson behave like only `-Dlua=enabled` was specified;
+                # - `-Dlua=enabled -Dlua=lua5.2` makes Meson take lua5.2 if available, erroring otherwise;
+                meson_opts=("${meson_opts[@]/-Dlua=enabled}")
+            elif [[ option =~ ^--enable-lua ]] && ! [[ "${meson_opts[@]}" =~ -Dlua= ]]; then
+                meson_opts+=("-Dlua=enabled")
+            # Add all options formatted as Meson args
+            elif [[ option =~ ^-D* ]]; then
+                meson_opts+=("${option}")
+            # Try to add all options given without -- or -D prefixes
+            elif ! [[ option =~ ^-(-|D) ]]; then
+                meson_opts+=("-D${option}")
+            fi
+            unset option
+        done
+
         extra_script pre configure
         CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
@@ -2439,20 +2528,18 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             log configure /usr/bin/python waf configure \
-            "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
-            "${MPV_OPTS[@]}"
+            "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video"
+        mkdir build
+        PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat
+        log "meson" meson setup build --default-library=static --buildtype=release --prefix="$LOCALDESTDIR" --backend=ninja --bindir=bin-video "${meson_opts[@]}"
         extra_script post configure
 
-        replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
-        sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py	
-
-        extra_script pre build
-        log build /usr/bin/python waf -j "${cpuCount:-1}"
-        extra_script post build
+        extra_script pre ninja
+        log "build" ninja
+        extra_script post ninja
 
         extra_script pre install
-        log install /usr/bin/python waf -j1 install ||
-            log install /usr/bin/python waf -j1 install
+        cpuCount=1 log "install" ninja install
         extra_script post install
 
         if ! files_exist libavutil.a; then
@@ -2464,7 +2551,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             done
         fi
 
-        unset mpv_ldflags replace PKGCONF_STATIC
+        unset mpv_ldflags replace PKGCONF_STATIC meson_opts
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
