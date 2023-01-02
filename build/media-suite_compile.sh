@@ -2449,59 +2449,60 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         local meson_opts=()
         local option
         for option in "${MPV_OPTS[@]}"; do
+            do_simple_print "Processing $option"
             # Process Waf flags into Meson options.
             # starting with boolean flags
-            if [[ option =~ ^--enable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
-                meson_opts+=("${${option/--enable-/-D}/libmpv-shared/libmpv}"+"=true")
-            elif [[ option =~ ^--disable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
-                meson_opts+=("${${option/--disable-/-D}/libmpv-shared/libmpv}"+"=false")
+            if [[ $option =~ ^--enable-(gpl|cplayer|libmpv-shared|build-date|tests|ta-leak-report) ]]; then
+                meson_opts+=("${option/--enable-/-D}=true")
+            elif [[ $option =~ ^--disable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
+                meson_opts+=("${${option/--disable-/-D}/libmpv-shared/libmpv}=false")
             # features in the misc section
-            elif [[ option =~ ^--enable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=enabled")
-            elif [[ option =~ ^--disable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
+                meson_opts+=("${option/--enable-/-D}=enabled")
+            elif [[ $option =~ ^--disable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
             # Audio option time! This goes in twos; we're unconditionally disabling non-Windows options and warning the user.
-            elif [[ option =~ ^--enable-(alsa|audiounit|coreaudio|oss-audio|pipewire|pulse|sndio) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(alsa|audiounit|coreaudio|oss-audio|pipewire|pulse|sndio) ]]; then
+                meson_opts+=("${option/--enable-/-D}=disabled")
                 do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
-            elif [[ option =~ ^--enable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=enabled")
-            elif [[ option =~ ^--disable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
+                meson_opts+=("${option/--enable-/-D}=enabled")
+            elif [[ $option =~ ^--disable-(jack|openal|opensles|sdl2-audio|wasapi) ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
             # Video corner, same as with audio
-            elif [[ option =~ ^--enable-(cocoa|drm|egl-android|*-drm|*-wayland|*-x11|*-cocoa|gbm|rpi|vdpau|vdpau-*|vaapi|vaapi-*|wayland|x11|xv) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(cocoa|drm|egl-android|*-drm|*-wayland|*-x11|*-cocoa|gbm|rpi|vdpau|vdpau-*|vaapi|vaapi-*|wayland|x11|xv) ]]; then
+                meson_opts+=("${option/--enable-/-D}=disabled")
                 do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
-            elif [[ option =~ ^--enable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=enabled")
-            elif [[ option =~ ^--disable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
+                meson_opts+=("${option/--enable-/-D}=enabled")
+            elif [[ $option =~ ^--disable-(caca|d3d11|direct3d|egl|egl-*|plain-gl|gl|gl-*|jpeg|libplacebo|sdl2-video|shaderc|sixel|spirv-cross|vulkan) ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
             # hwaccel features
-            elif [[ option =~ ^--enable-(android-media-ndk|ios-gl|rpi-mmal|videotoolbox-gl) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(android-media-ndk|ios-gl|rpi-mmal|videotoolbox-gl) ]]; then
+                meson_opts+=("${option/--enable-/-D}=disabled")
                 do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
-            elif [[ option =~ ^--enable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=enabled")
-            elif [[ option =~ ^--disable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
+                meson_opts+=("${option/--enable-/-D}=enabled")
+            elif [[ $option =~ ^--disable-(cuda-hwaccel|cuda-interop|d3d-hwaccel|d3d9-hwaccel|gl-dxinterop-d3d9) ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
             # Mac-only options, we might as well catch and squash them
-            elif [[ option =~ ^--enable-(macos-*|swift-*) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(macos-*|swift-*) ]]; then
+                meson_opts+=("${option/--enable-/-D}=disabled")
                 do_simple_print "${orange}Disabling option '${option}' as it's not usable on Windows"'!'"${reset}"
             # Manpages corner
-            elif [[ option =~ ^--enable-(html-build|manpage-build) ]]; then
-                meson_opts+=("${option/--enable-/-D}"+"=enabled")
-            elif [[ option =~ ^--disable-(html-build|manpage-build) ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
-            elif [[ option =~ ^--enable-pdf-build ]]; then
-                meson_opts+=("${option/--disable-/-D}"+"=disabled")
+            elif [[ $option =~ ^--enable-(html-build|manpage-build) ]]; then
+                meson_opts+=("${option/--enable-/-D}=enabled")
+            elif [[ $option =~ ^--disable-(html-build|manpage-build) ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
+            elif [[ $option =~ ^--enable-pdf-build ]]; then
+                meson_opts+=("${option/--disable-/-D}=disabled")
                 do_simple_print "${orange}Disabling PDF manual, currently broken"'!'"${reset}"
-            elif [[ option =~ ^--lua=lua* ]]; then
+            elif [[ $option =~ ^--lua=lua* ]]; then
                 # `meson setup build` does not take kindly to a format not matching lua(jit|\d\.\d)
-                local luaver="${option/--lua=}"
+                local luaver="${option/--lua=lua}"
                 if [[ luaver =~ ^(5|-5) ]]; then
                     luaver='5.${luaver:-1}'
-                elif [[ luaver =~ ^-jit ]]; then
+                elif [[ luaver =~ ^jit ]]; then
                     luaver='jit'
                 fi
                 meson_opts+=("-Dlua=lua${luaver}")
@@ -2509,17 +2510,12 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
                 # - `-Dlua=lua5.2 -Dlua=enabled` makes Meson behave like only `-Dlua=enabled` was specified;
                 # - `-Dlua=enabled -Dlua=lua5.2` makes Meson take lua5.2 if available, erroring otherwise;
                 meson_opts=("${meson_opts[@]/-Dlua=enabled}")
-            elif [[ option =~ ^--enable-lua ]] && ! [[ "${meson_opts[@]}" =~ -Dlua= ]]; then
+            elif [[ $option =~ ^--enable-lua ]] && ! [[ "${meson_opts[@]}" =~ -Dlua= ]]; then
                 meson_opts+=("-Dlua=enabled")
-            # Add all options formatted as Meson args
-            elif [[ option =~ ^-D* ]]; then
-                meson_opts+=("${option}")
-            # Try to add all options given without -- or -D prefixes
-            elif ! [[ option =~ ^-(-|D) ]]; then
-                meson_opts+=("-D${option}")
             fi
             unset option
         done
+        do_simple_print "${meson_opts[@]}"
 
         extra_script pre configure
         CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
@@ -2527,11 +2523,11 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-            log configure /usr/bin/python waf configure \
-            "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video"
-        mkdir build
-        PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat
-        log "meson" meson setup build --default-library=static --buildtype=release --prefix="$LOCALDESTDIR" --backend=ninja --bindir=bin-video "${meson_opts[@]}"
+            mkdir build\
+            PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat\
+            log "meson" meson setup build\
+            cd build\
+            log "meson" meson configure --default-library=static --buildtype=release --prefix="$LOCALDESTDIR" --backend=ninja --bindir=bin-video "${meson_opts[@]}"
         extra_script post configure
 
         extra_script pre ninja
