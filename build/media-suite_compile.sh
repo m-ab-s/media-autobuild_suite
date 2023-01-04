@@ -2384,7 +2384,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         hide_conflicting_libs
         create_ab_pkgconfig
 
-        log bootstrap /usr/bin/python bootstrap.py
         if [[ -d build ]]; then
             # Temporarily keep this until Waf is reasonably phased out.
             # Not all users will run this weekly, so keep the cleanup for now.
@@ -2447,15 +2446,20 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         # The alternative is having users only specify everything after it in the config, e.g.
         # `lua=luajit` and `cdda=enabled` (optionally omitting `=enabled` for on/off features)
         local meson_opts=()
+        local default_lib="both"
         local option
         for option in "${MPV_OPTS[@]}"; do
-            do_simple_print "Processing $option"
             # Process Waf flags into Meson options.
             # starting with boolean flags
-            if [[ $option =~ ^--enable-(gpl|cplayer|libmpv-shared|build-date|tests|ta-leak-report) ]]; then
+            if [[ $option =~ ^--enable-(gpl|cplayer|build-date|tests|ta-leak-report) ]]; then
                 meson_opts+=("${option/--enable-/-D}=true")
-            elif [[ $option =~ ^--disable-(gpl|cplayer|libmpv(-shared)?|build-date|tests|ta-leak-report) ]]; then
-                meson_opts+=("${${option/--disable-/-D}/libmpv-shared/libmpv}=false")
+            elif [[ $option =~ ^--disable-(gpl|cplayer|build-date|tests|ta-leak-report) ]]; then
+                meson_opts+=("${option/--disable-/-D}=false")
+            elif [[ $option =~ ^--enable-libmpv(-shared)? ]]; then
+                meson_opts+=("-Dlibmpv=true")
+            elif [[ $option =~ ^--disable-libmpv(-shared)? ]]; then
+                meson_opts+=("-Dlibmpv=false")
+                default_lib="static"
             # features in the misc section
             elif [[ $option =~ ^--enable-(cdda|cplugins|dvbin|dvdnav|iconv|javascript|lcms2|libarchive|libavdevice|libbluray|pthread-debug|rubberband|sdl2|sdl2-gamepad|stdatomic|uchardet|uwp|vapoursynth|vector|win32-internal-pthreads|zimg|zlib) ]]; then
                 meson_opts+=("${option/--enable-/-D}=enabled")
@@ -2509,7 +2513,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
                 # Remove the `-Dlua=enabled` flag if present, since the order of flags matters.
                 # - `-Dlua=lua5.2 -Dlua=enabled` makes Meson behave like only `-Dlua=enabled` was specified;
                 # - `-Dlua=enabled -Dlua=lua5.2` makes Meson take lua5.2 if available, erroring otherwise;
-                meson_opts=("${meson_opts[@]/-Dlua=enabled}")
+                meson_opts=("${meson_opts[@]/ -Dlua=enabled}")
             elif [[ $option =~ ^--enable-lua ]] && ! [[ "${meson_opts[@]}" =~ -Dlua= ]]; then
                 meson_opts+=("-Dlua=enabled")
             fi
@@ -2521,19 +2525,18 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
-            RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
-            PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags $LOCALDESTDIR/bin/ab-pkg-config" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat
+            RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2"
         mkdir build
-        log "meson" meson setup build
-        log "meson" meson configure --default-library=static --buildtype=release --prefix="$LOCALDESTDIR" --backend=ninja --bindir=bin-video "${meson_opts[@]}"
+        PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
+            log "meson.setup" meson setup build "${meson_opts[@]}" --prefix="${LOCALDESTDIR}" --bindir="${LOCALDESTDIR}/bin-video" --default-library="${default_lib}" --buildtype=release
         extra_script post configure
 
-        extra_script pre ninja
-        log "build" ninja
-        extra_script post ninja
+        extra_script pre build
+        log "meson.compile" meson compile -C build
+        extra_script post build
 
         extra_script pre install
-        cpuCount=1 log "install" ninja install
+        cpuCount=1 log "meson.install" meson install -C build
         extra_script post install
 
         if ! files_exist libavutil.a; then
@@ -2545,7 +2548,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             done
         fi
 
-        unset mpv_ldflags replace PKGCONF_STATIC meson_opts
+        unset mpv_ldflags replace PKGCONF_STATIC meson_opts default_lib
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
