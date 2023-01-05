@@ -2522,7 +2522,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_simple_print "${meson_opts[@]}"
 
         extra_script pre configure
-        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
+        local old_ldf="$LDFLAGS"
+        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]} -larchive -lb2 -lzstd" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2"
@@ -2536,7 +2537,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         extra_script post build
 
         extra_script pre install
-        cpuCount=1 log "meson.install" meson install -C build
+        cpuCount=1 log "meson.install" meson install -C build &&
+        mv "${LOCALDESTDIR}/bin-video/libmpv-2.dll" "$LOCALDESTDIR/bin-video/mpv-2.dll"
         extra_script post install
 
         if ! files_exist libavutil.a; then
@@ -2548,7 +2550,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             done
         fi
 
-        unset mpv_ldflags replace PKGCONF_STATIC meson_opts default_lib
+        LDFLAGS="$old_ldf"
+        unset mpv_ldflags replace PKGCONF_STATIC meson_opts default_lib old_ldf
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         ! mpv_disabled debug-build &&
