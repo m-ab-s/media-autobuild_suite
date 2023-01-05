@@ -2551,6 +2551,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         fi
 
         LDFLAGS="$old_ldf"
+        replace=" ${mpv_cflags[*]} -Wno-int-conversion"
+        CFLAGS="${CFLAGS/$replace}"
         unset mpv_ldflags replace PKGCONF_STATIC meson_opts default_lib old_ldf
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
