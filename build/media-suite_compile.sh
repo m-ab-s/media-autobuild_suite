@@ -2386,7 +2386,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         log bootstrap /usr/bin/python bootstrap.py
         if [[ -d build ]]; then
-            /usr/bin/python waf distclean >/dev/null 2>&1
+            WAF_NO_PREFORK=1 /usr/bin/python waf distclean >/dev/null 2>&1
             do_uninstall bin-video/mpv{.exe,-2.dll}.debug "${_check[@]}"
         fi
 
@@ -2438,6 +2438,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+            WAF_NO_PREFORK=1 \
             log configure /usr/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             "${MPV_OPTS[@]}"
@@ -2447,11 +2448,13 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py	
 
         extra_script pre build
-        log build /usr/bin/python waf -j "${cpuCount:-1}"
+        WAF_NO_PREFORK=1 \
+            log build /usr/bin/python waf -j "${cpuCount:-1}"
         extra_script post build
 
         extra_script pre install
-        log install /usr/bin/python waf -j1 install ||
+        WAF_NO_PREFORK=1 \
+            log install /usr/bin/python waf -j1 install ||
             log install /usr/bin/python waf -j1 install
         extra_script post install
 
