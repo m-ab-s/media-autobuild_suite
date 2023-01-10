@@ -2250,6 +2250,10 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
     [[ -d ffmpeg/.git ]] && {
         git -C ffmpeg fetch -q origin
         git -C ffmpeg checkout -qf --no-track -B master origin/HEAD
+        (
+            cd ffmpeg || return
+            do_patch "https://patchwork.ffmpeg.org/series/8130/mbox/" am
+        )
     }
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
