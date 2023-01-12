@@ -2328,10 +2328,25 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_vcs "$SOURCE_REPO_MUJS"; then
         do_uninstall bin-global/mujs.exe "${_check[@]}"
         log clean env -i PATH="$PATH" "$(command -v make)" clean
+        mujs_targets=(build/release/{mujs.pc,libmujs.a})
+        if [[ $standalone != n ]]; then
+            mujs_targets+=(build/release/mujs)
+            _check+=(bin-global/mujs.exe)
+            sed -i "s;-lreadline;$($PKG_CONFIG --libs readline);g" Makefile
+        fi
         extra_script pre make
         log "make" env -i PATH="$PATH" TEMP="${TEMP:-/tmp}" CPATH="${CPATH:-}" "$(command -v make)" \
-            install prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
+            "${mujs_targets[@]}" prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
         extra_script post make
+        extra_script pre install
+        [[ $standalone != n ]] && do_install build/release/mujs "$LOCALDESTDIR/bin-global"
+        do_install build/release/mujs.pc lib/pkgconfig/
+        do_install build/release/libmujs.a lib/
+        do_install mujs.h include/
+        extra_script post install
+        grep_or_sed "Requires.private:" "$LOCALDESTDIR/lib/pkgconfig/mujs.pc" \
+            's;Version:.*;&\nRequires.private: readline;'
+        unset mujs_targets
         do_checkIfExist
     fi
 
