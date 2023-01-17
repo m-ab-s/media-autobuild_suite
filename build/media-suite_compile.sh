@@ -1947,8 +1947,45 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_checkIfExist
 fi
 
+_check=(shaderc/shaderc.h libshaderc_combined.a)
+    if ! mpv_disabled shaderc &&
+        do_vcs "$SOURCE_REPO_SHADERC"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
+        do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
+
+        add_third_party() {
+            local repo=$1
+            local name=$2
+            [[ ! $name ]] && name=${repo##*/} && name=${name%.*}
+            local dest=third_party/$name
+
+            if [[ -d $dest/.git ]]; then
+                log "$name-reset" git -C "$dest" reset --hard "@{u}"
+                log "$name-pull" git -C "$dest" pull
+            else
+                log "$name-clone" git clone --depth 1 "$repo" "$dest"
+            fi
+        }
+
+        add_third_party "$SOURCE_REPO_GLSLANG"
+        add_third_party "$SOURCE_REPO_SPIRV_TOOLS" spirv-tools
+        add_third_party "$SOURCE_REPO_SPIRV_HEADERS" spirv-headers
+        add_third_party "$SOURCE_REPO_SPIRV_CROSS" spirv-cross
+
+        # fix python indentation errors from non-existant code review
+        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
+
+        do_cmakeinstall -GNinja -DSHADERC_SKIP_{TESTS,EXAMPLES}=ON -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DSKIP_{GLSLANG,SPIRV_TOOLS,GOOGLETEST}_INSTALL=ON -DSPIRV_HEADERS_SKIP_{INSTALL,EXAMPLES}=ON
+        do_checkIfExist
+        unset add_third_party
+    fi
+
+    file_installed -s shaderc.pc && file_installed -s shaderc_static.pc &&
+        mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
+
 _check=(libplacebo.{a,pc})
-_deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc)
+_deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_LIBPLACEBO"; then
@@ -2359,43 +2396,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         cmake -E copy_directory include "$LOCALDESTDIR/include"
         do_checkIfExist
     fi
-
-    _check=(shaderc/shaderc.h libshaderc_combined.a)
-    if ! mpv_disabled shaderc &&
-        do_vcs "$SOURCE_REPO_SHADERC"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
-        do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
-
-        add_third_party() {
-            local repo=$1
-            local name=$2
-            [[ ! $name ]] && name=${repo##*/} && name=${name%.*}
-            local dest=third_party/$name
-
-            if [[ -d $dest/.git ]]; then
-                log "$name-reset" git -C "$dest" reset --hard "@{u}"
-                log "$name-pull" git -C "$dest" pull
-            else
-                log "$name-clone" git clone --depth 1 "$repo" "$dest"
-            fi
-        }
-
-        add_third_party "$SOURCE_REPO_GLSLANG"
-        add_third_party "$SOURCE_REPO_SPIRV_TOOLS" spirv-tools
-        add_third_party "$SOURCE_REPO_SPIRV_HEADERS" spirv-headers
-        add_third_party "$SOURCE_REPO_SPIRV_CROSS" spirv-cross
-
-        # fix python indentation errors from non-existant code review
-        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
-
-        do_cmakeinstall -GNinja -DSHADERC_SKIP_{TESTS,EXAMPLES}=ON -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DSKIP_{GLSLANG,SPIRV_TOOLS,GOOGLETEST}_INSTALL=ON -DSPIRV_HEADERS_SKIP_{INSTALL,EXAMPLES}=ON
-        do_checkIfExist
-        unset add_third_party
-    fi
-
-    file_installed -s shaderc.pc && file_installed -s shaderc_static.pc &&
-        mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
 
     _check=()
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
