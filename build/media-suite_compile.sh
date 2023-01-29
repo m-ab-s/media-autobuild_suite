@@ -1008,6 +1008,9 @@ if { [[ $rtmpdump = y ]] ||
     [[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
     do_uninstall include/librtmp "${_check[@]}"
     [[ -f librtmp/librtmp.a ]] && log "clean" make clean
+    grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
+        's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
+
     _rtmp_pkgver() {
         printf '%s-%s-%s_%s-%s-static' \
             "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
