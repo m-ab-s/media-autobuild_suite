@@ -73,6 +73,7 @@ while true; do
     --svtvp9=* ) svtvp9=${1#*=} && shift ;;
     --xvc=* ) xvc=${1#*=} && shift ;;
     --vlc=* ) vlc=${1#*=} && shift ;;
+    --exitearly=* ) exitearly=${1#*=} && shift ;;
     # --autouploadlogs=* ) autouploadlogs=${1#*=} && shift ;;
     -- ) shift && break ;;
     -* ) echo "Error, unknown option: '$1'." && exit 1 ;;
@@ -86,6 +87,11 @@ source "$LOCALBUILDDIR"/media-suite_deps.sh
 
 # shellcheck source=media-suite_helper.sh
 source "$LOCALBUILDDIR"/media-suite_helper.sh
+
+if [[ $exitearly = EE1 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE1"
+    exit 0
+fi
 
 do_simple_print -p "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!$reset"
 
@@ -483,6 +489,11 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     do_checkIfExist
 fi
 
+if [[ $exitearly = EE2 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE2"
+    return
+fi
+
 if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     { [[ $standalone = y ]] && enabled libwebp; }; }; then
     _check=(libglut.a glut.pc)
@@ -653,6 +664,11 @@ if [[ $ffmpeg != no ]] && enabled libzimg &&
     do_autoreconf
     do_separate_confmakeinstall
     do_checkIfExist
+fi
+
+if [[ $exitearly = EE3 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE3"
+    return
 fi
 
 set_title "compiling audio tools"
@@ -994,6 +1010,11 @@ if { { [[ $ffmpeg != no ]] &&
     sed -i 's/Libs.private.*/& -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc"
     do_checkIfExist
     unset _mingw_patches
+fi
+
+if [[ $exitearly = EE4 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE4"
+    return
 fi
 
 set_title "compiling video tools"
@@ -1927,6 +1948,11 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     unset _DeadSix27 _mabs _shinchiro
 fi
 
+if [[ $exitearly = EE5 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE5"
+    return
+fi
+
 _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
 if { { [[ $mpv != n ]] && ! mpv_disabled libplacebo; } ||
      { [[ $mpv != n ]] && ! mpv_disabled spirv-cross; } ||
@@ -1999,6 +2025,11 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     log -q "git.submodule" git submodule update --init --recursive
     do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false -Dd3d11=enabled
     do_checkIfExist
+fi
+
+if [[ $exitearly = EE6 ]]; then
+    do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE6"
+    return
 fi
 
 enabled openssl && hide_libressl
@@ -2907,6 +2938,10 @@ run_builds() {
 
 cd_safe "$LOCALBUILDDIR"
 run_builds
+
+if [[ $exitearly = EE2 || $exitearly = EE3 || $exitearly = EE4 || $exitearly = EE5 || $exitearly = EE6 ]]; then
+    exit 0
+fi
 
 while [[ $new_updates = yes ]]; do
     ret=no
