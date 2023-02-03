@@ -217,6 +217,20 @@ do_mabs_clone() {
     check_valid_vcs "$2-git"
 }
 
+vcs_ref_to_hash() (
+    vcsURL=$1 ref=$2 vcsFolder=${3:-$(basename "$vcsURL" .git)}
+    if _ref=$(git ls-remote --refs --exit-code -q -- "$vcsURL" "$ref"); then
+        cut -f1 <<< "$_ref"
+        return 0
+    fi
+    if git -C "$vcsFolder-git" rev-parse --verify -q --end-of-options "$ref" 2> /dev/null ||
+        git -C "$vcsFolder" rev-parse --verify -q --end-of-options "$ref" 2> /dev/null ||
+        git rev-parse --verify -q --end-of-options "$ref" 2> /dev/null; then
+        return 0
+    fi
+    return 1
+)
+
 # get source from VCS
 # example:
 #   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
@@ -230,7 +244,7 @@ do_vcs() {
 
     if [[ -n $vcsBranch ]]; then
         ref=${vcsBranch##*=}
-        [[ ${vcsBranch%%=*}/$ref == branch/${ref%/*} ]] && ref=origin/$ref
+        unset vcsBranch
     fi
 
     cd_safe "$LOCALBUILDDIR"
@@ -241,13 +255,11 @@ do_vcs() {
 
     extra_script pre vcs
 
-    # try to see if we can "resolve" the currently provided ref, minus the origin/ part,
-    # if so, set ref to the ref on the origin, this might make it harder for people who
-    # want use multiple remotes other than origin. Converts ref=develop to ref=origin/develop
-    # ignore those that use the special tags/branches
+    # try to see if we can "resolve" the currently provided ref to a commit,
+    # excluding special tags that we will resolve later
     case $ref in
     LATEST | GREATEST | *\**) ;;
-    *) git ls-remote --exit-code "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
+    *) ref=$(vcs_ref_to_hash "$vcsURL" "$ref" "$vcsFolder") ;;
     esac
 
     if ! check_valid_vcs "$vcsFolder-git"; then
