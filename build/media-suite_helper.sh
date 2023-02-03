@@ -313,6 +313,64 @@ do_vcs() {
     return 0
 }
 
+# get source from VCS to a local subfolder
+# example:
+#   do_vcs_local "url#branch|revision|tag|commit=NAME" "subfolder"
+do_vcs_local() {
+    local vcsURL=${1#*::} vcsFolder=$2 vcsCheck=("${_check[@]}")
+    local vcsBranch=${vcsURL#*#} ref=origin/HEAD
+    local deps=("${_deps[@]}") && unset _deps
+    [[ $vcsBranch == "$vcsURL" ]] && unset vcsBranch
+    vcsURL=${vcsURL%#*}
+    : "${vcsFolder:=$(basename "$vcsURL" .git)}"
+
+    if [[ -n $vcsBranch ]]; then
+        ref=${vcsBranch##*=}
+        [[ ${vcsBranch%%=*}/$ref == branch/${ref%/*} ]] && ref=origin/$ref
+    fi
+
+    rm -f "$vcsFolder/custom_updated"
+
+    # try to see if we can "resolve" the currently provided ref, minus the origin/ part,
+    # if so, set ref to the ref on the origin, this might make it harder for people who
+    # want use multiple remotes other than origin. Converts ref=develop to ref=origin/develop
+    # ignore those that use the special tags/branches
+    case $ref in
+    LATEST | GREATEST | *\**) ;;
+    *) git ls-remote --exit-code "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
+    esac
+
+    if ! check_valid_vcs "$vcsFolder"; then
+        rm -rf "$vcsFolder"
+        rm -rf "$vcsFolder-git"
+        do_print_progress "  Running git clone for $vcsFolder"
+        if ! do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
+            echo "$vcsFolder git seems to be down"
+            echo "Try again later or <Enter> to continue"
+            do_prompt "if you're sure nothing depends on it."
+            # unset_extra_script
+            return
+        fi
+        mv "$vcsFolder-git" "$vcsFolder"
+        touch "$vcsFolder"/recently_{updated,checked}
+    fi
+
+    cd_safe "$vcsFolder"
+
+    vcs_set_url "$vcsURL"
+    log -q git.fetch vcs_fetch
+    oldHead=$(vcs_get_merge_base "$ref")
+    do_print_progress "  Running git update for $vcsFolder"
+    log -q git.reset vcs_reset "$ref"
+    newHead=$(vcs_get_current_head "$PWD")
+
+    vcs_clean
+
+    cd ..
+
+    return 0
+}
+
 guess_dirname() {
     expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$'
 }
