@@ -1957,24 +1957,14 @@ _check=(shaderc/shaderc.h libshaderc_combined.a)
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
         do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
-        add_third_party() {
-            local repo=$1
-            local name=$2
-            [[ ! $name ]] && name=${repo##*/} && name=${name%.*}
-            local dest=third_party/$name
+        cd third_party
 
-            if [[ -d $dest/.git ]]; then
-                log "$name-reset" git -C "$dest" reset --hard "@{u}"
-                log "$name-pull" git -C "$dest" pull
-            else
-                log "$name-clone" git clone --depth 1 "$repo" "$dest"
-            fi
-        }
+        do_vcs_local "$SOURCE_REPO_GLSLANG" glslang
+        do_vcs_local "$SOURCE_REPO_SPIRV_TOOLS" spirv-tools
+        do_vcs_local "$SOURCE_REPO_SPIRV_HEADERS" spirv-headers
+        do_vcs_local "$SOURCE_REPO_SPIRV_CROSS" spirv-cross
 
-        add_third_party "$SOURCE_REPO_GLSLANG"
-        add_third_party "$SOURCE_REPO_SPIRV_TOOLS" spirv-tools
-        add_third_party "$SOURCE_REPO_SPIRV_HEADERS" spirv-headers
-        add_third_party "$SOURCE_REPO_SPIRV_CROSS" spirv-cross
+        cd ..
 
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
