@@ -151,6 +151,10 @@ create_cmake_toolchain
 create_ab_ccache
 pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 
+# Global header fixups
+grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
+        's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
+
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
@@ -1008,8 +1012,6 @@ if { [[ $rtmpdump = y ]] ||
     [[ $rtmpdump = y || $standalone = y ]] && _check+=(bin-video/rtmp{suck,srv,gw}.exe)
     do_uninstall include/librtmp "${_check[@]}"
     [[ -f librtmp/librtmp.a ]] && log "clean" make clean
-    grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
-        's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
 
     _rtmp_pkgver() {
         printf '%s-%s-%s_%s-%s-static' \
