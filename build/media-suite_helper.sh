@@ -256,9 +256,11 @@ do_vcs() {
     extra_script pre vcs
 
     # try to see if we can "resolve" the currently provided ref to a commit,
-    # excluding special tags that we will resolve later
+    # excluding special tags that we will resolve later. Ignore it if it's
+    # a specific head. glslang's HEAD != their main branch somehow.
     case $ref in
     LATEST | GREATEST | *\**) ;;
+    origin/HEAD | origin/* | HEAD) ;;
     *) ref=$(vcs_ref_to_hash "$vcsURL" "$ref" "$vcsFolder") ;;
     esac
 
