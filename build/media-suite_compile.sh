@@ -922,14 +922,17 @@ fi
 
 _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
-if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
-    do_wget_sf -h ba804bb1ce5c71dd484a102a5b27d0dd "sox/sox/14.4.2/sox-14.4.2.tar.bz2"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch"
+if [[ $sox = y ]] && do_vcs "$SOURCE_REPO_SOX" sox; then
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch" am
     do_pacman_install libmad
     do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
+    do_autoreconf
     extracommands=()
+    extralibs=(-lshlwapi -lz)
     enabled libmp3lame || extracommands+=(--without-lame)
-    enabled_any libopencore-amr{wb,nb} || extracommands+=(--without-amr{wb,nb})
+    enabled_any libopencore-amr{wb,nb} &&
+        extralibs+=(-lvo-amrwbenc) ||
+        extracommands+=(--without-amr{wb,nb})
     if enabled libopus; then
         do_pacman_install opusfile
     else
@@ -943,12 +946,13 @@ if [[ $sox = y ]] && do_pkgConfig "sox = 14.4.2" &&
     enabled libvorbis || extracommands+=(--without-oggvorbis)
     hide_conflicting_libs
     sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
-    do_separate_conf --disable-symlinks LIBS='-lshlwapi -lz' "${extracommands[@]}"
+    do_separate_conf --disable-symlinks LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
     do_make
     do_install src/sox.exe bin-audio/
     do_install sox.pc
     hide_conflicting_libs -R
     do_checkIfExist
+    unset extralibs extracommands
 fi
 unset _deps
 
