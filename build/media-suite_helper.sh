@@ -1443,7 +1443,7 @@ compilation_fail() {
         create_diagnostic
         zip_logs
         echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
-        do_prompt "Try running the build again at a later time."
+        echo "Try running the build again at a later time."
         exit 1
     fi
 }
