@@ -1860,7 +1860,8 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
     do_uninstall "bin-video/lensfun" "${_check[@]}"
     CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
         do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
-        -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video"
+        -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video" \
+        -DINSTALL_PYTHON_MODULE=OFF
     do_checkIfExist
 fi
 
