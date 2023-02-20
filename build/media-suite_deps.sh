@@ -71,7 +71,6 @@ SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
 SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git
-SOURCE_REPO_MRUBY=https://github.com/mruby/mruby.git
 SOURCE_REPO_MUJS=https://github.com/ccxvii/mujs.git
 SOURCE_REPO_NEON=https://github.com/notroj/neon.git
 SOURCE_REPO_OPENAL=https://github.com/kcat/openal-soft.git

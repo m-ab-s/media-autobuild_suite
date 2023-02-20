@@ -2424,16 +2424,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_checkIfExist
     fi
 
-    _check=(mruby.h libmruby{,_core}.a)
-    if mpv_enabled mruby && do_vcs "$SOURCE_REPO_MRUBY"; then
-        do_uninstall "${_check[@]}" include/mruby mrbconf.h
-        log clean make clean
-        log make ./minirake "$(pwd)/build/host/lib/libmruby.a"
-        do_install build/host/lib/*.a lib/
-        cmake -E copy_directory include "$LOCALDESTDIR/include"
-        do_checkIfExist
-    fi
-
     _check=()
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
     mpv_enabled libmpv-shared && _check+=(bin-video/mpv-2.dll)
@@ -2474,9 +2464,13 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
-        mpv_enabled mruby &&
-            { git merge --no-edit --no-gpg-sign origin/mruby ||
-              git merge --abort && do_removeOption MPV_OPTS "--enable-mruby"; }
+        # The mruby branch cannot (currently) be built with Meson, and hasn't seen
+        # any activity in over 5 years; for now it's statically disabled.
+        # https://github.com/mpv-player/mpv/issues/11078
+        if mpv_enabled mruby; then
+            do_removeOption MPV_OPTS "--enable-mruby";
+            do_simple_print "${orange}mruby in mpv is no longer supported!${reset}"
+        fi
 
         if files_exist libavutil.a; then
             MPV_OPTS+=(--enable-static-build)
