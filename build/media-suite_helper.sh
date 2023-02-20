@@ -1381,7 +1381,7 @@ do_meson() {
         return
     # shellcheck disable=SC2086
     PKG_CONFIG="pkgconf --keep-system-libs --keep-system-cflags" CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
-        log "meson" meson "$root" --default-library=static --buildtype=release \
+        log "meson" meson setup "$root" --default-library=static --buildtype=release \
         --prefix="$LOCALDESTDIR" --backend=ninja $bindir "$@" "${meson_extras[@]}"
     extra_script post meson
     unset meson_extras
