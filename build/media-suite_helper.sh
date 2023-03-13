@@ -135,7 +135,8 @@ vcs_get_current_type() {
 
 # check_valid_vcs /build/ffmpeg-git
 check_valid_vcs() {
-    [[ -d ${1:-$PWD}/.git ]]
+    [[ -d ${1:-$PWD}/.git ]] &&
+        git -C "${1:-$PWD}/.git" rev-parse HEAD > /dev/null 2>&1
 }
 
 # vcs_get_current_head /build/ffmpeg-git
@@ -170,8 +171,6 @@ vcs_get_latest_tag() {
 vcs_set_url() {
     if vcs_test_remote "$1"; then
         git remote set-url origin "$1"
-    elif vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}"; then
-        git remote set-url origin "https://gitlab.com/m-ab-s/${1##*/}"
     fi
     git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 }
@@ -213,15 +212,24 @@ vcs_fetch() (
 # do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"
 # For internal use for fallback links
 do_mabs_clone() {
-    {
-        vcs_test_remote "$1" &&
-            log -qe git.clone vcs_clone "$1" "$2" "$3"
-    } || {
-        vcs_test_remote "https://gitlab.com/m-ab-s/${1##*/}" &&
-            log -qe git.clone vcs_clone "https://gitlab.com/m-ab-s/${1##*/}" "$2" "$3"
-    }
+    vcs_test_remote "$1" &&
+        log -q git.clone vcs_clone "$1" "$2" "$3"
     check_valid_vcs "$2-git"
 }
+
+vcs_ref_to_hash() (
+    vcsURL=$1 ref=$2 vcsFolder=${3:-$(basename "$vcsURL" .git)}
+    if _ref=$(git ls-remote --refs --exit-code -q -- "$vcsURL" "$ref"); then
+        cut -f1 <<< "$_ref"
+        return 0
+    fi
+    if git -C "$vcsFolder-git" rev-parse --verify -q --end-of-options "$ref" 2> /dev/null ||
+        git -C "$vcsFolder" rev-parse --verify -q --end-of-options "$ref" 2> /dev/null ||
+        git rev-parse --verify -q --end-of-options "$ref" 2> /dev/null; then
+        return 0
+    fi
+    return 1
+)
 
 # get source from VCS
 # example:
@@ -236,7 +244,7 @@ do_vcs() {
 
     if [[ -n $vcsBranch ]]; then
         ref=${vcsBranch##*=}
-        [[ ${vcsBranch%%=*}/$ref == branch/${ref%/*} ]] && ref=origin/$ref
+        unset vcsBranch
     fi
 
     cd_safe "$LOCALBUILDDIR"
@@ -247,13 +255,13 @@ do_vcs() {
 
     extra_script pre vcs
 
-    # try to see if we can "resolve" the currently provided ref, minus the origin/ part,
-    # if so, set ref to the ref on the origin, this might make it harder for people who
-    # want use multiple remotes other than origin. Converts ref=develop to ref=origin/develop
-    # ignore those that use the special tags/branches
+    # try to see if we can "resolve" the currently provided ref to a commit,
+    # excluding special tags that we will resolve later. Ignore it if it's
+    # a specific head. glslang's HEAD != their main branch somehow.
     case $ref in
     LATEST | GREATEST | *\**) ;;
-    *) git ls-remote --exit-code "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
+    origin/HEAD | origin/* | HEAD) ;;
+    *) ref=$(vcs_ref_to_hash "$vcsURL" "$ref" "$vcsFolder") ;;
     esac
 
     if ! check_valid_vcs "$vcsFolder-git"; then
@@ -281,14 +289,9 @@ do_vcs() {
     vcs_set_url "$vcsURL"
     log -q git.fetch vcs_fetch
     oldHead=$(vcs_get_merge_base "$ref")
-    newHead="$oldHead"
-
-    if ! [[ -f recently_checked && recently_checked -nt "$LOCALBUILDDIR/last_run" ]]; then
-        do_print_progress "  Running git update for $vcsFolder"
-        log -q git.reset vcs_reset "$ref"
-        newHead=$(vcs_get_current_head "$PWD")
-        touch recently_checked
-    fi
+    do_print_progress "  Running git update for $vcsFolder"
+    log -q git.reset vcs_reset "$ref"
+    newHead=$(vcs_get_current_head "$PWD")
 
     vcs_clean
 
@@ -321,6 +324,64 @@ do_vcs() {
         do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
     fi
     extra_script post vcs
+    return 0
+}
+
+# get source from VCS to a local subfolder
+# example:
+#   do_vcs_local "url#branch|revision|tag|commit=NAME" "subfolder"
+do_vcs_local() {
+    local vcsURL=${1#*::} vcsFolder=$2 vcsCheck=("${_check[@]}")
+    local vcsBranch=${vcsURL#*#} ref=origin/HEAD
+    local deps=("${_deps[@]}") && unset _deps
+    [[ $vcsBranch == "$vcsURL" ]] && unset vcsBranch
+    vcsURL=${vcsURL%#*}
+    : "${vcsFolder:=$(basename "$vcsURL" .git)}"
+
+    if [[ -n $vcsBranch ]]; then
+        ref=${vcsBranch##*=}
+        [[ ${vcsBranch%%=*}/$ref == branch/${ref%/*} ]] && ref=origin/$ref
+    fi
+
+    rm -f "$vcsFolder/custom_updated"
+
+    # try to see if we can "resolve" the currently provided ref, minus the origin/ part,
+    # if so, set ref to the ref on the origin, this might make it harder for people who
+    # want use multiple remotes other than origin. Converts ref=develop to ref=origin/develop
+    # ignore those that use the special tags/branches
+    case $ref in
+    LATEST | GREATEST | *\**) ;;
+    *) git ls-remote --exit-code "$vcsURL" "${ref#origin/}" > /dev/null 2>&1 && ref=origin/${ref#origin/} ;;
+    esac
+
+    if ! check_valid_vcs "$vcsFolder"; then
+        rm -rf "$vcsFolder"
+        rm -rf "$vcsFolder-git"
+        do_print_progress "  Running git clone for $vcsFolder"
+        if ! do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
+            echo "$vcsFolder git seems to be down"
+            echo "Try again later or <Enter> to continue"
+            do_prompt "if you're sure nothing depends on it."
+            # unset_extra_script
+            return
+        fi
+        mv "$vcsFolder-git" "$vcsFolder"
+        touch "$vcsFolder"/recently_{updated,checked}
+    fi
+
+    cd_safe "$vcsFolder"
+
+    vcs_set_url "$vcsURL"
+    log -q git.fetch vcs_fetch
+    oldHead=$(vcs_get_merge_base "$ref")
+    do_print_progress "  Running git update for $vcsFolder"
+    log -q git.reset vcs_reset "$ref"
+    newHead=$(vcs_get_current_head "$PWD")
+
+    vcs_clean
+
+    cd ..
+
     return 0
 }
 
@@ -1339,9 +1400,11 @@ do_rust() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
-    log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build --release \
+    PKG_CONFIG_ALL_STATIC=true \
+        CC="ccache clang" \
+        log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build \
         --target="$CARCH"-pc-windows-gnu \
-        --jobs="$cpuCount" "$@" "${rust_extras[@]}"
+        --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
 }
@@ -1353,7 +1416,10 @@ do_rustinstall() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
-    log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
+    PKG_CONFIG_ALL_STATIC=true \
+        CC="ccache clang" \
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+        log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
     extra_script post rust
@@ -1377,7 +1443,7 @@ compilation_fail() {
         create_diagnostic
         zip_logs
         echo "Make sure the suite is up-to-date before reporting an issue. It might've been fixed already."
-        do_prompt "Try running the build again at a later time."
+        $([[ $noMintty == y ]] && echo echo || echo do_prompt) "Try running the build again at a later time."
         exit 1
     fi
 }
@@ -1408,8 +1474,8 @@ zip_logs() {
         } | sort -uo failedFiles
         7za -mx=9 a logs.zip -- @failedFiles > /dev/null && rm failedFiles
     )
-    [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 && $autouploadlogs = y ]] &&
-        url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
+    # [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 && $autouploadlogs = y ]] &&
+    #     url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     echo
     if [[ $url ]]; then
         echo "${green}All relevant logs have been anonymously uploaded to $url"
@@ -1855,6 +1921,15 @@ get_java_home() {
         export JAVA_HOME="$javahome"
 }
 
+# can only retrieve the dll version if it's actually in the ProductVersion field
+get_dll_version() (
+    dll=$1
+    [[ -f $dll ]] || return 1
+    version="$(7z l "$dll" | grep 'ProductVersion:' | sed 's/.*ProductVersion: //')"
+    [[ -n $version ]] || return 1
+    echo "$version"
+)
+
 get_api_version() {
     local header="$1"
     [[ -n $(file_installed "$header") ]] && header="$(file_installed "$header")"
@@ -1925,7 +2000,7 @@ add_to_remove() {
 clean_suite() {
     do_simple_print -p "${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" > /dev/null
-    find . -maxdepth 2 \( -name recently_updated -o -name recently_checked \) -delete
+    find . -maxdepth 2 -name recently_updated -delete
     find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
     echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
@@ -2564,7 +2639,6 @@ safe_git_clean() {
     git clean -xfd \
         -e "/build_successful*" \
         -e "/recently_updated" \
-        -e '/recently_checked' \
         -e '/custom_updated' \
         -e '**/ab-suite.*.log' \
         "${@}"

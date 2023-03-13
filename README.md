@@ -85,10 +85,11 @@ For information about the compiler environment see the wiki, there you also have
         - chromaprint (mingw-w64)
         - cuda filters (needs CUDA SDK installed)
             - needs non-free license
-        - decklink (11.6)
+        - decklink (12.3)
             - needs non-free license
         - frei0r (git)
         - ladspa (mingw-w64)
+        - libaribb24 (git)
         - libbs2b (3.1.0)
         - libcaca (mingw-w64)
         - libcdio (mingw-w64)
@@ -180,6 +181,8 @@ For information about the compiler environment see the wiki, there you also have
     - svt-hevc (git)
     - svt-av1 (git)
     - tesseract (git)
+    - uvg266 (git)
+    - vvenc & vvdec (git)
     - vorbis-tools (git snapshot)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
     - vvc tools (git)
