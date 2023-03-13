@@ -1898,7 +1898,7 @@ _check=(bin-video/vvenc{,FF}app.exe
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
-    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF
+    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
     do_checkIfExist
 fi
 
@@ -1909,7 +1909,7 @@ _check=(bin-video/vvdecapp.exe
 if [[ $bits = 64bit && $vvdec = y ]] &&
     do_vcs "$SOURCE_REPO_LIBVVDEC"; then
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
-    do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF
+    do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
     do_checkIfExist
 fi
 
