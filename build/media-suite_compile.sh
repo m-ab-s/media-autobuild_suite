@@ -1553,7 +1553,6 @@ if [[ $x264 != no ]] ||
         if [[ $standalone = y && $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
             do_vcs "$ffmpegPath"
-            do_patch "https://patchwork.ffmpeg.org/series/8130/mbox/" am
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir light
@@ -2146,8 +2145,6 @@ if [[ $ffmpeg != no ]]; then
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
 
-        do_patch "https://patchwork.ffmpeg.org/series/8130/mbox/" am
-
         _patches=$(git rev-list origin/master.. --count)
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
@@ -2589,7 +2586,6 @@ if [[ $cyanrip = y ]]; then
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
         _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
         if flavor=cyan do_vcs "$ffmpegPath"; then
-            do_patch "https://patchwork.ffmpeg.org/series/8130/mbox/" am
             do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             mapfile -t cyan_ffmpeg_opts < <(
