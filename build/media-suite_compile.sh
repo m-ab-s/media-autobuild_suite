@@ -560,7 +560,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
 
     _deps=(libhwy.a libgflags.a)
     _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
-    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpeg_hdr,jxlinfo}.exe)
+    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
         do_uninstall "${_check[@]}" include/jxl
