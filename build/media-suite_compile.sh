@@ -1932,9 +1932,11 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     _DeadSix27=https://raw.githubusercontent.com/DeadSix27/python_cross_compile_script/master
     _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master
     _shinchiro=https://raw.githubusercontent.com/shinchiro/mpv-winbuild-cmake/master
+    do_pacman_install uasm
     do_uninstall "${_check[@]}"
     do_patch "$_mabs/vulkan-loader/0001-loader-cross-compile-static-linking-hacks.patch" am
     do_patch "$_mabs/vulkan-loader/0002-pc-remove-CMAKE_CXX_IMPLICIT_LINK_LIBRARIES.patch" am
+    do_patch "$_mabs/vulkan-loader/0003-loader-fix-32-bit-jwasm-compilation.patch" am
     grep_and_sed VULKAN_LIB_SUFFIX loader/vulkan.pc.in \
             's/@VULKAN_LIB_SUFFIX@//'
     create_build_dir
@@ -1948,8 +1950,10 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
         do_install d3d{kmthk,ukmdt}.h include/
     cd_safe "$(get_first_subdir -f)"
     do_print_progress "Building Vulkan-Loader"
-    CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" do_cmakeinstall -DBUILD_TESTS=OFF -DUSE_CCACHE=OFF \
-    -DUSE_UNSAFE_C_GEN=ON -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
+    CC="${CC##ccache }" CXX="${CXX##ccache }" \
+        CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" \
+        do_cmakeinstall -DBUILD_TESTS=OFF \
+    -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
     -DBUILD_STATIC_LOADER=ON -DUNIX=OFF -DENABLE_WERROR=OFF
     do_checkIfExist
     unset _DeadSix27 _mabs _shinchiro
