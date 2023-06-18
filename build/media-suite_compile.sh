@@ -1936,7 +1936,6 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     do_uninstall "${_check[@]}"
     do_patch "$_mabs/vulkan-loader/0001-loader-cross-compile-static-linking-hacks.patch" am
     do_patch "$_mabs/vulkan-loader/0002-pc-remove-CMAKE_CXX_IMPLICIT_LINK_LIBRARIES.patch" am
-    do_patch "$_mabs/vulkan-loader/0003-loader-fix-32-bit-jwasm-compilation.patch" am
     grep_and_sed VULKAN_LIB_SUFFIX loader/vulkan.pc.in \
             's/@VULKAN_LIB_SUFFIX@//'
     create_build_dir
