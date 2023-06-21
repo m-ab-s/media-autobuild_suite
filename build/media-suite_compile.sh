@@ -545,7 +545,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(libhwy{,_{contrib,test}}.a libhwy{,-{contrib,test}}.pc hwy/highway.h)
     if do_vcs "$SOURCE_REPO_LIBHWY"; then
         do_uninstall "${_check[@]}" include/hwy
-        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall
+        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall -DHWY_ENABLE_TESTS=OFF
         do_checkIfExist
     fi
 
