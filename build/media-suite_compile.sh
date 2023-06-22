@@ -1980,9 +1980,12 @@ _check=(lib{glslang,OSDependent,HLSL,OGLCompiler,SPVRemapper}.a
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
+    do_pacman_install python
     do_uninstall "${_check[@]}"
     log dependencies /usr/bin/python ./update_glslang_sources.py
-    do_cmakeinstall -DUNIX=OFF
+    # Python3_EXECUTABLE set to prevent CMake from finding the newer (but specific to the msys subsystem) python 3.11
+    # (current mingw-w64 versions are 3.10)
+    do_cmakeinstall -DUNIX=OFF -DPython3_EXECUTABLE="${MINGW_PREFIX}/bin/python.exe"
     do_checkIfExist
 fi
 
