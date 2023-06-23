@@ -2129,6 +2129,8 @@ if [[ $ffmpeg != no ]]; then
                 do_removeOption --enable-libsvtvp9
         fi
 
+        enabled libjxl && do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-libjxldec-remove-deprecated-fields.patch" am
+
         enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
         enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
