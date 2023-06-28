@@ -1881,17 +1881,17 @@ goto :EOF
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
     echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-libs --keep-system-cflags --static"
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-    echo.CPPFLAGS="-D_FORTIFY_SOURCE=0 -D__USE_MINGW_ANSI_STDIO=1"
-    if %CC%==clang (
-        echo.CFLAGS="-mtune=generic -O2 -pipe"
-    ) else (
-        echo.CFLAGS="-mthreads -mtune=generic -O2 -pipe"
+    echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+    echo.CFLAGS="-fstack-protector-strong -mtune=generic -O2 -pipe"
+    if %CC%==gcc (
+        echo.CFLAGS+=" -mthreads"
     )
     echo.CXXFLAGS="${CFLAGS}"
+    echo.LDFLAGS="-pipe -static-libgcc -fstack-protector-strong"
     if %CC%==clang (
-        echo.LDFLAGS="-pipe -static-libgcc --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
+        echo.LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
     ) else (
-        echo.LDFLAGS="-pipe -static-libgcc -static-libstdc++"
+        echo.LDFLAGS+=" -static-libstdc++"
     )
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
     echo.
