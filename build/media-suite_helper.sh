@@ -233,14 +233,18 @@ vcs_ref_to_hash() (
 
 # get source from VCS
 # example:
-#   do_vcs "url#branch|revision|tag|commit=NAME" "folder"
+#   do_vcs "url#branch|revision|tag|commit=NAME[ folder]" "folder"
 do_vcs() {
     local vcsURL=${1#*::} vcsFolder=$2 vcsCheck=("${_check[@]}")
     local vcsBranch=${vcsURL#*#} ref=origin/HEAD
     local deps=("${_deps[@]}") && unset _deps
     [[ $vcsBranch == "$vcsURL" ]] && unset vcsBranch
+    local vcsPotentialFolder=${vcsURL#* }
+    if [[ -z $vcsFolder ]] && [[ $vcsPotentialFolder != "$vcsURL" ]]; then
+        vcsFolder=$vcsPotentialFolder # if there was a space, use the folder name
+    fi
     vcsURL=${vcsURL%#*}
-    : "${vcsFolder:=$(basename "$vcsURL" .git)}"
+    : "${vcsFolder:=$(basename "$vcsURL" .git)}"  # else just grab from the url like git normally does
 
     if [[ -n $vcsBranch ]]; then
         ref=${vcsBranch##*=}
