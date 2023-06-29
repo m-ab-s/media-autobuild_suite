@@ -1455,7 +1455,7 @@ strip_ansi() {
         local name="${txtfile%.*}" ext="${txtfile##*.}"
         [[ $txtfile != "$name" ]] &&
             newfile="$name.stripped.$ext" || newfile="$txtfile-stripped"
-        sed 's/\x1b\[[0-9;]*[a-zA-Z]//g' "$txtfile" > "$newfile"
+        sed -r "s/\x1b[[(][0-9;?]*[a-zA-Z]|\x1b\][0-9];//g" "$txtfile" > "$newfile"
     done
 }
 
