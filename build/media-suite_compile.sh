@@ -1778,9 +1778,9 @@ fi
 _check=(librist.{a,pc} librist/librist.h)
 [[ $standalone = y ]] && _check+=(bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
 if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/librist/0001-Workaround-fixes-for-cJSON-symbol-collision.patch" am
+    do_pacman_install cjson
     do_uninstall include/librist "${_check[@]}"
-    extracommands=("-Ddisable_json=true")
+    extracommands=("-Dbuiltin_cjson=false")
     [[ $standalone = y ]] || extracommands+=("-Dbuilt_tools=false")
     do_mesoninstall global -Dhave_mingw_pthreads=true -Dtest=false "${extracommands[@]}"
     do_checkIfExist
