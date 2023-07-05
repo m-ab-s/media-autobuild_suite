@@ -238,11 +238,9 @@ _check=(libxml2.a libxml2/libxml/xmlIO.h libxml-2.0.pc)
 if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBXML2"; then
     do_uninstall include/libxml2/libxml "${_check[@]}"
-    NOCONFIGURE=true do_autogen
-    [[ -f config.mak ]] && log "distclean" make distclean
-    sed -ri 's|(bin_PROGRAMS = ).*|\1|g' Makefile.am
-    CFLAGS+=" -DLIBXML_STATIC_FOR_DLL -DNOLIBTOOL" \
-        do_separate_confmakeinstall --without-python
+    extracommands=("-DLIBXML2_WITH_PYTHON=OFF" "-DLIBXML2_WITH_TESTS=OFF")
+    [[ $standalone = y ]] || extracommands+=("-DLIBXML2_WITH_PROGRAMS=OFF")
+    do_cmakeinstall "${extracommands[@]}"
     do_checkIfExist
 fi
 
