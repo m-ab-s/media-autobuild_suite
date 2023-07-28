@@ -219,7 +219,7 @@ if [[ $jq = y ]] &&
     do_uninstall "${_check[@]}"
     do_autoreconf
     CFLAGS+=' -D_POSIX_C_SOURCE' YFLAGS='--warnings=no-yacc' \
-        do_separate_conf global --enable-{all-static,pthread-tls} --disable-docs
+        do_separate_conf global --enable-{all-static,pthread-tls,maintainer-mode} --disable-docs
     do_make && do_install jq.exe bin-global/
     do_checkIfExist
 fi
