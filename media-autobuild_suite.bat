@@ -1809,21 +1809,22 @@ findstr hkps://keys.openpgp.org "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.con
 rem loginProfile
 if exist %instdir%\msys64\etc\profile.pacnew ^
     move /y %instdir%\msys64\etc\profile.pacnew %instdir%\msys64\etc\profile
-findstr /C:"profile2.local" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
-    echo.if [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW64 ]]; then
-    echo.   source /local64/etc/profile2.local
-    echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
-    echo.   source /local32/etc/profile2.local
+(
+    echo.if [[ -n "$ZAB_SOURCED" ]]; then
+    echo.    return
+    echo.else
+    echo.    ZAB_SOURCED=yes
     echo.fi
-)>%instdir%\msys64\etc\profile.d\Zab-suite.sh
-
-
-findstr /C:"LANG" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
+    echo.
+    echo.case "$MSYSTEM" in
+    echo.*32^) source /local32/etc/profile2.local ;;
+    echo.*64^) source /local64/etc/profile2.local ;;
+    echo.esac
     echo.case $- in
     echo.*i*^) ;;
     echo.*^) export LANG=en_US.UTF-8 ;;
     echo.esac
-)>>%instdir%\msys64\etc\profile.d\Zab-suite.sh
+)>%instdir%\msys64\etc\profile.d\Zab-suite.sh
 
 rem compileLocals
 cd %instdir%
@@ -1888,8 +1889,8 @@ goto :EOF
 
 :writeProfile
 (
-    echo.MSYSTEM=MINGW%1
-    echo.source /etc/msystem
+    echo.#!/usr/bin/bash
+    echo.source shell mingw%1
     echo.
     echo.# package build directory
     echo.LOCALBUILDDIR=/build
@@ -1899,7 +1900,6 @@ goto :EOF
     echo.
     echo.bits='%1bit'
     echo.
-    echo.export CONFIG_SITE=/etc/config.site
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
     if %CC%==clang (
@@ -1911,24 +1911,18 @@ goto :EOF
     )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
-    echo.CPATH="$(cygpath -pm $LOCALDESTDIR/include:$MINGW_PREFIX/include)"
-    echo.LIBRARY_PATH="$(cygpath -pm $LOCALDESTDIR/lib:$MINGW_PREFIX/lib)"
-    echo.export CPATH LIBRARY_PATH
-    echo.
-    echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
-    echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
     echo.
     echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
-    echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-libs --keep-system-cflags --static"
-    echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
+    echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --static"
+    echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig"
     echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
     echo.CFLAGS="-fstack-protector-strong -mtune=generic -O2 -pipe"
     if %CC%==gcc (
         echo.CFLAGS+=" -mthreads"
     )
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -fstack-protector-strong"
+    echo.LDFLAGS="-static-libgcc ${CFLAGS}"
     if %CC%==clang (
         echo.LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
     ) else (
@@ -1942,9 +1936,8 @@ goto :EOF
     echo.export PYTHONPATH=
     echo.
     echo.LANG=en_US.UTF-8
-    echo.PATH="${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${PATH}"
-    echo.PATH="/opt/cargo/bin:/opt/bin:${PATH}"
+    echo.PATH="/opt/cargo/bin:${PATH}"
     echo.source '/etc/profile.d/perlbin.sh'
     echo.PS1='\[\033[32m\]\u@\h \[\e[33m\]\w\[\e[0m\]\n\$ '
     echo.HOME="/home/${USERNAME}"
