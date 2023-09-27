@@ -71,7 +71,7 @@ SOURCE_REPO_LIBXML2=https://gitlab.gnome.org/GNOME/libxml2.git
 SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
-SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git#commit=f2cce5f38f4031bf1a4b4919ec90e4e8f8c66a77~1
+SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git#0.36
 SOURCE_REPO_MUJS=https://github.com/ccxvii/mujs.git
 SOURCE_REPO_NEON=https://github.com/notroj/neon.git
 SOURCE_REPO_OPENAL=https://github.com/kcat/openal-soft.git
