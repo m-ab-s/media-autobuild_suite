@@ -525,13 +525,6 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
 fi
 
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
-    _check=(libhwy.a libhwy.pc hwy/highway.h)
-    if do_vcs "$SOURCE_REPO_LIBHWY"; then
-        do_uninstall "${_check[@]}" include/hwy
-        CXXFLAGS+=" -DHWY_COMPILE_ALL_ATTAINABLE" do_cmakeinstall -DHWY_ENABLE_TESTS=OFF
-        do_checkIfExist
-    fi
-
     _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
     if do_vcs "$SOURCE_REPO_GFLAGS"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
@@ -541,7 +534,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         do_checkIfExist
     fi
 
-    _deps=(libhwy.a libgflags.a)
+    _deps=(libgflags.a)
     _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
@@ -552,7 +545,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         log -q "git.submodule" git submodule update --init --recursive
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
-            -DJPEGXL_{FORCE_SYSTEM_{BROTLI,HWY},STATIC}=ON -DJPEGXL_BUNDLE_GFLAGS=OFF "${extracommands[@]}"
+            -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
     fi

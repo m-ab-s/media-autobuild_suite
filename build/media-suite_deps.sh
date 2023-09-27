@@ -42,7 +42,6 @@ SOURCE_REPO_LIBBMX=https://gitlab.com/m-ab-s/bmx.git
 SOURCE_REPO_LIBDVDNAV=https://code.videolan.org/videolan/libdvdnav.git
 SOURCE_REPO_LIBDVDREAD=https://code.videolan.org/videolan/libdvdread.git
 SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
-SOURCE_REPO_LIBHWY=https://github.com/google/highway.git
 SOURCE_REPO_LIBILBC=https://github.com/TimothyGu/libilbc.git
 SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
 SOURCE_REPO_LIBKVAZAAR=https://github.com/ultravideo/kvazaar.git
