@@ -1994,14 +1994,7 @@ _check=(shaderc/shaderc.h libshaderc_combined.a)
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
         do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
-        cd third_party
-
-        do_vcs_local "$SOURCE_REPO_GLSLANG" glslang
-        do_vcs_local "$SOURCE_REPO_SPIRV_TOOLS" spirv-tools
-        do_vcs_local "$SOURCE_REPO_SPIRV_HEADERS" spirv-headers
-        do_vcs_local "$SOURCE_REPO_SPIRV_CROSS" spirv-cross
-
-        cd ..
+        log dependencies /usr/bin/python ./utils/git-sync-deps
 
         # fix python indentation errors from non-existant code review
         grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
