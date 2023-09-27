@@ -148,8 +148,8 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 ^
-rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 timeStamp noMintty ccache ^
-svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath
+rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 dovitool hdr10plustool ^
+timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
 set deleteIni=0
@@ -1264,6 +1264,46 @@ if %buildavs2%==2 set "avs2=n"
 if %buildavs2% GTR 2 GOTO avs2
 if %deleteINI%==1 echo.avs2=^%buildavs2%>>%ini%
 
+:dovitool
+if [0]==[%dovitoolINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build dovi_tool (CLI tool for working with Dolby Vision^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P builddovitool="Build dovi_tool: "
+) else set builddovitool=%dovitoolINI%
+
+if "%builddovitool%"=="" GOTO dovitool
+if %builddovitool%==1 set "dovitool=y"
+if %builddovitool%==2 set "dovitool=n"
+if %builddovitool% GTR 2 GOTO dovitool
+if %deleteINI%==1 echo.dovitool=^%builddovitool%>>%ini%
+
+:hdr10plustool
+if [0]==[%hdr10plustoolINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build hdr10plus_tool (CLI utility to work with HDR10+ in HEVC files^)?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildhdr10plustool="Build hdr10plus_tool: "
+) else set buildhdr10plustool=%hdr10plustoolINI%
+
+if "%buildhdr10plustool%"=="" GOTO hdr10plustool
+if %buildhdr10plustool%==1 set "hdr10plustool=y"
+if %buildhdr10plustool%==2 set "hdr10plustool=n"
+if %buildhdr10plustool% GTR 2 GOTO hdr10plustool
+if %deleteINI%==1 echo.hdr10plustool=^%buildhdr10plustool%>>%ini%
+
 :CC
 if [0]==[%CCINI%] (
     echo -------------------------------------------------------------------------------
@@ -1802,7 +1842,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
---avs2=%avs2% --timeStamp=%timeStamp% --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% ^
+--avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% ^
 --svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
