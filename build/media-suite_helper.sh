@@ -1430,6 +1430,23 @@ do_rustinstall() {
     unset rust_extras
 }
 
+do_rustcinstall() {
+    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    # use this array to pass additional parameters to cargo
+    local rust_extras=()
+    extra_script pre rust
+    [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
+        return
+    PKG_CONFIG_ALL_STATIC=true \
+        CC="ccache clang" \
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+        log "rust.cinstall" "$RUSTUP_HOME/bin/cargo.exe" cinstall \
+        --target="$CARCH"-pc-windows-gnu \
+        --jobs="$cpuCount" --prefix="$LOCALDESTDIR" "$@" "${rust_extras[@]}"
+    extra_script post rust
+    unset rust_extras
+}
+
 compilation_fail() {
     [[ -z $build32$build64 ]] && return 1
     local reason="$1"
