@@ -65,6 +65,8 @@ while true; do
     --jo=* ) jo=${1#*=} && shift ;;
     --dssim=* ) dssim=${1#*=} && shift ;;
     --avs2=* ) avs2=${1#*=} && shift ;;
+    --dovitool=* ) dovitool=${1#*=} && shift ;;
+    --hdr10plustool=* ) hdr10plustool=${1#*=} && shift ;;
     --timeStamp=* ) timeStamp=${1#*=} && shift ;;
     --noMintty=* ) noMintty=${1#*=} && shift ;;
     --ccache=* ) ccache=${1#*=} && shift ;;
@@ -1364,6 +1366,27 @@ if [[ $ffmpeg != no ]] && enabled libuavs3d &&
     do_vcs "$SOURCE_REPO_UAVS3D"; then
     do_cmakeinstall
     [[ $standalone = y ]] && do_install uavs3dec.exe bin-video/
+    do_checkIfExist
+fi
+
+_check=(bin-video/dovi_tool.exe)
+if [[ $dovitool = y ]] &&
+    do_vcs "$SOURCE_REPO_DOVI_TOOL"; then
+
+    # dovi_tool
+    do_uninstall "${_check[@]}"
+    do_rust
+    do_install "target/$CARCH-pc-windows-gnu/release/dovi_tool.exe" bin-video/
+    do_checkIfExist
+fi
+
+_check=(bin-video/hdr10plus_tool.exe)
+if [[ $hdr10plustool = y ]] &&
+    do_vcs "$SOURCE_REPO_HDR10PLUS_TOOL"; then
+
+    do_uninstall "${_check[@]}"
+    do_rust
+    do_install "target/$CARCH-pc-windows-gnu/release/hdr10plus_tool.exe" bin-video/
     do_checkIfExist
 fi
 
