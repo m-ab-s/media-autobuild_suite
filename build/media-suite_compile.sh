@@ -1401,7 +1401,9 @@ if [[ $mediainfo = y ]]; then
     if do_vcs "$SOURCE_REPO_LIBMEDIAINFO" libmediainfo; then
         do_uninstall include/MediaInfo{,DLL} bin-global/libmediainfo-config \
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
-        do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
+        CFLAGS+=" $($PKG_CONFIG --cflags libzen)" \
+        LDFLAGS+=" $($PKG_CONFIG --cflags --libs libzen)" \
+            do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
         do_checkIfExist
     fi
     fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/mediainfolib"
