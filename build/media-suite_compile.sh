@@ -750,7 +750,9 @@ if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
         do_vcs "$SOURCE_REPO_FDKAACEXE" bin-fdk-aac; then
         do_autoreconf
         do_uninstall "${_check[@]}"
-        do_separate_confmakeinstall audio
+        CFLAGS+=" $($PKG_CONFIG --cflags fdk-aac)" \
+        LDFLAGS+=" $($PKG_CONFIG --cflags --libs fdk-aac)"
+            do_separate_confmakeinstall audio
         do_checkIfExist
     fi
 fi
