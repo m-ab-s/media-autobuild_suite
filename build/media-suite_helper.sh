@@ -2168,15 +2168,12 @@ create_cmake_toolchain() {
     local toolchain_file=(
         "SET(CMAKE_RC_COMPILER_INIT windres)"
         ""
-        "LIST(APPEND CMAKE_PROGRAM_PATH $(cygpath -m "$LOCALDESTDIR/bin"))"
-        "SET(CMAKE_FIND_ROOT_PATH $_win_paths)"
-        "SET(CMAKE_PREFIX_PATH $_win_paths)"
+        "LIST(APPEND CMAKE_PROGRAM_PATH \"$(cygpath -m "$LOCALDESTDIR/bin")\")"
+        "SET(CMAKE_PREFIX_PATH \"$_win_paths\")"
+        "SET(CMAKE_FIND_ROOT_PATH \"$_win_paths\")"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)"
         "SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)"
         "SET(CMAKE_BUILD_TYPE Release)"
-        "LIST(APPEND CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
-        "LIST(APPEND CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES $mingw_path)"
-        "SET(CMAKE_NO_SYSTEM_FROM_IMPORTED ON)"
     )
 
     mkdir -p "$LOCALDESTDIR"/etc > /dev/null 2>&1
