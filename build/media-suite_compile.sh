@@ -1795,7 +1795,6 @@ _check=(librist.{a,pc} librist/librist.h)
 [[ $standalone = y ]] && _check+=(bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
 if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
     do_pacman_install cjson
-    do_patch "https://code.videolan.org/1480c1/librist/-/commit/0dc32581ceb0af14b71d4f548eacdd51b775c0ad.patch" am
     do_uninstall include/librist "${_check[@]}"
     extracommands=("-Dbuiltin_cjson=false")
     [[ $standalone = y ]] || extracommands+=("-Dbuilt_tools=false")
