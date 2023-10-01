@@ -1922,13 +1922,13 @@ goto :EOF
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
     echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-libs --keep-system-cflags --static"
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-    echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-    echo.CFLAGS="-fstack-protector-strong -mtune=generic -O2 -pipe"
+    echo.CPPFLAGS="-fstack-protector-strong -D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
+    echo.CFLAGS="-fstack-protector-strong -D_FORTIFY_SOURCE=2 -mtune=generic -O2 -pipe"
     if %CC%==gcc (
         echo.CFLAGS+=" -mthreads"
     )
     echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -fstack-protector-strong"
+    echo.LDFLAGS="-pipe -static-libgcc -fstack-protector-strong -D_FORTIFY_SOURCE=2"
     if %CC%==clang (
         echo.LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
     ) else (
