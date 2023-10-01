@@ -426,9 +426,10 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
 fi
 
 do_pacman_install brotli
-grep_and_sed '-lbrotlidec' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc \
+# if brotlicommon not already added, then add it to the brotli .pc files
+grep_or_sed '-lbrotlidec -lbrotlicommon' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc \
         's|-lbrotlidec|-lbrotlidec -lbrotlicommon|g' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlidec.pc 
-grep_and_sed '-lbrotlienc' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlienc.pc \
+grep_or_sed '-lbrotlienc -lbrotlicommon' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlienc.pc \
         's|-lbrotlienc|-lbrotlienc -lbrotlicommon|g' "$MINGW_PREFIX"/lib/pkgconfig/libbrotlienc.pc 
 
 _check=(curl/curl.h libcurl.{{,l}a,pc})
