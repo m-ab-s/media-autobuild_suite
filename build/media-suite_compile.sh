@@ -1176,6 +1176,8 @@ if [[ $libavif = y ]] && {
         pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
     } &&
     do_vcs "$SOURCE_REPO_LIBAVIF"; then
+    # chop off any .lib suffixes that is attached to a library name
+    grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
     do_uninstall "${_check[@]}"
     do_pacman_install libjpeg-turbo
     extracommands=()
