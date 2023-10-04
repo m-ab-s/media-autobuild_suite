@@ -1809,21 +1809,16 @@ findstr hkps://keys.openpgp.org "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.con
 rem loginProfile
 if exist %instdir%\msys64\etc\profile.pacnew ^
     move /y %instdir%\msys64\etc\profile.pacnew %instdir%\msys64\etc\profile
-findstr /C:"profile2.local" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
-    echo.if [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW64 ]]; then
-    echo.   source /local64/etc/profile2.local
-    echo.elif [[ -z "$MSYSTEM" ^|^| "$MSYSTEM" = MINGW32 ]]; then
-    echo.   source /local32/etc/profile2.local
-    echo.fi
-)>%instdir%\msys64\etc\profile.d\Zab-suite.sh
-
-
-findstr /C:"LANG" %instdir%\msys64\etc\profile.d\Zab-suite.sh >nul 2>&1 || (
+(
+    echo.case "$MSYSTEM" in
+    echo.*32^) source /local32/etc/profile2.local ;;
+    echo.*64^) source /local64/etc/profile2.local ;;
+    echo.esac
     echo.case $- in
     echo.*i*^) ;;
     echo.*^) export LANG=en_US.UTF-8 ;;
     echo.esac
-)>>%instdir%\msys64\etc\profile.d\Zab-suite.sh
+)>%instdir%\msys64\etc\profile.d\Zab-suite.sh
 
 rem compileLocals
 cd %instdir%
@@ -1888,14 +1883,14 @@ goto :EOF
 
 :writeProfile
 (
+    echo.#!/usr/bin/bash
     echo.MSYSTEM=MINGW%1
     echo.source /etc/msystem
     echo.
     echo.# package build directory
-    echo.LOCALBUILDDIR=/build
+    echo.export LOCALBUILDDIR='/build'
     echo.# package installation prefix
-    echo.LOCALDESTDIR=/local%1
-    echo.export LOCALBUILDDIR LOCALDESTDIR
+    echo.export LOCALDESTDIR='/local%1'
     echo.
     echo.bits='%1bit'
     echo.
@@ -1911,9 +1906,10 @@ goto :EOF
     )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
-    echo.CPATH="$(cygpath -pm $LOCALDESTDIR/include:$MINGW_PREFIX/include)"
+    echo.C_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/include:$MINGW_PREFIX/include)"
+    echo.CXX_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/include)"
     echo.LIBRARY_PATH="$(cygpath -pm $LOCALDESTDIR/lib:$MINGW_PREFIX/lib)"
-    echo.export CPATH LIBRARY_PATH
+    echo.export C_INCLUDE_PATH CXX_INCLUDE_PATH LIBRARY_PATH
     echo.
     echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
     echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
@@ -1922,19 +1918,22 @@ goto :EOF
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
     echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-libs --keep-system-cflags --static"
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
-    echo.CPPFLAGS="-D_FORTIFY_SOURCE=2 -D__USE_MINGW_ANSI_STDIO=1"
-    echo.CFLAGS="-fstack-protector-strong -mtune=generic -O2 -pipe"
-    if %CC%==gcc (
-        echo.CFLAGS+=" -mthreads"
-    )
-    echo.CXXFLAGS="${CFLAGS}"
-    echo.LDFLAGS="-pipe -static-libgcc -fstack-protector-strong"
+    echo.
+    echo.CFLAGS="-D_FORTIFY_SOURCE=2 -fstack-protector-strong" # security related flags
+    echo.CFLAGS+=" -mtune=generic -O2 -pipe" # performance related flags
+    echo.CFLAGS+=" -D__USE_MINGW_ANSI_STDIO=1" # mingw-w64 specific flags for c99 printf
+    echo.CFLAGS+=" -mthreads" # mingw-w64 specific flags for windows threads. Used to be gcc only.
+    echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
+    echo.LDFLAGS="${CFLAGS} -static-libgcc" # copy CFLAGS to LDFLAGS
     if %CC%==clang (
+        # clang complains about using static-libstdc++ with C files.
         echo.LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
     ) else (
+        # while gcc doesn't.
         echo.LDFLAGS+=" -static-libstdc++"
     )
-    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CPPFLAGS CFLAGS CXXFLAGS LDFLAGS MSYSTEM
+    # CPPFLAGS used to be here, but cmake ignores it, so it's not as useful.
+    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
     echo.export CCACHE_DIR="${LOCALBUILDDIR}/cache"
