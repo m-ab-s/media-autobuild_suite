@@ -1948,7 +1948,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
      { [[ $mpv != n ]] && ! mpv_disabled_any vulkan libplacebo; } } &&
     do_vcs "$SOURCE_REPO_VULKANLOADER" vulkan-loader; then
     _wine_mirror=https://raw.githubusercontent.com/wine-mirror/wine/master/include
-    _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/vulkan-loader-stuff/vulkan-loader
+    _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vulkan-loader
     do_pacman_install uasm
     do_uninstall "${_check[@]}"
     do_patch "https://github.com/KhronosGroup/Vulkan-Loader/pull/1306.patch" am
