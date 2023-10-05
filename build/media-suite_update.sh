@@ -161,27 +161,11 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         done
     fi
     if [[ -n $install ]]; then
-        echo
-        echo "-------------------------------------------------------------------------------"
         echo "You're missing some packages!"
-        echo "Do you want to install them?"
-        echo "-------------------------------------------------------------------------------"
-        echo
-        echo "Install:"
-        echo "$install"
-        while true; do
-            read -r -p "install packs [y/n]? " yn
-            case $yn in
-            [Yy]*)
-                xargs $nargs pacman -Sw --noconfirm --ask 20 --needed <<< "$install"
-                xargs $nargs pacman -S --noconfirm --ask 20 --needed <<< "$install"
-                pacman -D --asexplicit $install
-                break
-                ;;
-            [Nn]*) exit ;;
-            *) echo "Please answer yes or no" ;;
-            esac
-        done
+        echo "Proceeding with installation..."
+        xargs $nargs pacman -Sw --noconfirm --ask 20 --needed <<< "$install"
+        xargs $nargs pacman -S --noconfirm --ask 20 --needed <<< "$install"
+        pacman -D --asexplicit $install
     fi
     rm -f /etc/pac-{base,mingw}.pk
 fi
