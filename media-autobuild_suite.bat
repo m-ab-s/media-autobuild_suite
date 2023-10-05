@@ -1907,9 +1907,9 @@ goto :EOF
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
     echo.C_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/include:$MINGW_PREFIX/include)"
-    echo.CXX_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/include)"
+    echo.CPLUS_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/include)"
     echo.LIBRARY_PATH="$(cygpath -pm $LOCALDESTDIR/lib:$MINGW_PREFIX/lib)"
-    echo.export C_INCLUDE_PATH CXX_INCLUDE_PATH LIBRARY_PATH
+    echo.export C_INCLUDE_PATH CPLUS_INCLUDE_PATH LIBRARY_PATH
     echo.
     echo.MANPATH="${LOCALDESTDIR}/share/man:${MINGW_PREFIX}/share/man:/usr/share/man"
     echo.INFOPATH="${LOCALDESTDIR}/share/info:${MINGW_PREFIX}/share/info:/usr/share/info"
