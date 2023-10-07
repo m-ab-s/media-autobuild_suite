@@ -1925,14 +1925,17 @@ goto :EOF
     echo.CFLAGS+=" -mthreads" # mingw-w64 specific flags for windows threads. Used to be gcc only.
     echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
     echo.LDFLAGS="${CFLAGS} -static-libgcc" # copy CFLAGS to LDFLAGS
-    if %CC%==clang (
-        # clang complains about using static-libstdc++ with C files.
-        echo.LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
-    ) else (
-        # while gcc doesn't.
-        echo.LDFLAGS+=" -static-libstdc++"
-    )
-    # CPPFLAGS used to be here, but cmake ignores it, so it's not as useful.
+    echo.case "$CC" in
+    echo.*clang^)
+    echo.    # clang complains about using static-libstdc++ with C files.
+    echo.    LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
+    echo.;;
+    echo.*gcc^)
+    echo.    # while gcc doesn't.
+    echo.    LDFLAGS+=" -static-libstdc++"
+    echo.;;
+    echo.esac
+    echo.# CPPFLAGS used to be here, but cmake ignores it, so it's not as useful.
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS
     echo.
     echo.export CARGO_HOME="/opt/cargo" RUSTUP_HOME="/opt/cargo"
