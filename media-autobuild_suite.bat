@@ -1922,17 +1922,18 @@ goto :EOF
     echo.CFLAGS="-D_FORTIFY_SOURCE=2 -fstack-protector-strong" # security related flags
     echo.CFLAGS+=" -mtune=generic -O2 -pipe" # performance related flags
     echo.CFLAGS+=" -D__USE_MINGW_ANSI_STDIO=1" # mingw-w64 specific flags for c99 printf
-    echo.CFLAGS+=" -mthreads" # mingw-w64 specific flags for windows threads. Used to be gcc only.
     echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
     echo.LDFLAGS="${CFLAGS} -static-libgcc" # copy CFLAGS to LDFLAGS
     echo.case "$CC" in
     echo.*clang^)
     echo.    # clang complains about using static-libstdc++ with C files.
     echo.    LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
+    echo.    CFLAGS+=" --start-no-unused-arguments -mthreads --end-no-unused-arguments" # mingw-w64 specific flags for windows threads.
     echo.;;
     echo.*gcc^)
     echo.    # while gcc doesn't.
     echo.    LDFLAGS+=" -static-libstdc++"
+    echo.    CFLAGS+=" -mthreads" # mingw-w64 specific flags for windows threads.
     echo.;;
     echo.esac
     echo.# CPPFLAGS used to be here, but cmake ignores it, so it's not as useful.
