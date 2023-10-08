@@ -1173,6 +1173,8 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
 
     do_checkIfExist
 fi
+# add allow-multiple-definition to the .pc file to fix linking with other rust libraries
+sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 
 _check=(libavif.{a,pc} avif/avif.h)
 [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
