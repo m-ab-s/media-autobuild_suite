@@ -1929,6 +1929,7 @@ goto :EOF
     echo.    # clang complains about using static-libstdc++ with C files.
     echo.    LDFLAGS+=" --start-no-unused-arguments -static-libstdc++ --end-no-unused-arguments"
     echo.    CFLAGS+=" --start-no-unused-arguments -mthreads --end-no-unused-arguments" # mingw-w64 specific flags for windows threads.
+    echo.    CFLAGS+=" -Qunused-arguments" # clang 17.0.1 complains about -mwindows being present during compilation
     echo.;;
     echo.*gcc^)
     echo.    # while gcc doesn't.
