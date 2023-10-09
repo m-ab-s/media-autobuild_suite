@@ -108,3 +108,4 @@ SOURCE_REPO_XAVS=https://github.com/Distrotech/xavs.git
 SOURCE_REPO_XVC=https://github.com/divideon/xvc.git
 SOURCE_REPO_XVID=https://github.com/m-ab-s/xvid.git
 SOURCE_REPO_ZIMG=https://github.com/sekrit-twc/zimg.git
+SOURCE_REPO_ZVBI=https://github.com/zapping-vbi/zvbi.git

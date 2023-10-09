@@ -1443,15 +1443,11 @@ fi
 
 _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
 if [[ $ffmpeg != no ]] && enabled libzvbi &&
-    do_pkgConfig "zvbi-0.2 = 0.2.35" &&
-    do_wget_sf -h 95e53eb208c65ba6667fd4341455fa27 \
-        "zapping/zvbi/0.2.35/zvbi-0.2.35.tar.bz2"; then
+    do_vcs "$SOURCE_REPO_ZVBI"; then
+    do_patch "https://github.com/zapping-vbi/zvbi/pull/42.patch" am
     do_uninstall "${_check[@]}" zvbi-0.2.pc
-    _vlc_zvbi_patches=https://raw.githubusercontent.com/videolan/vlc/master/contrib/src/zvbi
-    do_patch "$_vlc_zvbi_patches/zvbi-win32.patch"
-    # added by zvbi-win32.patch above, not needed anymore
-    sed -i 's;-lpthreadGC2 -lwsock32;;' zvbi-0.2.pc.in
-    do_separate_conf --disable-{dvb,bktr,nls,proxy} --without-doxygen
+    do_autoreconf
+    do_separate_conf --disable-{dvb,bktr,examples,nls,proxy,tests} --without-doxygen
     cd_safe src
     do_makeinstall
     cd_safe ..
