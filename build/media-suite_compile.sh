@@ -1374,12 +1374,11 @@ fi
 _check=(libdovi.a libdovi/rpu_parser.h dovi.pc bin-video/dovi_tool.exe)
 if [[ $dovitool = y ]] &&
     do_vcs "$SOURCE_REPO_DOVI_TOOL"; then
-
     do_uninstall "${_check[@]}" include/libdovi bin-video/dovi.dll dovi.def dovi.dll.a
     do_rust
     do_install "target/$CARCH-pc-windows-gnu/release/dovi_tool.exe" bin-video/
     cd dolby_vision
-    do_rustcinstall --bindir="$LOCALDESTDIR"/bin-video/
+    do_rustcinstall --bindir="$LOCALDESTDIR"/bin-video/ --library-type=staticlib
     do_checkIfExist
 fi
 
