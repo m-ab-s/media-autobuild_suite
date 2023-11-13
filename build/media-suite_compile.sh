@@ -1183,6 +1183,8 @@ if [[ $libavif = y ]] && {
         pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
     } &&
     do_vcs "$SOURCE_REPO_LIBAVIF"; then
+    curl -Ls "https://github.com/AOMediaCodec/libavif/commit/edf3dab0111ef749e84b344dac55c2f5ab4731a5.patch" |
+        patch -fR -p1 --batch >/dev/null 2>&1
     # chop off any .lib suffixes that is attached to a library name
     grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
     do_uninstall "${_check[@]}"
