@@ -756,7 +756,7 @@ if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
         do_autoreconf
         do_uninstall "${_check[@]}"
         CFLAGS+=" $($PKG_CONFIG --cflags fdk-aac)" \
-        LDFLAGS+=" $($PKG_CONFIG --cflags --libs fdk-aac)"
+        LDFLAGS+=" $($PKG_CONFIG --cflags --libs fdk-aac)" \
             do_separate_confmakeinstall audio
         do_checkIfExist
     fi
