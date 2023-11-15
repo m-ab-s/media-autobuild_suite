@@ -1898,11 +1898,11 @@ goto :EOF
     echo.alias dir='ls -la --color=auto'
     echo.alias ls='ls --color=auto'
     if %CC%==clang (
-        echo.export CC="ccache clang"
-        echo.export CXX="ccache clang++"
+        echo.export CC="clang"
+        echo.export CXX="clang++"
     ) else (
-        echo.export CC="ccache gcc"
-        echo.export CXX="ccache g++"
+        echo.export CC="gcc"
+        echo.export CXX="g++"
     )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
@@ -1946,7 +1946,7 @@ goto :EOF
     echo.export PYTHONPATH=
     echo.
     echo.LANG=en_US.UTF-8
-    echo.PATH="${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
+    echo.PATH="${MINGW_PREFIX}/lib/ccache/bin:${MINGW_PREFIX}/bin:${INFOPATH}:${MSYS2_PATH}:${ORIGINAL_PATH}"
     echo.PATH="${LOCALDESTDIR}/bin-audio:${LOCALDESTDIR}/bin-global:${LOCALDESTDIR}/bin-video:${LOCALDESTDIR}/bin:${PATH}"
     echo.PATH="/opt/cargo/bin:/opt/bin:${PATH}"
     echo.source '/etc/profile.d/perlbin.sh'
