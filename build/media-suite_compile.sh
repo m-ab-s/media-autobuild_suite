@@ -555,9 +555,6 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     fi
 fi
 
-grep_and_sed 'libjxl_cms' "$LOCALDESTDIR"/lib/pkgconfig/libjxl.pc \
-    's|libjxl_cms||'
-
 if files_exist bin-video/OpenCL.dll; then
     opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
 else
