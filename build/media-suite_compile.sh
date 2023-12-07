@@ -542,6 +542,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0002-jxl_cms.cmake-Add-lcms2-to-list-of-requires.patch" am
         do_uninstall "${_check[@]}" include/jxl
         do_pacman_install lcms2 asciidoc
         extracommands=()
