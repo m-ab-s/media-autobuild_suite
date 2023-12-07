@@ -43,7 +43,7 @@ SOURCE_REPO_LIBDVDNAV=https://code.videolan.org/videolan/libdvdnav.git
 SOURCE_REPO_LIBDVDREAD=https://code.videolan.org/videolan/libdvdread.git
 SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
 SOURCE_REPO_LIBILBC=https://github.com/TimothyGu/libilbc.git
-SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
+SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git#tag=v0.8.2
 SOURCE_REPO_LIBKVAZAAR=https://github.com/ultravideo/kvazaar.git
 SOURCE_REPO_LIBLSMASH=https://github.com/l-smash/l-smash.git
 SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git
