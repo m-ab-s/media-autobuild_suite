@@ -2445,6 +2445,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mpv/0001-ao_wasapi_utils-include-mmreg.h-for-WAVE_FORMAT.patch" am
         hide_conflicting_libs
         create_ab_pkgconfig
 
