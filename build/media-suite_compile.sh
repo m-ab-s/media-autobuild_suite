@@ -680,10 +680,8 @@ fi
 grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
 
 _check=(libogg.{l,}a ogg/ogg.h ogg.pc)
-if {
-    [[ $flac = y ]] ||
-    { [[ $standalone = y ]] && enabled libvorbis; }
-    } && do_vcs "$SOURCE_REPO_LIBOGG"; then
+if { [[ $flac = y ]] || enabled libvorbis; } &&
+    do_vcs "$SOURCE_REPO_LIBOGG"; then
     do_uninstall include/ogg "${_check[@]}"
     do_autogen
     do_separate_confmakeinstall audio
