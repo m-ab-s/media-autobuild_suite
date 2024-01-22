@@ -1443,7 +1443,6 @@ fi
 _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
 if [[ $ffmpeg != no ]] && enabled libzvbi &&
     do_vcs "$SOURCE_REPO_ZVBI"; then
-    do_patch "https://github.com/zapping-vbi/zvbi/pull/42.patch" am
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_autoreconf
     do_separate_conf --disable-{dvb,bktr,examples,nls,proxy,tests} --without-doxygen
