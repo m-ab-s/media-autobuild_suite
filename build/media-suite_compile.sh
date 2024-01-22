@@ -2170,6 +2170,9 @@ if [[ $ffmpeg != no ]]; then
 
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-Remove-HLSL-and-OGLCompiler-libraries.patch" am
 
+        # Fix for libjxl changes that removes including version.h from decode.h
+        grep_or_sed jxl/version.h libavcodec/libjxl.h 's;#include <jxl/decode.h>;#include <jxl/version.h>\n&;'
+
         _patches=$(git rev-list origin/master.. --count)
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
