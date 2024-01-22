@@ -1806,8 +1806,8 @@ if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
 fi
 
 if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    _python_ver=3.11.0
-    _python_lib=python311
+    _python_ver=3.12.1
+    _python_lib=python312
     [[ $bits = 32bit ]] && _arch=win32 || _arch=amd64
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
@@ -1819,7 +1819,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
         do_checkIfExist
     fi
 
-    _vsver=61
+    _vsver=65
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
