@@ -2001,7 +2001,6 @@ _check=(lib{glslang,OSDependent,SPVRemapper}.a
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/glslang/0001-Initialize-Include-array-to-fix-compilation-issue.patch" am
     do_pacman_install python
     do_uninstall libHLSL.a "${_check[@]}"
     log dependencies /usr/bin/python ./update_glslang_sources.py
