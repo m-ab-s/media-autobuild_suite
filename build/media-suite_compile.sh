@@ -442,7 +442,7 @@ esac
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     do_vcs "https://github.com/curl/curl.git"; then
-    do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-curl/0003-libpsl-static-libs.patch"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/curl/0001-configure-use-pkg-config-for-psl.patch" am
     do_pacman_install nghttp2
 
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
@@ -538,7 +538,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     fi
 
     _deps=(libgflags.a)
-    _check=(libjxl{{,_dec,_threads}.a,.pc} jxl/decode.h)
+    _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
@@ -549,14 +549,11 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         CXXFLAGS+=" -DJXL_CMS_STATIC_DEFINE -DJXL_STATIC_DEFINE -DJXL_THREADS_STATIC_DEFINE" \
             do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
-            -DJPEGXL_{FORCE_SYSTEM_BROTLI,STATIC}=ON "${extracommands[@]}"
+            -DJPEGXL_{FORCE_SYSTEM_{BROTLI,LCMS2},STATIC}=ON "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
     fi
 fi
-
-grep_and_sed 'libjxl_cms' "$LOCALDESTDIR"/lib/pkgconfig/libjxl.pc \
-    's|libjxl_cms||'
 
 if files_exist bin-video/OpenCL.dll; then
     opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
@@ -683,10 +680,8 @@ fi
 grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
 
 _check=(libogg.{l,}a ogg/ogg.h ogg.pc)
-if {
-    [[ $flac = y ]] ||
-    { [[ $standalone = y ]] && enabled libvorbis; }
-    } && do_vcs "$SOURCE_REPO_LIBOGG"; then
+if { [[ $flac = y ]] || enabled libvorbis; } &&
+    do_vcs "$SOURCE_REPO_LIBOGG"; then
     do_uninstall include/ogg "${_check[@]}"
     do_autogen
     do_separate_confmakeinstall audio
@@ -1161,8 +1156,8 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     if [[ $libavif = y ]] || enabled librav1e; then
         rm -f "$CARGO_HOME/config" 2> /dev/null
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
-            CC="ccache clang" \
-            CXX="ccache clang++" \
+            CC="clang" \
+            CXX="clang++" \
             log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" capi install \
             --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR" \
             --destdir="$PWD/install-$bits"
@@ -1186,8 +1181,6 @@ if [[ $libavif = y ]] && {
         pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
     } &&
     do_vcs "$SOURCE_REPO_LIBAVIF"; then
-    curl -Ls "https://github.com/AOMediaCodec/libavif/commit/edf3dab0111ef749e84b344dac55c2f5ab4731a5.patch" |
-        patch -fR -p1 --batch >/dev/null 2>&1
     # chop off any .lib suffixes that is attached to a library name
     grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
     do_uninstall "${_check[@]}"
@@ -1439,7 +1432,6 @@ fi
 _check=(libvidstab.a vidstab.pc)
 if [[ $ffmpeg != no ]] && enabled libvidstab &&
     do_vcs "$SOURCE_REPO_VIDSTAB" vidstab; then
-    do_patch "https://github.com/georgmartius/vid.stab/pull/108.patch" am
     do_pacman_install openmp
     do_uninstall include/vid.stab "${_check[@]}"
     do_cmakeinstall
@@ -1449,7 +1441,6 @@ fi
 _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
 if [[ $ffmpeg != no ]] && enabled libzvbi &&
     do_vcs "$SOURCE_REPO_ZVBI"; then
-    do_patch "https://github.com/zapping-vbi/zvbi/pull/42.patch" am
     do_uninstall "${_check[@]}" zvbi-0.2.pc
     do_autoreconf
     do_separate_conf --disable-{dvb,bktr,examples,nls,proxy,tests} --without-doxygen
@@ -1691,7 +1682,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         log "cmake" cmake "$(get_first_subdir -f)/source" -G Ninja \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON \
-        -DENABLE_HDR10_PLUS=ON $xpsupport -DCMAKE_CXX_COMPILER="$LOCALDESTDIR/bin/${CXX#ccache }.bat" \
+        -DENABLE_HDR10_PLUS=ON $xpsupport \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" "$@"
         extra_script post cmake
         do_ninja
@@ -1812,7 +1803,7 @@ if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
 fi
 
 if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
-    _python_ver=3.11.0
+    _python_ver=3.11.7
     _python_lib=python311
     [[ $bits = 32bit ]] && _arch=win32 || _arch=amd64
     _check=("lib$_python_lib.a")
@@ -1825,7 +1816,7 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
         do_checkIfExist
     fi
 
-    _vsver=61
+    _vsver=65
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
@@ -1977,7 +1968,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
         do_install d3d{kmthk,ukmdt}.h include/
     cd_safe "$(get_first_subdir -f)"
     do_print_progress "Building Vulkan-Loader"
-    CC="${CC##ccache }" CXX="${CXX##ccache }" \
+    CCACHE_DISABLE=1 \
         CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" \
         do_cmakeinstall -DBUILD_TESTS=OFF \
     -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
@@ -2173,6 +2164,11 @@ if [[ $ffmpeg != no ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
+
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-glslang-Remove-HLSL-and-OGLCompiler-libraries.patch" am
+
+        # Fix for libjxl changes that removes including version.h from decode.h
+        grep_or_sed jxl/version.h libavcodec/libjxl.h 's;#include <jxl/decode.h>;#include <jxl/version.h>\n&;'
 
         _patches=$(git rev-list origin/master.. --count)
         [[ $_patches -gt 0 ]] &&
@@ -2426,7 +2422,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             sed -i "s;-lreadline;$($PKG_CONFIG --libs readline);g" Makefile
         fi
         extra_script pre make
-        log "make" env -i PATH="$PATH" TEMP="${TEMP:-/tmp}" CPATH="${CPATH:-}" "$(command -v make)" \
+        TEMP="${TEMP:-/tmp}" CPATH="${CPATH:-}" log "make" "$(command -v make)" \
             "${mujs_targets[@]}" prefix="$LOCALDESTDIR" bindir="$LOCALDESTDIR/bin-global"
         extra_script post make
         extra_script pre install
@@ -2447,6 +2443,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mpv/0001-ao_wasapi_utils-include-mmreg.h-for-WAVE_FORMAT.patch" am
         hide_conflicting_libs
         create_ab_pkgconfig
 
