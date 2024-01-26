@@ -1405,7 +1405,7 @@ do_rust() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="clang" \
+        CC="ccache clang" \
         log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
@@ -1421,7 +1421,7 @@ do_rustinstall() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="clang" \
+        CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
         --target="$CARCH"-pc-windows-gnu \
@@ -1438,7 +1438,7 @@ do_rustcinstall() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="clang" \
+        CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.cinstall" "$RUSTUP_HOME/bin/cargo.exe" cinstall \
         --target="$CARCH"-pc-windows-gnu \
@@ -2137,54 +2137,29 @@ EOF
         printf '%s\r\n' "@echo off" "" "bash $LOCALDESTDIR/bin/ab-pkg-config --static %*" > "$LOCALDESTDIR"/bin/ab-pkg-config-static.bat
 }
 
-create_ab_ccache() (
-    mkdir -p "$LOCALDESTDIR"/bin /etc/pacman.d/hooks > /dev/null 2>&1
-    ccache_path=false ccache_win_path=
+create_ab_ccache() {
+    local bin temp_file ccache_path=false ccache_win_path=
+    temp_file=$(mktemp)
     if [[ $ccache == y ]] && type ccache > /dev/null 2>&1; then
         ccache_path="$(command -v ccache)"
         ccache_win_path=$(cygpath -m "$ccache_path")
     fi
+    mkdir -p "$LOCALDESTDIR"/bin > /dev/null 2>&1
     for bin in {$MINGW_CHOST-,}{gcc,g++} clang{,++} cc cpp c++; do
         type "$bin" > /dev/null 2>&1 || continue
-        cat << EOF > "$LOCALDESTDIR/bin/$bin.bat"
+        cat << EOF > "$temp_file"
 @echo off >nul 2>&1
 rem() { "\$@"; }
 rem test -f nul && rm nul
-rem $ccache_path --help > /dev/null 2>&1 && $ccache_path $(command -v "$bin") "\$@" || $(command -v "$bin") "\$@"
+rem $ccache_path --help > /dev/null 2>&1 && $ccache_path $(command -v $bin) "\$@" || $(command -v $bin) "\$@"
 rem exit \$?
-$ccache_win_path $(cygpath -m "$(command -v "$bin")") %*
+$ccache_win_path $(cygpath -m "$(command -v $bin)") %*
 EOF
+        diff -q "$temp_file" "$LOCALDESTDIR/bin/$bin.bat" > /dev/null 2>&1 || cp -f "$temp_file" "$LOCALDESTDIR/bin/$bin.bat"
         chmod +x "$LOCALDESTDIR/bin/$bin.bat"
     done
-
-    cat << 'EOF' > /etc/pacman.d/hooks/999-ccache.sh
-#!/usr/bin/bash
-
-find "${MINGW_PREFIX}/lib/ccache/bin/" -type f -exec basename {} \; | while read -r compiler; do
-    [[ -f "${MINGW_PREFIX}/bin/${compiler}.exe" ]] || continue
-    rm -f "${MINGW_PREFIX}/lib/ccache/bin/${compiler}"
-    ln -Pf "${MINGW_PREFIX}/bin/ccache.exe" "${MINGW_PREFIX}/lib/ccache/bin/${compiler}.exe"
-done
-EOF
-    cat << 'EOF' > /etc/pacman.d/hooks/999-ccache.hook
-# Replaces the hack scripts in "${MINGW_PREFIX}"/lib/ccache/bin with hard links if the associated compiler exists.
-
-[Trigger]
-Operation = Install
-Operation = Upgrade
-Type = Package
-Target = *-ccache
-
-[Action]
-Description = Replacing ccache scripts with hard links
-Depends = coreutils
-When = PostTransaction
-Exec = /etc/pacman.d/hooks/999-ccache.sh
-EOF
-    # force update of ccache links
-    chmod +x /etc/pacman.d/hooks/999-ccache.sh
-    exec /etc/pacman.d/hooks/999-ccache.sh
-)
+    rm "$temp_file"
+}
 
 create_cmake_toolchain() {
     local _win_paths mingw_path
