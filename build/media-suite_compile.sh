@@ -1802,21 +1802,24 @@ if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
     do_checkIfExist
 fi
 
-if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
+_vapoursynth_install() {
+    if [[ $bits = 32bit ]]; then
+        do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
+        return 1
+    fi
     _python_ver=3.11.7
     _python_lib=python311
-    [[ $bits = 32bit ]] && _arch=win32 || _arch=amd64
+    _vsver=65
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
-    elif do_wget "https://www.python.org/ftp/python/$_python_ver/python-$_python_ver-embed-$_arch.zip"; then
+    elif do_wget "https://www.python.org/ftp/python/$_python_ver/python-$_python_ver-embed-amd64.zip"; then
         gendef "$_python_lib.dll" >/dev/null 2>&1
         dlltool -y "lib$_python_lib.a" -d "$_python_lib.def"
         [[ -f lib$_python_lib.a ]] && do_install "lib$_python_lib.a"
         do_checkIfExist
     fi
 
-    _vsver=65
     _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
@@ -1859,8 +1862,10 @@ if  { ! mpv_disabled vapoursynth || enabled vapoursynth; }; then
         do_install vapoursynth{,-script}.pc lib/pkgconfig/
         do_checkIfExist
     fi
-    unset _arch _file _python_lib _python_ver _vsver _pc_vars
-else
+    unset _file _python_lib _python_ver _vsver _pc_vars
+    return 0
+}
+if ! { { ! mpv_disabled vapoursynth || enabled vapoursynth; } && _vapoursynth_install; }; then
     mpv_disable vapoursynth
     do_removeOption --enable-vapoursynth
 fi
