@@ -1242,7 +1242,7 @@ do_patch() {
     [[ $2 == am ]] && am=true
 
     # hack for URLs without filename
-    patchName=${patchName:-"$(/usr/bin/curl -sI "$patch" | grep -Eo 'filename=.*$' | sed 's/filename=//')"}
+    patchName=${patchName:-"$(/usr/bin/curl -LsI "$patch" | grep -Eo 'filename=.*$' | sed 's/filename=//')"}
     [[ -z $patchName ]] &&
         printf '%b\n' "${red}Failed to apply patch '$patch'" \
             "Patch without filename, ignoring. Specify an explicit filename.${reset}" &&
