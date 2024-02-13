@@ -85,6 +85,7 @@ done
 
 [[ $ccache != y ]] && export CCACHE_DISABLE=1
 
+# shellcheck source=media-suite_deps.sh
 source "$LOCALBUILDDIR"/media-suite_deps.sh
 
 # shellcheck source=media-suite_helper.sh
