@@ -2015,25 +2015,27 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
 fi
 
 _check=(shaderc/shaderc.h libshaderc_combined.a)
-    if ! mpv_disabled shaderc &&
-        do_vcs "$SOURCE_REPO_SHADERC"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0003-cmake-correct-PYTHON-Python.patch" am
-        do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
+if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+     { [[ $ffmpeg != no ]] && enabled libplacebo; } } ||
+     ! mpv_disabled shaderc &&
+    do_vcs "$SOURCE_REPO_SHADERC"; then
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0003-cmake-correct-PYTHON-Python.patch" am
+    do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
-        log dependencies /usr/bin/python ./utils/git-sync-deps
+    log dependencies /usr/bin/python ./utils/git-sync-deps
 
-        # fix python indentation errors from non-existant code review
-        grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
+    # fix python indentation errors from non-existant code review
+    grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
 
-        do_cmakeinstall -GNinja -DSHADERC_SKIP_{TESTS,EXAMPLES}=ON -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DSKIP_{GLSLANG,SPIRV_TOOLS,GOOGLETEST}_INSTALL=ON -DSPIRV_HEADERS_SKIP_{INSTALL,EXAMPLES}=ON
-        do_checkIfExist
-        unset add_third_party
-    fi
+    do_cmakeinstall -GNinja -DSHADERC_SKIP_{TESTS,EXAMPLES}=ON -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DSKIP_{GLSLANG,SPIRV_TOOLS,GOOGLETEST}_INSTALL=ON -DSPIRV_HEADERS_SKIP_{INSTALL,EXAMPLES}=ON
+    do_checkIfExist
+    unset add_third_party
+fi
 
-    file_installed -s shaderc.pc && file_installed -s shaderc_static.pc &&
-        mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
+file_installed -s shaderc_static.pc &&
+    mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
 
 _check=(libplacebo.{a,pc})
 _deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
