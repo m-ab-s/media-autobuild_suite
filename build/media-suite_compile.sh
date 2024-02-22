@@ -800,6 +800,7 @@ fi
 _check=(libopus.{,l}a opus.pc opus/opus.h)
 if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
     do_pacman_remove opus
+    do_pacman_install wget # autogen calls wget, but msys/wget seems to fail for some people, while the mingw64 one works
     do_uninstall include/opus "${_check[@]}"
     do_autogen
     do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
