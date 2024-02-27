@@ -443,7 +443,6 @@ esac
 [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
 if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
     do_vcs "https://github.com/curl/curl.git"; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/curl/0001-configure-use-pkg-config-for-psl.patch" am
     do_pacman_install nghttp2
 
     do_uninstall include/curl bin-global/curl-config "${_check[@]}"
