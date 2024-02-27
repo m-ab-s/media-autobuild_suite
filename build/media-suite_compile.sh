@@ -2141,12 +2141,6 @@ if [[ $ffmpeg != no ]]; then
     if do_vcs "$ffmpegPath"; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
-
-        # lavc/cbs_av1: fill in ref_frame_sign_bias
-        do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/Npbk3Pz--3-9@lynne.ee/raw/" am
-        # lavc/vulkan_av1: port to the new stable API
-        do_patch "https://patchwork.ffmpeg.org/project/ffmpeg/patch/NpbkH8f--3-9@lynne.ee/raw/" am
-
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
