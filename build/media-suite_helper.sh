@@ -276,7 +276,7 @@ do_vcs() {
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
             unset_extra_script
-            return
+            return 1
         fi
         touch "$vcsFolder-git"/recently_{updated,checked}
     fi
