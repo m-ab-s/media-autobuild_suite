@@ -367,7 +367,7 @@ do_vcs_local() {
             echo "Try again later or <Enter> to continue"
             do_prompt "if you're sure nothing depends on it."
             # unset_extra_script
-            return
+            return 1
         fi
         mv "$vcsFolder-git" "$vcsFolder"
         touch "$vcsFolder"/recently_{updated,checked}
