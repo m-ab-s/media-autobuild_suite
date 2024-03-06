@@ -417,7 +417,7 @@ check_hash() {
 
 # get wget download
 do_wget() {
-    local nocd=false norm=false quiet=false notmodified=false hash
+    local nocd=false norm=false quiet=false notmodified=false noextract=false hash
     while true; do
         case $1 in
         -c) nocd=true && shift ;;
@@ -425,6 +425,7 @@ do_wget() {
         -q) quiet=true && shift ;;
         -h) hash="$2" && shift 2 ;;
         -z) notmodified=true && shift ;;
+        -n) noextract=true && shift ;;
         --)
             shift
             break
@@ -493,7 +494,7 @@ do_wget() {
     done
 
     $norm || add_to_remove "$(pwd)/$archive"
-    do_extract "$archive" "$dirName"
+    $noextract || do_extract "$archive" "$dirName"
     ! $norm && [[ -n $dirName ]] && ! $nocd && add_to_remove
     [[ -z $response_code || $response_code != "304" ]] && return 0
 }
