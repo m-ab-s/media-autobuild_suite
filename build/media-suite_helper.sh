@@ -187,7 +187,7 @@ vcs_clone() (
     *i*) unset GIT_TERMINAL_PROMPT ;;
     *) export GIT_TERMINAL_PROMPT=0 ;;
     esac
-    git clone "$vcsURL" "$vcsFolder-git"
+    git clone --filter=tree:0 "$vcsURL" "$vcsFolder-git"
     git -C "$vcsFolder-git" reset --hard "${3:-origin/HEAD}"
     check_valid_vcs "$vcsFolder-git"
 )
