@@ -495,12 +495,20 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     fi
     _deps=(libglut.a)
     _check=(libtiff{.a,-4.pc})
+    [[ $standalone = y ]] && _check+=(bin-global/tiff{cp,dump,info,set,split}.exe)
     if do_vcs "$SOURCE_REPO_LIBTIFF"; then
         do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
-        do_uninstall "${_check[@]}"
+        do_uninstall lib/cmake/tiff "${_check[@]}"
+        extracommands=("-Dtiff-tests=OFF" "-Dtiff-docs=OFF")
+        if [[ $standalone = y ]]; then
+            extracommands+=("-Dtiff-tools=ON")
+        else
+            extracommands+=("-Dtiff-tools=OFF")
+        fi
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
             '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd glut'
-        CFLAGS+=" -DFREEGLUT_STATIC" do_cmakeinstall global -D{webp,jbig,UNIX,lerc}=OFF
+        CFLAGS+=" -DFREEGLUT_STATIC" \
+            do_cmakeinstall global -D{webp,jbig,lerc}=OFF "${extracommands[@]}"
         do_checkIfExist
     fi
 fi
