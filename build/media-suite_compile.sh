@@ -1936,6 +1936,7 @@ _check=(bin-video/vvenc{,FF}app.exe
     lib/cmake/vvenc/vvencConfig.cmake)
 if [[ $bits = 64bit && $vvenc = y ]] &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vvenc/0001-InterSearch-use-vector-to-replace-VLA.patch" am
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
     do_checkIfExist
