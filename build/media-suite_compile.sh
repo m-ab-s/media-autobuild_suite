@@ -1449,7 +1449,8 @@ fi
 _check=(libvidstab.a vidstab.pc)
 if [[ $ffmpeg != no ]] && enabled libvidstab &&
     do_vcs "$SOURCE_REPO_VIDSTAB" vidstab; then
-    do_pacman_install openmp
+    do_pacman_remove openmp
+    do_pacman_install omp
     do_uninstall include/vid.stab "${_check[@]}"
     do_cmakeinstall
     do_checkIfExist
