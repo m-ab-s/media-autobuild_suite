@@ -1722,10 +1722,12 @@ do_pacman_install() {
     done
 
     for pkg in $pkgs; do
-        pacman -Qqe "$pkg" > /dev/null 2>&1 && continue
+        # checks if a package is installed/provided by a package that is installed
+        # example is omp, which is purely a provided packge, so that fails with pacman -Qe
+        pacsift --local --provides="$pkg" | head -c1 | grep -qE . > /dev/null 2>&1 && continue
         do_simple_print -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
         if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" > /dev/null 2>&1; then
-            pacman -D --asexplicit "$pkg" > /dev/null
+            pacsift --local --provides="$pkg" | sed 's;local/;;' | pacman -D --asexplicit - > /dev/null 2>&1
             if $msyspackage; then
                 /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk > /dev/null 2>&1 ||
                     echo "${pkg}" >> /etc/pac-msys-extra.pk
