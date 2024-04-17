@@ -2039,7 +2039,6 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_vcs "$SOURCE_REPO_SHADERC"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0003-cmake-correct-PYTHON-Python.patch" am
     do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
     log dependencies /usr/bin/python ./utils/git-sync-deps
