@@ -7,6 +7,7 @@ SOURCE_REPO_ARRIB24=https://github.com/nkoriyama/aribb24.git
 SOURCE_REPO_AVISYNTH=https://github.com/AviSynth/AviSynthPlus.git
 SOURCE_REPO_CARGOC=https://github.com/lu-zero/cargo-c.git
 SOURCE_REPO_CODEC2=https://github.com/drowe67/codec2.git
+SOURCE_REPO_CURL=https://github.com/curl/curl.git
 SOURCE_REPO_CYANRIP=https://github.com/cyanreg/cyanrip.git
 SOURCE_REPO_DAV1D=https://code.videolan.org/videolan/dav1d.git
 SOURCE_REPO_DAVS=https://github.com/pkuvcl/davs2.git
