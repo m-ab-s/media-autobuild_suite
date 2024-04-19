@@ -2626,6 +2626,7 @@ if [[ $cyanrip = y ]]; then
     _deps=(libneon.a libxml2.a)
     _check=(musicbrainz5/mb5_c.h libmusicbrainz5{,cc}.{a,pc})
     if do_vcs "$SOURCE_REPO_LIBMUSICBRAINZ"; then
+        do_patch "https://github.com/metabrainz/libmusicbrainz/compare/master...wiiaboo:libmusicbrainz:master.patch" am
         do_uninstall "${_check[@]}" include/musicbrainz5
         LIBRARY_PATH="$(cygpath -pm "$LOCALDESTDIR/lib:$MINGW_PREFIX/lib")" do_cmakeinstall
         do_checkIfExist
