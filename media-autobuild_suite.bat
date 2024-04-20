@@ -2001,7 +2001,10 @@ goto :EOF
 
 :getmingw
 setlocal
-if exist %instdir%\msys64\mingw%1\bin\gcc.exe GOTO :EOF
+set found=0
+set "compilers=%instdir%\msys64\mingw%1\bin\gcc.exe %instdir%\msys64\clang%1\bin\clang.exe"
+for %%i in (%compilers%) do if exist %%i set found=1
+if %found%==1 GOTO :EOF
 echo.-------------------------------------------------------------------------------
 echo.install %1 bit compiler
 echo.-------------------------------------------------------------------------------
@@ -2024,10 +2027,11 @@ if %CC%==clang (
 )>%build%\mingw.sh
 call :runBash mingw%1.log /build/mingw.sh
 
-if not exist %instdir%\msys64\mingw%1\bin\gcc.exe (
+for %%i in (%compilers%) do if exist %%i set found=1
+if %found%==0 (
     echo -------------------------------------------------------------------------------
     echo.
-    echo.MinGW%1 GCC compiler isn't installed; maybe the download didn't work
+    echo.MinGW%1 compiler isn't installed; maybe the download didn't work
     echo.Do you want to try it again?
     echo.
     echo -------------------------------------------------------------------------------
