@@ -162,6 +162,8 @@ pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 # Global header fixups
 grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
         's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
+$CC -E -P -include pthread.h - < /dev/null | grep -q MemoryBarrier ||
+    grep_and_sed MemoryBarrier "$MINGW_PREFIX/include/pthread.h" 's/MemoryBarrier/__sync_synchronize/g'
 
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
