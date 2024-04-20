@@ -1884,7 +1884,11 @@ goto :EOF
 :writeProfile
 (
     echo.#!/usr/bin/bash
-    echo.MSYSTEM=MINGW%1
+    if %CC%==clang (
+        echo.MSYSTEM=CLANG%1
+    ) else (
+        echo.MSYSTEM=MINGW%1
+    )
     echo.source /etc/msystem
     echo.
     echo.# package build directory
@@ -2001,9 +2005,15 @@ if exist %instdir%\msys64\mingw%1\bin\gcc.exe GOTO :EOF
 echo.-------------------------------------------------------------------------------
 echo.install %1 bit compiler
 echo.-------------------------------------------------------------------------------
-if "%1"=="32" (
-    set prefix=mingw-w64-i686-
-) else set prefix=mingw-w64-x86_64-
+if %CC%==clang (
+    if "%1"=="32" (
+        set prefix=mingw-w64-clang-i686-
+    ) else set prefix=mingw-w64-clang-x86_64-
+) else (
+    if "%1"=="32" (
+        set prefix=mingw-w64-i686-
+    ) else set prefix=mingw-w64-x86_64-
+)
 (
     echo.printf '\033]0;install %1 bit compiler\007'
     echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
