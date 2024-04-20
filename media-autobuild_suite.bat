@@ -106,7 +106,7 @@ intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man
 gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
 
 set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-clang binutils gettext-tools
+clang binutils gettext-tools lld
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -1750,6 +1750,10 @@ if not exist %instdir%\msys64\usr\bin\make.exe (
 for %%i in (%instdir%\msys64\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert.log update-ca-trust
 
 rem installmingw
+rem extra package for clang
+if %CC%==clang (
+    set "mingwpackages=%mingwpackages% gcc-compat"
+)
 if exist "%instdir%\msys64\etc\pac-mingw.pk" del "%instdir%\msys64\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\msys64\etc\pac-mingw.pk
 if %build32%==yes call :getmingw 32
