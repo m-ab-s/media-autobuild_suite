@@ -108,19 +108,23 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     [[ -f /etc/pac-mingw-extra.pk ]] && printf -v newmingw '%s\n' "$newmingw" \
         "$(tr -d '\r' < /etc/pac-mingw-extra.pk)"
     [[ -f /etc/pac-msys-extra.pk ]] && printf -v newmsys '%s\n' "$(tr -d '\r' < /etc/pac-msys-extra.pk)"
+    case $CC in
+    *clang*) prefix_32=mingw-w64-clang-i686- prefix_64=mingw-w64-clang-x86_64- ;;
+    *) prefix_32=mingw-w64-i686- prefix_64=mingw-w64-x86_64- ;;
+    esac
     new=$(echo -n "$new" | tr ' ' '\n' | sort -u)
     newmingw=$(echo -n "$newmingw" | tr ' ' '\n' | sort -u)
     newmsys=$(echo -n "$newmsys" | tr ' ' '\n' | sort -u)
     for pkg in $newmingw; do
-        pkg=${pkg#mingw-w64-i686-}
-        pkg=${pkg#mingw-w64-x86_64-}
+        pkg=${pkg#"$prefix_32"}
+        pkg=${pkg#"$prefix_64"}
         if [[ $build32 == "yes" ]] &&
-            pacman -Ss "mingw-w64-i686-$pkg" > /dev/null 2>&1; then
-            printf -v new '%b' "$new\\nmingw-w64-i686-$pkg"
+            pacman -Ss "$prefix_32$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\n$prefix_32$pkg"
         fi
         if [[ $build64 == "yes" ]] &&
-            pacman -Ss "mingw-w64-x86_64-$pkg" > /dev/null 2>&1; then
-            printf -v new '%b' "$new\\nmingw-w64-x86_64-$pkg"
+            pacman -Ss "$prefix_64$pkg" > /dev/null 2>&1; then
+            printf -v new '%b' "$new\\n$prefix_64$pkg"
         fi
     done
     for pkg in $newmsys; do
