@@ -173,30 +173,6 @@ if [[ $packing = y &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
-_check=("$RUSTUP_HOME"/bin/rustup.exe)
-if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] || enabled librav1e; then
-    if ! files_exist "$RUSTUP_HOME"/bin/rustup.exe; then
-        mkdir -p "$LOCALBUILDDIR/rustinstall"
-        cd_safe "$LOCALBUILDDIR/rustinstall"
-        log download_rustup "${curl_opts[@]}" "https://sh.rustup.rs" -So rustup.sh
-        log install_rust ./rustup.sh -v -y --no-modify-path \
-            "--default-host=${MSYSTEM_CARCH}-pc-windows-gnu" \
-            --default-toolchain=stable
-        do_checkIfExist
-        hash -r
-        add_to_remove
-        cd_safe "$LOCALBUILDDIR"
-    fi
-    if ! [[ $(rustup toolchain list) =~ stable-$CARCH-pc-windows-gnu ]]; then
-        # install current target arch toolchain
-        log install_toolchain "$RUSTUP_HOME/bin/rustup.exe" toolchain \
-            install "stable-$CARCH-pc-windows-gnu"
-    fi
-    log rustup_update "$RUSTUP_HOME/bin/rustup.exe" update
-    log set_default_toolchain "$RUSTUP_HOME/bin/rustup.exe" default \
-        "stable-$CARCH-pc-windows-gnu"
-fi
-
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git"; then
@@ -1175,7 +1151,7 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
             CC="ccache clang" \
             CXX="ccache clang++" \
-            log "install-rav1e-c" "$RUSTUP_HOME/bin/cargo.exe" capi install \
+            log "install-rav1e-c" cargo capi install \
             --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR" \
             --destdir="$PWD/install-$bits"
 

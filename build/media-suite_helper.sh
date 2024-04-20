@@ -1399,7 +1399,7 @@ do_mesoninstall() {
 }
 
 do_rust() {
-    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
@@ -1407,7 +1407,7 @@ do_rust() {
         return
     PKG_CONFIG_ALL_STATIC=true \
         CC="ccache clang" \
-        log "rust.build" "$RUSTUP_HOME/bin/cargo.exe" build \
+        log "rust.build" cargo build \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
     extra_script post rust
@@ -1415,7 +1415,7 @@ do_rust() {
 }
 
 do_rustinstall() {
-    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
@@ -1424,7 +1424,7 @@ do_rustinstall() {
     PKG_CONFIG_ALL_STATIC=true \
         CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-        log "rust.install" "$RUSTUP_HOME/bin/cargo.exe" install \
+        log "rust.install" cargo install \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
     extra_script post rust
@@ -1432,7 +1432,7 @@ do_rustinstall() {
 }
 
 do_rustcinstall() {
-    log "rust.update" "$RUSTUP_HOME/bin/cargo.exe" update
+    log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
     extra_script pre rust
@@ -1441,7 +1441,7 @@ do_rustcinstall() {
     PKG_CONFIG_ALL_STATIC=true \
         CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-        log "rust.cinstall" "$RUSTUP_HOME/bin/cargo.exe" cinstall \
+        log "rust.cinstall" cargo cinstall \
         --target="$CARCH"-pc-windows-gnu \
         --jobs="$cpuCount" --prefix="$LOCALDESTDIR" "$@" "${rust_extras[@]}"
     extra_script post rust

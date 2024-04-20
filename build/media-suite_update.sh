@@ -180,11 +180,6 @@ else
     cd_safe "$(cygpath -w /).."
 fi
 
-if command -v rustup &> /dev/null; then
-    echo "Updating rust..."
-    rustup update
-fi
-
 # --------------------------------------------------
 # packet msys2 system
 # --------------------------------------------------
