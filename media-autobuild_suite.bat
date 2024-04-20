@@ -105,8 +105,8 @@ set msyspackages=asciidoc autoconf-wrapper automake-wrapper autogen base bison d
 intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man-db ^
 gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
 
-set mingwpackages=cmake dlfcn libpng gcc nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-clang binutils gettext-tools lld
+set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
+clang gettext-tools lld
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -1753,6 +1753,8 @@ rem installmingw
 rem extra package for clang
 if %CC%==clang (
     set "mingwpackages=%mingwpackages% gcc-compat"
+) else (
+    set "mingwpackages=%mingwpackages% binutils gcc"
 )
 if exist "%instdir%\msys64\etc\pac-mingw.pk" del "%instdir%\msys64\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\msys64\etc\pac-mingw.pk
