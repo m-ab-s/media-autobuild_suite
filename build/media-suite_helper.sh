@@ -2283,41 +2283,6 @@ grep_and_sed() {
         /usr/bin/sed -ri -- "$sed_re" "${sed_files[@]}"
 }
 
-compare_with_zeranoe() {
-    local comparison="${1:-builtin}"
-    local zeranoebase="https://ffmpeg.zeranoe.com/builds/readme"
-    local zeranoe32 zeranoe64
-    zeranoe32="$(curl -s "${zeranoebase}"/win32/static/ffmpeg-latest-win32-static-readme.txt |
-        sed -n '/Configuration/,/Libraries/{/\s*--/{s/\s*//gp}}' | sort)"
-    zeranoe64="$(curl -s "${zeranoebase}"/win64/static/ffmpeg-latest-win64-static-readme.txt |
-        sed -n '/Configuration/,/Libraries/{/\s*--/{s/\s*//gp}}' | sort)"
-    local localopts32=""
-    local localopts64=""
-    if [[ $comparison == "custom" ]]; then
-        local custom32="$LOCALBUILDDIR/ffmpeg_options_32bit.txt"
-        local custom64="$LOCALBUILDDIR/ffmpeg_options_64bit.txt"
-        local custom="$LOCALBUILDDIR/ffmpeg_options.txt"
-        [[ -f $custom32 ]] || custom32="$custom"
-        [[ -f $custom64 ]] || custom64="$custom"
-        if [[ -f $custom32 ]]; then
-            IFS=$'\n' read -d '' -r localopts32 < <(do_readoptionsfile "$custom32")
-        fi
-        if [[ -f $custom64 ]]; then
-            IFS=$'\n' read -d '' -r localopts64 < <(do_readoptionsfile "$custom64")
-        fi
-    else
-        IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
-        localopts32="$(do_readbatoptions "ffmpeg_options_(builtin|basic|zeranoe)" | sort)"
-        localopts64="$localopts32"
-    fi
-    echo "Missing options from zeranoe 32-bits in $comparison options:"
-    comm -23 <(echo "$zeranoe32") <(echo "$localopts32")
-    printf '\n'
-    echo "Missing options from zeranoe 64-bits in $comparison options:"
-    comm -23 <(echo "$zeranoe64") <(echo "$localopts64")
-    printf '\n'
-}
-
 fix_cmake_crap_exports() {
     local _dir="$1"
     # noop if passed directory is not valid
