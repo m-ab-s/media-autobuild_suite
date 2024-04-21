@@ -2054,9 +2054,9 @@ clean_suite() {
     unix2dos -n newchangelog CHANGELOG.txt 2> /dev/null && rm -f newchangelog
 }
 
-create_diagnostic() {
-    local cmd cmds=("uname -a" "pacman -Qe" "pacman -Qd")
-    local _env envs=(MINGW_{PACKAGE_PREFIX,CHOST,PREFIX} MSYSTEM CPATH
+create_diagnostic() (
+    cmds=("uname -a" "pacman -Qe" "pacman -Qd")
+    envs=(MINGW_{PACKAGE_PREFIX,CHOST,PREFIX} MSYSTEM CPATH
         LIBRARY_PATH {LD,C,CPP,CXX}FLAGS PATH)
     do_print_progress "  Creating diagnostics file"
     git -C /trunk rev-parse --is-inside-work-tree > /dev/null 2>&1 &&
@@ -2064,14 +2064,14 @@ create_diagnostic() {
     {
         echo "Env variables:"
         for _env in "${envs[@]}"; do
-            printf '\t%s=%s\n' "$_env" "${!_env}"
+            declare -p "$_env" 2> /dev/null
         done
-        echo
         for cmd in "${cmds[@]}"; do
-            printf '\t%s\n%s\n\n' "$cmd": "$($cmd)"
+            echo
+            (set -x; $cmd)
         done
-    } > "$LOCALBUILDDIR/diagnostics.txt"
-}
+    } > "$LOCALBUILDDIR/diagnostics.txt" 2>&1
+)
 
 create_winpty_exe() {
     local exename="$1"
