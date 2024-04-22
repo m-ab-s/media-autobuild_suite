@@ -565,7 +565,7 @@ if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
         mkdir -p opencl && cd_safe opencl
         create_build_dir
         gendef "$opencldll" >/dev/null 2>&1
-        [[ -f OpenCL.def ]] && dlltool -y libOpenCL.a -d OpenCL.def -k -A
+        [[ -f OpenCL.def ]] && do_dlltool libOpenCL.a OpenCL.def
         [[ -f libOpenCL.a ]] && do_install libOpenCL.a
         do_checkIfExist
     fi
@@ -1813,7 +1813,7 @@ _vapoursynth_install() {
         do_print_status "python $_python_ver" "$green" "Up-to-date"
     elif do_wget "https://www.python.org/ftp/python/$_python_ver/python-$_python_ver-embed-amd64.zip"; then
         gendef "$_python_lib.dll" >/dev/null 2>&1
-        dlltool -y "lib$_python_lib.a" -d "$_python_lib.def"
+        do_dlltool "lib$_python_lib.a" "$_python_lib.def"
         [[ -f lib$_python_lib.a ]] && do_install "lib$_python_lib.a"
         do_checkIfExist
     fi
@@ -1838,9 +1838,7 @@ _vapoursynth_install() {
         for _file in vapoursynth vsscript; do
             gendef - "../$_file.dll" 2>/dev/null |
                 sed -E 's|^_||;s|@[1-9]+$||' > "${_file}.def"
-            # shellcheck disable=SC2046
-            dlltool -y "lib${_file}.a" -d "${_file}.def" \
-                $([[ $bits = 32bit ]] && echo "-U") 2>/dev/null
+            do_dlltool "lib${_file}.a" "${_file}.def"
             [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
             # shellcheck disable=SC2016
             printf '%s\n' \

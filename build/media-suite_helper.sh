@@ -1858,6 +1858,17 @@ create_debug_link() {
     done
 }
 
+# do_dlltool lib.a a.def
+do_dlltool() (
+    if dlltool --help | grep -q llvm; then
+        # llvm's dlltool does not support delay import libraries.
+        # Until I can find a better way than just injecting `-Wl,--delayload=a.dll` into the LDFLAGS,
+        # ignore them for now.
+        exec llvm-dlltool -k -l "$1" -d "$2"
+    fi
+    exec dlltool -k -y "$1" -d "$2" -A
+)
+
 get_vs_prefix() {
     unset vsprefix
     local winvsprefix
