@@ -1099,7 +1099,7 @@ if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_pacman_install -m vim # for built_in_models
     cd_safe libvmaf
     CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" do_mesoninstall video \
-        -Denable_float=true -Dbuilt_in_models=true
+        -Denable_float=true -Dbuilt_in_models=true -Denable_tests=false
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
