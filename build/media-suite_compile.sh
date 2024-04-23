@@ -1519,8 +1519,10 @@ _check=(libgpac_static.a bin-video/{MP4Box,gpac}.exe)
 if [[ $mp4box = y ]] && do_vcs "$SOURCE_REPO_GPAC"; then
     do_uninstall include/gpac "${_check[@]}"
     git grep -PIl "\xC2\xA0" | xargs -r sed -i 's/\xC2\xA0/ /g'
-    LDFLAGS+=" -L$LOCALDESTDIR/lib -L$MINGW_PREFIX/lib" \
-        do_separate_conf --static-bin --static-build --static-modules --enable-all
+    # Disable passing rpath to the linker, as it's a no-op with ld, but an error with lld
+    find . -name "Makefile" -exec grep -q rpath {} \; -exec sed -i '/^LINKFLAGS.*-rpath/s/^/#/' {} +
+    LIBRARY_PATH="$(cygpath -pm "$LOCALDESTDIR/lib:$MINGW_PREFIX/lib")" \
+        do_separate_conf --static-bin --static-build --static-modules
     do_make
     log "install" make install-lib
     do_install bin/gcc/MP4Box.exe bin/gcc/gpac.exe bin-video/
