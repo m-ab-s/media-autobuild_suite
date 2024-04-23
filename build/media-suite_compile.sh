@@ -590,8 +590,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i -e 's|Libs.private.*|& -lstdc++|' \
-               -e 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
+        sed -i 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
         grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
         case $CC in
         *gcc) sed -i -e 's|Libs.private.*|& -fopenmp -lgomp|' tesseract.pc.in ;;
@@ -662,8 +661,6 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
     do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
 fi
-
-grep_or_sed stdc++ "$(file_installed libilbc.pc)" "/Libs:/ a\Libs.private: -lstdc++"
 
 _check=(libogg.{l,}a ogg/ogg.h ogg.pc)
 if { [[ $flac = y ]] || enabled libvorbis; } &&
@@ -956,7 +953,7 @@ if [[ $ffmpeg != no ]] && enabled libopenmpt &&
         "TEST=0" "OS=" "CC=$CC" "CXX=$CXX" "MINGW_COMPILER=${CC##* }")
     log clean make clean "${extracommands[@]}"
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
-    sed -i 's/Libs.private.*/& -lrpcrt4 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
+    sed -i 's/Libs.private.*/& -lrpcrt4/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
     do_checkIfExist
 fi
 
@@ -1006,7 +1003,7 @@ if { { [[ $ffmpeg != no ]] &&
     do_uninstall "${_check[@]}"
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch" am
     do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
-    sed -i 's/Libs.private.*/& -luuid -lole32 -lstdc++/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
+    sed -i 's/Libs.private.*/& -luuid -lole32/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
     do_checkIfExist
     unset _mingw_patches
 fi
@@ -1082,7 +1079,6 @@ if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
-grep_or_sed stdc++ "$(file_installed libvmaf.pc)" 's;Libs.private.*;& -lstdc++;'
 
 _check=(libaom.a aom.pc)
 if [[ $aom = y || $standalone = y ]]; then
@@ -1598,7 +1594,7 @@ if [[ $x264 != no ]] ||
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs "$SOURCE_REPO_FFMS2"; then
                 do_uninstall "${_check[@]}"
-                sed -i 's/Libs.private.*/& -lstdc++/;s/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
+                sed -i 's/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
                 do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffms2/0001-ffmsindex-fix-linking-issues.patch" am
                 mkdir -p src/config
                 do_autoreconf
@@ -1834,7 +1830,7 @@ _vapoursynth_install() {
 
             [vsscript-name]=vapoursynth-script
             [vsscript-description]='Library for interfacing VapourSynth with Python'
-            [vsscript-private]="-l$_python_lib -lstdc++"
+            [vsscript-private]="-l$_python_lib"
         )
         for _file in vapoursynth vsscript; do
             gendef - "../$_file.dll" 2>/dev/null |
@@ -1875,7 +1871,6 @@ if [[ $ffmpeg != no ]] && enabled liblensfun &&
     do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0001-CMake-exclude-mingw-w64-from-some-msvc-exclusive-thi.patch" am
     do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0002-CMake-don-t-add-glib2-s-includes-as-SYSTEM-dirs.patch" am
     do_patch "https://github.com/lensfun/lensfun/pull/1999.patch" am
-    grep_or_sed Libs.private libs/lensfun/lensfun.pc.cmake '/Libs:/ a\Libs.private: -lstdc++'
     do_uninstall "bin-video/lensfun" "${_check[@]}"
     CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
         do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
@@ -2054,7 +2049,7 @@ fi
 enabled openssl && hide_libressl
 if [[ $ffmpeg != no ]]; then
     enabled libgsm && do_pacman_install gsm
-    enabled libsnappy && do_addOption --extra-libs=-lstdc++ && do_pacman_install snappy
+    enabled libsnappy && do_pacman_install snappy
     if enabled libxvid && [[ $standalone = n ]]; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a
@@ -2107,7 +2102,7 @@ if [[ $ffmpeg != no ]]; then
         fi
         unset _sha256 _openh264_ver
     fi
-    enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL --extra-libs=-lstdc++ &&
+    enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL &&
         { do_pacman_remove fftw; do_pacman_install chromaprint; }
     if enabled libzmq; then
         do_pacman_install zeromq
