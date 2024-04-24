@@ -1705,85 +1705,104 @@ do_unhide_all_sharedlibs() {
     fi
 }
 
-do_pacman_install() {
-    local pkg msyspackage=false pkgs
+do_pacman_resolve_pkgs() (
+    : "${prefix=$MINGW_PACKAGE_PREFIX-}"
+    pacsift --exact --sync --any "${@/#/--provides=$prefix}" "${@/#/--name=$prefix}" 2>&1 | sed "s|^.*/$prefix||"
+)
+
+is_pkg_installed() (
+    : "${prefix=$MINGW_PACKAGE_PREFIX-}"
+    # checks if a package is installed/provided by a package that is installed
+    # example is omp, which is purely a provided packge, so that fails with pacman -Qe
+    pacsift --exact --local --any --exists --provides="$prefix$1" --name="$prefix$1" > /dev/null 2>&1
+)
+
+do_pacman_install() (
+    ret=true
+    prefix=$MINGW_PACKAGE_PREFIX-
+    file=/etc/pac-mingw-extra.pk
+    pkgs=()
     while true; do
         case "$1" in
-        -m) msyspackage=true && shift ;;
+        -m)
+            prefix=
+            file=/etc/pac-msys-extra.pk
+            shift
+            ;;
         *) break ;;
         esac
     done
     for pkg; do
-        if ! $msyspackage && [[ $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]]; then
-            pkgs="${pkgs:+$pkgs }${MINGW_PACKAGE_PREFIX}-${pkg}"
-        else
-            pkgs="${pkgs:+$pkgs }${pkg}"
-        fi
-    done
-
-    for pkg in $pkgs; do
-        # checks if a package is installed/provided by a package that is installed
-        # example is omp, which is purely a provided packge, so that fails with pacman -Qe
-        pacsift --local --provides="$pkg" | head -c1 | grep -qE . > /dev/null 2>&1 && continue
-        do_simple_print -n "Installing ${pkg#$MINGW_PACKAGE_PREFIX-}... "
-        if pacman -S --overwrite "/usr/*" --overwrite "/mingw64/*" --overwrite "/mingw32/*" --noconfirm --ask=20 --needed "$pkg" > /dev/null 2>&1; then
-            pacsift --local --provides="$pkg" | sed 's;local/;;' | pacman -D --asexplicit - > /dev/null 2>&1
-            if $msyspackage; then
-                /usr/bin/grep -q "^${pkg}$" /etc/pac-msys-extra.pk > /dev/null 2>&1 ||
-                    echo "${pkg}" >> /etc/pac-msys-extra.pk
-            else
-                /usr/bin/grep -q "^${pkg#$MINGW_PACKAGE_PREFIX-}$" /etc/pac-mingw-extra.pk > /dev/null 2>&1 ||
-                    echo "${pkg#$MINGW_PACKAGE_PREFIX-}" >> /etc/pac-mingw-extra.pk
+        for line in $(do_pacman_resolve_pkgs "$pkg"); do
+            if ! is_pkg_installed "$line"; then
+                pkgs+=("$line")
             fi
+        done
+    done
+
+    for pkg in "${pkgs[@]}"; do
+        do_simple_print -n "Installing $pkg... "
+        if pacman -S \
+            --noconfirm --ask=20 --needed \
+            --overwrite "/usr/*" \
+            --overwrite "/ucrt64/*" \
+            --overwrite "/mingw64/*" \
+            --overwrite "/mingw32/*" \
+            --overwrite "/clang64/*" \
+            --overwrite "/clang32/*" \
+            "$prefix$pkg" > /dev/null 2>&1; then
+            pacman -D --asexplicit "$prefix$pkg" > /dev/null 2>&1
+            echo "$pkg" >> $file
             echo "done"
         else
+            ret=false
             echo "failed"
         fi
     done
-    sort -uo /etc/pac-mingw-extra.pk{,} > /dev/null 2>&1
-    sort -uo /etc/pac-msys-extra.pk{,} > /dev/null 2>&1
+    sort -uo $file{,} > /dev/null 2>&1
     do_hide_all_sharedlibs
-}
+    $ret
+)
 
-do_pacman_remove() {
-    local pkg msyspackage=false pkgs
+do_pacman_remove() (
+    ret=true
+    prefix=$MINGW_PACKAGE_PREFIX-
+    file=/etc/pac-mingw-extra.pk
+    pkgs=()
     while true; do
         case "$1" in
-        -m) msyspackage=true && shift ;;
+        -m)
+            prefix=
+            file=/etc/pac-msys-extra.pk
+            shift
+            ;;
         *) break ;;
         esac
     done
     for pkg; do
-        if ! $msyspackage && [[ $pkg != "${MINGW_PACKAGE_PREFIX}-"* ]]; then
-            pkgs="${pkgs:+$pkgs }${MINGW_PACKAGE_PREFIX}-${pkg}"
-        else
-            pkgs="${pkgs:+$pkgs }${pkg}"
-        fi
+        for line in $(do_pacman_resolve_pkgs "$pkg"); do
+            if is_pkg_installed "$line"; then
+                pkgs+=("$line")
+            fi
+        done
     done
 
-    for pkg in $pkgs; do
-        if $msyspackage; then
-            [[ -f /etc/pac-msys-extra.pk ]] &&
-                sed -i "/^${pkg}$/d" /etc/pac-msys-extra.pk > /dev/null 2>&1
-        else
-            [[ -f /etc/pac-mingw-extra.pk ]] &&
-                sed -i "/^${pkg#$MINGW_PACKAGE_PREFIX-}$/d" /etc/pac-mingw-extra.pk > /dev/null 2>&1
-        fi
-        pacman -Qqe "$pkg" > /dev/null 2>&1 || continue
-        do_simple_print -n "Uninstalling ${pkg#$MINGW_PACKAGE_PREFIX-}... "
-        do_hide_pacman_sharedlibs "$pkg" revert
-        if pacman -Rs --noconfirm --ask=20 "$pkg" > /dev/null 2>&1; then
+    for pkg in "${pkgs[@]}"; do
+        sed -i "/^${pkg}$/d" "$file" > /dev/null 2>&1
+        do_simple_print -n "Uninstalling $pkg... "
+        do_hide_pacman_sharedlibs "$prefix$pkg" revert
+        if pacman -Rs --noconfirm --ask=20 "$prefix$pkg" > /dev/null 2>&1; then
             echo "done"
         else
-            pacman -D --asdeps "$pkg" > /dev/null 2>&1
+            ret=false
+            pacman -D --asdeps "$prefix$pkg" > /dev/null 2>&1
             echo "failed"
         fi
     done
-    sort -uo /etc/pac-mingw-extra.pk{,} > /dev/null 2>&1
-    sort -uo /etc/pac-msys-extra.pk{,} > /dev/null 2>&1
+    sort -uo "$file"{,} > /dev/null 2>&1
     do_hide_all_sharedlibs
-    return 0
-}
+    $ret
+)
 
 do_prompt() {
     # from http://superuser.com/a/608509
