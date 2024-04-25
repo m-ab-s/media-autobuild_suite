@@ -1194,6 +1194,7 @@ _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
 if { [[ $other265 = y ]] || { [[ $ffmpeg != no ]] && enabled libkvazaar; }; } &&
     do_vcs "$SOURCE_REPO_LIBKVAZAAR"; then
     do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/kvazaar/0001-Mingw-w64-Re-enable-avx2.patch" am
+    do_patch "https://github.com/ultravideo/kvazaar/pull/407.patch" am
     do_uninstall kvazaar_version.h "${_check[@]}"
     do_autogen
     [[ $standalone = y || $other265 = y ]] ||
