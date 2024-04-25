@@ -2567,30 +2567,18 @@ fi
 if [[ $bmx = y ]]; then
     do_pacman_install uriparser
 
-    _check=(bin-video/MXFDump.exe libMXF-1.0.{{,l}a,pc})
-    if do_vcs "$SOURCE_REPO_LIBMXF" libMXF-1.0; then
-        do_autogen
-        do_uninstall include/libMXF-1.0 "${_check[@]}"
-        do_separate_confmakeinstall video --disable-examples
-        do_checkIfExist
-    fi
-
-    _check=(libMXF++-1.0.{{,l}a,pc})
-    _deps=(libMXF-1.0.a)
-    if do_vcs "$SOURCE_REPO_LIBMXFPP" libMXF++-1.0; then
-        do_autogen
-        do_uninstall include/libMXF++-1.0 "${_check[@]}"
-        do_separate_confmakeinstall video --disable-examples
-        do_checkIfExist
-    fi
-
+    # libMXF and libMXF++ were moved into bmx.
     _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
-    _deps=("$MINGW_PREFIX"/lib/liburiparser.a lib{MXF{,++}-1.0,curl}.a)
+    _deps=("$MINGW_PREFIX"/lib/liburiparser.a)
     if do_vcs "$SOURCE_REPO_LIBBMX"; then
-        do_autogen
+        (
+            pushd deps/libMXF >/dev/null
+            do_patch "https://github.com/bbc/libMXF/commit/0a9d2129f2a883d600369b031e1ee29dc808a193.patch" am
+            popd >/dev/null
+        ) || do_exit_prompt "Did you delete the libMXF folder?"
         do_uninstall libbmx-0.1.{{,l}a,pc} bin-video/bmxparse.exe \
             include/bmx-0.1 "${_check[@]}"
-        do_separate_confmakeinstall video
+        do_cmakeinstall video -DUNIX=OFF -DBMX_BUILD_TESTING=OFF -DBMX_BUILD_WITH_LIBCURL=OFF -DLIBMXF_BUILD_TOOLS=OFF -DLIBMXF_BUILD_MXFDUMP=OFF
         do_checkIfExist
     fi
 fi

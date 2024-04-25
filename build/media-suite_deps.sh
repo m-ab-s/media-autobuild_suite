@@ -39,7 +39,7 @@ SOURCE_REPO_LIBASS=https://github.com/libass/libass.git
 SOURCE_REPO_LIBAVIF=https://github.com/AOMediaCodec/libavif.git
 SOURCE_REPO_LIBBDPLUS=https://code.videolan.org/videolan/libbdplus.git
 SOURCE_REPO_LIBBLURAY=https://code.videolan.org/videolan/libbluray.git
-SOURCE_REPO_LIBBMX=https://gitlab.com/m-ab-s/bmx.git
+SOURCE_REPO_LIBBMX=https://github.com/bbc/bmx.git
 SOURCE_REPO_LIBDVDNAV=https://code.videolan.org/videolan/libdvdnav.git
 SOURCE_REPO_LIBDVDREAD=https://code.videolan.org/videolan/libdvdread.git
 SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
@@ -50,8 +50,6 @@ SOURCE_REPO_LIBLSMASH=https://github.com/l-smash/l-smash.git
 SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git
 SOURCE_REPO_LIBMFX=https://github.com/lu-zero/mfx_dispatch.git
 SOURCE_REPO_LIBMUSICBRAINZ=https://github.com/metabrainz/libmusicbrainz.git
-SOURCE_REPO_LIBMXF=https://gitlab.com/m-ab-s/libmxf.git
-SOURCE_REPO_LIBMXFPP=https://gitlab.com/m-ab-s/libmxfpp.git
 SOURCE_REPO_LIBMYSOFA=https://github.com/hoene/libmysofa.git
 SOURCE_REPO_LIBOGG=https://github.com/xiph/ogg.git
 SOURCE_REPO_LIBOPENMPT=https://github.com/OpenMPT/openmpt.git#branch=OpenMPT-1.30
