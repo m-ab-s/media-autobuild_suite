@@ -2517,6 +2517,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         fi
         if [[ $CC == *clang* ]]; then
             mpv_cflags+=("-Wno-incompatible-function-pointer-types")
+            mpv_ldflags+=("-lc++")
         fi
 
         extra_script pre configure
