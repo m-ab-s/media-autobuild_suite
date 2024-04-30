@@ -97,6 +97,9 @@ pacman -Sy --ask=20 --noconfirm
 { pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex; } > /dev/null
 do_unhide_all_sharedlibs
 
+# make sure that pacutils is always installed for pacsift
+pacman -Qq pacutils || pacman -S --needed --noconfirm pacutils > /dev/null 2>&1
+
 extract_pkg_prefix() (
     case $1 in
     *32) [[ $build32 != "yes" ]] && return 1 ;;
