@@ -1274,6 +1274,7 @@ _check=(libbluray.{{l,}a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBBLURAY"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libbluray/0001-dec-prefix-with-libbluray-for-now.patch" am
     do_autoreconf
     do_uninstall include/libbluray share/java "${_check[@]}"
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
