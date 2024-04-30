@@ -1805,9 +1805,9 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    _python_ver=3.11.7
-    _python_lib=python311
-    _vsver=65
+    _python_ver=3.12.2
+    _python_lib=python312
+    _vsver=66
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
