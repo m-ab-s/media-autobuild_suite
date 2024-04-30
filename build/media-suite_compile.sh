@@ -1825,6 +1825,9 @@ _vapoursynth_install() {
         do_uninstall {vapoursynth,vsscript}.lib include/vapoursynth "${_check[@]}"
         do_install sdk/include/*.h include/vapoursynth/
 
+        # Extract the .dll from the pip wheel
+        7z e wheel/VapourSynth-66-cp312-cp312-win_amd64.whl VapourSynth-66.data/data/Lib/site-packages/vapoursynth.dll
+
         create_build_dir
         declare -A _pc_vars=(
             [vapoursynth-name]=vapoursynth
