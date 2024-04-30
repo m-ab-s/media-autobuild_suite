@@ -98,7 +98,7 @@ pacman -Sy --ask=20 --noconfirm
 do_unhide_all_sharedlibs
 
 # make sure that pacutils is always installed for pacsift
-pacman -Qq pacutils || pacman -S --needed --noconfirm pacutils > /dev/null 2>&1
+{ pacman -Qq pacutils || pacman -S --needed --noconfirm pacutils; } > /dev/null 2>&1
 
 extract_pkg_prefix() (
     case $1 in
