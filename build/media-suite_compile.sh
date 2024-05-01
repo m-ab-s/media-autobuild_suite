@@ -1826,7 +1826,7 @@ _vapoursynth_install() {
         do_install sdk/include/*.h include/vapoursynth/
 
         # Extract the .dll from the pip wheel
-        log "7z" 7z e wheel/VapourSynth-66-cp312-cp312-win_amd64.whl VapourSynth-66.data/data/Lib/site-packages/vapoursynth.dll
+        log "7z" 7z e -y -aoa wheel/VapourSynth-66-cp312-cp312-win_amd64.whl VapourSynth-66.data/data/Lib/site-packages/vapoursynth.dll
 
         create_build_dir
         declare -A _pc_vars=(
