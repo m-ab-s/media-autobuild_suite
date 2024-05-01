@@ -87,6 +87,8 @@ fi # end suite update
 grep -q abrepo /etc/pacman.conf && sed -i '/abrepo/d' /etc/pacman.conf
 rm -f /etc/pacman.d/abrepo.conf
 
+rm -rf /opt/cargo/bin
+
 echo
 echo "-------------------------------------------------------------------------------"
 echo "Updating pacman database..."
