@@ -2606,7 +2606,10 @@ if [[ $cyanrip = y ]]; then
     if do_vcs "$SOURCE_REPO_LIBMUSICBRAINZ"; then
         do_patch "https://github.com/metabrainz/libmusicbrainz/compare/master...wiiaboo:libmusicbrainz:master.patch" am
         do_uninstall "${_check[@]}" include/musicbrainz5
-        LIBRARY_PATH="$(cygpath -pm "$LOCALDESTDIR/lib:$MINGW_PREFIX/lib")" do_cmakeinstall
+        LIBRARY_PATH="$(cygpath -pm "$LOCALDESTDIR/lib:$MINGW_PREFIX/lib")" \
+            CXXFLAGS+=" $($PKG_CONFIG --cflags libxml-2.0)" \
+            LDFLAGS+=" $($PKG_CONFIG --libs libxml-2.0)" \
+            do_cmakeinstall
         do_checkIfExist
     fi
 
