@@ -5,7 +5,6 @@ SOURCE_REPO_AMF=https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
 SOURCE_REPO_ANGLE=https://chromium.googlesource.com/angle/angle
 SOURCE_REPO_ARRIB24=https://github.com/nkoriyama/aribb24.git
 SOURCE_REPO_AVISYNTH=https://github.com/AviSynth/AviSynthPlus.git
-SOURCE_REPO_CARGOC=https://github.com/lu-zero/cargo-c.git
 SOURCE_REPO_CODEC2=https://github.com/drowe67/codec2.git
 SOURCE_REPO_CURL=https://github.com/curl/curl.git
 SOURCE_REPO_CYANRIP=https://github.com/cyanreg/cyanrip.git

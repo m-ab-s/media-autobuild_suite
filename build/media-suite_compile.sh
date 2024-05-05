@@ -1118,14 +1118,7 @@ if { [[ $dav1d = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled 
     do_checkIfExist
 fi
 
-_check=(/opt/cargo/bin/cargo-c{build,api}.exe)
-if { enabled librav1e || [[ $libavif = y ]]; } &&
-    do_vcs "$SOURCE_REPO_CARGOC"; then
-    # Delete any old cargo-cbuilds
-    [[ -x /opt/cargo/bin/cargo-cbuild.exe ]] && log uninstall.cargo-c cargo uninstall -q cargo-c
-    do_rustinstall
-    do_checkIfExist
-fi
+{ enabled librav1e || [[ $libavif = y ]]; } && do_pacman_install cargo-c
 
 _check=()
 { [[ $rav1e = y ]] ||
