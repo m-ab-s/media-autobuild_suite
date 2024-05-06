@@ -2169,8 +2169,6 @@ if [[ $ffmpeg != no ]]; then
             # remove redundant -L and -l flags from extralibs
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
-        # Removes hardcoding of libstdc++ for clang
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-strip-hardcoded-lstdc.patch" am
 
         # Fix for libjxl changes that removes including version.h from decode.h
         grep_or_sed jxl/version.h libavcodec/libjxl.h 's;#include <jxl/decode.h>;#include <jxl/version.h>\n&;'
