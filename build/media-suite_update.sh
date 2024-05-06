@@ -36,6 +36,7 @@ else
     cd "$(cygpath -w /)../build" || exit 1
 fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
+[[ -f media-suite_deps.sh ]] && source media-suite_deps.sh
 
 do_pacman_remove -m mercurial
 
@@ -51,7 +52,7 @@ if [[ $update == "yes" ]]; then
     echo
 
     if [[ ! -d ../.git ]] && command -v git > /dev/null; then
-        if ! git clone "https://github.com/m-ab-s/media-autobuild_suite.git" ab-git; then
+        if ! git clone "${SOURCE_REPO_MABS:-https://github.com/m-ab-s/media-autobuild_suite.git}" ab-git; then
             git -C ab-git fetch
         fi
         cp -fr ab-git/.git ..
