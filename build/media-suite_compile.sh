@@ -2551,11 +2551,17 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 fi
 
 if [[ $bmx = y ]]; then
-    do_pacman_install uriparser
+    _check=(bin-global/uriparse.exe liburiparser.a liburiparser.pc uriparser/Uri.h)
+    do_pacman_remove uriparser
+    if do_vcs "$SOURCE_REPO_URIPARSER"; then
+        do_uninstall include/uriparser "${_check[@]}"
+        do_cmakeinstall global -DURIPARSER_BUILD_{DOCS,TESTS}=OFF
+        do_checkIfExist
+    fi
 
     # libMXF and libMXF++ were moved into bmx.
     _check=(bin-video/{bmxtranswrap,{h264,mov,vc2}dump,mxf2raw,raw2bmx}.exe)
-    _deps=("$MINGW_PREFIX"/lib/liburiparser.a)
+    _deps=(liburiparser.a)
     if do_vcs "$SOURCE_REPO_LIBBMX"; then
         (
             pushd deps/libMXF >/dev/null

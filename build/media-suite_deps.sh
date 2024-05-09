@@ -94,6 +94,7 @@ SOURCE_REPO_SVTHEVC=https://github.com/OpenVisualCloud/SVT-HEVC.git
 SOURCE_REPO_SVTVP9=https://github.com/OpenVisualCloud/SVT-VP9.git
 SOURCE_REPO_TESSERACT=https://github.com/tesseract-ocr/tesseract.git
 SOURCE_REPO_UAVS3D=https://github.com/uavs3/uavs3d.git
+SOURCE_REPO_URIPARSER=https://github.com/uriparser/uriparser.git
 SOURCE_REPO_UVG266=https://github.com/ultravideo/uvg266.git
 SOURCE_REPO_VIDSTAB=https://github.com/georgmartius/vid.stab.git
 SOURCE_REPO_VORBIS_TOOLS=https://github.com/xiph/vorbis-tools.git
