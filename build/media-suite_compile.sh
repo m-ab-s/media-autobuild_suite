@@ -129,7 +129,7 @@ unset _keys _root
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
+    libSDL{,main}.{l,}a libopen{jpwl,mj2}.{a,pc}
     include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
     {nettle,vo-aacenc,sdl,uchardet}.pc
@@ -531,6 +531,16 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
             do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
         do_checkIfExist
     fi
+fi
+
+_check=(libopenjp2.{a,pc} openjpeg-2.5/openjpeg.h)
+if { { [[ $ffmpeg != no ]] && enabled libopenjpeg; } ||
+    [[ $vlc = y ]] } &&
+    do_vcs "$SOURCE_REPO_OPENJPEG2"; then
+    do_pacman_remove openjpeg2
+    do_uninstall {include,lib/cmake}/openjpeg-2.5 "${_check[@]}"
+    do_cmakeinstall global -DBUILD_{CODEC,JPIP,JAVA,TESTING}=OFF
+    do_checkIfExist
 fi
 
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
@@ -2219,7 +2229,6 @@ if [[ $ffmpeg != no ]]; then
     fi
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
-    enabled libopenjpeg && do_pacman_install openjpeg2
     if enabled libopenh264; then
         # We use msys2's package for the header and import library so we don't build it, for licensing reasons
         do_pacman_install openh264
