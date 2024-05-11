@@ -1486,6 +1486,7 @@ fi
 
 _check=(libgpac_static.a bin-video/{MP4Box,gpac}.exe)
 if [[ $mp4box = y ]] && do_vcs "$SOURCE_REPO_GPAC"; then
+    do_patch "https://github.com/gpac/gpac/pull/2836.patch" am
     do_uninstall include/gpac "${_check[@]}"
     git grep -PIl "\xC2\xA0" | xargs -r sed -i 's/\xC2\xA0/ /g'
     # Disable passing rpath to the linker, as it's a no-op with ld, but an error with lld
