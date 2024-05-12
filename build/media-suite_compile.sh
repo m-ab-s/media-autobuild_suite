@@ -2507,7 +2507,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         fi
 
         extra_script pre configure
-        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion" LDFLAGS+=" ${mpv_ldflags[*]}" \
+        # -Wno-incompatible-pointer-types there until we can move to a newer version of mpv and fix it properly.
+        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion -Wno-incompatible-pointer-types" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
