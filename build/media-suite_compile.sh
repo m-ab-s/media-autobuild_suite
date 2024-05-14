@@ -475,6 +475,8 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     _check=(libtiff{.a,-4.pc})
     [[ $standalone = y ]] && _check+=(bin-global/tiff{cp,dump,info,set,split}.exe)
     if do_vcs "$SOURCE_REPO_LIBTIFF"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0001-tiffgt-Link-winmm-if-windows.patch" am
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0002-tiffgt-link-gl-after-glut.patch" am
         do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
         do_uninstall lib/cmake/tiff "${_check[@]}"
         extracommands=("-Dtiff-tests=OFF" "-Dtiff-docs=OFF")
