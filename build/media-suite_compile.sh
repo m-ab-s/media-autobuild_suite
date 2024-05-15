@@ -1131,6 +1131,19 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     do_vcs "$SOURCE_REPO_LIBRAV1E"; then
     do_uninstall "${_check[@]}" include/rav1e
 
+    # We want to hide libgit2 unless we have a static library
+    _libgit2_pc="$MINGW_PACKAGE_PREFIX/lib/pkgconfig/libgit2.pc"
+    if ! [[ -f $MINGW_PACKAGE_PREFIX/lib/libgit2.a ]]; then
+        if  [[ -f $_libgit2_pc ]]; then
+            mv -f "$_libgit2_pc"{,.dyn}
+        fi
+    else
+        if ! [[ -f $_libgit2_pc ]]; then
+            cp -f "$_libgit2_pc"{.dyn,}
+        fi
+    fi
+    unset _libgit2_pc
+
     # standalone binary
     if [[ $rav1e = y || $standalone = y ]]; then
         do_rust --profile release-no-lto
