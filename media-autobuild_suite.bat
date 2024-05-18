@@ -1791,6 +1791,13 @@ if %updateSuite%==y (
     )>%instdir%\update_suite.sh
 )
 
+rem ------------------------------------------------------------------
+rem write config profiles:
+rem ------------------------------------------------------------------
+
+if %build32%==yes call :writeProfile 32
+if %build64%==yes call :writeProfile 64
+
 rem update
 call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64%
 
@@ -1801,13 +1808,6 @@ if exist "%build%\update_core" (
     pacman -S --needed --noconfirm --ask=20 --asdeps bash pacman msys2-runtime
     del "%build%\update_core"
 )
-
-rem ------------------------------------------------------------------
-rem write config profiles:
-rem ------------------------------------------------------------------
-
-if %build32%==yes call :writeProfile 32
-if %build64%==yes call :writeProfile 64
 
 mkdir "%instdir%\msys64\home\%USERNAME%\.gnupg" > nul 2>&1
 findstr hkps://keys.openpgp.org "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.conf" >nul 2>&1 || echo keyserver hkps://keys.openpgp.org >> "%instdir%\msys64\home\%USERNAME%\.gnupg\gpg.conf"
