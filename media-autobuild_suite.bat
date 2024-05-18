@@ -1799,7 +1799,7 @@ if %build32%==yes call :writeProfile 32
 if %build64%==yes call :writeProfile 64
 
 rem update
-call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64%
+call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64% --CC="%CC%"
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------

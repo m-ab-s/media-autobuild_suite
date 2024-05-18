@@ -15,6 +15,10 @@ while true; do
         update="${1#*=}"
         shift
         ;;
+    --CC=*)
+        CC="${1#*=}"
+        shift
+        ;;
     --)
         shift
         break
@@ -113,15 +117,17 @@ extract_pkg_prefix() (
 )
 
 if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
+    new=$(mktemp)
+    old=$(mktemp)
     echo
     echo "-------------------------------------------------------------------------------"
     echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
-    mapfile -t new < <(sort -u /etc/pac-base.pk | tr -d '\r')
-    mapfile -t newmingw < <(find /etc/pac-mingw.pk /etc/pac-mingw-extra.pk -exec sort -u {} + 2> /dev/null | tr -d '\r')
-    mapfile -t newmsys < <(sort -u /etc/pac-msys-extra.pk 2> /dev/null | tr -d '\r')
-    prefix_32= prefix_64=
+    dos2unix -O /etc/pac-base.pk 2> /dev/null | sort -u >> "$new"
+    mapfile -t newmingw < <(dos2unix -O /etc/pac-mingw.pk /etc/pac-mingw-extra.pk 2>/dev/null | sort -u)
+    mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
+    prefix_32='' prefix_64=''
     case $CC in
     *clang*) prefix_32=$(extract_pkg_prefix clang32) prefix_64=$(extract_pkg_prefix clang64) ;;
     *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix mingw64) ;;
@@ -129,20 +135,21 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     for pkg in "${newmingw[@]}"; do
         if [[ $build32 == "yes" ]] &&
             pacman -Ss "$prefix_32$pkg" > /dev/null 2>&1; then
-            new+=("$prefix_32$pkg")
+            printf %s\\n "$prefix_32$pkg" >> "$new"
         fi
         if [[ $build64 == "yes" ]] &&
             pacman -Ss "$prefix_64$pkg" > /dev/null 2>&1; then
-            new+=("$prefix_64$pkg")
+            printf %s\\n "$prefix_64$pkg" >> "$new"
         fi
     done
     for pkg in "${newmsys[@]}"; do
-        pacman -Ss "^${pkg}$" > /dev/null 2>&1 && new+=("$pkg")
+        pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf %s\\n "$pkg" >> "$new"
     done
-    mapfile -t old < <(pacman -Qqe | sort -u)
-    mapfile -t new < <(printf %s\\n "${new[@]}" | sort -u)
-    mapfile -t install < <(diff --changed-group-format='%>' --unchanged-group-format='' <(printf %s\\n "${old[@]}") <(printf %s\\n "${new[@]}"))
-    mapfile -t uninstall < <(diff --changed-group-format='%<' --unchanged-group-format='' <(printf %s\\n "${old[@]}") <(printf %s\\n "${new[@]}"))
+    pacman -Qqe | sort -u >> "$old"
+    sort -uo "$new"{,}
+    # mapfile -t new < <(printf %s\\n "${new[@]}" | sort -u)
+    mapfile -t install < <(diff --changed-group-format='%>' --unchanged-group-format='' "$old" "$new")
+    mapfile -t uninstall < <(diff --changed-group-format='%<' --unchanged-group-format='' "$old" "$new")
 
     if [[ ${#uninstall[@]} -gt 0 ]]; then
         echo
@@ -178,7 +185,7 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         pacman -S --noconfirm --needed "${install[@]}"
         pacman -D --asexplicit "${install[@]}"
     fi
-    rm -f /etc/pac-{base,mingw}.pk
+    rm -f /etc/pac-{base,mingw}.pk "$new" "$old"
 fi
 
 if [[ -d "/trunk" ]]; then
