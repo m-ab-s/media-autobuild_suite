@@ -1950,7 +1950,9 @@ goto :EOF
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS
     echo.
     echo.export CARGO_HOME="/opt/cargo"
-    echo.export CCACHE_DIR="${LOCALBUILDDIR}/cache"
+    echo.if [[ -z "$CCACHE_DIR" ]]; then
+    echo.    export CCACHE_DIR="${LOCALBUILDDIR}/cache"
+    echo.fi
     echo.
     echo.export PYTHONPATH=
     echo.
