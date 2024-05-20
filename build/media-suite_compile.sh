@@ -1813,9 +1813,9 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    _python_ver=3.12.2
+    _python_ver=3.12.3
     _python_lib=python312
-    _vsver=66
+    _vsver=68
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
@@ -1831,10 +1831,11 @@ _vapoursynth_install() {
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
     elif do_wget "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth${bits%bit}-Portable-R$_vsver.zip"; then
         do_uninstall {vapoursynth,vsscript}.lib include/vapoursynth "${_check[@]}"
-        do_install sdk/include/*.h include/vapoursynth/
+        do_install sdk/include/vapoursynth/*.h include/vapoursynth/
 
         # Extract the .dll from the pip wheel
-        log "7z" 7z e -y -aoa wheel/VapourSynth-66-cp312-cp312-win_amd64.whl VapourSynth-66.data/data/Lib/site-packages/vapoursynth.dll
+        log "7z" 7z e -y -aoa wheel/VapourSynth-$_vsver-cp${_python_lib:6:3}-cp${_python_lib:6:3}-win_amd64.whl \
+            VapourSynth-$_vsver.data/data/Lib/site-packages/vapoursynth.dll
 
         create_build_dir
         declare -A _pc_vars=(
