@@ -1984,7 +1984,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
         CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" \
         do_cmakeinstall -DBUILD_TESTS=OFF \
     -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
-    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF -DENABLE_WERROR=OFF
+    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF
     do_checkIfExist
     unset _wine_mirror _mabs
 fi
