@@ -283,7 +283,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
     _check=(libharfbuzz.a harfbuzz.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(libharfbuzz.dll.a bin-video/libharfbuzz-{subset-,}0.dll)
     if do_vcs "$SOURCE_REPO_HARFBUZZ"; then
-        do_pacman_install ragel icu
+        do_pacman_install ragel
         do_uninstall include/harfbuzz "${_check[@]}" libharfbuzz{-subset,}.la
         extracommands=(-D{glib,gobject,cairo,icu,tests,introspection,docs,benchmark}"=disabled")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
@@ -336,14 +336,14 @@ if [[ $curl = y ]]; then
     enabled mbedtls && curl=mbedtls
     [[ $curl = y ]] && curl=schannel
 fi
-_check=(libgnutls.{,l}a gnutls.pc)
-_gnutls_ver=3.8.5
-_gnutls_hash=66269a2cfe0e1c2dabec87bdbbd8ab656f396edd9a40dd006978e003cfa52bfc
-if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]] &&
-    do_pkgConfig "gnutls = $_gnutls_ver" &&
-    do_wget -h $_gnutls_hash \
-    "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
-        do_pacman_install nettle
+
+if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
+    do_pacman_install nettle
+    _check=(libgnutls.{,l}a gnutls.pc)
+    _gnutls_ver=3.8.5
+    _gnutls_hash=66269a2cfe0e1c2dabec87bdbbd8ab656f396edd9a40dd006978e003cfa52bfc
+    if do_pkgConfig "gnutls = $_gnutls_ver" && do_wget -h $_gnutls_hash \
+        "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
         do_uninstall include/gnutls "${_check[@]}"
         grep_or_sed crypt32 lib/gnutls.pc.in 's/Libs.private.*/& -lcrypt32/'
         CFLAGS="-Wno-int-conversion" \
@@ -353,6 +353,7 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]] &&
             --with-included-unistring --disable-code-coverage \
             LDFLAGS="$LDFLAGS -L${LOCALDESTDIR}/lib -L${MINGW_PREFIX}/lib"
         do_checkIfExist
+    fi
 fi
 
 if [[ $curl = openssl ]] || { [[ $ffmpeg != no ]] && enabled openssl; }; then
@@ -408,54 +409,52 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     fi
 fi
 
-do_pacman_install brotli
-
-_check=(curl/curl.h libcurl.{{,l}a,pc})
-case $curl in
-libressl) _deps=(libssl.a) ;;
-openssl) _deps=("$MINGW_PREFIX/lib/libssl.a") ;;
-gnutls) _deps=(libgnutls.a) ;;
-mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
-*) _deps=() ;;
-esac
-[[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
-if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]] &&
-    do_vcs "$SOURCE_REPO_CURL"; then
-    do_pacman_install nghttp2
-
-    do_uninstall include/curl bin-global/curl-config "${_check[@]}"
-    [[ $standalone = y || $curl != n ]] ||
-        sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
-    extra_opts=()
+if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]]; then
+    do_pacman_install brotli nghttp2
+    _check=(curl/curl.h libcurl.{{,l}a,pc})
     case $curl in
-    libressl|openssl)
-        extra_opts+=(--with-{nghttp2,openssl} --without-{gnutls,mbedtls})
-        ;;
-    mbedtls) extra_opts+=(--with-{mbedtls,nghttp2} --without-openssl) ;;
-    gnutls) extra_opts+=(--with-gnutls --without-{nghttp2,mbedtls,openssl}) ;;
-    *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{gnutls,mbedtls,openssl});;
+    libressl) _deps=(libssl.a) ;;
+    openssl) _deps=("$MINGW_PREFIX/lib/libssl.a") ;;
+    gnutls) _deps=(libgnutls.a) ;;
+    mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
+    *) _deps=() ;;
     esac
-
-    [[ ! -f configure || configure.ac -nt configure ]] &&
-        do_autoreconf
-    [[ $curl = openssl ]] && hide_libressl
-    hide_conflicting_libs
-    CPPFLAGS+=" -DGNUTLS_INTERNAL_BUILD -DNGHTTP2_STATICLIB -DPSL_STATIC" \
-        do_separate_confmakeinstall global "${extra_opts[@]}" \
-        --without-{libssh2,random,ca-bundle,ca-path,librtmp} \
-        --with-brotli --enable-sspi --disable-debug
-    hide_conflicting_libs -R
-    [[ $curl = openssl ]] && hide_libressl -R
-    if [[ $curl != schannel ]]; then
-        _notrequired=true
-        cd_safe "build-$bits"
-        PATH=/usr/bin log ca-bundle make ca-bundle
-        unset _notrequired
-        [[ -f lib/ca-bundle.crt ]] &&
-            cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
-        cd_safe ..
+    [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
+    if do_vcs "$SOURCE_REPO_CURL"; then
+        do_uninstall include/curl bin-global/curl-config "${_check[@]}"
+        [[ $standalone = y || $curl != n ]] ||
+            sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
+        extra_opts=()
+        case $curl in
+        libressl|openssl)
+            extra_opts+=(--with-{nghttp2,openssl} --without-{gnutls,mbedtls})
+            ;;
+        mbedtls) extra_opts+=(--with-{mbedtls,nghttp2} --without-openssl) ;;
+        gnutls) extra_opts+=(--with-gnutls --without-{nghttp2,mbedtls,openssl}) ;;
+        *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{gnutls,mbedtls,openssl});;
+        esac
+       
+        [[ ! -f configure || configure.ac -nt configure ]] &&
+            do_autoreconf
+        [[ $curl = openssl ]] && hide_libressl
+        hide_conflicting_libs
+        CPPFLAGS+=" -DGNUTLS_INTERNAL_BUILD -DNGHTTP2_STATICLIB -DPSL_STATIC" \
+            do_separate_confmakeinstall global "${extra_opts[@]}" \
+            --without-{libssh2,random,ca-bundle,ca-path,librtmp} \
+            --with-brotli --enable-sspi --disable-debug
+        hide_conflicting_libs -R
+        [[ $curl = openssl ]] && hide_libressl -R
+        if [[ $curl != schannel ]]; then
+            _notrequired=true
+            cd_safe "build-$bits"
+            PATH=/usr/bin log ca-bundle make ca-bundle
+            unset _notrequired
+            [[ -f lib/ca-bundle.crt ]] &&
+                cp -f lib/ca-bundle.crt "$LOCALDESTDIR"/bin-global/curl-ca-bundle.crt
+            cd_safe ..
+        fi
+        do_checkIfExist
     fi
-    do_checkIfExist
 fi
 
 if [[ $exitearly = EE2 ]]; then
@@ -471,13 +470,14 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         do_cmakeinstall -D{UNIX,FREEGLUT_BUILD_DEMOS,FREEGLUT_BUILD_SHARED_LIBS}=OFF -DFREEGLUT_REPLACE_GLUT=ON
         do_checkIfExist
     fi
+
+    do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
     _deps=(libglut.a)
     _check=(libtiff{.a,-4.pc})
     [[ $standalone = y ]] && _check+=(bin-global/tiff{cp,dump,info,set,split}.exe)
     if do_vcs "$SOURCE_REPO_LIBTIFF"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0001-tiffgt-Link-winmm-if-windows.patch" am
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libtiff/0002-tiffgt-link-gl-after-glut.patch" am
-        do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
         do_uninstall lib/cmake/tiff "${_check[@]}"
         extracommands=("-Dtiff-tests=OFF" "-Dtiff-docs=OFF")
         if [[ $standalone = y ]]; then
@@ -497,22 +497,23 @@ file_installed -s libtiff-4.pc &&
     grep_or_sed '-ldeflate' "$(file_installed libtiff-4.pc)" \
         's/Libs.private:.*/& -ldeflate/'
 
-_check=(libwebp{,mux}.{a,pc})
-[[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{a,pc}
-    bin-global/{{c,d}webp,webpmux,img2webp}.exe)
-if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp &&
-    do_vcs "$SOURCE_REPO_LIBWEBP"; then
+if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
     do_pacman_install giflib
-    do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
-    extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
-    if [[ $standalone = y ]]; then
-        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2}WEBP,ANIM_UTILS,WEBPMUX}"=ON")
-    else
-        extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=OFF")
+    _check=(libwebp{,mux}.{a,pc})
+    [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{a,pc}
+    bin-global/{{c,d}webp,webpmux,img2webp}.exe)
+    if do_vcs "$SOURCE_REPO_LIBWEBP"; then
+        do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
+        extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
+        if [[ $standalone = y ]]; then
+            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2}WEBP,ANIM_UTILS,WEBPMUX}"=ON")
+        else
+            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=OFF")
+        fi
+        CFLAGS+=" -DFREEGLUT_STATIC" \
+            do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
+        do_checkIfExist
     fi
-    CFLAGS+=" -DFREEGLUT_STATIC" \
-        do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
-    do_checkIfExist
 fi
 
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
@@ -525,13 +526,14 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         do_checkIfExist
     fi
 
+    do_pacman_install brotli lcms2
     _deps=(libgflags.a)
     _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-add-ldflags.patch" am
         do_uninstall "${_check[@]}" include/jxl
-        do_pacman_install lcms2 asciidoc
+        do_pacman_install asciidoc
         extracommands=()
         log -q "git.submodule" git submodule update --init --recursive
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
@@ -586,9 +588,10 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_checkIfExist
     fi
 
+    do_pacman_install libarchive pango asciidoc
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "$SOURCE_REPO_TESSERACT"; then
-        do_pacman_install docbook-xsl libarchive pango asciidoc
+        do_pacman_install docbook-xsl
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
@@ -745,14 +748,17 @@ if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
     fi
 fi
 
-[[ $faac = y ]] && do_pacman_install faac
-_check=(bin-audio/faac.exe)
-if [[ $standalone = y && $faac = y ]] &&
-    do_vcs "$SOURCE_REPO_FAAC"; then
-    do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
-    log bootstrap ./bootstrap
-    do_separate_confmakeinstall audio
-    do_checkIfExist
+if [[ $faac = y ]]; then
+    _check=(bin-audio/faac.exe)
+    if [[ $standalone = y ]]; then
+        do_pacman_install faac
+    elif do_vcs "$SOURCE_REPO_FAAC"; then
+        do_pacman_remove faac
+        do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
+        log bootstrap ./bootstrap
+        do_separate_confmakeinstall audio
+        do_checkIfExist
+    fi
 fi
 
 _check=(bin-audio/exhale.exe)
@@ -802,6 +808,7 @@ fi
 if [[ $standalone = y ]] && enabled libopus; then
     do_pacman_install openssl
     hide_libressl
+    do_pacman_remove opusfile
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
     _deps=(ogg.pc opus.pc "$MINGW_PREFIX"/lib/pkgconfig/libssl.pc)
     if do_vcs "$SOURCE_REPO_OPUSFILE"; then
@@ -911,38 +918,39 @@ fi
 
 _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
-if [[ $sox = y ]] && do_vcs "$SOURCE_REPO_SOX" sox; then
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch" am
-    do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-sox/0001-ucrt-no-rewind-pipe.patch"
+if [[ $sox = y ]]; then
     do_pacman_install libmad
-    do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
-    do_autoreconf
     extracommands=()
-    extralibs=(-lshlwapi -lz)
-    enabled libmp3lame || extracommands+=(--without-lame)
-    enabled_any libopencore-amr{wb,nb} &&
-        extralibs+=(-lvo-amrwbenc) ||
-        extracommands+=(--without-amr{wb,nb})
     if enabled libopus; then
-        do_pacman_install opusfile
+        [[ $standalone = y ]] || do_pacman_install opusfile
     else
         extracommands+=(--without-opus)
     fi
-    if enabled libtwolame; then
-        extracommands+=(CFLAGS="$CFLAGS -DLIBTWOLAME_STATIC")
-    else
-        extracommands+=(--without-twolame)
+    if do_vcs "$SOURCE_REPO_SOX" sox; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch" am
+        do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-sox/0001-ucrt-no-rewind-pipe.patch"
+        do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
+        do_autoreconf
+        extralibs=(-lshlwapi -lz)
+        enabled libmp3lame || extracommands+=(--without-lame)
+        enabled_any libopencore-amr{wb,nb} &&
+            extralibs+=(-lvo-amrwbenc) ||
+            extracommands+=(--without-amr{wb,nb})
+        enabled libtwolame &&
+            extracommands+=(CFLAGS="$CFLAGS -DLIBTWOLAME_STATIC") ||
+            extracommands+=(--without-twolame)
+        enabled libvorbis || extracommands+=(--without-oggvorbis)
+        hide_conflicting_libs
+        sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
+        do_separate_conf --disable-symlinks LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
+        do_make
+        do_install src/sox.exe bin-audio/
+        do_install sox.pc
+        hide_conflicting_libs -R
+        do_checkIfExist
+        unset extralibs
     fi
-    enabled libvorbis || extracommands+=(--without-oggvorbis)
-    hide_conflicting_libs
-    sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
-    do_separate_conf --disable-symlinks LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
-    do_make
-    do_install src/sox.exe bin-audio/
-    do_install sox.pc
-    hide_conflicting_libs -R
-    do_checkIfExist
-    unset extralibs extracommands
+    unset extracommands
 fi
 unset _deps
 
@@ -1175,27 +1183,27 @@ fi
 # add allow-multiple-definition to the .pc file to fix linking with other rust libraries
 sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 
-_check=(libavif.{a,pc} avif/avif.h)
-[[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
-if [[ $libavif = y ]] && {
-        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "SvtAv1Enc"
-    } &&
-    do_vcs "$SOURCE_REPO_LIBAVIF"; then
-    # chop off any .lib suffixes that is attached to a library name
-    grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
-    do_uninstall "${_check[@]}"
+if [[ $libavif = y ]]; then
     do_pacman_install libjpeg-turbo libyuv
-    extracommands=()
-    pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
-    pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
-    pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
-    pc_exists "SvtAv1Enc" && extracommands+=("-DAVIF_CODEC_SVT=ON")
-    case $standalone in
-    y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
-    *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
-    esac
-    do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
-    do_checkIfExist
+    _check=(libavif.{a,pc} avif/avif.h)
+    [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
+    if { pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "SvtAv1Enc"; } &&
+        do_vcs "$SOURCE_REPO_LIBAVIF"; then
+        # chop off any .lib suffixes that is attached to a library name
+        grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
+        do_uninstall "${_check[@]}"
+        extracommands=()
+        pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
+        pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
+        pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
+        pc_exists "SvtAv1Enc" && extracommands+=("-DAVIF_CODEC_SVT=ON")
+        case $standalone in
+        y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
+        *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
+        esac
+        do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
+        do_checkIfExist
+    fi
 fi
 
 _check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
@@ -1431,14 +1439,15 @@ if [[ $mediainfo = y ]]; then
     [[ $curl = openssl ]] && hide_libressl -R
 fi
 
-_check=(libvidstab.a vidstab.pc)
-if [[ $ffmpeg != no ]] && enabled libvidstab &&
-    do_vcs "$SOURCE_REPO_VIDSTAB" vidstab; then
-    do_pacman_remove openmp
+if [[ $ffmpeg != no ]] && enabled libvidstab; then
     do_pacman_install omp
-    do_uninstall include/vid.stab "${_check[@]}"
-    do_cmakeinstall
-    do_checkIfExist
+    do_pacman_remove openmp
+    _check=(libvidstab.a vidstab.pc)
+    if do_vcs "$SOURCE_REPO_VIDSTAB" vidstab; then
+        do_uninstall include/vid.stab "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
 fi
 
 _check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
@@ -1787,26 +1796,30 @@ if [[ $ffmpeg != no ]] && { enabled ffnvcodec ||
     do_checkIfExist
 fi
 
-_check=(libsrt.a srt.pc srt/srt.h)
-[[ $standalone = y ]] && _check+=(bin-video/srt-live-transmit.exe)
-if enabled libsrt && do_vcs "$SOURCE_REPO_SRT"; then
+if enabled libsrt; then
     do_pacman_install openssl
-    hide_libressl
-    do_cmakeinstall video -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
-        -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on -DUSE_STATIC_LIBSTDCXX=ON
-    hide_libressl -R
-    do_checkIfExist
+    _check=(libsrt.a srt.pc srt/srt.h)
+    [[ $standalone = y ]] && _check+=(bin-video/srt-live-transmit.exe)
+    if do_vcs "$SOURCE_REPO_SRT"; then
+        hide_libressl
+        do_cmakeinstall video -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
+            -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on -DUSE_STATIC_LIBSTDCXX=ON
+        hide_libressl -R
+        do_checkIfExist
+    fi
 fi
 
-_check=(librist.{a,pc} librist/librist.h)
-[[ $standalone = y ]] && _check+=(bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
-if enabled librist && do_vcs "$SOURCE_REPO_LIBRIST"; then
+if enabled librist; then
     do_pacman_install cjson
-    do_uninstall include/librist "${_check[@]}"
-    extracommands=("-Dbuiltin_cjson=false")
-    [[ $standalone = y ]] || extracommands+=("-Dbuilt_tools=false")
-    do_mesoninstall global -Dhave_mingw_pthreads=true -Dtest=false "${extracommands[@]}"
-    do_checkIfExist
+    _check=(librist.{a,pc} librist/librist.h)
+    [[ $standalone = y ]] && _check+=(bin-global/rist{sender,receiver,2rist,srppasswd}.exe)
+    if do_vcs "$SOURCE_REPO_LIBRIST"; then
+        do_uninstall include/librist "${_check[@]}"
+        extracommands=("-Dbuiltin_cjson=false")
+        [[ $standalone = y ]] || extracommands+=("-Dbuilt_tools=false")
+        do_mesoninstall global -Dhave_mingw_pthreads=true -Dtest=false "${extracommands[@]}"
+        do_checkIfExist
+    fi
 fi
 
 _vapoursynth_install() {
@@ -1879,20 +1892,21 @@ if ! { { ! mpv_disabled vapoursynth || enabled vapoursynth; } && _vapoursynth_in
     do_removeOption --enable-vapoursynth
 fi
 
-_check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
-if [[ $ffmpeg != no ]] && enabled liblensfun &&
-    do_vcs "$SOURCE_REPO_LENSFUN"; then
+if [[ $ffmpeg != no ]] && enabled liblensfun; then
     do_pacman_install glib2
     grep_or_sed liconv "$MINGW_PREFIX/lib/pkgconfig/glib-2.0.pc" 's;-lintl;& -liconv;g'
-    do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0001-CMake-exclude-mingw-w64-from-some-msvc-exclusive-thi.patch" am
-    do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0002-CMake-don-t-add-glib2-s-includes-as-SYSTEM-dirs.patch" am
-    do_patch "https://github.com/lensfun/lensfun/pull/1999.patch" am
-    do_uninstall "bin-video/lensfun" "${_check[@]}"
-    CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
-        do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
-        -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video" \
-        -DINSTALL_PYTHON_MODULE=OFF
-    do_checkIfExist
+    _check=(liblensfun.a lensfun.pc lensfun/lensfun.h)
+    if do_vcs "$SOURCE_REPO_LENSFUN"; then
+        do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0001-CMake-exclude-mingw-w64-from-some-msvc-exclusive-thi.patch" am
+        do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0002-CMake-don-t-add-glib2-s-includes-as-SYSTEM-dirs.patch" am
+        do_patch "https://github.com/lensfun/lensfun/pull/1999.patch" am
+        do_uninstall "bin-video/lensfun" "${_check[@]}"
+        CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
+            do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
+            -DINSTALL_HELPER_SCRIPTS=off -DCMAKE_INSTALL_DATAROOTDIR="$LOCALDESTDIR/bin-video" \
+            -DINSTALL_PYTHON_MODULE=OFF
+        do_checkIfExist
+    fi
 fi
 
 _check=(bin-video/vvc/{Encoder,Decoder}App.exe)
