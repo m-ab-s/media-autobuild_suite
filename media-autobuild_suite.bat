@@ -106,7 +106,7 @@ intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man
 gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
 
 set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-clang gettext-tools lld rust
+clang gettext-tools rust
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
@@ -1752,7 +1752,7 @@ for %%i in (%instdir%\msys64\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert
 rem installmingw
 rem extra package for clang
 if %CC%==clang (
-    set "mingwpackages=%mingwpackages% gcc-compat"
+    set "mingwpackages=%mingwpackages% gcc-compat lld"
 ) else (
     set "mingwpackages=%mingwpackages% binutils gcc"
 )
