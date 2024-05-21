@@ -1178,7 +1178,7 @@ sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib
 _check=(libavif.{a,pc} avif/avif.h)
 [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
 if [[ $libavif = y ]] && {
-        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e"
+        pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "SvtAv1Enc"
     } &&
     do_vcs "$SOURCE_REPO_LIBAVIF"; then
     # chop off any .lib suffixes that is attached to a library name
@@ -1189,6 +1189,7 @@ if [[ $libavif = y ]] && {
     pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
     pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
     pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
+    pc_exists "SvtAv1Enc" && extracommands+=("-DAVIF_CODEC_SVT=ON")
     case $standalone in
     y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
     *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
