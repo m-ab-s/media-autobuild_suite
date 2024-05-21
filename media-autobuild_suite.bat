@@ -106,7 +106,7 @@ intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man
 gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
 
 set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-clang gettext-tools rust
+clang gettext-tools
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
