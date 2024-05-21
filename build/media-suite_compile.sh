@@ -175,6 +175,10 @@ if [[ $packing = y &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
+if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] || enabled librav1e; then
+    do_pacman_install rust
+fi
+
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git"; then
