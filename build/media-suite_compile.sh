@@ -1225,7 +1225,8 @@ if { { [[ $ffmpeg != no ]] &&
 fi
 
 _check=(libdvdread.{l,}a dvdread.pc)
-if { [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
+if { { [[ $ffmpeg != no ]] && enabled_any libdvdread libdvdnav; } ||
+    [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDREAD" dvdread; then
     do_autoreconf
     do_uninstall include/dvdread "${_check[@]}"
@@ -1238,7 +1239,8 @@ fi
 
 _check=(libdvdnav.{l,}a dvdnav.pc)
 _deps=(libdvdread.a)
-if { [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
+if { { [[ $ffmpeg != no ]] && enabled libdvdnav; } ||
+    [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDNAV" dvdnav; then
     do_autoreconf
     do_uninstall include/dvdnav "${_check[@]}"
