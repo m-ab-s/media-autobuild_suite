@@ -1043,14 +1043,15 @@ if [0]==[%vlcINI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build vlc?
+    echo. Build VLC media player?
     echo. Takes a long time because of qt5 and wouldn't recommend it if you
     echo. don't have ccache enabled.
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Note: the resulting vlc is extra buggy, do not expect it to work smoothly
-    echo.
+    echo. Note: compilation of VLC is currently broken, do not enable unless you know
+    echo. what you are doing.
+    echo. 
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvlc="Build vlc: "
@@ -1647,7 +1648,11 @@ if not exist %instdir%\mintty.lnk (
     (
         echo.Set Shell = CreateObject("WScript.Shell"^)
         echo.Set link = Shell.CreateShortcut("%instdir%\mintty.lnk"^)
-        echo.link.Arguments = "-full-path -mingw -where .."
+        if %CC%==clang (
+            echo.link.Arguments = "-full-path -clang64 -where .."
+        ) else (
+            echo.link.Arguments = "-full-path -mingw -where .."
+        )
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\msys64\msys2_shell.cmd"
         echo.link.WindowStyle = 1
@@ -1667,7 +1672,6 @@ rem checkFstab
 set "removefstab=no"
 set "fstab=%instdir%\msys64\etc\fstab"
 if exist %fstab%. (
-    findstr build32 %fstab% >nul 2>&1 && set "removefstab=yes"
     findstr trunk %fstab% >nul 2>&1 || set "removefstab=yes"
     for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
     findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
@@ -1688,6 +1692,8 @@ if not [%removefstab%]==[no] (
         echo.%instdir%\build\ /build ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\mingw32\ /mingw32 ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\mingw64\ /mingw64 ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\msys64\clang32\ /clang32 ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\msys64\clang64\ /clang64 ntfs binary,posix=0,noacl,user 0 0
         if "%build32%"=="yes" echo.%instdir%\local32\ /local32 ntfs binary,posix=0,noacl,user 0 0
         if "%build64%"=="yes" echo.%instdir%\local64\ /local64 ntfs binary,posix=0,noacl,user 0 0
     )>"%instdir%\msys64\etc\fstab."
@@ -1849,7 +1855,11 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
-    if %build64%==yes ( set "MSYSTEM=MINGW64" ) else set "MSYSTEM=MINGW32"
+    if %build64%==yes (
+        if %CC%==clang ( set "MSYSTEM=CLANG64" ) else set "MSYSTEM=MINGW64"
+    ) else (
+        if %CC%==clang ( set "MSYSTEM=CLANG32" ) else set "MSYSTEM=MINGW32"
+    )
     set "MSYS2_PATH_TYPE=inherit"
     if %noMintty%==y set "PATH=%PATH%"
     set "build=%build%"
