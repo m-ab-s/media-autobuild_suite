@@ -38,7 +38,7 @@ For information about the compiler environment see the wiki, there you also have
         - schannel with gmp (mingw-w64)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
             - gmp can be switched by gcrypt (mingw-w64) with --enable-gcrypt
-        - sdl2 (2.0.10) (needed for ffplay)
+        - sdl2 (git tag) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
     - Zeranoe-emulating build (in addition to Light)
         - avisynthplus (needs avisynth dll installed)
@@ -51,11 +51,11 @@ For information about the compiler environment see the wiki, there you also have
                 - needs non-GPL license
             - mbedtls (mingw-w64)
                 - preferred to gnutls if GPLv3 license is chosen
-            - gnutls (latest release)
+            - gnutls (3.8.5)
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig, fontconfig backend included
-            - with harfbuzz (latest release)
+            - with harfbuzz (git)
         - libbluray (git)
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
@@ -74,18 +74,18 @@ For information about the compiler environment see the wiki, there you also have
         - libsvtav1 (git)
         - libtheora (mingw-w64)
         - libtwolame (mingw-w64)
-        - libvidstab (git snapshot)
+        - libvidstab (git)
         - libvmaf (git)
         - libvo-amrwbenc (0.1.3)
         - libwebp (git)
         - libxml2 (mingw-w64)
-        - libxvid (1.3.7)
+        - libxvid (git)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - chromaprint (mingw-w64)
         - cuda filters (needs CUDA SDK installed)
             - needs non-free license
-        - decklink (12.3)
+        - decklink (12.5.1)
             - needs non-free license
         - frei0r (git)
         - ladspa (mingw-w64)
@@ -96,10 +96,10 @@ For information about the compiler environment see the wiki, there you also have
         - libcodec2 (git)
         - libdavs2 (git)
         - libflite (git)
-        - libfribidi (latest release)
+        - libfribidi (git)
         - libglslang (git)
-        - libgme (git snapshot)
-        - libilbc (git snapshot)
+        - libgme (0.6.3)
+        - libilbc (git)
         - libjxl (git)
         - libkvazaar (git)
         - libmysofa (git)
@@ -109,7 +109,7 @@ For information about the compiler environment see the wiki, there you also have
         - libopenh264 (official binaries)
         - librist (git)
         - librtmp (git)
-        - librubberband (git snapshot)
+        - librubberband (git)
         - libssh (broken)
         - libsvthevc (git) (using non-upstream patch)
         - libsvtvp9 (git) (using non-upstream patch)
@@ -118,22 +118,22 @@ For information about the compiler environment see the wiki, there you also have
         - libxavs (git)
         - libxavs2 (git)
         - libzmq (mingw-w64)
-        - libzvbi (0.2.35)
+        - libzvbi (git)
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R57)
+        - vapoursynth (R68)
         - vulkan (git)
 
 - other tools
     - aom (git)
     - bmx (git)
-    - curl (latest release) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
+    - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
     - dav1d (git)
     - dssim (git)
     - exhale (git)
-    - faac (1.30)
+    - faac (git)
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
     - flac (git)
@@ -145,9 +145,10 @@ For information about the compiler environment see the wiki, there you also have
     - lame (3.100)
     - libaacs (git) (shared)
     - libavif (git) with following encoders/decoders:
-        - rav1e (enc only)
         - aom (enc/dec)
         - dav1d (dec only)
+        - rav1e (enc only)
+        - svt-av1 (enc only)
     - libbdplus (git) (shared)
     - mediainfo cli (git)
     - mp4box (git)
@@ -161,7 +162,7 @@ For information about the compiler environment see the wiki, there you also have
             - libbluray (git)
                 - BD-J support requires installation of Java JDK
                 - BD-J support after compilation probably only requires JRE (untested)
-            - luajit (mingw-w64)
+            - luajit (git)
             - mujs (git)
             - rubberband (git snapshot)
             - uchardet (mingw-w64)
@@ -176,21 +177,22 @@ For information about the compiler environment see the wiki, there you also have
     - rav1e (git)
     - ripgrep (git)
     - rtmpdump (git)
-    - sox (14.4.2)
+    - sox (git)
     - speex (git)
-    - svt-hevc (git)
     - svt-av1 (git)
+    - svt-hevc (git)
     - tesseract (git)
     - uvg266 (git)
+    - vlc (git) (broken)
     - vvenc & vvdec (git)
-    - vorbis-tools (git snapshot)
+    - vorbis-tools (git)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
     - vvc tools (git)
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (git)
     - xvc (git) (unsupported)
-    - xvid (1.3.7)
+    - xvid (git)
 
 --------
 
@@ -198,10 +200,10 @@ For information about the compiler environment see the wiki, there you also have
 
 --------
 
-- Windows 64-bits (tested with Win10 64-bits)
-  - 32-bit hosts are no longer supported.
+- Windows 64-bits (tested with Win10 & Win11 64-bits)
+  - 32-bit hosts are not supported.
 - NTFS drive
-- 13GB+ disk space for a full 32 and 64-bit build, 8GB+ for 64-bit
+- 23GB+ disk space for a full 32 and 64-bit build, 18GB+ for 64-bit
 - 4GB+ RAM
 - At least Powershell 4, Powershell core is not supported at this time
   - Powershell 5.1 can be downloaded [here](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
@@ -215,7 +217,7 @@ For information about the compiler environment see the wiki, there you also have
 This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
 <https://github.com/rdp/ffmpeg-windows-build-helpers>
 
-It is based on msys2 and tested under Windows 7, 8.1. and 10.
+It is based on msys2 and tested under Windows 8.1, 10 and 11.
 <http://sourceforge.net/projects/msys2/>
 
 I use some jscript parts from nu774:
@@ -228,21 +230,20 @@ After building the environment it retrieves and compiles all tools. All tools ge
 
 How to use it:
 
-- Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder without space characters. A good place might be: c:\mabs
+- Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder with a short path and without space characters. A good place might be: C:\mabs
 - Double click the media-autobuild_suite.bat file
 - Select if you want to compile for Windows 32-bit, 64-bit or both
-- Select if you want to compile non-free tools like "fdk aac"
+- Select if you want to compile non-free tools like "fdk-aac"
 - Select the numbers of CPU (cores) you want to use
-- Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local32\bin-(audio|global|video) or local64\bin-(audio|global|video)
+- Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local[32|64]\bin-(audio|global|video)
 
-The Script writes a ini-file, so you only need to make these choices the first time what you want to build.
+The script writes an .ini file at /build/media-autobuild_suite.ini, so you only need to make these choices the first time what you want to build.
 
-The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean.
-Building everything from scratch takes about ~3 hours depending on what is enabled.
+The script doesn't build any registry key or system variables, when you don't need it any more you can delete the folder and your system will be clean. Building everything from scratch takes about ~3 hours depending on how many CPU cores are utilized and what is enabled.
 
-Check [forcing-recompilations](./doc/forcing-recompilations.md) to check how you can force a rebuild of all libs/binaries.
+Check [forcing-recompilations](./doc/forcing-recompilations.md) for documentation on how you can force a rebuild of all libs/binaries.
 
-To save a bit of space you can delete, after compiling, all source folders (except the folders with a "-git" or "-svn" on end) in /build. There's an option in the .bat for the script to remove these folders automatically.
+To save a bit of space after compiling, you can delete all source folders (except the folders with a "-git" or "-svn" on end) in /build. There's an option in the .bat for the script to remove these folders automatically. To save even more space, you can delete /msys64 after compiling. If the suite is run after /msys64 has been deleted, it will download again.
 
 Have fun!
 
@@ -255,7 +256,7 @@ If there's some error during compilation follow these steps:
 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/m-ab-s/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
 3. If it still doesn't work, [create an issue](https://github.com/m-ab-s/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
-4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64, /local32 and /local64 if they exist. /build is usually safe to keep and saves time;
+4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64 and /local[32|64] if they exist. /build is usually safe to keep and saves time;
 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 6. If you compile with `--enable-libnpp` and/or `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
@@ -283,9 +284,13 @@ If there's some error during compilation follow these steps:
 
 - This script contains helper functions used by compile and update that can also be `source`'d by the user if desired.
 
+`/build/media-suite_deps.sh`
+
+- This script contains the URLs for each git repo used by `build/media-suite_compile.sh`. These URLs can be appended with `#branch=BRANCH`, `#commit=COMMITHASH`, or `#tag=TAG` to build from a branch, commit, or tag respectively. They can also be replaced to build from forked repositories (For example, changing `SOURCE_REPO_SVTAV1=https://gitlab.com/AOMediaCodec/SVT-AV1.git` to `SOURCE_REPO_SVTAV1=https://github.com/gianni-rosato/svt-av1-psy.git`).
+
 `/build/ffmpeg_options.txt` & `/build/mpv_options.txt`
 
-- If you select the option to choose your own FFmpeg/mpv optional libraries, this file will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit this file as you wish to get a smaller FFmpeg/mpv without features you don't need or with additional features not compiled by default, if supported.
+- If you select the option to choose your own FFmpeg/mpv optional libraries, these files will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit them as you wish to get a custom FFmpeg/mpv with or without any features available, if supported by the suite.
 
 ## Optional User Files
 
@@ -319,7 +324,7 @@ To reference the generated build folder, you would need to use `${REPO_DIR}/buil
 
 - For some packages, the build folder may be slightly different (`build-shared-${bits}` for shared ffmpeg or `build-light-${bits}` for light build, etc. Try to compile at least once to see what folders are generated or look through the [compile script](build/media-suite_compile.sh))
 
-If you are building for both 32 and 64-bit, you can gate certain commands using `if [ "$bits"="64bits" ]; then <command>; fi` to only run them when building for 64 bits.\
+If you are building for both 32 and 64-bit, you can gate certain commands using `if [[ $bits = 64bit ]]; then <command>; fi` to only run them when building for 64 bits.\
 Be careful with certain packages due to their unique build process (x265, x264, and some others) so make sure to check the compile script
 
 Example Script: `/build/aom_extra.sh` for `aom-git`
