@@ -1418,6 +1418,8 @@ if [[ $mediainfo = y ]]; then
     fi
     fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/zenlib"
 
+    sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' \
+        "$MINGW_PREFIX"/lib/cmake/CURL/CURLTargets.cmake
     _check=(libmediainfo.{a,pc})
     _deps=(lib{zen,curl}.a)
     if do_vcs "$SOURCE_REPO_LIBMEDIAINFO" libmediainfo; then
