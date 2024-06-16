@@ -790,13 +790,12 @@ fi
 _check=(libopus.{,l}a opus.pc opus/opus.h)
 if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
     do_pacman_remove opus
-    do_pacman_install wget # autogen calls wget, but msys/wget seems to fail for some people, while the mingw64 one works
     do_uninstall include/opus "${_check[@]}"
     (
         sha=$(grep dnn/download_model.sh autogen.sh | awk -F'"' '{print $2}')
-        model=opus_data-${sha:-735117b}.tar.gz
+        model=opus_data-${sha}.tar.gz
         pushd . > /dev/null
-        do_wget -r -q -n "https://media.xiph.org/opus/models/$model"
+        [ -f "/build/$model" ] || do_wget -r -q -n "https://media.xiph.org/opus/models/$model"
         popd > /dev/null || return 1
         ln -s "$LOCALBUILDDIR/$model" .
     )
