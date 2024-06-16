@@ -702,13 +702,15 @@ fi
 
 _check=(libFLAC{,++}.a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
-if [[ $flac = y ]] && do_vcs "$SOURCE_REPO_FLAC"; then
-    if [[ $standalone = y ]]; then
-        _check+=(bin-audio/metaflac.exe)
+if [[ $flac = y ]]; then
+    if do_vcs "$SOURCE_REPO_FLAC"; then
+        if [[ $standalone = y ]]; then
+            _check+=(bin-audio/metaflac.exe)
+        fi
+        do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
+        do_cmakeinstall audio -DBUILD_{DOCS,DOXYGEN,EXAMPLES,TESTING}=OFF -DINSTALL_MANPAGES=OFF
+        do_checkIfExist
     fi
-    do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
-    do_cmakeinstall audio -DBUILD_{DOCS,DOXYGEN,EXAMPLES,TESTING}=OFF -DINSTALL_MANPAGES=OFF
-    do_checkIfExist
 elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
     grep_and_sed dllimport "$MINGW_PREFIX"/include/FLAC++/export.h \
