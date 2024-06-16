@@ -700,18 +700,14 @@ if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
     do_checkIfExist
 fi
 
-_check=(libFLAC{,++}.{,l}a flac{,++}.pc)
+_check=(libFLAC{,++}.a flac{,++}.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/flac.exe)
 if [[ $flac = y ]] && do_vcs "$SOURCE_REPO_FLAC"; then
-    do_autogen
     if [[ $standalone = y ]]; then
         _check+=(bin-audio/metaflac.exe)
-    else
-        sed -i "/^SUBDIRS/,/[^\\]$/{/flac/d;}" src/Makefile.in
     fi
-    sed -i 's|__declspec(dllimport)||g' include/FLAC{,++}/export.h
     do_uninstall include/FLAC{,++} share/aclocal/libFLAC{,++}.m4 "${_check[@]}"
-    do_separate_confmakeinstall audio --disable-{xmms-plugin,doxygen-docs}
+    do_cmakeinstall audio -DBUILD_{DOCS,DOXYGEN,EXAMPLES,TESTING}=OFF -DINSTALL_MANPAGES=OFF
     do_checkIfExist
 elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
