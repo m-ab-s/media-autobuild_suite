@@ -1543,8 +1543,8 @@ elif { [[ $svthevc = y ]] || enabled libsvthevc; } &&
     do_checkIfExist
 fi
 
-_check=(bin-video/SvtAv1{Enc,Dec}App.exe
-    libSvtAv1{Enc,Dec}.a SvtAv1{Enc,Dec}.pc)
+_check=(bin-video/SvtAv1EncApp.exe
+    libSvtAv1Enc.a SvtAv1Enc.pc)
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libsvtav1
 elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
