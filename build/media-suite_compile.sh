@@ -1944,7 +1944,8 @@ _check=(bin-video/vvenc{,FF}app.exe
     vvenc/vvenc.h
     libvvenc.{a,pc}
     lib/cmake/vvenc/vvencConfig.cmake)
-if [[ $bits = 64bit && $vvenc = y ]] &&
+if [[ $bits = 64bit && $vvenc = y ]] ||
+    { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvenc; } &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
