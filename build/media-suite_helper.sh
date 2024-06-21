@@ -592,7 +592,7 @@ do_strip() {
             [[ ! $file =~ ($nostrip)\.exe$ ]]; then
             cmd+=(--strip-all)
         elif [[ $file =~ \.dll$ ]] ||
-            [[ $file =~ x265(|-numa)\.exe$ ]]; then
+            [[ $file =~ (x265|x265-numa)\.exe$ ]]; then
             cmd+=(--strip-unneeded)
         elif ! disabled debug && [[ $file =~ \.a$ ]]; then
             cmd+=(--strip-debug)
