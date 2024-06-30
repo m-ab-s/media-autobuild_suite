@@ -1995,7 +1995,8 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     cd_safe Vulkan-Headers
         do_print_progress "Installing Vulkan-Headers"
         do_uninstall include/vulkan
-        do_cmakeinstall
+        # disable module header because clang-scan-deps can't understand `ccache clang++` as the "compiler."
+        do_cmakeinstall -DVULKAN_HEADERS_ENABLE_MODULE=OFF
         do_wget -c -r -q "$_wine_mirror/ddk/d3dkmthk.h"
         do_wget -c -r -q "$_wine_mirror/d3dukmdt.h"
         do_install d3d{kmthk,ukmdt}.h include/
