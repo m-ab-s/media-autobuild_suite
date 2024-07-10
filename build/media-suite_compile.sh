@@ -396,6 +396,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
         # unistring also depends on iconv
         grep_or_sed '@LTLIBUNISTRING@ @LTLIBICONV@' libidn2.pc.in \
             's|(@LTLIBICONV@) (@LTLIBUNISTRING@)|\2 \1|'
+	do_autoreconf   
         do_separate_confmakeinstall global --disable-{doc,rpath,nls}
         do_checkIfExist
     fi
