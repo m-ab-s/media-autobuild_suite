@@ -1186,6 +1186,17 @@ fi
 # add allow-multiple-definition to the .pc file to fix linking with other rust libraries
 sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 
+_check=(bin-video/SvtAv1EncApp.exe
+    libSvtAv1Enc.a SvtAv1Enc.pc)
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libsvtav1
+elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
+    do_vcs "$SOURCE_REPO_SVTAV1"; then
+    do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
+    do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON
+    do_checkIfExist
+fi
+
 if [[ $libavif = y ]]; then
     do_pacman_install libjpeg-turbo libyuv
     _check=(libavif.{a,pc} avif/avif.h)
@@ -1537,17 +1548,6 @@ elif { [[ $svthevc = y ]] || enabled libsvthevc; } &&
     do_vcs "$SOURCE_REPO_SVTHEVC"; then
     do_uninstall "${_check[@]}" include/svt-hevc
     do_cmakeinstall video -DUNIX=OFF
-    do_checkIfExist
-fi
-
-_check=(bin-video/SvtAv1EncApp.exe
-    libSvtAv1Enc.a SvtAv1Enc.pc)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libsvtav1
-elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
-    do_vcs "$SOURCE_REPO_SVTAV1"; then
-    do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
-    do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON
     do_checkIfExist
 fi
 
