@@ -596,7 +596,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     do_pacman_install libarchive pango asciidoc
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "$SOURCE_REPO_TESSERACT"; then
-        do_pacman_install docbook-xsl
+        do_pacman_install docbook-xsl omp
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
