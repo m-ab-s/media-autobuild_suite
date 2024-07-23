@@ -1131,7 +1131,7 @@ if { [[ $dav1d = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled 
     do_checkIfExist
 fi
 
-{ enabled librav1e || [[ $libavif = y ]]; } && do_pacman_install cargo-c
+{ enabled librav1e || [[ $libavif = y ]] || [[ $dovitool = y ]]; } && do_pacman_install cargo-c
 
 _check=()
 { [[ $rav1e = y ]] ||
