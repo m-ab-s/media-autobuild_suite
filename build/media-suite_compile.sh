@@ -1963,6 +1963,28 @@ if [[ $bits = 64bit && $vvdec = y ]] &&
     do_checkIfExist
 fi
 
+_check=(bin-video/xeve_app.exe xeve/xeve{,_exports}.h libxeve.a xeve.pc)
+if [[ $ffmpeg != no ]] && enabled libxeve &&
+    do_vcs "$SOURCE_REPO_XEVE"; then
+    do_uninstall bin-video/libxeve.dll lib/libxeve.dll.a.dyn "${_check[@]}"
+    do_cmakeinstall video
+    # no way to disable shared lib building in cmake
+    mv -f "$LOCALDESTDIR"/lib/xeve/libxeve.a "$LOCALDESTDIR"/lib/libxeve.a
+    mv -f "$LOCALDESTDIR"/lib/libxeve.dll.a "$LOCALDESTDIR"/lib/libxeve.dll.a.dyn
+    do_checkIfExist
+fi
+
+_check=(bin-video/xevd_app.exe xevd/xevd{,_exports}.h libxevd.a xevd.pc)
+if [[ $ffmpeg != no ]] && enabled libxevd &&
+    do_vcs "$SOURCE_REPO_XEVD"; then
+    do_uninstall bin-video/libxevd.dll lib/libxevd.dll.a.dyn "${_check[@]}"
+    do_cmakeinstall video
+    # no way to disable chared lib building in cmake
+    mv -f "$LOCALDESTDIR"/lib/xevd/libxevd.a "$LOCALDESTDIR"/lib/libxevd.a
+    mv -f "$LOCALDESTDIR"/lib/libxevd.dll.a "$LOCALDESTDIR"/lib/libxevd.dll.a.dyn
+    do_checkIfExist
+fi
+
 _check=(avisynth/avisynth{,_c}.h
         avisynth/avs/{alignment,arch,capi,config,cpuid,minmax,posix,types,win,version}.h)
 if [[ $ffmpeg != no ]] && enabled avisynth &&
