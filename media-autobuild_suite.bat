@@ -1805,7 +1805,11 @@ if %build32%==yes call :writeProfile 32
 if %build64%==yes call :writeProfile 64
 
 rem update
-call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64% --CC="%CC%"
+powershell -noprofile -command "exit ([datetimeoffset]::now.tounixtimeseconds() - (get-content %instdir%\build\updated.log) -gt 86400)" || set needsupdate=yes
+if defined needsupdate (
+    call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64% --CC="%CC%"
+    powershell -noprofile -command "[datetimeoffset]::now.tounixtimeseconds()" > %instdir%\build\updated.log
+)
 
 if exist "%build%\update_core" (
     echo.-------------------------------------------------------------------------------
