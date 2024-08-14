@@ -1949,6 +1949,8 @@ if [[ $bits = 64bit && $vvenc = y ]] ||
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
     do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
     do_checkIfExist
+else
+    pc_exists libvvenc || do_removeOption "--enable-libvvenc"
 fi
 
 _check=(bin-video/vvdecapp.exe
