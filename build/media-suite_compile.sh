@@ -1834,7 +1834,7 @@ _vapoursynth_install() {
     fi
     _python_ver=3.12.3
     _python_lib=python312
-    _vsver=68
+    _vsver=69
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
