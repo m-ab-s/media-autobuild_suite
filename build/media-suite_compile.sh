@@ -1834,7 +1834,7 @@ _vapoursynth_install() {
     fi
     _python_ver=3.12.3
     _python_lib=python312
-    _vsver=68
+    _vsver=69
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
@@ -1904,7 +1904,6 @@ if [[ $ffmpeg != no ]] && enabled liblensfun; then
     if do_vcs "$SOURCE_REPO_LENSFUN"; then
         do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0001-CMake-exclude-mingw-w64-from-some-msvc-exclusive-thi.patch" am
         do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/lensfun/0002-CMake-don-t-add-glib2-s-includes-as-SYSTEM-dirs.patch" am
-        do_patch "https://github.com/lensfun/lensfun/pull/1999.patch" am
         do_uninstall "bin-video/lensfun" "${_check[@]}"
         CFLAGS+=" -DGLIB_STATIC_COMPILATION" CXXFLAGS+=" -DGLIB_STATIC_COMPILATION" \
             do_cmakeinstall -DBUILD_STATIC=on -DBUILD_{TESTS,LENSTOOL,DOC}=off \
