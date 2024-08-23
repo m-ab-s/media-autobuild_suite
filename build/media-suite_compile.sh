@@ -1962,6 +1962,8 @@ if [[ $bits = 64bit && $vvdec = y ]] &&
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
     do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
     do_checkIfExist
+else
+    pc_exists libvvdec || do_removeOption "--enable-libvvdec"
 fi
 
 _check=(bin-video/xeve_app.exe xeve/xeve{,_exports}.h libxeve.a xeve.pc)
@@ -2207,6 +2209,10 @@ if [[ $ffmpeg != no ]]; then
     if do_vcs "$ffmpegPath"; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
+        if enabled libvvdec; then
+            do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v6-0001-avcodec-add-external-dec-libvvdec-for-H266-VVC.patch" am  ||
+                do_removeOptions --enable-libvvdec
+        fi
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/OpenVisualCloud/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
