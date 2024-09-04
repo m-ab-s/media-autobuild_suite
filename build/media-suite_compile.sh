@@ -1021,6 +1021,19 @@ if { { [[ $ffmpeg != no ]] &&
     unset _mingw_patches
 fi
 
+_check=(liblc3.a lc3.pc)
+if [[ $ffmpeg != no ]] && enabled liblc3 &&
+    do_vcs "$SOURCE_REPO_LIBLC3"; then
+    do_uninstall "${_check[@]}"
+    if [[ $standalone = y ]]; then
+        _check+=(bin-audio/{d,e}lc3.exe)
+        do_mesoninstall audio -Dtools=true
+    else
+        do_mesoninstall audio
+    fi
+    do_checkIfExist
+fi
+
 if [[ $exitearly = EE4 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE4"
     return

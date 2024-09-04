@@ -45,6 +45,7 @@ SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
 SOURCE_REPO_LIBILBC=https://github.com/TimothyGu/libilbc.git
 SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
 SOURCE_REPO_LIBKVAZAAR=https://github.com/ultravideo/kvazaar.git
+SOURCE_REPO_LIBLC3=https://github.com/google/liblc3.git
 SOURCE_REPO_LIBLSMASH=https://github.com/l-smash/l-smash.git
 SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git
 SOURCE_REPO_LIBMFX=https://github.com/lu-zero/mfx_dispatch.git
