@@ -1507,6 +1507,18 @@ if [[ $ffmpeg != no ]] && enabled decklink &&
     do_checkIfExist
 fi
 
+_check=(libvpl.a vpl.pc)
+if [[ $ffmpeg != no ]] && enabled libvpl; then
+    if enabled libmfx; then
+        do_removeOption --enable-libmfx
+    fi
+    if do_vcs "$SOURCE_REPO_LIBVPL" libvpl; then
+    do_uninstall include/vpl "${_check[@]}"
+    do_cmakeinstall -DUNIX=OFF
+    do_checkIfExist
+    fi
+fi
+
 _check=(libmfx.{{l,}a,pc})
 if [[ $ffmpeg != no ]] && enabled libmfx &&
     do_vcs "$SOURCE_REPO_LIBMFX" libmfx; then

@@ -63,6 +63,7 @@ SOURCE_REPO_LIBSOXR=https://gitlab.com/m-ab-s/libsoxr.git
 SOURCE_REPO_LIBTIFF=https://gitlab.com/libtiff/libtiff.git
 SOURCE_REPO_LIBVMAF=https://github.com/Netflix/vmaf.git
 SOURCE_REPO_LIBVORBIS=https://github.com/xiph/vorbis.git
+SOURCE_REPO_LIBVPL=https://github.com/intel/libvpl.git
 SOURCE_REPO_LIBVVDEC=https://github.com/fraunhoferhhi/vvdec.git
 SOURCE_REPO_LIBVVENC=https://github.com/fraunhoferhhi/vvenc.git
 SOURCE_REPO_LIBWEBP=https://chromium.googlesource.com/webm/libwebp
