@@ -109,7 +109,7 @@ set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meso
 clang gettext-tools
 
 :: built-ins
-set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d11va dxva2 ^
+set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d12va d3d11va dxva2 ^
 iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm
 
 :: common external libs
@@ -120,7 +120,7 @@ libdav1d libaom --disable-debug libfdk-aac
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
 libharfbuzz libvpl libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
 libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc ^
-libwebp libxml2 libzimg libshine gpl openssl libtls avisynth mbedtls libxvid ^
+libwebp libxml2 libzimg libshine gpl openssl libtls avisynth #mbedtls libxvid ^
 libopenmpt version3 librav1e libsrt libgsm libvmaf libsvtav1
 
 :: options also available with the suite
