@@ -1027,7 +1027,7 @@ if [[ $ffmpeg != no ]] && enabled liblc3 &&
     do_uninstall "${_check[@]}"
     if [[ $standalone = y ]]; then
         _check+=(bin-audio/{d,e}lc3.exe)
-        do_mesoninstall audio -Dtools=true
+        LDFLAGS+=" -lpthread" do_mesoninstall audio -Dtools=true
     else
         do_mesoninstall audio
     fi
