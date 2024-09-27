@@ -127,6 +127,7 @@ For information about the compiler environment see the wiki, there you also have
 
 - other tools
     - aom (git)
+    - av1an (git)
     - bmx (git)
     - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
