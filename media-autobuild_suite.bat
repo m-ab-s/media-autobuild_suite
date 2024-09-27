@@ -147,7 +147,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
-strip pack logging bmx standalone updateSuite aom faac exhale ffmbc curl cyanrip2 ^
+strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc curl cyanrip2 ^
 rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 dovitool hdr10plustool ^
 timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
@@ -261,6 +261,33 @@ if %buildstandalone%==2 set "standalone=n"
 if %buildstandalone% GTR 2 GOTO standalone
 if %deleteINI%==1 echo.standalone=^%buildstandalone%>>%ini%
 
+:av1an
+if [0]==[%av1anINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build Av1an [Scalable video encoding framework]?
+    echo. 1 = Yes [link with static FFmpeg]
+    echo. 2 = Yes [link with shared FFmpeg]
+    echo. 3 = No
+    echo.
+    echo. Av1an requires an executable of FFmpeg and one of these encoders to function:
+    echo. aom, SVT-AV1, rav1e, vpx, x264, or x265
+    echo. If FFmpeg is built shared, then the Av1an executable will be in a subfolder.
+    echo. (Note: Not available for 32-bit due to Vapoursynth being broken in 32-bit!^)
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildav1an="Build av1an: "
+) else set buildav1an=%av1anINI%
+
+if "%buildav1an%"=="" GOTO av1an
+if %buildav1an%==1 set "av1an=y"
+if %buildav1an%==2 set "av1an=shared"
+if %buildav1an%==3 set "av1an=n"
+if %buildav1an% GTR 3 GOTO av1an
+if %deleteINI%==1 echo.av1an=^%buildav1an%>>%ini%
+
 :vpx
 if [0]==[%vpx2INI%] (
     echo -------------------------------------------------------------------------------
@@ -270,7 +297,7 @@ if [0]==[%vpx2INI%] (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Binaries being built depends on "standalone=y"
+    echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -292,7 +319,7 @@ if [0]==[%aomINI%] (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo. Binaries being built depends on "standalone=y"
+    echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -313,6 +340,8 @@ if [0]==[%rav1eINI%] (
     echo. Build rav1e [Alternative, faster AV1 standalone encoder]?
     echo. 1 = Yes
     echo. 2 = No
+    echo.
+    echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -404,7 +433,7 @@ if [0]==[%x2643INI%] (
     echo. 6 = Same as 4 with video codecs only (can reduce size by ~3MB^)
     echo. 7 = Lib/binary with only 8-bit
     echo.
-    echo. Binaries being built depends on "standalone=y" and are always static.
+    echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -436,7 +465,7 @@ if [0]==[%x2652INI%] (
     echo. 6 = Same as 1 with XP support and non-XP compatible x265-numa.exe
     echo. 7 = Lib/binary with Main12 only
     echo.
-    echo. Binaries being built depends on "standalone=y"
+    echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1858,8 +1887,8 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
---noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% ^
---svtav1=%svtav1% --svtvp9=%svtvp9% --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% ^
+--noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
+--xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% --av1an=%av1an% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
