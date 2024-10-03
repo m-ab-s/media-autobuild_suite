@@ -184,7 +184,7 @@ For information about the compiler environment see the wiki, there you also have
     - svt-hevc (git)
     - tesseract (git)
     - uvg266 (git)
-    - vlc (git) (broken)
+    - vlc (git)
     - vvenc & vvdec (git)
     - vorbis-tools (git)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)

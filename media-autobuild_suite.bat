@@ -1073,13 +1073,9 @@ if [0]==[%vlcINI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build VLC media player?
-    echo. Takes a long time because of qt5 and wouldn't recommend it if you
-    echo. don't have ccache enabled.
+    echo. Takes a long time to build due to the lengthy Qt6 compilation process.
     echo. 1 = Yes
     echo. 2 = No
-    echo.
-    echo. Note: compilation of VLC is currently broken, do not enable unless you know
-    echo. what you are doing.
     echo. 
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
