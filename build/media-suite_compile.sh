@@ -2046,7 +2046,8 @@ _check=(bin-video/vvdecapp.exe
     vvdec/vvdec.h
     libvvdec.{a,pc}
     lib/cmake/vvdec/vvdecConfig.cmake)
-if [[ $bits = 64bit && $vvdec = y ]] &&
+if [[ $bits = 64bit && $vvdec = y ]] ||
+    { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvdec; } &&
     do_vcs "$SOURCE_REPO_LIBVVDEC"; then
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
     do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
