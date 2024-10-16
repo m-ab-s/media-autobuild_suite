@@ -187,8 +187,9 @@ if [[ $packing = y &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
-if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] || enabled librav1e; then
+if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool|$av1an" = *y* ]] || enabled librav1e; then
     do_pacman_install rust
+    [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
 
 _check=(bin-global/rg.exe)
@@ -196,7 +197,7 @@ if [[ $ripgrep = y ]] &&
     do_vcs "https://github.com/BurntSushi/ripgrep.git"; then
     do_uninstall "${_check[@]}"
     do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/rg.exe" bin-global/
+    do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/rg.exe" bin-global/
     do_checkIfExist
 fi
 
@@ -225,7 +226,7 @@ if [[ $dssim = y ]] &&
     do_vcs "https://github.com/kornelski/dssim.git"; then
     do_uninstall "${_check[@]}"
     CFLAGS+=" -fno-PIC" do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/dssim.exe" bin-global/
+    do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/dssim.exe" bin-global/
     do_checkIfExist
 fi
 
@@ -1183,7 +1184,7 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     # standalone binary
     if [[ $rav1e = y || $standalone = y || $av1an != n ]]; then
         do_rust --profile release-no-lto
-        find "target/$CARCH-pc-windows-gnu" -name "rav1e.exe" | while read -r f; do
+        find "target/$CARCH-pc-windows-gnu$rust_target_suffix" -name "rav1e.exe" | while read -r f; do
             do_install "$f" bin-video/
         done
     fi
@@ -1426,7 +1427,7 @@ if [[ $dovitool = y ]] &&
     do_vcs "$SOURCE_REPO_DOVI_TOOL"; then
     do_uninstall "${_check[@]}" include/libdovi bin-video/dovi.dll dovi.def dovi.dll.a
     do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/dovi_tool.exe" bin-video/
+    do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/dovi_tool.exe" bin-video/
     cd dolby_vision
     do_rustcinstall --bindir="$LOCALDESTDIR"/bin-video/ --library-type=staticlib
     do_checkIfExist
@@ -1438,7 +1439,7 @@ if [[ $hdr10plustool = y ]] &&
 
     do_uninstall "${_check[@]}"
     do_rust
-    do_install "target/$CARCH-pc-windows-gnu/release/hdr10plus_tool.exe" bin-video/
+    do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/hdr10plus_tool.exe" bin-video/
     do_checkIfExist
 fi
 
@@ -1977,7 +1978,7 @@ if [[ $av1an != n ]]; then
         do_uninstall "${_check[@]}"
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
             VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
-        do_install "target/$CARCH-pc-windows-gnu/release/av1an.exe" $av1an_bindir/
+        do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" $av1an_bindir/
         do_checkIfExist
     fi
 
