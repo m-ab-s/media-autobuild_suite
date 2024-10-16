@@ -1402,13 +1402,14 @@ do_rust() {
     log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
+    [[ $CC =~ clang ]] && local target_suffix="llvm"
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
         CC="ccache clang" \
         log "rust.build" cargo build \
-        --target="$CARCH"-pc-windows-gnu \
+        --target="$CARCH"-pc-windows-gnu$target_suffix \
         --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
@@ -1418,6 +1419,7 @@ do_rustinstall() {
     log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
+    [[ $CC =~ clang ]] && local target_suffix="llvm"
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
@@ -1425,7 +1427,7 @@ do_rustinstall() {
         CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.install" cargo install \
-        --target="$CARCH"-pc-windows-gnu \
+        --target="$CARCH"-pc-windows-gnu$target_suffix \
         --jobs="$cpuCount" "${@:---path=.}" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
@@ -1435,6 +1437,7 @@ do_rustcinstall() {
     log "rust.update" cargo update
     # use this array to pass additional parameters to cargo
     local rust_extras=()
+    [[ $CC =~ clang ]] && local target_suffix="llvm"
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
@@ -1442,7 +1445,7 @@ do_rustcinstall() {
         CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.cinstall" cargo cinstall \
-        --target="$CARCH"-pc-windows-gnu \
+        --target="$CARCH"-pc-windows-gnu$target_suffix \
         --jobs="$cpuCount" --prefix="$LOCALDESTDIR" "$@" "${rust_extras[@]}"
     extra_script post rust
     unset rust_extras
