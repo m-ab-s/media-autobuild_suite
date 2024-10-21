@@ -610,6 +610,10 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "$SOURCE_REPO_TESSERACT"; then
         do_pacman_install docbook-xsl omp
+        # Reverts a commit that breaks the pkgconfig file
+        {
+            git revert --no-edit b4a4f5c || git revert --abort
+        } > /dev/null 2>&1
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
