@@ -271,7 +271,8 @@ if [0]==[%av1anINI%] (
     echo. 2 = Yes [link with shared FFmpeg]
     echo. 3 = No
     echo.
-    echo. Av1an requires an executable of FFmpeg and one of these encoders to function:
+    echo. Av1an requires local installed copies of Python and Vapoursynth,
+    echo. an executable of FFmpeg and one of these encoders to function:
     echo. aom, SVT-AV1, rav1e, vpx, x264, or x265
     echo. If FFmpeg is built shared, then the Av1an executable will be in a subfolder.
     echo. (Note: Not available for 32-bit due to Vapoursynth being broken in 32-bit!^)
