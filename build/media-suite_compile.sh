@@ -171,12 +171,12 @@ do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${r
 
 if [[ $bits = 32bit && $av1an != n ]]; then
     do_simple_print "${orange}Av1an cannot be compiled due to Vapoursynth being broken on 32-bit and will be disabled"'!'"${reset}"
+    _reenable_av1an=$av1an # so that av1an can be built if both 32 bit and 64 bit targets are enabled
     av1an=n
-    _reenable_av1an=y # so that av1an can be built if both 32 bit and 64 bit targets are enabled
 fi
 
-if [[ $bits = 64bit && $_reenable_av1an = y ]]; then
-    av1an=y
+if [[ ! -z $_reenable_av1an ]] && [[ $bits = 64bit ]]; then
+    av1an=$_reenable_av1an
     unset _reenable_av1an
 fi
 
@@ -187,7 +187,8 @@ if [[ $packing = y &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
-if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool|$av1an" = *y* ]] || enabled librav1e; then
+if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] ||
+    [[ $av1an != n ]] || enabled librav1e; then
     do_pacman_install rust
     [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
@@ -1876,7 +1877,7 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    _python_ver=3.12.6
+    _python_ver=3.12.7
     _python_lib=python312
     _vsver=70
     _check=("lib$_python_lib.a")

@@ -122,12 +122,13 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R68)
+        - vapoursynth (R70)
         - vulkan (git)
 
 - other tools
     - aom (git)
     - av1an (git)
+        - requires installation of [64-bit Python 3.8.x/3.12.x](https://www.python.org/downloads/) and [Vapoursynth](https://github.com/vapoursynth/vapoursynth/releases/latest)
     - bmx (git)
     - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
