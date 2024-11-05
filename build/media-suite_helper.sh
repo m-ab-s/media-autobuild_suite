@@ -1336,6 +1336,7 @@ do_cmake() {
         return
     # shellcheck disable=SC2086
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=on \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
         -DCMAKE_BUILD_TYPE=Release $bindir "$@" "${cmake_extras[@]}"
