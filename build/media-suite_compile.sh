@@ -2172,6 +2172,7 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
     do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
+    grep_and_sed d0e67c58134377f065a509845ca6b7d463f5b487 DEPS 's/d0e67c58134377f065a509845ca6b7d463f5b487/76cc41d26f6902de543773023611e40fbcdde58b/g'
     log dependencies /usr/bin/python ./utils/git-sync-deps
 
     # fix python indentation errors from non-existant code review
