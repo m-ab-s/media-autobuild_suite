@@ -2511,6 +2511,9 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
     }
 
     grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
+    grep_or_sed gnu11 configure 's/c11/gnu11/g'
+    # shellcheck disable=SC2016
+    sed -i '/%\$(EXESUF):/{n; s/\$(CC)/\$(CXX)/g};/mencoder$(EXESUF)/{n; s/\$(CC)/\$(CXX)/g}' Makefile
 
     _notrequired=true
     do_configure --bindir="$LOCALDESTDIR"/bin-video \
@@ -2520,7 +2523,7 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
     --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
     --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
     --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
-        do_makeinstall && do_checkIfExist
+        do_makeinstall CXX="$CXX" && do_checkIfExist
     unset _notrequired faac_opts
 fi
 
