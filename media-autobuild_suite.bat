@@ -106,7 +106,7 @@ intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man
 gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
 
 set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-clang gettext-tools
+gettext-tools
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d12va d3d11va dxva2 ^
@@ -1788,7 +1788,7 @@ for %%i in (%instdir%\msys64\usr\ssl\cert.pem) do if %%~zi==0 call :runBash cert
 rem installmingw
 rem extra package for clang
 if %CC%==clang (
-    set "mingwpackages=%mingwpackages% gcc-compat lld"
+    set "mingwpackages=%mingwpackages% clang gcc-compat lld"
 ) else (
     set "mingwpackages=%mingwpackages% binutils gcc"
 )
@@ -2058,8 +2058,10 @@ goto :EOF
 :getmingw
 setlocal
 set found=0
-set "compilers=%instdir%\msys64\mingw%1\bin\gcc.exe %instdir%\msys64\clang%1\bin\clang.exe"
-for %%i in (%compilers%) do if exist %%i set found=1
+if %CC%==clang (
+    set "compiler=%instdir%\msys64\clang%1\bin\clang.exe"
+) else set "compiler=%instdir%\msys64\mingw%1\bin\gcc.exe"
+if exist %compiler% set found=1
 if %found%==1 GOTO :EOF
 echo.-------------------------------------------------------------------------------
 echo.install %1 bit compiler
@@ -2083,7 +2085,7 @@ if %CC%==clang (
 )>%build%\mingw.sh
 call :runBash mingw%1.log /build/mingw.sh
 
-for %%i in (%compilers%) do if exist %%i set found=1
+if exist %compiler% set found=1
 if %found%==0 (
     echo -------------------------------------------------------------------------------
     echo.

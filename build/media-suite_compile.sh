@@ -1979,6 +1979,7 @@ if [[ $av1an != n ]]; then
     _check=("$av1an_bindir"/av1an.exe)
     if do_vcs "$SOURCE_REPO_AV1AN"; then
         do_uninstall "${_check[@]}"
+        do_pacman_install clang
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
             VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" $av1an_bindir/
