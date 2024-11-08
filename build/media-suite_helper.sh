@@ -1408,7 +1408,6 @@ do_rust() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="ccache clang" \
         log "rust.build" cargo build \
         --target="$CARCH"-pc-windows-gnu$target_suffix \
         --jobs="$cpuCount" "${@:---release}" "${rust_extras[@]}"
@@ -1425,7 +1424,6 @@ do_rustinstall() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.install" cargo install \
         --target="$CARCH"-pc-windows-gnu$target_suffix \
@@ -1443,7 +1441,6 @@ do_rustcinstall() {
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
     PKG_CONFIG_ALL_STATIC=true \
-        CC="ccache clang" \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
         log "rust.cinstall" cargo cinstall \
         --target="$CARCH"-pc-windows-gnu$target_suffix \
