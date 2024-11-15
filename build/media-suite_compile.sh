@@ -158,7 +158,6 @@ do_hide_all_sharedlibs
 create_ab_pkgconfig
 create_cmake_toolchain
 create_ab_ccache
-pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 
 # Global header fixups
 grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
