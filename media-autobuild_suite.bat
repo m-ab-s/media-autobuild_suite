@@ -1601,7 +1601,7 @@ rem ------------------------------------------------------------------
 rem download and install basic msys2 system:
 rem ------------------------------------------------------------------
 cd %build%
-set scripts=media-suite_compile.sh media-suite_helper.sh media-suite_update.sh
+set scripts=media-suite_compile.sh media-suite_deps.sh media-suite_helper.sh media-suite_update.sh
 for %%s in (%scripts%) do (
     if not exist "%build%\%%s" (
         powershell -Command (New-Object System.Net.WebClient^).DownloadFile('"https://github.com/m-ab-s/media-autobuild_suite/raw/master/build/%%s"', '"%%s"' ^)
