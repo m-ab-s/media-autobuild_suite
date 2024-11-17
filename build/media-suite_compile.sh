@@ -181,9 +181,9 @@ if [[ ! -z $_reenable_av1an ]] && [[ $bits = 64bit ]]; then
 fi
 
 if [[ $packing = y &&
-    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 4.2.2" ]] &&
-    do_wget -h 141e7cd8d009b827590662b482f1ae2f1dda17cf446a5651078235efb1429c59 \
-        "https://github.com/upx/upx/releases/download/v4.2.2/upx-4.2.2-win32.zip"; then
+    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 4.2.4" ]] &&
+    do_wget -h 2e90ebda45b29217126d8e8ee4d0863bd9705a13adcca3ce07b7d19df55ca355 \
+        "https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win32.zip"; then
     do_install upx.exe /opt/bin/upx.exe
 fi
 
@@ -358,8 +358,8 @@ fi
 if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
     do_pacman_install nettle
     _check=(libgnutls.{,l}a gnutls.pc)
-    _gnutls_ver=3.8.5
-    _gnutls_hash=66269a2cfe0e1c2dabec87bdbbd8ab656f396edd9a40dd006978e003cfa52bfc
+    _gnutls_ver=3.8.8
+    _gnutls_hash=ac4f020e583880b51380ed226e59033244bc536cad2623f2e26f5afa2939d8fb
     if do_pkgConfig "gnutls = $_gnutls_ver" && do_wget -h $_gnutls_hash \
         "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
         do_uninstall include/gnutls "${_check[@]}"
@@ -402,24 +402,25 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     _deps=("$MINGW_PREFIX/lib/libunistring.a")
     _check=(libidn2.{{,l}a,pc} idn2.h)
     [[ $standalone == y ]] && _check+=(bin-global/idn2.exe)
-    if do_pkgConfig "libidn2 = 2.3.0" &&
-        do_wget -h e1cb1db3d2e249a6a3eb6f0946777c2e892d5c5dc7bd91c74394fc3a01cab8b5 \
-        "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.0.tar.gz"; then
+    if do_pkgConfig "libidn2 = 2.3.7" &&
+        do_wget -h 4c21a791b610b9519b9d0e12b8097bf2f359b12f8dd92647611a929e6bfd7d64 \
+        "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz"; then
         do_uninstall "${_check[@]}"
+        do_pacman_install gtk-doc
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.am
         # unistring also depends on iconv
         grep_or_sed '@LTLIBUNISTRING@ @LTLIBICONV@' libidn2.pc.in \
             's|(@LTLIBICONV@) (@LTLIBUNISTRING@)|\2 \1|'
-	do_autoreconf   
+        AUTOPOINT=true do_autoreconf
         do_separate_confmakeinstall global --disable-{doc,rpath,nls}
         do_checkIfExist
     fi
     _deps=(libidn2.a)
     _check=(libpsl.{{,l}a,h,pc})
     [[ $standalone == y ]] && _check+=(bin-global/psl.exe)
-    if do_pkgConfig "libpsl = 0.21.0" &&
-        do_wget -h 41bd1c75a375b85c337b59783f5deb93dbb443fb0a52d257f403df7bd653ee12 \
-        "https://github.com/rockdaboot/libpsl/releases/download/libpsl-0.21.0/libpsl-0.21.0.tar.gz"; then
+    if do_pkgConfig "libpsl = 0.21.5" &&
+        do_wget -h 1dcc9ceae8b128f3c0b3f654decd0e1e891afc6ff81098f227ef260449dae208 \
+        "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz"; then
         do_uninstall "${_check[@]}"
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' tools/Makefile.in
         grep_or_sed "Requires.private" libpsl.pc.in "/Libs:/ i\Requires.private: libidn2"
@@ -2237,7 +2238,7 @@ if [[ $ffmpeg != no ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        _openh264_ver=2.4.1
+        _openh264_ver=2.5.0
         _pacman_openh264_ver=$(pacman -Q "${MINGW_PACKAGE_PREFIX}-openh264" | awk '{print $2}')
         if [[ $(vercmp.exe $_openh264_ver "$_pacman_openh264_ver") -ne 0 ]]; then
             do_simple_print "${orange}Openh264 version differs from msys2's, current: $_openh264_ver, msys2: $_pacman_openh264_ver${reset}"
@@ -2247,9 +2248,9 @@ if [[ $ffmpeg != no ]]; then
             ! get_dll_version "$LOCALDESTDIR/bin-video/libopenh264-7.dll" | grep -q "$_openh264_ver"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
             if [[ $bits = 64bit ]]; then
-                _sha256=c0df66e90d46c688558d5697c845886839c918b8253b86425bcde6be0d871f13
+                _sha256=1879afe8429fc9b064cfbdeb91a19d9e0594116d06702d8e0c821150d6150972
             else
-                _sha256=5aaf0bcebc0bb510130c4fb14fb7694bfd5597be0a5e101c01a35f07c594e482
+                _sha256=004c3cf7cd8633067d33acb19e3c945396b011f6ef64545780b061d6eaae540f
             fi
             do_wget -c -r -q -h $_sha256 \
             "http://ciscobinary.openh264.org/openh264-${_openh264_ver}-win${bits%bit}.dll.bz2" \
