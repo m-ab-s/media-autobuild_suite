@@ -2092,8 +2092,11 @@ if [[ $ffmpeg != no ]] && enabled libxeve &&
     sed -i 's/-Werror //' CMakeLists.txt
     do_cmakeinstall video
     # no way to disable shared lib building in cmake
+    # move the static library out from subfolder to make ffmpeg configure find it easier
     mv -f "$LOCALDESTDIR"/lib/xeve/libxeve.a "$LOCALDESTDIR"/lib/libxeve.a
     mv -f "$LOCALDESTDIR"/lib/libxeve.dll.a "$LOCALDESTDIR"/lib/libxeve.dll.a.dyn
+    # delete the now empty subfolder
+    rmdir "$LOCALDESTDIR/lib/xeve" > /dev/null 2>&1
     do_checkIfExist
 fi
 
@@ -2104,8 +2107,11 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     sed -i 's/-Werror //' CMakeLists.txt
     do_cmakeinstall video
     # no way to disable shared lib building in cmake
+    # move the static library out from subfolder to make ffmpeg configure find it easier
     mv -f "$LOCALDESTDIR"/lib/xevd/libxevd.a "$LOCALDESTDIR"/lib/libxevd.a
     mv -f "$LOCALDESTDIR"/lib/libxevd.dll.a "$LOCALDESTDIR"/lib/libxevd.dll.a.dyn
+    # delete the now empty subfolder
+    rmdir "$LOCALDESTDIR/lib/xevd" > /dev/null 2>&1
     do_checkIfExist
 fi
 
