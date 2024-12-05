@@ -1947,7 +1947,7 @@ if [[ $av1an != n ]]; then
     [[ $av1an = shared ]] && av1an_bindir="bin-video/av1an/bin" && av1an_ffmpeg_prefix="bin-video/av1an"
 
     _check=("$LOCALDESTDIR"/"$av1an_ffmpeg_prefix"/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
-    if flavor=av1an do_vcs "$ffmpegPath#branch=release/7.1"; then
+    if flavor=av1an do_vcs "${ffmpegPath%%#*}#branch=release/7.1"; then
         do_uninstall "$LOCALDESTDIR"/"$av1an_ffmpeg_prefix"
         [[ -f config.mak ]] && log "distclean" make distclean
         local av1an_ffmpeg_opts=("--enable-static" "--disable-shared")
