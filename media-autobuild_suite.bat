@@ -405,12 +405,12 @@ if [0]==[%libheifINI%] (
     echo. Build libheif [High Efficiency Image File Format encoder and decoder]?
     echo. 1 = Yes
     echo. 2 = No
+    echo. 3 = Shared (a single libheif.dll with multiple execatables^)
     echo.
-    echo. Libheif binaries will always be built.
     echo. Will use available encoders and decoders supported by libheif.
     echo. If not found, built libheif will lack the corresponding encode/decode ability.
     echo. Additionally libde265 will be built.
-    echo. dec265 being built depends on "standalone=y" and are always static.
+    echo. dec265 of libde265 being built depends on "standalone=y" and is always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -420,7 +420,8 @@ if [0]==[%libheifINI%] (
 if "%buildlibheif%"=="" GOTO libheif
 if %buildlibheif%==1 set "libheif=y"
 if %buildlibheif%==2 set "libheif=n"
-if %buildlibheif% GTR 2 GOTO libheif
+if %buildlibheif%==3 set "libheif=shared"
+if %buildlibheif% GTR 3 GOTO libheif
 if %deleteINI%==1 echo.libheif=^%buildlibheif%>>%ini%
 
 :jpegxl
