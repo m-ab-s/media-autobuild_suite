@@ -56,6 +56,7 @@ while true; do
     --rav1e=* ) rav1e=${1#*=} && shift ;;
     --dav1d=* ) dav1d=${1#*=} && shift ;;
     --libavif=* ) libavif=${1#*=} && shift ;;
+    --libheif=* ) libheif=${1#*=} && shift ;;
     --jpegxl=* ) jpegxl=${1#*=} && shift ;;
     --av1an=* ) av1an=${1#*=} && shift ;;
     --vvc=* ) vvc=${1#*=} && shift ;;
@@ -158,7 +159,6 @@ do_hide_all_sharedlibs
 create_ab_pkgconfig
 create_cmake_toolchain
 create_ab_ccache
-pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 
 # Global header fixups
 grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
@@ -2068,8 +2068,11 @@ if [[ $ffmpeg != no ]] && enabled libxeve &&
     sed -i 's/-Werror //' CMakeLists.txt
     do_cmakeinstall video
     # no way to disable shared lib building in cmake
+    # move the static library out from subfolder to make ffmpeg configure find it easier
     mv -f "$LOCALDESTDIR"/lib/xeve/libxeve.a "$LOCALDESTDIR"/lib/libxeve.a
     mv -f "$LOCALDESTDIR"/lib/libxeve.dll.a "$LOCALDESTDIR"/lib/libxeve.dll.a.dyn
+    # delete the now empty subfolder
+    rmdir "$LOCALDESTDIR/lib/xeve" > /dev/null 2>&1
     do_checkIfExist
 fi
 
@@ -2080,8 +2083,11 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     sed -i 's/-Werror //' CMakeLists.txt
     do_cmakeinstall video
     # no way to disable shared lib building in cmake
+    # move the static library out from subfolder to make ffmpeg configure find it easier
     mv -f "$LOCALDESTDIR"/lib/xevd/libxevd.a "$LOCALDESTDIR"/lib/libxevd.a
     mv -f "$LOCALDESTDIR"/lib/libxevd.dll.a "$LOCALDESTDIR"/lib/libxevd.dll.a.dyn
+    # delete the now empty subfolder
+    rmdir "$LOCALDESTDIR/lib/xevd" > /dev/null 2>&1
     do_checkIfExist
 fi
 
@@ -2423,6 +2429,78 @@ if [[ $ffmpeg != no ]]; then
             create_winpty_exe ffmpeg "$LOCALDESTDIR"/bin-video/
         unset ffmpeg_cflags build_suffix
     fi
+fi
+
+_check=(libde265.a)
+[[ $standalone = y ]] && _check+=(bin-video/dec265.exe)
+if [[ $libheif != n ]] &&
+    do_vcs "$SOURCE_REPO_LIBDE265"; then
+    do_uninstall "${_check[@]}"
+    extracommands=()
+    [[ $standalone = n ]] && extracommands+=(-DENABLE_{DE,EN}CODER=OFF)
+    do_cmakeinstall video "${extracommands[@]}"
+    do_checkIfExist
+fi
+
+_check=(bin-video/heif-{dec,enc,info,thumbnailer}.exe)
+[[ $libheif = shared ]] && _check+=(bin-video/libheif.dll)
+if [[ $libheif != n ]] &&
+    do_vcs "$SOURCE_REPO_LIBHEIF"; then
+    do_uninstall "${_check[@]}"
+
+    do_patch https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libheif/0001-Edit-CMakeLists.patch
+
+    extracflags=()
+    extracommands=(-DWITH_HEADER_COMPRESSION=ON -DWITH_UNCOMPRESSED_CODEC=ON)
+
+    pc_exists "libde265" &&
+        extracommands+=(-DWITH_LIBDE265=ON -DWITH_LIBDE265_PLUGIN=OFF) &&
+        extracflags+=(-DLIBDE265_STATIC_BUILD=1)
+    pc_exists "kvazaar" &&
+        extracommands+=(-DWITH_KVAZAAR=ON -DWITH_KVAZAAR_PLUGIN=OFF) &&
+        extracflags+=(-DKVZ_STATIC_LIB=1)
+    pc_exists "uvg266" &&
+        extracommands+=(-DWITH_UVG266=ON -DWITH_UVG266_PLUGIN=OFF) &&
+        extracflags+=(-DUVG_STATIC_LIB=1)
+
+    pc_exists "x265" &&
+        extracommands+=(-DWITH_X265=ON -DWITH_X265_PLUGIN=OFF)
+    pc_exists "aom" &&
+        extracommands+=(-DWITH_AOM_{DE,EN}CODER=ON -DWITH_AOM_{DE,EN}CODER_PLUGIN=OFF)
+    pc_exists "dav1d" &&
+        extracommands+=(-DWITH_DAV1D=ON -DWITH_DAV1D_PLUGIN=OFF)
+    pc_exists "SvtAv1Enc" &&
+        extracommands+=(-DWITH_SvtEnc=ON -DWITH_SvtEnc_PLUGIN=OFF)
+    pc_exists "libvvenc" &&
+        extracommands+=(-DWITH_VVENC=ON -DWITH_VVENC_PLUGIN=OFF)
+    pc_exists "libvvdec" &&
+        extracommands+=(-DWITH_VVDEC=ON -DWITH_VVDEC_PLUGIN=OFF)
+    pacman -Q $MINGW_PACKAGE_PREFIX-libjpeg > /dev/null 2>&1 &&
+        extracommands+=(-DWITH_JPEG_{DE,EN}CODER=ON -DWITH_JPEG_{DE,EN}CODER_PLUGIN=OFF)
+    pacman -Q $MINGW_PACKAGE_PREFIX-openh264 > /dev/null 2>&1 &&
+        extracommands+=(-DWITH_OpenH264_DECODER=ON -DWITH_OpenH264_DECODER_PLUGIN=OFF)
+
+    # don't fail on .dll.a not found because we hide it
+    # still need to make it link to static lib as it still wants to link to .dll.a and fails
+    # pacman -Q $MINGW_PACKAGE_PREFIX-openjpeg2 > /dev/null 2>&1 &&
+    #     sed -i 's/message(FATAL_ERROR "The imported target/message(WARNING "The imported target/' \
+    #     "$MINGW_PREFIX"/lib/cmake/openjpeg-2.5/OpenJPEGTargets.cmake &&
+    #     extracommands+=(-DWITH_OpenJPEG_{DE,EN}CODER=ON -DWITH_OpenJPEG_{DE,EN}CODER_PLUGIN=OFF)
+
+    # linking difficulties
+    pc_exists "rav1e" &&
+        extracommands+=(-DWITH_RAV1E=OFF -DWITH_RAV1E_PLUGIN=OFF)
+    pc_exists "libavcodec" "libavutil" &&
+        extracommands+=(-DWITH_FFMPEG_DECODER=OFF -DWITH_FFMPEG_DECODER_PLUGIN=OFF)
+
+    # this depends on CMake overrides -DBUILD_SHARED_LIBS=off in do_cmake, may break if that behavior changes.
+    [[ $libheif = shared ]] && extracommands+=(-DBUILD_SHARED_LIBS=ON)
+    CFLAGS+=" ${extracflags[@]}" CXXFLAGS+=" ${extracflags[@]}" \
+        do_cmakeinstall video -DBUILD_TESTING=OFF -DWITH_GDK_PIXBUF=OFF "${extracommands[@]}"
+
+    # this subfolder is for plugins and is empty since we did't build any plugin so we delete it
+    rmdir "$LOCALDESTDIR/lib/libheif" > /dev/null 2>&1
+    do_checkIfExist
 fi
 
 # static do_vcs just for svn

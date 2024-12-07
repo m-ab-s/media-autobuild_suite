@@ -148,7 +148,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc curl cyanrip2 ^
-rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 dovitool hdr10plustool timeStamp ^
+rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim avs2 dovitool hdr10plustool timeStamp ^
 noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
@@ -399,6 +399,33 @@ if %buildlibavif%==1 set "libavif=y"
 if %buildlibavif%==2 set "libavif=n"
 if %buildlibavif% GTR 2 GOTO libavif
 if %deleteINI%==1 echo.libavif=^%buildlibavif%>>%ini%
+
+:libheif
+if [0]==[%libheifINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build libheif [High Efficiency Image File Format encoder and decoder]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo. 3 = Shared (a single libheif.dll with multiple execatables^)
+    echo.
+    echo. Will use available encoders and decoders supported by libheif.
+    echo. If not found, built libheif will lack the corresponding encode/decode ability.
+    echo. Additionally libde265 will be built.
+    echo. dec265 of libde265 being built depends on "standalone=y" and is always static.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildlibheif="Build libheif: "
+) else set buildlibheif=%libheifINI%
+
+if "%buildlibheif%"=="" GOTO libheif
+if %buildlibheif%==1 set "libheif=y"
+if %buildlibheif%==2 set "libheif=n"
+if %buildlibheif%==3 set "libheif=shared"
+if %buildlibheif% GTR 3 GOTO libheif
+if %deleteINI%==1 echo.libheif=^%buildlibheif%>>%ini%
 
 :jpegxl
 if [0]==[%jpegxlINI%] (
@@ -1895,7 +1922,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
---xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% --av1an=%av1an% ^
+--xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
