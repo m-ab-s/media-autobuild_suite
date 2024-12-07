@@ -2461,7 +2461,7 @@ fi
 
 _check=(libde265.a)
 [[ $standalone = y ]] && _check+=(bin-video/dec265.exe)
-if [[ $libheif = y ]] &&
+if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBDE265"; then
     do_uninstall "${_check[@]}"
     extracommands=()
@@ -2471,17 +2471,16 @@ if [[ $libheif = y ]] &&
 fi
 
 _check=(bin-video/heif-{dec,enc,info,thumbnailer}.exe)
-if [[ $libheif = y ]] &&
+[[ $libheif = shared ]] && _check+=(bin-video/libheif.dll)
+if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBHEIF"; then
     do_uninstall "${_check[@]}"
 
-    sed -i 's/find_package(vvdec 2.3.0)/find_package(vvdec 3.0.0)/' CMakeLists.txt
-    sed -i 's/find_package(Doxygen)/#/' CMakeLists.txt # no configurable option?
-    sed -i 's/find_package(Brotli)/#/' CMakeLists.txt # linking difficulties
-    sed -i 's/find_package(TIFF)/#/' heifio/CMakeLists.txt # configure & linking difficulties
+    do_patch https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libheif/0001-Edit-CMakeLists.patch
 
     extracflags=()
     extracommands=(-DWITH_HEADER_COMPRESSION=ON -DWITH_UNCOMPRESSED_CODEC=ON)
+
     pc_exists "libde265" &&
         extracommands+=(-DWITH_LIBDE265=ON -DWITH_LIBDE265_PLUGIN=OFF) &&
         extracflags+=(-DLIBDE265_STATIC_BUILD=1)
@@ -2522,9 +2521,12 @@ if [[ $libheif = y ]] &&
     pc_exists "libavcodec" "libavutil" &&
         extracommands+=(-DWITH_FFMPEG_DECODER=OFF -DWITH_FFMPEG_DECODER_PLUGIN=OFF)
 
+    # this depends on CMake overrides -DBUILD_SHARED_LIBS=off in do_cmake, may break if that behavior changes.
+    [[ $libheif = shared ]] && extracommands+=(-DBUILD_SHARED_LIBS=ON)
     CFLAGS+=" ${extracflags[@]}" CXXFLAGS+=" ${extracflags[@]}" \
         do_cmakeinstall video -DBUILD_TESTING=OFF -DWITH_GDK_PIXBUF=OFF "${extracommands[@]}"
-    # this subfolder is for plugins and is empty so we delete it
+
+    # this subfolder is for plugins and is empty since we didn't build any plugin so we delete it
     rmdir "$LOCALDESTDIR/lib/libheif" > /dev/null 2>&1
     do_checkIfExist
 fi
