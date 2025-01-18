@@ -2358,11 +2358,13 @@ verify_cuda_deps() {
     if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
         do_removeOption --enable-libnpp
     fi
-    if ! disabled cuda-llvm && do_pacman_install clang; then
+    if enabled cuda-llvm && do_pacman_install clang; then
         do_removeOption --enable-cuda-nvcc
     else
         do_removeOption --enable-cuda-llvm
-        do_addOption --disable-cuda-llvm
+        if ! disabled autodetect; then
+            do_addOption --disable-cuda-llvm
+        fi
     fi
     if enabled cuda-nvcc; then
         if ! get_cl_path; then
