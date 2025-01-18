@@ -405,7 +405,7 @@ if [0]==[%libheifINI%] (
     echo. Build libheif [High Efficiency Image File Format encoder and decoder]?
     echo. 1 = Yes
     echo. 2 = No
-    echo. 3 = Shared (a single libheif.dll with multiple execatables^)
+    echo. 3 = Shared (a single libheif.dll with multiple executables^)
     echo.
     echo. Will use available encoders and decoders supported by libheif.
     echo. If not found, built libheif will lack the corresponding encode/decode ability.
