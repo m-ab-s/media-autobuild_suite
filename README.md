@@ -153,6 +153,18 @@ For information about the compiler environment see the wiki, there you also have
         - dav1d (dec only)
         - rav1e (enc only)
         - svt-av1 (enc only)
+    - libheif (git) with following encoders/decoders:
+        - x265 (enc only)
+        - kvazaar (enc only)
+        - libde265 (dec only)
+        - aom (enc/dec)
+        - dav1d (dec only)
+        - svt-av1 (enc only)
+        - vvenc & vvdec
+        - uvg266 (enc only)
+        - libjpeg (enc/dec)
+        - openh264 (dec only)
+        - uncompressed
     - libbdplus (git) (shared)
     - mediainfo cli (git)
     - mp4box (git)
