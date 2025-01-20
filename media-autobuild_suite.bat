@@ -1986,7 +1986,7 @@ goto :EOF
     echo.CFLAGS+=" -mtune=generic -O2 -pipe" # performance related flags
     echo.CFLAGS+=" -D__USE_MINGW_ANSI_STDIO=1" # mingw-w64 specific flags for c99 printf
     echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
-    echo.LDFLAGS="${CFLAGS} -static-libgcc" # copy CFLAGS to LDFLAGS
+    echo.LDFLAGS="${CFLAGS} -static-libgcc -liconv" # copy CFLAGS to LDFLAGS
     echo.case "$CC" in
     echo.*clang^)
     echo.    # clang complains about using static-libstdc++ with C files.
