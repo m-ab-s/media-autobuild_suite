@@ -1987,6 +1987,7 @@ goto :EOF
     echo.CFLAGS+=" -D__USE_MINGW_ANSI_STDIO=1" # mingw-w64 specific flags for c99 printf
     echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
     echo.LDFLAGS="${CFLAGS} -static-libgcc -liconv" # copy CFLAGS to LDFLAGS
+    echo.RUSTFLAGS="-Clink-arg=-liconv"
     echo.case "$CC" in
     echo.*clang^)
     echo.    # clang complains about using static-libstdc++ with C files.
@@ -2001,7 +2002,7 @@ goto :EOF
     echo.;;
     echo.esac
     echo.# CPPFLAGS used to be here, but cmake ignores it, so it's not as useful.
-    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS
+    echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS RUSTFLAGS
     echo.
     echo.export CARGO_HOME="/opt/cargo"
     echo.if [[ -z "$CCACHE_DIR" ]]; then
