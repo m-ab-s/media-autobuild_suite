@@ -297,6 +297,8 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_checkIfExist
     fi
 
+    grep_or_sed iconv "$LOCALDESTDIR/lib/pkgconfig/fontconfig.pc" 's/Libs:.*/& -liconv/'
+
     _deps=(libfreetype.a)
     _check=(libharfbuzz.a harfbuzz.pc)
     [[ $ffmpeg = sharedlibs ]] && _check+=(libharfbuzz.dll.a bin-video/libharfbuzz-{subset-,}0.dll)
