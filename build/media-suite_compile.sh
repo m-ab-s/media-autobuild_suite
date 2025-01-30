@@ -1239,10 +1239,10 @@ if [[ $libavif = y ]]; then
         grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
         do_uninstall "${_check[@]}"
         extracommands=()
-        pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=ON")
-        pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=ON")
-        pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=ON")
-        pc_exists "SvtAv1Enc" && extracommands+=("-DAVIF_CODEC_SVT=ON")
+        pc_exists "dav1d" && extracommands+=("-DAVIF_CODEC_DAV1D=SYSTEM")
+        pc_exists "rav1e" && extracommands+=("-DAVIF_CODEC_RAV1E=SYSTEM")
+        pc_exists "aom" && extracommands+=("-DAVIF_CODEC_AOM=SYSTEM")
+        pc_exists "SvtAv1Enc" && extracommands+=("-DAVIF_CODEC_SVT=SYSTEM")
         case $standalone in
         y) extracommands+=("-DAVIF_BUILD_APPS=ON") ;;
         *) extracommands+=("-DAVIF_BUILD_APPS=OFF") ;;
