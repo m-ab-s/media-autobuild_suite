@@ -236,7 +236,7 @@ vcs_ref_to_hash() (
 #   do_vcs "url#branch|revision|tag|commit=NAME[ folder]" "folder"
 do_vcs() {
     local vcsURL=${1#*::} vcsFolder=$2 vcsCheck=("${_check[@]}")
-    local vcsBranch=${vcsURL#*#} ref=origin/HEAD
+    local vcsBranch=${vcsURL#*#} ref=origin/HEAD commit='' refmsg=''
     local deps=("${_deps[@]}") && unset _deps
     [[ $vcsBranch == "$vcsURL" ]] && unset vcsBranch
     local vcsPotentialFolder=${vcsURL#* }
@@ -247,6 +247,8 @@ do_vcs() {
     : "${vcsFolder:=$(basename "$vcsURL" .git)}"  # else just grab from the url like git normally does
 
     if [[ -n $vcsBranch ]]; then
+        commit=${vcsBranch##*commit=}
+        [[ $vcsBranch == "$commit" ]] && unset commit
         ref=${vcsBranch##*=}
         unset vcsBranch
     fi
@@ -268,9 +270,14 @@ do_vcs() {
     *) ref=$(vcs_ref_to_hash "$vcsURL" "$ref" "$vcsFolder") ;;
     esac
 
+    if [[ -n $commit ]]; then
+        ref=$commit
+        refmsg="with ref $ref"
+    fi
+
     if ! check_valid_vcs "$vcsFolder-git"; then
         rm -rf "$vcsFolder-git"
-        do_print_progress "  Running git clone for $vcsFolder"
+        do_print_progress "  Running git clone for $vcsFolder $refmsg"
         if ! do_mabs_clone "$vcsURL" "$vcsFolder" "$ref"; then
             echo "$vcsFolder git seems to be down"
             echo "Try again later or <Enter> to continue"
@@ -293,7 +300,7 @@ do_vcs() {
     vcs_set_url "$vcsURL"
     log -q git.fetch vcs_fetch
     oldHead=$(vcs_get_merge_base "$ref")
-    do_print_progress "  Running git update for $vcsFolder"
+    do_print_progress "  Running git update for $vcsFolder $refmsg"
     log -q git.reset vcs_reset "$ref"
     newHead=$(vcs_get_current_head "$PWD")
 
