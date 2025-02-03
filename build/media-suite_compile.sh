@@ -1235,6 +1235,7 @@ if [[ $libavif = y ]]; then
     [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
     if { pc_exists "aom" || pc_exists "dav1d" || pc_exists "rav1e" || pc_exists "SvtAv1Enc"; } &&
         do_vcs "$SOURCE_REPO_LIBAVIF"; then
+        do_patch "https://gitlab.com/AOMediaCodec/SVT-AV1/-/raw/master/.gitlab/workflows/linux/libavif_api_job_fix.patch"
         # chop off any .lib suffixes that is attached to a library name
         grep_and_sed '\.lib' CMakeLists.txt 's|(\w)\.lib\b|\1|g'
         do_uninstall "${_check[@]}"
