@@ -213,6 +213,7 @@ _deps=("$MINGW_PREFIX"/lib/pkgconfig/oniguruma.pc)
 _check=(bin-global/jq.exe)
 if [[ $jq = y ]] &&
     do_vcs "https://github.com/jqlang/jq.git"; then
+    do_pacman_install -m bison flex
     do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
     do_autoreconf
@@ -578,6 +579,7 @@ fi
 if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
     do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll$reset"
     do_pacman_remove opencl-headers
+    do_pacman_install tools-git
     _check=(CL/cl.h)
     if do_vcs "$SOURCE_REPO_OPENCLHEADERS"; then
         do_uninstall include/CL
@@ -1093,6 +1095,7 @@ fi
 _check=(libvpx.a vpx.pc)
 [[ $standalone = y || $av1an != n ]] && _check+=(bin-video/vpxenc.exe)
 if { enabled libvpx || [[ $vpx = y ]]; } && do_vcs "$SOURCE_REPO_VPX" vpx; then
+    do_pacman_install yasm
     extracommands=()
     [[ -f config.mk ]] && log "distclean" make distclean
     [[ $standalone = y || $av1an != n ]] && _check+=(bin-video/vpxdec.exe) ||
@@ -1136,6 +1139,7 @@ else
 fi
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "$SOURCE_REPO_LIBAOM"; then
+    do_pacman_install yasm
     extracommands=()
     if $_aom_bins; then
         _check+=(bin-video/aomdec.exe)
@@ -1315,6 +1319,7 @@ fi
 if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
     if do_vcs "$SOURCE_REPO_LIBAACS"; then
+        do_pacman_install -m bison flex
         sed -ri 's;bin_PROGRAMS.*;bin_PROGRAMS = ;' Makefile.am
         do_autoreconf
         do_uninstall "${_check[@]}" include/libaacs
@@ -1380,6 +1385,7 @@ fi
 _check=(libxavs.a xavs.{h,pc})
 if [[ $ffmpeg != no ]] && enabled libxavs && do_pkgConfig "xavs = 0.1." "0.1" &&
     do_vcs "$SOURCE_REPO_XAVS"; then
+    do_pacman_install yasm
     do_patch "https://github.com/Distrotech/xavs/pull/1.patch" am
     [[ -f libxavs.a ]] && log "distclean" make distclean
     do_uninstall "${_check[@]}"
@@ -1824,6 +1830,7 @@ pc_exists x265 && sed -i 's|-lmingwex||g' "$(file_installed x265.pc)"
 _check=(xvid.h libxvidcore.a bin-video/xvid_encraw.exe)
 if enabled libxvid && [[ $standalone = y ]] &&
     do_vcs "$SOURCE_REPO_XVID"; then
+    do_pacman_install yasm
     do_patch "https://github.com/m-ab-s/xvid/compare/lighde.patch" am
     do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
@@ -1879,6 +1886,7 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
+    do_pacman_install tools-git
     _python_ver=3.12.7
     _python_lib=python312
     _vsver=70
@@ -2115,7 +2123,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     grep_and_sed VULKAN_LIB_SUFFIX loader/vulkan.pc.in \
             's/@VULKAN_LIB_SUFFIX@//'
     create_build_dir
-    log dependencies /usr/bin/python3 ../scripts/update_deps.py --no-build
+    log dependencies "$MINGW_PREFIX"/bin/python ../scripts/update_deps.py --no-build
     cd_safe Vulkan-Headers
         do_print_progress "Installing Vulkan-Headers"
         do_uninstall include/vulkan
@@ -2157,12 +2165,9 @@ _check=(lib{glslang,OSDependent,SPVRemapper}.a
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
-    do_pacman_install python
     do_uninstall libHLSL.a "${_check[@]}"
-    log dependencies /usr/bin/python ./update_glslang_sources.py
-    # Python3_EXECUTABLE set to prevent CMake from finding the newer (but specific to the msys subsystem) python 3.11
-    # (current mingw-w64 versions are 3.10)
-    do_cmakeinstall -DUNIX=OFF -DPython3_EXECUTABLE="${MINGW_PREFIX}/bin/python.exe"
+    log dependencies "$MINGW_PREFIX"/bin/python ./update_glslang_sources.py
+    do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
 fi
 
@@ -2176,7 +2181,7 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
     do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
     grep_and_sed d0e67c58134377f065a509845ca6b7d463f5b487 DEPS 's/d0e67c58134377f065a509845ca6b7d463f5b487/76cc41d26f6902de543773023611e40fbcdde58b/g'
-    log dependencies /usr/bin/python ./utils/git-sync-deps
+    log dependencies "$MINGW_PREFIX"/bin/python ./utils/git-sync-deps
 
     # fix python indentation errors from non-existant code review
     grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
@@ -2620,16 +2625,16 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
-        do_pacman_install -m python-setuptools
+        do_pacman_install python-setuptools
         do_patch "https://github.com/mpv-player/mpv/commit/78447c4b91634aa91dcace1cc6a9805fb93b9252.patch" am
         do_patch "https://github.com/mpv-player/mpv/commit/414ddbd628724df3afc1e15f5e415dbb2c76a0b5.patch" am
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mpv/0001-ao_wasapi_utils-include-mmreg.h-for-WAVE_FORMAT.patch" am
         hide_conflicting_libs
         create_ab_pkgconfig
 
-        log bootstrap /usr/bin/python bootstrap.py
+        log bootstrap "$MINGW_PREFIX"/bin/python bootstrap.py
         if [[ -d build ]]; then
-            WAF_NO_PREFORK=1 /usr/bin/python waf distclean >/dev/null 2>&1
+            WAF_NO_PREFORK=1 "$MINGW_PREFIX"/bin/python waf distclean >/dev/null 2>&1
             do_uninstall bin-video/mpv{.exe,-2.dll}.debug "${_check[@]}"
         fi
 
@@ -2691,7 +2696,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             WAF_NO_PREFORK=1 \
-            log configure /usr/bin/python waf configure \
+            log configure "$MINGW_PREFIX"/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             "${MPV_OPTS[@]}"
         extra_script post configure
@@ -2701,13 +2706,13 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         extra_script pre build
         WAF_NO_PREFORK=1 \
-            log build /usr/bin/python waf -j "${cpuCount:-1}"
+            log build "$MINGW_PREFIX"/bin/python waf -j "${cpuCount:-1}"
         extra_script post build
 
         extra_script pre install
         WAF_NO_PREFORK=1 \
-            log install /usr/bin/python waf -j1 install ||
-            log install /usr/bin/python waf -j1 install
+            log install "$MINGW_PREFIX"/bin/python waf -j1 install ||
+            log install "$MINGW_PREFIX"/bin/python waf -j1 install
         extra_script post install
 
         if ! files_exist libavutil.a; then
