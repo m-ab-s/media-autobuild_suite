@@ -101,12 +101,10 @@ do if %%f lss 4 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=asciidoc autoconf-wrapper automake-wrapper autogen base bison diffstat dos2unix filesystem help2man ^
-intltool libtool patch python xmlto make zip unzip git subversion wget p7zip man-db ^
-gperf winpty texinfo gyp doxygen autoconf-archive itstool ruby mintty flex msys2-runtime pacutils
+set msyspackages=autoconf-archive autoconf-wrapper autogen automake-wrapper base dos2unix ^
+filesystem git libtool make msys2-runtime patch pacutils p7zip subversion unzip winpty
 
-set mingwpackages=cmake dlfcn libpng nasm pcre tools-git yasm ninja pkgconf meson ccache jq ^
-gettext-tools
+set mingwpackages=ccache cmake dlfcn gettext-tools meson nasm ninja pkgconf
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d12va d3d11va dxva2 ^

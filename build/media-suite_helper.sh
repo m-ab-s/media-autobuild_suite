@@ -1343,6 +1343,7 @@ do_cmake() {
         return
     # shellcheck disable=SC2086
     log "cmake" cmake "$root" -G Ninja -DBUILD_SHARED_LIBS=off \
+        -DPython3_EXECUTABLE="${MINGW_PREFIX}/bin/python.exe" \
         -DCMAKE_EXPORT_COMPILE_COMMANDS=on \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DUNIX=on \
