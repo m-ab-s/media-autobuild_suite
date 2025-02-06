@@ -777,7 +777,7 @@ fi
 
 if [[ $faac = y ]]; then
     _check=(bin-audio/faac.exe)
-    if [[ $standalone = y ]]; then
+    if ! [[ $standalone = y ]]; then
         do_pacman_install faac
     elif do_vcs "$SOURCE_REPO_FAAC"; then
         do_pacman_remove faac
