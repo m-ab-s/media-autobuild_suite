@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# The version of Qt that VLC uses
+_qt_version=6.7.3
+
 # Dependency References
+SOURCE_REPO_ABSL=https://github.com/abseil/abseil-cpp.git
 SOURCE_REPO_AMF=https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
 SOURCE_REPO_ANGLE=https://chromium.googlesource.com/angle/angle
 SOURCE_REPO_ARRIB24=https://github.com/nkoriyama/aribb24.git
@@ -26,6 +30,7 @@ SOURCE_REPO_FONTCONFIG=https://gitlab.freedesktop.org/fontconfig/fontconfig.git#
 SOURCE_REPO_FREETYPE=https://github.com/freetype/freetype.git#tag=LATEST
 SOURCE_REPO_FREI0R=https://github.com/dyne/frei0r.git
 SOURCE_REPO_FRIBIDI=https://github.com/fribidi/fribidi.git
+SOURCE_REPO_FXC=https://github.com/JPeterMugaas/efxc2.git
 SOURCE_REPO_GFLAGS=https://github.com/gflags/gflags.git
 SOURCE_REPO_GLSLANG=https://github.com/KhronosGroup/glslang.git
 SOURCE_REPO_GPAC=https://github.com/gpac/gpac.git
@@ -42,12 +47,14 @@ SOURCE_REPO_LIBBLURAY=https://code.videolan.org/videolan/libbluray.git
 SOURCE_REPO_LIBBMX=https://github.com/bbc/bmx.git
 SOURCE_REPO_LIBDVDNAV=https://code.videolan.org/videolan/libdvdnav.git
 SOURCE_REPO_LIBDVDREAD=https://code.videolan.org/videolan/libdvdread.git
+SOURCE_REPO_LIBEBML=https://github.com/Matroska-Org/libebml.git#branch=v1.x
 SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
 SOURCE_REPO_LIBILBC=https://github.com/TimothyGu/libilbc.git
 SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
 SOURCE_REPO_LIBKVAZAAR=https://github.com/ultravideo/kvazaar.git
 SOURCE_REPO_LIBLC3=https://github.com/google/liblc3.git
 SOURCE_REPO_LIBLSMASH=https://github.com/l-smash/l-smash.git
+SOURCE_REPO_LIBMATROSKA=https://github.com/Matroska-Org/libmatroska.git#branch=v1.x
 SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git
 SOURCE_REPO_LIBMFX=https://github.com/lu-zero/mfx_dispatch.git
 SOURCE_REPO_LIBMUSICBRAINZ=https://github.com/metabrainz/libmusicbrainz.git
@@ -61,7 +68,10 @@ SOURCE_REPO_LIBRAV1E=https://github.com/xiph/rav1e.git
 SOURCE_REPO_LIBRESSL=https://github.com/libressl-portable/portable.git#tag=LATEST
 SOURCE_REPO_LIBRIST=https://code.videolan.org/rist/librist.git
 SOURCE_REPO_LIBRTMP=https://gitlab.com/m-ab-s/rtmpdump.git
+SOURCE_REPO_LIBSHOUT=https://gitlab.xiph.org/xiph/icecast-libshout.git
 SOURCE_REPO_LIBSOXR=https://gitlab.com/m-ab-s/libsoxr.git
+SOURCE_REPO_LIBSPATIALAUDIO=https://github.com/videolabs/libspatialaudio.git#tag=0.3.0
+SOURCE_REPO_LIBTHAI=https://github.com/tlwg/libthai.git
 SOURCE_REPO_LIBTIFF=https://gitlab.com/libtiff/libtiff.git
 SOURCE_REPO_LIBVMAF=https://github.com/Netflix/vmaf.git
 SOURCE_REPO_LIBVORBIS=https://github.com/xiph/vorbis.git
@@ -74,14 +84,23 @@ SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MABS=https://github.com/m-ab-s/media-autobuild_suite.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
+SOURCE_REPO_MEDIALIBRARY=https://code.videolan.org/videolan/medialibrary.git
 SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git#tag=v0.36.0
 SOURCE_REPO_MUJS=https://github.com/ccxvii/mujs.git
 SOURCE_REPO_NEON=https://github.com/notroj/neon.git
 SOURCE_REPO_OPENAL=https://github.com/kcat/openal-soft.git
 SOURCE_REPO_OPENCLHEADERS=https://github.com/KhronosGroup/OpenCL-Headers.git
+SOURCE_REPO_OPENJPEG2=https://github.com/uclouvain/openjpeg.git
 SOURCE_REPO_OPUS=https://gitlab.xiph.org/xiph/opus.git
 SOURCE_REPO_OPUSEXE=https://gitlab.xiph.org/xiph/opus-tools.git
 SOURCE_REPO_OPUSFILE=https://gitlab.xiph.org/xiph/opusfile.git
+SOURCE_REPO_PIXMAN=https://gitlab.freedesktop.org/pixman/pixman.git
+SOURCE_REPO_PROTOBUF=https://github.com/protocolbuffers/protobuf.git
+SOURCE_REPO_QTBASE=https://github.com/qt/qtbase.git#branch=$_qt_version
+SOURCE_REPO_QTDECLARATIVE=https://github.com/qt/qtdeclarative.git#branch=$_qt_version
+SOURCE_REPO_QTSHADERTOOLS=https://github.com/qt/qtshadertools.git#branch=$_qt_version
+SOURCE_REPO_QTSVG=https://github.com/qt/qtsvg.git#branch=$_qt_version
+SOURCE_REPO_QT5COMPAT=https://github.com/qt/qt5compat.git#branch=$_qt_version
 SOURCE_REPO_RUBBERBAND=https://github.com/m-ab-s/rubberband.git
 SOURCE_REPO_SDL2=https://github.com/libsdl-org/SDL.git#SDL2
 SOURCE_REPO_SHADERC=https://github.com/google/shaderc.git
@@ -100,6 +119,7 @@ SOURCE_REPO_UAVS3D=https://github.com/uavs3/uavs3d.git
 SOURCE_REPO_URIPARSER=https://github.com/uriparser/uriparser.git
 SOURCE_REPO_UVG266=https://github.com/ultravideo/uvg266.git
 SOURCE_REPO_VIDSTAB=https://github.com/georgmartius/vid.stab.git
+SOURCE_REPO_VLC=https://code.videolan.org/videolan/vlc.git
 SOURCE_REPO_VORBIS_TOOLS=https://github.com/xiph/vorbis-tools.git
 SOURCE_REPO_VPX=https://chromium.googlesource.com/webm/libvpx
 SOURCE_REPO_VULKANLOADER=https://github.com/KhronosGroup/Vulkan-Loader.git

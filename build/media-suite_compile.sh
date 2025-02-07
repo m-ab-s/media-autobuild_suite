@@ -129,7 +129,7 @@ unset _keys _root
 _clean_old_builds=(j{config,error,morecfg,peglib}.h
     lib{jpeg,nettle,gnurx,regex}.{,l}a
     lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
+    libSDL{,main}.{l,}a libopen{jpwl,mj2}.{a,pc}
     include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
     regex.h magic.h
     {nettle,vo-aacenc,sdl,uchardet}.pc
@@ -246,7 +246,7 @@ fi
 # Probably caused by https://gitlab.gnome.org/GNOME/libxml2/-/commit/93e8bb2a402012858500b608b4146cd5c756e34d
 grep_or_sed Requires.private "$LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc" 's/Requires:/Requires.private:/'
 
-if [[ $ffmpeg != no ]] && enabled libaribb24; then
+if { [[ $ffmpeg != no ]] && enabled libaribb24; } || [[ $vlc = y ]]; then
     _check=(libpng.{pc,{,l}a} libpng16.{pc,{,l}a} libpng16/png.h)
     if do_vcs "$SOURCE_REPO_LIBPNG"; then
         do_uninstall include/libpng16 "${_check[@]}"
@@ -257,7 +257,8 @@ if [[ $ffmpeg != no ]] && enabled libaribb24; then
 
     _deps=(libpng.{pc,a} libpng16.{pc,a})
     _check=(aribb24.pc libaribb24.{,l}a)
-    if do_vcs "$SOURCE_REPO_ARRIB24"; then
+    if [[ $ffmpeg != no ]] && enabled libaribb24 && 
+        do_vcs "$SOURCE_REPO_ARRIB24"; then
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/12.patch"
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/13.patch"
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/17.patch"
@@ -268,7 +269,7 @@ if [[ $ffmpeg != no ]] && enabled libaribb24; then
     fi
 fi
 
-if [[ $mplayer = y || $mpv = y ]] ||
+if [[ $mplayer = y || $mpv = y || $vlc = y ]] ||
     { [[ $ffmpeg != no ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
@@ -539,6 +540,16 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
     fi
 fi
 
+_check=(libopenjp2.{a,pc} openjpeg-2.5/openjpeg.h)
+if { { [[ $ffmpeg != no ]] && enabled libopenjpeg; } ||
+    [[ $vlc = y ]] } &&
+    do_vcs "$SOURCE_REPO_OPENJPEG2"; then
+    do_pacman_remove openjpeg2
+    do_uninstall {include,lib/cmake}/openjpeg-2.5 "${_check[@]}"
+    do_cmakeinstall global -DBUILD_{CODEC,JPIP,JAVA,TESTING}=OFF
+    do_checkIfExist
+fi
+
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
     if do_vcs "$SOURCE_REPO_GFLAGS"; then
@@ -696,7 +707,7 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
 fi
 
 _check=(libogg.{l,}a ogg/ogg.h ogg.pc)
-if { [[ $flac = y ]] || enabled libvorbis; } &&
+if { [[ $flac = y || $vlc = y ]] || enabled libvorbis; } &&
     do_vcs "$SOURCE_REPO_LIBOGG"; then
     do_uninstall include/ogg "${_check[@]}"
     do_autogen
@@ -1517,9 +1528,7 @@ if [[ $ffmpeg != no ]] && enabled libzvbi &&
     cd_safe ..
     log pkgconfig make SUBDIRS=. install
     do_checkIfExist
-    unset _vlc_zvbi_patches
 fi
-
 
 if [[ $ffmpeg != no ]] && enabled_any frei0r ladspa; then
     _check=(libdl.a dlfcn.h)
@@ -2235,7 +2244,6 @@ if [[ $ffmpeg != no ]]; then
     fi
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
-    enabled libopenjpeg && do_pacman_install openjpeg2
     if enabled libopenh264; then
         # We use msys2's package for the header and import library so we don't build it, for licensing reasons
         do_pacman_install openh264
@@ -2843,266 +2851,6 @@ if [[ $cyanrip = y ]]; then
     fi
 fi
 
-if [[ $vlc == y ]]; then
-    do_pacman_install lib{cddb,nfs,shout,samplerate,microdns,secret} \
-        a52dec taglib gtk3 lua perl
-
-    # Remove useless shell scripts file that causes errors when stdout is not a tty.
-    find "$MINGW_PREFIX/bin/" -name "luac" -delete
-
-    _check=("$DXSDK_DIR/fxc2.exe" "$DXSDK_DIR/d3dcompiler_47.dll")
-    if do_vcs "https://github.com/mozilla/fxc2.git"; then
-        do_uninstall "${_check[@]}"
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0001-make-Vn-argument-as-optional-and-provide-default-var.patch" am
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch" am
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch" am
-        $CXX $CFLAGS -static -static-libgcc -static-libstdc++ -o "$DXSDK_DIR/fxc2.exe" fxc2.cpp -ld3dcompiler $LDFLAGS
-        case $bits in
-        32*) cp -f "dll/d3dcompiler_47_32.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
-        *) cp -f "dll/d3dcompiler_47.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
-        esac
-        do_checkIfExist
-    fi
-
-    # Taken from https://code.videolan.org/videolan/vlc/blob/master/contrib/src/qt/AddStaticLink.sh
-    _add_static_link() {
-        local PRL_SOURCE=$LOCALDESTDIR/$2/lib$3.prl LIBS
-        [[ -f $PRL_SOURCE ]] || PRL_SOURCE=$LOCALDESTDIR/$2/$3.prl
-        [[ ! -f $PRL_SOURCE ]] && return 1
-        LIBS=$(sed -e "
-            /QMAKE_PRL_LIBS =/ {
-                s@QMAKE_PRL_LIBS =@@
-                s@$LOCALDESTDIR/lib@\${libdir}@g
-                s@\$\$\[QT_INSTALL_LIBS\]@\${libdir}@g
-                p
-            }
-            d" "$PRL_SOURCE" | grep -v QMAKE_PRL_LIBS_FOR_CMAKE)
-        sed -i.bak "
-            s# -l$1# -l$3 -l$1#
-            s#Libs.private:.*#& $LIBS -L\${prefix}/$2#
-            " "$LOCALDESTDIR/lib/pkgconfig/$1.pc"
-    }
-
-    _qt_version=5.15 # Version that vlc uses
-    # $PKG_CONFIG --exists Qt5{Core,Widgets,Gui,Quick{,Widgets,Controls2},Svg}
-
-    # Qt compilation takes ages.
-    export QMAKE_CXX=$CXX QMAKE_CC=$CC
-    export MSYS2_ARG_CONV_EXCL="--foreign-types="
-    _check=(bin/qmake.exe Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc)
-    if do_vcs "https://github.com/qt/qtbase.git#branch=${_qt_version:=5.15}"; then
-        do_uninstall include/QtCore share/mkspecs "${_check[@]}"
-        # Enable ccache on !unix and use cygpath to fix certain issues
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0001-qtbase-mabs.patch" am
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0003-allow-cross-compilation-of-angle-with-wine.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0003-Remove-wine-prefix-before-fxc2.patch" am
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0006-ANGLE-don-t-use-msvc-intrinsics-when-crosscompiling-.patch" am
-        do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/qt/0009-Add-KHRONOS_STATIC-to-allow-static-linking-on-Windows.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0006-qt_module.prf-don-t-create-libtool-if-not-unix.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtbase/0007-qmake-Patch-win32-g-for-static-builds.patch" am
-        cp -f src/3rdparty/angle/src/libANGLE/{,libANGLE}Debug.cpp
-        grep_and_sed "src/libANGLE/Debug.cpp" src/angle/src/common/gles_common.pri \
-            "s#src/libANGLE/Debug.cpp#src/libANGLE/libANGLEDebug.cpp#g"
-
-        QT5Base_config=(
-            -prefix "$LOCALDESTDIR"
-            -datadir "$LOCALDESTDIR"
-            -archdatadir "$LOCALDESTDIR"
-            -opensource
-            -confirm-license
-            -release
-            -static
-            -platform "$(
-                case $CC in
-                *clang) echo win32-clang-g++ ;;
-                *) echo win32-g++ ;;
-                esac
-            )"
-            -make-tool make
-            -qt-{libjpeg,freetype,zlib}
-            -angle
-            -no-{shared,fontconfig,pkg-config,sql-sqlite,gif,openssl,dbus,vulkan,sql-odbc,pch,compile-examples,glib,direct2d,feature-testlib}
-            -skip qtsql
-            -nomake examples
-            -nomake tests
-        )
-        if [[ $strip == y ]]; then
-            QT5Base_config+=(-strip)
-        fi
-        if [[ $ccache == y ]]; then
-            QT5Base_config+=(-ccache)
-        fi
-        # can't use regular do_configure since their configure doesn't follow
-        # standard and uses single dash args
-        log "configure" ./configure "${QT5Base_config[@]}"
-
-        do_make
-        do_makeinstall
-
-        _add_static_link Qt5Gui plugins/imageformats qjpeg
-        grep_or_sed "QtGui/$(qmake -query QT_VERSION)/QtGui" "$LOCALDESTDIR/lib/pkgconfig/Qt5Gui.pc" \
-            "s;Cflags:.*;& -I\${includedir}/QtGui/$(qmake -query QT_VERSION)/QtGui;"
-        _add_static_link Qt5Gui plugins/platforms qwindows
-        _add_static_link Qt5Widgets plugins/styles qwindowsvistastyle
-
-        cat >> "$LOCALDESTDIR/mkspecs/win32-g++/qmake.conf" <<'EOF'
-CONFIG += static
-EOF
-        do_checkIfExist
-    fi
-
-    _deps=(Qt5Core.pc)
-    _check=(Qt5Quick.pc Qt5Qml.pc)
-    if do_vcs "https://github.com/qt/qtdeclarative.git#branch=$_qt_version"; then
-        do_uninstall "${_check[@]}"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/qtdeclarative/0001-features-hlsl_bytecode_header.prf-Use-DXSDK_DIR-for-.patch" am
-        git cherry-pick 0b9fcb829313d0eaf2b496bf3ad44e5628fa43b2 > /dev/null 2>&1 ||
-            git cherry-pick --abort
-        do_qmake
-        do_makeinstall
-        _add_static_link Qt5Quick qml/QtQuick.2 qtquick2plugin
-        _add_static_link Qt5Quick qml/QtQuick/Layouts qquicklayoutsplugin
-        _add_static_link Qt5Quick qml/QtQuick/Window.2 windowplugin
-        _add_static_link Qt5Qml qml/QtQml/Models.2 modelsplugin
-        do_checkIfExist
-    fi
-
-    _deps=(Qt5Core.pc)
-    _check=(Qt5Svg.pc)
-    if do_vcs "https://github.com/qt/qtsvg.git#branch=$_qt_version"; then
-        do_uninstall "${_check[@]}"
-        do_qmake
-        do_makeinstall
-        _add_static_link Qt5Svg plugins/iconengines qsvgicon
-        _add_static_link Qt5Svg plugins/imageformats qsvg
-        do_checkIfExist
-    fi
-
-    _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
-    _check=("$LOCALDESTDIR/qml/QtGraphicalEffects/libqtgraphicaleffectsplugin.a")
-    if do_vcs "https://github.com/qt/qtgraphicaleffects.git#branch=$_qt_version"; then
-        do_uninstall "${_check[@]}"
-        do_qmake
-        do_makeinstall
-        _add_static_link Qt5QuickWidgets qml/QtGraphicalEffects qtgraphicaleffectsplugin
-	    _add_static_link Qt5QuickWidgets qml/QtGraphicalEffects/private qtgraphicaleffectsprivate
-        do_checkIfExist
-    fi
-
-    _deps=(Qt5Core.pc Qt5Quick.pc Qt5Qml.pc)
-    _check=(Qt5QuickControls2.pc)
-    if do_vcs "https://github.com/qt/qtquickcontrols2.git#branch=$_qt_version"; then
-        do_uninstall "${_check[@]}"
-        do_qmake
-        do_makeinstall
-        _add_static_link Qt5QuickControls2 qml/QtQuick/Controls.2 qtquickcontrols2plugin
-        _add_static_link Qt5QuickControls2 qml/QtQuick/Templates.2 qtquicktemplates2plugin
-        do_checkIfExist
-    fi
-
-    _check=(libspatialaudio.a spatialaudio/Ambisonics.h spatialaudio.pc)
-    if do_vcs "https://github.com/videolabs/libspatialaudio.git"; then
-        do_uninstall include/spatialaudio "${_check[@]}"
-        do_cmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(libshout.{,l}a shout.pc shout/shout.h)
-    if do_vcs "https://gitlab.xiph.org/xiph/icecast-libshout.git" libshout; then
-        do_uninstall "${_check[@]}"
-        log -q "git.submodule" git submodule update --init
-        do_autoreconf
-        CFLAGS+=" -include ws2tcpip.h" do_separate_confmakeinstall --disable-examples LIBS="$($PKG_CONFIG --libs openssl)"
-        do_checkIfExist
-    fi
-
-    _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
-    if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
-        do_uninstall include/google/protobuf "${_check[@]}"
-        do_autogen
-        do_separate_confmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(pixman-1.pc libpixman-1.a pixman-1/pixman.h)
-    if do_vcs "https://gitlab.freedesktop.org/pixman/pixman.git"; then
-        do_uninstall include/pixman-1 "${_check[@]}"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/pixman/0001-pixman-pixman-mmx-fix-redefinition-of-_mm_mulhi_pu16.patch" am
-        NOCONFIGURE=y do_autogen
-        CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" \
-            do_separate_confmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(libmedialibrary.a medialibrary.pc medialibrary/IAlbum.h)
-    if do_vcs "https://code.videolan.org/videolan/medialibrary.git"; then
-        do_uninstall include/medialibrary "${_check[@]}"
-        do_mesoninstall -Dtests=disabled -Dlibvlc=disabled
-        do_checkIfExist
-    fi
-
-    _check=(libthai.pc libthai.{,l}a thai/thailib.h)
-    if do_vcs "https://github.com/tlwg/libthai.git"; then
-        do_uninstall include/thai "${_check[@]}"
-        do_autogen
-        do_separate_confmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(libebml.a ebml/ebml_export.h libebml.pc lib/cmake/EBML/EBMLTargets.cmake)
-    if do_vcs "https://github.com/Matroska-Org/libebml.git"; then
-        do_uninstall include/ebml lib/cmake/EBML "${_check[@]}"
-        do_cmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=(libmatroska.a libmatroska.pc matroska/KaxTypes.h lib/cmake/Matroska/MatroskaTargets.cmake)
-    if do_vcs "https://github.com/Matroska-Org/libmatroska.git"; then
-        do_uninstall include/matroska lib/cmake/Matroska "${_check[@]}"
-        do_cmakeinstall
-        do_checkIfExist
-    fi
-
-    _check=("$LOCALDESTDIR"/vlc/bin/{{c,r}vlc,vlc.exe,libvlc.dll}
-            "$LOCALDESTDIR"/vlc/libexec/vlc/vlc-cache-gen.exe
-            "$LOCALDESTDIR"/vlc/lib/pkgconfig/libvlc.pc
-            "$LOCALDESTDIR"/vlc/include/vlc/libvlc_version.h)
-    if do_vcs "https://code.videolan.org/videolan/vlc.git"; then
-        do_uninstall bin/plugins lib/vlc "${_check[@]}"
-        _mabs_vlc=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vlc
-        do_patch "https://code.videolan.org/videolan/vlc/-/merge_requests/155.patch" am
-        do_patch "$_mabs_vlc/0001-modules-access-srt-Use-srt_create_socket-instead-of-.patch" am
-        do_patch "$_mabs_vlc/0002-modules-codec-libass-Use-ass_set_pixel_aspect-instea.patch" am
-        do_patch "$_mabs_vlc/0003-Use-libdir-for-plugins-on-msys2.patch" am
-        do_patch "$_mabs_vlc/0004-include-vlc_fixups.h-fix-iovec-is-redefined-errors.patch" am
-        do_patch "$_mabs_vlc/0005-include-vlc_common.h-fix-snprintf-and-vsnprintf-rede.patch" am
-        do_patch "$_mabs_vlc/0006-configure.ac-check-if-_WIN32_IE-is-already-defined.patch" am
-        do_patch "$_mabs_vlc/0007-modules-stream_out-rtp-don-t-redefine-E-defines.patch" am
-        do_patch "$_mabs_vlc/0008-include-vlc_codecs.h-don-t-redefine-WAVE_FORMAT_PCM.patch" am
-        do_patch "$_mabs_vlc/0009-modules-audio_filter-channel_mixer-spatialaudio-add-.patch" am
-        do_patch "$_mabs_vlc/0010-modules-access_output-don-t-put-lgpg-error-for-liveh.patch" am
-
-        do_autoreconf
-        # All of the disabled are because of multiple issues both on the installed libs and on vlc's side.
-        # Maybe set up vlc_options.txt
-
-        # Can't disable shared since vlc will error out. I don't think enabling static will really do anything for us other than breaking builds.
-        create_build_dir
-        config_path=".." do_configure \
-            --prefix="$LOCALDESTDIR/vlc" \
-            --sysconfdir="$LOCALDESTDIR/vlc/etc" \
-            --{build,host,target}="$MINGW_CHOST" \
-            --enable-{shared,avcodec,merge-ffmpeg,qt,nls} \
-            --disable-{static,dbus,fluidsynth,svgdec,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode,nvdec} \
-            --with-binary-version="MABS" BUILDCC="$CC" \
-            CFLAGS="$CFLAGS -DGLIB_STATIC_COMPILATION -DQT_STATIC -DGNUTLS_INTERNAL_BUILD -DLIBXML_STATIC -DLIBXML_CATALOG_ENABLED" \
-            LIBS="$($PKG_CONFIG --libs libcddb regex iconv) -lwsock32 -lws2_32 -lpthread -liphlpapi"
-        do_makeinstall
-        do_checkIfExist
-        PATH="$LOCALDESTDIR/vlc/bin:$PATH" "$LOCALDESTDIR/vlc/libexec/vlc/vlc-cache-gen" "$LOCALDESTDIR/vlc/lib/plugins"
-    fi
-fi
-
 _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
     _notrequired=true
@@ -3114,6 +2862,266 @@ if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ff
     do_install ffmbc.exe bin-video/
     do_checkIfExist
     unset _notrequired
+fi
+
+if [[ $vlc = y ]]; then
+    do_pacman_remove gtk3 lib{cddb,microdns,nfs,samplerate,shout} lua perl taglib
+    do_pacman_install a52dec gsm libdatrie libjpeg-turbo pcre2
+
+    # base URL for VLC contrib patches
+    local _vlc=https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src
+
+    _check=(bin/fxc.exe)
+    if do_vcs "$SOURCE_REPO_FXC"; then
+        do_uninstall "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    # ccache errors out with "unknown option -- t" on Qt repos, so no ccache
+    CC="${CC/ccache /}" CXX="${CXX/ccache /}"
+
+    # Qt compilation takes ages.
+    export QMAKE_CXX="$CXX" QMAKE_CC="$CC"
+    _check=(bin/qmake{,6}.exe libQt6{Core,Gui,Widgets}.a lib/cmake/Qt6/qt.toolchain.cmake)
+    if do_vcs "$SOURCE_REPO_QTBASE"; then
+        do_uninstall lib/cmake/Qt6{,Core,Gui,Widgets} \
+            share/qt6 include/Qt{Core,Gui,OpenGL{,Widgets},Widgets} "${_check[@]}"
+        do_patch "$_vlc/qt/0001-Windows-Tray-Icon-Set-NOSOUND.patch" am
+        do_patch "$_vlc/qt/0003-Revert-QMutex-remove-qmutex_win.cpp.patch" am
+        do_patch "$_vlc/qt/0004-Expose-QRhiImplementation-in-QRhi.patch" am
+        do_patch "$_vlc/qt/0005-Do-not-include-D3D12MemAlloc.h-in-header-file.patch" am
+        do_patch "$_vlc/qt/0006-Try-DCompositionCreateDevice3-first-if-available.patch" am
+        do_patch "$_vlc/qt/0007-Try-to-satisfy-Windows-7-compatibility.patch" am
+        do_patch "$_vlc/qt/0001-disable-precompiled-headers-when-forcing-WINVER-inte.patch" am
+        do_patch "$_vlc/qt/0001-Do-not-link-D3D9.patch" am
+        # make cmake not error out on missing shared libs
+        sed -i 's;message(FATAL_ERROR \"The;message(WARNING \"The;' \
+            "$MINGW_PREFIX"/lib/cmake/zstd/zstdTargets.cmake
+
+        QTBase_config=(
+            -DQT_BUILD_{EXAMPLES,TESTS}=OFF
+            -DINSTALL_ARCHDATADIR="$(cygpath -pm $LOCALDESTDIR/share/qt6)"
+            -DINSTALL_DATADIR="$(cygpath -pm $LOCALDESTDIR/share/qt6)"
+            -DINSTALL_DESCRIPTIONSDIR="$(cygpath -pm $LOCALDESTDIR/share/qt6/modules)"
+            -DINSTALL_MKSPECSDIR="$(cygpath -pm $LOCALDESTDIR/share/qt6/mkspecs)"
+            -DFEATURE_optimize_full=ON
+            -DFEATURE_relocatable=ON
+            -DFEATURE_{androiddeployqt,concurrent,freetype,network,pdf,printsupport,sql,style-fusion,testlib,xml,zstd}=OFF
+            -DFEATURE_{dockwidget,keysequenceedit,lcdnumber,mdiarea,movie,pkg-config,splashscreen,statusbar,statustip,syntaxhighlighter,undoview,whatsthis}=OFF
+            -DFEATURE_{,system_}{harfbuzz,jpeg,png,zlib}=ON
+            -DFEATURE_{directwrite{,3}}=ON
+        )
+
+        create_build_dir
+        CXXFLAGS+=" -DPCRE2_STATIC" \
+            do_cmake -DUNIX=OFF -DCMAKE_TOOLCHAIN_FILE="$(cygpath -pm $LOCALDESTDIR/etc/toolchain.cmake)" \
+            "${QTBase_config[@]}"
+        do_ninja && do_ninjainstall
+        do_checkIfExist
+    fi
+
+    # do_cmakeinstall with options specific for Qt
+    do_qt_cmakeinstall() {
+        do_cmakeinstall -DUNIX=OFF -DQT_HOST_PATH="$(cygpath -pm $LOCALDESTDIR)" \
+            -DCMAKE_TOOLCHAIN_FILE="$(cygpath -pm $LOCALDESTDIR/lib/cmake/Qt6/qt.toolchain.cmake)" "$@"
+    }
+
+    _deps=(libQt6Core.a)
+    _check=(libQt6Svg.a)
+    if do_vcs "$SOURCE_REPO_QTSVG"; then
+        do_uninstall {include/Qt,lib/cmake/Qt6}Svg{,Widgets} "${_check[@]}"
+        do_qt_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _deps=(libQt6Core.a)
+    _check=(bin/qsb.exe libQt6ShaderTools.a)
+    if do_vcs "$SOURCE_REPO_QTSHADERTOOLS"; then
+        do_uninstall {include/Qt,lib/cmake/Qt6}ShaderTools "${_check[@]}"
+        do_qt_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _deps=(libQt6Core.a bin/qsb.exe)
+    _check=(libQt6{Quick{Controls2,Layouts,Templates2},Qml{,Models,WorkerScript}}.a)
+    if do_vcs "$SOURCE_REPO_QTDECLARATIVE"; then
+        do_uninstall share/qt6/qml \
+            {include/Qt,lib/cmake/Qt6}{Qml{,Core,Models,WorkerScript},Quick{Controls2,Layouts,Templates2,Widgets}} "${_check[@]}"
+        do_patch "$_vlc/qtdeclarative/0001-Fix-incorrect-library-inclusion.patch" am
+        do_patch "$_vlc/qtdeclarative/0002-Fix-build-with-no-feature-network.patch" am
+        # don't build features not used by VLC
+	    sed -e 's,add_subdirectory(qml),#add_subdirectory(qml),' \
+            -e 's,add_subdirectory(qmleasing),#add_subdirectory(qmleasing),' \
+            -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' \
+            -e 's,add_subdirectory(qmlformat),#add_subdirectory(qmlformat),' \
+            -e 's,add_subdirectory(qmltc),#add_subdirectory(qmltc),' \
+            -e 's,add_subdirectory(svgtoqml),#add_subdirectory(svgtoqml),' \
+            -i tools/CMakeLists.txt
+
+	    sed -e 's,add_subdirectory(labs),#add_subdirectory(labs),' \
+            -e 's,add_subdirectory(quickdialogs),#add_subdirectory(quickdialogs),' \
+            -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' \
+            -e 's,add_subdirectory(effects),#add_subdirectory(effects),' \
+            -e 's,add_subdirectory(quickwidgets),#add_subdirectory(quickwidgets),' \
+            -i src/CMakeLists.txt
+
+        do_qt_cmakeinstall -DFEATURE_qml_{debug,profiler,preview,network}=OFF \
+	        -DFEATURE_quick_{animatedimage,canvas,designer,flipable,particles,path,sprite}=OFF \
+	        -DFEATURE_quickcontrols2_{imagine,material,universal,macos,ios,fusion,windows}=OFF \
+	        -DFEATURE_quicktemplates2_calendar=OFF
+        do_checkIfExist
+    fi
+
+    _deps=(libQt6Core.a)
+    _check=("$LOCALDESTDIR"/share/qt6/qml/Qt5Compat/GraphicalEffects/libqtgraphicaleffectsplugin.a)
+    if do_vcs "$SOURCE_REPO_QT5COMPAT"; then
+        do_uninstall share/qt6/qml/Qt5Compat "${_check[@]}"
+        do_patch "$_vlc/qt5compat/0001-Revert-Auxiliary-commit-to-revert-individual-files-f.patch" am
+        do_patch "$_vlc/qt5compat/0002-Do-not-build-core5.patch" am
+        do_qt_cmakeinstall
+        do_checkIfExist
+    fi
+
+    CC="ccache $CC" CXX="ccache $CXX"
+
+    _check=(spatialaudio.pc libspatialaudio.a spatialaudio/Ambisonics.h)
+    if do_vcs "$SOURCE_REPO_LIBSPATIALAUDIO"; then
+        do_uninstall include/spatialaudio "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _deps=(ogg.pc)
+    _check=(shout.pc libshout.{,l}a shout/shout.h)
+    if do_vcs "$SOURCE_REPO_LIBSHOUT" libshout; then
+        do_uninstall "${_check[@]}"
+        log -q "git.submodule" git submodule update --init --recursive
+        # fix building without openssl
+        grep -q -- "with_openssl" m4/xiph_openssl.m4 ||
+            sed -e 's;linking to openssl;&\nif test x\$with_openssl != xno\; then;' \
+                -e 's;LIBS="\$xt_save_LIBS";&\nfi;' -i m4/xiph_openssl.m4
+        do_autoreconf
+        CFLAGS+=" -include ws2tcpip.h -Wno-implicit-function-declaration" \
+            do_separate_confmakeinstall --disable-{examples,thread,tools} --without-openssl
+        do_checkIfExist
+    fi
+
+    _check=(absl_base.pc libabsl_base.a absl/base/config.h)
+    if do_vcs "$SOURCE_REPO_ABSL"; then
+        do_uninstall include/absl "${_check[@]}"
+        sed -i '/lrt/d' absl/base/CMakeLists.txt
+        do_cmakeinstall -DABSL_PROPAGATE_CXX_STD=ON
+        do_checkIfExist
+    fi
+
+    _deps=(absl_base.pc)
+    _check=(bin/protoc.exe)
+    if do_vcs "$SOURCE_REPO_PROTOBUF"; then
+        do_uninstall include/google/protobuf "${_check[@]}"
+        log -q "git.submodule" git submodule update --init --recursive
+        # don't install unneeded files
+	    sed -e '1s;^;function (noinstall ...)\nendfunction()\n;' \
+            -e 's,install(FILES ,noinstall(FILES ,' \
+            -e 's,install(EXPORT ,noinstall(EXPORT ,' \
+            -e 's,install(DIRECTORY ,noinstall(DIRECTORY ,' \
+            -e 's,install(TARGETS ,noinstall(TARGETS ,' \
+            -e 's,noinstall(TARGETS protoc,install(TARGETS protoc,' \
+            -i cmake/install.cmake
+        do_cmakeinstall -Dprotobuf_BUILD_{LIBPROTOC,LIBUPB,SHARED_LIBS,TESTS}=OFF \
+            -Dprotobuf_BUILD_PROTOC_BINARIES=ON -Dprotobuf_WITH_ZLIB=ON \
+            -Dprotobuf_{ABSL,JSONCPP}_PROVIDER=package
+        do_checkIfExist
+    fi
+
+    _check=(medialibrary.pc libmedialibrary.a medialibrary/IAlbum.h)
+    if do_vcs "$SOURCE_REPO_MEDIALIBRARY"; then
+        do_uninstall include/medialibrary "${_check[@]}"
+        sed -e 's;<string>;&\n#include <cstdint>;' \
+            -i include/medialibrary/IChapter.h -i include/medialibrary/ISubtitleTrack.h
+        do_mesoninstall -Dtests=disabled -Dlibvlc=disabled -Dlibtool_workaround=true
+        do_checkIfExist
+    fi
+
+    _check=(libebml.pc libebml.a ebml/ebml_export.h lib/cmake/EBML/EBMLTargets.cmake)
+    if do_vcs "$SOURCE_REPO_LIBEBML"; then
+        do_uninstall include/ebml lib/cmake/EBML "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=(libmatroska.pc libmatroska.a matroska/KaxTypes.h lib/cmake/Matroska/MatroskaTargets.cmake)
+    if do_vcs "$SOURCE_REPO_LIBMATROSKA"; then
+        do_uninstall include/matroska lib/cmake/Matroska "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
+    fi
+
+    _check=("$LOCALDESTDIR"/opt/vlcffmpeg/lib/pkgconfig/lib{av{codec,format,util},swscale,postproc}.pc)
+    if flavor=vlc do_vcs "$ffmpegPath#branch=release/6.1"; then
+        do_uninstall "$LOCALDESTDIR"/opt/vlcffmpeg
+        do_patch "$_vlc/ffmpeg/0001-avcodec-dxva2_hevc-add-support-for-parsing-HEVC-Rang.patch" am
+        do_patch "$_vlc/ffmpeg/0002-avcodec-hevcdec-allow-HEVC-444-8-10-12-bits-decoding.patch" am
+        do_patch "$_vlc/ffmpeg/0003-avcodec-hevcdec-allow-HEVC-422-10-12-bits-decoding-w.patch" am
+        do_patch "$_vlc/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch" am
+        do_patch "$_vlc/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch" am
+        do_patch "$_vlc/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch"
+        do_patch "$_vlc/ffmpeg/dxva_vc1_crash.patch" am
+        do_patch "$_vlc/ffmpeg/h264_early_SAR.patch" am
+        [[ -f config.mak ]] && log "distclean" make distclean
+        create_build_dir vlc
+        config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
+            --prefix="$LOCALDESTDIR/opt/vlcffmpeg" --disable-autodetect \
+            --disable-{bsfs,encoders,programs,devices,filters,muxers} \
+            --disable-{avdevice,avfilter,swresample,debug,doc,network} \
+            --disable-{avisynth,bzlib,iconv,libvpx,linux-perf,nvenc} \
+            --disable-decoder=opus --disable-encoder=vorbis \
+            --disable-protocol=concat --enable-bsf=vp9_superframe \
+            --enable-{dxva2,libgsm,libopenjpeg} --enable-{gpl,postproc}
+        do_make && do_makeinstall
+        files_exist "${_check[@]}" && touch ../"build_successful${bits}_vlc"
+    fi
+
+    local _old_PKG_CONFIG_PATH="$PKG_CONFIG_PATH"
+    PKG_CONFIG_PATH="$LOCALDESTDIR/opt/vlcffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH"
+
+    # install VLC in a separate folder, due to its mandatory compilation of shared libs
+    local _vlc_dir="$LOCALDESTDIR/vlc"
+
+    _check=("$_vlc_dir"/bin/{{c,q,r,s}vlc,vlc.exe,libvlc{,core}.dll}
+            "$_vlc_dir"/libexec/vlc/vlc-cache-gen.exe
+            "$_vlc_dir"/lib/pkgconfig/libvlc.pc
+            "$_vlc_dir"/include/vlc/libvlc_version.h)
+    if do_vcs "$SOURCE_REPO_VLC"; then
+        do_uninstall "$_vlc_dir"/{bin,include,lib}/vlc "${_check[@]}"
+        do_pacman_install spirv-tools
+        do_patch "https://gist.githubusercontent.com/woot000/99d1107e7968ad9880deec16b49e95a6/raw/225ae9ba94931f412a7ca3816ac7f8feba9281c4/0001-Use-libdir-for-plugins-on-msys2.patch"
+
+        # dirty hacks to make building with Qt work
+		sed -e 's;"qmlimportscanner";"qmlimportscanner.exe";' \
+            -e 's;suffix=".qml");suffix=".qml", delete=False);' \
+            -i buildsystem/check_qml_module.py
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" log "bootstrap" ./bootstrap
+
+        # All of the disabled options are because of multiple issues both on the installed libs and on vlc's side.
+        # Maybe set up vlc_options.txt
+        # TODO: Switch to Meson after all missing options are ported from configure
+        C_INCLUDE_PATH="$(cygpath -pm $LOCALDESTDIR/opt/vlcffmpeg/include);$C_INCLUDE_PATH" \
+            FXC="$(cygpath -m $LOCALDESTDIR/bin/fxc.exe)" \
+            do_separate_confmakeinstall \
+            --prefix="$_vlc_dir" \
+            --sysconfdir="$_vlc_dir/etc" \
+            --{build,host,target}="$MINGW_CHOST" \
+            --enable-{shared,avcodec,avformat,postproc,swscale,fribidi,harfbuzz,merge-ffmpeg,nls,qt} \
+            --disable-{static,dbus,fluidsynth,svgdec,vulkan,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode,nvdec} \
+            --with-binary-version="MABS" BUILDCC="$CC"
+        PATH="$_vlc_dir/bin:$PATH" log -q "vlc-cache-gen" \
+            "$_vlc_dir/libexec/vlc/vlc-cache-gen" "$_vlc_dir/lib/vlc/plugins"
+        do_checkIfExist
+    fi
+
+    PKG_CONFIG_PATH="$_old_PKG_CONFIG_PATH"
+    unset _{,mabs_}vlc _vlc_dir _old_PKG_CONFIG_PATH
 fi
 
 do_simple_print -p "${orange}Finished $bits compilation of all tools${reset}"
