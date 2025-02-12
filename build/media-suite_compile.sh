@@ -361,8 +361,8 @@ fi
 if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
     do_pacman_install nettle
     _check=(libgnutls.{,l}a gnutls.pc)
-    _gnutls_ver=3.8.8
-    _gnutls_hash=ac4f020e583880b51380ed226e59033244bc536cad2623f2e26f5afa2939d8fb
+    _gnutls_ver=3.8.9
+    _gnutls_hash=69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed
     if do_pkgConfig "gnutls = $_gnutls_ver" && do_wget -h $_gnutls_hash \
         "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
         do_uninstall include/gnutls "${_check[@]}"
@@ -1887,7 +1887,7 @@ _vapoursynth_install() {
         return 1
     fi
     do_pacman_install tools-git
-    _python_ver=3.12.7
+    _python_ver=3.12.9
     _python_lib=python312
     _vsver=70
     _check=("lib$_python_lib.a")
