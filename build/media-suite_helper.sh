@@ -1678,7 +1678,7 @@ do_hide_pacman_sharedlibs() {
 do_hide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /{mingw,clang}{32,64}/lib /{mingw,clang}{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
+    files="$(find /{mingw{32,64},clang64}/lib /{mingw{32/i686,64/x86_64},clang64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f ${file%*.dll.a}.a ]] && tomove+=("$file")
@@ -1695,7 +1695,7 @@ do_hide_all_sharedlibs() {
 do_unhide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /{mingw,clang}{32,64}/lib /{mingw,clang}{32/i686,64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
+    files="$(find /{mingw{32,64},clang64}/lib /{mingw{32/i686,64/x86_64},clang64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
     local tomove=()
     local todelete=()
     for file in $files; do
@@ -1758,7 +1758,6 @@ do_pacman_install() (
             --overwrite "/mingw64/*" \
             --overwrite "/mingw32/*" \
             --overwrite "/clang64/*" \
-            --overwrite "/clang32/*" \
             "$prefix$pkg" > /dev/null 2>&1; then
             pacman -D --asexplicit "$prefix$pkg" > /dev/null 2>&1
             echo "$pkg" >> $file

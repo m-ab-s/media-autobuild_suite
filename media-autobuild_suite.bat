@@ -1601,6 +1601,19 @@ if [0]==[%pkgUpdateTimeINI%] (
 ) else set pkgUpdateTime=%pkgUpdateTimeINI%
 if %deleteINI%==1 echo.pkgUpdateTime=^%pkgUpdateTime%>>%ini%
 
+if %build32%==yes (
+    if %CC%==clang (
+        echo ----------------------------------------------------------------------
+        echo. As of December 18th 2024, msys2 no longer supports the
+        echo. CLANG32 environment. To continue running the suite, either
+        echo. switch to 64-bit (arch=3^), or
+        echo. switch to using gcc as the compiler (CC=2^).
+        echo. This can be done through editing build\media-autobuild_suite.ini.
+        pause
+        exit
+    )
+)
+
 rem ------------------------------------------------------------------
 rem download and install basic msys2 system:
 rem ------------------------------------------------------------------
@@ -1710,6 +1723,7 @@ if exist %fstab%. (
     for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
     findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
     findstr local64 %fstab% >nul 2>&1 && ( if [%build64%]==[no] set "removefstab=yes" ) || if [%build64%]==[yes] set "removefstab=yes"
+    findstr clang32 %fstab% >nul 2>&1 && set "removefstab=yes"
 ) else set removefstab=yes
 
 if not [%removefstab%]==[no] (
@@ -1726,7 +1740,6 @@ if not [%removefstab%]==[no] (
         echo.%instdir%\build\ /build ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\mingw32\ /mingw32 ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\mingw64\ /mingw64 ntfs binary,posix=0,noacl,user 0 0
-        echo.%instdir%\msys64\clang32\ /clang32 ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\clang64\ /clang64 ntfs binary,posix=0,noacl,user 0 0
         if "%build32%"=="yes" echo.%instdir%\local32\ /local32 ntfs binary,posix=0,noacl,user 0 0
         if "%build64%"=="yes" echo.%instdir%\local64\ /local64 ntfs binary,posix=0,noacl,user 0 0
@@ -1900,7 +1913,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     if %build64%==yes (
         if %CC%==clang ( set "MSYSTEM=CLANG64" ) else set "MSYSTEM=MINGW64"
     ) else (
-        if %CC%==clang ( set "MSYSTEM=CLANG32" ) else set "MSYSTEM=MINGW32"
+        if %CC%==gcc set "MSYSTEM=MINGW32"
     )
     set "MSYS2_PATH_TYPE=inherit"
     if %noMintty%==y set "PATH=%PATH%"
@@ -2072,9 +2085,9 @@ echo.---------------------------------------------------------------------------
 echo.install %1 bit compiler
 echo.-------------------------------------------------------------------------------
 if %CC%==clang (
-    if "%1"=="32" (
-        set prefix=mingw-w64-clang-i686-
-    ) else set prefix=mingw-w64-clang-x86_64-
+    if "%1"=="64" (
+        set prefix=mingw-w64-clang-x86_64-
+    )
 ) else (
     if "%1"=="32" (
         set prefix=mingw-w64-i686-
