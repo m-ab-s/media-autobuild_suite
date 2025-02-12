@@ -42,8 +42,6 @@ fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 [[ -f media-suite_deps.sh ]] && source media-suite_deps.sh
 
-do_pacman_remove -m mercurial
-
 # --------------------------------------------------
 # update suite
 # --------------------------------------------------
@@ -129,7 +127,7 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" &
     mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
     prefix_32='' prefix_64=''
     case $CC in
-    *clang*) prefix_64=$(extract_pkg_prefix clang64) ;;
+    *clang) prefix_64=$(extract_pkg_prefix clang64) ;;
     *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix mingw64) ;;
     esac
     for pkg in "${newmingw[@]}"; do
@@ -206,9 +204,9 @@ if [[ -n $have_updates ]]; then
     echo "-------------------------------------------------------------------------------"
     echo "Updating msys2 system and installed packages..."
     echo "-------------------------------------------------------------------------------"
-    /usr/bin/grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
+    grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
         touch /build/update_core &&
-        have_updates="$(/usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
+        have_updates="$(grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
     xargs $nargs pacman -S --noconfirm --overwrite "/mingw64/*" \
         --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/usr/*" <<< "$have_updates"
 fi
