@@ -41,7 +41,6 @@ if %PROCESSOR_ARCHITECTURE%==x86 if NOT DEFINED PROCESSOR_ARCHITEW6432 (
     exit
 )
 
-
 if not exist %instdir% (
     echo ----------------------------------------------------------------------
     echo. You have probably run the script in a path with spaces.
@@ -1022,7 +1021,7 @@ if [0]==[%mplayer2INI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo ######### UNSUPPORTED, IF IT BREAKS, IT BREAKS ################################
+    echo. #################### UNSUPPORTED, IF IT BREAKS, IT BREAKS ####################
     echo.
     echo. Build static mplayer/mencoder binary?
     echo. 1 = Yes
@@ -1149,7 +1148,7 @@ if [0]==[%ffmbcINI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo ######### UNSUPPORTED, IF IT BREAKS, IT BREAKS ################################
+    echo. #################### UNSUPPORTED, IF IT BREAKS, IT BREAKS ####################
     echo.
     echo. Build FFMedia Broadcast binary?
     echo. 1 = Yes
@@ -1459,8 +1458,8 @@ if [0]==[%loggingINI%] (
     echo. 1 = Yes [recommended]
     echo. 2 = No
     echo.
-    echo Note: Setting this to yes will also hide output from these commands.
-    echo On successful compilation, these logs are deleted since they aren't needed.
+    echo. Note: Setting this to yes will also hide output from these commands.
+    echo. On successful compilation, these logs are deleted since they aren't needed.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1482,9 +1481,9 @@ if %deleteINI%==1 echo.logging=^%loggingF%>>%ini%
 @REM     echo. 1 = Yes [recommended]
 @REM     echo. 2 = No
 @REM     echo.
-@REM     echo This will upload logs.zip to 0x0.st for easy copy and pasting into github
-@REM     echo issues. If you choose no, then uploading logs will be your responsibility and
-@REM     echo no guarantees will be made for issues lacking logs.
+@REM     echo. This will upload logs.zip to 0x0.st for easy copy and pasting into github
+@REM     echo. issues. If you choose no, then uploading logs will be your responsibility and
+@REM     echo. no guarantees will be made for issues lacking logs.
 @REM     echo.
 @REM     echo -------------------------------------------------------------------------------
 @REM     echo -------------------------------------------------------------------------------
@@ -1506,8 +1505,8 @@ if [0]==[%updateSuiteINI%] (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo If you have made changes to the scripts, they will be reset but saved to a
-    echo .diff text file inside %build%
+    echo. If you have made changes to the scripts, they will be reset but saved to a
+    echo. .diff text file inside %build%
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1529,12 +1528,12 @@ if [0]==[%timeStampINI%] (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo This will show the start times of commands during compilation.
-    echo Don't turn this on unless you really want to see the timestamps.
+    echo. This will show the start times of commands during compilation.
+    echo. Don't turn this on unless you really want to see the timestamps.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
-    set /P timeStampF="Show Timestamps: "
+    set /P timeStampF="Show timestamps: "
 ) else set timeStampF=%timeStampINI%
 
 if "%timeStampF%"=="" GOTO timestamp
@@ -1549,11 +1548,11 @@ if [0]==[%ccacheINI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Use ccache when compiling?
-    echo. Experimental.
-    echo. Speeds up rebuilds and recompilations, but requires the files to be
-    echo. compiled at least once before any effect is seen
     echo. 1 = Yes
     echo. 2 = No
+    echo.
+    echo. Speeds up rebuilds and recompilations, but requires the files
+    echo. to be compiled at least once before any effect is seen
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1576,10 +1575,10 @@ if [0]==[%noMinttyINI%] (
     echo. 1 = Yes
     echo. 2 = No
     echo.
-    echo This will disable the use of mintty and print the output to this console.
-    echo There is no guarantee that this will work properly.
-    echo You must make sure that you have ssh keep-alive enabled or something similar
-    echo to screen that will allow you to run this script in the background.
+    echo. This will disable the use of mintty and print the output to this console.
+    echo. There is no guarantee that this will work properly.
+    echo. You must make sure that you have ssh keep-alive enabled or something similar
+    echo. to screen that will allow you to run this script in the background.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -1913,7 +1912,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
     if %build64%==yes (
         if %CC%==clang ( set "MSYSTEM=CLANG64" ) else set "MSYSTEM=MINGW64"
     ) else (
-        if %CC%==gcc set "MSYSTEM=MINGW32"
+        set "MSYSTEM=MINGW32"
     )
     set "MSYS2_PATH_TYPE=inherit"
     if %noMintty%==y set "PATH=%PATH%"
@@ -2085,9 +2084,7 @@ echo.---------------------------------------------------------------------------
 echo.install %1 bit compiler
 echo.-------------------------------------------------------------------------------
 if %CC%==clang (
-    if "%1"=="64" (
-        set prefix=mingw-w64-clang-x86_64-
-    )
+    set prefix=mingw-w64-clang-x86_64-
 ) else (
     if "%1"=="32" (
         set prefix=mingw-w64-i686-

@@ -128,7 +128,7 @@ For information about the compiler environment see the wiki, there you also have
 - other tools
     - aom (git)
     - av1an (git)
-        - requires installation of [64-bit Python 3.8.x/3.12.x](https://www.python.org/downloads/) and [Vapoursynth](https://github.com/vapoursynth/vapoursynth/releases/latest)
+        - requires an installed or portable copy of [64-bit Python 3.12.x](https://www.python.org/downloads/) and [Vapoursynth](https://github.com/vapoursynth/vapoursynth/releases/latest)
     - bmx (git)
     - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
@@ -169,7 +169,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git snapshot)
             - uchardet (mingw-w64)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R52)
+            - vapoursynth (R70)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw-w64)

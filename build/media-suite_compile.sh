@@ -111,44 +111,8 @@ cd_safe "$LOCALBUILDDIR"
 do_getFFmpegConfig "$license"
 do_getMpvConfig
 
-# in case the root was moved, this fixes windows abspaths
-mkdir -p "$LOCALDESTDIR/lib/pkgconfig"
-# pkgconfig keys to find the wrong abspaths from
-local _keys="(prefix|exec_prefix|libdir|includedir)"
-# current abspath root
-local _root
-_root=$(cygpath -m "$LOCALDESTDIR")
-# find .pc files with Windows abspaths
-grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
-    # find those with a different abspath than the current
-    xargs -0r grep -LZ "$_root" | \
-    # replace with current abspath
-    xargs -0r sed -ri "s;${_keys}=.*$LOCALDESTDIR;\1=$_root;g"
-unset _keys _root
-
-_clean_old_builds=(j{config,error,morecfg,peglib}.h
-    lib{jpeg,nettle,gnurx,regex}.{,l}a
-    lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{l,}a
-    libSDL{,main}.{l,}a libopen{jpwl,mj2,jp2}.{a,pc}
-    include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
-    regex.h magic.h
-    {nettle,vo-aacenc,sdl,uchardet}.pc
-    {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
-    libcdio_{cdda,paranoia}.{{l,}a,pc}
-    twolame.h bin-audio/{twolame,cd-paranoia}.exe
-    bin-global/{{file,uchardet}.exe,sdl-config,luajit-2.0.4.exe}
-    libebur128.a ebur128.h
-    libopenh264.a
-    liburiparser.{{,l}a,pc}
-    libchromaprint.{a,pc} chromaprint.h
-    bin-global/libgcrypt-config libgcrypt.a gcrypt.h
-    lib/libgcrypt.def bin-global/{dumpsexp,hmac256,mpicalc}.exe
-    crossc.{h,pc} libcrossc.a
-    include/onig{uruma,gnu,posix}.h libonig.a oniguruma.pc
-)
-
-do_uninstall q all "${_clean_old_builds[@]}"
-unset _clean_old_builds
+do_fix_pkgconfig_abspaths
+do_clean_old_builds
 
 # In case a build was interrupted before reversing hide_conflicting_libs
 [[ -d $LOCALDESTDIR/opt/cyanffmpeg ]] &&
@@ -158,11 +122,7 @@ do_hide_all_sharedlibs
 create_ab_pkgconfig
 create_cmake_toolchain
 create_ab_ccache
-pacman -S --noconfirm "$MINGW_PACKAGE_PREFIX-cmake" > /dev/null 2>&1
 
-# Global header fixups
-grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
-        's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
 $CC -E -P -include pthread.h - < /dev/null | grep -q MemoryBarrier ||
     grep_and_sed MemoryBarrier "$MINGW_PREFIX/include/pthread.h" 's/MemoryBarrier/__sync_synchronize/g'
 
@@ -195,7 +155,7 @@ fi
 
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
-    do_vcs "https://github.com/BurntSushi/ripgrep.git"; then
+    do_vcs "$SOURCE_REPO_RIPGREP"; then
     do_uninstall "${_check[@]}"
     do_rust
     do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/rg.exe" bin-global/
@@ -204,7 +164,7 @@ fi
 
 _check=(bin-global/jo.exe)
 if [[ $jo = y ]] &&
-    do_vcs "https://github.com/jpmens/jo.git"; then
+    do_vcs "$SOURCE_REPO_JO"; then
     do_mesoninstall global
     do_checkIfExist
 fi
@@ -212,7 +172,7 @@ fi
 _deps=("$MINGW_PREFIX"/lib/pkgconfig/oniguruma.pc)
 _check=(bin-global/jq.exe)
 if [[ $jq = y ]] &&
-    do_vcs "https://github.com/jqlang/jq.git"; then
+    do_vcs "$SOURCE_REPO_JQ"; then
     do_pacman_install -m bison flex
     do_pacman_install oniguruma
     do_uninstall "${_check[@]}"
@@ -225,7 +185,7 @@ fi
 
 _check=(bin-global/dssim.exe)
 if [[ $dssim = y ]] &&
-    do_vcs "https://github.com/kornelski/dssim.git"; then
+    do_vcs "$SOURCE_REPO_DSSIM"; then
     do_uninstall "${_check[@]}"
     CFLAGS+=" -fno-PIC" do_rust
     do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/dssim.exe" bin-global/
@@ -240,6 +200,7 @@ if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbl
     [[ $standalone = y ]] || extracommands+=("-DLIBXML2_WITH_PROGRAMS=OFF")
     do_cmakeinstall "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 # Fixes an issue with ordering with libbluray libxml2 and libz and liblzma
@@ -282,6 +243,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_mesoninstall global "${extracommands[@]}"
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
         do_checkIfExist
+        unset extracommands
     fi
 
     _deps=(libfreetype.a)
@@ -296,6 +258,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         [[ $standalone = y ]] || extracommands+=(-Dtools=disabled)
         do_mesoninstall global -Ddoc=disabled -Dtests=disabled "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 
     grep_or_sed iconv "$LOCALDESTDIR/lib/pkgconfig/fontconfig.pc" 's/Libs:.*/& -liconv/'
@@ -312,6 +275,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         # directwrite shaper doesn't work with mingw headers, maybe too old
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin-global/libharfbuzz-{subset-,}0.dll bin-video/
         do_checkIfExist
+        unset extracommands
     fi
 
     _check=(libfribidi.a fribidi.pc)
@@ -323,6 +287,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
         do_mesoninstall video "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 
     _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
@@ -336,6 +301,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--disable-fontconfig --enable-shared)
         do_separate_confmakeinstall video "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
     if [[ $ffmpeg != sharedlibs && $ffmpeg != shared ]]; then
         _libs=(lib{freetype,harfbuzz{-subset,},fribidi,ass}.dll.a
@@ -360,6 +326,8 @@ fi
 
 if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
     do_pacman_install nettle
+    grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
+        's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
     _check=(libgnutls.{,l}a gnutls.pc)
     _gnutls_ver=3.8.9
     _gnutls_hash=69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed
@@ -513,6 +481,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         CFLAGS+=" -DFREEGLUT_STATIC" \
             do_cmakeinstall global -D{webp,jbig,lerc}=OFF "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 fi
 
@@ -536,6 +505,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
         CFLAGS+=" -DFREEGLUT_STATIC" \
             do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 fi
 
@@ -626,8 +596,8 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         sed -i 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
         grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
         case $CC in
-        *gcc) sed -i -e 's|Libs.private.*|& -fopenmp -lgomp|' tesseract.pc.in ;;
         *clang) sed -i -e 's|Libs.private.*|& -fopenmp=libomp|' tesseract.pc.in ;;
+        *) sed -i -e 's|Libs.private.*|& -fopenmp -lgomp|' tesseract.pc.in ;;
         esac
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             --without-curl \
@@ -695,7 +665,7 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
     do_checkIfExist
 fi
 
-_check=(libogg.{l,}a ogg/ogg.h ogg.pc)
+_check=(libogg.{,l}a ogg/ogg.h ogg.pc)
 if { [[ $flac = y ]] || enabled libvorbis; } &&
     do_vcs "$SOURCE_REPO_LIBOGG"; then
     do_uninstall include/ogg "${_check[@]}"
@@ -712,7 +682,7 @@ if enabled libvorbis && do_vcs "$SOURCE_REPO_LIBVORBIS"; then
     do_checkIfExist
 fi
 
-_check=(libspeex.{l,}a speex.pc speex/speex.h)
+_check=(libspeex.{,l}a speex.pc speex/speex.h)
 [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
 if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
     do_pacman_remove speex
@@ -722,6 +692,7 @@ if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
     [[ $standalone = y ]] || extracommands+=(--disable-binaries)
     do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libFLAC{,++}.a flac{,++}.pc)
@@ -744,7 +715,7 @@ grep_and_sed dllimport "$LOCALDESTDIR"/include/FLAC++/export.h \
         's|__declspec\(dllimport\)||g' "$LOCALDESTDIR"/include/FLAC{,++}/export.h
 grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/flac.pc" 's/Libs.private: /&-pthread /;s/Cflags: .*/& -pthread/'
 
-_check=(libvo-amrwbenc.{l,}a vo-amrwbenc.pc)
+_check=(libvo-amrwbenc.{,l}a vo-amrwbenc.pc)
 if [[ $ffmpeg != no ]] && enabled libvo-amrwbenc &&
     do_pkgConfig "vo-amrwbenc = 0.1.3" &&
     do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
@@ -755,7 +726,7 @@ if [[ $ffmpeg != no ]] && enabled libvo-amrwbenc &&
 fi
 
 if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
-    _check=(libfdk-aac.{l,}a fdk-aac.pc)
+    _check=(libfdk-aac.{,l}a fdk-aac.pc)
     if do_vcs "$SOURCE_REPO_FDKAAC"; then
         do_autoreconf
         do_uninstall include/fdk-aac "${_check[@]}"
@@ -812,6 +783,7 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     do_make
     do_install oggenc/oggenc.exe oggdec/oggdec.exe bin-audio/
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libopus.{,l}a opus.pc opus/opus.h)
@@ -899,7 +871,7 @@ if [[ $standalone = y ]] && enabled libmp3lame; then
     elif do_wget_sf \
             -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
             "lame/lame/3.100/lame-3.100.tar.gz"; then
-        do_uninstall include/lame libmp3lame.{l,}a "${_check[@]}"
+        do_uninstall include/lame libmp3lame.{,l}a "${_check[@]}"
         _mingw_patches_lame="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-lame"
         do_patch "$_mingw_patches_lame/0005-no-gtk.all.patch"
         do_patch "$_mingw_patches_lame/0006-dont-use-outdated-symbol-list.patch"
@@ -924,12 +896,12 @@ if [[ $ffmpeg != no ]] && enabled libgme && do_pkgConfig "libgme = 0.6.3" &&
     do_checkIfExist
 fi
 
-_check=(libbs2b.{{l,}a,pc})
+_check=(libbs2b.{{,l}a,pc})
 if [[ $ffmpeg != no ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
     do_wget_sf -h c1486531d9e23cf34a1892ec8d8bfc06 "bs2b/libbs2b/3.1.0/libbs2b-3.1.0.tar.bz2"; then
     do_uninstall include/bs2b "${_check[@]}"
     # sndfile check is disabled since we don't compile binaries anyway
-    /usr/bin/grep -q sndfile configure && sed -i '20119,20133d' configure
+    grep -q sndfile configure && sed -i '20119,20133d' configure
     sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     do_separate_confmakeinstall
     do_checkIfExist
@@ -955,7 +927,7 @@ if [[ $sox = y ]]; then
     if do_vcs "$SOURCE_REPO_SOX" sox; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/sox/0001-sox_version-fold-function-into-sox_version_info.patch" am
         do_patch "https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-sox/0001-ucrt-no-rewind-pipe.patch"
-        do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{l,}a "${_check[@]}"
+        do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{,l}a "${_check[@]}"
         do_autoreconf
         extralibs=(-lshlwapi -lz)
         enabled libmp3lame || extracommands+=(--without-lame)
@@ -978,7 +950,6 @@ if [[ $sox = y ]]; then
     fi
     unset extracommands
 fi
-unset _deps
 
 _check=(libopenmpt.{a,pc})
 if [[ $ffmpeg != no ]] && enabled libopenmpt &&
@@ -991,6 +962,7 @@ if [[ $ffmpeg != no ]] && enabled libopenmpt &&
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
     sed -i 's/Libs.private.*/& -lrpcrt4/' "$LOCALDESTDIR/lib/pkgconfig/libopenmpt.pc"
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libmysofa.{a,pc} mysofa.h)
@@ -1077,7 +1049,7 @@ if { [[ $rtmpdump = y ]] ||
 
     _rtmp_pkgver() {
         printf '%s-%s-%s_%s-%s-static' \
-            "$(/usr/bin/grep -oP "(?<=^VERSION=).+" Makefile)" \
+            "$(grep -oP "(?<=^VERSION=).+" Makefile)" \
             "$(git log -1 --format=format:%cd-g%h --date=format:%Y%m%d)" \
             "GnuTLS" \
             "$($PKG_CONFIG --modversion gnutls)" \
@@ -1131,18 +1103,12 @@ fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
 
 _check=(libaom.a aom.pc)
-if [[ $aom = y || $standalone = y || $av1an != n ]]; then
-    _aom_bins=true
-    _check+=(bin-video/aomenc.exe)
-else
-    _aom_bins=false
-fi
+[[ $aom = y || $standalone = y || $av1an != n ]] && _check+=(bin-video/aom{dec,enc}.exe)
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "$SOURCE_REPO_LIBAOM"; then
     do_pacman_install yasm
     extracommands=()
-    if $_aom_bins; then
-        _check+=(bin-video/aomdec.exe)
+    if [[ $aom = y || $standalone = y || $av1an != n ]]; then
         # fix google's shit
         sed -ri 's;_PREFIX.+CMAKE_INSTALL_BINDIR;_FULL_BINDIR;' \
             build/cmake/aom_install.cmake
@@ -1156,7 +1122,6 @@ if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled li
     do_checkIfExist
     unset extracommands
 fi
-unset _aom_bins
 
 _check=(dav1d/dav1d.h dav1d.pc libdav1d.a)
 [[ $standalone = y ]] && _check+=(bin-video/dav1d.exe)
@@ -1167,6 +1132,7 @@ if { [[ $dav1d = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled 
     [[ $standalone = y ]] || extracommands=("-Denable_tools=false")
     do_mesoninstall video -Denable_{tests,examples}=false "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 { enabled librav1e || [[ $libavif = y ]] || [[ $dovitool = y ]]; } && do_pacman_install cargo-c
@@ -1254,6 +1220,7 @@ if [[ $libavif = y ]]; then
         esac
         do_cmakeinstall video -DAVIF_ENABLE_WERROR=OFF "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 fi
 
@@ -1283,7 +1250,7 @@ if { { [[ $ffmpeg != no ]] &&
     do_checkIfExist
 fi
 
-_check=(libdvdread.{l,}a dvdread.pc)
+_check=(libdvdread.{,l}a dvdread.pc)
 if { { [[ $ffmpeg != no ]] && enabled_any libdvdread libdvdnav; } ||
     [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDREAD" dvdread; then
@@ -1296,7 +1263,7 @@ fi
     grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
         "/Libs:/ a\Libs.private: -ldl -lpsapi"
 
-_check=(libdvdnav.{l,}a dvdnav.pc)
+_check=(libdvdnav.{,l}a dvdnav.pc)
 _deps=(libdvdread.a)
 if { { [[ $ffmpeg != no ]] && enabled libdvdnav; } ||
     [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
@@ -1306,7 +1273,6 @@ if { { [[ $ffmpeg != no ]] && enabled libdvdnav; } ||
     do_separate_confmakeinstall
     do_checkIfExist
 fi
-unset _deps
 
 if { [[ $ffmpeg != no ]] && enabled_any gcrypt libbluray; } ||
     ! mpv_disabled libbluray; then
@@ -1314,7 +1280,6 @@ if { [[ $ffmpeg != no ]] && enabled_any gcrypt libbluray; } ||
     grep_or_sed ws2_32 "$MINGW_PREFIX/bin/libgcrypt-config" 's;-lgpg-error;& -lws2_32;'
     grep_or_sed ws2_32 "$MINGW_PREFIX/bin/gpg-error-config" 's;-lgpg-error;& -lws2_32;'
 fi
-
 
 if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; then
     _check=(bin-video/libaacs.dll libaacs.{{,l}a,pc} libaacs/aacs.h)
@@ -1340,7 +1305,7 @@ if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; th
     fi
 fi
 
-_check=(libbluray.{{l,}a,pc})
+_check=(libbluray.{{,l}a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBBLURAY"; then
     [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
@@ -1441,7 +1406,7 @@ if [[ $dovitool = y ]] &&
     do_uninstall "${_check[@]}" include/libdovi bin-video/dovi.dll dovi.def dovi.dll.a
     do_rust
     do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/dovi_tool.exe" bin-video/
-    cd dolby_vision
+    cd_safe dolby_vision
     do_rustcinstall --bindir="$LOCALDESTDIR"/bin-video/ --library-type=staticlib
     do_checkIfExist
 fi
@@ -1449,7 +1414,6 @@ fi
 _check=(bin-video/hdr10plus_tool.exe)
 if [[ $hdr10plustool = y ]] &&
     do_vcs "$SOURCE_REPO_HDR10PLUS_TOOL"; then
-
     do_uninstall "${_check[@]}"
     do_rust
     do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/hdr10plus_tool.exe" bin-video/
@@ -1506,7 +1470,7 @@ if [[ $ffmpeg != no ]] && enabled libvidstab; then
     fi
 fi
 
-_check=(libzvbi.{h,{l,}a} zvbi-0.2.pc)
+_check=(libzvbi.{h,{,l}a} zvbi-0.2.pc)
 if [[ $ffmpeg != no ]] && enabled libzvbi &&
     do_vcs "$SOURCE_REPO_ZVBI"; then
     do_uninstall "${_check[@]}" zvbi-0.2.pc
@@ -1519,7 +1483,6 @@ if [[ $ffmpeg != no ]] && enabled libzvbi &&
     do_checkIfExist
     unset _vlc_zvbi_patches
 fi
-
 
 if [[ $ffmpeg != no ]] && enabled_any frei0r ladspa; then
     _check=(libdl.a dlfcn.h)
@@ -1561,7 +1524,7 @@ if [[ $ffmpeg != no ]] && enabled libvpl; then
     fi
 fi
 
-_check=(libmfx.{{l,}a,pc})
+_check=(libmfx.{{,l}a,pc})
 if [[ $ffmpeg != no ]] && enabled libmfx &&
     do_vcs "$SOURCE_REPO_LIBMFX" libmfx; then
     do_autoreconf
@@ -1878,6 +1841,7 @@ if enabled librist; then
         [[ $standalone = y ]] || extracommands+=("-Dbuilt_tools=false")
         do_mesoninstall global -Dhave_mingw_pthreads=true -Dtest=false "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 fi
 
@@ -2285,14 +2249,11 @@ if [[ $ffmpeg != no ]]; then
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
     enabled ladspa && do_pacman_install ladspa-sdk
-    if enabled vapoursynth && pc_exists "vapoursynth-script >= 42"; then
+    if enabled vapoursynth && pc_exists "vapoursynth-script"; then
         _ver=$($PKG_CONFIG --modversion vapoursynth-script)
         do_simple_print "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
         do_simple_print "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers"'!'"${reset}"
         unset _ver
-    elif enabled vapoursynth; then
-        do_removeOption --enable-vapoursynth
-        do_simple_print "${red}Update to at least Vapoursynth R42 to use with FFmpeg${reset}"
     fi
     disabled autodetect && enabled iconv && do_addOption --extra-libs=-liconv
 
@@ -2342,6 +2303,12 @@ if [[ $ffmpeg != no ]]; then
                 do_addOption "--extra-cflags=$_openal_flag"
             done
             unset _openal_flag
+        fi
+
+        if enabled gmp; then
+            do_pacman_install gmp
+            grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
+                's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
         fi
 
         if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
@@ -2582,14 +2549,11 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         mpv_disable egl-angle
     fi
 
-    if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script >= 24"; then
+    if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script"; then
         _ver=$($PKG_CONFIG --modversion vapoursynth-script)
         do_simple_print "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
         do_simple_print "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter"'!'"${reset}"
         unset _ver
-    elif ! mpv_disabled vapoursynth; then
-        mpv_disable vapoursynth
-        do_simple_print "${red}Update to at least Vapoursynth R24 to use with mpv${reset}"
     fi
 
     _check=(mujs.{h,pc} libmujs.a)
@@ -2683,7 +2647,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
                 fi
             done
         fi
-        if [[ $CC == *clang* ]]; then
+        if [[ $CC =~ clang ]]; then
             mpv_cflags+=("-Wno-incompatible-function-pointer-types")
             mpv_ldflags+=("-lc++")
         fi
@@ -3104,7 +3068,7 @@ EOF
 fi
 
 _check=(bin-video/ffmbc.exe)
-if [[ $ffmbc = y ]] && do_vcs "https://github.com/bcoudurier/FFmbc.git#branch=ffmbc"; then # no other branch
+if [[ $ffmbc = y ]] && do_vcs "$SOURCE_REPO_FFMBC"; then
     _notrequired=true
     create_build_dir
     log configure ../configure --target-os=mingw32 --enable-gpl \
