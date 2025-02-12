@@ -51,7 +51,7 @@ For information about the compiler environment see the wiki, there you also have
                 - needs non-GPL license
             - mbedtls (mingw-w64)
                 - preferred to gnutls if GPLv3 license is chosen
-            - gnutls (3.8.5)
+            - gnutls (3.8.9)
         - libass (git)
             - by default with DirectWrite backend
             - if --enable-fontconfig, fontconfig backend included
