@@ -116,7 +116,7 @@ extract_pkg_prefix() (
     echo "$MINGW_PACKAGE_PREFIX-"
 )
 
-if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
+if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" && $CC =~ clang ]]; then
     new=$(mktemp)
     old=$(mktemp)
     echo
@@ -129,11 +129,11 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
     prefix_32='' prefix_64=''
     case $CC in
-    *clang*) prefix_32=$(extract_pkg_prefix clang32) prefix_64=$(extract_pkg_prefix clang64) ;;
+    *clang*) prefix_64=$(extract_pkg_prefix clang64) ;;
     *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix mingw64) ;;
     esac
     for pkg in "${newmingw[@]}"; do
-        if [[ $build32 == "yes" ]] &&
+        if [[ $build32 == "yes" ]] && [[ ! $CC =~ clang ]] &&
             pacman -Ss "$prefix_32$pkg" > /dev/null 2>&1; then
             printf %s\\n "$prefix_32$pkg" >> "$new"
         fi
@@ -186,6 +186,9 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         pacman -D --asexplicit "${install[@]}"
     fi
     rm -f /etc/pac-{base,mingw}.pk "$new" "$old"
+elif [[ $build32 == "yes" && $CC =~ clang ]]; then
+    echo "The CLANG32 environment is no longer supported"
+    exit 1
 fi
 
 if [[ -d "/trunk" ]]; then
@@ -207,7 +210,7 @@ if [[ -n $have_updates ]]; then
         touch /build/update_core &&
         have_updates="$(/usr/bin/grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
     xargs $nargs pacman -S --noconfirm --overwrite "/mingw64/*" \
-        --overwrite "/mingw32/*" --overwrite "/usr/*" <<< "$have_updates"
+        --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/usr/*" <<< "$have_updates"
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
@@ -215,7 +218,7 @@ fi
 
 # do a final overall installation for potential downgrades
 pacman -Syuu --noconfirm --overwrite "/mingw64/*" \
-    --overwrite "/mingw32/*" --overwrite "/usr/*"
+    --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
 
