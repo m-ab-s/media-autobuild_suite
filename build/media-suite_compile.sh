@@ -123,9 +123,6 @@ create_ab_pkgconfig
 create_cmake_toolchain
 create_ab_ccache
 
-$CC -E -P -include pthread.h - < /dev/null | grep -q MemoryBarrier ||
-    grep_and_sed MemoryBarrier "$MINGW_PREFIX/include/pthread.h" 's/MemoryBarrier/__sync_synchronize/g'
-
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
