@@ -145,7 +145,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc curl cyanrip2 ^
-rav1e ripgrep dav1d libavif vvc uvg266 jq dssim avs2 dovitool hdr10plustool timeStamp ^
+rav1e ripgrep dav1d libavif vvc uvg266 jq dssim gifski avs2 dovitool hdr10plustool timeStamp ^
 noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
@@ -1270,6 +1270,28 @@ if %builddssim%==2 set "dssim=n"
 if %builddssim% GTR 2 GOTO dssim
 if %deleteINI%==1 echo.dssim=^%builddssim%>>%ini%
 
+:gifski
+if [0]==[%gifskiINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build gifski (high quality GIF encoder in Rust^)?
+    echo. 1 = Yes
+    echo. 2 = With built-in video support
+    echo. 3 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildgifski="Build gifski: "
+) else set buildgifski=%gifskiINI%
+
+if "%buildgifski%"=="" GOTO gifski
+if %buildgifski%==1 set "gifski=y"
+if %buildgifski%==2 set "gifski=video"
+if %buildgifski%==3 set "gifski=n"
+if %buildgifski% GTR 3 GOTO gifski
+if %deleteINI%==1 echo.gifski=^%buildgifski%>>%ini%
+
 :avs2
 if [0]==[%avs2INI%] (
     echo -------------------------------------------------------------------------------
@@ -1903,7 +1925,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
---avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
+--gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
 --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --jpegxl=%jpegxl% --av1an=%av1an% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
