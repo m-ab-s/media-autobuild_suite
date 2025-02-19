@@ -65,6 +65,7 @@ while true; do
     --jq=* ) jq=${1#*=} && shift ;;
     --jo=* ) jo=${1#*=} && shift ;;
     --dssim=* ) dssim=${1#*=} && shift ;;
+    --gifski=* ) gifski=${1#*=} && shift ;;
     --avs2=* ) avs2=${1#*=} && shift ;;
     --dovitool=* ) dovitool=${1#*=} && shift ;;
     --hdr10plustool=* ) hdr10plustool=${1#*=} && shift ;;
@@ -145,7 +146,7 @@ if [[ $packing = y &&
 fi
 
 if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] ||
-    [[ $av1an != n ]] || enabled librav1e; then
+    [[ "$gifski|$av1an" != n ]] || enabled librav1e; then
     do_pacman_install rust
     [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
@@ -187,6 +188,57 @@ if [[ $dssim = y ]] &&
     CFLAGS+=" -fno-PIC" do_rust
     do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/dssim.exe" bin-global/
     do_checkIfExist
+fi
+
+if [[ $gifski != n ]]; then
+    if [[ $gifski = video ]]; then
+        _check=("$LOCALDESTDIR"/opt/gifskiffmpeg/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
+        if flavor=gifski do_vcs "${ffmpegPath%%#*}#branch=release/6.1"; then
+            do_uninstall "$LOCALDESTDIR"/opt/gifskiffmpeg
+            [[ -f config.mak ]] && log "distclean" make distclean
+            create_build_dir gifski
+            mapfile -t audio_codecs < <(
+                sed -n '/audio codecs/,/external libraries/p' ../libavcodec/allcodecs.c |
+                sed -n 's/^[^#]*extern.* *ff_\([^ ]*\)_decoder;/\1/p')
+            mapfile -t image_demuxers < <(
+                sed -n '/image demuxers/,/external libraries/p' ../libavformat/allformats.c |
+                sed -n 's/^[^#]*extern.* *ff_\([^ ]*\)_demuxer;/\1/p')
+            config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
+                --prefix="$LOCALDESTDIR/opt/gifskiffmpeg" \
+                --enable-static --disable-shared --disable-programs \
+                --disable-autodetect --disable-everything \
+                --disable-{debug,doc,network,postproc,protocols} \
+                --enable-{decoders,demuxers} \
+                --enable-filter=format,fps,scale --enable-protocol=file \
+                --disable-bsf=evc_frame_merge,media100_to_mjpegb,vp9_superframe_split \
+                --disable-decoder="$(IFS=, ; echo "${audio_codecs[*]}")" \
+                --disable-demuxer="$(IFS=, ; echo "${image_demuxers[*]}"),image2pipe,yuv4mpegpipe"
+            do_make && do_makeinstall
+            files_exist "${_check[@]}" && touch ../"build_successful${bits}_gifski"
+            unset audio_codecs image_demuxers gifski_ffmpeg_opts
+        fi
+        old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
+        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/gifskiffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH
+    fi
+
+    _check=(bin-global/gifski.exe)
+    if do_vcs "$SOURCE_REPO_GIFSKI"; then
+        do_uninstall "${_check[@]}"
+        extracommands=()
+        if [[ $gifski = video ]]; then
+            extracommands=("--release" "--features=video-prebuilt-static")
+            do_pacman_install clang
+        fi
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
+            do_rust "${extracommands[@]}"
+        do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/gifski.exe" bin-global/
+        do_checkIfExist
+        unset extracommands
+    fi
+    if [[ $gifski = video ]]; then
+        PKG_CONFIG_PATH=$old_PKG_CONFIG_PATH
+        unset old_PKG_CONFIG_PATH
+    fi
 fi
 
 _check=(libxml2.a libxml2/libxml/xmlIO.h libxml-2.0.pc)

@@ -143,6 +143,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         djxl
         dssim
         dwebp
+        gifski
         idn2
         img2webp
         jxlinfo

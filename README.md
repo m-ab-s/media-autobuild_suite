@@ -139,6 +139,8 @@ For information about the compiler environment see the wiki, there you also have
     - fdk-aac (git)
     - ffmbc (git) (unsupported)
     - flac (git)
+    - gifski (git)
+        - with optional built-in video support (ffmpeg 6.1)
     - haisrt tools (git)
     - jo (git)
     - jpeg-xl tools (git)

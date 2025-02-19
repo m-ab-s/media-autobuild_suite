@@ -29,6 +29,7 @@ SOURCE_REPO_FREETYPE=https://github.com/freetype/freetype.git#tag=LATEST
 SOURCE_REPO_FREI0R=https://github.com/dyne/frei0r.git
 SOURCE_REPO_FRIBIDI=https://github.com/fribidi/fribidi.git
 SOURCE_REPO_GFLAGS=https://github.com/gflags/gflags.git
+SOURCE_REPO_GIFSKI=https://github.com/ImageOptim/gifski.git
 SOURCE_REPO_GLSLANG=https://github.com/KhronosGroup/glslang.git
 SOURCE_REPO_GPAC=https://github.com/gpac/gpac.git
 SOURCE_REPO_HARFBUZZ=https://github.com/harfbuzz/harfbuzz.git
