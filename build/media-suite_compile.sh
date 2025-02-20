@@ -2475,6 +2475,9 @@ if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBHEIF"; then
     do_uninstall "${_check[@]}"
 
+    do_pacman_install libjpeg-turbo
+    pc_exists "libpng" || do_pacman_install libpng
+
     do_patch https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libheif/0001-Edit-CMakeLists.patch
 
     extracflags=()
