@@ -2334,7 +2334,7 @@ if [[ $ffmpeg != no ]]; then
                 do_removeOption --enable-libsvtvp9
         fi
         if enabled libsvtav1; then
-            do_patch "https://gitlab.com/AOMediaCodec/SVT-AV1/-/raw/master/.gitlab/workflows/linux/ffmpeg_n7_fix.patch"
+            do_patch "https://code.ffmpeg.org/FFmpeg/FFmpeg/pulls/12.patch" am
         fi
 
         enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
