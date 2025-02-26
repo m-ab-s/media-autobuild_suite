@@ -2265,7 +2265,7 @@ if [[ $ffmpeg != no ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        _openh264_ver=2.5.0
+        _openh264_ver=2.6.0
         _pacman_openh264_ver=$(pacman -Q "${MINGW_PACKAGE_PREFIX}-openh264" | awk '{print $2}')
         if [[ $(vercmp.exe $_openh264_ver "$_pacman_openh264_ver") -ne 0 ]]; then
             do_simple_print "${orange}Openh264 version differs from msys2's, current: $_openh264_ver, msys2: $_pacman_openh264_ver${reset}"
@@ -2275,9 +2275,9 @@ if [[ $ffmpeg != no ]]; then
             ! get_dll_version "$LOCALDESTDIR/bin-video/libopenh264-7.dll" | grep -q "$_openh264_ver"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
             if [[ $bits = 64bit ]]; then
-                _sha256=1879afe8429fc9b064cfbdeb91a19d9e0594116d06702d8e0c821150d6150972
+                _sha256=dab5f2a872777f9a58b69bfa9fbcf20d9f82f2d6ec91383fd70bff49bd34ac9f
             else
-                _sha256=004c3cf7cd8633067d33acb19e3c945396b011f6ef64545780b061d6eaae540f
+                _sha256=a9445ed1fa2ce9665b22461a7ed0aeb52274add899aa55a93ef6278dbc17c90d
             fi
             do_wget -c -r -q -h $_sha256 \
             "http://ciscobinary.openh264.org/openh264-${_openh264_ver}-win${bits%bit}.dll.bz2" \
