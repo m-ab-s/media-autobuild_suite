@@ -147,7 +147,7 @@ if [[ $packing = y &&
 fi
 
 if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] ||
-    [[ "$gifski|$av1an" != n ]] || enabled librav1e; then
+    [[ $av1an != n ]] || [[ $gifski != n ]] || enabled librav1e; then
     do_pacman_install rust
     [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
