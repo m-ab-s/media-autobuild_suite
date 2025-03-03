@@ -2326,6 +2326,7 @@ if [[ $ffmpeg != no ]]; then
     [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     if do_vcs "$ffmpegPath"; then
+        ff_base_commit=$(git rev-parse HEAD)
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
         if enabled libvvdec; then
@@ -2371,9 +2372,9 @@ if [[ $ffmpeg != no ]]; then
             do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
         fi
 
-        _patches=$(git rev-list origin/master.. --count)
+        _patches=$(git rev-list $ff_base_commit.. --count)
         [[ $_patches -gt 0 ]] &&
-            do_addOption "--extra-version=g$(git rev-parse --short origin/master)+$_patches"
+            do_addOption "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
