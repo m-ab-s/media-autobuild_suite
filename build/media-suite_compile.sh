@@ -2785,12 +2785,14 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         extra_script pre configure
         # -Wno-incompatible-pointer-types there until we can move to a newer version of mpv and fix it properly.
+        # Disable ccache until we move to meson since mingw64 python seems to cause issues with waf with a CC that has a space in it.
         CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion -Wno-incompatible-pointer-types" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             WAF_NO_PREFORK=1 \
+            CC="${CC#ccache }" CXX="${CXX#ccache }" \
             log configure "$MINGW_PREFIX"/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             "${MPV_OPTS[@]}"
