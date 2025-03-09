@@ -2791,7 +2791,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
-            PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
+            PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf.exe --keep-system-cflags --static" \
             WAF_NO_PREFORK=1 \
             CC="ccache.exe ${CC#ccache }" CXX="ccache.exe ${CXX#ccache }" \
             log configure "$MINGW_PREFIX"/bin/python waf configure \
