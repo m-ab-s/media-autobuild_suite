@@ -2785,12 +2785,15 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         extra_script pre configure
         # -Wno-incompatible-pointer-types there until we can move to a newer version of mpv and fix it properly.
+        # Make sure that ccache has a .exe suffix as waf looks for the compiler by looking at PATH and appending `split[0]`
+        # and checking each result if it's a path and executable. Thus `G:\\MABS\\msys64\\mingw32\\bin\\ccache` would fail.
         CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion -Wno-incompatible-pointer-types" LDFLAGS+=" ${mpv_ldflags[*]}" \
             RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
             RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
             WAF_NO_PREFORK=1 \
+            CC="ccache.exe ${CC#ccache }" CXX="ccache.exe ${CXX#ccache }" \
             log configure "$MINGW_PREFIX"/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             "${MPV_OPTS[@]}"
