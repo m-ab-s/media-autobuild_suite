@@ -2793,7 +2793,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
             RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
             PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf.exe --keep-system-cflags --static" \
             WAF_NO_PREFORK=1 \
-            CC="ccache.exe ${CC#ccache }" CXX="ccache.exe ${CXX#ccache }" \
+            CC="${CC#ccache }.exe" CXX="${CXX#ccache }.exe" \
             log configure "$MINGW_PREFIX"/bin/python waf configure \
             "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
             "${MPV_OPTS[@]}"
