@@ -2627,20 +2627,33 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
         git -C ffmpeg checkout -qf --no-track -B master origin/HEAD
     }
 
-    grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
-    grep_or_sed gnu11 configure 's/c11/gnu11/g'
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0001-ae_lavc-fix-deprecated-warnings.patch"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0002-configure-fix-cddb-on-mingw-w64.patch"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0003-w32_common-add-casts-for-Wint-conversion.patch"
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0004-configure-add-checking-libass-from-pkg-config.patch"
+
+    # grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
+    # grep_or_sed gnu11 configure 's/c11/gnu11/g'
     # shellcheck disable=SC2016
     sed -i '/%\$(EXESUF):/{n; s/\$(CC)/\$(CXX)/g};/mencoder$(EXESUF)/{n; s/\$(CC)/\$(CXX)/g}' Makefile
 
     _notrequired=true
-    do_configure --bindir="$LOCALDESTDIR"/bin-video \
-    --extra-cflags='-fpermissive -DPTW32_STATIC_LIB -O3 -DMODPLUG_STATIC -Wno-int-conversion -Wno-error=incompatible-function-pointer-types' \
-    --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $($PKG_CONFIG --libs libilbc) \
-        $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
-    --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
-    --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
-    --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
+    # do_configure --bindir="$LOCALDESTDIR"/bin-video \
+    # --extra-cflags='-fpermissive -DPTW32_STATIC_LIB -O3 -DMODPLUG_STATIC -Wno-int-conversion -Wno-error=incompatible-function-pointer-types' \
+    # --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $($PKG_CONFIG --libs libilbc) \
+    #     $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
+    # --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
+    # --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
+    # --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
+    #     do_makeinstall CXX="$CXX" && do_checkIfExist
+
+    do_configure \
+        --bindir="$LOCALDESTDIR"/bin-video \
+        --enable-{static,runtime-cpudetection} \
+        --extra-cflags='-Wno-error=incompatible-pointer-types' \
+        "${faac_opts[@]}" &&
         do_makeinstall CXX="$CXX" && do_checkIfExist
+
     unset _notrequired faac_opts
 fi
 
