@@ -298,8 +298,10 @@ if [[ $mplayer = y || $mpv = y ]] ||
 
     _deps=(libfreetype.a)
     _check=(libfontconfig.a fontconfig.pc)
-    [[ $ffmpeg = sharedlibs ]] && enabled_any {lib,}fontconfig &&
-        do_removeOption "--enable-(lib|)fontconfig"
+    if [[ $ffmpeg = sharedlibs ]]; then
+        enabled_any {lib,}fontconfig && do_removeOption "--enable-(lib|)fontconfig"
+        _check+=(bin-global/libfontconfig-1.dll libfontconfig.dll.a)
+    fi
     if enabled_any {lib,}fontconfig &&
         do_vcs "$SOURCE_REPO_FONTCONFIG"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/fontconfig/0001-meson-change-default_library-to-default_both_librari.patch" am
@@ -309,6 +311,8 @@ if [[ $mplayer = y || $mpv = y ]] ||
         [[ $standalone = y ]] || extracommands+=(-Dtools=disabled)
         do_mesoninstall global -Ddoc=disabled -Dtests=disabled "${extracommands[@]}"
         do_checkIfExist
+        # Prevents ffmpeg from trying to link to a broken libfontconfig.dll.a
+        [[ $ffmpeg = sharedlibs ]] || do_uninstall bin-global/libfontconfig-1.dll libfontconfig.dll.a
         unset extracommands
     fi
 
