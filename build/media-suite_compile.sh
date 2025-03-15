@@ -2066,6 +2066,7 @@ if [[ $bits = 64bit && $vvenc = y ]] ||
     { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvenc; } &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
+    grep_and_sed '"" _json' thirdparty/nlohmann_json/single_include/nlohmann/json.hpp 's|"" _json|""_json|g'
     do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
     do_checkIfExist
 else
