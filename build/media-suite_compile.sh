@@ -2375,11 +2375,6 @@ if [[ $ffmpeg != no ]]; then
                 's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
         fi
 
-        if [[ ${#FFMPEG_OPTS[@]} -gt 35 ]]; then
-            # remove redundant -L and -l flags from extralibs
-            do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/ffmpeg/0001-configure-deduplicate-linking-flags.patch" am
-        fi
-
         _patches=$(git rev-list $ff_base_commit.. --count)
         [[ $_patches -gt 0 ]] &&
             do_addOption "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
