@@ -577,7 +577,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     do_pacman_install brotli lcms2
     _deps=(libgflags.a)
     _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
-    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,cjpegli,jxlinfo}.exe)
+    [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,{c,d}jpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-link-enc-before-common.patch" am
         do_uninstall "${_check[@]}" include/jxl
