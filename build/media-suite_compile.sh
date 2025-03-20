@@ -2069,9 +2069,10 @@ _check=(bin-video/vvenc{,FF}app.exe
 if [[ $bits = 64bit && $vvenc = y ]] ||
     { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvenc; } &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
+    do_patch "https://github.com/fraunhoferhhi/vvenc/pull/522.patch" am
+    do_pacman_install nlohmann-json
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
-    grep_and_sed '"" _json' thirdparty/nlohmann_json/single_include/nlohmann/json.hpp 's|"" _json|""_json|g'
-    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON
+    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON -DVVENC_ENABLE_THIRDPARTY_JSON=SYSTEM
     do_checkIfExist
 else
     pc_exists libvvenc || do_removeOption "--enable-libvvenc"
