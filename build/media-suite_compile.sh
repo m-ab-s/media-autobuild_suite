@@ -355,6 +355,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--disable-fontconfig --enable-shared)
         do_separate_confmakeinstall video "${extracommands[@]}"
+        [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
         unset extracommands
     fi
