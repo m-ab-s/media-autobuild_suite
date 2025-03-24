@@ -309,6 +309,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         do_pacman_install gperf
         extracommands=()
         [[ $standalone = y ]] || extracommands+=(-Dtools=disabled)
+        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-both-library=both)
         do_mesoninstall global -Ddoc=disabled -Dtests=disabled "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
