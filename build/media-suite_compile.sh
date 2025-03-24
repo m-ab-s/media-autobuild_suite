@@ -291,7 +291,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
         extracommands=(-D{harfbuzz,png,bzip2,brotli,zlib,tests}"=disabled")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
         do_mesoninstall global "${extracommands[@]}"
-        [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libfreetype-6.dll bin-video/
+        [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin-global/libfreetype-6.dll bin-video/
         do_checkIfExist
         unset extracommands
     fi
