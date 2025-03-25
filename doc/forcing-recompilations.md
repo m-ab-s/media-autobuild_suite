@@ -95,6 +95,7 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
     xavs2
     xvc
     zimg
+    zlib
     zvbi-0.2 (libzvbi)
 
 ## Libraries not using pkg-config
@@ -150,6 +151,9 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         jo
         jq
         luajit
+        minigzip
+        miniunzip
+        minizip
         mujs
         openssl
         psl
