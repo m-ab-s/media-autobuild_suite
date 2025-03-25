@@ -209,6 +209,15 @@ For information about the compiler environment see the wiki, there you also have
     - x265 (8, 10 and 12 bit) (git)
     - xvc (git) (unsupported)
     - xvid (git)
+    - zlib (git or mingw-w64)
+        - minizip, miniunzip (git)
+    - zlib (Chromium fork, git)
+        - minizip, minigzip (git)
+    - zlib (Cloudflare fork, git)
+        - minigzip (git)
+    - zlib-ng (git)
+        - minizip, minigzip (minizip-ng, git)
+    - zlib-rs (git)
 
 --------
 

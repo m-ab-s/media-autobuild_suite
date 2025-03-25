@@ -78,6 +78,7 @@ while true; do
     --svtvp9=* ) svtvp9=${1#*=} && shift ;;
     --xvc=* ) xvc=${1#*=} && shift ;;
     --vlc=* ) vlc=${1#*=} && shift ;;
+    --zlib=* ) zlib=${1#*=} && shift ;;
     --exitearly=* ) exitearly=${1#*=} && shift ;;
     # --autouploadlogs=* ) autouploadlogs=${1#*=} && shift ;;
     -- ) shift && break ;;
@@ -147,10 +148,106 @@ if [[ $packing = y &&
 fi
 
 if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] ||
-    [[ $av1an != n ]] || [[ $gifski != n ]] || enabled librav1e; then
+    [[ $av1an != n ]] || [[ $gifski != n ]] || [[ $zlib = rs ]] || enabled librav1e; then
     do_pacman_install rust
     [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
+
+if [[ $libavif = y ]] || [[ $dovitool = y ]] || [[ $zlib = rs ]] || enabled librav1e; then
+    do_pacman_install cargo-c
+fi
+
+_check=(libz.a zlib.pc)
+_zlib_uninstall=(lib/cmake/{zlib,minizip} z{conf,lib,lib_name_mangling}.h include/minizip libminizip.{,l}a minizip.pc)
+if [[ $zlib = n ]]; then
+    # uninstall existing zlib files, if the user switched from building zlib to using the msys2 package
+    do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+    zlib_dir="$MINGW_PREFIX"
+else
+    zlib_dir="$LOCALDESTDIR"
+    if [[ $zlib = y ]]; then
+        [[ $standalone = y ]] && _check+=(bin-global/mini{,un}zip.exe)
+        if do_vcs "$SOURCE_REPO_ZLIB"; then
+            do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+            sed -i 's; -L${sharedlibdir};;' zlib.pc.in
+            do_cmakeinstall -DZLIB_BUILD_{TESTING,SHARED}=OFF -DZLIB_INSTALL_COMPAT_DLL=OFF
+            if [[ $standalone = y ]]; then
+                cd_safe ../contrib/minizip
+                sed -i 's/Libs.private.*/& -lbz2/' minizip.pc.in
+                do_autoreconf
+                CFLAGS+=" -DHAVE_BZIP2" do_separate_confmakeinstall global --enable-demos LIBS="-lbz2"
+            fi
+            [[ -f "$LOCALDESTDIR"/lib/libzs.a ]] && mv -f "$LOCALDESTDIR"/lib/libz{s,}.a
+            do_checkIfExist
+        fi
+    elif [[ $zlib = chromium ]]; then
+        [[ $standalone = y ]] && _check+=(bin-global/mini{,g}zip.exe)
+        if do_vcs "$SOURCE_REPO_ZLIBCHROMIUM"; then
+            do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+            extracommands=()
+            [[ $standalone = y ]] && extracommands=(-DBUILD_MINIZIP_BIN=YES -DBUILD_MINIGZIP=YES)
+            # these macros are for some reason not set, even though they should be according to CMakeLists.txt
+            local zlib_macros="-DINFLATE_CHUNK_SIMD_SSE2 -DADLER32_SIMD_SSSE3 -DINFLATE_CHUNK_READ_64LE -DCRC32_SIMD_SSE42_PCLMUL -DDEFLATE_SLIDE_HASH_SSE2 -D_LARGEFILE64_SOURCE=1 -DX86_WINDOWS"
+            sed -i 's; -L${sharedlibdir};;' zlib.pc.cmakein
+            # add missing header and source files needed for compilation, and force all executables to link with static zlib
+            sed -e 's;ioapi.h;ioapi.h contrib/minizip/iowin32.c contrib/minizip/iowin32.h;' \
+                -e 's;zlib);zlibstatic);' -i CMakeLists.txt
+            # the win32 dir is missing, so copy the folder from original zlib
+            do_wget -c -r -q "https://github.com/madler/zlib/archive/refs/heads/develop.tar.gz"
+            tar --strip-components=1 -xzf develop.tar.gz zlib-develop/win32
+            do_cmakeinstall -DINSTALL_PKGCONFIG_DIR="${LOCALDESTDIR}/lib/pkgconfig" \
+                -DUSE_ZLIB_RABIN_KARP_HASH=ON -DENABLE_SIMD_OPTIMIZATIONS=ON \
+                -DCMAKE_C_FLAGS="${CFLAGS} ${zlib_macros} -msse4.2 -mpclmul" "${extracommands[@]}"
+            [[ $standalone = y ]] && do_install minizip_bin.exe bin-global/minizip.exe &&
+                do_install minigzip_bin.exe bin-global/minigzip.exe
+            # there's no option to disable building the shared library, so delete them manually
+            [[ -f "$LOCALDESTDIR"/lib/libz.dll.a ]] && rm -f "$LOCALDESTDIR"/lib/libz.dll.a
+            [[ -f "$LOCALDESTDIR"/bin/libz.dll ]] && rm -f "$LOCALDESTDIR"/bin/libz.dll
+            do_checkIfExist
+            unset extracommands
+        fi
+    elif [[ $zlib = cloudflare ]]; then
+        [[ $standalone = y ]] && _check+=(bin-global/minigzip.exe)
+        if do_vcs "$SOURCE_REPO_ZLIBCLOUDFLARE"; then
+            do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+            extracommands=()
+            [[ $standalone = y ]] && extracommands=(-DBUILD_EXAMPLES=YES)
+            sed -i 's; -L${sharedlibdir};;' zlib.pc.in
+            do_cmakeinstall -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "${extracommands[@]}"
+            [[ $standalone = y ]] && do_install minigzip.exe bin-global/
+            do_checkIfExist
+            unset extracommands
+        fi
+        if enabled zlib; then
+            do_addOption --extra-cflags=-Wno-error=incompatible-pointer-types
+        fi
+    elif [[ $zlib = ng ]]; then
+        [[ $standalone = y ]] && _check+=(bin-global/mini{,g}zip.exe)
+        if do_vcs "$SOURCE_REPO_ZLIBNG"; then
+            do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+            do_cmakeinstall global -DZLIB_COMPAT=ON -DWITH_GTEST=OFF -DZLIB_ENABLE_TESTS=OFF
+            if [[ $standalone = y ]] &&
+                do_vcs "$SOURCE_REPO_MINIZIPNG"; then
+                do_cmakeinstall global -DMZ_BUILD_TESTS=ON
+            fi
+            do_checkIfExist
+        fi
+    elif [[ $zlib = rs ]]; then
+        if do_vcs "$SOURCE_REPO_ZLIBRS"; then
+            do_uninstall "${_check[@]}" "${_zlib_uninstall[@]}"
+            cd_safe libz-rs-sys-cdylib
+            # edit package metadata and library name to match zlib
+            sed -e 's;libz_rs;libz;' -e 's;z_rs;z;' -i Cargo.toml
+            PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
+                log "rust.capi" cargo capi build \
+                --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR"
+            do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/libz.a" libz.a
+            do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/libz.pc" zlib.pc
+            do_checkIfExist
+        fi
+    fi
+fi
+unset _zlib_uninstall
 
 _check=(bin-global/rg.exe)
 if [[ $ripgrep = y ]] &&
@@ -242,6 +339,7 @@ if [[ $gifski != n ]]; then
     fi
 fi
 
+_deps=("$zlib_dir"/lib/libz.a)
 _check=(libxml2.a libxml2/libxml/xmlIO.h libxml-2.0.pc)
 if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBXML2"; then
@@ -258,6 +356,7 @@ fi
 grep_or_sed Requires.private "$LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc" 's/Requires:/Requires.private:/'
 
 if [[ $ffmpeg != no ]] && enabled libaribb24; then
+    _deps=("$zlib_dir"/lib/libz.a)
     _check=(libpng.{pc,{,l}a} libpng16.{pc,{,l}a} libpng16/png.h)
     if do_vcs "$SOURCE_REPO_LIBPNG"; then
         do_uninstall include/libpng16 "${_check[@]}"
@@ -520,7 +619,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     fi
 
     do_pacman_install libjpeg-turbo xz zlib zstd libdeflate
-    _deps=(libglut.a)
+    _deps=(libglut.a "$zlib_dir"/lib/libz.a)
     _check=(libtiff{.a,-4.pc})
     [[ $standalone = y ]] && _check+=(bin-global/tiff{cp,dump,info,set,split}.exe)
     if do_vcs "$SOURCE_REPO_LIBTIFF"; then
@@ -1191,8 +1290,6 @@ if { [[ $dav1d = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled 
     do_checkIfExist
     unset extracommands
 fi
-
-{ enabled librav1e || [[ $libavif = y ]] || [[ $dovitool = y ]]; } && do_pacman_install cargo-c
 
 _check=()
 { [[ $rav1e = y ]] || [[ $av1an != n ]] ||
@@ -2336,6 +2433,8 @@ if [[ $ffmpeg != no ]]; then
     # todo: make this more easily customizable
     [[ $ffmpegUpdate = y ]] && enabled_any lib{aom,tesseract,vmaf,x265,vpx} &&
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
+    [[ $ffmpegUpdate = y ]] && enabled zlib &&
+        _deps+=("$zlib_dir"/lib/libz.a)
     if do_vcs "$ffmpegPath"; then
         ff_base_commit=$(git rev-parse HEAD)
         do_changeFFmpegConfig "$license"

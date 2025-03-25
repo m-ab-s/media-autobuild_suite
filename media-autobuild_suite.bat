@@ -146,7 +146,7 @@ set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
 strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc curl cyanrip2 ^
 rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool hdr10plustool timeStamp ^
-noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ffmpegPath pkgUpdateTime
+noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
 set deleteIni=0
@@ -1381,6 +1381,36 @@ if %buildhdr10plustool%==2 set "hdr10plustool=n"
 if %buildhdr10plustool% GTR 2 GOTO hdr10plustool
 if %deleteINI%==1 echo.hdr10plustool=^%buildhdr10plustool%>>%ini%
 
+:zlib
+if [0]==[%zlibINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build zlib?
+    echo. 1 = Yes, build zlib
+    echo. 2 = Yes, build zlib (Chromium fork^)
+    echo. 3 = Yes, build zlib (Cloudflare fork^)
+    echo. 4 = Yes, build zlib-ng
+    echo. 5 = Yes, build zlib-rs
+    echo. 6 = No, use msys2 package when needed [Recommended]
+    echo.
+    echo. If "standalone=y", then minizip will be built alongside zlib.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildzlib="Build zlib: "
+) else set buildzlib=%zlibINI%
+
+if "%buildzlib%"=="" GOTO zlib
+if %buildzlib%==1 set "zlib=y"
+if %buildzlib%==2 set "zlib=chromium"
+if %buildzlib%==3 set "zlib=cloudflare"
+if %buildzlib%==4 set "zlib=ng"
+if %buildzlib%==5 set "zlib=rs"
+if %buildzlib%==6 set "zlib=n"
+if %buildzlib% GTR 6 GOTO zlib
+if %deleteINI%==1 echo.zlib=^%buildzlib%>>%ini%
+
 :CC
 if [0]==[%CCINI%] (
     echo -------------------------------------------------------------------------------
@@ -1954,7 +1984,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
---xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% ^
+--xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% --zlib=%zlib% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
