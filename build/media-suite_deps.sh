@@ -81,6 +81,7 @@ SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MABS=https://github.com/m-ab-s/media-autobuild_suite.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
+SOURCE_REPO_MINIZIPNG=https://github.com/zlib-ng/minizip-ng.git
 SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git#tag=v0.36.0
 SOURCE_REPO_MUJS=https://github.com/ccxvii/mujs.git
 SOURCE_REPO_NEON=https://github.com/notroj/neon.git
@@ -121,4 +122,9 @@ SOURCE_REPO_XEVE=https://github.com/mpeg5/xeve.git
 SOURCE_REPO_XVC=https://github.com/divideon/xvc.git
 SOURCE_REPO_XVID=https://github.com/m-ab-s/xvid.git
 SOURCE_REPO_ZIMG=https://github.com/sekrit-twc/zimg.git
+SOURCE_REPO_ZLIB=https://github.com/madler/zlib.git
+SOURCE_REPO_ZLIBCHROMIUM=https://chromium.googlesource.com/chromium/src/third_party/zlib
+SOURCE_REPO_ZLIBCLOUDFLARE=https://github.com/cloudflare/zlib.git
+SOURCE_REPO_ZLIBNG=https://github.com/zlib-ng/zlib-ng.git
+SOURCE_REPO_ZLIBRS=https://github.com/trifectatechfoundation/zlib-rs.git
 SOURCE_REPO_ZVBI=https://github.com/zapping-vbi/zvbi.git
