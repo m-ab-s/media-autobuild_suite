@@ -2921,6 +2921,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
         sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py	
+        grep_and_sed FF_PROFILE audio/decode/ad_spdif.c 's/FF_PROFILE/AV_PROFILE/g'
 
         extra_script pre build
         WAF_NO_PREFORK=1 \
