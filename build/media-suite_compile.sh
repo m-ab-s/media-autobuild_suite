@@ -680,11 +680,11 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,{c,d}jpegli,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
+        do_git_submodule
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libjxl/0001-brotli-link-enc-before-common.patch" am
         do_uninstall "${_check[@]}" include/jxl
         do_pacman_install asciidoc
         extracommands=()
-        log -q "git.submodule" git submodule update --init --recursive
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         CXXFLAGS+=" -DJXL_CMS_STATIC_DEFINE -DJXL_STATIC_DEFINE -DJXL_THREADS_STATIC_DEFINE" \
             do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
@@ -786,7 +786,7 @@ fi
 _check=(zimg{.h,++.hpp} libzimg.{,l}a zimg.pc)
 if [[ $ffmpeg != no ]] && enabled libzimg &&
     do_vcs "$SOURCE_REPO_ZIMG"; then
-    log -q "git.submodule" git submodule update --init --recursive
+    do_git_submodule
     do_uninstall "${_check[@]}"
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/zimg/0001-libm_wrapper-define-__CRT__NO_INLINE-before-math.h.patch" am
     do_autoreconf
@@ -815,8 +815,8 @@ fi
 _check=(ilbc.h libilbc.{a,pc})
 if [[ $ffmpeg != no ]] && enabled libilbc &&
     do_vcs "$SOURCE_REPO_LIBILBC"; then
+    do_git_submodule
     do_uninstall "${_check[@]}"
-    log -q "git.submodule" git submodule update --init --recursive
     do_cmakeinstall -DUNIX=OFF
     do_checkIfExist
 fi
@@ -1461,7 +1461,7 @@ fi
 _check=(libbluray.{{,l}a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBBLURAY"; then
-    [[ -f contrib/libudfread/.git ]] || log git.submodule git submodule update --init
+    [[ -f contrib/libudfread/.git ]] || do_git_submodule
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libbluray/0001-dec-prefix-with-libbluray-for-now.patch" am
     do_autoreconf
     do_uninstall include/libbluray share/java "${_check[@]}"
@@ -2327,11 +2327,11 @@ _deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
 if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_LIBPLACEBO"; then
+    do_git_submodule
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0001-meson-use-shaderc_combined.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0002-spirv-cross-use-spirv-cross-instead-of-c-shared.patch" am
     do_pacman_install python-{mako,setuptools}
     do_uninstall "${_check[@]}"
-    log -q "git.submodule" git submodule update --init --recursive
     do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false -Dd3d11=enabled
     do_checkIfExist
 fi
@@ -3228,8 +3228,8 @@ EOF
 
     _check=(libshout.{,l}a shout.pc shout/shout.h)
     if do_vcs "https://gitlab.xiph.org/xiph/icecast-libshout.git" libshout; then
+        do_git_submodule
         do_uninstall "${_check[@]}"
-        log -q "git.submodule" git submodule update --init
         do_autoreconf
         CFLAGS+=" -include ws2tcpip.h" do_separate_confmakeinstall --disable-examples LIBS="$($PKG_CONFIG --libs openssl)"
         do_checkIfExist
