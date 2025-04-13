@@ -393,6 +393,10 @@ do_vcs_local() {
     return 0
 }
 
+do_git_submodule() {
+    log -q git.submodule git submodule update --jobs "$cpuCount" --filter=tree:0 --init --recursive
+}
+
 guess_dirname() {
     expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$'
 }
