@@ -141,9 +141,9 @@ if [[ ! -z $_reenable_av1an ]] && [[ $bits = 64bit ]]; then
 fi
 
 if [[ $packing = y &&
-    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 4.2.4" ]] &&
-    do_wget -h 2e90ebda45b29217126d8e8ee4d0863bd9705a13adcca3ce07b7d19df55ca355 \
-        "https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-win32.zip"; then
+    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 5.0.0" ]] &&
+    do_wget -h 8c34b9cec2c225bf71f43cf2b788043d0d203d23edb54f649fbec16f34938d80 \
+        "https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win32.zip"; then
     do_install upx.exe /opt/bin/upx.exe
 fi
 
@@ -529,9 +529,9 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     _deps=("$MINGW_PREFIX/lib/libunistring.a")
     _check=(libidn2.{{,l}a,pc} idn2.h)
     [[ $standalone == y ]] && _check+=(bin-global/idn2.exe)
-    if do_pkgConfig "libidn2 = 2.3.7" &&
-        do_wget -h 4c21a791b610b9519b9d0e12b8097bf2f359b12f8dd92647611a929e6bfd7d64 \
-        "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.7.tar.gz"; then
+    if do_pkgConfig "libidn2 = 2.3.8" &&
+        do_wget -h f557911bf6171621e1f72ff35f5b1825bb35b52ed45325dcdee931e5d3c0787a \
+        "https://ftp.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz"; then
         do_uninstall "${_check[@]}"
         do_pacman_install gtk-doc
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' src/Makefile.am
@@ -2003,7 +2003,7 @@ _vapoursynth_install() {
         return 1
     fi
     do_pacman_install tools-git
-    _python_ver=3.12.9
+    _python_ver=3.12.10
     _python_lib=python312
     _vsver=70
     _check=("lib$_python_lib.a")
