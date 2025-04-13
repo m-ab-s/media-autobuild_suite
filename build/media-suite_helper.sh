@@ -2070,6 +2070,7 @@ clean_suite() {
         find . -maxdepth 5 -name "ab-suite.*.log" -delete
         find . -maxdepth 5 -type d -name "build-*bit" -exec rm -rf {} +
         find . -maxdepth 2 -type d -name "build" -exec test -f "{}/CMakeCache.txt" ';' -exec rm -rf {} ';'
+        find . -maxdepth 3 -type f -name "Cargo.toml" -execdir cargo clean -q ";"
 
         if [[ -f _to_remove ]]; then
             echo -e "\\n\\t${orange}Deleting source folders...${reset}"
