@@ -569,8 +569,6 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]]; then
     [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
     if do_vcs "$SOURCE_REPO_CURL"; then
         do_uninstall include/curl bin-global/curl-config "${_check[@]}"
-        [[ $standalone = y || $curl != n ]] ||
-            sed -ri "s;(^SUBDIRS = lib) src (include) scripts;\1 \2;" Makefile.in
         extra_opts=()
         case $curl in
         libressl|openssl)
