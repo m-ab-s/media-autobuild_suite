@@ -927,7 +927,7 @@ _check=(bin-audio/ogg{enc,dec}.exe)
 _deps=(ogg.pc vorbis.pc)
 if [[ $standalone = y ]] && enabled libvorbis &&
     do_vcs "$SOURCE_REPO_VORBIS_TOOLS"; then
-    do_patch "https://github.com/xiph/vorbis-tools/pull/39.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vorbis-tools/0001-utf8-add-empty-convert_free_charset-for-Windows.patch" am
     do_autoreconf
     do_uninstall "${_check[@]}"
     extracommands=()
