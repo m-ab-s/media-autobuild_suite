@@ -409,14 +409,12 @@ if [[ $mplayer = y || $mpv = y ]] ||
         extracommands=()
         [[ $standalone = y ]] || extracommands+=(-Dtools=disabled)
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-both-libraries=both)
-        do_mesoninstall global -Ddoc=disabled -Dtests=disabled "${extracommands[@]}"
+        do_mesoninstall global -D{doc,tests}=disabled -Diconv=enabled "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
     fi
     # Prevents ffmpeg from trying to link to a broken libfontconfig.dll.a
     [[ $ffmpeg = sharedlibs ]] || do_uninstall bin-global/libfontconfig-1.dll libfontconfig.dll.a
-
-    grep_or_sed iconv "$LOCALDESTDIR/lib/pkgconfig/fontconfig.pc" 's/Libs:.*/& -liconv/'
 
     _deps=(libfreetype.a)
     _check=(libharfbuzz.a harfbuzz.pc)
