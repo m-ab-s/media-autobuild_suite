@@ -823,52 +823,55 @@ do_pkgConfig() {
     fi
 }
 
-do_readoptionsfile() {
-    local filename="$1"
-    if [[ -f $filename ]]; then
-        sed -r '# remove commented text
-                s/#.*//
-                # delete empty lines
-                /^\s*$/d
-                # remove leading whitespace
-                s/^\s+//
-                # remove trailing whitespace
-                s/\s+$//
-                ' "$filename" | tr -d '\r' # cut cr out from any crlf files
-        echo "Imported options from ${filename##*/}" >&2
-    fi
-}
+do_readoptionsfile() (
+    filename="$1"
+    [[ -f $filename ]] || return 1
+    sed -E '# remove commented text
+            s/#.*//
+            # remove leading whitespace
+            s/^\s+//
+            # remove trailing whitespace
+            s/\s+$//
+            # strip carriage return
+            s/\r$//
+            # delete empty lines
+            /^\s*$/d
+            ' "$filename"
+    echo "Imported options from ${filename##*/}" >&2
+)
 
-do_readbatoptions() {
-    local varname="$1"
-    # shellcheck disable=SC1117
-    printf '%s\n' "${bat[@]}" |
-        sed -En "/set ${varname}=/,/[^^]$/p" |
-        sed -E "/^:/d;s/(set ${varname}=| \\^|\")//g;s/ /\\n/g" |
-        sed -E '/^#/d;/^[^-]/{s/^/--enable-/g}'
-}
+do_readbatoptions_inner() (
+    sed -En "/set ${1}=/,/[^^]$/p" "$2" |
+        sed -E "/^:/d;s/(set ${1}=| \\^|\")//g;s/ +/\n/g;s/ /\\n/g" |
+        sed -E '/^#/d'
+)
+
+
+do_readbatoptions_ffmpeg() (
+    do_readbatoptions_inner "$@" |
+        sed -E '/^[^-]/{s/^/--enable-/g}'
+)
+
+do_readbatoptions_mpv() (
+    do_readbatoptions_inner "$@" |
+        sed -E '/^[^-]/{s/^(.*)$/-D\1=enabled/g}'
+)
 
 do_getFFmpegConfig() {
     local license="${1:-nonfree}"
 
     FFMPEG_DEFAULT_OPTS=()
     if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
-        IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
-        mapfile -t FFMPEG_DEFAULT_OPTS < <(do_readbatoptions "ffmpeg_options_(builtin|basic)")
-        local option
-        [[ $ffmpegChoice != n ]] && while read -r option; do
-            FFMPEG_DEFAULT_OPTS+=("$option")
-        done < <(do_readbatoptions "ffmpeg_options_zeranoe")
-        [[ $ffmpegChoice == f ]] && while read -r option; do
-            FFMPEG_DEFAULT_OPTS+=("$option")
-        done < <(do_readbatoptions "ffmpeg_options_full(|_shared)")
+        mapfile -t FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_(builtin|basic)" /trunk/media-autobuild_suite.bat)
+        [[ $ffmpegChoice != n ]] && mapfile -t -O "${#FFMPEG_DEFAULT_OPTS[@]}" FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_zeranoe" /trunk/media-autobuild_suite.bat)
+        [[ $ffmpegChoice == f ]] && mapfile -t -O "${#FFMPEG_DEFAULT_OPTS[@]}" FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_full(|_shared)" /trunk/media-autobuild_suite.bat)
         echo "Imported default FFmpeg options from .bat"
     else
-        local custom_opts_file="$LOCALBUILDDIR/ffmpeg_options.txt"
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_$bits.txt" ]]; then
-            custom_opts_file="$LOCALBUILDDIR/ffmpeg_options_$bits.txt"
+            IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options_$bits.txt")
+        else
+            IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/ffmpeg_options.txt")
         fi
-        IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS < <(do_readoptionsfile "$custom_opts_file")
         unset FFMPEG_DEFAULT_OPTS_SHARED
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_shared.txt" ]]; then
             IFS=$'\n' read -d '' -r -a FFMPEG_DEFAULT_OPTS_SHARED < <(
@@ -1072,130 +1075,128 @@ disabled() {
     test "${FFMPEG_OPTS[*]}" != "${FFMPEG_OPTS[*]#--disable-$1}"
 }
 
-enabled_any() {
-    local opt
+enabled_any() (
     for opt; do
         enabled "$opt" && return 0
     done
     return 1
-}
+)
 
-disabled_any() {
-    local opt
+disabled_any() (
     for opt; do
         disabled "$opt" && return 0
     done
     return 1
-}
+)
 
-enabled_all() {
-    local opt
+enabled_all() (
     for opt; do
         enabled "$opt" || return 1
     done
     return 0
-}
+)
 
-disabled_all() {
-    local opt
+disabled_all() (
     for opt; do
         disabled "$opt" || return 1
     done
     return 0
-}
+)
 
-do_getMpvConfig() {
-    local MPV_TEMP_OPTS=()
-    MPV_OPTS=()
+do_getMpvConfig() (
+    declare -a MPV_TEMP_OPTS
     if [[ -f "/trunk/media-autobuild_suite.bat" && $ffmpegChoice =~ (n|z|f) ]]; then
-        IFS=$'\r\n' read -d '' -r -a bat < /trunk/media-autobuild_suite.bat
-        mapfile -t MPV_TEMP_OPTS < <(do_readbatoptions "mpv_options_(builtin|basic)")
-        local option
-        [[ $ffmpegChoice == f ]] && while read -r option; do
-            [[ -n $option ]] && MPV_TEMP_OPTS+=("$option")
-        done < <(do_readbatoptions "mpv_options_full")
-        echo "Imported default mpv options from .bat"
+        mapfile -t MPV_TEMP_OPTS < <(do_readbatoptions_mpv "mpv_options_(builtin|basic)" /trunk/media-autobuild_suite.bat)
+        [[ $ffmpegChoice == f ]] && mapfile -t -O "${#MPV_TEMP_OPTS[@]}" MPV_TEMP_OPTS  < <(do_readbatoptions_mpv "mpv_options_full" /trunk/media-autobuild_suite.bat)
+        echo "Imported default mpv options from .bat" >&2
     else
         IFS=$'\n' read -d '' -r -a MPV_TEMP_OPTS < <(do_readoptionsfile "$LOCALBUILDDIR/mpv_options.txt")
     fi
-    do_removeOption MPV_TEMP_OPTS \
-        "--(en|dis)able-(vapoursynth-lazy|libguess|static-build|enable-gpl3|egl-angle-lib|encoding|crossc|dvdread|libass)"
+    declare -A MPV_OPTS
     for opt in "${MPV_TEMP_OPTS[@]}"; do
-        [[ -n $opt ]] && MPV_OPTS+=("$opt")
+        if [[ $opt =~ ^-D ]]; then
+            local opt_name="${opt#-D}"
+            opt_name="${opt_name%%=*}"
+            MPV_OPTS["$opt_name"]="${opt#*=}"
+        elif [[ $opt =~ ^-- ]]; then
+            MPV_OPTS["$opt"]=""
+        fi
     done
-}
+    echo "${MPV_OPTS[@]@K}"
+)
 
-mpv_enabled() {
-    local option
-    [[ $mpv == n ]] && return 1
-    for option in "${MPV_OPTS[@]}"; do
-        [[ $option =~ "--enable-$1"$ ]] && return
-    done
-    return 1
-}
-
-mpv_disabled() {
-    local option
+mpv_disabled() (
+    # if mpv is disabled, we don't need to check for options
     [[ $mpv == n ]] && return 0
-    for option in "${MPV_OPTS[@]}"; do
-        [[ $option =~ "--disable-$1"$ ]] && return
-    done
+    # if the option is not present, we assume it's auto, which probably means enabled
+    [[ ${!MPV_OPTS[*]} =~ $1 ]] || return 1
+    [[ ${MPV_OPTS[$1]} == "disabled" ]] && return 0
+    [[ ${MPV_OPTS[$1]} == "false" ]] && return 0
     return 1
+)
+
+# with mpv, we will imply that something is enabled if it is not explicitly disabled
+# since features can often have enabled or auto.
+mpv_enabled() {
+    ! mpv_disabled "$1"
 }
 
-mpv_enabled_any() {
-    local opt
+mpv_enabled_any() (
     for opt; do
         mpv_enabled "$opt" && return 0
     done
     return 1
-}
+)
 
-mpv_disabled_any() {
-    local opt
+mpv_disabled_any() (
     for opt; do
         mpv_disabled "$opt" && return 0
     done
     return 1
-}
+)
 
-mpv_enabled_all() {
-    local opt
+mpv_enabled_all() (
     for opt; do
         mpv_enabled "$opt" || return 1
     done
-}
+)
 
-mpv_disabled_all() {
-    local opt
+mpv_disabled_all() (
     for opt; do
         mpv_disabled "$opt" || return 1
     done
-}
+)
 
 mpv_enable() {
-    local opt newopts=()
-    for opt in "${MPV_OPTS[@]}"; do
-        if [[ $opt =~ "--disable-$1"$ ]]; then
-            newopts+=("--enable-$1")
-        else
-            newopts+=("$opt")
-        fi
-    done
-    MPV_OPTS=("${newopts[@]}")
+    case "${MPV_OPTS[$1]}" in
+    disabled) MPV_OPTS[$1]="enabled" ;;
+    false) MPV_OPTS[$1]="true" ;;
+    enabled) ;;
+    true) ;;
+    "") MPV_OPTS[$1]="enabled" ;;
+    esac
 }
 
 mpv_disable() {
-    local opt newopts=()
-    for opt in "${MPV_OPTS[@]}"; do
-        if [[ $opt =~ "--enable-$1"$ ]]; then
-            newopts+=("--disable-$1")
+    case "${MPV_OPTS[$1]}" in
+    disabled) ;;
+    false) ;;
+    enabled) MPV_OPTS[$1]="disabled" ;;
+    true) MPV_OPTS[$1]="false" ;;
+    "") MPV_OPTS[$1]="disabled" ;;
+    esac
+}
+
+mpv_build_args() (
+    for key in "${!MPV_OPTS[@]}"; do
+        val="${MPV_OPTS[$key]}"
+        if [[ -n "$val" ]]; then
+            echo "-D${key}=${val}"
         else
-            newopts+=("$opt")
+            echo "$key"
         fi
     done
-    MPV_OPTS=("${newopts[@]}")
-}
+)
 
 do_addOption() {
     local varname="$1" array opt
@@ -1488,7 +1489,7 @@ strip_ansi() {
         local name="${txtfile%.*}" ext="${txtfile##*.}"
         [[ $txtfile != "$name" ]] &&
             newfile="$name.stripped.$ext" || newfile="$txtfile-stripped"
-        sed -r "s/\x1b[[(][0-9;?]*[a-zA-Z]|\x1b\][0-9];//g" "$txtfile" > "$newfile"
+        sed -E "s/\x1b[[(][0-9;?]*[a-zA-Z]|\x1b\][0-9];//g" "$txtfile" > "$newfile"
     done
 }
 

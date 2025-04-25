@@ -112,7 +112,7 @@ do_simple_print -p '\n\t'"${orange}Starting $bits compilation of all tools$reset
 cd_safe "$LOCALBUILDDIR"
 
 do_getFFmpegConfig "$license"
-do_getMpvConfig
+declare -A MPV_OPTS="($(do_getMpvConfig))"
 
 do_fix_pkgconfig_abspaths
 do_clean_old_builds
@@ -2755,7 +2755,7 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
 fi
 
 if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    if ! mpv_disabled lua && opt_exists MPV_OPTS "--lua=5.1"; then
+    if ! mpv_disabled lua && [[ ${MPV_OPTS[lua]} == 5.1 ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua &&
         _check=(bin-global/luajit.exe libluajit-5.1.a luajit.pc luajit-2.1/lua.h) &&
@@ -2832,120 +2832,26 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_checkIfExist
     fi
 
-    _check=()
+    _check=(libmpv.a mpv.pc)
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
-    mpv_enabled libmpv-shared && _check+=(bin-video/mpv-2.dll)
-    mpv_enabled libmpv-static && _check+=(libmpv.a)
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
-        do_pacman_install python-setuptools
-        do_patch "https://github.com/mpv-player/mpv/commit/78447c4b91634aa91dcace1cc6a9805fb93b9252.patch" am
-        do_patch "https://github.com/mpv-player/mpv/commit/414ddbd628724df3afc1e15f5e415dbb2c76a0b5.patch" am
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mpv/0001-ao_wasapi_utils-include-mmreg.h-for-WAVE_FORMAT.patch" am
+        do_patch "https://github.com/1480c1/mpv/commit/e26713d7b0e4a096c2039a263532ce818cc8043e.patch" am
+        do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
         hide_conflicting_libs
         create_ab_pkgconfig
-
-        log bootstrap "$MINGW_PREFIX"/bin/python bootstrap.py
-        if [[ -d build ]]; then
-            WAF_NO_PREFORK=1 "$MINGW_PREFIX"/bin/python waf distclean >/dev/null 2>&1
-            do_uninstall bin-video/mpv{.exe,-2.dll}.debug "${_check[@]}"
-        fi
-
-        mpv_ldflags=("-L$LOCALDESTDIR/lib" "-L$MINGW_PREFIX/lib")
-        if [[ $bits = 64bit ]]; then
-            mpv_ldflags+=("-Wl,--image-base,0x140000000,--high-entropy-va")
-            if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
-                mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
-                mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
-            fi
-        fi
-
-        enabled libvidstab && {
-            mapfile -d ' ' -t -O "${#mpv_cflags[@]}" mpv_cflags < <($PKG_CONFIG --libs vidstab)
-            mapfile -d ' ' -t -O "${#mpv_ldflags[@]}" mpv_ldflags < <($PKG_CONFIG --libs vidstab)
-        }
-        enabled_any libssh libxavs2 && mpv_ldflags+=("-Wl,--allow-multiple-definition")
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python-docutils
         fi
-        # do_pacman_remove python3-rst2pdf
-        # mpv_enabled pdf-build && do_pacman_install python2-rst2pdf
-
-        # rst2pdf is broken
-        mpv_disable pdf-build
+        mpv_enabled pdf-build && do_pacman_install python-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
-        # The mruby branch cannot (currently) be built with Meson, and hasn't seen
-        # any activity in over 5 years; for now it's statically disabled.
-        # https://github.com/mpv-player/mpv/issues/11078
-        if mpv_enabled mruby; then
-            do_removeOption MPV_OPTS "--enable-mruby";
-            do_simple_print "${orange}mruby in mpv is no longer supported!${reset}"
-        fi
-
-        if files_exist libavutil.a; then
-            MPV_OPTS+=(--enable-static-build)
-        else
-            # force pkg-config lookup to look for static requirements
-            export PKGCONF_STATIC=yes
-            # hacky way of ignoring ffmpeg libs own shared dependencies
-            for _avpc in avcodec avdevice avfilter avformat avutil swresample swscale; do
-                if [[ -f $LOCALDESTDIR/lib/pkgconfig/lib$_avpc.pc ]]; then
-                    sed -i 's;^Requires.private;# &;g' "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc"
-                fi
-            done
-        fi
-        if [[ $CC =~ clang ]]; then
-            mpv_cflags+=("-Wno-incompatible-function-pointer-types")
-            mpv_ldflags+=("-lc++")
-        fi
-
-        extra_script pre configure
-        # -Wno-incompatible-pointer-types there until we can move to a newer version of mpv and fix it properly.
-        # Make sure that ccache has a .exe suffix as waf looks for the compiler by looking at PATH and appending `split[0]`
-        # and checking each result if it's a path and executable. Thus `G:\\MABS\\msys64\\mingw32\\bin\\ccache` would fail.
-        CFLAGS+=" ${mpv_cflags[*]} -Wno-int-conversion -Wno-incompatible-pointer-types" LDFLAGS+=" ${mpv_ldflags[*]}" \
-            RST2MAN="${MINGW_PREFIX}/bin/rst2man" \
-            RST2HTML="${MINGW_PREFIX}/bin/rst2html" \
-            RST2PDF="${MINGW_PREFIX}/bin/rst2pdf2" \
-            PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf.exe --keep-system-cflags --static" \
-            WAF_NO_PREFORK=1 \
-            CC="${CC#ccache }.exe" CXX="${CXX#ccache }.exe" \
-            log configure "$MINGW_PREFIX"/bin/python waf configure \
-            "--prefix=$LOCALDESTDIR" "--bindir=$LOCALDESTDIR/bin-video" \
-            "${MPV_OPTS[@]}"
-        extra_script post configure
-
-        replace="LIBPATH_lib\1 = ['${LOCALDESTDIR}/lib','${MINGW_PREFIX}/lib']"
-        sed -r -i "s:LIBPATH_lib(ass|av(|device|filter)) = .*:$replace:g" ./build/c4che/_cache.py	
-        grep_and_sed FF_PROFILE audio/decode/ad_spdif.c 's/FF_PROFILE/AV_PROFILE/g'
-
-        extra_script pre build
-        WAF_NO_PREFORK=1 \
-            log build "$MINGW_PREFIX"/bin/python waf -j "${cpuCount:-1}"
-        extra_script post build
-
-        extra_script pre install
-        WAF_NO_PREFORK=1 \
-            log install "$MINGW_PREFIX"/bin/python waf -j1 install ||
-            log install "$MINGW_PREFIX"/bin/python waf -j1 install
-        extra_script post install
-
-        if ! files_exist libavutil.a; then
-            # revert hack
-            for _avpc in avcodec avdevice avfilter avformat avutil swresample swscale; do
-                if [[ -f $LOCALDESTDIR/lib/pkgconfig/lib$_avpc.pc ]]; then
-                    sed -ri 's;#.*(Requires.private);\1;g' "$LOCALDESTDIR/lib/pkgconfig/lib${_avpc}.pc"
-                fi
-            done
-        fi
-
-        unset mpv_ldflags replace PKGCONF_STATIC
+        mapfile -t MPV_ARGS < <(mpv_build_args)
+        do_mesoninstall video "${MPV_ARGS[@]}"
+        unset MPV_ARGS
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
-        ! mpv_disabled debug-build &&
-            create_debug_link "$LOCALDESTDIR"/bin-video/mpv{.exe,-2.dll}
         create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
         do_checkIfExist
     fi

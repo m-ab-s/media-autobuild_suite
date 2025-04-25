@@ -131,16 +131,16 @@ libglslang vulkan libdavs2 libxavs2 libuavs3d libplacebo libjxl libvvenc libvvde
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
-set mpv_options_builtin=#cplayer #manpage-build #lua #javascript ^
+set mpv_options_builtin=#-Dcplayer=true #manpage-build #lua #javascript ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
-#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan #libplacebo
+#shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan
 
 :: overriden defaults
-set mpv_options_basic=--disable-debug-build "--lua=luajit"
+set mpv_options_basic=-Dlua=luajit
 
 :: all supported options
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
-#pdf-build libmpv-shared openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
+#pdf-build openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
@@ -953,19 +953,19 @@ if %buildffmpegChoice%==1 (
             echo.# To override some options specifically for the shared build, create a ffmpeg_options_shared.txt file.
             echo.
             echo.# Basic built-in options, can be removed if you delete "--disable-autodetect"
-            call :writeOption %ffmpeg_options_builtin%
+            call :writeFFmpegOption %ffmpeg_options_builtin%
             echo.
             echo.# Common options
-            call :writeOption %ffmpeg_options_basic%
+            call :writeFFmpegOption %ffmpeg_options_basic%
             echo.
             echo.# Zeranoe
-            call :writeOption %ffmpeg_options_zeranoe%
+            call :writeFFmpegOption %ffmpeg_options_zeranoe%
             echo.
             echo.# Full
-            call :writeOption %ffmpeg_options_full%
+            call :writeFFmpegOption %ffmpeg_options_full%
             echo.
             echo.# Full plus options that add shared dependencies
-            call :writeOption %ffmpeg_options_full_shared%
+            call :writeFFmpegOption %ffmpeg_options_full_shared%
             )>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default FFmpeg options has been created in
@@ -975,18 +975,27 @@ if %buildffmpegChoice%==1 (
         echo -------------------------------------------------------------------------------
         pause
         )
+    findstr --enable-cplayer %build%\mpv_options.txt >nul 2>&1 && for /f %%i in ('powershell -c "Get-Date -format yyyy-MM-dd--HH-mm-ss"') do (
+        rename %build%\mpv_options.txt %%i-mpv_options.txt >nul 2>&1
+        echo -------------------------------------------------------------------------------
+        echo. Old mpv_options.txt was detected.
+        echo. It has been renamed to %%i-mpv_options.txt.
+        echo. You can delete it if you don't need it.
+        echo -------------------------------------------------------------------------------
+        echo.
+    )
     if not exist %build%\mpv_options.txt (
         (
             echo.# Lines starting with this character are ignored
             echo.
-            echo.# Built-in options, use --disable- to disable them
-            call :writeOption %mpv_options_builtin%
+            echo.# Built-in options, use =disabled to disable them
+            call :writempvOption %mpv_options_builtin%
             echo.
             echo.# Common options or overriden defaults
-            call :writeOption %mpv_options_basic%
+            call :writempvOption %mpv_options_basic%
             echo.
             echo.# Full
-            call :writeOption %mpv_options_full%
+            call :writempvOption %mpv_options_full%
             )>%build%\mpv_options.txt
         echo -------------------------------------------------------------------------------
         echo. File with default mpv options has been created in
@@ -2114,7 +2123,7 @@ goto :EOF
 %instdir%\msys64\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
 goto :EOF
 
-:writeOption
+:writeFFmpegOption
 setlocal enabledelayedexpansion
 for %%i in (%*) do (
     set _opt=%%~i
@@ -2126,6 +2135,23 @@ for %%i in (%*) do (
         echo #--enable-!_opt:~1!
     ) else (
         echo --enable-!_opt!
+    )
+)
+endlocal
+goto :EOF
+
+:writempvOption
+setlocal enabledelayedexpansion
+for %%i in (%*) do (
+    set _opt=%%~i
+    if ["!_opt:~0,1!"]==["-"] (
+        echo !_opt!
+    ) else if ["!_opt:~0,2!"]==["#-"] (
+        echo !_opt!
+    ) else if ["!_opt:~0,1!"]==["#"] (
+        echo #-D!_opt:~1!=enabled
+    ) else (
+        echo -D!_opt!=enabled
     )
 )
 endlocal
