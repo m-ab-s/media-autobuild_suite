@@ -1108,7 +1108,7 @@ if [[ $ffmpeg != no ]] && enabled libopenmpt &&
     do_vcs "$SOURCE_REPO_LIBOPENMPT"; then
     do_uninstall include/libopenmpt "${_check[@]}"
     mkdir bin 2> /dev/null
-    extracommands=("CONFIG=mingw64-win${bits%bit}" "AR=ar" "STATIC_LIB=1" "EXAMPLES=0" "OPENMPT123=0"
+    extracommands=("CONFIG=mingw64-win${bits%bit}" "AR=ar" "STATIC_LIB=1" "SHARED_LIB=0" "EXAMPLES=0" "OPENMPT123=0"
         "TEST=0" "OS=" "CC=$CC" "CXX=$CXX" "MINGW_COMPILER=${CC##* }")
     log clean make clean "${extracommands[@]}"
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
