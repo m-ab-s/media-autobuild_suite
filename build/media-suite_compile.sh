@@ -403,7 +403,6 @@ if [[ $mplayer = y || $mpv = y ]] ||
     fi
     if enabled_any {lib,}fontconfig &&
         do_vcs "$SOURCE_REPO_FONTCONFIG"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/fontconfig/0001-meson-change-default_library-to-default_both_librari.patch" am
         do_uninstall include/fontconfig "${_check[@]}"
         do_pacman_install gperf
         extracommands=()
