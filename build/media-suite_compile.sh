@@ -2274,8 +2274,7 @@ if [[ $exitearly = EE5 ]]; then
 fi
 
 _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
-if { { [[ $mpv != n ]] && ! mpv_disabled libplacebo; } ||
-     { [[ $mpv != n ]] && ! mpv_disabled spirv-cross; } ||
+if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_SPIRV_CROSS"; then
     do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
@@ -2287,7 +2286,7 @@ fi
 
 _check=(lib{glslang,OSDependent,SPVRemapper}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
-if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
     do_uninstall libHLSL.a "${_check[@]}"
@@ -2297,7 +2296,7 @@ if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
 fi
 
 _check=(shaderc/shaderc.h libshaderc_combined.a)
-if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } ||
      ! mpv_disabled shaderc &&
     do_vcs "$SOURCE_REPO_SHADERC"; then
@@ -2321,7 +2320,7 @@ file_installed -s shaderc_static.pc &&
 
 _check=(libplacebo.{a,pc})
 _deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
-if { { [[ $mpv != n ]]  && ! mpv_disabled libplacebo; } ||
+if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_LIBPLACEBO"; then
     do_git_submodule
@@ -2755,7 +2754,7 @@ if [[ $mplayer = y ]] && check_mplayer_updates; then
 fi
 
 if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
-    if ! mpv_disabled lua && [[ ${MPV_OPTS[lua]} == 5.1 ]]; then
+    if [[ ${MPV_OPTS[lua]} == 5.1 ]]; then
         do_pacman_install lua51
     elif ! mpv_disabled lua &&
         _check=(bin-global/luajit.exe libluajit-5.1.a luajit.pc luajit-2.1/lua.h) &&
