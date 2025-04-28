@@ -434,6 +434,7 @@ if [[ $mplayer = y || $mpv = y ]] ||
     [[ $standalone = y ]] && _check+=(bin-video/fribidi.exe)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libfribidi-0.dll libfribidi.dll.a)
     if do_vcs "$SOURCE_REPO_FRIBIDI"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/fribidi/0001-bin-only-use-vendored-getopt-if-not-provided.patch" am
         extracommands=("-Ddocs=false" "-Dtests=false")
         [[ $standalone = n ]] && extracommands+=("-Dbin=false")
         [[ $ffmpeg = sharedlibs ]] && extracommands+=(--default-library=both)
