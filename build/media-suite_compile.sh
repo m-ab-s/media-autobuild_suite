@@ -3227,7 +3227,9 @@ _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs "$SOURCE_REPO_FFMBC"; then
     _notrequired=true
     create_build_dir
-    log configure ../configure --target-os=mingw32 --enable-gpl \
+    # Too many errors with GCC 15 due to really old code.
+    CFLAGS+=" -Wno-error=incompatible-pointer-types" \
+        log configure ../configure --target-os=mingw32 --enable-gpl \
         --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE \
         --cc="$CC" --ld="$CXX"
     do_make
