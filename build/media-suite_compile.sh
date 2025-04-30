@@ -2841,6 +2841,12 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python-docutils
         fi
+        if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
+            mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
+            mpv_ldflags=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
+            MPV_OPTS["c_args"]="${mpv_cflags[*]}"
+            MPV_OPTS["c_link_args"]="${mpv_ldflags[*]}"
+        fi        
         mpv_enabled pdf-build && do_pacman_install python-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
