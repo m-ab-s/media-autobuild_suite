@@ -2844,8 +2844,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
             mpv_cflags=("-I$(cygpath -sm "$CUDA_PATH")/include")
             mpv_ldflags=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
-            MPV_OPTS["c_args"]="${mpv_cflags[*]}"
-            MPV_OPTS["c_link_args"]="${mpv_ldflags[*]}"
+            MPV_OPTS["c_args"]="$(IFS=,; echo "${mpv_cflags[*]}")"
+            MPV_OPTS["c_link_args"]="$(IFS=,; echo "${mpv_ldflags[*]}")"
         fi        
         mpv_enabled pdf-build && do_pacman_install python-rst2pdf
 
