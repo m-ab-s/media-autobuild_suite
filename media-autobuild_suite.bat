@@ -975,7 +975,7 @@ if %buildffmpegChoice%==1 (
         echo -------------------------------------------------------------------------------
         pause
         )
-    findstr --enable-cplayer %build%\mpv_options.txt >nul 2>&1 && for /f %%i in ('powershell -c "Get-Date -format yyyy-MM-dd--HH-mm-ss"') do (
+    findstr /C:--enable-cplayer %build%\mpv_options.txt >nul 2>&1 && for /f %%i in ('powershell -c "Get-Date -format yyyy-MM-dd--HH-mm-ss"') do (
         rename %build%\mpv_options.txt %%i-mpv_options.txt >nul 2>&1
         echo -------------------------------------------------------------------------------
         echo. Old mpv_options.txt was detected.
