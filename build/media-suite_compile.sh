@@ -2574,7 +2574,7 @@ if [[ $libheif != n ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/heif-{dec,enc,info,thumbnailer}.exe)
+_check=(bin-video/heif-{dec,enc,info,thumbnailer,view}.exe)
 [[ $libheif = shared ]] && _check+=(bin-video/libheif.dll)
 if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBHEIF"; then
