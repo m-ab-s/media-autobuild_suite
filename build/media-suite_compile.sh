@@ -2215,6 +2215,16 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     do_checkIfExist
 fi
 
+_check=(bin-video/oapv_app_{enc,dec}.exe oapv/oapv.h oapv/liboapv.a oapv.pc)
+if [[ $ffmpeg != no ]] && enabled liboapv &&
+    do_vcs "$SOURCE_REPO_OPENAPV"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall video -DOAPV_BUILD_SHARED_LIB=OFF
+    # patch the lib path to actual subdirectory it installed to
+    sed -i 's|Libs: -L${libdir} -loapv|Libs: -L${libdir}/oapv -loapv|' "$LOCALDESTDIR"/lib/pkgconfig/oapv.pc
+    do_checkIfExist
+fi
+
 _check=(avisynth/avisynth{,_c}.h
         avisynth/avs/{alignment,arch,capi,config,cpuid,minmax,posix,types,win,version}.h)
 if [[ $ffmpeg != no ]] && enabled avisynth &&
