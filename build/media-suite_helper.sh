@@ -1709,7 +1709,10 @@ do_unhide_all_sharedlibs() {
 
 do_pacman_resolve_pkgs() (
     : "${prefix=$MINGW_PACKAGE_PREFIX-}"
-    pacsift --exact --sync --any "${@/#/--provides=$prefix}" "${@/#/--name=$prefix}" 2>&1 | sed "s|^.*/$prefix||"
+    # Prefer exact matches, then provides
+    pkg=$(pacsift --exact --sync --any "${@/#/--name=$prefix}" 2>&1)
+    [[ -z $pkg ]] && pkg=$(pacsift --exact --sync --any "${@/#/--provides=$prefix}" 2>&1)
+    echo "${pkg#*/"$prefix"}"
 )
 
 is_pkg_installed() (
