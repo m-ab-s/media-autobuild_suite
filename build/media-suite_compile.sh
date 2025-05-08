@@ -2221,6 +2221,22 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     do_checkIfExist
 fi
 
+_check=(bin-video/oapv_app_{enc,dec}.exe bin-video/liboapv.dll oapv/oapv{,_exports}.h liboapv{,.dll}.a oapv.pc)
+if [[ $ffmpeg != no ]] && enabled liboapv &&
+    do_vcs "$SOURCE_REPO_OPENAPV"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall video -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=x86_64
+    # no way to disable shared lib building in cmake, and it's important!!
+    # move the libraries out from subfolder to make ffmpeg configure find it easier
+    # somehow the FFmpeg configure can't handle static oapv, so... you'll have dll dependency
+    mv -f "$LOCALDESTDIR"/lib/oapv/liboapv.a "$LOCALDESTDIR"/lib/liboapv.a
+    mv -f "$LOCALDESTDIR"/lib/oapv/import/liboapv.dll.a "$LOCALDESTDIR"/lib/liboapv.dll.a
+    # delete the now empty subfolder
+    rmdir "$LOCALDESTDIR/lib/oapv/import" > /dev/null 2>&1
+    rmdir "$LOCALDESTDIR/lib/oapv" > /dev/null 2>&1
+    do_checkIfExist
+fi
+
 _check=(avisynth/avisynth{,_c}.h
         avisynth/avs/{alignment,arch,capi,config,cpuid,minmax,posix,types,win,version}.h)
 if [[ $ffmpeg != no ]] && enabled avisynth &&
