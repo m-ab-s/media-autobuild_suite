@@ -955,16 +955,6 @@ do_changeFFmpegConfig() {
     eval "$(sed -n '/EXTERNAL_LIBRARY_NONFREE_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
     eval "$(sed -n '/EXTERNAL_LIBRARY_VERSION3_LIST=/,/^"/p' "$config_script" | tr -s '\n' ' ')"
 
-    # handle gpl libs
-    local gpl
-    read -ra gpl <<< "${EXTERNAL_LIBRARY_GPL_LIST//_/-} gpl"
-    if [[ $license == gpl* || $license == nonfree ]] &&
-        { enabled_any "${gpl[@]}" || ! disabled postproc; }; then
-        do_addOption --enable-gpl
-    else
-        do_removeOptions "${gpl[*]/#/--enable-} --enable-postproc --enable-gpl"
-    fi
-
     # handle (l)gplv3 libs
     local version3
     read -ra version3 <<< "${EXTERNAL_LIBRARY_VERSION3_LIST//_/-}"

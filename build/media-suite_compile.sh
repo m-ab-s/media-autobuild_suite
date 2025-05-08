@@ -305,7 +305,7 @@ if [[ $gifski != n ]]; then
                 --prefix="$LOCALDESTDIR/opt/gifskiffmpeg" \
                 --enable-static --disable-shared --disable-programs \
                 --disable-autodetect --disable-everything \
-                --disable-{debug,doc,network,postproc,protocols} \
+                --disable-{debug,doc,network,protocols} \
                 --enable-{decoders,demuxers} \
                 --enable-filter=format,fps,scale --enable-protocol=file \
                 --disable-bsf=evc_frame_merge,media100_to_mjpegb,vp9_superframe_split \
@@ -2091,7 +2091,7 @@ if [[ $av1an != n ]]; then
         config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
             --prefix="$LOCALDESTDIR/$av1an_ffmpeg_prefix" \
             --disable-autodetect --disable-everything \
-            --disable-{debug,doc,postproc,network} \
+            --disable-{debug,doc,network} \
             --enable-{decoders,demuxers,protocols} \
             "${av1an_ffmpeg_opts[@]}"
         do_make && do_makeinstall
@@ -2942,7 +2942,7 @@ if [[ $cyanrip = y ]]; then
             config_path=.. do_configure "${FFMPEG_BASE_OPTS[@]}" \
                 --prefix="$LOCALDESTDIR/opt/cyanffmpeg" \
                 --disable-{programs,devices,filters,decoders,hwaccels,encoders,muxers} \
-                --disable-{debug,protocols,demuxers,parsers,doc,swscale,postproc,network} \
+                --disable-{debug,protocols,demuxers,parsers,doc,swscale,network} \
                 --disable-{avdevice,autodetect} \
                 --disable-bsfs --enable-protocol=file,data \
                 --enable-encoder=flac,tta,aac,wavpack,alac,pcm_s16le,pcm_s32le \
