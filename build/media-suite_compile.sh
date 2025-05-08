@@ -1141,9 +1141,7 @@ fi
 
 _check=(shine/layer3.h libshine.{,l}a shine.pc)
 [[ $standalone = y ]] && _check+=(bin-audio/shineenc.exe)
-if enabled libshine && do_pkgConfig "shine = 3.1.1" &&
-    do_wget -h 58e61e70128cf73f88635db495bfc17f0dde3ce9c9ac070d505a0cd75b93d384 \
-        "https://github.com/toots/shine/releases/download/3.1.1/shine-3.1.1.tar.gz"; then
+if enabled libshine && do_vcs "$SOURCE_REPO_SHINE"; then
     do_uninstall "${_check[@]}"
     [[ $standalone = n ]] && sed -i '/bin_PROGRAMS/,+4d' Makefile.am
     # fix out-of-root build
