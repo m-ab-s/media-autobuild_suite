@@ -1946,6 +1946,7 @@ if enabled libxvid && [[ $standalone = y ]] &&
     do_vcs "$SOURCE_REPO_XVID"; then
     do_pacman_install yasm
     do_patch "https://github.com/m-ab-s/xvid/compare/lighde.patch" am
+    do_patch "https://github.com/m-ab-s/xvid/compare/mabs.patch" am
     do_pacman_remove xvidcore
     do_uninstall "${_check[@]}"
     cd_safe xvidcore/build/generic
