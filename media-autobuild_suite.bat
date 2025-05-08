@@ -136,7 +136,7 @@ set mpv_options_builtin=#-Dcplayer=true #manpage-build #lua #javascript ^
 #shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan
 
 :: overriden defaults
-set mpv_options_basic=-Dlua=luajit
+set mpv_options_basic="-Dlua=luajit"
 
 :: all supported options
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
