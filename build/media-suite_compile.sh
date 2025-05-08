@@ -2810,6 +2810,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     _check=(mujs.{h,pc} libmujs.a)
     if ! mpv_disabled javascript &&
         do_vcs "$SOURCE_REPO_MUJS"; then
+        do_patch "https://github.com/ccxvii/mujs/compare/master...1480c1:mujs:pkgconfig/prefix.patch" am
         do_uninstall bin-global/mujs.exe "${_check[@]}"
         log clean env -i PATH="$PATH" "$(command -v make)" clean
         mujs_targets=(build/release/{mujs.pc,libmujs.a})
