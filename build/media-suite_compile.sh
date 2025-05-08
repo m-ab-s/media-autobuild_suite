@@ -2840,16 +2840,22 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
         hide_conflicting_libs
         create_ab_pkgconfig
+        mpv_cflags=() mpv_ldflags=()
         if ! mpv_disabled manpage-build || mpv_enabled html-build; then
             do_pacman_install python-docutils
+        fi
+        if enabled libnpp && [[ -n "$CUDA_PATH" ]]; then
+            mpv_cflags+=("-I$(cygpath -sm "$CUDA_PATH")/include")
+            mpv_ldflags+=("-L$(cygpath -sm "$CUDA_PATH")/lib/x64")
         fi
         mpv_enabled pdf-build && do_pacman_install python-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
         mapfile -t MPV_ARGS < <(mpv_build_args)
-        do_mesoninstall video "${MPV_ARGS[@]}"
-        unset MPV_ARGS
+        CFLGAS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
+            do_mesoninstall video "${MPV_ARGS[@]}"
+        unset MPV_ARGS mpv_cflags mpv_ldflags
         hide_conflicting_libs -R
         files_exist share/man/man1/mpv.1 && dos2unix -q "$LOCALDESTDIR"/share/man/man1/mpv.1
         create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
