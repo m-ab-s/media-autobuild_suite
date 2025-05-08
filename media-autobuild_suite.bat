@@ -131,7 +131,7 @@ libglslang vulkan libdavs2 libxavs2 libuavs3d libplacebo libjxl libvvenc libvvde
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libnpp libopenh264
 
 :: built-ins
-set mpv_options_builtin=#-Dcplayer=true #manpage-build #lua #javascript ^
+set mpv_options_builtin="#-Dcplayer=true" #manpage-build #lua #javascript ^
 #libbluray #uchardet #rubberband #lcms2 #libarchive #libavdevice ^
 #shaderc #spirv-cross #d3d11 #jpeg #vapoursynth #vulkan
 
