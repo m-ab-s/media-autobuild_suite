@@ -2340,6 +2340,11 @@ if [[ $exitearly = EE6 ]]; then
 fi
 
 enabled openssl && hide_libressl
+if enabled libcdio || mpv_enabled cdda; then
+    do_pacman_install libcdio-paranoia
+    grep -ZlER -- "-R/mingw\S+" "$MINGW_PREFIX"/lib/pkgconfig/* | xargs -r -0 sed -ri 's;-R/mingw\S+;;g'
+fi
+
 if [[ $ffmpeg != no ]]; then
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy
@@ -2355,10 +2360,6 @@ if [[ $ffmpeg != no ]]; then
             "/Libs:/ i\Requires.private: zlib libssl"
     fi
     enabled libtheora && do_pacman_install libtheora
-    if enabled libcdio; then
-        do_pacman_install libcdio-paranoia
-        grep -ZlER -- "-R/mingw\S+" "$MINGW_PREFIX"/lib/pkgconfig/* | xargs -r -0 sed -ri 's;-R/mingw\S+;;g'
-    fi
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
