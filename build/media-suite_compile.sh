@@ -2842,7 +2842,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
     _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
-        do_patch "https://github.com/1480c1/mpv/commit/e26713d7b0e4a096c2039a263532ce818cc8043e.patch" am
         do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
         hide_conflicting_libs
         create_ab_pkgconfig
