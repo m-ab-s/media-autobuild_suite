@@ -1228,6 +1228,9 @@ if { enabled libvpx || [[ $vpx = y ]]; } && do_vcs "$SOURCE_REPO_VPX" vpx; then
     [[ $standalone = y || $av1an != n ]] && _check+=(bin-video/vpxdec.exe) ||
         extracommands+=(--disable-{examples,webm-io,libyuv,postproc})
     do_uninstall include/vpx "${_check[@]}"
+    # Work around for semaphore.h not having struct _timespec64 info
+    grep_or_sed sys/timeb.h vp8/common/threading.h \
+        '/<semaphore.h>/ i\#include <sys/timeb.h>'
     create_build_dir
     [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
     [[ $ffmpeg = sharedlibs ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
