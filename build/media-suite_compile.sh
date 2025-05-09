@@ -1162,10 +1162,8 @@ if { { [[ $ffmpeg != no ]] &&
     do_vcs "$SOURCE_REPO_OPENAL"; then
     do_uninstall "${_check[@]}"
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0002-uiddefs-limit-AL_NO_UID_DEFS-to-DEVPKEY-stuff.patch" am
-    # ALSOFT_NO_UID_DEFS is for mpv and errors with KSDATAFORMAT_SUBTYPE_PCM and KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
     CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
-        do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_NO_UID_DEFS=ON
+        do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
     sed -i 's/Libs.private.*/& -luuid -lole32/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
     do_checkIfExist
     unset _mingw_patches
