@@ -2581,11 +2581,11 @@ if [[ $libheif != n ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/heif-{dec,enc,info,thumbnailer,view}.exe)
+_check=(bin-video/heif-{dec,enc,info,thumbnailer}.exe)
 [[ $libheif = shared ]] && _check+=(bin-video/libheif.dll)
 if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBHEIF"; then
-    do_uninstall "${_check[@]}"
+    do_uninstall bin-video/heif-view.exe "${_check[@]}"
 
     do_pacman_install libjpeg-turbo
     pc_exists "libpng" || do_pacman_install libpng
