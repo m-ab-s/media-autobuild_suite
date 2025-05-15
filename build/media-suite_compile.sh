@@ -2860,7 +2860,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
         mapfile -t MPV_ARGS < <(mpv_build_args)
-        CFLGAS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
+        CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             do_mesoninstall video "${MPV_ARGS[@]}"
         unset MPV_ARGS mpv_cflags mpv_ldflags
         hide_conflicting_libs -R
