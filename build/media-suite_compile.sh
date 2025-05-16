@@ -2478,8 +2478,10 @@ if [[ $ffmpeg != no ]]; then
         fi
 
         _patches=$(git rev-list $ff_base_commit.. --count)
-        [[ $_patches -gt 0 ]] &&
+        if [[ $_patches -gt 0 ]]; then
             do_addOption "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
+            do_addOption FFMPEG_OPTS_SHARED "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
+        fi
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
