@@ -2196,33 +2196,37 @@ else
     pc_exists libvvdec || do_removeOption "--enable-libvvdec"
 fi
 
-_check=(bin-video/xeve_app.exe xeve/xeve{,_exports}.h libxeve.a xeve.pc)
+_check=(bin-video/xeve_app.exe xeve/xeve{,_exports}.h xeve/libxeve.a xeve.pc)
 if [[ $ffmpeg != no ]] && enabled libxeve &&
     do_vcs "$SOURCE_REPO_XEVE"; then
     do_uninstall bin-video/libxeve.dll lib/libxeve.dll.a.dyn "${_check[@]}"
     sed -i 's/-Werror //' CMakeLists.txt
-    do_cmakeinstall video
-    # no way to disable shared lib building in cmake
-    # move the static library out from subfolder to make ffmpeg configure find it easier
-    mv -f "$LOCALDESTDIR"/lib/xeve/libxeve.a "$LOCALDESTDIR"/lib/libxeve.a
+    do_cmakeinstall video # no way to disable shared lib building in cmake
     mv -f "$LOCALDESTDIR"/lib/libxeve.dll.a "$LOCALDESTDIR"/lib/libxeve.dll.a.dyn
-    # delete the now empty subfolder
-    rmdir "$LOCALDESTDIR/lib/xeve" > /dev/null 2>&1
+    # patch the lib path to actual subdirectory it installed to
+    sed -i 's|Libs: -L${libdir} -lxeve|Libs: -L${libdir}/xeve -lxeve|' "$LOCALDESTDIR"/lib/pkgconfig/xeve.pc
     do_checkIfExist
 fi
 
-_check=(bin-video/xevd_app.exe xevd/xevd{,_exports}.h libxevd.a xevd.pc)
+_check=(bin-video/xevd_app.exe xevd/xevd{,_exports}.h xevd/libxevd.a xevd.pc)
 if [[ $ffmpeg != no ]] && enabled libxevd &&
     do_vcs "$SOURCE_REPO_XEVD"; then
     do_uninstall bin-video/libxevd.dll lib/libxevd.dll.a.dyn "${_check[@]}"
     sed -i 's/-Werror //' CMakeLists.txt
-    do_cmakeinstall video
-    # no way to disable shared lib building in cmake
-    # move the static library out from subfolder to make ffmpeg configure find it easier
-    mv -f "$LOCALDESTDIR"/lib/xevd/libxevd.a "$LOCALDESTDIR"/lib/libxevd.a
+    do_cmakeinstall video # no way to disable shared lib building in cmake
     mv -f "$LOCALDESTDIR"/lib/libxevd.dll.a "$LOCALDESTDIR"/lib/libxevd.dll.a.dyn
-    # delete the now empty subfolder
-    rmdir "$LOCALDESTDIR/lib/xevd" > /dev/null 2>&1
+    # patch the lib path to actual subdirectory it installed to
+    sed -i 's|Libs: -L${libdir} -lxevd|Libs: -L${libdir}/xevd -lxevd|' "$LOCALDESTDIR"/lib/pkgconfig/xevd.pc
+    do_checkIfExist
+fi
+
+_check=(bin-video/oapv_app_{enc,dec}.exe oapv/oapv.h oapv/liboapv.a oapv.pc)
+if [[ $ffmpeg != no ]] && enabled liboapv &&
+    do_vcs "$SOURCE_REPO_OPENAPV"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall video -DOAPV_BUILD_SHARED_LIB=OFF
+    # patch the lib path to actual subdirectory it installed to
+    sed -i 's|Libs: -L${libdir} -loapv|Libs: -L${libdir}/oapv -loapv|' "$LOCALDESTDIR"/lib/pkgconfig/oapv.pc
     do_checkIfExist
 fi
 
@@ -2484,8 +2488,10 @@ if [[ $ffmpeg != no ]]; then
         fi
 
         _patches=$(git rev-list $ff_base_commit.. --count)
-        [[ $_patches -gt 0 ]] &&
+        if [[ $_patches -gt 0 ]]; then
             do_addOption "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
+            do_addOption FFMPEG_OPTS_SHARED "--extra-version=g$(git rev-parse --short $ff_base_commit)+$_patches"
+        fi
 
         _uninstall=(include/libav{codec,device,filter,format,util,resample}
             include/lib{sw{scale,resample},postproc}
