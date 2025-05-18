@@ -1182,6 +1182,27 @@ if [[ $ffmpeg != no ]] && enabled liblc3 &&
     do_checkIfExist
 fi
 
+_check=(bin/atw_ldwrapper libAudioToolboxWrapper.a
+    bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
+if [[ $ffmpeg != no ]] && enabled audiotoolbox &&
+    do_vcs "$SOURCE_REPO_AUDIOTOOLBOX"; then
+    _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"
+    do_uninstall "${_check[@]}"
+    if [[ $build64 = yes ]]; then
+        do_wget -c -r -q "${_qtfiles_url}/QTfiles64.7z" QTfiles64.7z
+        do_install QTfiles64/*.dll bin-video
+        rm -rf QTfiles64/ QTfiles64.7z
+    fi
+    if [[ $build32 = yes ]]; then
+        do_wget -c -r -q "${_qtfiles_url}/QTfiles.7z" QTfiles.7z
+        do_install QTfiles/*.dll bin-video
+        rm -rf QTfiles/ QTfiles.7z
+    fi
+    do_cmakeinstall
+    do_checkIfExist
+    unset _ver _qtfiles_url
+fi
+
 if [[ $exitearly = EE4 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE4"
     return
@@ -2464,6 +2485,10 @@ if [[ $ffmpeg != no ]]; then
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
         enabled libvvdec && grep_and_sed FF_PROFILE libavcodec/libvvdec.c 's/FF_PROFILE/AV_PROFILE/g'
+
+        # Bypass ffmpeg check for audiotoolbox
+        enabled audiotoolbox && do_addOption --extra-libs=-lAudioToolboxWrapper && do_addOption --disable-outdev=audiotoolbox &&
+            sed -ri "s/check_apple_framework AudioToolbox/check_apple_framework/g" /build/ffmpeg-git/configure
 
         if enabled openal &&
             pc_exists "openal"; then
