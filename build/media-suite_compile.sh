@@ -1189,18 +1189,20 @@ if [[ $ffmpeg != no ]] && enabled audiotoolbox &&
     _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"
     do_uninstall "${_check[@]}"
     if [[ $build64 = yes ]]; then
-        do_wget -c -r -q "${_qtfiles_url}/QTfiles64.7z" QTfiles64.7z
+        do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
+            "${_qtfiles_url}/QTfiles64.7z" QTfiles64.7z
         do_install QTfiles64/*.dll bin-video
         rm -rf QTfiles64/ QTfiles64.7z
     fi
     if [[ $build32 = yes ]]; then
-        do_wget -c -r -q "${_qtfiles_url}/QTfiles.7z" QTfiles.7z
+        do_wget -r -q -h c6c582fe1af4e0c2b1eb7c141ad929a81f14d123aedd3b16df8226c104fb3028 \
+            "${_qtfiles_url}/QTfiles.7z" QTfiles.7z
         do_install QTfiles/*.dll bin-video
         rm -rf QTfiles/ QTfiles.7z
     fi
     do_cmakeinstall
     do_checkIfExist
-    unset _ver _qtfiles_url
+    unset _qtfiles_url
 fi
 
 if [[ $exitearly = EE4 ]]; then
@@ -2492,7 +2494,7 @@ if [[ $ffmpeg != no ]]; then
 
         # Bypass ffmpeg check for audiotoolbox
         enabled audiotoolbox && do_addOption --extra-libs=-lAudioToolboxWrapper && do_addOption --disable-outdev=audiotoolbox &&
-            sed -ri "s/check_apple_framework AudioToolbox/check_apple_framework/g" /build/ffmpeg-git/configure
+            sed -ri "s/check_apple_framework AudioToolbox/check_apple_framework/g" configure
 
         if enabled openal &&
             pc_exists "openal"; then
