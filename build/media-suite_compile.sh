@@ -1182,26 +1182,30 @@ if [[ $ffmpeg != no ]] && enabled liblc3 &&
     do_checkIfExist
 fi
 
-_check=(bin/atw_ldwrapper libAudioToolboxWrapper.a
-    bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
-if [[ $ffmpeg != no ]] && enabled audiotoolbox &&
-    do_vcs "$SOURCE_REPO_AUDIOTOOLBOX"; then
+_check=(bin/atw_ldwrapper libAudioToolboxWrapper.a)
+if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
     _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"
-    do_uninstall "${_check[@]}"
-    if [[ $build64 = yes ]]; then
-        do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
-            "${_qtfiles_url}/QTfiles64.7z" QTfiles64.7z
-        do_install QTfiles64/*.dll bin-video
-        rm -rf QTfiles64/ QTfiles64.7z
+    _deps=(bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
+    if ! files_exist "${_deps[@]}"; then
+        if [[ $build64 = yes ]]; then
+            do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
+                "${_qtfiles_url}/QTfiles64.7z"
+            do_install *.dll bin-video
+            rm -rf ../QTfiles64/
+        fi
+        if [[ $build32 = yes ]]; then
+            do_wget -r -q -h c6c582fe1af4e0c2b1eb7c141ad929a81f14d123aedd3b16df8226c104fb3028 \
+                "${_qtfiles_url}/QTfiles.7z"
+            do_install *.dll bin-video
+            rm -rf ../QTfiles/
+        fi
     fi
-    if [[ $build32 = yes ]]; then
-        do_wget -r -q -h c6c582fe1af4e0c2b1eb7c141ad929a81f14d123aedd3b16df8226c104fb3028 \
-            "${_qtfiles_url}/QTfiles.7z" QTfiles.7z
-        do_install QTfiles/*.dll bin-video
-        rm -rf QTfiles/ QTfiles.7z
+
+    if do_vcs "$SOURCE_REPO_AUDIOTOOLBOX"; then
+        do_uninstall "${_check[@]}"
+        do_cmakeinstall
+        do_checkIfExist
     fi
-    do_cmakeinstall
-    do_checkIfExist
     unset _qtfiles_url
 fi
 
