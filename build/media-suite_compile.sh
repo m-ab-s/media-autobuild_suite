@@ -2608,6 +2608,10 @@ if [[ $ffmpeg != no ]]; then
     fi
 fi
 
+# Fix linking to audiotoolboxwrapper
+grep_or_sed "AudioToolboxWrapper" "$LOCALDESTDIR"/lib/pkgconfig/libavcodec.pc \
+    's/(Libs: .*)/\1 -lAudioToolboxWrapper -lshlwapi -lshell32/'
+
 _check=(libde265.a)
 [[ $standalone = y ]] && _check+=(bin-video/dec265.exe)
 if [[ $libheif != n ]] &&
