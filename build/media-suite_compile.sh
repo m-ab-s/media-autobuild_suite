@@ -2498,6 +2498,7 @@ if [[ $ffmpeg != no ]]; then
 
         # Bypass ffmpeg check for audiotoolbox
         enabled audiotoolbox && do_addOption --extra-libs=-lAudioToolboxWrapper && do_addOption --disable-outdev=audiotoolbox &&
+            do_addOption FFMPEG_OPTS_SHARED --extra-libs=-lAudioToolboxWrapper && do_addOption FFMPEG_OPTS_SHARED --disable-outdev=audiotoolbox &&
             sed -ri "s/check_apple_framework AudioToolbox/check_apple_framework/g" configure
 
         if enabled openal &&
