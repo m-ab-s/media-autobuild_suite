@@ -328,7 +328,7 @@ if [[ $gifski != n ]]; then
             do_pacman_install clang
         fi
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
-            do_rust "${extracommands[@]}"
+            LIBCLANG_PATH="$MINGW_PREFIX/bin" do_rust "${extracommands[@]}"
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/gifski.exe" bin-global/
         do_checkIfExist
         unset extracommands
@@ -2141,7 +2141,7 @@ if [[ $av1an != n ]]; then
         do_uninstall "${_check[@]}"
         do_pacman_install clang
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
-            VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
+            LIBCLANG_PATH="$MINGW_PREFIX/bin" VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" $av1an_bindir/
         do_checkIfExist
     fi
