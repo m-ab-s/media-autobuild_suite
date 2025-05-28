@@ -736,6 +736,9 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     fi
 
     do_pacman_install libarchive pango asciidoc
+    # need to fixup libarchive.pc
+    grep_and_sed libiconv.dll.a "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" \
+        "s| ${MINGW_PREFIX}/lib/libiconv.dll.a -L${MINGW_PREFIX}/lib||"
     _check=(libtesseract.{,l}a tesseract.pc)
     if do_vcs "$SOURCE_REPO_TESSERACT"; then
         do_pacman_install docbook-xsl omp
