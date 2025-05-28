@@ -189,13 +189,14 @@ else
             # these macros are for some reason not set, even though they should be according to CMakeLists.txt
             local zlib_macros="-DINFLATE_CHUNK_SIMD_SSE2 -DADLER32_SIMD_SSSE3 -DINFLATE_CHUNK_READ_64LE -DCRC32_SIMD_SSE42_PCLMUL -DDEFLATE_SLIDE_HASH_SSE2 -D_LARGEFILE64_SOURCE=1 -DX86_WINDOWS"
             sed -i 's; -L${sharedlibdir};;' zlib.pc.cmakein
-            # add missing header and source files needed for compilation, and force all executables to link with static zlib
+            # add missing header and source files needed for compilation, force all executables to link with static zlib, and name libraries correctly with -DUNIX=OFF
             sed -e 's;ioapi.h;ioapi.h contrib/minizip/iowin32.c contrib/minizip/iowin32.h;' \
-                -e 's;zlib);zlibstatic);' -i CMakeLists.txt
+                -e 's;zlib);zlibstatic);' -e 's;BUILD_SHARED_LIBS AND WIN32;MINGW;' \
+                -e 's;zlib PROPERTIES SUFFIX "1.dll";zlib zlibstatic PROPERTIES OUTPUT_NAME z;' -i CMakeLists.txt
             # the win32 dir is missing, so copy the folder from original zlib
             do_wget -c -r -q "https://github.com/madler/zlib/archive/refs/heads/develop.tar.gz"
             tar --strip-components=1 -xzf develop.tar.gz zlib-develop/win32
-            do_cmakeinstall -DINSTALL_PKGCONFIG_DIR="${LOCALDESTDIR}/lib/pkgconfig" \
+            do_cmakeinstall -DUNIX=OFF -DINSTALL_PKGCONFIG_DIR="${LOCALDESTDIR}/lib/pkgconfig" \
                 -DUSE_ZLIB_RABIN_KARP_HASH=ON -DENABLE_SIMD_OPTIMIZATIONS=ON \
                 -DCMAKE_C_FLAGS="${CFLAGS} ${zlib_macros} -msse4.2 -mpclmul" "${extracommands[@]}"
             [[ $standalone = y ]] && do_install minizip_bin.exe bin-global/minizip.exe &&
