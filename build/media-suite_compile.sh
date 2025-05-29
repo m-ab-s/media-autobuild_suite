@@ -2145,7 +2145,6 @@ if [[ $av1an != n ]]; then
         do_uninstall "${_check[@]}"
         do_pacman_install clang
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
-            CARGO_BUILD_RUSTFLAGS+=" -ladvapi32" \
             LIBCLANG_PATH="$MINGW_PREFIX/bin" VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" $av1an_bindir/
         do_checkIfExist
