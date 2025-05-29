@@ -2461,7 +2461,7 @@ if [[ $ffmpeg != no ]]; then
 
     do_hide_all_sharedlibs
 
-    _check=(libavutil.pc)
+    _check=(libav{util,codec}.pc)
     disabled_any avfilter ffmpeg || _check+=(bin-video/ffmpeg.exe)
     if [[ $ffmpeg =~ shared ]]; then
         _check+=(libavutil.dll.a)
