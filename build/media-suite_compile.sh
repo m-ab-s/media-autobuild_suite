@@ -2611,11 +2611,10 @@ if [[ $ffmpeg != no ]]; then
             create_winpty_exe ffmpeg "$LOCALDESTDIR"/bin-video/
         unset ffmpeg_cflags build_suffix
     fi
+    # Fix linking to audiotoolboxwrapper
+    enabled audiotoolbox && grep_or_sed "AudioToolboxWrapper" "$LOCALDESTDIR"/lib/pkgconfig/libavcodec.pc \
+        's/(Libs: .*)/\1 -lAudioToolboxWrapper -lshlwapi -lshell32/'
 fi
-
-# Fix linking to audiotoolboxwrapper
-grep_or_sed "AudioToolboxWrapper" "$LOCALDESTDIR"/lib/pkgconfig/libavcodec.pc \
-    's/(Libs: .*)/\1 -lAudioToolboxWrapper -lshlwapi -lshell32/'
 
 _check=(libde265.a)
 [[ $standalone = y ]] && _check+=(bin-video/dec265.exe)
