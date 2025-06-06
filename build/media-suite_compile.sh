@@ -680,7 +680,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
         do_git_submodule
         do_uninstall "${_check[@]}" include/jxl bin-global/cjpegli.exe bin-global/djpegli.exe 
-        do_pacman_install asciidoc
+        do_pacman_install asciidoc openexr
         extracommands=()
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         CXXFLAGS+=" -DJXL_CMS_STATIC_DEFINE -DJXL_STATIC_DEFINE -DJXL_THREADS_STATIC_DEFINE" \
