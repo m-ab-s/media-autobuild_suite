@@ -2069,7 +2069,7 @@ _vapoursynth_install() {
 
         # Extract the .dll from the pip wheel
         log "7z" 7z e -y -aoa wheel/vapoursynth-$_vsver-cp${_python_lib:6:3}-abi3-win_amd64.whl \
-            VapourSynth-$_vsver.data/data/Lib/site-packages/vapoursynth.dll
+            vapoursynth-$_vsver.data/data/Lib/site-packages/vapoursynth.dll
 
         create_build_dir
         declare -A _pc_vars=(
