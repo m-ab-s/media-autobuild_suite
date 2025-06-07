@@ -1512,11 +1512,13 @@ zip_logs() {
 }
 
 log() {
-    local errorOut=true quiet=false ret OPTION OPTIND
-    while getopts ':qe' OPTION; do
+    local errorOut=true quiet=false noRunning=false dontPrint=true ret OPTION OPTIND
+    while getopts ':qenp' OPTION; do
         case "$OPTION" in
         e) errorOut=false ;;
         q) quiet=true ;;
+        n) noRunning=true ;;
+        p) dontPrint=false ;;
         *) break ;;
         esac
     done
@@ -1525,13 +1527,18 @@ log() {
     [[ $1 == quiet ]] && quiet=true && shift # Temp compat with old style just in case
     local name="${1// /.}" _cmd="$2" extra
     shift 2
-    $quiet || do_print_progress Running "$name"
+    $quiet || $noRunning || do_print_progress Running "$name"
     [[ $_cmd =~ ^(make|ninja)$ ]] && extra="-j$cpuCount"
 
     if [[ $logging == "y" ]]; then
         printf 'CPPFLAGS: %s\nCFLAGS: %s\nCXXFLAGS: %s\nLDFLAGS: %s\n%s %s\n' "$CPPFLAGS" "$CFLAGS" "$CXXFLAGS" "$LDFLAGS" "$_cmd${extra:+ $extra}" "$*" > "ab-suite.$name.log"
-        $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
-            { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; }
+        if $dontPrint; then
+            $_cmd $extra "$@" >> "ab-suite.$name.log" 2>&1 ||
+                { [[ $extra ]] && $_cmd -j1 "$@" >> "ab-suite.$name.log" 2>&1; }
+        else
+            { $_cmd $extra "$@" 2>&1 || { [[ $extra ]] && $_cmd -j1 "$@" 2>&1; } } \
+                | tee -a "ab-suite.$name.log"
+        fi
     else
         $_cmd $extra "$@" || { [[ $extra ]] && $_cmd -j1 "$@"; }
     fi
@@ -2376,12 +2383,12 @@ extra_script() {
         type "_${stage}_build" > /dev/null 2>&1; then
         pushd "${REPO_DIR}" > /dev/null 2>&1 || true
         do_print_progress "Running ${stage} build from ${vcsFolder}_extra.sh"
-        log -q "${stage}_build" "_${stage}_build"
+        log -n -p "${stage}_build" "_${stage}_build"
         popd > /dev/null 2>&1 || true
     elif type "_${stage}_${commandname}" > /dev/null 2>&1; then
         pushd "${REPO_DIR}" > /dev/null 2>&1 || true
         do_print_progress "Running ${stage} ${commandname} from ${vcsFolder}_extra.sh"
-        log -q "${stage}_${commandname}" "_${stage}_${commandname}"
+        log -n -p "${stage}_${commandname}" "_${stage}_${commandname}"
         popd > /dev/null 2>&1 || true
     fi
 }
