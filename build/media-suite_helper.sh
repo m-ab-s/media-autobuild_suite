@@ -1518,7 +1518,7 @@ log() {
         e) errorOut=false ;;
         q) quiet=true ;;
         n) noRunning=true ;;
-		p) dontPrint=false ;;
+        p) dontPrint=false ;;
         *) break ;;
         esac
     done
