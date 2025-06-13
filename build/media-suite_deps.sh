@@ -131,3 +131,4 @@ SOURCE_REPO_ZLIBCLOUDFLARE=https://github.com/cloudflare/zlib.git
 SOURCE_REPO_ZLIBNG=https://github.com/zlib-ng/zlib-ng.git
 SOURCE_REPO_ZLIBRS=https://github.com/trifectatechfoundation/zlib-rs.git
 SOURCE_REPO_ZVBI=https://github.com/zapping-vbi/zvbi.git
+SOURCE_REPO_LIBGME=https://github.com/libgme/game-music-emu.git
