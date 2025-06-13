@@ -98,7 +98,7 @@ For information about the compiler environment see the wiki, there you also have
         - libflite (git)
         - libfribidi (git)
         - libglslang (git)
-        - libgme (0.6.3)
+        - libgme (git)
         - libilbc (git)
         - libjxl (git)
         - libkvazaar (git)
