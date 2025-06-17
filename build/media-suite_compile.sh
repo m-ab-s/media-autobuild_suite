@@ -2151,6 +2151,9 @@ if [[ $av1an != n ]]; then
     if do_vcs "$SOURCE_REPO_AV1AN"; then
         do_uninstall "${_check[@]}"
         do_pacman_install clang
+        # vergen-git2 fails compilation due to cargo not linking advapi32 by default, so don't use Git2Builder
+        # This results in no compiler information being available in the executable when compiled under MINGW64/UCRT64
+        [[ $CC =~ gcc ]] && sed -e '/let git2/d' -e '/(&git2)?/d' -e 's;Git2Builder, ;;' -i av1an/build.rs
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
             LIBCLANG_PATH="$MINGW_PREFIX/bin" VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" $av1an_bindir/
