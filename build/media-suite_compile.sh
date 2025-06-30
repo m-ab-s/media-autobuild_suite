@@ -1172,6 +1172,7 @@ if { { [[ $ffmpeg != no ]] &&
     do_vcs "$SOURCE_REPO_OPENAL"; then
     do_uninstall "${_check[@]}"
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch" am
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0003-CMake-include-gsl-include-for-main-lib-too.patch" am
     CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
         do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF
     sed -i 's/Libs.private.*/& -luuid -lole32/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
