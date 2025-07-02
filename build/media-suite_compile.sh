@@ -2978,6 +2978,7 @@ if [[ $cyanrip = y ]]; then
     _deps=(libmusicbrainz5.a libcurl.a)
     _check=(bin-audio/cyanrip.exe)
     if do_vcs "$SOURCE_REPO_CYANRIP"; then
+        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cyanrip/0001-os_compat-re-add-cast-for-gcc-15-compat.patch" am
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
         _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
         if flavor=cyan do_vcs "$ffmpegPath"; then
