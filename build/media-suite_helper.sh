@@ -1268,6 +1268,9 @@ do_patch() {
         [[ ${patch%/*} != "$PWD" ]] && cp -f "$patch" "$patchName" > /dev/null 2>&1
     fi
 
+    [[ -f "$(get_first_subdir -f)/do_not_patch" ]] &&
+        return
+
     if [[ -f $patchName ]]; then
         if $am; then
             git apply -3 --check --ignore-space-change --ignore-whitespace "$patchName" > /dev/null 2>&1 &&
@@ -2484,6 +2487,10 @@ create_extra_skeleton() {
 _pre_vcs() {
     # ref changes the branch/commit/tag that you want to clone
     ref=research
+
+    # Bypasses any patches that the suite applies, they will still get downloaded in case they want to be patched in some other form
+    # You need to delete the file again if you want to patch something yourself!
+    #touch "$(get_first_subdir -f)/do_not_patch"
 }
 
 # Commands to run before and after running cmake (do_cmake)
