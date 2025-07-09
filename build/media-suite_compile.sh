@@ -1799,7 +1799,7 @@ if [[ $x264 != no ]] ||
         unset_extra_script
         if [[ $standalone = y || $av1an = y ]] && [[ $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
-            do_vcs "$ffmpegPath"
+            do_vcs "$ffmpegPath" ffmpeg
             do_uninstall "$LOCALDESTDIR"/opt/lightffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir light
@@ -2448,7 +2448,7 @@ if [[ $ffmpeg != no ]]; then
         _deps=(lib{aom,tesseract,vmaf,x265,vpx}.a)
     [[ $ffmpegUpdate = y ]] && enabled zlib &&
         _deps+=("$zlib_dir"/lib/libz.a)
-    if do_vcs "$ffmpegPath"; then
+    if do_vcs "$ffmpegPath" ffmpeg; then
         ff_base_commit=$(git rev-parse HEAD)
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
@@ -2942,7 +2942,7 @@ if [[ $cyanrip = y ]]; then
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/cyanrip/0001-os_compat-re-add-cast-for-gcc-15-compat.patch" am
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
         _check=("$LOCALDESTDIR"/opt/cyanffmpeg/lib/pkgconfig/libav{codec,format}.pc)
-        if flavor=cyan do_vcs "$ffmpegPath"; then
+        if flavor=cyan do_vcs "$ffmpegPath" ffmpeg; then
             do_uninstall "$LOCALDESTDIR"/opt/cyanffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             mapfile -t cyan_ffmpeg_opts < <(
