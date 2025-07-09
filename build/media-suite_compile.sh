@@ -37,6 +37,7 @@ while true; do
     --ffmpegUpdate=* ) ffmpegUpdate=${1#*=} && shift ;;
     --ffmpegPath=* ) ffmpegPath="${1#*=}"; shift ;;
     --ffmpegChoice=* ) ffmpegChoice=${1#*=} && shift ;;
+    --ffmpegKeepLegacyOpts=* ) ffmpegKeepLegacyOpts=${1#*=} && shift ;;
     --mplayer=* ) mplayer=${1#*=} && shift ;;
     --mpv=* ) mpv=${1#*=} && shift ;;
     --deleteSource=* ) deleteSource=${1#*=} && shift ;;
