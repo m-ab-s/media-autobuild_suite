@@ -1301,7 +1301,8 @@ _check=(libaom.a aom.pc)
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "$SOURCE_REPO_LIBAOM"; then
     do_pacman_install yasm
-    extracommands=()
+    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/aom/0001-CMake-Add-ENABLE_EXTRA_EXAMPLES.patch" am
+    extracommands=("-DENABLE_EXTRA_EXAMPLES=off")
     if [[ $aom = y || $standalone = y || $av1an != n ]]; then
         # fix google's shit
         sed -ri 's;_PREFIX.+CMAKE_INSTALL_BINDIR;_FULL_BINDIR;' \
