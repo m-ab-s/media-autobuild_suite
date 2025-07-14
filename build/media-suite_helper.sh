@@ -149,7 +149,7 @@ vcs_test_remote() {
 vcs_clean() {
     GIT_TERMINAL_PROMPT=0 \
         git -C "${1:-$PWD}" clean -dffxq \
-        -e{recently_{updated,checked},build_successful*,*.{patch,diff},custom_updated,**/ab-suite.*.log} "$@"
+        -e{recently_{updated,checked},build_successful*,*.{patch,diff},custom_updated,do_not_build,**/ab-suite.*.log} "$@"
 }
 
 # vcs_get_latest_tag "libopenmpt-*"
@@ -2648,6 +2648,7 @@ safe_git_clean() {
         -e "/build_successful*" \
         -e "/recently_updated" \
         -e '/custom_updated' \
+        -e '/do_not_build' \
         -e '**/ab-suite.*.log' \
         "${@}"
 }
