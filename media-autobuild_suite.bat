@@ -264,14 +264,12 @@ if [0]==[%av1anINI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build Av1an [Scalable video encoding framework]?
-    echo. 1 = Yes [link with static FFmpeg]
-    echo. 2 = Yes [link with shared FFmpeg]
-    echo. 3 = No
+    echo. 1 = Yes
+    echo. 2 = No
     echo.
     echo. Av1an requires local installed copies of Python and Vapoursynth,
-    echo. an executable of FFmpeg and one of these encoders to function:
+    echo. an executable of FFmpeg and FFprobe, and one of these encoders to function:
     echo. aom, SVT-AV1, rav1e, vpx, x264, or x265
-    echo. If FFmpeg is built shared, then the Av1an executable will be in a subfolder.
     echo. (Note: Not available for 32-bit due to Vapoursynth being broken in 32-bit!^)
     echo.
     echo -------------------------------------------------------------------------------
@@ -281,9 +279,8 @@ if [0]==[%av1anINI%] (
 
 if "%buildav1an%"=="" GOTO av1an
 if %buildav1an%==1 set "av1an=y"
-if %buildav1an%==2 set "av1an=shared"
-if %buildav1an%==3 set "av1an=n"
-if %buildav1an% GTR 3 GOTO av1an
+if %buildav1an%==2 set "av1an=n"
+if %buildav1an% GTR 2 GOTO av1an
 if %deleteINI%==1 echo.av1an=^%buildav1an%>>%ini%
 
 :vpx
