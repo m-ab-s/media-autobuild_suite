@@ -143,10 +143,11 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
-soxB ffmpegB2 ffmpegUpdate ffmpegChoice mp4box rtmpdump mplayer2 mpv cores deleteSource ^
-strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc curl cyanrip2 ^
-rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool hdr10plustool timeStamp ^
-noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec zlib ffmpegPath pkgUpdateTime
+soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mplayer2 mpv ^
+cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc ^
+curl cyanrip2 rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool ^
+hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ^
+zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
 set deleteIni=0
@@ -1687,6 +1688,11 @@ if [0]==[%pkgUpdateTimeINI%] (
 ) else set pkgUpdateTime=%pkgUpdateTimeINI%
 if %deleteINI%==1 echo.pkgUpdateTime=^%pkgUpdateTime%>>%ini%
 
+rem ffmpegKeepLegacyOpts
+if %ffmpegKeepLegacyOptsINI%==0 set ffmpegKeepLegacyOpts=n
+if %ffmpegKeepLegacyOptsINI%==1 set ffmpegKeepLegacyOpts=y
+if %deleteINI%==1 echo.ffmpegKeepLegacyOpts=^%ffmpegKeepLegacyOptsINI%>>%ini%
+
 if %build32%==yes (
     if %CC%==clang (
         echo ----------------------------------------------------------------------
@@ -1985,7 +1991,7 @@ endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
---ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --mplayer=%mplayer% ^
+--ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% --mplayer=%mplayer% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
