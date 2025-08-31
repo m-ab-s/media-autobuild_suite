@@ -1443,27 +1443,25 @@ if { { [[ $ffmpeg != no ]] &&
     do_checkIfExist
 fi
 
-_check=(libdvdread.{,l}a dvdread.pc)
+_check=(libdvdread.a dvdread.pc)
 if { { [[ $ffmpeg != no ]] && enabled_any libdvdread libdvdnav; } ||
     [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDREAD" dvdread; then
-    do_autoreconf
     do_uninstall include/dvdread "${_check[@]}"
-    do_separate_confmakeinstall
+    do_mesoninstall
     do_checkIfExist
 fi
 [[ -f $LOCALDESTDIR/lib/pkgconfig/dvdread.pc ]] &&
     grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
         "/Libs:/ a\Libs.private: -ldl -lpsapi"
 
-_check=(libdvdnav.{,l}a dvdnav.pc)
+_check=(libdvdnav.a dvdnav.pc)
 _deps=(libdvdread.a)
 if { { [[ $ffmpeg != no ]] && enabled libdvdnav; } ||
     [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDNAV" dvdnav; then
-    do_autoreconf
     do_uninstall include/dvdnav "${_check[@]}"
-    do_separate_confmakeinstall
+    do_mesoninstall
     do_checkIfExist
 fi
 
