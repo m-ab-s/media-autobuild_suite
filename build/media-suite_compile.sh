@@ -1451,9 +1451,9 @@ if { { [[ $ffmpeg != no ]] && enabled_any libdvdread libdvdnav; } ||
     do_mesoninstall
     do_checkIfExist
 fi
-[[ -f $LOCALDESTDIR/lib/pkgconfig/dvdread.pc ]] &&
-    grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
-        "/Libs:/ a\Libs.private: -ldl -lpsapi"
+# [[ -f $LOCALDESTDIR/lib/pkgconfig/dvdread.pc ]] &&
+#     grep_or_sed "Libs.private" "$LOCALDESTDIR"/lib/pkgconfig/dvdread.pc \
+#         "/Libs:/ a\Libs.private: -ldl -lpsapi"
 
 _check=(libdvdnav.a dvdnav.pc)
 _deps=(libdvdread.a)
