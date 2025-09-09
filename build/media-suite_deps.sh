@@ -12,7 +12,7 @@ SOURCE_REPO_CURL=https://github.com/curl/curl.git
 SOURCE_REPO_CYANRIP=https://github.com/cyanreg/cyanrip.git
 SOURCE_REPO_DAV1D=https://code.videolan.org/videolan/dav1d.git
 SOURCE_REPO_DAVS=https://github.com/pkuvcl/davs2.git
-SOURCE_REPO_DECKLINK=https://gitlab.com/m-ab-s/decklink-headers.git
+SOURCE_REPO_DECKLINK=https://gitlab.com/m-ab-s/decklink-headers.git#commit=47d84f8d272ca6872b5440eae57609e36014f3b6
 SOURCE_REPO_DLFCN=https://github.com/dlfcn-win32/dlfcn-win32.git
 SOURCE_REPO_DOVI_TOOL=https://github.com/quietvoid/dovi_tool.git
 SOURCE_REPO_DSSIM=https://github.com/kornelski/dssim.git
