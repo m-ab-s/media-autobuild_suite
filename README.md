@@ -104,8 +104,6 @@ For information about the compiler environment see the wiki, there you also have
         - libkvazaar (git)
         - libmysofa (git)
             - needed for sofalizer filter
-        - libnpp (needs CUDA SDK installed)
-            - needs non-free license
         - libopenh264 (official binaries)
         - librist (git)
         - librtmp (git)
@@ -283,7 +281,7 @@ If there's some error during compilation follow these steps:
 3. If it still doesn't work, [create an issue](https://github.com/m-ab-s/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64 and /local[32|64] if they exist. /build is usually safe to keep and saves time;
 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
-6. If you compile with `--enable-libnpp` and/or `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
+6. If you compile with `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
 ## What The Individual Files Do
 
@@ -435,9 +433,9 @@ Beware as they may change in the future.
 
 --------
 
-### This is for cuda-nvcc and libnpp, not for NVENC, it is built with ffmpeg by default
+### This is for cuda-nvcc, not for NVENC, it is built with ffmpeg by default
 
-For `--enable-cuda-nvcc` and `--enable-libnpp` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide (Usually set by default on CUDA SDK install) and VS2017 or better installed which should come with `vswhere.exe`.\
+For `--enable-cuda-nvcc` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide (Usually set by default on CUDA SDK install) and VS2017 or better installed which should come with `vswhere.exe`.\
 If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute `cygpath` converted path to MSVC's `cl.exe`.
 
 ### You do not need to do the following if you installed the SDK with the default locations etc and you have 8.3 short paths enabled or if you installed to a directory without any spaces
@@ -450,7 +448,7 @@ You will only need to be worried if running the following command in the mintty 
 cygpath -sm "$CUDA_PATH"
 ```
 
-If running the above command produces a path with a space, you will need to either disable cuda/npp stuff or reinstall your cuda sdk to a path without spaces.
+If running the above command produces a path with a space, you will need to either disable cuda or reinstall your cuda sdk to a path without spaces.
 
 ### Nothing should be disabled manually when installing CUDA SDK as disabling random things can cause the compilation to fail
 
