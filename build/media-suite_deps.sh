@@ -64,7 +64,7 @@ SOURCE_REPO_LIBOGG=https://github.com/xiph/ogg.git
 SOURCE_REPO_LIBOPENMPT=https://github.com/OpenMPT/openmpt.git#branch=OpenMPT-1.30
 SOURCE_REPO_LIBOPUSENC=https://github.com/xiph/libopusenc.git
 SOURCE_REPO_LIBPLACEBO=https://code.videolan.org/videolan/libplacebo.git
-SOURCE_REPO_LIBPNG=https://github.com/glennrp/libpng.git
+SOURCE_REPO_LIBPNG=https://github.com/glennrp/libpng.git#branch=libpng16
 SOURCE_REPO_LIBRAV1E=https://github.com/xiph/rav1e.git
 SOURCE_REPO_LIBRESSL=https://github.com/libressl-portable/portable.git#tag=LATEST
 SOURCE_REPO_LIBRIST=https://code.videolan.org/rist/librist.git
