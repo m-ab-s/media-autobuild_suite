@@ -2296,7 +2296,7 @@ if { [[ $mpv != n ]] ||
     do_checkIfExist
 fi
 
-_check=(lib{glslang,OSDependent,SPVRemapper}.a
+_check=(lib{glslang,OSDependent}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang; } } &&
