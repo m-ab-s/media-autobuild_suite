@@ -2875,6 +2875,15 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
 
+        # We don't have that lib, but mpv specifically checks that lib *only*, and it's required for d3d11 support.
+        # So d3d11 support never got built, but the "non c-shared" lib actually works.
+        sed -i "s|spirv-cross-c-shared|spirv-cross|" meson.build
+
+        # Fix clang vsscript.dll hard requirement, imitate shinchiro's cmake.
+        [[ $CC =~ clang ]] && \
+            sed -i "s|-lvsscript|-lvsscript -Wl,-delayload=vsscript.dll|" \
+                "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+
         mapfile -t MPV_ARGS < <(mpv_build_args)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
             do_mesoninstall video "${MPV_ARGS[@]}"
