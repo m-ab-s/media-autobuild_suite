@@ -965,7 +965,10 @@ if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
         ln -s "$LOCALBUILDDIR/$model" .
     )
     do_autogen
-    do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
+    # The default flags used by opus configure + a warning disable flag.
+    # GCC fails this test with that warning as error, so avx2 intrinsics never got built.
+    X86_AVX2_CFLAGS="-mavx -mfma -mavx2 -Wno-incompatible-pointer-types" \
+        do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
     do_checkIfExist
 fi
 
