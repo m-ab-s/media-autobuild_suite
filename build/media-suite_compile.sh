@@ -1588,7 +1588,7 @@ _check=(libuavs3d.a uavs3d.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/uavs3dec.exe)
 if [[ $ffmpeg != no ]] && enabled libuavs3d &&
     do_vcs "$SOURCE_REPO_UAVS3D"; then
-    do_cmakeinstall
+    do_cmakeinstall -DCOMPILE_10BIT=ON # 10bit lib supports both 8 and 10 bits
     [[ $standalone = y ]] && do_install uavs3dec.exe bin-video/
     do_checkIfExist
 fi
