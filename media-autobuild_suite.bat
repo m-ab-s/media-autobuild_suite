@@ -140,7 +140,7 @@ set mpv_options_basic="-Dlua=luajit"
 
 :: all supported options
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
-#pdf-build openal sdl2 #sdl2-gamepad #sdl2-audio #sdl2-video
+#pdf-build openal sdl2-gamepad sdl2-audio sdl2-video
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mplayer2 mpv ^
