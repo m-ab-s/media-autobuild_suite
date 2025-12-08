@@ -918,8 +918,7 @@ if [[ $faac = y ]]; then
     elif do_vcs "$SOURCE_REPO_FAAC"; then
         do_pacman_remove faac
         do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
-        log bootstrap ./bootstrap
-        do_separate_confmakeinstall audio
+        do_mesoninstall audio
         do_checkIfExist
     fi
 fi
