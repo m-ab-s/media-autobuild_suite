@@ -967,7 +967,7 @@ do_changeFFmpegConfig() {
     fi
 
     local nonfreehwaccel
-    read -ra nonfreehwaccel <<< "(${HWACCEL_LIBRARY_NONFREE_LIST//_/-}"
+    read -ra nonfreehwaccel <<< "${HWACCEL_LIBRARY_NONFREE_LIST//_/-}"
     if [[ $license == "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
