@@ -2480,6 +2480,9 @@ if [[ $ffmpeg != no ]]; then
 
         enabled libvvdec && grep_and_sed FF_PROFILE libavcodec/libvvdec.c 's/FF_PROFILE/AV_PROFILE/g'
 
+        # Remove explicit include of DeckLinkAPI_v14_2_1.h since it's merged into the main file for Windows
+        enabled decklink && sed -ri 's|#include <DeckLinkAPI_v14_2_1.h>||g' libavdevice/decklink_{dec,enc,common}.cpp
+
         # Bypass ffmpeg check for audiotoolbox
         enabled audiotoolbox && do_addOption --extra-libs=-lAudioToolboxWrapper && do_addOption --disable-outdev=audiotoolbox &&
             do_addOption FFMPEG_OPTS_SHARED --extra-libs=-lAudioToolboxWrapper && do_addOption FFMPEG_OPTS_SHARED --disable-outdev=audiotoolbox &&
