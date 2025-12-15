@@ -803,6 +803,14 @@ if [[ $ffmpeg != no ]] && enabled libzimg &&
     do_checkIfExist
 fi
 
+_check=(bin-global/SvtJpegxs{De,En}cApp.exe svt-jpegxs/SvtJpegxs{,Dec,Enc}.h libSvtJpegxs.a SvtJpegxs.pc)
+if [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
+    do_vcs "$SOURCE_REPO_SVTJXS"; then
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall global -DUNIX=OFF
+    do_checkIfExist
+fi
+
 if [[ $exitearly = EE3 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE3"
     return
