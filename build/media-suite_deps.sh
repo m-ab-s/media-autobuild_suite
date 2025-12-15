@@ -107,6 +107,7 @@ SOURCE_REPO_SRT=https://github.com/Haivision/srt.git
 SOURCE_REPO_SVTAV1=https://gitlab.com/AOMediaCodec/SVT-AV1.git
 SOURCE_REPO_SVTHEVC=https://github.com/OpenVisualCloud/SVT-HEVC.git
 SOURCE_REPO_SVTVP9=https://github.com/OpenVisualCloud/SVT-VP9.git
+SOURCE_REPO_SVTJXS=https://github.com/OpenVisualCloud/SVT-JPEG-XS.git
 SOURCE_REPO_TESSERACT=https://github.com/tesseract-ocr/tesseract.git
 SOURCE_REPO_UAVS3D=https://github.com/uavs3/uavs3d.git
 SOURCE_REPO_URIPARSER=https://github.com/uriparser/uriparser.git
