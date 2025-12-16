@@ -2441,6 +2441,12 @@ if [[ $ffmpeg != no ]]; then
         unset _ver
     fi
     disabled autodetect && enabled iconv && do_addOption --extra-libs=-liconv
+    if enabled cairo; then
+        do_pacman_install cairo
+        grep_or_sed ole32 "$MINGW_PREFIX"/lib/pkgconfig/cairo.pc \
+            's/-lwindowscodecs/& -lole32/'
+        do_addOption --extra-cflags=-DCAIRO_COMPILATION
+    fi
 
     do_hide_all_sharedlibs
 
