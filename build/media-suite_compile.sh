@@ -2268,6 +2268,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     do_patch "$_mabs/0003-loader-Re-add-private-libs-to-pc-file.patch" am
     do_patch "$_mabs/0004-loader-Static-library-name-related-hacks.patch" am
     do_patch "$_mabs/0005-loader-dllmain-related-hacks.patch" am
+    do_patch "$_mabs/0006-loader-cross-compile-static-linking-hacks.patch" am
 
     grep_and_sed VULKAN_LIB_SUFFIX loader/vulkan.pc.in \
             's/@VULKAN_LIB_SUFFIX@//'
