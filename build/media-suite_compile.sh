@@ -2902,8 +2902,8 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
         # Fix clang vsscript.dll hard requirement, imitate shinchiro's cmake.
         [[ $CC =~ clang ]] && \
-            sed -i "s|-lvsscript|-lvsscript -Wl,-delayload=vsscript.dll|" \
-                "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc
+            grep_or_sed "-Wl,-delayload=vsscript.dll" "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc \
+                "s|-lvsscript|-lvsscript -Wl,-delayload=vsscript.dll|"
 
         mapfile -t MPV_ARGS < <(mpv_build_args)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
