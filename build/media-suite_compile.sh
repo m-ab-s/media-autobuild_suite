@@ -702,7 +702,7 @@ fi
 if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
     do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll$reset"
     do_pacman_remove opencl-headers
-    do_pacman_install tools-git
+    do_pacman_install tools
     _check=(CL/cl.h)
     if do_vcs "$SOURCE_REPO_OPENCLHEADERS"; then
         do_uninstall include/CL
@@ -2054,7 +2054,7 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    do_pacman_install tools-git
+    do_pacman_install tools
     _python_ver=3.12.10
     _python_lib=python312
     _vsver=72
