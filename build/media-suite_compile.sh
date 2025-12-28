@@ -2630,7 +2630,8 @@ if [[ $libheif != n ]] &&
     do_patch https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libheif/0001-Edit-CMakeLists.patch
 
     extracflags=()
-    extracommands=(-DWITH_HEADER_COMPRESSION=ON -DWITH_UNCOMPRESSED_CODEC=ON -DBUILD_DOCUMENTATION=OFF)
+    extracommands=(-DWITH_HEADER_COMPRESSION=ON -DWITH_UNCOMPRESSED_CODEC=ON -DBUILD_DOCUMENTATION=OFF \
+        -DWITH_JPEG_{DE,EN}CODER=ON -DWITH_JPEG_{DE,EN}CODER_PLUGIN=OFF)
 
     pc_exists "libde265" &&
         extracommands+=(-DWITH_LIBDE265=ON -DWITH_LIBDE265_PLUGIN=OFF) &&
@@ -2654,8 +2655,6 @@ if [[ $libheif != n ]] &&
         extracommands+=(-DWITH_VVENC=ON -DWITH_VVENC_PLUGIN=OFF)
     pc_exists "libvvdec" &&
         extracommands+=(-DWITH_VVDEC=ON -DWITH_VVDEC_PLUGIN=OFF)
-    pacman -Q $MINGW_PACKAGE_PREFIX-libjpeg > /dev/null 2>&1 &&
-        extracommands+=(-DWITH_JPEG_{DE,EN}CODER=ON -DWITH_JPEG_{DE,EN}CODER_PLUGIN=OFF)
     pacman -Q $MINGW_PACKAGE_PREFIX-openh264 > /dev/null 2>&1 &&
         extracommands+=(-DWITH_OpenH264_DECODER=ON -DWITH_OpenH264_DECODER_PLUGIN=OFF)
 
