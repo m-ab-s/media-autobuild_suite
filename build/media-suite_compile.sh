@@ -818,8 +818,8 @@ fi
 set_title "compiling audio tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
+[[ $sox = y ]] && do_pacman_install wavpack
 if [[ $ffmpeg != no || $sox = y ]]; then
-    do_pacman_install wavpack
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
         do_pacman_install twolame
