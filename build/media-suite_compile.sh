@@ -1161,7 +1161,7 @@ if enabled libshine && do_vcs "$SOURCE_REPO_SHINE"; then
     sed -ri -e 's;(libshine.sym)$;$(srcdir)/\1;' \
         -e '/libshine_la_HEADERS/{s;(src/lib);$(srcdir)/\1;}' \
         -e '/shineenc_CFLAGS/{s;(src/lib);$(srcdir)/\1;}' Makefile.am
-    rm configure
+    [[ ! -f configure ]] || rm configure
     do_autoreconf
     do_separate_confmakeinstall audio
     do_checkIfExist
