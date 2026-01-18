@@ -3279,6 +3279,7 @@ fi
 _check=(bin-video/ffmbc.exe)
 if [[ $ffmbc = y ]] && do_vcs "$SOURCE_REPO_FFMBC"; then
     _notrequired=true
+    do_patch "https://github.com/bcoudurier/FFmbc/compare/ffmbc...1480c1:shr-ffmbc.patch" am
     create_build_dir
     # Too many errors with GCC 15 due to really old code.
     CFLAGS+=" -Wno-error=incompatible-pointer-types" \
