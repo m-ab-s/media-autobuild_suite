@@ -962,19 +962,8 @@ _check=(libopus.{,l}a opus.pc opus/opus.h)
 if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
-    (
-        sha=$(grep dnn/download_model.sh autogen.sh | awk -F'"' '{print $2}')
-        model=opus_data-${sha}.tar.gz
-        pushd . > /dev/null
-        [ -f "/build/$model" ] || do_wget -r -q -n "https://media.xiph.org/opus/models/$model"
-        popd > /dev/null || return 1
-        ln -s "$LOCALBUILDDIR/$model" .
-    )
-    do_autogen
-    # The default flags used by opus configure + a warning disable flag.
-    # GCC fails this test with that warning as error, so avx2 intrinsics never got built.
-    X86_AVX2_CFLAGS="-mavx -mfma -mavx2 -Wno-incompatible-pointer-types" \
-        do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
+    do_autoreconf
+    do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
     do_checkIfExist
 fi
 
