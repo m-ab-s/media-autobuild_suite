@@ -2348,6 +2348,23 @@ if { [[ $mpv != n ]] ||
     do_checkIfExist
 fi
 
+_check=(libwhisper.a whisper.pc whisper.h)
+if [[ $ffmpeg != no ]] && enabled whisper &&
+    do_vcs "$SOURCE_REPO_WHISPER"; then
+    do_uninstall include/whisper.h include/ggml*.h "${_check[@]}" libggml{,-base,-cpu}.a
+    extracommands=(-DBUILD_SHARED_LIBS=OFF
+        -DWHISPER_BUILD_TESTS=OFF
+        -DWHISPER_BUILD_EXAMPLES=OFF
+        -DWHISPER_BUILD_SERVER=OFF
+        -DGGML_NATIVE=OFF
+        -DGGML_OPENMP=OFF)
+    pc_exists vulkan && extracommands+=(-DGGML_VULKAN=ON
+        -DVulkan_LIBRARY="$LOCALDESTDIR/lib/libvulkan.a"
+        -DVulkan_INCLUDE_DIR="$LOCALDESTDIR/include")
+    do_cmakeinstall "${extracommands[@]}"
+    do_checkIfExist
+fi
+
 if [[ $exitearly = EE6 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE6"
     return

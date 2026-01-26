@@ -117,6 +117,7 @@ SOURCE_REPO_VORBIS_TOOLS=https://github.com/xiph/vorbis-tools.git
 SOURCE_REPO_VPX=https://chromium.googlesource.com/webm/libvpx
 SOURCE_REPO_VULKANLOADER=https://github.com/KhronosGroup/Vulkan-Loader.git
 SOURCE_REPO_VVC=https://gitlab.com/m-ab-s/VVCSoftware_VTM.git
+SOURCE_REPO_WHISPER=https://github.com/ggml-org/whisper.cpp.git
 SOURCE_REPO_X264=https://code.videolan.org/videolan/x264.git
 SOURCE_REPO_X265=https://bitbucket.org/multicoreware/x265_git.git
 SOURCE_REPO_XAVS=https://github.com/Distrotech/xavs.git
