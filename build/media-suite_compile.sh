@@ -1103,7 +1103,7 @@ if [[ $sox = y ]]; then
         enabled libvorbis || extracommands+=(--without-oggvorbis)
         hide_conflicting_libs
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
-        do_separate_conf --disable-symlinks LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
+        do_separate_conf --disable-symlinks ac_cv_lib_winmm_waveOutOpen=yes LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
         do_make
         do_install src/sox.exe bin-audio/
         do_install sox.pc
