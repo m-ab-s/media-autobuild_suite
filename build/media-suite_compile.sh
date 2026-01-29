@@ -1081,6 +1081,7 @@ _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
 if [[ $sox = y ]]; then
     do_pacman_install libmad
+    do_pacman_install libid3tag
     extracommands=()
     if enabled libopus; then
         [[ $standalone = y ]] || do_pacman_install opusfile
