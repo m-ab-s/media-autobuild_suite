@@ -293,7 +293,7 @@ fi
 if [[ $gifski != n ]]; then
     if [[ $gifski = video ]]; then
         _check=("$LOCALDESTDIR"/opt/gifskiffmpeg/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
-        if flavor=gifski do_vcs "https://git.ffmpeg.org/ffmpeg.git#branch=release/6.1"; then
+        if flavor=gifski do_vcs "https://git.ffmpeg.org/ffmpeg.git#branch=release/8.0"; then
             do_uninstall "$LOCALDESTDIR"/opt/gifskiffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir gifski
