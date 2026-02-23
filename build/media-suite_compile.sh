@@ -803,7 +803,9 @@ if [[ $ffmpeg != no ]] && enabled libzimg &&
 fi
 
 _check=(bin-global/SvtJpegxs{De,En}cApp.exe svt-jpegxs/SvtJpegxs{,Dec,Enc}.h libSvtJpegxs.a SvtJpegxs.pc)
-if [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libsvtjpegxs
+elif [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
     do_vcs "$SOURCE_REPO_SVTJXS"; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall global -DUNIX=OFF
