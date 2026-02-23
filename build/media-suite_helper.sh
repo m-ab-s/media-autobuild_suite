@@ -2130,8 +2130,8 @@ create_winpty_exe() {
     # shellcheck disable=SC2016
     printf '%s\n' "#!/usr/bin/env bash" "$@" \
         'if [[ -t 1 ]]; then' \
-        '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"' \
-        'else "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$@"; fi' \
+        '/usr/bin/winpty "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$( /usr/bin/cygpath -a -u "$@" 2> /dev/null )"' \
+        'else "$( dirname ${BASH_SOURCE[0]} )/'"${exename}"'.exe" "$( /usr/bin/cygpath -a -u "$@" 2> /dev/null )"; fi' \
         > "${installdir}/${exename}"
     [[ -f "${installdir}/${exename}"_exe ]] && mv "${installdir}/${exename}"{_,.}exe
 }
