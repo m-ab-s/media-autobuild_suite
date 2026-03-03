@@ -2,13 +2,11 @@
 
 Before opening an issue, check if it's an issue directly from executing the suite. This isn't Doom9, reddit, stackoverflow or any other forum for general questions about the things being compiled. This script builds them, that's all.
 
-This source code is also mirrored in [GitLab](https://gitlab.com/RiCON/media-autobuild_suite).
-
 Most git sources in the suite use GitHub, so if it's down, it's probably useless to run the suite at that time.
 
 ## Download
 
-**[Click here to download latest version](https://github.com/m-ab-s/media-autobuild_suite/archive/master.zip)**
+**[Click here to download latest version](https://github.com/Jsoeph192/media-autobuild_suite/archive/master.zip)**
 
 For information about the compiler environment see the wiki, there you also have a example of how to compile your own tools.
 
@@ -95,6 +93,7 @@ For information about the compiler environment see the wiki, there you also have
         - libcdio (mingw-w64)
         - libcodec2 (git)
         - libdavs2 (git)
+        - libdvdcss (mingw-w64)
         - libflite (git)
         - libfribidi (git)
         - libglslang (git)
