@@ -111,7 +111,7 @@ iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm
 
 :: common external libs
 set ffmpeg_options_basic=gmp gpl libmp3lame libopus libvorbis libvpx libx264 libx265 ^
-libdav1d libaom --disable-debug libfdk-aac
+libdav1d libaom --disable-debug libfdk-aac libdvdcss
 
 :: options used in zeranoe builds and not present above
 set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
@@ -126,7 +126,7 @@ libcdio libflite libfribidi libgme libilbc libsvthevc ^
 libsvtvp9 libkvazaar libmodplug librist librtmp librubberband #libssh ^
 libtesseract libxavs libzmq libzvbi openal libcodec2 ladspa #vapoursynth #liblensfun ^
 libglslang vulkan libdavs2 libxavs2 libuavs3d libplacebo libjxl libvvenc libvvdec liblc3 audiotoolbox ^
-libsvtjpegxs
+libsvtjpegxs libdvdcss
 
 :: options also available with the suite that add shared dependencies
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libopenh264
@@ -147,7 +147,7 @@ set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mplayer2 mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc ^
 curl cyanrip2 rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool ^
-hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ^
+hdr10plustool libdvdcss timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ^
 zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
@@ -860,7 +860,7 @@ if %buildffmpeg%==6 set "ffmpeg=bothstatic"
 if %buildffmpeg% GTR 6 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
-set defaultFFmpegPath=https://git.ffmpeg.org/ffmpeg.git
+set defaultFFmpegPath=https://github.com/Jsoeph192/FFmpeg
 
 :ffmpegPath
 if [0]==[%ffmpegPathINI%] (
@@ -1396,6 +1396,26 @@ if %buildhdr10plustool%==1 set "hdr10plustool=y"
 if %buildhdr10plustool%==2 set "hdr10plustool=n"
 if %buildhdr10plustool% GTR 2 GOTO hdr10plustool
 if %deleteINI%==1 echo.hdr10plustool=^%buildhdr10plustool%>>%ini%
+
+:libdvdcss
+if [0]==[%libdvdcssINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build libdvdcss?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildlibdvdcss="Build libdvdcss: "
+) else set buildlibdvdcss=%libdvdcssINI%
+
+if "%buildlibdvdcss%"=="" GOTO libdvdcss
+if %buildlibdvdcss%==1 set "libdvdcss=y"
+if %buildlibdvdcss%==2 set "libdvdcss=n"
+if %buildlibdvdcss% GTR 2 GOTO libdvdcss
+if %deleteINI%==1 echo.libdvdcss=^%buildlibdvdcss%>>%ini%
 
 :zlib
 if [0]==[%zlibINI%] (
@@ -2003,7 +2023,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
 --vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
---gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
+--gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --libdvdcss=%libdvdcss% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
 --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% --zlib=%zlib% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
