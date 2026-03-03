@@ -16,13 +16,14 @@ SOURCE_REPO_DECKLINK=https://gitlab.com/m-ab-s/decklink-headers.git
 SOURCE_REPO_DLFCN=https://github.com/dlfcn-win32/dlfcn-win32.git
 SOURCE_REPO_DOVI_TOOL=https://github.com/quietvoid/dovi_tool.git
 SOURCE_REPO_DSSIM=https://github.com/kornelski/dssim.git
+SOURCE_REPO_LIBDVDCSS=https://code.videolan.org/videolan/libdvdcss.git
 SOURCE_REPO_EXHALE=https://gitlab.com/ecodis/exhale.git
 SOURCE_REPO_FAAC=https://github.com/knik0/faac.git
 SOURCE_REPO_FDKAAC=https://github.com/mstorsjo/fdk-aac
 SOURCE_REPO_FDKAACEXE=https://github.com/nu774/fdkaac
 SOURCE_REPO_FFMBC=https://github.com/bcoudurier/FFmbc.git#branch=ffmbc # no other branch
 SOURCE_REPO_FFMS2=https://github.com/FFMS/ffms2.git
-SOURCE_REPO_FFNVCODEC=https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+SOURCE_REPO_FFNVCODEC=https://github.com/FFmpeg/nv-codec-headers
 SOURCE_REPO_FLAC=https://github.com/xiph/flac.git
 SOURCE_REPO_FLITE=https://github.com/festvox/flite.git
 SOURCE_REPO_FONTCONFIG=https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=LATEST
