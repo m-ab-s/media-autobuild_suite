@@ -290,7 +290,9 @@ if [[ $dssim = y ]] &&
     do_checkIfExist
 fi
 
-if [[ $gifski != n ]]; then
+if [[ $gifski != n ]] && [[ $bits = 32bit ]]; then
+    do_simple_print "${orange}Gifski does not support 32-bit compilation and will be disabled"'!'"${reset}"
+elif [[ $gifski != n ]]; then
     if [[ $gifski = video ]]; then
         _check=("$LOCALDESTDIR"/opt/gifskiffmpeg/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
         if flavor=gifski do_vcs "https://git.ffmpeg.org/ffmpeg.git#branch=release/8.0"; then
