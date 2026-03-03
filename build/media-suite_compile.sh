@@ -71,6 +71,7 @@ while true; do
     --avs2=* ) avs2=${1#*=} && shift ;;
     --dovitool=* ) dovitool=${1#*=} && shift ;;
     --hdr10plustool=* ) hdr10plustool=${1#*=} && shift ;;
+    --libdvdcss=* ) libdvdcss=${1#*=} && shift ;;
     --timeStamp=* ) timeStamp=${1#*=} && shift ;;
     --noMintty=* ) noMintty=${1#*=} && shift ;;
     --ccache=* ) ccache=${1#*=} && shift ;;
@@ -294,6 +295,7 @@ if [[ $gifski != n ]]; then
     if [[ $gifski = video ]]; then
         _check=("$LOCALDESTDIR"/opt/gifskiffmpeg/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
         if flavor=gifski do_vcs "https://git.ffmpeg.org/ffmpeg.git#branch=release/6.1"; then
+            do_patch "https://raw.githubusercontent.com/Jsoeph192/gifski-patch/fix_ffmpeg_fps.patch"
             do_uninstall "$LOCALDESTDIR"/opt/gifskiffmpeg
             [[ -f config.mak ]] && log "distclean" make distclean
             create_build_dir gifski
@@ -1610,6 +1612,12 @@ if [[ $hdr10plustool = y ]] &&
     do_checkIfExist
 fi
 
+[[ $ffmpeg != no ]] && enabled libdvdcss && do_pacman_install libdvdcss
+
+if [[ $standalone = y || $ffmpeg != no ]]; then
+    enabled libdvdcss && do_pacman_install libdvdcss
+fi
+
 if [[ $mediainfo = y ]]; then
     [[ $curl = openssl ]] && hide_libressl
     _check=(libzen.{a,pc})
@@ -2299,6 +2307,7 @@ if { [[ $mpv != n ]] ||
     do_checkIfExist
 fi
 
+
 _check=(lib{glslang,OSDependent}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { [[ $mpv != n ]] ||
@@ -2476,7 +2485,11 @@ if [[ $ffmpeg != no ]]; then
         enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
         enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
         enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
-
+        if enabled libdvdcss; then
+            do_pacman_install libdvdcss
+            do_addOption --enable-libdvdcss --enable-libdvdcss-protocol
+        fi
+        
         enabled libvvdec && grep_and_sed FF_PROFILE libavcodec/libvvdec.c 's/FF_PROFILE/AV_PROFILE/g'
 
         # Remove explicit include of DeckLinkAPI_v14_2_1.h since it's merged into the main file for Windows
