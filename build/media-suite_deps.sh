@@ -22,7 +22,7 @@ SOURCE_REPO_FDKAAC=https://github.com/mstorsjo/fdk-aac
 SOURCE_REPO_FDKAACEXE=https://github.com/nu774/fdkaac
 SOURCE_REPO_FFMBC=https://github.com/bcoudurier/FFmbc.git#branch=ffmbc # no other branch
 SOURCE_REPO_FFMS2=https://github.com/FFMS/ffms2.git
-SOURCE_REPO_FFNVCODEC=https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
+SOURCE_REPO_FFNVCODEC=https://code.ffmpeg.org/FFmpeg/nv-codec-headers.git
 SOURCE_REPO_FLAC=https://github.com/xiph/flac.git
 SOURCE_REPO_FLITE=https://github.com/festvox/flite.git
 SOURCE_REPO_FONTCONFIG=https://gitlab.freedesktop.org/fontconfig/fontconfig.git#tag=LATEST
