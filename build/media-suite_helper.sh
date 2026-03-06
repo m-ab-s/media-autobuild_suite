@@ -924,6 +924,7 @@ do_getFFmpegConfig() {
         do_addOption --enable-gnutls
     elif ! disabled schannel; then
         # fallback to schannel if no other tls libs are enabled
+        do_removeOption "${_all_tls}"
         do_addOption --enable-schannel
     fi
 
