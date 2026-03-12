@@ -56,7 +56,7 @@ SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
 SOURCE_REPO_LIBKVAZAAR=https://github.com/ultravideo/kvazaar.git
 SOURCE_REPO_LIBLC3=https://github.com/google/liblc3.git
 SOURCE_REPO_LIBLSMASH=https://github.com/l-smash/l-smash.git
-SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git
+SOURCE_REPO_LIBMEDIAINFO=https://github.com/MediaArea/MediaInfoLib.git#commit=8c64a46836b448171af92d1a753a4720d01a13fd
 SOURCE_REPO_LIBMFX=https://github.com/lu-zero/mfx_dispatch.git
 SOURCE_REPO_LIBMUSICBRAINZ=https://github.com/metabrainz/libmusicbrainz.git
 SOURCE_REPO_LIBMYSOFA=https://github.com/hoene/libmysofa.git
@@ -78,10 +78,10 @@ SOURCE_REPO_LIBVVDEC=https://github.com/fraunhoferhhi/vvdec.git
 SOURCE_REPO_LIBVVENC=https://github.com/fraunhoferhhi/vvenc.git
 SOURCE_REPO_LIBWEBP=https://chromium.googlesource.com/webm/libwebp
 SOURCE_REPO_LIBXML2=https://gitlab.gnome.org/GNOME/libxml2.git
-SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
+SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git#commit=0675b2edbafbeaa415762a566a681deff838913a
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MABS=https://github.com/m-ab-s/media-autobuild_suite.git
-SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
+SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git#commit=cdc5c62c56c2811dbadba4bcb5ee76d046ad93bd
 SOURCE_REPO_MINIZIPNG=https://github.com/zlib-ng/minizip-ng.git
 SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git
 SOURCE_REPO_MUJS=https://codeberg.org/ccxvii/mujs.git
