@@ -2046,9 +2046,10 @@ _vapoursynth_install() {
         return 1
     fi
     do_pacman_install tools
-    _python_ver=3.12.10
-    _python_lib=python312
-    _vsver=72
+    _python_ver=3.14.3
+    _python_lib=python314
+    _vsver=73
+    _vspyver=312
     _check=("lib$_python_lib.a")
     if files_exist "${_check[@]}"; then
         do_print_status "python $_python_ver" "$green" "Up-to-date"
@@ -2059,7 +2060,7 @@ _vapoursynth_install() {
         do_checkIfExist
     fi
 
-    _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Helper,Script},VapourSynth}.h)
+    _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
     elif do_wget "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth${bits%bit}-Portable-R$_vsver.zip"; then
@@ -2067,7 +2068,7 @@ _vapoursynth_install() {
         do_install sdk/include/vapoursynth/*.h include/vapoursynth/
 
         # Extract the .dll from the pip wheel
-        log "7z" 7z e -y -aoa wheel/vapoursynth-$_vsver-cp${_python_lib:6:3}-abi3-win_amd64.whl \
+        log "7z" 7z e -y -aoa wheel/vapoursynth-$_vsver-cp$_vspyver-abi3-win_amd64.whl \
             vapoursynth-$_vsver.data/data/Lib/site-packages/vapoursynth.dll
 
         create_build_dir
