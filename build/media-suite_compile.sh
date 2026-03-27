@@ -2622,6 +2622,7 @@ if [[ $libheif != n ]] &&
     pc_exists "libpng" || do_pacman_install libpng
 
     do_patch https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libheif/0001-Edit-CMakeLists.patch
+    grep_and_sed 'SvtAv1PredStructure' libheif/plugins/encoder_svt.cc 's/SvtAv1PredStructure/PredStructure/g;s/SVT_AV1_PRED_//g'
 
     extracflags=()
     extracommands=(-DWITH_HEADER_COMPRESSION=ON -DWITH_UNCOMPRESSED_CODEC=ON -DBUILD_DOCUMENTATION=OFF \
