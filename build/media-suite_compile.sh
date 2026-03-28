@@ -1632,6 +1632,7 @@ if [[ $mediainfo = y ]]; then
             "${_check[@]}" libmediainfo.la lib/cmake/mediainfolib
         grep_and_sed ',0[1-9]' Source/MediaInfoDLL/MediaInfoDLL.rc \
             's;,0+([1-9]);,\1;g'
+        CC="${CC##ccache }" CXX="${CXX##ccache }" \
         CFLAGS+=" $($PKG_CONFIG --cflags libzen)" \
         LDFLAGS+=" $($PKG_CONFIG --cflags --libs libzen)" \
             do_cmakeinstall Project/CMake -DBUILD_ZLIB=off -DBUILD_ZENLIB=off
