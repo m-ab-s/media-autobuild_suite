@@ -1617,7 +1617,8 @@ if [[ $mediainfo = y ]]; then
     if do_vcs "$SOURCE_REPO_LIBZEN" libzen; then
         do_uninstall include/ZenLib bin-global/libzen-config \
             "${_check[@]}" libzen.la lib/cmake/zenlib
-        do_cmakeinstall Project/CMake
+        CC="${CC##ccache }" CXX="${CXX##ccache }" \
+            do_cmakeinstall Project/CMake
         do_checkIfExist
     fi
     fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/zenlib"
