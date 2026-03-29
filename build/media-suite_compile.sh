@@ -195,6 +195,7 @@ else
                 -e 's;\(target.*\) zlib);\1 zlibstatic);' -e 's;BUILD_SHARED_LIBS AND WIN32;MINGW;' \
                 -e 's;zlib PROPERTIES SUFFIX "1.dll";zlib zlibstatic PROPERTIES OUTPUT_NAME z;' \
                 -e 's/${zlib_static_suffix}//' \
+                -e 's/zlib.h)/zlib.h chromeconf.h)/' \
                 -i CMakeLists.txt
             grep_or_sed 'string.h' contrib/bench/zlib_bench.cc 's/#include <stdlib.h>/#include <stdlib.h>\n#include <string.h>/'
             # the win32 dir is missing, so copy the folder from original zlib
