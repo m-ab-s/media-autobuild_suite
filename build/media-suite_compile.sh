@@ -2856,6 +2856,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         log clean env -i PATH="$PATH" "$(command -v make)" clean
         mujs_targets=(build/release/{mujs.pc,libmujs.a})
         if [[ $standalone != n ]]; then
+            do_pacman_install readline
             mujs_targets+=(build/release/mujs)
             _check+=(bin-global/mujs.exe)
             sed -i "s;-lreadline;$($PKG_CONFIG --libs readline);g" Makefile
