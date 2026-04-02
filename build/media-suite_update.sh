@@ -128,7 +128,7 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" &
     prefix_32='' prefix_64=''
     case $CC in
     *clang) prefix_64=$(extract_pkg_prefix clang64) ;;
-    *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix mingw64) ;;
+    *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix ucrt64) ;;
     esac
     for pkg in "${newmingw[@]}"; do
         if [[ $build32 == "yes" ]] && [[ ! $CC =~ clang ]] &&
@@ -208,7 +208,7 @@ if [[ -n $have_updates ]]; then
         touch /build/update_core &&
         have_updates="$(grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
     xargs $nargs pacman -S --noconfirm --overwrite "/mingw64/*" \
-        --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/usr/*" <<< "$have_updates"
+        --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*" <<< "$have_updates"
 fi
 
 [[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
@@ -216,7 +216,7 @@ fi
 
 # do a final overall installation for potential downgrades
 pacman -Syuu --noconfirm --overwrite "/mingw64/*" \
-    --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/usr/*"
+    --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
 
