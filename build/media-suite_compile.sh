@@ -1361,7 +1361,8 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
 
     # standalone binary
     if [[ $rav1e = y || $standalone = y || $av1an = y ]]; then
-        do_rust --profile release-no-lto
+        PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
+            do_rust --profile release-no-lto
         find "target/$CARCH-pc-windows-gnu$rust_target_suffix" -name "rav1e.exe" | while read -r f; do
             do_install "$f" bin-video/
         done
