@@ -1201,7 +1201,7 @@ do_addOption() {
     for opt; do
         ! opt_exists "$array" "$opt" && declare -ag "$array+=(\"$opt\")"
     done
-	return 0
+    return 0
 }
 
 do_removeOption() {
@@ -1666,10 +1666,11 @@ do_makeinstall() {
 do_hide_pacman_sharedlibs() {
     local packages="$1"
     local revert="$2"
-    local files
-    files="$(pacman -Qql "$packages" 2> /dev/null | grep .dll.a)"
+    shift 2
+    set -- $packages
+    set -- $(pacman -Qql "$@" 2> /dev/null | grep .dll.a)
 
-    for file in $files; do
+    for file in "$@"; do
         if [[ -f "${file%*.dll.a}.a" ]]; then
             if [[ -z $revert ]]; then
                 mv -f "${file}" "${file}.dyn"
