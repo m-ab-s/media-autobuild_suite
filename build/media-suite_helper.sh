@@ -1201,6 +1201,7 @@ do_addOption() {
     for opt; do
         ! opt_exists "$array" "$opt" && declare -ag "$array+=(\"$opt\")"
     done
+	return 0
 }
 
 do_removeOption() {
