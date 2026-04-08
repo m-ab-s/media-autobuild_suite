@@ -663,7 +663,8 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
         else
             extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=OFF")
         fi
-        CFLAGS+=" -DFREEGLUT_STATIC" \
+        CFLAGS+=" -DFREEGLUT_STATIC $($PKG_CONFIG --cflags zlib)" \
+            LDFLAGS+=" $($PKG_CONFIG --libs zlib)" \
             do_cmakeinstall global -DWEBP_ENABLE_SWAP_16BIT_CSP=ON "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
