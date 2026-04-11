@@ -246,7 +246,7 @@ else
             sed -e 's;libz_rs;libz;' -e 's;z_rs;z;' -i Cargo.toml
             PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config-static.bat" \
                 log "rust.capi" cargo capi build \
-                --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR"
+                --release --jobs "$cpuCount" --prefix="$LOCALDESTDIR" -F gz
             do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/libz.a" libz.a
             do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/libz.pc" zlib.pc
             do_checkIfExist
