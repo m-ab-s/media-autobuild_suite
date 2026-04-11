@@ -2382,6 +2382,8 @@ if [[ $ffmpeg != no ]]; then
     fi
     enabled libtheora && do_pacman_install libtheora
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
+    grep_and_sed '-lz' "$MINGW_PREFIX"/lib/pkgconfig/caca.pc \
+        '/Requires:/s|[[:blank:]]*$| zlib|;s|[[:blank:]]+-lz||'
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
     if enabled libopenh264; then
