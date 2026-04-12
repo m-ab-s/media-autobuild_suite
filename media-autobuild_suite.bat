@@ -278,11 +278,11 @@ if [0]==[%av1anINI%] (
     echo -------------------------------------------------------------------------------
     set /P buildav1an="Build av1an: "
 ) else (
-	if %av1anINI% GTR 2 (
-		set "buildav1an=2"
-	) else (
-		set buildav1an=%av1anINI%
-	)
+    if %av1anINI% GTR 2 (
+        set "buildav1an=2"
+    ) else (
+        set buildav1an=%av1anINI%
+    )
 )
 
 if "%buildav1an%"=="" GOTO av1an
