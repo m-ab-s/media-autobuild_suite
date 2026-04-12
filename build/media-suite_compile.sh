@@ -1061,6 +1061,10 @@ if [[ $ffmpeg != no ]] && enabled libgme &&
     do_vcs "$SOURCE_REPO_LIBGME"; then
     do_uninstall include/gme "${_check[@]}"
     do_cmakeinstall -DENABLE_UBSAN=OFF
+    grep_and_sed '-lz' "$LOCALDESTDIR/lib/pkgconfig/libgme.pc" \
+        '/Version:/a\
+Requires: zlib
+s|[[:blank:]]*-lz||'
     do_checkIfExist
 fi
 
