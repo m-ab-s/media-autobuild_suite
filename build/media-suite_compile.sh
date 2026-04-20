@@ -761,7 +761,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_autogen
         _check+=(bin-global/tesseract.exe)
         do_uninstall include/tesseract "${_check[@]}"
-        sed -i 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
+        sed -i 's|Requires.private.*|& libarchive iconv libtiff-4 zlib|' tesseract.pc.in
         grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
         case $CC in
         *clang) sed -i -e 's|Libs.private.*|& -fopenmp=libomp|' tesseract.pc.in ;;
@@ -770,7 +770,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_separate_confmakeinstall global --disable-{graphics,tessdata-prefix} \
             --without-curl \
             LIBLEPT_HEADERSDIR="$LOCALDESTDIR/include" \
-            LIBS="$($PKG_CONFIG --libs iconv lept libtiff-4)" --datadir="$LOCALDESTDIR/bin-global"
+            LIBS="$($PKG_CONFIG --libs iconv lept libtiff-4 libarchive)" --datadir="$LOCALDESTDIR/bin-global"
         if [[ ! -f $LOCALDESTDIR/bin-global/tessdata/eng.traineddata ]]; then
             do_pacman_install tesseract-data-eng
             mkdir -p "$LOCALDESTDIR"/bin-global/tessdata
