@@ -740,6 +740,20 @@ if { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
             s| -L'"${MINGW_PREFIX}"'/lib||g
             s|'"${MINGW_PREFIX}"'/lib/lib(.+)\.dll\.a|-l\1|g
         }'
+    if nm "$MINGW_PREFIX/lib/libarchive.a" | grep __imp_zlibVersion >/dev/null 2>&1; then
+        mv -f "$MINGW_PREFIX/lib/libarchive.a" "$MINGW_PREFIX/lib/libarchive.a.bak"
+        objcopy --redefine-sym __imp_zlibVersion=zlibVersion --redefine-sym __imp_crc32=crc32 \
+            --redefine-sym __imp_inflate=inflate --redefine-sym __imp_inflateEnd=inflateEnd \
+            --redefine-sym __imp_inflateInit2_=inflateInit2_ --redefine-sym __imp_inflateReset=inflateReset \
+            --redefine-sym __imp_inflateSetDictionary=inflateSetDictionary \
+            --redefine-sym __imp_inflateInit_=inflateInit_ \
+            --redefine-sym __imp_deflate=deflate --redefine-sym __imp_deflateEnd=deflateEnd \
+            --redefine-sym __imp_deflateInit2_=deflateInit2_ --redefine-sym __imp_deflateReset=deflateReset \
+            --redefine-sym __imp_deflateSetDictionary=deflateSetDictionary \
+            --redefine-sym __imp_deflateInit_=deflateInit_ \
+            "$MINGW_PREFIX/lib/libarchive.a.bak" "$MINGW_PREFIX/lib/libarchive.a"
+        rm -f "$MINGW_PREFIX/lib/libarchive.a.bak"
+    fi
 fi
 
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
@@ -765,6 +779,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_uninstall include/tesseract "${_check[@]}"
         sed -i 's|Requires.private.*|& libarchive iconv libtiff-4|' tesseract.pc.in
         grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
+        grep_or_sed crypt32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lcrypt32;g'
         case $CC in
         *clang) sed -i -e 's|Libs.private.*|& -fopenmp=libomp|' tesseract.pc.in ;;
         *) sed -i -e 's|Libs.private.*|& -fopenmp -lgomp|' tesseract.pc.in ;;
