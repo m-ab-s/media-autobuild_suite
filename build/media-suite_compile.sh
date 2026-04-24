@@ -2175,10 +2175,10 @@ if [[ $bits = 64bit && $vvc = y ]] &&
     unset _notrequired
 fi
 
-_check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266.h)
+_check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266/uvg266.h)
 if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_vcs "$SOURCE_REPO_UVG266"; then
-    do_uninstall version.h "${_check[@]}"
+    do_uninstall include/uvg266 "${_check[@]}"
     do_cmakeinstall video -DBUILD_TESTING=OFF
     do_checkIfExist
 fi
