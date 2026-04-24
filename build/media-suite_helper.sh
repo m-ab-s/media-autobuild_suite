@@ -1907,6 +1907,77 @@ do_dlltool() (
     exec dlltool -k -y "$1" -d "$2" -A
 )
 
+# fix_impsyms "$MINGW_PREFIX/lib/libarchive.a" libarchive
+fix_impsyms() (
+    client_lib="$1"
+    pkg_name="$2"
+
+    # 1. Extract undefined __imp_ symbols from the client
+    mapfile -t undef_imps < <(nm -jug "$client_lib" | grep "__imp_" | sort -u)
+
+    if [[ -z "${undef_imps[*]}" ]]; then
+        return 0
+    fi
+
+    # 2. Resolve provider library paths from pkg-config
+    mapfile -t pkg_libs < <($PKG_CONFIG --libs "$pkg_name" 2> /dev/null | tr ' ' '\n' | grep -- '.')
+
+    search_paths=()
+    lib_names=()
+    provider_paths=()
+
+    for flag in "${pkg_libs[@]}"; do
+        case $flag in
+            -L*) search_paths+=("${flag#-L}") ;;
+            -l*) lib_names+=("${flag#-l}") ;;
+            *.a) provider_paths+=("$flag") ;;
+        esac
+    done
+    unset pkg_libs
+
+    # Resolve -l flags to actual .a paths
+    for name in "${lib_names[@]}"; do
+        for path in "${search_paths[@]}"; do
+            if [[ -f "$path/lib${name}.a" ]]; then
+                provider_paths+=("$path/lib${name}.a")
+                break
+            fi
+        done
+    done
+    unset search_paths lib_names
+
+    # 3. Iterate through providers and patch them
+    for provider in "${provider_paths[@]}"; do
+        # Get all global defined symbols in the provider
+        mapfile -t provider_defs < <(nm -jUg "$provider" | sort -u)
+
+        thunk_source=""
+        found_provider=false
+
+        for imp_sym in "${undef_imps[@]}"; do
+            base_sym="${imp_sym#__imp_}"
+
+            # Check if this provider defines the base symbol
+            # AND doesn't already have the __imp_ version
+            if [[ " ${provider_defs[*]} " =~ [[:space:]]${base_sym}[[:space:]] ]] && [[ ! " ${provider_defs[*]} " =~ [[:space:]]${imp_sym}[[:space:]] ]]; then
+                thunk_source+="extern void ${base_sym}(); void *${imp_sym} = &${base_sym};"$'\n'
+                found_provider=true
+            fi
+        done
+
+        if ! $found_provider; then
+            continue
+        fi
+
+        # Compile and inject
+        obj="thunk_$(basename "${provider%.a}" | sed 's/^lib//').o"
+        # shellcheck disable=SC2086
+        $CC -x c -c $CFLAGS - -o "$obj" <<<"$thunk_source"
+        $AR rcs "$provider" "$obj"
+        rm -f "$obj"
+    done
+)
+
 get_vs_prefix() {
     unset vsprefix
     local winvsprefix

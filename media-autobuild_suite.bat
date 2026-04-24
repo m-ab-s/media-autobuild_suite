@@ -2077,9 +2077,11 @@ goto :EOF
     if %CC%==clang (
         echo.export CC="ccache clang"
         echo.export CXX="ccache clang++"
+        echo.export AR="llvm-ar"
     ) else (
         echo.export CC="ccache gcc"
         echo.export CXX="ccache g++"
+        echo.export AR="gcc-ar"
     )
     echo.
     echo.CARCH="${MINGW_CHOST%%%%-*}"
