@@ -763,6 +763,7 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
         do_uninstall include/tesseract "${_check[@]}"
         sed -i 's|Requires.private.*|& libarchive iconv libtiff-4 zlib|' tesseract.pc.in
         grep_or_sed ws2_32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lws2_32;g'
+        grep_or_sed crypt32 "$MINGW_PREFIX/lib/pkgconfig/libarchive.pc" 's;Libs.private:.*;& -lcrypt32;g'
         # Fixup some __imp_zlib related symbols, but in libz.a.
         fix_impsyms "$MINGW_PREFIX/lib/libarchive.a" libarchive
         case $CC in
