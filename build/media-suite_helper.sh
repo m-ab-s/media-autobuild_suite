@@ -2369,8 +2369,8 @@ grep_and_sed() {
     local sed_files=("$grep_file")
     [[ -n $1 ]] && sed_files=("$@")
 
-    grep -q -- "$grep_re" "$grep_file" &&
-        sed -ri -- "$sed_re" "${sed_files[@]}"
+    grep -Eq -- "$grep_re" "$grep_file" &&
+        sed -Ei -- "$sed_re" "${sed_files[@]}"
 }
 
 fix_cmake_crap_exports() {
