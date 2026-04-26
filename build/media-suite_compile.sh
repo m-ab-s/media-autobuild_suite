@@ -637,6 +637,9 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         else
             extracommands+=("-Dtiff-tools=OFF")
         fi
+        sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' \
+        "$MINGW_PREFIX"/lib/cmake/libjpeg-turbo/libjpeg-turboTargets.cmake
+        sed -ri 's/libjpeg-turbo::(|turbo)jpeg/&-static/' cmake/JPEGCodec.cmake
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
             '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd glut'
         LDFLAGS+=" $($PKG_CONFIG --libs zlib)" CFLAGS+=" -DFREEGLUT_STATIC $($PKG_CONFIG --cflags zlib)" \
