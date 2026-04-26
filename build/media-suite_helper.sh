@@ -1920,7 +1920,7 @@ fix_impsyms() (
     fi
 
     # 2. Resolve provider library paths from pkg-config
-    mapfile -t pkg_libs < <($PKG_CONFIG --libs "$pkg_name" 2> /dev/null | tr ' ' '\n' | grep -- '.')
+    mapfile -t pkg_libs < <($PKG_CONFIG --libs --keep-system-libs "$pkg_name" 2> /dev/null | tr ' ' '\n' | grep -- '.')
 
     search_paths=()
     lib_names=()
