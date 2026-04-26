@@ -2182,7 +2182,9 @@ _check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266/uvg266.h)
 if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_vcs "$SOURCE_REPO_UVG266"; then
     do_uninstall include/uvg266 "${_check[@]}"
-    do_cmakeinstall video -DBUILD_TESTING=OFF
+    grep_or_sed __MINGW32__ src/uvg266.h 's;UVG_STATIC_LIB.*;& || defined(__MINGW32__);'
+    # -DBUILD_SHARED_LIBS is now ignored, have to set it manually
+    do_cmakeinstall video -DUVG_BUILD_TESTS=OFF -DUVG_BUILD_SHARED=OFF -DUVG_BUILD_STATIC=on
     do_checkIfExist
 fi
 
