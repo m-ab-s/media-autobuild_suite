@@ -1333,11 +1333,7 @@ if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled li
     do_pacman_install yasm
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/aom/0001-CMake-Add-ENABLE_EXTRA_EXAMPLES.patch" am
     extracommands=("-DENABLE_EXTRA_EXAMPLES=off")
-    if [[ $aom = y || $standalone = y || $av1an = y ]]; then
-        # fix google's shit
-        sed -ri 's;_PREFIX.+CMAKE_INSTALL_BINDIR;_FULL_BINDIR;' \
-            build/cmake/aom_install.cmake
-    else
+    if [[ $aom != y ]] && [[ $standalone != y ]] && [[ $av1an != y ]]; then
         extracommands+=("-DENABLE_EXAMPLES=off")
     fi
     do_uninstall include/aom "${_check[@]}"
