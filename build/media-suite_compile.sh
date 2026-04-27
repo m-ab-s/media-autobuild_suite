@@ -130,15 +130,66 @@ create_ab_ccache
 set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
-if [[ $bits = 32bit && $av1an = y ]]; then
-    do_simple_print "${orange}Av1an cannot be compiled due to Vapoursynth being broken on 32-bit and will be disabled"'!'"${reset}"
-    _reenable_av1an=$av1an # so that av1an can be built if both 32 bit and 64 bit targets are enabled
-    av1an=n
+rust_wanted=false
+rust_packages=(ripgrep rav1e dssim libavif dovitool hdr10plustool av1an)
+if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool|$av1an" = *y* ]] ||
+    [[ $gifski != n ]] || [[ $zlib = rs ]] || enabled librav1e; then
+    rust_wanted=true
 fi
 
-if [[ ! -z $_reenable_av1an ]] && [[ $bits = 64bit ]]; then
-    av1an=$_reenable_av1an
-    unset _reenable_av1an
+if [[ $bits = 32bit ]] && $rust_wanted; then
+    do_simple_print "${orange}Rust packages cannot be compiled on 32-bit systems due to its removal from msys2"'!'"${reset}"
+    for package in "${rust_packages[@]}"; do
+        if [[ ${!package} = y ]]; then
+            declare "_reenable_$package=${!package}" "$package=n"
+        fi
+    done
+
+    # the rest are special cases as they aren't just y/n
+    if [[ $gifski != n ]]; then
+        _reenable_gifski=$gifski
+        gifski=n
+    fi
+    if [[ $zlib = rs ]]; then
+        _reenable_zlib=$zlib
+        zlib=n
+    fi
+
+    if enabled librav1e; then
+        _reenable_librav1e=y
+        do_removeOption --enable-librav1e
+    fi
+    rust_wanted=false
+fi
+
+# reenable rust packages if they were disabled due to 32-bit compilation
+if [[ $bits = 64bit ]]; then
+    for package in "${rust_packages[@]}"; do
+        local reenable_var="_reenable_$package"
+        if [[ ${!package} = n && -n ${!reenable_var} ]]; then
+            declare "$package=${!reenable_var}"
+            rust_wanted=true
+            unset "$reenable_var"
+        fi
+    done
+
+    if [[ $gifski = n && -n $_reenable_gifski ]]; then
+        gifski=$_reenable_gifski
+        rust_wanted=true
+        unset _reenable_gifski
+    fi
+
+    if [[ $zlib = n && -n $_reenable_zlib ]]; then
+        zlib=$_reenable_zlib
+        rust_wanted=true
+        unset _reenable_zlib
+    fi
+
+    if [[ ${_reenable_librav1e:-} = y ]]; then
+        do_addOption --enable-librav1e
+        rust_wanted=true
+        unset _reenable_librav1e
+    fi
 fi
 
 if [[ $packing = y &&
@@ -148,8 +199,7 @@ if [[ $packing = y &&
     do_install upx.exe /opt/bin/upx.exe
 fi
 
-if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool" = *y* ]] ||
-    [[ $av1an = y ]] || [[ $gifski != n ]] || [[ $zlib = rs ]] || enabled librav1e; then
+if $rust_wanted; then
     do_pacman_install rust
     [[ $CC =~ clang ]] && rust_target_suffix="llvm"
 fi
