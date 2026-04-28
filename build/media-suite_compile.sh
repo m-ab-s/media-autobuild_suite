@@ -1575,6 +1575,7 @@ fi
 _check=(libbluray.{a,pc})
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBBLURAY"; then
+    do_patch "https://gitlab.com/m-ab-s/libbluray/-/commit/92813268bd2de33ddc9a94143869eb9212521701.patch" am
     [[ -f contrib/libudfread/.git ]] || do_git_submodule
     do_uninstall include/libbluray share/java "${_check[@]}" libbluray.la
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
