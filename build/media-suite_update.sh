@@ -41,6 +41,7 @@ else
 fi
 [[ -f media-suite_helper.sh ]] && source media-suite_helper.sh
 [[ -f media-suite_deps.sh ]] && source media-suite_deps.sh
+[[ -f media-suite_deps_extra.sh ]] && source media-suite_deps_extra.sh
 
 # --------------------------------------------------
 # update suite

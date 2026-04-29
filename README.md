@@ -311,6 +311,11 @@ If there's some error during compilation follow these steps:
 
 - This script contains the URLs for each git repo used by `build/media-suite_compile.sh`. These URLs can be appended with `#branch=BRANCH`, `#commit=COMMITHASH`, or `#tag=TAG` to build from a branch, commit, or tag respectively. They can also be replaced to build from forked repositories (For example, changing `SOURCE_REPO_SVTAV1=https://gitlab.com/AOMediaCodec/SVT-AV1.git` to `SOURCE_REPO_SVTAV1=https://github.com/gianni-rosato/svt-av1-psy.git`).
 
+`/build/media-suite_deps_extra.sh`
+
+- This file is meant for overriding URLS in `media-suite_deps.sh` or adding new variables that can be used in the extra scripts. It is sourced by `media-suite_compile.sh` and `media-suite_update.sh` if it exists.
+- This file is not meant to be checked in, and is meant to be created and edited by the user.
+
 `/build/ffmpeg_options.txt` & `/build/mpv_options.txt`
 
 - If you select the option to choose your own FFmpeg/mpv optional libraries, these files will contain options that get sent to FFmpeg/mpv's configure script before compiling. Edit them as you wish to get a custom FFmpeg/mpv with or without any features available, if supported by the suite.

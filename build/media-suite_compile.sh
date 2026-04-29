@@ -92,6 +92,9 @@ done
 
 # shellcheck source=media-suite_deps.sh
 source "$LOCALBUILDDIR"/media-suite_deps.sh
+if [[ -f "$LOCALBUILDDIR"/media-suite_deps_extra.sh ]]; then
+    source "$LOCALBUILDDIR"/media-suite_deps_extra.sh
+fi
 
 # shellcheck source=media-suite_helper.sh
 source "$LOCALBUILDDIR"/media-suite_helper.sh
