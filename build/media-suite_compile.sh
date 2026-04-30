@@ -1906,13 +1906,14 @@ if [[ $x264 != no ]] ||
             files_exist "${_check[@]}" && touch "build_successful${bits}_light"
             unset_extra_script
 
+            _deps=("$zlib_dir"/lib/libz.a)
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/ffms2.pc bin-video/ffmsindex.exe)
             if do_vcs "$SOURCE_REPO_FFMS2"; then
                 do_uninstall "${_check[@]}"
                 sed -i 's/Cflags.*/& -DFFMS_STATIC/' ffms2.pc.in
                 mkdir -p src/config
                 do_autoreconf
-                do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg"
+                do_separate_confmakeinstall video --prefix="$LOCALDESTDIR/opt/lightffmpeg" --with-zlib="$zlib_dir"
                 do_checkIfExist
             fi
             cd_safe "$LOCALBUILDDIR"/x264-git
