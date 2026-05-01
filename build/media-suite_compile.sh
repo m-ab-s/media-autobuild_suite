@@ -250,6 +250,7 @@ else
                 -e 's/${zlib_static_suffix}//' \
                 -e 's/zlib.h)/zlib.h chromeconf.h)/' \
                 -i CMakeLists.txt
+            sed -i 's|#include "chromeconf.h"||' zconf.h
             grep_or_sed 'string.h' contrib/bench/zlib_bench.cc 's/#include <stdlib.h>/#include <stdlib.h>\n#include <string.h>/'
             # the win32 dir is missing, so copy the folder from original zlib
             do_wget -c -r -q "https://github.com/madler/zlib/archive/refs/heads/develop.tar.gz"
