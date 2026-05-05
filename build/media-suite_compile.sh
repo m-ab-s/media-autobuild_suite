@@ -2445,6 +2445,7 @@ if enabled libcdio || mpv_enabled cdda; then
 fi
 
 if [[ $ffmpeg != no ]]; then
+    do_pacman_install texinfo
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy
     if enabled libxvid && [[ $standalone = n ]]; then
