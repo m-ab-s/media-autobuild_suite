@@ -1768,7 +1768,6 @@ if [[ $ffmpeg != no ]] && enabled_any frei0r ladspa; then
 
     _check=(frei0r.{h,pc})
     if do_vcs "$SOURCE_REPO_FREI0R"; then
-        do_patch "https://github.com/dyne/frei0r/pull/274.patch" am
         do_uninstall lib/frei0r-1 "${_check[@]}"
         do_pacman_install gavl
         do_cmakeinstall -DWITHOUT_OPENCV=on -DWITHOUT_CAIRO=on
