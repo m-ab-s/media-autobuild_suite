@@ -288,6 +288,10 @@ else
             do_cmakeinstall global -DZLIB_COMPAT=ON -DWITH_GTEST=OFF -DZLIB_ENABLE_TESTS=OFF
             if [[ $standalone = y ]] &&
                 do_vcs "$SOURCE_REPO_MINIZIPNG"; then
+                # Only demote to a warning if shared mode is NOT explicitly requested
+                if ! [[ ${shared:-n} == y || ${enable_shared:-n} == y || ${BUILD_SHARED_LIBS:-OFF} == ON ]]; then
+                    sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' "$MINGW_PREFIX"/lib/cmake/zstd/zstdTargets.cmake
+                fi
                 do_cmakeinstall global -DMZ_BUILD_TESTS=ON
             fi
             do_checkIfExist
