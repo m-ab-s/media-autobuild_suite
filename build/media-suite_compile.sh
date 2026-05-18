@@ -288,6 +288,8 @@ else
             do_cmakeinstall global -DZLIB_COMPAT=ON -DWITH_GTEST=OFF -DZLIB_ENABLE_TESTS=OFF
             if [[ $standalone = y ]] &&
                 do_vcs "$SOURCE_REPO_MINIZIPNG"; then
+                # demote fail to a warning
+                sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' "$MINGW_PREFIX"/lib/cmake/zstd/zstdTargets.cmake
                 do_cmakeinstall global -DMZ_BUILD_TESTS=ON
             fi
             do_checkIfExist
