@@ -1940,7 +1940,6 @@ fix_impsyms() (
         for path in "${search_paths[@]}"; do
             if [[ -f "$path/lib${name}.a" ]]; then
                 provider_paths+=("$path/lib${name}.a")
-                break
             fi
         done
     done
