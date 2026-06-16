@@ -1448,9 +1448,11 @@ do_rustcinstall() {
     extra_script pre rust
     [[ -f "$(get_first_subdir -f)/do_not_reconfigure" ]] &&
         return
+    # We use capi install instead of cinstall because it requires elevated perms for cargo-cinstall.exe with clang64.
+    # Something about the cinstall work triggers UAC.
     PKG_CONFIG_ALL_STATIC=true \
         PKG_CONFIG="$LOCALDESTDIR/bin/ab-pkg-config" \
-        log "rust.cinstall" cargo cinstall \
+        log "rust.cinstall" cargo capi install \
         --target="$CARCH"-pc-windows-gnu$target_suffix \
         --jobs="$cpuCount" --prefix="$LOCALDESTDIR" "$@" "${rust_extras[@]}"
     extra_script post rust
