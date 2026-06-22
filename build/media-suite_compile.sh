@@ -905,8 +905,12 @@ do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${re
 if [[ $ffmpeg != no || $sox = y ]]; then
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
-        do_pacman_install twolame
-        do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
+        if [[ $bits = 64bit ]]; then
+            do_pacman_install twolame
+            do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
+        else
+            do_removeOption --enable-libtwolame
+        fi
     fi
     enabled libmp3lame && do_pacman_install lame
 fi
