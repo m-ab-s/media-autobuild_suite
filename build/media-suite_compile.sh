@@ -2555,7 +2555,7 @@ if [[ $ffmpeg != no ]]; then
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
         if enabled libvvdec; then
-            do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch" am  ||
+            do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch"  ||
                 do_removeOptions --enable-libvvdec
         fi
         if enabled libsvthevc; then
