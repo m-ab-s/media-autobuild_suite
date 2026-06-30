@@ -2554,10 +2554,6 @@ if [[ $ffmpeg != no ]]; then
         ff_base_commit=$(git rev-parse HEAD)
         do_changeFFmpegConfig "$license"
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
-        if enabled libvvdec; then
-            do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch"  ||
-                do_removeOptions --enable-libvvdec
-        fi
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/1480c1/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
                 do_removeOption --enable-libsvthevc
@@ -2565,6 +2561,10 @@ if [[ $ffmpeg != no ]]; then
         if enabled libsvtvp9; then
             do_patch "https://raw.githubusercontent.com/1480c1/SVT-VP9/master/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch" am ||
                 do_removeOption --enable-libsvtvp9
+        fi
+        if enabled libvvdec; then
+            do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch"  ||
+                do_removeOptions --enable-libvvdec
         fi
 
         enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
