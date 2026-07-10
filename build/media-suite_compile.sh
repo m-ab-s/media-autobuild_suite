@@ -1643,7 +1643,7 @@ _check=(libxavs2.a xavs2_config.h xavs2.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/xavs2.exe)
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libxavs2
-elif { [[ $avs2 = y ]] || { [[ $ffmpeg != no ]] && enabled libxavs2; }; } &&
+elif { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libxavs2; }; } &&
     do_vcs "$SOURCE_REPO_XAVS2"; then
     do_patch "https://github.com/pkuvcl/xavs2/compare/master...1480c1:xavs2:gcc14/pointerconversion.patch" am
     cd_safe build/linux
@@ -1656,17 +1656,24 @@ fi
 
 _check=(libdavs2.a davs2_config.h davs2.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/davs2.exe)
+davs2_repo=$SOURCE_REPO_DAVS
+extracommands=()
+if [[ $avs2 = 10bit ]]; then
+    davs2_repo=$SOURCE_REPO_DAVS10bit
+    extracommands+=(--bit-depth=10)
+fi
 if [[ $bits = 32bit ]]; then
     do_removeOption --enable-libdavs2
-elif { [[ $avs2 = y ]] || { [[ $ffmpeg != no ]] && enabled libdavs2; }; } &&
-    do_vcs "$SOURCE_REPO_DAVS"; then
+elif { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libdavs2; }; } &&
+    do_vcs "$davs2_repo"; then
     cd_safe build/linux
     [[ -f config.mak ]] && log "distclean" make distclean
     do_uninstall all "${_check[@]}"
-    do_configure --bindir="$LOCALDESTDIR"/bin-video --enable-strip
+    do_configure --bindir="$LOCALDESTDIR"/bin-video --enable-strip "${extracommands[@]}"
     do_makeinstall
     do_checkIfExist
 fi
+unset davs2_repo extracommands
 
 _check=(libuavs3d.a uavs3d.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/uavs3dec.exe)

@@ -1371,8 +1371,9 @@ if [0]==[%avs2INI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build avs2 (Audio Video Coding Standard Gen2 encoder/decoder^)?
-    echo. 1 = Yes
+    echo. 1 = Yes (official davs2, 8-bit only^)
     echo. 2 = No
+    echo. 3 = Yes (unofficial davs2 fork with 10-bit support^)
     echo.
     echo. Binaries being built depends on "standalone=y" and are always static.
     echo.
@@ -1384,7 +1385,8 @@ if [0]==[%avs2INI%] (
 if "%buildavs2%"=="" GOTO avs2
 if %buildavs2%==1 set "avs2=y"
 if %buildavs2%==2 set "avs2=n"
-if %buildavs2% GTR 2 GOTO avs2
+if %buildavs2%==3 set "avs2=10bit"
+if %buildavs2% GTR 3 GOTO avs2
 if %deleteINI%==1 echo.avs2=^%buildavs2%>>%ini%
 
 :dovitool
