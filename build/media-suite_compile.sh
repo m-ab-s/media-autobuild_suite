@@ -2452,7 +2452,7 @@ if enabled libcdio || mpv_enabled cdda; then
 fi
 
 if [[ $ffmpeg != no ]]; then
-    do_pacman_install texinfo
+    do_pacman_install -m texinfo
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy
     if enabled libxvid && [[ $standalone = n ]]; then
@@ -2462,9 +2462,9 @@ if [[ $ffmpeg != no ]]; then
     fi
     if enabled libssh; then
         do_pacman_install libssh
-        do_addOption --extra-cflags=-DLIBSSH_STATIC "--extra-ldflags=-Wl,--allow-multiple-definition"
-        grep_or_sed "Requires.private" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc \
-            "/Libs:/ i\Requires.private: zlib libssl"
+        do_addOption --extra-cflags=-DLIBSSH_STATIC
+        grep_or_sed "Requires.private:.*libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc \
+            $'/^Libs:/ i\\\nRequires.private: libssl libcrypto zlib\\\nLibs.private: -liphlpapi -lws2_32 -lpthread'
     fi
     enabled libtheora && do_pacman_install libtheora
     enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
