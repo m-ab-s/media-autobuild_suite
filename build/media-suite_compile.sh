@@ -1283,6 +1283,28 @@ if [[ $ffmpeg != no ]] && enabled liblc3 &&
     do_checkIfExist
 fi
 
+_check=(libmpeghdec.a mpeghdec.pc mpeghdec/{mpeghexport,mpeghdecoder}.h)
+[[ $standalone = y ]] && _check+=(mpeghdec/mpeghUIManager.h
+    bin-audio/{mpeghDecoder,mpeghUiManager}.exe)
+if [[ $ffmpeg != no ]] && enabled libmpeghdec &&
+    do_vcs "$SOURCE_REPO_MPEGHDEC"; then
+    do_uninstall include/mpeghdec "${_check[@]}"
+    # Avoid duplicate SHORT overloads with MinGW's LLP64 data model.(Upstream issue)
+    grep_or_sed '__x86_64__) && !defined(_WIN32)' src/libFDK/include/common_fix.h \
+        's;!defined\(_MSC_VER\) && defined\(__x86_64__\);& \&\& !defined(_WIN32);'
+    if [[ $standalone = y ]]; then
+        extracommands=(-Dmpeghdec_BUILD_BINARIES=ON -Dmpeghdec_BUILD_UIMANAGER=ON)
+    else
+        extracommands=(-Dmpeghdec_BUILD_BINARIES=OFF -Dmpeghdec_BUILD_UIMANAGER=OFF)
+    fi
+    do_cmakeinstall "${extracommands[@]}" -DCMAKE_INSTALL_DATAROOTDIR=lib
+    [[ $standalone = y ]] &&
+        do_install bin/{mpeghDecoder,mpeghUiManager}.exe bin-audio/
+    sed -i 's/^Cflags:.*/& -DMPEGHDEC_STATIC/' "$LOCALDESTDIR/lib/pkgconfig/mpeghdec.pc"
+    do_checkIfExist
+    unset extracommands
+fi
+
 _check=(bin/atw_ldwrapper libAudioToolboxWrapper.a)
 if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
     _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"

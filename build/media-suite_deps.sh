@@ -84,6 +84,7 @@ SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MABS=https://github.com/m-ab-s/media-autobuild_suite.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
 SOURCE_REPO_MINIZIPNG=https://github.com/zlib-ng/minizip-ng.git
+SOURCE_REPO_MPEGHDEC=https://github.com/Fraunhofer-IIS/mpeghdec.git
 SOURCE_REPO_MPV=https://github.com/mpv-player/mpv.git
 SOURCE_REPO_MUJS=https://codeberg.org/ccxvii/mujs.git
 SOURCE_REPO_NEON=https://github.com/notroj/neon.git
