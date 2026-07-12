@@ -547,8 +547,8 @@ if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
     grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
         's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
     _check=(libgnutls.{,l}a gnutls.pc)
-    _gnutls_ver=3.8.9
-    _gnutls_hash=69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed
+    _gnutls_ver=3.8.13
+    _gnutls_hash=ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e
     if do_pkgConfig "gnutls = $_gnutls_ver" && do_wget -h $_gnutls_hash \
         "https://www.gnupg.org/ftp/gcrypt/gnutls/v${_gnutls_ver%.*}/gnutls-${_gnutls_ver}.tar.xz"; then
         do_uninstall include/gnutls "${_check[@]}"
