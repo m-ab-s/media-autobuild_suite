@@ -1298,6 +1298,11 @@ if [[ $ffmpeg != no ]] && enabled libmpeghdec &&
         extracommands=(-Dmpeghdec_BUILD_BINARIES=OFF -Dmpeghdec_BUILD_UIMANAGER=OFF)
     fi
     do_cmakeinstall "${extracommands[@]}" -DCMAKE_INSTALL_DATAROOTDIR=lib
+    # Avoid bundled FDK symbol collisions with libfdk-aac.
+    if enabled libfdk-aac; then
+        prefix_archive_symbols "$LOCALDESTDIR/lib/libmpeghdec.a" \
+            mpeghdec_private_ '^_?(mpeghdecoder_|mpegh_UI_)'
+    fi
     [[ $standalone = y ]] &&
         do_install bin/{mpeghDecoder,mpeghUiManager}.exe bin-audio/
     sed -i 's/^Cflags:.*/& -DMPEGHDEC_STATIC/' "$LOCALDESTDIR/lib/pkgconfig/mpeghdec.pc"
