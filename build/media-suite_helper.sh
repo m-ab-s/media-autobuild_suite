@@ -1898,6 +1898,93 @@ create_debug_link() {
     done
 }
 
+# Prefix internal strong symbols in a static archive without changing its public ABI.
+# preserve_regex is an AWK ERE tested against each full symbol name; matches stay unchanged.
+# Unsafe archive formats and target-name collisions fail without running objcopy.
+# prefix_archive_symbols archive symbol_prefix preserve_regex
+# Example: prefix_archive_symbols libfoo.a foo_private_ '^_?foo_'
+prefix_archive_symbols() (
+    set -o pipefail
+    local archive="$1" symbol_prefix="$2" preserve_regex="$3" archive_magic temp_dir
+    local symbol_map symbol_table section_table
+    [[ -f $archive && -n $symbol_prefix && -n $preserve_regex ]] || return 1
+    [[ $symbol_prefix != *[[:space:]]* ]] || return 1
+
+    # Thin archives reference external members, so an in-place rewrite is not self-contained.
+    archive_magic=$(head -c 7 "$archive") || return 1
+    if [[ $archive_magic != '!<arch>' ]]; then
+        printf 'prefix_archive_symbols: %s is not a regular archive\n' "$archive" >&2
+        return 1
+    fi
+
+    temp_dir=$(mktemp -d) || return 1
+    trap 'rm -rf "$temp_dir"' EXIT
+    symbol_map="$temp_dir/symbol-map"
+    symbol_table="$temp_dir/symbol-table"
+    section_table="$temp_dir/sections"
+
+    # Renaming the native symbol table does not update embedded GCC/LLVM LTO bytecode.
+    objdump -h "$archive" > "$section_table" || return 1
+    if grep -Eq '\.gnu\.lto_|\.llvmbc|\.llvmcmd' "$section_table"; then
+        printf 'prefix_archive_symbols: LTO archives are not supported: %s\n' "$archive" >&2
+        return 1
+    fi
+
+    # POSIX nm output supplies both names and types. Keep every row until END because
+    # a weak/import companion can appear after the ordinary-looking symbol it protects.
+    nm -P -g "$archive" > "$symbol_table" || return 1
+    awk -v preserve="$preserve_regex" -v prefix="$symbol_prefix" '
+        function protect(symbol) { protected[symbol] = 1 }
+        NF >= 2 && length($2) == 1 {
+            symbol = $1
+            type = $2
+            symbols[++count] = symbol
+            types[count] = type
+            # Include both definitions and references when checking generated names.
+            existing[symbol] = 1
+
+            # MinGW represents weak aliases as .weak.foo. + foo, and imports as
+            # __imp_foo + foo. Renaming only one half would break linker semantics.
+            if (symbol ~ /^\.weak\./) {
+                protect(symbol)
+                sub(/^\.weak\./, "", symbol)
+                sub(/\.$/, "", symbol)
+                protect(symbol)
+            } else if (symbol ~ /^__imp_/) {
+                protect(symbol)
+                sub(/^__imp_/, "", symbol)
+                protect(symbol)
+            } else if (type != "U" && type !~ /^[BDGRST]$/) {
+                protect(symbol)
+            }
+        }
+        END {
+            # Emit mappings only after the complete protection set is known.
+            for (i = 1; i <= count; i++) {
+                symbol = symbols[i]
+                type = types[i]
+                # U entries get rewritten by objcopy only when a matching definition
+                # produced a mapping. Other non-strong types stay untouched.
+                if (type == "U" || symbol in protected || type !~ /^[BDGRST]$/) continue
+                if (symbol ~ preserve || index(symbol, prefix) == 1) continue
+                target = prefix symbol
+                # Do not let a generated name capture an existing definition/reference.
+                if (target in existing) {
+                    printf "prefix_archive_symbols: target symbol already exists: %s\n", \
+                        target > "/dev/stderr"
+                    collision = 1
+                    continue
+                }
+                print symbol, target
+            }
+            exit collision
+        }' "$symbol_table" |
+        sort -u > "$symbol_map" ||
+        return 1
+    [[ -s $symbol_map ]] || return 0
+    objcopy --redefine-syms="$symbol_map" "$archive"
+)
+
 # do_dlltool lib.a a.def
 do_dlltool() (
     if dlltool --help | grep -q llvm; then
