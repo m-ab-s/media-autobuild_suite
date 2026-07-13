@@ -2424,7 +2424,7 @@ fi
 _check=(lib{glslang,OSDependent}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { [[ $mpv != n ]] ||
-     { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang libshaderc vulkan; } } &&
+     { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang libshaderc; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
     do_uninstall libHLSL.a "${_check[@]}"
     sed -i "s|command_output(\['git', 'clone',|command_output(\['git', 'clone', '--filter=tree:0',|" ./update_glslang_sources.py
@@ -2628,7 +2628,6 @@ if [[ $ffmpeg != no ]]; then
                 's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
         fi
 
-        enabled vulkan && ! enabled_any libshaderc libglslang && do_addOption --enable-libglslang
         enabled_all libshaderc libglslang && do_removeOption --enable-libglslang
         enabled libshaderc && sed -ri 's/(require_pkg_config spirv_library "shaderc) >/\1_combined >/' configure
 
