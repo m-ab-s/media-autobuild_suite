@@ -143,7 +143,7 @@ set mpv_options_basic="-Dlua=luajit"
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build openal sdl2-gamepad sdl2-audio sdl2-video
 
-set iniOptions=arch targetPlatform license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
+set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mplayer2 mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc ^
 curl cyanrip2 rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool ^
@@ -200,36 +200,6 @@ if %buildEnv%==2 set "build32=yes" && set "build64=no"
 if %buildEnv%==3 set "build32=no" && set "build64=yes"
 if %buildEnv% GTR 3 GOTO selectSystem
 if %deleteINI%==1 echo.arch=^%buildEnv%>>%ini%
-
-:targetPlatform
-if [0]==[%targetPlatformINI%] (
-    if %build64%==yes (
-        echo -------------------------------------------------------------------------------
-        echo -------------------------------------------------------------------------------
-        echo.
-        echo. Choose CPU requirement for 64-bit binaries:
-        echo. 1 = x86-64, baseline x64 [maximum compatibility]
-        echo. 2 = x86-64-v2, SSE4.2/POPCNT-capable CPUs
-        echo. 3 = x86-64-v3, AVX/AVX2-capable CPUs [recommended]
-        echo. 4 = x86-64-v4, AVX-512-capable CPUs, limited compatibility
-        echo. 5 = native, optimize for this CPU, not portable
-        echo.
-        echo. For "both", this only affects 64-bit builds; 32-bit stays generic.
-        echo.
-        echo -------------------------------------------------------------------------------
-        echo -------------------------------------------------------------------------------
-        set /P buildTargetPlatform="64-bit CPU target: "
-    ) else set "buildTargetPlatform=1"
-) else set buildTargetPlatform=%targetPlatformINI%
-
-if "%buildTargetPlatform%"=="" GOTO targetPlatform
-if %buildTargetPlatform%==1 set "targetPlatform=x86-64"
-if %buildTargetPlatform%==2 set "targetPlatform=x86-64-v2"
-if %buildTargetPlatform%==3 set "targetPlatform=x86-64-v3"
-if %buildTargetPlatform%==4 set "targetPlatform=x86-64-v4"
-if %buildTargetPlatform%==5 set "targetPlatform=native"
-if %buildTargetPlatform% GTR 5 GOTO targetPlatform
-if %deleteINI%==1 echo.targetPlatform=^%buildTargetPlatform%>>%ini%
 
 :ffmpeglicense
 if [0]==[%license2INI%] (
@@ -2085,8 +2055,6 @@ if not exist %instdir%\%1\share (
 goto :EOF
 
 :writeProfile
-set "profileMarchFlag= -march=%targetPlatform%"
-if %1==32 set "profileMarchFlag="
 (
     echo.#!/usr/bin/bash
     if %1==32 (
@@ -2132,7 +2100,7 @@ if %1==32 set "profileMarchFlag="
     echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
     echo.
     echo.CFLAGS="-D_FORTIFY_SOURCE=2 -fstack-protector-strong" # security related flags
-    echo.CFLAGS+=" -mtune=generic -O2 -pipe%profileMarchFlag%" # performance related flags
+    echo.CFLAGS+=" -mtune=generic -O2 -pipe" # performance related flags
     echo.CFLAGS+=" -D__USE_MINGW_ANSI_STDIO=1" # mingw-w64 specific flags for c99 printf
     echo.CXXFLAGS="${CFLAGS}" # copy CFLAGS to CXXFLAGS
     echo.LDFLAGS="${CFLAGS} -static-libgcc" # copy CFLAGS to LDFLAGS
@@ -2153,10 +2121,6 @@ if %1==32 set "profileMarchFlag="
     echo.export DXSDK_DIR ACLOCAL_PATH PKG_CONFIG PKG_CONFIG_PATH CFLAGS CXXFLAGS LDFLAGS
     echo.
     echo.export CARGO_HOME="/opt/cargo"
-    echo.[[ ${MABS_ORIGINAL_RUSTFLAGS+x} ]] ^|^| MABS_ORIGINAL_RUSTFLAGS="$RUSTFLAGS"
-    echo.export RUSTFLAGS="$MABS_ORIGINAL_RUSTFLAGS"
-    if "%1"=="64" echo.export RUSTFLAGS="${RUSTFLAGS:+$RUSTFLAGS }-C target-cpu=%targetPlatform%"
-    echo.[[ $RUSTFLAGS ]] ^|^| unset RUSTFLAGS
     echo.if [[ -z "$CCACHE_DIR" ]]; then
     echo.    export CCACHE_DIR="${LOCALBUILDDIR}/cache"
     echo.fi
