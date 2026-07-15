@@ -1289,9 +1289,6 @@ _check=(libmpeghdec.a mpeghdec.pc mpeghdec/{mpeghexport,mpeghdecoder}.h)
 if [[ $ffmpeg != no ]] && enabled libmpeghdec &&
     do_vcs "$SOURCE_REPO_MPEGHDEC"; then
     do_uninstall include/mpeghdec "${_check[@]}"
-    # Avoid duplicate SHORT overloads with MinGW's LLP64 data model.(Upstream issue)
-    grep_or_sed '__x86_64__) && !defined(_WIN32)' src/libFDK/include/common_fix.h \
-        's;!defined\(_MSC_VER\) && defined\(__x86_64__\);& \&\& !defined(_WIN32);'
     if [[ $standalone = y ]]; then
         extracommands=(-Dmpeghdec_BUILD_BINARIES=ON -Dmpeghdec_BUILD_UIMANAGER=ON)
     else
