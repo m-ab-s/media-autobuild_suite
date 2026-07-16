@@ -104,7 +104,6 @@ SOURCE_REPO_SOX=https://git.code.sf.net/p/sox/code
 SOURCE_REPO_SPEEX=https://github.com/xiph/speex.git
 SOURCE_REPO_SPIRV_CROSS=https://github.com/KhronosGroup/SPIRV-Cross.git
 SOURCE_REPO_SPIRV_HEADERS=https://github.com/KhronosGroup/SPIRV-Headers.git
-SOURCE_REPO_SPIRV_TOOLS=https://github.com/KhronosGroup/SPIRV-Tools.git
 SOURCE_REPO_SRT=https://github.com/Haivision/srt.git
 SOURCE_REPO_SVTAV1=https://gitlab.com/AOMediaCodec/SVT-AV1.git
 SOURCE_REPO_SVTHEVC=https://github.com/OpenVisualCloud/SVT-HEVC.git

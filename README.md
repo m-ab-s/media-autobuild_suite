@@ -97,7 +97,6 @@ For information about the compiler environment see the wiki, there you also have
         - libdavs2 (git)
         - libflite (git)
         - libfribidi (git)
-        - libglslang (git)
         - libgme (git)
         - libilbc (git)
         - libjxl (git)

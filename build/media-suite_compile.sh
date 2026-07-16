@@ -2416,15 +2416,14 @@ if { [[ $mpv != n ]] ||
     do_vcs "$SOURCE_REPO_SPIRV_CROSS"; then
     do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
-    sed -i 's/0.13.0/0.48.0/' meson.build
     do_mesoninstall
     do_checkIfExist
 fi
 
-_check=(lib{glslang,OSDependent}.a
+_check=(bin/glslangValidator.exe lib{glslang,OSDependent}.a
         libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
 if { [[ $mpv != n ]] ||
-     { [[ $ffmpeg != no ]] && enabled_any libplacebo libglslang libshaderc; } } &&
+     { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } } &&
     do_vcs "$SOURCE_REPO_GLSLANG"; then
     do_uninstall libHLSL.a "${_check[@]}"
     sed -i "s|command_output(\['git', 'clone',|command_output(\['git', 'clone', '--filter=tree:0',|" ./update_glslang_sources.py
@@ -2435,7 +2434,7 @@ fi
 
 _check=(shaderc/shaderc.h libshaderc_combined.a)
 if { [[ $mpv != n ]] ||
-     { [[ $ffmpeg != no ]] && enabled_any libplacebo libshaderc; } } ||
+     { [[ $ffmpeg != no ]] && enabled libplacebo; } } ||
      ! mpv_disabled shaderc &&
     do_vcs "$SOURCE_REPO_SHADERC"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
@@ -2627,9 +2626,6 @@ if [[ $ffmpeg != no ]]; then
             grep_and_sed '__declspec(__dllimport__)' "$MINGW_PREFIX"/include/gmp.h \
                 's|__declspec\(__dllimport__\)||g' "$MINGW_PREFIX"/include/gmp.h
         fi
-
-        enabled_all libshaderc libglslang && do_removeOption --enable-libglslang
-        enabled libshaderc && sed -ri 's/(require_pkg_config spirv_library "shaderc) >/\1_combined >/' configure
 
         _patches=$(git rev-list $ff_base_commit.. --count)
         if [[ $_patches -gt 0 ]]; then
