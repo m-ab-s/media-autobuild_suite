@@ -2461,6 +2461,17 @@ grep_and_sed() {
         sed -Ei -- "$sed_re" "${sed_files[@]}"
 }
 
+do_cmake_targets_error_to_warning() {
+    local targetsfile
+    if [[ "$1" == *".cmake" ]]; then
+        targetsfile="$MINGW_PREFIX/lib/cmake/$1"
+    else
+        targetsfile="$MINGW_PREFIX/lib/cmake/$1/$1Targets.cmake"
+    fi
+    sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' \
+        "${targetsfile}"
+}
+
 fix_cmake_crap_exports() {
     local _dir="$1"
     # noop if passed directory is not valid

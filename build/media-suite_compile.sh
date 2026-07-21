@@ -288,8 +288,7 @@ else
             do_cmakeinstall global -DZLIB_COMPAT=ON -DWITH_GTEST=OFF -DZLIB_ENABLE_TESTS=OFF
             if [[ $standalone = y ]] &&
                 do_vcs "$SOURCE_REPO_MINIZIPNG"; then
-                # demote fail to a warning
-                sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' "$MINGW_PREFIX"/lib/cmake/zstd/zstdTargets.cmake
+                do_cmake_targets_error_to_warning zstd
                 do_cmakeinstall global -DMZ_BUILD_TESTS=ON
             fi
             do_checkIfExist
@@ -694,8 +693,7 @@ if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
         else
             extracommands+=("-Dtiff-tools=OFF")
         fi
-        sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' \
-        "$MINGW_PREFIX"/lib/cmake/libjpeg-turbo/libjpeg-turboTargets.cmake
+        do_cmake_targets_error_to_warning libjpeg-turbo
         sed -ri 's/libjpeg-turbo::(|turbo)jpeg/&-static/' cmake/JPEGCodec.cmake
         grep_or_sed 'Requires.private' libtiff-4.pc.in \
             '/Libs:/ a\Requires.private: libjpeg liblzma zlib libzstd glut'
@@ -1759,8 +1757,7 @@ if [[ $mediainfo = y ]]; then
     fi
     fix_cmake_crap_exports "$LOCALDESTDIR/lib/cmake/zenlib"
 
-    sed -i 's;message(FATAL_ERROR "The imported target;message(WARNING "The imported target;' \
-        "$MINGW_PREFIX"/lib/cmake/CURL/CURLTargets.cmake
+    do_cmake_targets_error_to_warning CURL
     _check=(libmediainfo.{a,pc})
     _deps=(lib{zen,curl}.a)
     if do_vcs "$SOURCE_REPO_LIBMEDIAINFO" libmediainfo; then
