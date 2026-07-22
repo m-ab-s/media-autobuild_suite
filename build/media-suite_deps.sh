@@ -38,6 +38,7 @@ SOURCE_REPO_HARFBUZZ=https://github.com/harfbuzz/harfbuzz.git
 SOURCE_REPO_HDR10PLUS_TOOL=https://github.com/quietvoid/hdr10plus_tool.git
 SOURCE_REPO_JO=https://github.com/jpmens/jo.git
 SOURCE_REPO_JQ=https://github.com/jqlang/jq.git
+SOURCE_REPO_LCMS2=https://github.com/mm2/Little-CMS.git
 SOURCE_REPO_LENSFUN=https://github.com/lensfun/lensfun.git
 SOURCE_REPO_LEPT=https://github.com/DanBloomberg/leptonica.git
 SOURCE_REPO_LIBAACS=https://code.videolan.org/videolan/libaacs.git
