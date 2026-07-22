@@ -444,6 +444,7 @@ fi
 
 if [[ $mplayer = y || $mpv = y ]] ||
     { [[ $ffmpeg != no ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
+    do_pacman_remove python-rst2pdf
     do_pacman_remove freetype fontconfig harfbuzz fribidi
 
     _check=(libfreetype.a freetype2.pc)
@@ -730,6 +731,24 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
     fi
 fi
 
+if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; } } ||
+    ! mpv_disabled lcms2; then
+    do_pacman_remove python-rst2pdf lcms2
+    do_pacman_install libjpeg-turbo
+    _check=(liblcms2{,_fast_float}.a lcms2.pc)
+    [[ $standalone = y ]] && _check+=(bin-global/{jpg,link,ps,trans}icc.exe)
+    [[ $standalone = y ]] && pc_exists libtiff-4 && _check+=(bin-global/tificc.exe)
+    if do_vcs "$SOURCE_REPO_LCMS2"; then
+        do_uninstall include/lcms2{,_fast_float,_plugin}.h "${_check[@]}"
+        extracommands=(-Dtiff=disabled)
+        pc_exists libtiff-4 && extracommands=(-Dtiff=enabled)
+        [[ $standalone = y ]] && extracommands+=(-Dutils=true)
+        LDFLAGS+=" $([[ ${extracommands[@]} = *Dtiff=enabled* ]] && echo "$($PKG_CONFIG --libs libtiff-4)")" \
+            do_mesoninstall global -Djpeg=enabled -Dfastfloat=true "${extracommands[@]}"
+        do_checkIfExist
+    fi
+fi
+
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
     _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
     if do_vcs "$SOURCE_REPO_GFLAGS"; then
@@ -740,8 +759,8 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         do_checkIfExist
     fi
 
-    do_pacman_install brotli lcms2
-    _deps=(libgflags.a)
+    do_pacman_install brotli
+    _deps=(libgflags.a liblcms2.a)
     _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
@@ -822,7 +841,7 @@ if { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
 fi
 
 if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
-    do_pacman_remove tesseract-ocr
+    do_pacman_remove python-rst2pdf tesseract-ocr
     _check=(libleptonica.{,l}a lept.pc)
     if do_vcs "$SOURCE_REPO_LEPT"; then
         do_uninstall include/leptonica "${_check[@]}"
@@ -1504,6 +1523,7 @@ elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
 fi
 
 if [[ $libavif = y ]]; then
+    do_pacman_remove python-rst2pdf
     do_pacman_install libjpeg-turbo libyuv
     _check=(libavif.{a,pc} avif/avif.h)
     [[ $standalone = y ]] && _check+=(bin-video/avif{enc,dec}.exe)
@@ -2481,6 +2501,7 @@ if enabled libcdio || mpv_enabled cdda; then
 fi
 
 if [[ $ffmpeg != no ]]; then
+    do_pacman_remove python-rst2pdf
     do_pacman_install -m texinfo
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy
@@ -2734,6 +2755,7 @@ _check=(bin-video/heif-{dec,enc,info,thumbnailer}.exe)
 if [[ $libheif != n ]] &&
     do_vcs "$SOURCE_REPO_LIBHEIF"; then
     do_uninstall bin-video/heif-view.exe "${_check[@]}"
+    do_pacman_remove python-rst2pdf
 
     do_pacman_install libjpeg-turbo
     pc_exists "libpng" || do_pacman_install libpng
@@ -2937,7 +2959,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     do_pacman_remove uchardet-git
     ! mpv_disabled uchardet && do_pacman_install uchardet
     ! mpv_disabled libarchive && do_pacman_install libarchive
-    ! mpv_disabled lcms2 && do_pacman_install lcms2
 
     do_pacman_remove angleproject-git
     _check=(EGL/egl.h)
@@ -3026,6 +3047,10 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         create_winpty_exe mpv "$LOCALDESTDIR"/bin-video/ "export _started_from_console=yes"
         do_checkIfExist
     fi
+
+    # python-rst2pdf adds libtiff, libwebp, lcms2, and many other libraries when installed
+    # Uninstall as to not accidentally link the bundled package libraries when re-running the suite
+    do_pacman_remove python-rst2pdf
 fi
 
 if [[ $bmx = y ]]; then

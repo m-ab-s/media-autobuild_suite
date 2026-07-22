@@ -170,7 +170,7 @@ For information about the compiler environment see the wiki, there you also have
         - Base build (ffmpegChoice=2 or 3)
             - ANGLE Headers (git)
                 - requires ANGLE shared libraries from somewhere else (i.e. Chrome, Firefox) for gpu-context=angle support
-            - lcms2 (mingw-w64)
+            - lcms2 (git)
             - libass (git)
             - libbluray (git)
                 - BD-J support requires installation of Java JDK
