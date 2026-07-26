@@ -1774,8 +1774,8 @@ if not exist %instdir%\mintty.lnk (
     echo -------------------------------------------------------------------------------
     call :runBash firstrun.log exit
 
-    sed -i "s/#Color/Color/;s/^^IgnorePkg.*/#&/" %instdir%\msys64\etc\pacman.conf
-    if defined CI sed -i "s/^^#NoProgressBar/NoProgressBar/" %instdir%\msys64\etc\pacman.conf
+    sed -i "s/#Color/Color/;s/^IgnorePkg.*/#&/" %instdir%\msys64\etc\pacman.conf
+    if defined CI sed -i "s/#NoProgressBar/NoProgressBar/" %instdir%\msys64\etc\pacman.conf
 
     echo.-------------------------------------------------------------------------------
     echo.first update
