@@ -4,6 +4,7 @@
 SOURCE_REPO_AMF=https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
 SOURCE_REPO_ANGLE=https://chromium.googlesource.com/angle/angle
 SOURCE_REPO_ARRIB24=https://github.com/nkoriyama/aribb24.git
+SOURCE_REPO_ARIBCAPTION=https://github.com/xqq/libaribcaption.git
 SOURCE_REPO_AUDIOTOOLBOX=https://github.com/cynagenautes/AudioToolboxWrapper.git
 SOURCE_REPO_AV1AN=https://github.com/rust-av/Av1an.git
 SOURCE_REPO_AVISYNTH=https://github.com/AviSynth/AviSynthPlus.git
