@@ -90,6 +90,7 @@ For information about the compiler environment see the wiki, there you also have
         - frei0r (git)
         - ladspa (mingw-w64)
         - libaribb24 (git)
+        - libaribcaption (git)
         - libbs2b (3.1.0)
         - libcaca (mingw-w64)
         - libcdio (mingw-w64)

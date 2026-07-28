@@ -418,6 +418,14 @@ fi
 # Probably caused by https://gitlab.gnome.org/GNOME/libxml2/-/commit/93e8bb2a402012858500b608b4146cd5c756e34d
 grep_or_sed Requires.private "$LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc" 's/Requires:/Requires.private:/'
 
+_check=(aribcaption/aribcaption.h libaribcaption.{a,pc})
+if [[ $ffmpeg != no ]] && enabled libaribcaption &&
+    do_vcs "$SOURCE_REPO_ARIBCAPTION"; then
+    do_uninstall include/aribcaption lib/cmake/aribcaption "${_check[@]}"
+    do_cmakeinstall -DARIBCC_SHARED_LIBRARY=OFF -DARIBCC_BUILD_TESTS=OFF
+    do_checkIfExist
+fi
+
 if [[ $ffmpeg != no ]] && enabled libaribb24; then
     _deps=("$zlib_dir"/lib/libz.a)
     _check=(libpng.{pc,{,l}a} libpng16.{pc,{,l}a} libpng16/png.h)
