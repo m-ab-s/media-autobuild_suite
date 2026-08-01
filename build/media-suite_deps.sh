@@ -66,6 +66,7 @@ SOURCE_REPO_LIBOGG=https://github.com/xiph/ogg.git
 SOURCE_REPO_LIBOPENMPT=https://github.com/OpenMPT/openmpt.git#branch=OpenMPT-1.30
 SOURCE_REPO_LIBOPUSENC=https://github.com/xiph/libopusenc.git
 SOURCE_REPO_LIBPLACEBO=https://code.videolan.org/videolan/libplacebo.git
+SOURCE_REPO_LIBQRENCODE=https://github.com/fukuchi/libqrencode.git
 SOURCE_REPO_LIBPNG=https://github.com/pnggroup/libpng.git#branch=libpng16
 SOURCE_REPO_LIBRAV1E=https://github.com/xiph/rav1e.git
 SOURCE_REPO_LIBRESSL=https://github.com/libressl-portable/portable.git#tag=LATEST
@@ -95,6 +96,7 @@ SOURCE_REPO_OPENCLHEADERS=https://github.com/KhronosGroup/OpenCL-Headers.git
 SOURCE_REPO_OPUS=https://github.com/xiph/opus.git
 SOURCE_REPO_OPUSEXE=https://github.com/xiph/opus-tools.git
 SOURCE_REPO_OPUSFILE=https://github.com/xiph/opusfile.git
+SOURCE_REPO_QUIRC=https://github.com/dlbeer/quirc.git
 SOURCE_REPO_RIPGREP=https://github.com/BurntSushi/ripgrep.git
 SOURCE_REPO_RUBBERBAND=https://github.com/m-ab-s/rubberband.git
 SOURCE_REPO_SDL2=https://github.com/libsdl-org/SDL.git#SDL2
