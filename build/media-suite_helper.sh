@@ -1826,6 +1826,10 @@ do_pacman_remove() (
 )
 
 do_prompt() {
+    if [[ -n ${CI:-} ]]; then
+        ret=
+        return 0
+    fi
     # from http://superuser.com/a/608509
     while read -r -s -e -t 0.1; do :; done
     read -r -p "$1" ret
