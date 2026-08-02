@@ -860,7 +860,7 @@ if %buildffmpeg%==6 set "ffmpeg=bothstatic"
 if %buildffmpeg% GTR 6 GOTO ffmpeg
 if %deleteINI%==1 echo.ffmpegB2=^%buildffmpeg%>>%ini%
 
-set defaultFFmpegPath=https://git.ffmpeg.org/ffmpeg.git
+set defaultFFmpegPath=https://code.ffmpeg.org/FFmpeg/FFmpeg.git
 
 :ffmpegPath
 if [0]==[%ffmpegPathINI%] (
@@ -868,7 +868,7 @@ if [0]==[%ffmpegPathINI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Using default ffmpeg source path: https://git.ffmpeg.org/ffmpeg.git
+    echo. Using default ffmpeg source path: %defaultFFmpegPath%
     echo.
     echo. If you want to use a custom source repository, add a line like this 
     echo. to media-autobuild_suite.ini:
