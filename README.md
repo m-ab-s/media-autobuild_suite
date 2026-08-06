@@ -120,7 +120,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R70)
+        - vapoursynth (R78)
         - vulkan (git)
 
 - other tools
@@ -181,7 +181,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git snapshot)
             - uchardet (mingw-w64)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R70)
+            - vapoursynth (R78)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw-w64)
@@ -240,8 +240,8 @@ For information about the compiler environment see the wiki, there you also have
 This tool is inspired by the very nice, linux cross-compiling tool from Roger Pack (rdp):
 <https://github.com/rdp/ffmpeg-windows-build-helpers>
 
-It is based on msys2 and tested under Windows 8.1, 10 and 11.
-<http://sourceforge.net/projects/msys2/>
+It is based on msys2 and tested under Windows 10 and 11.
+<https://www.msys2.org/>
 
 I use some jscript parts from nu774:
 <https://github.com/nu774/fdkaac_autobuild>
