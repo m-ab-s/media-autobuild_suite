@@ -2197,69 +2197,35 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    do_pacman_install tools
-    _python_ver=3.14.3
-    _python_lib=python314
-    _vsver=73
+    do_uninstall libpython314.a lib{vapoursynth,vsscript}.a \
+        {vapoursynth,vsscript}.lib vapoursynth-script.pc
+    _vsver=78
     _vspyver=312
-    _check=("lib$_python_lib.a")
-    if files_exist "${_check[@]}"; then
-        do_print_status "python $_python_ver" "$green" "Up-to-date"
-    elif do_wget "https://www.python.org/ftp/python/$_python_ver/python-$_python_ver-embed-amd64.zip"; then
-        gendef "$_python_lib.dll" >/dev/null 2>&1
-        do_dlltool "lib$_python_lib.a" "$_python_lib.def"
-        [[ -f lib$_python_lib.a ]] && do_install "lib$_python_lib.a"
-        do_checkIfExist
-    fi
 
-    _check=(lib{vapoursynth,vsscript}.a vapoursynth{,-script}.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
+    _check=(vapoursynth.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
-    elif do_wget "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth${bits%bit}-Portable-R$_vsver.zip"; then
-        do_uninstall {vapoursynth,vsscript}.lib include/vapoursynth "${_check[@]}"
-        do_install sdk/include/vapoursynth/*.h include/vapoursynth/
+    elif do_wget -n -c "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth64-Portable-R$_vsver.zip"; then
+        # Archive uses backslashes, which 7z cannot deal with, so use unzip instead of 7z
+        log -e "unzip" unzip -o "VapourSynth64-Portable-R$_vsver.zip" -d "VapourSynth64-Portable-R$_vsver"
+        cd_safe "VapourSynth64-Portable-R$_vsver"
+        do_uninstall include/vapoursynth "${_check[@]}"
 
-        # Extract the .dll from the pip wheel
+        # FFmpeg and mpv load VSScript at runtime and only need build metadata here.
         log "7z" 7z e -y -aoa wheel/vapoursynth-$_vsver-cp$_vspyver-abi3-win_amd64.whl \
-            vapoursynth-$_vsver.data/data/Lib/site-packages/vapoursynth.dll
-
-        create_build_dir
-        declare -A _pc_vars=(
-            [vapoursynth-name]=vapoursynth
-            [vapoursynth-description]='A frameserver for the 21st century'
-            [vapoursynth-cflags]="-DVS_CORE_EXPORTS"
-
-            [vsscript-name]=vapoursynth-script
-            [vsscript-description]='Library for interfacing VapourSynth with Python'
-            [vsscript-private]="-l$_python_lib"
-        )
-        for _file in vapoursynth vsscript; do
-            gendef - "../$_file.dll" 2>/dev/null |
-                sed -E 's|^_||;s|@[1-9]+$||' > "${_file}.def"
-            do_dlltool "lib${_file}.a" "${_file}.def"
-            [[ -f lib${_file}.a ]] && do_install "lib${_file}.a"
-            # shellcheck disable=SC2016
-            printf '%s\n' \
-               "prefix=$LOCALDESTDIR" \
-               'exec_prefix=${prefix}' \
-               'libdir=${exec_prefix}/lib' \
-               'includedir=${prefix}/include/vapoursynth' \
-               "Name: ${_pc_vars[${_file}-name]}" \
-               "Description: ${_pc_vars[${_file}-description]}" \
-               "Version: $_vsver" \
-               "Libs: -L\${libdir} -l${_file}" \
-               "Libs.private: ${_pc_vars[${_file}-private]}" \
-               "Cflags: -I\${includedir} ${_pc_vars[${_file}-cflags]}" \
-               > "${_pc_vars[${_file}-name]}.pc"
-        done
-
-        do_install vapoursynth{,-script}.pc lib/pkgconfig/
+            'vapoursynth/include/*.h' vapoursynth/pkgconfig/vapoursynth.pc
+        do_install VSConstants4.h VSHelper4.h VSScript4.h VapourSynth4.h include/vapoursynth/
+        sed -i \
+            -e 's|^prefix=.*|prefix=${pcfiledir}/../..|' \
+            -e 's|^includedir=.*|includedir=${prefix}/include/vapoursynth|' \
+            vapoursynth.pc
+        do_install vapoursynth.pc lib/pkgconfig/
         do_checkIfExist
     fi
-    unset _file _python_lib _python_ver _vsver _pc_vars
+    unset _vspyver _vsver
     return 0
 }
-if ! { { ! mpv_disabled vapoursynth || enabled vapoursynth || [[ $av1an = y ]]; } && _vapoursynth_install; }; then
+if ! { { ! mpv_disabled vapoursynth || enabled vapoursynth; } && _vapoursynth_install; }; then
     mpv_disable vapoursynth
     do_removeOption --enable-vapoursynth
 fi
@@ -2274,7 +2240,7 @@ if [[ $av1an = y ]]; then
     _check=(bin-video/av1an.exe)
     if do_vcs "$SOURCE_REPO_AV1AN"; then
         do_uninstall "${_check[@]}"
-        VAPOURSYNTH_LIB_DIR="$LOCALDESTDIR/lib" do_rust
+        do_rust
         do_install "target/$CARCH-pc-windows-gnu$rust_target_suffix/release/av1an.exe" bin-video/
         do_checkIfExist
     fi
@@ -2584,10 +2550,10 @@ if [[ $ffmpeg != no ]]; then
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
     enabled ladspa && do_pacman_install ladspa-sdk
-    if enabled vapoursynth && pc_exists "vapoursynth-script"; then
-        _ver=$($PKG_CONFIG --modversion vapoursynth-script)
+    if enabled vapoursynth && pc_exists "vapoursynth"; then
+        _ver=$($PKG_CONFIG --modversion vapoursynth)
         do_simple_print "${green}Compiling FFmpeg with Vapoursynth R${_ver}${reset}"
-        do_simple_print "${orange}FFmpeg will need vapoursynth.dll and vsscript.dll to run using vapoursynth demuxers"'!'"${reset}"
+        do_simple_print "${orange}FFmpeg will need libvapoursynth.dll and vsscript.dll to run using vapoursynth demuxers"'!'"${reset}"
         unset _ver
     fi
     disabled autodetect && enabled iconv && do_addOption --extra-libs=-liconv
@@ -2986,10 +2952,10 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         mpv_disable egl-angle
     fi
 
-    if ! mpv_disabled vapoursynth && pc_exists "vapoursynth-script"; then
-        _ver=$($PKG_CONFIG --modversion vapoursynth-script)
+    if ! mpv_disabled vapoursynth && pc_exists "vapoursynth"; then
+        _ver=$($PKG_CONFIG --modversion vapoursynth)
         do_simple_print "${green}Compiling mpv with Vapoursynth R${_ver}${reset}"
-        do_simple_print "${orange}mpv will need vapoursynth.dll and vsscript.dll to use vapoursynth filter"'!'"${reset}"
+        do_simple_print "${orange}mpv will need libvapoursynth.dll and vsscript.dll to use vapoursynth filter"'!'"${reset}"
         unset _ver
     fi
 
@@ -3024,7 +2990,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 
     _check=(libmpv.a mpv.pc)
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
-    _deps=(lib{ass,avcodec,vapoursynth,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
+    _deps=(lib{ass,avcodec,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
         do_patch "https://github.com/mpv-player/mpv/compare/master...1480c1:mpv:initguid.patch" am
         do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
@@ -3045,11 +3011,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         # We don't have that lib, but mpv specifically checks that lib *only*, and it's required for d3d11 support.
         # So d3d11 support never got built, but the "non c-shared" lib actually works.
         sed -i "s|spirv-cross-c-shared|spirv-cross|" meson.build
-
-        # Fix clang vsscript.dll hard requirement, imitate shinchiro's cmake.
-        [[ $CC =~ clang ]] && \
-            grep_or_sed "-Wl,-delayload=vsscript.dll" "$LOCALDESTDIR"/lib/pkgconfig/vapoursynth-script.pc \
-                "s|-lvsscript|-lvsscript -Wl,-delayload=vsscript.dll|"
 
         mapfile -t MPV_ARGS < <(mpv_build_args)
         CFLAGS+=" ${mpv_cflags[*]}" LDFLAGS+=" ${mpv_ldflags[*]}" \
