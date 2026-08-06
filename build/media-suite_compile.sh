@@ -1454,11 +1454,9 @@ _check=(libaom.a aom.pc)
 [[ $aom = y || $standalone = y || $av1an = y ]] && _check+=(bin-video/aom{dec,enc}.exe)
 if { [[ $aom = y ]] || [[ $libavif = y ]] || { [[ $ffmpeg != no ]] && enabled libaom; }; } &&
     do_vcs "$SOURCE_REPO_LIBAOM"; then
-    do_pacman_install yasm
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/aom/0001-CMake-Add-ENABLE_EXTRA_EXAMPLES.patch" am
-    extracommands=("-DENABLE_EXTRA_EXAMPLES=off")
+    extracommands=("-DENABLE_EXAMPLES=off")
     if [[ $aom != y ]] && [[ $standalone != y ]] && [[ $av1an != y ]]; then
-        extracommands+=("-DENABLE_EXAMPLES=off")
+        extracommands+=("-DENABLE_APPS=off")
     fi
     do_uninstall include/aom "${_check[@]}"
     get_external_opts extracommands
