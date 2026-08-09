@@ -3,7 +3,7 @@
 # Dependency References
 SOURCE_REPO_AMF=https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
 SOURCE_REPO_ANGLE=https://chromium.googlesource.com/angle/angle
-SOURCE_REPO_ARRIB24=https://github.com/nkoriyama/aribb24.git
+SOURCE_REPO_ARIBB24=https://github.com/nkoriyama/aribb24.git
 SOURCE_REPO_ARIBCAPTION=https://github.com/xqq/libaribcaption.git
 SOURCE_REPO_AUDIOTOOLBOX=https://github.com/cynagenautes/AudioToolboxWrapper.git
 SOURCE_REPO_AV1AN=https://github.com/rust-av/Av1an.git
@@ -52,6 +52,7 @@ SOURCE_REPO_LIBDE265=https://github.com/strukturag/libde265.git
 SOURCE_REPO_LIBDVDNAV=https://code.videolan.org/videolan/libdvdnav.git
 SOURCE_REPO_LIBDVDREAD=https://code.videolan.org/videolan/libdvdread.git
 SOURCE_REPO_LIBGLUT=https://github.com/dcnieho/FreeGLUT.git
+SOURCE_REPO_LIBGME=https://github.com/libgme/game-music-emu.git
 SOURCE_REPO_LIBHEIF=https://github.com/strukturag/libheif.git
 SOURCE_REPO_LIBILBC=https://github.com/TimothyGu/libilbc.git
 SOURCE_REPO_LIBJXL=https://github.com/libjxl/libjxl.git
@@ -136,4 +137,3 @@ SOURCE_REPO_ZLIBCLOUDFLARE=https://github.com/cloudflare/zlib.git
 SOURCE_REPO_ZLIBNG=https://github.com/zlib-ng/zlib-ng.git
 SOURCE_REPO_ZLIBRS=https://github.com/trifectatechfoundation/zlib-rs.git
 SOURCE_REPO_ZVBI=https://github.com/zapping-vbi/zvbi.git
-SOURCE_REPO_LIBGME=https://github.com/libgme/game-music-emu.git

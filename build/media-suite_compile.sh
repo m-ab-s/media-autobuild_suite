@@ -438,7 +438,7 @@ if [[ $ffmpeg != no ]] && enabled libaribb24; then
 
     _deps=(libpng.{pc,a} libpng16.{pc,a})
     _check=(aribb24.pc libaribb24.{,l}a)
-    if do_vcs "$SOURCE_REPO_ARRIB24"; then
+    if do_vcs "$SOURCE_REPO_ARIBB24"; then
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/12.patch"
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/13.patch"
         do_patch "https://raw.githubusercontent.com/BtbN/FFmpeg-Builds/master/patches/aribb24/17.patch"
