@@ -552,7 +552,7 @@ do_pack() {
     local cmd=(/opt/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
-    [[ $bits == 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mplayer|mpv"
+    [[ $bits == 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mpv"
     for file; do
         if [[ $file =~ \.($exts)$ && ! $file =~ ($nopack)\.exe$ ]]; then
             do_print_progress Packing with UPX

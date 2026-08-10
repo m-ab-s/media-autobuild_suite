@@ -144,9 +144,9 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build openal sdl2-gamepad sdl2-audio sdl2-video
 
 set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
-soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mplayer2 mpv ^
-cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ffmbc ^
-curl cyanrip2 rav1e ripgrep dav1d libavif libheif vvc uvg266 jq dssim gifski avs2 dovitool ^
+soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mpv ^
+cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ^
+curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski avs2 dovitool ^
 hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ^
 zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
@@ -577,26 +577,6 @@ if %buildxvc%==2 set "xvc=n"
 if %buildxvc% GTR 2 GOTO xvc
 if %deleteINI%==1 echo.xvc=^%buildxvc%>>%ini%
 
-:vvc
-if [0]==[%vvcINI%] (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Build VVC Reference Software? [H.265 successor enc/decoder]
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildvvc="Build vvc: "
-) else set buildvvc=%vvcINI%
-
-if "%buildvvc%"=="" GOTO vvc
-if %buildvvc%==1 set "vvc=y"
-if %buildvvc%==2 set "vvc=n"
-if %buildvvc% GTR 2 GOTO vvc
-if %deleteINI%==1 echo.vvc=^%buildvvc%>>%ini%
-
 :uvg266
 if [0]==[%uvg266INI%] (
     echo -------------------------------------------------------------------------------
@@ -748,7 +728,7 @@ if [0]==[%faacINI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build FAAC library and binary? [old, low-quality and nonfree AAC-LC codec]
+    echo. Build FAAC binary? [old, low-quality AAC-LC and HE-AAC v1 encoder]
     echo. 1 = Yes
     echo. 2 = No
     echo.
@@ -1059,32 +1039,6 @@ if %buildrtmpdump%==2 set "rtmpdump=n"
 if %buildrtmpdump% GTR 2 GOTO rtmpdump
 if %deleteINI%==1 echo.rtmpdump=^%buildrtmpdump%>>%ini%
 
-:mplayer
-if [0]==[%mplayer2INI%] (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. #################### UNSUPPORTED, IF IT BREAKS, IT BREAKS ####################
-    echo.
-    echo. Build static mplayer/mencoder binary?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo. Don't bother opening issues about this if it breaks, I don't fucking care
-    echo. about ancient unmaintained shit code. One more issue open about this that
-    echo. isn't the suite's fault and mplayer goes fucking out.
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildmplayer="Build mplayer: "
-) else set buildmplayer=%mplayer2INI%
-
-if "%buildmplayer%"=="" GOTO mplayer
-if %buildmplayer%==1 set "mplayer=y"
-if %buildmplayer%==2 set "mplayer=n"
-if %buildmplayer% GTR 2 GOTO mplayer
-if %deleteINI%==1 echo.mplayer2=^%buildmplayer%>>%ini%
-
 :mpv
 if [0]==[%mpvINI%] (
     echo -------------------------------------------------------------------------------
@@ -1185,33 +1139,6 @@ if %buildcurl%==6 set "curl=libressl"
 if %buildcurl%==7 set "curl=mbedtls"
 if %buildcurl% GTR 7 GOTO curl
 if %deleteINI%==1 echo.curl=^%buildcurl%>>%ini%
-
-:ffmbc
-if [0]==[%ffmbcINI%] (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. #################### UNSUPPORTED, IF IT BREAKS, IT BREAKS ####################
-    echo.
-    echo. Build FFMedia Broadcast binary?
-    echo. 1 = Yes
-    echo. 2 = No
-    echo.
-    echo. Note: this is a fork of FFmpeg 0.10. As such, it's very likely to fail
-    echo. to build, work, might burn your computer, kill your children, like mplayer.
-    echo. Only enable it if you absolutely need it. If it breaks, complain first to
-    echo. the author in #ffmbc in Freenode IRC.
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildffmbc="Build ffmbc: "
-) else set buildffmbc=%ffmbcINI%
-
-if "%buildffmbc%"=="" GOTO ffmbc
-if %buildffmbc%==1 set "ffmbc=y"
-if %buildffmbc%==2 set "ffmbc=n"
-if %buildffmbc% GTR 2 GOTO ffmbc
-if %deleteINI%==1 echo.ffmbc=^%buildffmbc%>>%ini%
 
 :cyanrip
 if [0]==[%cyanrip2INI%] (
@@ -2002,11 +1929,11 @@ endlocal & (
 set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
---ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% --mplayer=%mplayer% ^
+--ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
---ffmbc=%ffmbc% --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
---vvc=%vvc% --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
+--curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
+--uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
 --xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% --zlib=%zlib% ^

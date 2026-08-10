@@ -183,7 +183,6 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         dav1d
         davs2
         dovi_tool
-        ffmbc
         ffmpeg (for static and both)
         ffmpegSHARED/ffmpeg (for shared only)
         ffmsindex
@@ -201,9 +200,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         libharfbuzz-subset-0.dll
         mediainfo
         MP4Box
-        mencoder
         movdump
-        mplayer
         mpv
         MXFDump
         mxf2raw
@@ -221,9 +218,6 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         vvdecapp
         vvencapp
         vvencFFapp
-        vvc
-            EncoderApp
-            DecoderApp
         vpxenc
         x264
         x265

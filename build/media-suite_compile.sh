@@ -38,7 +38,6 @@ while true; do
     --ffmpegPath=* ) ffmpegPath="${1#*=}"; shift ;;
     --ffmpegChoice=* ) ffmpegChoice=${1#*=} && shift ;;
     --ffmpegKeepLegacyOpts=* ) ffmpegKeepLegacyOpts=${1#*=} && shift ;;
-    --mplayer=* ) mplayer=${1#*=} && shift ;;
     --mpv=* ) mpv=${1#*=} && shift ;;
     --deleteSource=* ) deleteSource=${1#*=} && shift ;;
     --license=* ) license=${1#*=} && shift ;;
@@ -50,7 +49,6 @@ while true; do
     --aom=* ) aom=${1#*=} && shift ;;
     --faac=* ) faac=${1#*=} && shift ;;
     --exhale=* ) exhale=${1#*=} && shift ;;
-    --ffmbc=* ) ffmbc=${1#*=} && shift ;;
     --curl=* ) curl=${1#*=} && shift ;;
     --cyanrip=* ) cyanrip=${1#*=} && shift ;;
     --ripgrep=* ) ripgrep=${1#*=} && shift ;;
@@ -60,7 +58,6 @@ while true; do
     --libheif=* ) libheif=${1#*=} && shift ;;
     --jpegxl=* ) jpegxl=${1#*=} && shift ;;
     --av1an=* ) av1an=${1#*=} && shift ;;
-    --vvc=* ) vvc=${1#*=} && shift ;;
     --uvg266=* ) uvg266=${1#*=} && shift ;;
     --vvenc=* ) vvenc=${1#*=} && shift ;;
     --vvdec=* ) vvdec=${1#*=} && shift ;;
@@ -449,7 +446,7 @@ if [[ $ffmpeg != no ]] && enabled libaribb24; then
     fi
 fi
 
-if [[ $mplayer = y || $mpv = y ]] ||
+if [[ $mpv = y ]] ||
     { [[ $ffmpeg != no ]] && enabled_any libass libfreetype {lib,}fontconfig libfribidi; }; then
     do_pacman_remove python-rst2pdf
     do_pacman_remove freetype fontconfig harfbuzz fribidi
@@ -1048,16 +1045,14 @@ if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
     fi
 fi
 
-if [[ $faac = y ]]; then
-    _check=(bin-audio/faac.exe)
-    if ! [[ $standalone = y ]]; then
-        do_pacman_install faac
-    elif do_vcs "$SOURCE_REPO_FAAC"; then
-        do_pacman_remove faac
-        do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
-        do_mesoninstall audio
-        do_checkIfExist
-    fi
+_check=(bin-audio/faac.exe)
+if [[ $faac = y ]] &&
+    do_vcs "$SOURCE_REPO_FAAC"; then
+    do_uninstall libfaac.a faac{,cfg}.h "${_check[@]}"
+    _notrequired=true
+    do_mesoninstall audio
+    do_checkIfExist
+    unset _notrequired
 fi
 
 _check=(bin-audio/exhale.exe)
@@ -1594,7 +1589,7 @@ fi
 
 _check=(libdvdread.a dvdread.pc)
 if { { [[ $ffmpeg != no ]] && enabled_any libdvdread libdvdnav; } ||
-    [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
+    mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDREAD" dvdread; then
     do_uninstall include/dvdread "${_check[@]}"
     do_mesoninstall
@@ -1607,7 +1602,7 @@ fi
 _check=(libdvdnav.a dvdnav.pc)
 _deps=(libdvdread.a)
 if { { [[ $ffmpeg != no ]] && enabled libdvdnav; } ||
-    [[ $mplayer = y ]] || mpv_enabled dvdnav; } &&
+    mpv_enabled dvdnav; } &&
     do_vcs "$SOURCE_REPO_LIBDVDNAV" dvdnav; then
     do_uninstall include/dvdnav "${_check[@]}"
     do_mesoninstall
@@ -2255,24 +2250,6 @@ if [[ $ffmpeg != no ]] && enabled liblensfun; then
     fi
 fi
 
-_check=(bin-video/vvc/{Encoder,Decoder}App.exe)
-if [[ $bits = 64bit && $vvc = y ]] &&
-    do_vcs "$SOURCE_REPO_VVC" vvc; then
-    do_uninstall bin-video/vvc
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0001-BBuildEnc.cmake-Remove-Werror-for-gcc-and-clang.patch" am
-    # patch for easier install of apps
-    # probably not of upstream's interest because of how experimental the codec is
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0002-cmake-allow-installing-apps.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/VVCSoftware_VTM/0003-CMake-add-USE_CCACHE-variable-to-disable-using-found.patch" am
-    _notrequired=true
-    # install to own dir because the binaries' names are too generic
-    do_cmakeinstall -DCMAKE_INSTALL_BINDIR="$LOCALDESTDIR"/bin-video/vvc \
-        -DBUILD_STATIC=on -DSET_ENABLE_SPLIT_PARALLELISM=ON -DENABLE_SPLIT_PARALLELISM=OFF \
-        -DUSE_CCACHE=OFF
-    do_checkIfExist
-    unset _notrequired
-fi
-
 _check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266/uvg266.h)
 if [[ $bits = 64bit && $uvg266 = y ]] &&
     do_vcs "$SOURCE_REPO_UVG266"; then
@@ -2787,121 +2764,6 @@ if [[ $libheif != n ]] &&
     do_checkIfExist
 fi
 
-# static do_vcs just for svn
-check_mplayer_updates() {
-    cd_safe "$LOCALBUILDDIR"
-    if [[ ! -d mplayer-svn/.svn ]]; then
-        rm -rf mplayer-svn
-        do_print_progress "  Running svn clone for mplayer"
-        svn_clone() (
-            set -x
-            svn --non-interactive checkout -r HEAD svn://svn.mplayerhq.hu/mplayer/trunk mplayer-svn &&
-                [[ -d mplayer-svn/.svn ]]
-        )
-        if svn --non-interactive ls svn://svn.mplayerhq.hu/mplayer/trunk > /dev/null 2>&1 &&
-            log -q "svn.clone" svn_clone; then
-            touch mplayer-svn/recently_{updated,checked}
-        else
-            echo "mplayer svn seems to be down"
-            echo "Try again later or <Enter> to continue"
-            do_prompt "if you're sure nothing depends on it."
-            return
-        fi
-        unset svn_clone
-    fi
-
-    cd_safe mplayer-svn
-
-    oldHead=$(svn info --show-item last-changed-revision .)
-    log -q "svn.reset" svn revert --recursive .
-    if ! [[ -f recently_checked && recently_checked -nt $LOCALBUILDDIR/last_run ]]; then
-        do_print_progress "  Running svn update for mplayer"
-        log -q "svn.update" svn update -r HEAD
-        newHead=$(svn info --show-item last-changed-revision .)
-        touch recently_checked
-    else
-        newHead="$oldHead"
-    fi
-
-    rm -f custom_updated
-    check_custom_patches
-
-    if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
-        touch recently_updated
-        rm -f ./build_successful{32,64}bit{,_*}
-        if [[ $build32$build64$bits == yesyes64bit ]]; then
-            new_updates="yes"
-            new_updates_packages="$new_updates_packages [mplayer]"
-        fi
-        printf 'mplayer\n' >> "$LOCALBUILDDIR"/newchangelog
-        do_print_status "┌ mplayer svn" "$orange" "Updates found"
-    elif [[ -f recently_updated && ! -f build_successful$bits ]]; then
-        do_print_status "┌ mplayer svn" "$orange" "Recently updated"
-    elif ! files_exist "${_check[@]}"; then
-        do_print_status "┌ mplayer svn" "$orange" "Files missing"
-    else
-        do_print_status "mplayer svn" "$green" "Up-to-date"
-        [[ ! -f recompile ]] &&
-            return 1
-        do_print_status "┌ mplayer svn" "$orange" "Forcing recompile"
-        do_print_status prefix "$bold├$reset " "Found recompile flag" "$orange" "Recompiling"
-    fi
-    return 0
-}
-
-_check=(bin-video/m{player,encoder}.exe)
-if [[ $mplayer = y ]] && check_mplayer_updates; then
-    [[ $license != nonfree || $faac == n ]] && faac_opts=(--disable-faac)
-    do_uninstall "${_check[@]}"
-    [[ -f config.mak ]] && log "distclean" make distclean
-    if [[ ! -d ffmpeg ]] &&
-        ! { [[ -d $LOCALBUILDDIR/ffmpeg-git ]] &&
-        git clone -q "$LOCALBUILDDIR/ffmpeg-git" ffmpeg; } &&
-        ! git clone "$ffmpegPath" ffmpeg; then
-        rm -rf ffmpeg
-        printf '%s\n' \
-            "Failed to get a FFmpeg checkout" \
-            "Please try again or put FFmpeg source code copy into ffmpeg/ manually." \
-            "Nightly snapshot: http://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2" \
-            "Either re-run the script or extract above to inside /build/mplayer-svn."
-        do_prompt "<Enter> to continue or <Ctrl+c> to exit the script"
-    fi
-    [[ ! -d ffmpeg ]] && compilation_fail "Finding valid ffmpeg dir"
-    [[ -d ffmpeg/.git ]] && {
-        git -C ffmpeg fetch -q origin
-        git -C ffmpeg checkout -qf --no-track -B master origin/HEAD
-    }
-
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0001-ae_lavc-fix-deprecated-warnings.patch"
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0002-configure-fix-cddb-on-mingw-w64.patch"
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0003-w32_common-add-casts-for-Wint-conversion.patch"
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/mplayer/0004-configure-add-checking-libass-from-pkg-config.patch"
-
-    # grep_or_sed windows libmpcodecs/ad_spdif.c '/#include "mp_msg.h/ a\#include <windows.h>'
-    # grep_or_sed gnu11 configure 's/c11/gnu11/g'
-    # shellcheck disable=SC2016
-    sed -i '/%\$(EXESUF):/{n; s/\$(CC)/\$(CXX)/g};/mencoder$(EXESUF)/{n; s/\$(CC)/\$(CXX)/g}' Makefile
-
-    _notrequired=true
-    # do_configure --bindir="$LOCALDESTDIR"/bin-video \
-    # --extra-cflags='-fpermissive -DPTW32_STATIC_LIB -O3 -DMODPLUG_STATIC -Wno-int-conversion -Wno-error=incompatible-function-pointer-types' \
-    # --extra-libs="-llzma -liconv -lws2_32 -lpthread -lwinpthread -lpng -lwinmm $($PKG_CONFIG --libs libilbc) \
-    #     $(enabled vapoursynth && $PKG_CONFIG --libs vapoursynth-script)" \
-    # --extra-ldflags='-Wl,--allow-multiple-definition' --enable-{static,runtime-cpudetection} \
-    # --disable-{gif,cddb} "${faac_opts[@]}" --with-dvdread-config="$PKG_CONFIG dvdread" \
-    # --with-freetype-config="$PKG_CONFIG freetype2" --with-dvdnav-config="$PKG_CONFIG dvdnav" &&
-    #     do_makeinstall CXX="$CXX" && do_checkIfExist
-
-    do_configure \
-        --bindir="$LOCALDESTDIR"/bin-video \
-        --enable-{static,runtime-cpudetection} \
-        --extra-cflags='-Wno-error=incompatible-pointer-types' \
-        "${faac_opts[@]}" &&
-        do_makeinstall CXX="$CXX" && do_checkIfExist
-
-    unset _notrequired faac_opts
-fi
-
 if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; then
     if [[ ${MPV_OPTS[lua]} == 5.1 ]]; then
         do_pacman_install lua51
@@ -3389,22 +3251,6 @@ EOF
         do_checkIfExist
         PATH="$LOCALDESTDIR/vlc/bin:$PATH" "$LOCALDESTDIR/vlc/libexec/vlc/vlc-cache-gen" "$LOCALDESTDIR/vlc/lib/plugins"
     fi
-fi
-
-_check=(bin-video/ffmbc.exe)
-if [[ $ffmbc = y ]] && do_vcs "$SOURCE_REPO_FFMBC"; then
-    _notrequired=true
-    do_patch "https://github.com/bcoudurier/FFmbc/compare/ffmbc...1480c1:shr-ffmbc.patch" am
-    create_build_dir
-    # Too many errors with GCC 15 due to really old code.
-    CFLAGS+=" -Wno-error=incompatible-pointer-types" \
-        log configure ../configure --target-os=mingw32 --enable-gpl \
-        --disable-{dxva2,ffprobe} --extra-cflags=-DNO_DSHOW_STRSAFE \
-        --cc="$CC" --ld="$CXX"
-    do_make
-    do_install ffmbc.exe bin-video/
-    do_checkIfExist
-    unset _notrequired
 fi
 
 do_simple_print -p "${orange}Finished $bits compilation of all tools${reset}"
