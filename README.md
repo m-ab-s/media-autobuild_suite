@@ -120,7 +120,7 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - opencl (from system)
         - opengl (from system)
-        - vapoursynth (R78)
+        - vapoursynth (R79)
         - vulkan (git)
 
 - other tools
@@ -181,7 +181,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git snapshot)
             - uchardet (mingw-w64)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R78)
+            - vapoursynth (R79)
         - Full build (ffmpegChoice=4)
             - dvdnav (git)
             - libarchive (mingw-w64)

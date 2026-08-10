@@ -2195,18 +2195,13 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    do_uninstall libpython314.a lib{vapoursynth,vsscript}.a \
-        {vapoursynth,vsscript}.lib vapoursynth-script.pc
-    _vsver=78
+    _vsver=79
     _vspyver=312
 
     _check=(vapoursynth.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
     if pc_exists "vapoursynth = $_vsver" && files_exist "${_check[@]}"; then
         do_print_status "vapoursynth R$_vsver" "$green" "Up-to-date"
-    elif do_wget -n -c "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth64-Portable-R$_vsver.zip"; then
-        # Archive uses backslashes, which 7z cannot deal with, so use unzip instead of 7z
-        log -e "unzip" unzip -o "VapourSynth64-Portable-R$_vsver.zip" -d "VapourSynth64-Portable-R$_vsver"
-        cd_safe "VapourSynth64-Portable-R$_vsver"
+    elif do_wget "https://github.com/vapoursynth/vapoursynth/releases/download/R$_vsver/VapourSynth64-Portable-R$_vsver.zip"; then
         do_uninstall include/vapoursynth "${_check[@]}"
 
         # FFmpeg and mpv load VSScript at runtime and only need build metadata here.
