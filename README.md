@@ -135,7 +135,6 @@ For information about the compiler environment see the wiki, there you also have
     - exhale (git)
     - faac (git)
     - fdk-aac (git)
-    - ffmbc (git) (unsupported)
     - flac (git)
     - gifski (git)
         - with optional built-in video support (ffmpeg 6.1)
@@ -166,7 +165,6 @@ For information about the compiler environment see the wiki, there you also have
     - libbdplus (git) (shared)
     - mediainfo cli (git)
     - mp4box (git)
-    - mplayer (svn) (unsupported)
     - mpv (git) including in addition to ffmpeg libs:
         - Base build (ffmpegChoice=2 or 3)
             - ANGLE Headers (git)
@@ -201,7 +199,6 @@ For information about the compiler environment see the wiki, there you also have
     - vvenc & vvdec (git)
     - vorbis-tools (git)
     - vpx (VP8 and VP9 8, 10 and 12 bit) (git)
-    - vvc tools (git)
     - webp tools (git)
     - x264 (8 and 10 bit, with l-smash [mp4 output], lavf and ffms2) (git)
     - x265 (8, 10 and 12 bit) (git)
@@ -297,7 +294,7 @@ If there's some error during compilation follow these steps:
 
 `/build/media-suite_compile.sh`
 
-- This is the compiling script, it builds all the libs and tools we want, like ffmpeg; mplayer; etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
+- This is the compiling script, it builds all the libs and tools we want, like ffmpeg, etc. You can also inspect it and see how to compile your own tools. Normally you can copy the code and paste it in the mintty shell (except `make -j $cpuCount`, here you need to put your cpu count). You don't need to start this script, it's called by the batch script.
 
 `/build/media-suite_update.sh`
 
