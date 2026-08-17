@@ -1656,8 +1656,12 @@ do_unhide_all_sharedlibs() {
 do_pacman_resolve_pkgs() (
     : "${prefix=$MINGW_PACKAGE_PREFIX-}"
     # Prefer exact matches, then provides
-    pkg=$(pacsift --exact --sync --any "${@/#/--name=$prefix}" 2>&1)
-    [[ -z $pkg ]] && pkg=$(pacsift --exact --sync --any "${@/#/--provides=$prefix}" 2>&1)
+    pkg=$(pacsift --exact --sync --any "${@/#/--name=$prefix}" 2> /dev/null)
+    [[ -z $pkg ]] && pkg=$(pacsift --exact --sync --any "${@/#/--provides=$prefix}" 2> /dev/null)
+    if [[ -z $pkg ]]; then
+        do_simple_print "${red}Failed to resolve pacman package '$prefix$1'.${reset}" >&2
+        return 1
+    fi
     echo "${pkg#*/"$prefix"}"
 )
 
@@ -1684,7 +1688,8 @@ do_pacman_install() (
         esac
     done
     for pkg; do
-        for line in $(do_pacman_resolve_pkgs "$pkg"); do
+        resolved=$(do_pacman_resolve_pkgs "$pkg") || return 1
+        for line in $resolved; do
             if ! is_pkg_installed "$line"; then
                 pkgs+=("$line")
             fi
