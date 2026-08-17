@@ -539,12 +539,12 @@ fi
 
 [[ $ffmpeg != no ]] && enabled gcrypt && do_pacman_install libgcrypt
 
-if [[ $curl = y ]]; then
+if [[ $curl = y ]] || { [[ $curl = n ]] && enabled libcurl; }; then
+    curl=schannel
     enabled libtls && curl=libressl
     enabled openssl && curl=openssl
     enabled gnutls && curl=gnutls
     enabled mbedtls && curl=mbedtls
-    [[ $curl = y ]] && curl=schannel
 fi
 
 if enabled_any gnutls librtmp || [[ $rtmpdump = y || $curl = gnutls ]]; then
@@ -643,7 +643,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]]; then
             extra_opts+=(--with-{nghttp2,openssl} --without-{gnutls,mbedtls})
             ;;
         mbedtls) extra_opts+=(--with-{mbedtls,nghttp2} --without-openssl) ;;
-        gnutls) extra_opts+=(--with-gnutls --without-{nghttp2,mbedtls,openssl}) ;;
+        gnutls) extra_opts+=(--with-{gnutls,nghttp2} --without-{mbedtls,openssl}) ;;
         *) extra_opts+=(--with-{schannel,winidn,nghttp2} --without-{gnutls,mbedtls,openssl});;
         esac
        
@@ -1305,7 +1305,6 @@ if { { [[ $ffmpeg != no ]] &&
         do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_ENABLE_MODULES=OFF
     sed -i 's/Libs.private.*/& -luuid -lole32/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
     do_checkIfExist
-    unset _mingw_patches
 fi
 
 _check=(liblc3.a lc3.pc)
