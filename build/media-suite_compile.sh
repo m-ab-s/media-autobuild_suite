@@ -1858,12 +1858,13 @@ if [[ $ffmpeg != no ]] && enabled libvpl; then
         do_removeOption --enable-libmfx
     fi
     if do_vcs "$SOURCE_REPO_LIBVPL" libvpl; then
-    if [[ $bits = 32bit ]]; then
-        do_patch https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-libvpl/0003-cmake-fix-32bit-install.patch
-    fi
-    do_uninstall include/vpl "${_check[@]}"
-    do_cmakeinstall -DUNIX=OFF
-    do_checkIfExist
+        do_patch https://github.com/intel/libvpl/pull/198.patch am
+        if [[ $bits = 32bit ]]; then
+            do_patch https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-libvpl/0003-cmake-fix-32bit-install.patch
+        fi
+        do_uninstall include/vpl "${_check[@]}"
+        do_cmakeinstall -DUNIX=OFF
+        do_checkIfExist
     fi
 fi
 
