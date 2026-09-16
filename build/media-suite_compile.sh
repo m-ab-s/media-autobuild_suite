@@ -411,6 +411,23 @@ if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbl
     unset extracommands
 fi
 
+_check=(libastcenc.a astc/astcenc/astcenc.h)
+if [[ $bits = 32bit ]]; then
+    do_removeOption --enable-libastcenc
+elif [[ $ffmpeg != no ]] && enabled libastcenc; then
+    do_addOption --extra-cflags="-I$LOCALDESTDIR/include/astc"
+    if do_vcs "$SOURCE_REPO_ASTCENC" astc-encoder; then
+        do_uninstall include/astc libastcenc.a
+        # astc-encoder has no install target when only the static core is enabled.
+        do_install "Source/astcenc.h" include/astc/astcenc/
+        do_cmake builddir=astcenc -DASTCENC_CLI=OFF -DASTCENC_SHAREDLIB=OFF \
+            -DASTCENC_ISA_SSE2=ON -DASTCENC_WERROR=OFF
+        do_ninja
+        do_install "Source/libastcenc-sse2-static.a" libastcenc.a
+        do_checkIfExist
+    fi
+fi
+
 # Fixes an issue with ordering with libbluray libxml2 and libz and liblzma
 # Probably caused by https://gitlab.gnome.org/GNOME/libxml2/-/commit/93e8bb2a402012858500b608b4146cd5c756e34d
 grep_or_sed Requires.private "$LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc" 's/Requires:/Requires.private:/'
