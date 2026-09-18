@@ -107,7 +107,7 @@ set mingwpackages=ccache cmake dlfcn gettext-tools meson nasm ninja pkgconf
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d12va d3d11va dxva2 ^
-iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm
+iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm mediafoundation
 
 :: common external libs
 set ffmpeg_options_basic=gmp gpl libmp3lame libopus libvorbis libvpx libx264 libx265 ^
@@ -123,10 +123,11 @@ libopenmpt version3 librav1e libsrt libgsm libvmaf libsvtav1
 :: options also available with the suite
 set ffmpeg_options_full=chromaprint decklink frei0r libaribb24 libaribcaption libbs2b libcaca ^
 libcdio libflite libfribidi libgme libilbc libsvthevc ^
-libsvtvp9 libkvazaar libmodplug librist librtmp librubberband #libssh ^
-libtesseract libxavs libzmq libzvbi openal libcodec2 ladspa #vapoursynth #liblensfun ^
+libsvtvp9 libkvazaar libmodplug librist librtmp librubberband libssh ^
+libtesseract libxavs libzmq libzvbi openal libcodec2 ladspa vapoursynth #liblensfun ^
 vulkan libdavs2 libxavs2 libuavs3d libplacebo libjxl libvvenc libvvdec liblc3 audiotoolbox ^
-libsvtjpegxs
+libsvtjpegxs libxeve libxevd libdvdnav libdvdread liboapv cairo lcms2 ^
+libmpeghdec libcurl libqrencode libquirc libastcenc
 
 :: options also available with the suite that add shared dependencies
 set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libopenh264

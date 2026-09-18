@@ -879,9 +879,6 @@ do_changeFFmpegConfig() {
         do_addOption --disable-w32threads
     fi
 
-    # add options for static kvazaar
-    enabled libkvazaar && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
-
     # get libs restricted by license
     local config_script=configure
     [[ $(get_first_subdir) != "ffmpeg-git" ]] && config_script="$LOCALBUILDDIR/ffmpeg-git/configure"
