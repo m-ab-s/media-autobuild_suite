@@ -2216,7 +2216,7 @@ _vapoursynth_install() {
         do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
         return 1
     fi
-    _vsver=79
+    _vsver=80
     _vspyver=312
 
     _check=(vapoursynth.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
@@ -2228,7 +2228,7 @@ _vapoursynth_install() {
         # FFmpeg and mpv load VSScript at runtime and only need build metadata here.
         log "7z" 7z e -y -aoa wheel/vapoursynth-$_vsver-cp$_vspyver-abi3-win_amd64.whl \
             'vapoursynth/include/*.h' vapoursynth/pkgconfig/vapoursynth.pc
-        do_install VSConstants4.h VSHelper4.h VSScript4.h VapourSynth4.h include/vapoursynth/
+        do_install VSConstants4.h VSHelper4.h VSScript4.h VSVulkan4.h VapourSynth4.h include/vapoursynth/
         sed -i \
             -e 's|^prefix=.*|prefix=${pcfiledir}/../..|' \
             -e 's|^includedir=.*|includedir=${prefix}/include/vapoursynth|' \
