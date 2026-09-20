@@ -106,31 +106,29 @@ filesystem git libtool make msys2-runtime patch pacutils p7zip subversion unzip 
 set mingwpackages=ccache cmake dlfcn gettext-tools meson nasm ninja pkgconf
 
 :: built-ins
-set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuvid d3d12va d3d11va dxva2 ^
-iconv lzma nvenc schannel zlib sdl2 ffnvcodec nvdec cuda-llvm mediafoundation
+set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuda-llvm cuvid d3d11va d3d12va ^
+dxva2 ffnvcodec iconv lzma mediafoundation nvdec nvenc schannel sdl2 zlib
 
 :: common external libs
-set ffmpeg_options_basic=gmp gpl libmp3lame libopus libvorbis libvpx libx264 libx265 ^
-libdav1d libaom --disable-debug libfdk-aac
+set ffmpeg_options_basic=--disable-debug gmp gpl libaom libdav1d libfdk-aac libmp3lame libopus ^
+libsvtav1 libvorbis libvpl libvpx libx264 libx265
 
 :: options used in zeranoe builds and not present above
-set ffmpeg_options_zeranoe=fontconfig gnutls libass libbluray libfreetype ^
-libharfbuzz libvpl libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libsnappy ^
-libsoxr libspeex libtheora libtwolame libvidstab libvo-amrwbenc ^
-libwebp libxml2 libzimg libshine openssl libtls avisynth #mbedtls libxvid ^
-libopenmpt version3 librav1e libsrt libgsm libvmaf libsvtav1
+set ffmpeg_options_zeranoe=avisynth fontconfig gnutls libass libbluray libfreetype libgsm ^
+libharfbuzz libmysofa libopencore-amrnb libopencore-amrwb libopenjpeg libopenmpt librav1e libshine ^
+libsnappy libsoxr libspeex libsrt libtheora libtls libtwolame libvidstab libvmaf libvo-amrwbenc ^
+libwebp libxml2 libxvid libzimg #mbedtls openssl version3
 
 :: options also available with the suite
-set ffmpeg_options_full=chromaprint decklink frei0r libaribb24 libaribcaption libbs2b libcaca ^
-libcdio libflite libfribidi libgme libilbc libsvthevc ^
-libsvtvp9 libkvazaar libmodplug librist librtmp librubberband libssh ^
-libtesseract libxavs libzmq libzvbi openal libcodec2 ladspa vapoursynth #liblensfun ^
-vulkan libdavs2 libxavs2 libuavs3d libplacebo libjxl libvvenc libvvdec liblc3 audiotoolbox ^
-libsvtjpegxs libxeve libxevd libdvdnav libdvdread liboapv cairo lcms2 ^
-libmpeghdec libcurl libqrencode libquirc libastcenc
+set ffmpeg_options_full=audiotoolbox cairo chromaprint #cuda-nvcc decklink frei0r ladspa lcms2 ^
+libaribb24 libaribcaption libastcenc libbs2b libcaca libcdio libcodec2 libcurl libdavs2 libdvdnav ^
+libdvdread libflite libfribidi libgme libilbc libjxl libkvazaar liblc3 #liblensfun libmodplug ^
+libmpeghdec liboapv libplacebo libqrencode libquirc librist librtmp librubberband libssh ^
+libsvthevc libsvtjpegxs libsvtvp9 libtesseract libuavs3d libvvdec libvvenc libxavs libxavs2 ^
+libxevd libxeve libzmq libzvbi openal vapoursynth vulkan
 
 :: options also available with the suite that add shared dependencies
-set ffmpeg_options_full_shared=opencl opengl cuda-nvcc libopenh264
+set ffmpeg_options_full_shared=libopenh264 opencl opengl
 
 :: built-ins
 set mpv_options_builtin="#-Dcplayer=true" #manpage-build #lua #javascript ^
@@ -823,7 +821,7 @@ if [0]==[%ffmpegB2INI%] (
     echo. compiled shared so they take less space. Currently broken if libass or libass
     echo. dependees are enabled.
     echo. Option 6 produces static and shared ffmpeg and ffmpeg libs where the static
-    echo. one includes only strictly static dependencies (opencl, opengl, cuda-nvcc,
+    echo. one includes only strictly static dependencies (opencl, opengl,
     echo. libopenh264 are hard disabled.^)
     echo.
     echo -------------------------------------------------------------------------------

@@ -16,23 +16,31 @@ For information about the compiler environment see the wiki, there you also have
 
 ### [Information about FFmpeg external libraries](https://github.com/m-ab-s/media-autobuild_suite/wiki/ffmpeg_options.txt)
 
-- FFmpeg (shared or static) with these libraries (all optional, but compiled by default unless said otherwise):
+- FFmpeg (shared or static) with these libraries and features (all optional, but enabled by default unless said otherwise; subject to license and platform restrictions):
     - Light build:
         - amd amf encoders (built-in)
+        - bzlib (mingw-w64)
         - cuda (built-in)
         - cuda-llvm (built-in)
         - cuvid (built-in)
+        - d3d11va (built-in)
+        - d3d12va (built-in)
+        - dxva2 (built-in)
         - ffnvcodec (git)
+        - iconv (mingw-w64)
         - libaom (git)
         - libdav1d (git)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
+        - libsvtav1 (git)
         - libmp3lame (mingw-w64)
         - libopus (mingw-w64)
         - libvorbis (mingw-w64)
+        - libvpl (git)
         - libvpx (git)
         - libx264 (git)
         - libx265 (git)
+        - lzma (mingw-w64)
         - mediafoundation (built-in)
         - nvdec (built-in)
         - nvenc (built-in)
@@ -41,8 +49,9 @@ For information about the compiler environment see the wiki, there you also have
             - gmp can be switched by gcrypt (mingw-w64) with --enable-gcrypt
         - sdl2 (git tag) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
+        - zlib (see the zlib variants under other tools)
     - Zeranoe-emulating build (in addition to Light)
-        - avisynthplus (needs avisynth dll installed)
+        - avisynth (AviSynthPlus; needs avisynth dll installed)
         - fontconfig (latest release)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw-w64)
@@ -51,6 +60,7 @@ For information about the compiler environment see the wiki, there you also have
             - libtls (from libressl) (latest release)
                 - needs non-GPL license
             - mbedtls (mingw-w64)
+                - disabled by default
                 - preferred to gnutls if GPLv3 license is chosen
             - gnutls (3.8.13)
         - libass (git)
@@ -62,16 +72,18 @@ For information about the compiler environment see the wiki, there you also have
             - BD-J support after compilation probably only requires JRE (untested)
         - libfreetype (latest release)
         - libgsm (mingw-w64)
-        - libmodplug (mingw-w64)
-        - libopencore-amr(nb/wb) (mingw-w64)
-        - libopenjpeg2 (mingw-w64)
+        - libharfbuzz (git)
+        - libmysofa (git)
+            - needed for sofalizer filter
+        - libopencore-amrnb / libopencore-amrwb (mingw-w64)
+        - libopenjpeg (openjpeg2, mingw-w64)
         - libopenmpt (git tag)
         - librav1e (git)
+        - libshine (git)
         - libsnappy (mingw-w64)
         - libsoxr (git)
         - libspeex (mingw-w64)
         - libsrt (git)
-        - libsvtav1 (git)
         - libtheora (mingw-w64)
         - libtwolame (mingw-w64)
         - libvidstab (git)
@@ -82,8 +94,13 @@ For information about the compiler environment see the wiki, there you also have
         - libxvid (git)
         - libzimg (git)
     - Full build (in addition to Zeranoe)
+        - audiotoolbox (AudioToolboxWrapper, git)
+            - requires Apple runtime DLLs, downloaded by the suite
         - cairo (mingw-w64)
         - chromaprint (mingw-w64)
+        - cuda-nvcc (needs CUDA SDK installed)
+            - needs non-free license
+            - disabled by default
         - decklink (12.5.1)
             - needs non-free license
         - frei0r (git)
@@ -106,11 +123,14 @@ For information about the compiler environment see the wiki, there you also have
         - libjxl (git)
         - libkvazaar (git)
         - lcms2 (git)
-        - libmysofa (git)
-            - needed for sofalizer filter
+        - liblc3 (git)
+        - liblensfun (git)
+            - disabled by default
+        - libmodplug (mingw-w64)
         - libmpeghdec (git)
             - needs non-free license
         - liboapv (git)
+        - libplacebo (git)
         - libqrencode (git)
         - libquirc (git)
         - librist (git)
@@ -118,6 +138,7 @@ For information about the compiler environment see the wiki, there you also have
         - librubberband (git)
         - libssh (mingw-w64)
         - libsvthevc (git) (using non-upstream patch)
+        - libsvtjpegxs (git)
         - libsvtvp9 (git) (using non-upstream patch)
         - libtesseract (git)
         - libuavs3d (git)
@@ -133,8 +154,6 @@ For information about the compiler environment see the wiki, there you also have
         - vapoursynth (R80)
         - vulkan (git)
     - Full shared dependencies (in addition to Full)
-        - cuda-nvcc (needs CUDA SDK installed)
-            - needs non-free license
         - libopenh264 (official binaries)
         - opencl (from system)
         - opengl (from system)

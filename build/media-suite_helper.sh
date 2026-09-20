@@ -945,7 +945,7 @@ do_changeFFmpegConfig() {
         done
     fi
     if [[ $ffmpeg == "bothstatic" ]]; then
-        do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libopenh264)"
+        do_removeOption "--enable-(opencl|opengl|libopenh264)"
     fi
 }
 
