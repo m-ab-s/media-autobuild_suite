@@ -39,7 +39,6 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
     libilbc
     libjxl
     libmediainfo
-    libmfx (intel quick sync hw accelerator)
     libmusicbrainz5
     libMXF-1.0
     libMXF++-1.0

@@ -907,36 +907,6 @@ do_changeFFmpegConfig() {
 
     # cuda-only workarounds
     if verify_cuda_deps; then
-        if enabled libnpp; then
-            echo -e "${orange}FFmpeg and related apps will depend on CUDA SDK to run!${reset}"
-            local fixed_CUDA_PATH
-            fixed_CUDA_PATH="$(cygpath -sm "$CUDA_PATH")"
-            if [[ $fixed_CUDA_PATH != "${fixed_CUDA_PATH// /}" ]]; then
-                # Assumes CUDA_PATH backwards is version/CUDA/NVIDIA GPU Computing Toolkit/rest of the path
-                # Strips the onion to the rest of the path
-                {
-                    cat << EOF
-@echo off
-fltmc > NUL 2>&1 || echo Elevation required, right click the script and click 'Run as administrator'. & echo/ & pause & exit /b 1
-cd /d "$(dirname "$(dirname "$(dirname "$(cygpath -sw "$CUDA_PATH")")")")"
-EOF
-                    # Generate up to 4 shortnames
-                    for _n in 1 2 3 4; do
-                        printf 'fsutil file setshortname "NVIDIA GPU Computing Toolkit" NVIDIA~%d || ' "$_n"
-                    done
-                    echo 'echo Failed to set a shortname for your CUDA_PATH'
-                } > "$LOCALBUILDDIR/cuda.bat"
-                do_simple_print "${orange}Spaces detected in the CUDA path"'!'"$reset"
-                do_simple_print "Path returned by windows: ${bold}$fixed_CUDA_PATH${reset}"
-                do_simple_print "A script to create the missing short paths for your CUDA_PATH"
-                do_simple_print "was created at $(cygpath -m "$LOCALBUILDDIR/cuda.bat")"
-                do_simple_print "Please run that script as an administrator and rerun the suite"
-                do_simple_print "${red}This will break FFmpeg compilation, so aborting early"'!'"${reset}"
-                logging=n compilation_fail "do_changeFFmpegConfig"
-            fi
-            do_addOption "--extra-cflags=-I$fixed_CUDA_PATH/include"
-            do_addOption "--extra-ldflags=-L$fixed_CUDA_PATH/lib/x64"
-        fi
         if enabled cuda-nvcc; then
             local fixed_CUDA_PATH_UNIX
             fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
@@ -944,7 +914,7 @@ EOF
             echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
     else
-        do_removeOption "--enable-(libnpp|cuda-nvcc)"
+        do_removeOption "--enable-cuda-nvcc"
     fi
 
     # handle gpl-incompatible libs
@@ -975,7 +945,7 @@ EOF
         done
     fi
     if [[ $ffmpeg == "bothstatic" ]]; then
-        do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libnpp|libopenh264)"
+        do_removeOption "--enable-(opencl|opengl|cuda-nvcc|libopenh264)"
     fi
 }
 
@@ -2318,19 +2288,12 @@ fix_cmake_crap_exports() {
 
 verify_cuda_deps() {
     enabled cuda-sdk && do_removeOption --enable-cuda-sdk && do_addOption --enable-cuda-nvcc
-    if enabled_any libnpp cuda-nvcc && [[ $license != "nonfree" ]]; then
-        do_removeOption "--enable-(cuda-nvcc|libnpp)"
+    if enabled cuda-nvcc && [[ $license != "nonfree" ]]; then
+        do_removeOption "--enable-cuda-nvcc"
     fi
-    if enabled libnpp && [[ $bits == 32bit ]]; then
-        echo -e "${orange}libnpp is only supported in 64-bit.${reset}"
-        do_removeOption --enable-libnpp
-    fi
-    if enabled_any libnpp cuda-nvcc && [[ -z $CUDA_PATH || ! -d $CUDA_PATH ]]; then
+    if enabled cuda-nvcc && [[ -z $CUDA_PATH || ! -d $CUDA_PATH ]]; then
         echo -e "${orange}CUDA_PATH environment variable not set or directory does not exist.${reset}"
-        do_removeOption "--enable-(cuda-nvcc|libnpp)"
-    fi
-    if enabled libnpp && [[ ! -f "$CUDA_PATH/lib/x64/nppc.lib" ]]; then
-        do_removeOption --enable-libnpp
+        do_removeOption "--enable-cuda-nvcc"
     fi
     if enabled cuda-llvm && do_pacman_install clang; then
         do_removeOption --enable-cuda-nvcc
@@ -2350,7 +2313,7 @@ verify_cuda_deps() {
             do_removeOption --enable-cuda-nvcc
         fi
     fi
-    enabled_any libnpp cuda-nvcc || ! disabled cuda-llvm
+    enabled_any cuda-nvcc || ! disabled cuda-llvm
 }
 
 check_custom_patches() {

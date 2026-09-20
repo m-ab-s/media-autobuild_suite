@@ -62,7 +62,6 @@ For information about the compiler environment see the wiki, there you also have
             - BD-J support after compilation probably only requires JRE (untested)
         - libfreetype (latest release)
         - libgsm (mingw-w64)
-        - libmfx (git)
         - libmodplug (mingw-w64)
         - libopencore-amr(nb/wb) (mingw-w64)
         - libopenjpeg2 (mingw-w64)
