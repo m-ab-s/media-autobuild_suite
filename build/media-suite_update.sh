@@ -3,14 +3,6 @@
 
 while true; do
     case $1 in
-    --build32=*)
-        build32="${1#*=}"
-        shift
-        ;;
-    --build64=*)
-        build64="${1#*=}"
-        shift
-        ;;
     --update=*)
         update="${1#*=}"
         shift
@@ -107,15 +99,11 @@ do_unhide_all_sharedlibs
 { pacman -Qq pacutils || pacman -S --needed --noconfirm pacutils; } > /dev/null 2>&1
 
 extract_pkg_prefix() (
-    case $1 in
-    *32) [[ $build32 != "yes" ]] && return 1 ;;
-    *64) [[ $build64 != "yes" ]] && return 1 ;;
-    esac
     . shell "$1"
     echo "$MINGW_PACKAGE_PREFIX-"
 )
 
-if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" && $CC =~ clang ]]; then
+if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     new=$(mktemp)
     old=$(mktemp)
     echo
@@ -126,20 +114,13 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" &
     dos2unix -O /etc/pac-base.pk 2> /dev/null | sort -u >> "$new"
     mapfile -t newmingw < <(dos2unix -O /etc/pac-mingw.pk /etc/pac-mingw-extra.pk 2>/dev/null | sort -u)
     mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
-    prefix_32='' prefix_64=''
     case $CC in
-    *clang) prefix_64=$(extract_pkg_prefix clang64) ;;
-    *) prefix_32=$(extract_pkg_prefix mingw32) prefix_64=$(extract_pkg_prefix ucrt64) ;;
+    *clang) prefix=$(extract_pkg_prefix clang64) ;;
+    *) prefix=$(extract_pkg_prefix ucrt64) ;;
     esac
     for pkg in "${newmingw[@]}"; do
-        if [[ $build32 == "yes" ]] && [[ ! $CC =~ clang ]] &&
-            pacman -Ss "$prefix_32$pkg" > /dev/null 2>&1; then
-            printf %s\\n "$prefix_32$pkg" >> "$new"
-        fi
-        if [[ $build64 == "yes" ]] &&
-            pacman -Ss "$prefix_64$pkg" > /dev/null 2>&1; then
-            printf %s\\n "$prefix_64$pkg" >> "$new"
-        fi
+        pacman -Ss "$prefix$pkg" > /dev/null 2>&1 &&
+            printf %s\\n "$prefix$pkg" >> "$new"
     done
     for pkg in "${newmsys[@]}"; do
         pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf %s\\n "$pkg" >> "$new"
@@ -185,9 +166,6 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]] && ! [[ $build32 == "yes" &
         pacman -D --asexplicit "${install[@]}"
     fi
     rm -f /etc/pac-{base,mingw}.pk "$new" "$old"
-elif [[ $build32 == "yes" && $CC =~ clang ]]; then
-    echo "The CLANG32 environment is no longer supported"
-    exit 1
 fi
 
 if [[ -d "/trunk" ]]; then

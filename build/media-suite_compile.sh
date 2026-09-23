@@ -18,11 +18,11 @@ printf '\nBuild start: %(%F %T %z)T\n' -1 >> "$LOCALBUILDDIR/newchangelog"
 
 printf '#!/bin/bash\nbash %s %s\n' "$LOCALBUILDDIR/media-suite_compile.sh" "$*" > "$LOCALBUILDDIR/last_run"
 
+suiteMode=no
+
 while true; do
     case $1 in
     --cpuCount=* ) cpuCount=${1#*=} && shift ;;
-    --build32=* ) build32=${1#*=} && shift ;;
-    --build64=* ) build64=${1#*=} && shift ;;
     --mp4box=* ) mp4box=${1#*=} && shift ;;
     --rtmpdump=* ) rtmpdump=${1#*=} && shift ;;
     --vpx=* ) vpx=${1#*=} && shift ;;
@@ -42,6 +42,7 @@ while true; do
     --deleteSource=* ) deleteSource=${1#*=} && shift ;;
     --license=* ) license=${1#*=} && shift ;;
     --standalone=* ) standalone=${1#*=} && shift ;;
+    --suite=* ) suiteMode=${1#*=} && shift ;;
     --stripping* ) stripping=${1#*=} && shift ;;
     --packing* ) packing=${1#*=} && shift ;;
     --logging=* ) logging=${1#*=} && shift ;;
@@ -103,7 +104,9 @@ fi
 
 do_simple_print -p "${orange}Warning: We will not accept any issues lacking any form of logs or logs.zip!$reset"
 
-buildProcess() {
+cd_safe "$LOCALBUILDDIR"
+source /local64/etc/profile2.local
+
 set_title
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of all tools$reset"
 [[ -f $HOME/custom_build_options ]] &&
@@ -131,65 +134,9 @@ set_title "compiling global tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of global tools${reset}"
 
 rust_wanted=false
-rust_packages=(ripgrep rav1e dssim libavif dovitool hdr10plustool av1an)
 if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool|$av1an" = *y* ]] ||
     [[ $gifski != n ]] || [[ $zlib = rs ]] || enabled librav1e; then
     rust_wanted=true
-fi
-
-if [[ $bits = 32bit ]] && $rust_wanted; then
-    do_simple_print "${orange}Rust packages cannot be compiled on 32-bit systems due to its removal from msys2"'!'"${reset}"
-    for package in "${rust_packages[@]}"; do
-        if [[ ${!package} = y ]]; then
-            declare "_reenable_$package=${!package}" "$package=n"
-        fi
-    done
-
-    # the rest are special cases as they aren't just y/n
-    if [[ $gifski != n ]]; then
-        _reenable_gifski=$gifski
-        gifski=n
-    fi
-    if [[ $zlib = rs ]]; then
-        _reenable_zlib=$zlib
-        zlib=n
-    fi
-
-    if enabled librav1e; then
-        _reenable_librav1e=y
-        do_removeOption --enable-librav1e
-    fi
-    rust_wanted=false
-fi
-
-# reenable rust packages if they were disabled due to 32-bit compilation
-if [[ $bits = 64bit ]]; then
-    for package in "${rust_packages[@]}"; do
-        local reenable_var="_reenable_$package"
-        if [[ ${!package} = n && -n ${!reenable_var} ]]; then
-            declare "$package=${!reenable_var}"
-            rust_wanted=true
-            unset "$reenable_var"
-        fi
-    done
-
-    if [[ $gifski = n && -n $_reenable_gifski ]]; then
-        gifski=$_reenable_gifski
-        rust_wanted=true
-        unset _reenable_gifski
-    fi
-
-    if [[ $zlib = n && -n $_reenable_zlib ]]; then
-        zlib=$_reenable_zlib
-        rust_wanted=true
-        unset _reenable_zlib
-    fi
-
-    if [[ ${_reenable_librav1e:-} = y ]]; then
-        do_addOption --enable-librav1e
-        rust_wanted=true
-        unset _reenable_librav1e
-    fi
 fi
 
 if [[ $packing = y &&
@@ -346,9 +293,7 @@ if [[ $dssim = y ]] &&
     do_checkIfExist
 fi
 
-if [[ $gifski != n ]] && [[ $bits = 32bit ]]; then
-    do_simple_print "${orange}Gifski does not support 32-bit compilation and will be disabled"'!'"${reset}"
-elif [[ $gifski != n ]]; then
+if [[ $gifski != n ]]; then
     if [[ $gifski = video ]]; then
         _check=("$LOCALDESTDIR"/opt/gifskiffmpeg/lib/pkgconfig/lib{av{codec,device,filter,format,util},swscale}.pc)
         if flavor=gifski do_vcs "https://code.ffmpeg.org/FFmpeg/FFmpeg.git#branch=release/8.0"; then
@@ -412,9 +357,7 @@ if { enabled_any libxml2 libbluray || [[ $cyanrip = y ]] || ! mpv_disabled libbl
 fi
 
 _check=(libastcenc.a astc/astcenc/astcenc.h)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libastcenc
-elif [[ $ffmpeg != no ]] && enabled libastcenc; then
+if [[ $ffmpeg != no ]] && enabled libastcenc; then
     do_addOption --extra-cflags="-I$LOCALDESTDIR/include/astc"
     if do_vcs "$SOURCE_REPO_ASTCENC" astc-encoder; then
         do_uninstall include/astc libastcenc.a
@@ -697,7 +640,7 @@ fi
 
 if [[ $exitearly = EE2 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE2"
-    return
+    exit 0
 fi
 
 if { { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
@@ -827,7 +770,6 @@ if files_exist bin-video/OpenCL.dll; then
     opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
 else
     syspath=$(cygpath -S)
-    [[ $bits = 32bit && -d $syspath/../SysWOW64 ]] && syspath+=/../SysWOW64
     opencldll=$syspath/OpenCL.dll
     unset syspath
 fi
@@ -949,9 +891,7 @@ if [[ $ffmpeg != no ]] && enabled libzimg &&
 fi
 
 _check=(bin-global/SvtJpegxs{De,En}cApp.exe svt-jpegxs/SvtJpegxs{,Dec,Enc}.h libSvtJpegxs.a SvtJpegxs.pc)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libsvtjpegxs
-elif [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
+if [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
     do_vcs "$SOURCE_REPO_SVTJXS"; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall global -DUNIX=OFF
@@ -960,7 +900,7 @@ fi
 
 if [[ $exitearly = EE3 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE3"
-    return
+    exit 0
 fi
 
 set_title "compiling audio tools"
@@ -970,12 +910,8 @@ do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${re
 if [[ $ffmpeg != no || $sox = y ]]; then
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
-        if [[ $bits = 64bit ]]; then
-            do_pacman_install twolame
-            do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
-        else
-            do_removeOption --enable-libtwolame
-        fi
+        do_pacman_install twolame
+        do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
     fi
     enabled libmp3lame && do_pacman_install lame
 fi
@@ -1273,7 +1209,7 @@ if [[ $ffmpeg != no ]] && enabled libopenmpt &&
     do_vcs "$SOURCE_REPO_LIBOPENMPT"; then
     do_uninstall include/libopenmpt "${_check[@]}"
     mkdir bin 2> /dev/null
-    extracommands=("CONFIG=mingw64-win${bits%bit}" "AR=ar" "STATIC_LIB=1" "SHARED_LIB=0" "EXAMPLES=0" "OPENMPT123=0"
+    extracommands=("CONFIG=mingw64-win64" "AR=ar" "STATIC_LIB=1" "SHARED_LIB=0" "EXAMPLES=0" "OPENMPT123=0"
         "TEST=0" "OS=" "CC=$CC" "CXX=$CXX" "MINGW_COMPILER=${CC##* }")
     log clean make clean "${extracommands[@]}"
     do_makeinstall PREFIX="$LOCALDESTDIR" "${extracommands[@]}"
@@ -1371,18 +1307,10 @@ if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
     _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"
     _deps=(bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
     if ! files_exist "${_deps[@]}"; then
-        if [[ $build64 = yes ]]; then
-            do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
-                "${_qtfiles_url}/QTfiles64.7z"
-            do_install *.dll bin-video
-            rm -rf ../QTfiles64/
-        fi
-        if [[ $build32 = yes ]]; then
-            do_wget -r -q -h c6c582fe1af4e0c2b1eb7c141ad929a81f14d123aedd3b16df8226c104fb3028 \
-                "${_qtfiles_url}/QTfiles.7z"
-            do_install *.dll bin-video
-            rm -rf ../QTfiles/
-        fi
+        do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
+            "${_qtfiles_url}/QTfiles64.7z"
+        do_install *.dll bin-video
+        rm -rf ../QTfiles64/
     fi
 
     if do_vcs "$SOURCE_REPO_AUDIOTOOLBOX"; then
@@ -1395,7 +1323,7 @@ fi
 
 if [[ $exitearly = EE4 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE4"
-    return
+    exit 0
 fi
 
 set_title "compiling video tools"
@@ -1441,10 +1369,9 @@ if { enabled libvpx || [[ $vpx = y ]]; } && do_vcs "$SOURCE_REPO_VPX" vpx; then
     grep_or_sed sys/timeb.h vp8/common/threading.h \
         '/<semaphore.h>/ i\#include <sys/timeb.h>'
     create_build_dir
-    [[ $bits = 32bit ]] && arch=x86 || arch=x86_64
     [[ $ffmpeg = sharedlibs ]] || extracommands+=(--enable-{vp9-postproc,vp9-highbitdepth})
     get_external_opts extracommands
-    config_path=.. do_configure --target="${arch}-win${bits%bit}-gcc" \
+    config_path=.. do_configure --target="x86_64-win64-gcc" \
         --disable-{shared,unit-tests,docs,install-bins} \
         "${extracommands[@]}"
     sed -i 's;HAVE_GNU_STRIP=yes;HAVE_GNU_STRIP=no;' -- ./*.mk
@@ -1551,9 +1478,7 @@ sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib
 
 _check=(bin-video/SvtAv1EncApp.exe
     libSvtAv1Enc.a SvtAv1Enc.pc)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libsvtav1
-elif { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
+if { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "$SOURCE_REPO_SVTAV1"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
     do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON
@@ -1723,9 +1648,7 @@ fi
 
 _check=(libxavs2.a xavs2_config.h xavs2.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/xavs2.exe)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libxavs2
-elif { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libxavs2; }; } &&
+if { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libxavs2; }; } &&
     do_vcs "$SOURCE_REPO_XAVS2"; then
     do_patch "https://github.com/pkuvcl/xavs2/compare/master...1480c1:xavs2:gcc14/pointerconversion.patch" am
     cd_safe build/linux
@@ -1744,9 +1667,7 @@ if [[ $avs2 = 10bit ]]; then
     davs2_repo=$SOURCE_REPO_DAVS10bit
     extracommands+=(--bit-depth=10)
 fi
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libdavs2
-elif { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libdavs2; }; } &&
+if { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libdavs2; }; } &&
     do_vcs "$davs2_repo"; then
     cd_safe build/linux
     [[ -f config.mak ]] && log "distclean" make distclean
@@ -1874,9 +1795,6 @@ _check=(libvpl.a vpl.pc)
 if [[ $ffmpeg != no ]] && enabled libvpl; then
     if do_vcs "$SOURCE_REPO_LIBVPL" libvpl; then
         do_patch https://github.com/intel/libvpl/pull/198.patch am
-        if [[ $bits = 32bit ]]; then
-            do_patch https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-libvpl/0003-cmake-fix-32bit-install.patch
-        fi
         do_uninstall include/vpl "${_check[@]}"
         do_cmakeinstall -DUNIX=OFF
         do_checkIfExist
@@ -1909,9 +1827,7 @@ fi
 
 _check=(SvtHevcEnc.pc libSvtHevcEnc.a svt-hevc/EbApi.h
     bin-video/SvtHevcEncApp.exe)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libsvthevc
-elif { [[ $svthevc = y ]] || enabled libsvthevc; } &&
+if { [[ $svthevc = y ]] || enabled libsvthevc; } &&
     do_vcs "$SOURCE_REPO_SVTHEVC"; then
     do_uninstall "${_check[@]}" include/svt-hevc
     do_cmakeinstall video -DUNIX=OFF
@@ -1920,9 +1836,7 @@ fi
 
 _check=(bin-video/SvtVp9EncApp.exe
     libSvtVp9Enc.a SvtVp9Enc.pc)
-if [[ $bits = 32bit ]]; then
-    do_removeOption --enable-libsvtvp9
-elif { [[ $svtvp9 = y ]] || enabled libsvtvp9; } &&
+if { [[ $svtvp9 = y ]] || enabled libsvtvp9; } &&
     do_vcs "$SOURCE_REPO_SVTVP9"; then
     do_uninstall include/svt-vp9 "${_check[@]}" include/svt-vp9
     do_cmakeinstall video -DUNIX=OFF
@@ -2057,9 +1971,6 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
     grep_and_sed CMAKE_CXX_IMPLICIT_LINK_LIBRARIES source/CMakeLists.txt 's|\$\{CMAKE_CXX_IMPLICIT_LINK_LIBRARIES\}||g'
     grep_or_sed cstdint source/dynamicHDR10/json11/json11.cpp "/cstdlib/ i\#include <cstdint>"
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
-    [[ $bits = 32bit ]] && assembly=-DENABLE_ASSEMBLY=OFF
-    [[ $x265 = d ]] && xpsupport=-DWINXP_SUPPORT=ON
-
     build_x265() {
         create_build_dir
         local build_root=$PWD
@@ -2072,14 +1983,14 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" -DBIN_INSTALL_DIR="$LOCALDESTDIR/bin-video" \
         -DENABLE_SHARED=OFF -DENABLE_CLI=OFF -DHIGH_BIT_DEPTH=ON \
-        -DENABLE_HDR10_PLUS=ON $xpsupport -DCMAKE_CXX_COMPILER="$LOCALDESTDIR/bin/${CXX#ccache }.bat" \
+        -DENABLE_HDR10_PLUS=ON -DCMAKE_CXX_COMPILER="$LOCALDESTDIR/bin/${CXX#ccache }.bat" \
         -DCMAKE_TOOLCHAIN_FILE="$LOCALDESTDIR/etc/toolchain.cmake" "$@"
         extra_script post cmake
         do_ninja
     }
     [[ $standalone = y || $av1an = y ]] && cli=-DENABLE_CLI=ON
 
-    if [[ $x265 =~ (o12|s|d|y) ]]; then
+    if [[ $x265 =~ (o12|s|y) ]]; then
         cd_safe "$build_root/12bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 12-bit lib" $assembly -DENABLE_SHARED=ON -DMAIN12=ON
@@ -2093,7 +2004,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         fi
     fi
 
-    if [[ $x265 =~ (o10|s|d|y) ]]; then
+    if [[ $x265 =~ (o10|s|y) ]]; then
         cd_safe "$build_root/10bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 10-bit lib" $assembly -DENABLE_SHARED=ON
@@ -2107,7 +2018,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         fi
     fi
 
-    if [[ $x265 =~ (o8|s|d|y) ]]; then
+    if [[ $x265 =~ (o8|s|y) ]]; then
         cd_safe "$build_root/8bit"
         if [[ $x265 = s || $x265 = o8 ]]; then
             do_x265_cmake "8-bit lib/bin" $cli -DHIGH_BIT_DEPTH=OFF
@@ -2128,16 +2039,8 @@ EOF
     }
     build_x265
     cpuCount=1 log "install" ninja install
-    if [[ $standalone = y || $av1an = y ]] && [[ $x265 = d ]]; then
-        cd_safe "$(get_first_subdir -f)"
-        do_uninstall bin-video/x265-numa.exe
-        do_print_progress "Building NUMA version of binary"
-        xpsupport="" build_x265
-        do_install x265.exe bin-video/x265-numa.exe
-        _check+=(bin-video/x265-numa.exe)
-    fi
     do_checkIfExist
-    unset xpsupport assembly cli
+    unset assembly cli
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
@@ -2200,10 +2103,6 @@ if enabled librist; then
 fi
 
 _vapoursynth_install() {
-    if [[ $bits = 32bit ]]; then
-        do_simple_print "${orange}Vapoursynth is known to be broken on 32-bit and will be disabled"'!'"${reset}"
-        return 1
-    fi
     _vsver=80
     _vspyver=312
 
@@ -2265,7 +2164,7 @@ if [[ $ffmpeg != no ]] && enabled liblensfun; then
 fi
 
 _check=(bin-video/uvg266.exe libuvg266.a uvg266.pc uvg266/uvg266.h)
-if [[ $bits = 64bit && $uvg266 = y ]] &&
+if [[ $uvg266 = y ]] &&
     do_vcs "$SOURCE_REPO_UVG266"; then
     do_uninstall include/uvg266 "${_check[@]}"
     grep_or_sed __MINGW32__ src/uvg266.h 's;UVG_STATIC_LIB.*;& || defined(__MINGW32__);'
@@ -2278,8 +2177,8 @@ _check=(bin-video/vvenc{,FF}app.exe
     vvenc/vvenc.h
     libvvenc.{a,pc}
     lib/cmake/vvenc/vvencConfig.cmake)
-if [[ $bits = 64bit && $vvenc = y ]] ||
-    { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvenc; } &&
+if [[ $vvenc = y ]] ||
+    { [[ $ffmpeg != no ]] && enabled libvvenc; } &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
     do_pacman_install nlohmann-json
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
@@ -2293,8 +2192,8 @@ _check=(bin-video/vvdecapp.exe
     vvdec/vvdec.h
     libvvdec.{a,pc}
     lib/cmake/vvdec/vvdecConfig.cmake)
-if [[ $bits = 64bit && $vvdec = y ]] ||
-    { [[ $ffmpeg != no && $bits = 64bit ]] && enabled libvvdec; } &&
+if [[ $vvdec = y ]] ||
+    { [[ $ffmpeg != no ]] && enabled libvvdec; } &&
     do_vcs "$SOURCE_REPO_LIBVVDEC"; then
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
     do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
@@ -2389,7 +2288,7 @@ fi
 
 if [[ $exitearly = EE5 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE5"
-    return
+    exit 0
 fi
 
 _check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
@@ -2454,7 +2353,7 @@ fi
 
 if [[ $exitearly = EE6 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE6"
-    return
+    exit 0
 fi
 
 enabled openssl && hide_libressl
@@ -2521,15 +2420,10 @@ if [[ $ffmpeg != no ]]; then
     enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL &&
         { do_pacman_remove fftw; do_pacman_install chromaprint; }
     if enabled libzmq; then
-        if [[ $bits = 64bit ]]; then
-            do_pacman_install zeromq
-            grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
-                's/-lpthread/& -lws2_32/'
-            do_addOption --extra-cflags=-DZMQ_STATIC
-        else
-            do_removeOption --enable-libzmq
-            do_simple_print "${orange}libzmq is not available for 32-bit, disabling${reset}"
-        fi
+        do_pacman_install zeromq
+        grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
+            's/-lpthread/& -lws2_32/'
+        do_addOption --extra-cflags=-DZMQ_STATIC
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
@@ -2797,7 +2691,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         _luajit_args=("PREFIX=$LOCALDESTDIR" "INSTALL_BIN=$LOCALDESTDIR/bin-global" "INSTALL_TNAME=luajit.exe")
         do_make amalg HOST_CC="$CC" BUILDMODE=static \
             CFLAGS='-D_WIN32_WINNT=0x0602 -DUNICODE' \
-            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT$([[ $bits = 64bit ]] && echo " -DLUAJIT_ENABLE_GC64")" \
+            XCFLAGS="-DLUAJIT_ENABLE_LUA52COMPAT -DLUAJIT_ENABLE_GC64" \
             "${_luajit_args[@]}"
         do_makeinstall "${_luajit_args[@]}"
         do_checkIfExist
@@ -3017,10 +2911,7 @@ if [[ $vlc == y ]]; then
         do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch" am
         do_patch "https://code.videolan.org/videolan/vlc/-/raw/master/contrib/src/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch" am
         $CXX $CFLAGS -static -static-libgcc -static-libstdc++ -o "$DXSDK_DIR/fxc2.exe" fxc2.cpp -ld3dcompiler $LDFLAGS
-        case $bits in
-        32*) cp -f "dll/d3dcompiler_47_32.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
-        *) cp -f "dll/d3dcompiler_47.dll" "$DXSDK_DIR/d3dcompiler_47.dll" ;;
-        esac
+        cp -f "dll/d3dcompiler_47.dll" "$DXSDK_DIR/d3dcompiler_47.dll"
         do_checkIfExist
     fi
 
@@ -3264,44 +3155,6 @@ EOF
 fi
 
 do_simple_print -p "${orange}Finished $bits compilation of all tools${reset}"
-}
-
-run_builds() {
-    new_updates=no
-    new_updates_packages=""
-    if [[ $build32 = yes ]]; then
-        source /local32/etc/profile2.local
-        buildProcess
-    fi
-
-    if [[ $build64 = yes ]]; then
-        source /local64/etc/profile2.local
-        buildProcess
-    fi
-}
-
-cd_safe "$LOCALBUILDDIR"
-run_builds
-
-if [[ $exitearly = EE2 || $exitearly = EE3 || $exitearly = EE4 || $exitearly = EE5 || $exitearly = EE6 ]]; then
-    exit 0
-fi
-
-while [[ $new_updates = yes ]]; do
-    ret=no
-    printf '%s\n' \
-        "-------------------------------------------------------------------------------" \
-        "There were new updates while compiling." \
-        "Updated:$new_updates_packages" \
-        "Would you like to run compilation again to get those updates? Default: no"
-    do_prompt "y/[n] "
-    echo "-------------------------------------------------------------------------------"
-    if [[ $ret = y || $ret = Y || $ret = yes ]]; then
-        run_builds
-    else
-        break
-    fi
-done
 
 clean_suite
 if [[ -f $LOCALBUILDDIR/post_suite.sh ]]; then

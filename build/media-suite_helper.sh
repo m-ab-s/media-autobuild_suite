@@ -93,12 +93,12 @@ set_title() {
 }
 
 do_exit_prompt() {
-    if [[ -n $build32$build64 ]]; then # meaning "executing this in the suite's context"
+    if [[ $suiteMode == yes ]]; then
         create_diagnostic
         zip_logs
     fi
     do_prompt "$*"
-    [[ -n $build32$build64 ]] && exit 1
+    [[ $suiteMode == yes ]] && exit 1
 }
 
 cd_safe() {
@@ -296,11 +296,7 @@ do_vcs() {
 
     if [[ $oldHead != "$newHead" || -f custom_updated ]]; then
         touch recently_updated
-        rm -f ./build_successful{32,64}bit{,_*}
-        if [[ $build32$build64$bits == yesyes64bit ]]; then
-            new_updates=yes
-            new_updates_packages="$new_updates_packages [$vcsFolder]"
-        fi
+        rm -f ./build_successful64bit{,_*}
         {
             echo "$vcsFolder"
             git log --no-merges --pretty="%ci: %an - %h%n    %s" "$oldHead..$newHead"
@@ -479,10 +475,7 @@ do_extract() {
     # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
     if [[ $dirName != "." && -d $dirName ]]; then
-        if [[ $build32 == "yes" && ! -f \
-            "$dirName/build_successful32bit${flavor:+_$flavor}" ]]; then
-            rm -rf "$dirName"
-        elif [[ $build64 == "yes" && ! -f \
+        if [[ $suiteMode == yes && ! -f \
             "$dirName/build_successful64bit${flavor:+_$flavor}" ]]; then
             rm -rf "$dirName"
         fi
@@ -515,7 +508,7 @@ do_wget_sf() {
 do_strip() {
     local cmd exts nostrip file
     local cmd=(strip)
-    local nostrip="x265|x265-numa|ffmpeg|ffprobe|ffplay"
+    local nostrip="x265|ffmpeg|ffprobe|ffplay"
     local exts="exe|dll|com|a"
     [[ -f $LOCALDESTDIR/bin-video/mpv.exe.debug ]] && nostrip+="|mpv"
     for file; do
@@ -533,7 +526,7 @@ do_strip() {
             [[ ! $file =~ ($nostrip)\.exe$ ]]; then
             cmd+=(--strip-all)
         elif [[ $file =~ \.dll$ ]] ||
-            [[ $file =~ (x265|x265-numa)\.exe$ ]]; then
+            [[ $file =~ x265\.exe$ ]]; then
             cmd+=(--strip-unneeded)
         elif ! disabled debug && [[ $file =~ \.a$ ]]; then
             cmd+=(--strip-debug)
@@ -552,7 +545,7 @@ do_pack() {
     local cmd=(/opt/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
-    [[ $bits == 64bit ]] && enabled_any libtls openssl && nopack="ffmpeg|mpv"
+    enabled_any libtls openssl && nopack="ffmpeg|mpv"
     for file; do
         if [[ $file =~ \.($exts)$ && ! $file =~ ($nopack)\.exe$ ]]; then
             do_print_progress Packing with UPX
@@ -576,7 +569,7 @@ do_pack() {
 
 do_zipman() {
     local file files
-    local man_dirs=(/local{32,64}/share/man)
+    local man_dirs=(/local64/share/man)
     files=$(find "${man_dirs[@]}" -type f \! -name "*.gz" \! -name "*.db" \! -name "*.bz2" 2> /dev/null)
     for file in $files; do
         gzip -9 -n -f "$file"
@@ -608,10 +601,10 @@ do_checkIfExist() {
         [[ $stripping == y ]] && do_strip "${check[@]}"
         [[ $packing == y ]] && do_pack "${check[@]}"
         do_print_status "└ $packetName" "$blue" "Updated"
-        [[ $build32 == yes || $build64 == yes ]] && [[ -d $packageDir ]] &&
+        [[ $suiteMode == yes ]] && [[ -d $packageDir ]] &&
             touch "$buildSuccessFile"
     else
-        [[ $build32 == yes || $build64 == yes ]] && [[ -d $packageDir ]] &&
+        [[ $suiteMode == yes ]] && [[ -d $packageDir ]] &&
             rm -f "$buildSuccessFile"
         do_print_status "└ $packetName" "$red" "Failed"
         if ${_notrequired:-false}; then
@@ -1356,7 +1349,7 @@ do_rustcinstall() {
 }
 
 compilation_fail() {
-    [[ -z $build32$build64 ]] && return 1
+    [[ $suiteMode != yes ]] && return 1
     local reason="$1"
     local operation="${reason,,}"
     if [[ $logging == y ]]; then
@@ -1403,7 +1396,7 @@ zip_logs() {
         } | sort -uo failedFiles
         7za -mx=9 a logs.zip -- @failedFiles > /dev/null && rm failedFiles
     )
-    # [[ ! -f $LOCALBUILDDIR/no_logs && -n $build32$build64 && $autouploadlogs = y ]] &&
+    # [[ ! -f $LOCALBUILDDIR/no_logs && $suiteMode = yes && $autouploadlogs = y ]] &&
     #     url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
     echo
     if [[ $url ]]; then
@@ -1584,7 +1577,7 @@ do_hide_pacman_sharedlibs() {
 do_hide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /{mingw{32,64},clang64,ucrt64}/lib /{mingw{32/i686,64/x86_64},clang64,ucrt64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
+    files="$(find /{clang64,ucrt64}/lib /{clang64/x86_64,ucrt64/x86_64}-w64-mingw32/lib -name "*.dll.a" 2> /dev/null)"
     local tomove=()
     for file in $files; do
         [[ -f ${file%*.dll.a}.a ]] && tomove+=("$file")
@@ -1601,7 +1594,7 @@ do_hide_all_sharedlibs() {
 do_unhide_all_sharedlibs() {
     local dryrun="${dry:-n}"
     local files
-    files="$(find /{mingw{32,64},clang64}/lib /{mingw{32/i686,64/x86_64},clang64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
+    files="$(find /{ucrt64,clang64}/lib /{ucrt64/x86_64,clang64/x86_64}-w64-mingw32/lib -name "*.dll.a.dyn" 2> /dev/null)"
     local tomove=()
     local todelete=()
     for file in $files; do
@@ -1905,12 +1898,11 @@ get_cl_path() {
         return 1
     fi
 
-    local _hostbits=HostX64 _arch=x64
+    local _hostbits=HostX64
     [[ $(uname -m) != x86_64 ]] && _hostbits=HostX86
-    [[ $bits == 32bit ]] && _arch=x86
 
     local basepath
-    if basepath=$(cygpath -u "$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/${_hostbits:-HostX64}/${_arch:-x64}" | sort -uV | tail -1)") &&
+    if basepath=$(cygpath -u "$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/${_hostbits}/x64" | sort -uV | tail -1)") &&
         "$basepath/cl.exe" /? > /dev/null 2>&1; then
         export PATH="$basepath:$PATH"
         return 0
@@ -2019,7 +2011,7 @@ clean_suite() {
     do_simple_print -p "${orange}Deleting status files...${reset}"
     cd_safe "$LOCALBUILDDIR" > /dev/null
     find . -maxdepth 2 -name recently_updated -delete
-    find . -maxdepth 2 -regex ".*build_successful\(32\|64\)bit\(_\\w+\)?\$" -delete
+    find . -maxdepth 2 -regex ".*build_successful64bit\(_\\w+\)?\$" -delete
     echo -e "\\n\\t${green}Zipping man files...${reset}"
     do_zipman
 
@@ -2041,7 +2033,7 @@ clean_suite() {
         fi
     fi
 
-    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw32,mingw64}.log diagnostics.txt \
+    rm -f {firstrun,firstUpdate,secondUpdate,pacman,mingw64}.log diagnostics.txt \
         logs.zip _to_remove ./*.stripped.log
 
     [[ -f last_run ]] && mv last_run last_successful_run && touch last_successful_run
@@ -2466,7 +2458,7 @@ _pre_cmake(){
 }
 
 _post_cmake(){
-    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64 or local32
+    # Run cmake directly with custom options. $LOCALDESTDIR refers to local64
     #cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
     #    -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
     #    -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off

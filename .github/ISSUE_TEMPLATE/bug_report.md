@@ -1,7 +1,7 @@
 ---
 name: 'Build Bug report'
 about: 'Repo bug report'
-title: '[mingw32|mingw64] [repo]'
+title: '[ucrt64|clang64] [repo]'
 labels: 'Bug Report'
 assignees: ''
 

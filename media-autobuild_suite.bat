@@ -142,7 +142,7 @@ set mpv_options_basic="-Dlua=luajit"
 set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build openal sdl2-gamepad sdl2-audio sdl2-video
 
-set iniOptions=arch license2 vpx2 x2643 x2652 other265 flac fdkaac mediainfo ^
+set iniOptions=license2 vpx2 x2643 x2653 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ^
 curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski avs2 dovitool ^
@@ -177,28 +177,6 @@ for %%a in (%iniOptions%) do if [0]==[!%%aINI!] set deleteIni=1 && goto :endINIc
 endlocal & set deleteIni=%deleteIni%
 
 if %deleteINI%==1 echo.[compiler list] >"%ini%"
-
-:selectSystem
-if [0]==[%archINI%] (
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    echo.
-    echo. Select the build target system:
-    echo. 1 = both [32 bit and 64 bit]
-    echo. 2 = 32 bit build system
-    echo. 3 = 64 bit build system
-    echo.
-    echo -------------------------------------------------------------------------------
-    echo -------------------------------------------------------------------------------
-    set /P buildEnv="Build System: "
-) else set buildEnv=%archINI%
-
-if "%buildEnv%"=="" GOTO selectSystem
-if %buildEnv%==1 set "build32=yes" && set "build64=yes"
-if %buildEnv%==2 set "build32=yes" && set "build64=no"
-if %buildEnv%==3 set "build32=no" && set "build64=yes"
-if %buildEnv% GTR 3 GOTO selectSystem
-if %deleteINI%==1 echo.arch=^%buildEnv%>>%ini%
 
 :ffmpeglicense
 if [0]==[%license2INI%] (
@@ -271,7 +249,6 @@ if [0]==[%av1anINI%] (
     echo. Av1an requires local installed copies of Python and Vapoursynth,
     echo. an executable of FFmpeg and FFprobe, and one of these encoders to function:
     echo. aom, SVT-AV1, rav1e, vpx, x264, or x265
-    echo. (Note: Not available for 32-bit due to Vapoursynth being broken in 32-bit!^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -472,18 +449,18 @@ if [0]==[%x2643INI%] (
 ) else set buildx264=%x2643INI%
 
 if "%buildx264%"=="" GOTO x264
-if %buildx264%==1 set "x2643=yes"
-if %buildx264%==2 set "x2643=no"
-if %buildx264%==3 set "x2643=high"
-if %buildx264%==4 set "x2643=full"
-if %buildx264%==5 set "x2643=shared"
-if %buildx264%==6 set "x2643=fullv"
-if %buildx264%==7 set "x2643=o8"
+if %buildx264%==1 set "x264=yes"
+if %buildx264%==2 set "x264=no"
+if %buildx264%==3 set "x264=high"
+if %buildx264%==4 set "x264=full"
+if %buildx264%==5 set "x264=shared"
+if %buildx264%==6 set "x264=fullv"
+if %buildx264%==7 set "x264=o8"
 if %buildx264% GTR 7 GOTO x264
 if %deleteINI%==1 echo.x2643=^%buildx264%>>%ini%
 
 :x265
-if [0]==[%x2652INI%] (
+if [0]==[%x2653INI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
@@ -493,26 +470,24 @@ if [0]==[%x2652INI%] (
     echo. 3 = Lib/binary with Main10 only
     echo. 4 = Lib/binary with Main only
     echo. 5 = Lib/binary with Main, shared libs with Main10 and Main12
-    echo. 6 = Same as 1 with XP support and non-XP compatible x265-numa.exe
-    echo. 7 = Lib/binary with Main12 only
+    echo. 6 = Lib/binary with Main12 only
     echo.
     echo. Binaries being built depends on "standalone/av1an=y" and are always static.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildx265="Build x265: "
-) else set buildx265=%x2652INI%
+) else set buildx265=%x2653INI%
 
 if "%buildx265%"=="" GOTO x265
-if %buildx265%==1 set "x2652=y"
-if %buildx265%==2 set "x2652=n"
-if %buildx265%==3 set "x2652=o10"
-if %buildx265%==4 set "x2652=o8"
-if %buildx265%==5 set "x2652=s"
-if %buildx265%==6 set "x2652=d"
-if %buildx265%==7 set "x2652=o12"
-if %buildx265% GTR 7 GOTO x265
-if %deleteINI%==1 echo.x2652=^%buildx265%>>%ini%
+if %buildx265%==1 set "x265=y"
+if %buildx265%==2 set "x265=n"
+if %buildx265%==3 set "x265=o10"
+if %buildx265%==4 set "x265=o8"
+if %buildx265%==5 set "x265=s"
+if %buildx265%==6 set "x265=o12"
+if %buildx265% GTR 6 GOTO x265
+if %deleteINI%==1 echo.x2653=^%buildx265%>>%ini%
 
 :other265
 if [0]==[%other265INI%] (
@@ -1628,19 +1603,6 @@ if %ffmpegKeepLegacyOptsINI%==0 set ffmpegKeepLegacyOpts=n
 if %ffmpegKeepLegacyOptsINI%==1 set ffmpegKeepLegacyOpts=y
 if %deleteINI%==1 echo.ffmpegKeepLegacyOpts=^%ffmpegKeepLegacyOptsINI%>>%ini%
 
-if %build32%==yes (
-    if %CC%==clang (
-        echo ----------------------------------------------------------------------
-        echo. As of December 18th 2024, msys2 no longer supports the
-        echo. CLANG32 environment. To continue running the suite, either
-        echo. switch to 64-bit (arch=3^), or
-        echo. switch to using gcc as the compiler (CC=2^).
-        echo. This can be done through editing build\media-autobuild_suite.ini.
-        pause
-        exit
-    )
-)
-
 rem ------------------------------------------------------------------
 rem download and install basic msys2 system:
 rem ------------------------------------------------------------------
@@ -1726,7 +1688,7 @@ if not exist %instdir%\mintty.lnk (
         if %CC%==clang (
             echo.link.Arguments = "-full-path -clang64 -where .."
         ) else (
-            echo.link.Arguments = "-full-path -mingw -where .."
+            echo.link.Arguments = "-full-path -ucrt64 -where .."
         )
         echo.link.Description = "msys2 shell console"
         echo.link.TargetPath = "%instdir%\msys64\msys2_shell.cmd"
@@ -1740,8 +1702,7 @@ if not exist %instdir%\mintty.lnk (
 )
 
 rem createFolders
-if %build32%==yes call :createBaseFolders local32
-if %build64%==yes call :createBaseFolders local64
+call :createBaseFolders
 
 rem checkFstab
 set "removefstab=no"
@@ -1749,8 +1710,7 @@ set "fstab=%instdir%\msys64\etc\fstab"
 if exist %fstab%. (
     findstr trunk %fstab% >nul 2>&1 || set "removefstab=yes"
     for /f "tokens=1 delims= " %%a in ('findstr trunk %fstab%') do if not [%%a]==[%instdir%\] set "removefstab=yes"
-    findstr local32 %fstab% >nul 2>&1 && ( if [%build32%]==[no] set "removefstab=yes" ) || if [%build32%]==[yes] set "removefstab=yes"
-    findstr local64 %fstab% >nul 2>&1 && ( if [%build64%]==[no] set "removefstab=yes" ) || if [%build64%]==[yes] set "removefstab=yes"
+    findstr local32 %fstab% >nul 2>&1 && set "removefstab=yes"
     findstr clang32 %fstab% >nul 2>&1 && set "removefstab=yes"
 ) else set removefstab=yes
 
@@ -1770,8 +1730,7 @@ if not [%removefstab%]==[no] (
         echo.%instdir%\msys64\mingw64\ /mingw64 ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\ucrt64\ /ucrt64 ntfs binary,posix=0,noacl,user 0 0
         echo.%instdir%\msys64\clang64\ /clang64 ntfs binary,posix=0,noacl,user 0 0
-        if "%build32%"=="yes" echo.%instdir%\local32\ /local32 ntfs binary,posix=0,noacl,user 0 0
-        if "%build64%"=="yes" echo.%instdir%\local64\ /local64 ntfs binary,posix=0,noacl,user 0 0
+        echo.%instdir%\local64\ /local64 ntfs binary,posix=0,noacl,user 0 0
     )>"%instdir%\msys64\etc\fstab."
 )
 
@@ -1840,8 +1799,7 @@ if %CC%==clang (
 )
 if exist "%instdir%\msys64\etc\pac-mingw.pk" del "%instdir%\msys64\etc\pac-mingw.pk"
 for %%i in (%mingwpackages%) do echo.%%i>>%instdir%\msys64\etc\pac-mingw.pk
-if %build32%==yes call :getmingw 32
-if %build64%==yes call :getmingw 64
+call :getmingw
 if exist "%build%\mingw.sh" del %build%\mingw.sh
 
 rem updatebase
@@ -1877,8 +1835,7 @@ rem ------------------------------------------------------------------
 rem write config profiles:
 rem ------------------------------------------------------------------
 
-if %build32%==yes call :writeProfile 32
-if %build64%==yes call :writeProfile 64
+call :writeProfile
 
 rem update
 if exist "%instdir%\build\updated.log" (
@@ -1887,7 +1844,7 @@ if exist "%instdir%\build\updated.log" (
     set needsupdate=yes
 )
 if defined needsupdate (
-    call :runBash update.log /build/media-suite_update.sh --build32=%build32% --build64=%build64% --CC="%CC%"
+    call :runBash update.log /build/media-suite_update.sh --CC="%CC%"
     powershell -noprofile -command "[datetimeoffset]::now.tounixtimeseconds()" > %instdir%\build\updated.log
 )
 
@@ -1906,10 +1863,7 @@ rem loginProfile
 if exist %instdir%\msys64\etc\profile.pacnew ^
     move /y %instdir%\msys64\etc\profile.pacnew %instdir%\msys64\etc\profile
 (
-    echo.case "$MSYSTEM" in
-    echo.*32^) source /local32/etc/profile2.local ;;
-    echo.*64^) source /local64/etc/profile2.local ;;
-    echo.esac
+    echo.source /local64/etc/profile2.local
     echo.case $- in
     echo.*i*^) ;;
     echo.*^) export LANG=en_US.UTF-8 ;;
@@ -1925,8 +1879,8 @@ if exist %build%\compilation_failed del %build%\compilation_failed
 if exist %build%\fail_comp del %build%\compilation_failed
 
 endlocal & (
-set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
---deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x2643% --x265=%x2652% ^
+set compileArgs=--suite=yes --cpuCount=%cpuCount% ^
+--deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x264% --x265=%x265% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
 --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% ^
 --mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
@@ -1939,11 +1893,7 @@ set compileArgs=--cpuCount=%cpuCount% --build32=%build32% --build64=%build64% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"
-    if %build64%==yes (
-        if %CC%==clang ( set "MSYSTEM=CLANG64" ) else set "MSYSTEM=UCRT64"
-    ) else (
-        set "MSYSTEM=MINGW32"
-    )
+    if %CC%==clang ( set "MSYSTEM=CLANG64" ) else set "MSYSTEM=UCRT64"
     set "MSYS2_PATH_TYPE=inherit"
     if %noMintty%==y set "PATH=%PATH%"
     set "build=%build%"
@@ -1964,29 +1914,27 @@ endlocal
 goto :EOF
 
 :createBaseFolders
-if not exist %instdir%\%1\share (
+if not exist %instdir%\local64\share (
     echo.-------------------------------------------------------------------------------
-    echo.creating %1-bit install folders
+    echo.creating 64-bit install folders
     echo.-------------------------------------------------------------------------------
-    mkdir %instdir%\%1 2>NUL
-    mkdir %instdir%\%1\bin 2>NUL
-    mkdir %instdir%\%1\bin-audio 2>NUL
-    mkdir %instdir%\%1\bin-global 2>NUL
-    mkdir %instdir%\%1\bin-video 2>NUL
-    mkdir %instdir%\%1\etc 2>NUL
-    mkdir %instdir%\%1\include 2>NUL
-    mkdir %instdir%\%1\lib 2>NUL
-    mkdir %instdir%\%1\lib\pkgconfig 2>NUL
-    mkdir %instdir%\%1\share 2>NUL
+    mkdir %instdir%\local64 2>NUL
+    mkdir %instdir%\local64\bin 2>NUL
+    mkdir %instdir%\local64\bin-audio 2>NUL
+    mkdir %instdir%\local64\bin-global 2>NUL
+    mkdir %instdir%\local64\bin-video 2>NUL
+    mkdir %instdir%\local64\etc 2>NUL
+    mkdir %instdir%\local64\include 2>NUL
+    mkdir %instdir%\local64\lib 2>NUL
+    mkdir %instdir%\local64\lib\pkgconfig 2>NUL
+    mkdir %instdir%\local64\share 2>NUL
 )
 goto :EOF
 
 :writeProfile
 (
     echo.#!/usr/bin/bash
-    if %1==32 (
-        echo.MSYSTEM=MINGW32
-    ) else if %CC%==clang (
+    if %CC%==clang (
         echo.MSYSTEM=CLANG64
     ) else (
         echo.MSYSTEM=UCRT64
@@ -1996,9 +1944,9 @@ goto :EOF
     echo.# package build directory
     echo.export LOCALBUILDDIR='/build'
     echo.# package installation prefix
-    echo.export LOCALDESTDIR='/local%1'
+    echo.export LOCALDESTDIR='/local64'
     echo.
-    echo.bits='%1bit'
+    echo.bits='64bit'
     echo.
     echo.export CONFIG_SITE=/etc/config.site
     echo.alias dir='ls -la --color=auto'
@@ -2065,8 +2013,8 @@ goto :EOF
     echo.export LANG PATH PS1 HOME GIT_GUI_LIB_DIR
     echo.stty susp undef
     echo.test -f "$LOCALDESTDIR/etc/custom_profile" ^&^& source "$LOCALDESTDIR/etc/custom_profile"
-)>%instdir%\local%1\etc\profile2.local
-%instdir%\msys64\usr\bin\dos2unix -q %instdir%\local%1\etc\profile2.local
+)>%instdir%\local64\etc\profile2.local
+%instdir%\msys64\usr\bin\dos2unix -q %instdir%\local64\etc\profile2.local
 goto :EOF
 
 :writeFFmpegOption
@@ -2125,44 +2073,40 @@ goto :EOF
 :getmingw
 setlocal
 set found=0
-if %1==32 (
-    set "compiler=%instdir%\msys64\mingw32\bin\gcc.exe"
-) else if %CC%==clang (
+if %CC%==clang (
     set "compiler=%instdir%\msys64\clang64\bin\clang.exe"
 ) else set "compiler=%instdir%\msys64\ucrt64\bin\gcc.exe"
 if exist %compiler% set found=1
 if %found%==1 GOTO :EOF
 echo.-------------------------------------------------------------------------------
-echo.install %1 bit compiler
+echo.install 64-bit compiler
 echo.-------------------------------------------------------------------------------
-if "%1"=="32" (
-    set prefix=mingw-w64-i686-
-) else if %CC%==clang (
+if %CC%==clang (
     set prefix=mingw-w64-clang-x86_64-
 ) else (
     set prefix=mingw-w64-ucrt-x86_64-
 )
 (
-    echo.printf '\033]0;install %1 bit compiler\007'
+    echo.printf '\033]0;install 64-bit compiler\007'
     echo.[[ "$(uname)" = *6.1* ]] ^&^& nargs="-n 4"
     echo.sed 's/^^/%prefix%/g' /etc/pac-mingw.pk ^| xargs $nargs pacman -Sw --noconfirm --ask=20 --needed
     echo.sed 's/^^/%prefix%/g' /etc/pac-mingw.pk ^| xargs $nargs pacman -S --noconfirm --ask=20 --needed
     echo.sleep 3
     echo.exit
 )>%build%\mingw.sh
-call :runBash mingw%1.log /build/mingw.sh
+call :runBash mingw64.log /build/mingw.sh
 
 if exist %compiler% set found=1
 if %found%==0 (
     echo -------------------------------------------------------------------------------
     echo.
-    echo.MinGW%1 compiler isn't installed; maybe the download didn't work
+    echo.MinGW 64-bit compiler isn't installed; maybe the download didn't work
     echo.Do you want to try it again?
     echo.
     echo -------------------------------------------------------------------------------
     set /P try="try again [y/n]: "
 
-    if [%try%]==[y] GOTO getmingw %1
+    if [%try%]==[y] GOTO getmingw
     exit
 )
 endlocal
