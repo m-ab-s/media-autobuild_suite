@@ -256,9 +256,9 @@ For information about the compiler environment see the wiki, there you also have
 --------
 
 - Windows 64-bits (tested with Win10 & Win11 64-bits)
-  - 32-bit hosts are not supported.
+  - 32-bit Windows hosts are not supported. The suite no longer builds 32-bit targets.
 - NTFS drive
-- 23GB+ disk space for a full 32 and 64-bit build, 18GB+ for 64-bit
+- 18GB+ disk space for a 64-bit build
 - 4GB+ RAM
 - At least Powershell 4, Powershell core is not supported at this time
   - Powershell 5.1 can be downloaded [here](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
@@ -283,14 +283,17 @@ Thanks to all of them!
 This Windows Batchscript setups a Mingw-w64/GCC compiler environment for building ffmpeg and other media tools under Windows.
 After building the environment it retrieves and compiles all tools. All tools get static compiled, no external .dlls needed (with some optional exceptions)
 
+The suite uses the MSYS2 UCRT64 environment by default. CLANG64 can be selected as an experimental alternative; it may be less stable than UCRT64.
+
 How to use it:
 
 - Download the file, and extract it to your target folder or `git clone` the project. Compilers and tools will get installed there. Please make sure you use a folder with a short path and without space characters. A good place might be: C:\mabs
 - Double click the media-autobuild_suite.bat file
-- Select if you want to compile for Windows 32-bit, 64-bit or both
+- The suite builds Windows 64-bit binaries only; 32-bit targets are no longer supported.
+- UCRT64 is the default compiler environment. CLANG64 is available as experimental support.
 - Select if you want to compile non-free tools like "fdk-aac"
 - Select the numbers of CPU (cores) you want to use
-- Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local[32|64]\bin-(audio|global|video)
+- Wait a little bit, and hopefully after a while you'll find all your "*.exe" tools under local64\bin-(audio|global|video)
 
 The script writes an .ini file at /build/media-autobuild_suite.ini, so you only need to make these choices the first time what you want to build.
 
@@ -311,7 +314,7 @@ If there's some error during compilation follow these steps:
 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/m-ab-s/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
 3. If it still doesn't work, [create an issue](https://github.com/m-ab-s/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
-4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64 and /local[32|64] if they exist. /build is usually safe to keep and saves time;
+4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64 and /local64 if they exist. /build is usually safe to keep and saves time;
 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 6. If you compile with `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)
 
@@ -356,9 +359,9 @@ If there's some error during compilation follow these steps:
 
 --------
 
-`/local32|64/etc/custom_profile` & `$HOME/custom_build_options`
+`/local64/etc/custom_profile` & `$HOME/custom_build_options`
 
-- Put here any general/platform tweaks that you need for _your_ specific environment. See `/local32|64/etc/profile2.local` for example usage.
+- Put here any general/platform tweaks that you need for _your_ specific environment. See `/local64/etc/profile2.local` for example usage.
 
 ## Custom Patches
 
@@ -380,11 +383,11 @@ Using custom patches is not officially supported, if you do use custom patches, 
 - The commands will run in the cloned/unzipped folder unless otherwise stated. (flac_extra.sh would run commands within flac-git)
 
 To reference the cloned folder itself (`flac-git` `ffmpeg-git`) you can use the variable `${REPO_DIR}`.
-To reference the generated build folder, you would need to use `${REPO_DIR}/build-${bits}` to reference the build-64bit folder for 64 bit builds or build-32bit folder for 32 bit builds.
+To reference the generated build folder, use `${REPO_DIR}/build-${bits}` to reference the build-64bit folder.
 
 - For some packages, the build folder may be slightly different (`build-shared-${bits}` for shared ffmpeg or `build-light-${bits}` for light build, etc. Try to compile at least once to see what folders are generated or look through the [compile script](build/media-suite_compile.sh))
 
-If you are building for both 32 and 64-bit, you can gate certain commands using `if [[ $bits = 64bit ]]; then <command>; fi` to only run them when building for 64 bits.\
+Build scripts run for 64-bit Windows targets.\
 Be careful with certain packages due to their unique build process (x265, x264, and some others) so make sure to check the compile script
 
 Example Script: `/build/aom_extra.sh` for `aom-git`
@@ -404,7 +407,7 @@ _pre_cmake(){
     # Change directory to the build folder
     cd_safe "build-${bits}"
     # Run cmake with custom options. This will override the previous cmake commands.
-    # $LOCALDESTDIR refers to local64 or local32
+    # $LOCALDESTDIR refers to local64
     cmake .. -G"Ninja" -DCMAKE_INSTALL_PREFIX="$LOCALDESTDIR" \
         -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang \
         -DBUILD_SHARED_LIBS=off -DENABLE_TOOLS=off
