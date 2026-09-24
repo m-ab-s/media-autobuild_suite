@@ -1521,7 +1521,8 @@ if { [[ $other265 = y ]] || { [[ $ffmpeg != no ]] && enabled libkvazaar; }; } &&
         sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
     CFLAGS+=" -fno-asynchronous-unwind-tables -DKVZ_BIT_DEPTH=10" \
         do_separate_confmakeinstall video
-    [[ $ffmpeg != no ]] && do_addOption --extra-cflags=-DKVZ_STATIC_LIB
+    grep_or_sed 'KVZ_STATIC_LIB' "$LOCALDESTDIR/lib/pkgconfig/kvazaar.pc" \
+    '/^Cflags:/a Cflags.private: -DKVZ_STATIC_LIB'
     do_checkIfExist
 fi
 
