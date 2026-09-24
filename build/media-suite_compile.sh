@@ -1264,7 +1264,9 @@ if { { [[ $ffmpeg != no ]] &&
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0003-CMake-include-gsl-include-for-main-lib-too.patch" am
     CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
         do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_ENABLE_MODULES=OFF
-    sed -i 's/Libs.private.*/& -luuid -lole32/' "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
+    sed -i -e 's/Libs.private.*/& -luuid -lole32/' \
+        -e '/^Cflags:/a Cflags.private: -DAL_LIBTYPE_STATIC' \
+        "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
     do_checkIfExist
 fi
 
@@ -2375,14 +2377,13 @@ if [[ $ffmpeg != no ]]; then
     fi
     if enabled libssh; then
         do_pacman_install libssh
-        do_addOption --extra-cflags=-DLIBSSH_STATIC
-        grep_or_sed "Requires.private:.*libssl" "$MINGW_PREFIX"/lib/pkgconfig/libssh.pc \
-            $'/^Libs:/ i\\\nRequires.private: libssl libcrypto zlib\\\nLibs.private: -liphlpapi -lws2_32 -lpthread'
+        grep_or_sed 'LIBSSH_STATIC' "$MINGW_PREFIX/lib/pkgconfig/libssh.pc" \
+            $'/^Cflags:/a\\\nCflags.private: -DLIBSSH_STATIC\n/^Libs:/ i\\\nRequires.private: libssl libcrypto zlib\\\nLibs.private: -liphlpapi -lws2_32 -lpthread'
     fi
     enabled libtheora && do_pacman_install libtheora
-    enabled libcaca && do_addOption --extra-cflags=-DCACA_STATIC && do_pacman_install libcaca
-    grep_and_sed '-lz' "$MINGW_PREFIX"/lib/pkgconfig/caca.pc \
-        '/Requires:/s|[[:blank:]]*$| zlib|;s|[[:blank:]]+-lz||'
+    enabled libcaca && do_pacman_install libcaca
+    grep_or_sed 'CACA_STATIC' "$MINGW_PREFIX/lib/pkgconfig/caca.pc" \
+        $'/^Cflags:/a\\\nCflags.private: -DCACA_STATIC\n/Requires:/s|[[:blank:]]*$| zlib|;s|[[:blank:]]+-lz||'
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
     if enabled libopenh264; then
@@ -2422,9 +2423,8 @@ if [[ $ffmpeg != no ]]; then
         { do_pacman_remove fftw; do_pacman_install chromaprint; }
     if enabled libzmq; then
         do_pacman_install zeromq
-        grep_or_sed ws2_32 "$MINGW_PREFIX"/lib/pkgconfig/libzmq.pc \
-            's/-lpthread/& -lws2_32/'
-        do_addOption --extra-cflags=-DZMQ_STATIC
+        grep_or_sed 'ZMQ_STATIC' "$MINGW_PREFIX/lib/pkgconfig/libzmq.pc" \
+            $'/^Cflags:/a\\\nCflags.private: -DZMQ_STATIC\ns/-lpthread/& -lws2_32/'
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
@@ -2461,23 +2461,26 @@ if [[ $ffmpeg != no ]]; then
     if do_vcs "$ffmpegPath" ffmpeg; then
         ff_base_commit=$(git rev-parse HEAD)
         do_changeFFmpegConfig "$license"
+        # Keep option changes below in sync between FFMPEG_OPTS and FFMPEG_OPTS_SHARED.
         [[ -f ffmpeg_extra.sh ]] && source ffmpeg_extra.sh
         if enabled libsvthevc; then
             do_patch "https://raw.githubusercontent.com/1480c1/SVT-HEVC/master/ffmpeg_plugin/master-0001-lavc-svt_hevc-add-libsvt-hevc-encoder-wrapper.patch" am ||
-                do_removeOption --enable-libsvthevc
+                {
+                    do_removeOption --enable-libsvthevc
+                    do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
+                }
         fi
         if enabled libsvtvp9; then
             do_patch "https://raw.githubusercontent.com/1480c1/SVT-VP9/master/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch" am ||
-                do_removeOption --enable-libsvtvp9
+                {
+                    do_removeOption --enable-libsvtvp9
+                    do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
+                }
         fi
         if enabled libvvdec; then
             do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch"  ||
                 do_removeOptions --enable-libvvdec
         fi
-
-        enabled libsvthevc || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvthevc"
-        enabled libsvtav1 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtav1"
-        enabled libsvtvp9 || do_removeOption FFMPEG_OPTS_SHARED "--enable-libsvtvp9"
 
         # Remove explicit include of DeckLinkAPI_v14_2_1.h since it's merged into the main file for Windows
         enabled decklink && sed -ri 's|#include <DeckLinkAPI_v14_2_1.h>||g' libavdevice/decklink_{dec,enc,common}.cpp
@@ -2486,18 +2489,6 @@ if [[ $ffmpeg != no ]]; then
         enabled audiotoolbox && do_addOption --extra-libs=-lAudioToolboxWrapper && do_addOption --disable-outdev=audiotoolbox &&
             do_addOption FFMPEG_OPTS_SHARED --extra-libs=-lAudioToolboxWrapper && do_addOption FFMPEG_OPTS_SHARED --disable-outdev=audiotoolbox &&
             sed -ri "s/enabled audiotoolbox && check_apple_framework.*/enable audiotoolbox/g" configure
-
-        if enabled openal &&
-            pc_exists "openal"; then
-            OPENAL_LIBS=$($PKG_CONFIG --libs openal)
-            export OPENAL_LIBS
-            do_addOption "--extra-cflags=-DAL_LIBTYPE_STATIC"
-            do_addOption FFMPEG_OPTS_SHARED "--extra-cflags=-DAL_LIBTYPE_STATIC"
-            for _openal_flag in $($PKG_CONFIG --cflags openal); do
-                do_addOption "--extra-cflags=$_openal_flag"
-            done
-            unset _openal_flag
-        fi
 
         if enabled gmp; then
             do_pacman_install gmp
