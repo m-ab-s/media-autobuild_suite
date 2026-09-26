@@ -824,11 +824,11 @@ if [0]==[%ffmpegPathINI%] (
     echo.
     echo. Using default ffmpeg source path: %defaultFFmpegPath%
     echo.
-    echo. If you want to use a custom source repository, add a line like this 
+    echo. If you want to use a custom source repository, add a line like this
     echo. to media-autobuild_suite.ini:
     echo.
     echo.     ffmpegPath=https://github.com/username/FFmpeg.git#branch=branchname
-    echo. 
+    echo.
     echo. or for a local repository like:
     echo.
     echo.     ffmpegPath=../myrepos/ffmpeg
@@ -1049,7 +1049,7 @@ if [0]==[%vlcINI%] (
     echo.
     echo. Note: compilation of VLC is currently broken, do not enable unless you know
     echo. what you are doing.
-    echo. 
+    echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildvlc="Build vlc: "
