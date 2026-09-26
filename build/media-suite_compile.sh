@@ -742,7 +742,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         CXXFLAGS+=" -DJXL_CMS_STATIC_DEFINE -DJXL_STATIC_DEFINE -DJXL_THREADS_STATIC_DEFINE $($PKG_CONFIG --cflags zlib)" \
             LDFLAGS+=" $($PKG_CONFIG --libs zlib)" \
-            do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES,JPEGLI}}=OFF \
+            do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
             -DJPEGXL_{FORCE_SYSTEM_{BROTLI,LCMS2},STATIC}=ON "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
@@ -2231,13 +2231,11 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     do_checkIfExist
 fi
 
-_check=(bin-video/oapv_app_{enc,dec}.exe oapv/oapv.h oapv/liboapv.a oapv.pc)
+_check=(bin-video/oapv_app_{enc,dec}.exe oapv/oapv.h liboapv.a oapv.pc)
 if [[ $ffmpeg != no ]] && enabled liboapv &&
     do_vcs "$SOURCE_REPO_OPENAPV"; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall video -DOAPV_BUILD_SHARED_LIB=OFF
-    # patch the lib path to actual subdirectory it installed to
-    sed -i 's|Libs: -L${libdir} -loapv|Libs: -L${libdir}/oapv -loapv|' "$LOCALDESTDIR"/lib/pkgconfig/oapv.pc
     do_checkIfExist
 fi
 
@@ -2692,11 +2690,9 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         unset _luajit_args
     fi
 
-    do_pacman_remove uchardet-git
     ! mpv_disabled uchardet && do_pacman_install uchardet
     ! mpv_disabled libarchive && do_pacman_install libarchive
 
-    do_pacman_remove angleproject-git
     _check=(EGL/egl.h)
     if mpv_enabled egl-angle && do_vcs "$SOURCE_REPO_ANGLE"; then
         do_simple_print "${orange}mpv will need libGLESv2.dll and libEGL.dll to use gpu-context=angle"'!'
