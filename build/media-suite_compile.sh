@@ -777,7 +777,6 @@ fi
 if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
     do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll$reset"
     do_pacman_remove opencl-headers
-    do_pacman_install tools
     _check=(CL/cl.h)
     if do_vcs "$SOURCE_REPO_OPENCLHEADERS"; then
         do_uninstall include/CL
