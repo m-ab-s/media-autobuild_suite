@@ -100,7 +100,8 @@ do if %%f lss 4 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=autoconf-archive autogen autotools base-devel pacutils unzip winpty
+set msyspackages=autoconf-archive autogen autotools base base-devel filesystem msys2-runtime ^
+pacutils unzip winpty
 
 set mingwpackages=7zip ccache cmake dlfcn gettext-tools git meson nasm ninja toolchain
 

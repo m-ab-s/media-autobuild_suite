@@ -103,6 +103,13 @@ extract_pkg_prefix() (
     echo "$MINGW_PACKAGE_PREFIX-"
 )
 
+add_pkg_group() {
+    local packages
+    packages=$(pacman -Sgq "$1" 2> /dev/null)
+    [[ -n $packages ]] || return 1
+    printf '%s\n' "$packages" >> "$new"
+}
+
 if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     new=$(mktemp)
     old=$(mktemp)
@@ -111,7 +118,9 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
-    dos2unix -O /etc/pac-base.pk 2> /dev/null | sort -u >> "$new"
+    while read -r pkg; do
+        add_pkg_group "$pkg" || printf '%s\n' "$pkg" >> "$new"
+    done < <(dos2unix -O /etc/pac-base.pk 2> /dev/null | sort -u)
     mapfile -t newmingw < <(dos2unix -O /etc/pac-mingw.pk /etc/pac-mingw-extra.pk 2>/dev/null | sort -u)
     mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
     case $CC in
@@ -119,11 +128,15 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     *) prefix=$(extract_pkg_prefix ucrt64) ;;
     esac
     for pkg in "${newmingw[@]}"; do
-        pacman -Ss "$prefix$pkg" > /dev/null 2>&1 &&
-            printf %s\\n "$prefix$pkg" >> "$new"
+        add_pkg_group "$prefix$pkg" || {
+            pacman -Ss "$prefix$pkg" > /dev/null 2>&1 &&
+            printf '%s\n' "$prefix$pkg" >> "$new"
+        }
     done
     for pkg in "${newmsys[@]}"; do
-        pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf %s\\n "$pkg" >> "$new"
+        add_pkg_group "$pkg" || {
+            pacman -Ss "^${pkg}$" > /dev/null 2>&1 && printf '%s\n' "$pkg" >> "$new"
+        }
     done
     pacman -Qqe | sort -u >> "$old"
     sort -uo "$new"{,}
