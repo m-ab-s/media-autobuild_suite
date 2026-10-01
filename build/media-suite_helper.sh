@@ -1389,12 +1389,12 @@ zip_logs() {
     (
         cd "$LOCALBUILDDIR" > /dev/null || do_exit_prompt "Did you delete /build?"
         {
-            echo /trunk/media-autobuild_suite.bat
+            echo ../media-autobuild_suite.bat
             [[ $failed != . ]] && find "$failed" -name "*.log"
             find . -maxdepth 1 -name "*.stripped.log" -o -name "*_options.txt" -o -name "media-suite_*.sh" \
                 -o -name "last_run" -o -name "media-autobuild_suite.ini" -o -name "diagnostics.txt" -o -name "patchedFolders"
         } | sort -uo failedFiles
-        7z -mx=9 a logs.zip -- @failedFiles > /dev/null && rm failedFiles
+        7z -mx=9 a logs.zip @failedFiles > /dev/null && rm failedFiles
     )
     # [[ ! -f $LOCALBUILDDIR/no_logs && $suiteMode = yes && $autouploadlogs = y ]] &&
     #     url="$(cd "$LOCALBUILDDIR" && /usr/bin/curl -sF'file=@logs.zip' https://0x0.st)"
