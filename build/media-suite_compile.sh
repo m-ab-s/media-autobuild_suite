@@ -1393,8 +1393,7 @@ if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_uninstall share/model "${_check[@]}"
     do_pacman_install -m vim # for built_in_models
     cd_safe libvmaf
-    CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" do_mesoninstall video \
-        -Denable_float=true -Dbuilt_in_models=true -Denable_tests=false
+    do_mesoninstall video -Denable_{float,tests}=true -Dbuilt_in_models=true
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
@@ -2044,7 +2043,7 @@ EOF
     build_x265
     cpuCount=1 log "install" ninja install
     do_checkIfExist
-    unset assembly cli
+    unset cli
 else
     pc_exists x265 || do_removeOption "--enable-libx265"
 fi
