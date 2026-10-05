@@ -722,17 +722,8 @@ if { [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; } } ||
 fi
 
 if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
-    _check=(bin/gflags_completions.sh gflags.pc gflags/gflags.h libgflags{,_nothreads}.a)
-    if do_vcs "$SOURCE_REPO_GFLAGS"; then
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/gflags/0001-cmake-chop-off-.lib-extension-from-shlwapi.patch" am
-        do_uninstall "${_check[@]}" lib/cmake/gflags include/gflags
-        do_cmakeinstall -D{BUILD,INSTALL}_STATIC_LIBS=ON -DBUILD_gflags_LIB=ON -DINSTALL_HEADERS=ON \
-            -DREGISTER_{BUILD_DIR,INSTALL_PREFIX}=OFF
-        do_checkIfExist
-    fi
-
     do_pacman_install brotli
-    _deps=(libgflags.a liblcms2.a)
+    _deps=(liblcms2.a)
     _check=(libjxl{{,_threads}.a,.pc} jxl/decode.h)
     [[ $jpegxl = y ]] && _check+=(bin-global/{{c,d}jxl,jxlinfo}.exe)
     if do_vcs "$SOURCE_REPO_LIBJXL"; then
@@ -742,7 +733,7 @@ if [[ $jpegxl = y ]] || { [[ $ffmpeg != no ]] && enabled libjxl; }; then
         [[ $jpegxl = y ]] || extracommands=("-DJPEGXL_ENABLE_TOOLS=OFF")
         CXXFLAGS+=" -DJXL_CMS_STATIC_DEFINE -DJXL_STATIC_DEFINE -DJXL_THREADS_STATIC_DEFINE $($PKG_CONFIG --cflags zlib)" \
             LDFLAGS+=" $($PKG_CONFIG --libs zlib)" \
-            do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,MANPAGES,OPENEXR,SKCMS,EXAMPLES}}=OFF \
+            do_cmakeinstall global -D{BUILD_TESTING,JPEGXL_ENABLE_{BENCHMARK,DOXYGEN,JNI,MANPAGES,OPENEXR,SJPEG,SKCMS,EXAMPLES}}=OFF \
             -DJPEGXL_{FORCE_SYSTEM_{BROTLI,LCMS2},STATIC}=ON "${extracommands[@]}"
         do_checkIfExist
         unset extracommands
