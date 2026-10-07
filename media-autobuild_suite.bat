@@ -146,7 +146,7 @@ set iniOptions=license2 vpx2 x2643 x2653 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ^
 curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski avs2 dovitool ^
-hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl vvenc vvdec ^
+hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl jpegli vvenc vvdec ^
 zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
 
@@ -426,6 +426,26 @@ if %buildjpegxl%==1 set "jpegxl=y"
 if %buildjpegxl%==2 set "jpegxl=n"
 if %buildjpegxl% GTR 2 GOTO jpegxl
 if %deleteINI%==1 echo.jpegxl=^%buildjpegxl%>>%ini%
+
+:jpegli
+if [0]==[%jpegliINI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. Build jpegli tools [JPEG encoder and decoder with improved compression]?
+    echo. 1 = Yes
+    echo. 2 = No
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildjpegli="Build jpegli: "
+) else set buildjpegli=%jpegliINI%
+
+if "%buildjpegli%"=="" GOTO jpegli
+if %buildjpegli%==1 set "jpegli=y"
+if %buildjpegli%==2 set "jpegli=n"
+if %buildjpegli% GTR 2 GOTO jpegli
+if %deleteINI%==1 echo.jpegli=^%buildjpegli%>>%ini%
 
 :x264
 if [0]==[%x2643INI%] (
@@ -1887,7 +1907,7 @@ set compileArgs=--suite=yes --cpuCount=%cpuCount% ^
 --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^
 --gifski=%gifski% --avs2=%avs2% --dovitool=%dovitool% --hdr10plustool=%hdr10plustool% --timeStamp=%timeStamp% ^
 --noMintty=%noMintty% --ccache=%ccache% --svthevc=%svthevc% --svtav1=%svtav1% --svtvp9=%svtvp9% ^
---xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --av1an=%av1an% --zlib=%zlib% ^
+--xvc=%xvc% --vlc=%vlc% --libavif=%libavif% --libheif=%libheif% --jpegxl=%jpegxl% --jpegli=%jpegli% --av1an=%av1an% --zlib=%zlib% ^
 --ffmpegPath=%ffmpegPath% --exitearly=%MABS_EXIT_EARLY%
     @REM --autouploadlogs=%autouploadlogs%
     set "noMintty=%noMintty%"

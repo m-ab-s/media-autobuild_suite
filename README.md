@@ -175,6 +175,7 @@ For information about the compiler environment see the wiki, there you also have
         - with optional built-in video support (ffmpeg 6.1)
     - haisrt tools (git)
     - jo (git)
+    - jpegli tools (git)
     - jpeg-xl tools (git)
     - jq (git)
     - kvazaar (git)

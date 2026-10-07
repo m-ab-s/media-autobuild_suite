@@ -134,7 +134,7 @@ To recompile these, delete `<appname>.exe` in corresponding binary directories:
         speexenc
 
     /bin-global
-        cjpegl
+        cjpegli
         cjxl
         curl
         cwebp
