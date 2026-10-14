@@ -1974,7 +1974,8 @@ fi
 
 _check=(x265{,_config}.h libx265.a x265.pc)
 [[ $standalone = y || $av1an = y ]] && _check+=(bin-video/x265.exe)
-if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
+if { [[ $x265 != n ]] || { [[ $ffmpeg != no ]] && enabled libx265; }; } &&
+    do_vcs "$SOURCE_REPO_X265"; then
     grep_and_sed CMAKE_CXX_IMPLICIT_LINK_LIBRARIES source/CMakeLists.txt 's|\$\{CMAKE_CXX_IMPLICIT_LINK_LIBRARIES\}||g'
     grep_or_sed cstdint source/dynamicHDR10/json11/json11.cpp "/cstdlib/ i\#include <cstdint>"
     do_uninstall libx265{_main10,_main12}.a bin-video/libx265_main{10,12}.dll "${_check[@]}"
@@ -1997,7 +1998,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
     }
     [[ $standalone = y || $av1an = y ]] && cli=-DENABLE_CLI=ON
 
-    if [[ $x265 =~ (o12|s|y) ]]; then
+    if [[ $x265 =~ (o12|s|y|n) ]]; then
         cd_safe "$build_root/12bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 12-bit lib" -DENABLE_SHARED=ON -DMAIN12=ON
@@ -2011,7 +2012,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         fi
     fi
 
-    if [[ $x265 =~ (o10|s|y) ]]; then
+    if [[ $x265 =~ (o10|s|y|n) ]]; then
         cd_safe "$build_root/10bit"
         if [[ $x265 = s ]]; then
             do_x265_cmake "shared 10-bit lib" -DENABLE_SHARED=ON
@@ -2025,7 +2026,7 @@ if [[ ! $x265 = n ]] && do_vcs "$SOURCE_REPO_X265"; then
         fi
     fi
 
-    if [[ $x265 =~ (o8|s|y) ]]; then
+    if [[ $x265 =~ (o8|s|y|n) ]]; then
         cd_safe "$build_root/8bit"
         if [[ $x265 = s || $x265 = o8 ]]; then
             do_x265_cmake "8-bit lib/bin" $cli -DHIGH_BIT_DEPTH=OFF
