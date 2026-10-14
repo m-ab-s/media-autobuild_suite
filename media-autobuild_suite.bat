@@ -122,7 +122,7 @@ libwebp libxml2 libxvid libzimg #mbedtls openssl version3
 :: options also available with the suite
 set ffmpeg_options_full=audiotoolbox cairo chromaprint #cuda-nvcc decklink frei0r ladspa lcms2 ^
 libaribb24 libaribcaption libastcenc libbs2b libcaca libcdio libcodec2 libcurl libdavs2 libdvdnav ^
-libdvdread libflite libfribidi libgme libilbc libjxl libkvazaar liblc3 #liblensfun libmodplug ^
+libdvdread libfdk-xhe-aac libflite libfribidi libgme libilbc libjxl libkvazaar liblc3 #liblensfun libmodplug ^
 libmpeghdec liboapv libplacebo libqrencode libquirc librist librtmp librubberband libssh ^
 libsvthevc libsvtjpegxs libsvtvp9 libtesseract libuavs3d libvvdec libvvenc libxavs libxavs2 ^
 libxevd libxeve libzmq libzvbi openal vapoursynth vulkan
@@ -702,7 +702,7 @@ if [0]==[%fdkaacINI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
-    echo. Build FDK-AAC library and binary? [AAC-LC/HE/HEv2 codec]
+    echo. Build FDK-AAC/xHE-AAC libraries and the fdkaac binary?
     echo. 1 = Yes
     echo. 2 = No
     echo.

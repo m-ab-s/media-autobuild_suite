@@ -13,7 +13,7 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
     dovi
     dvdnav
     dvdread
-    fdk-aac (fdk-aac library only)
+    fdk-aac (FDK-AAC and FDK-XHE-AAC libraries)
     ffms2
     ffnvcodec
     flac
