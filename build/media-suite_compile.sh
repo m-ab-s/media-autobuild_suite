@@ -992,23 +992,20 @@ if [[ $ffmpeg != no ]] && enabled libvo-amrwbenc &&
     do_checkIfExist
 fi
 
-if { [[ $ffmpeg != no ]] && enabled libfdk-aac; } || [[ $fdkaac = y ]]; then
-    _check=(libfdk-aac.{,l}a fdk-aac.pc)
+if { [[ $ffmpeg != no ]] && enabled_any libfdk-aac libfdk-xhe-aac; } || [[ $fdkaac = y ]]; then
+    _check=(libfdk-aac.a libfdk-xhe-aac.a fdk-aac.pc fdk-xhe-aac.pc)
     if do_vcs "$SOURCE_REPO_FDKAAC"; then
-        do_autoreconf
-        do_uninstall include/fdk-aac "${_check[@]}"
-        CXXFLAGS+=" -fno-exceptions -fno-rtti" do_separate_confmakeinstall
+        do_uninstall include/fdk-aac include/fdk-xhe-aac \
+            libfdk-aac.la "${_check[@]}"
+        do_cmakeinstall audio -DBUILD_SHARED_LIBS=OFF
         do_checkIfExist
     fi
     _check=(bin-audio/fdkaac.exe)
     _deps=(libfdk-aac.a)
     if [[ $standalone = y ]] &&
         do_vcs "$SOURCE_REPO_FDKAACEXE" bin-fdk-aac; then
-        do_autoreconf
         do_uninstall "${_check[@]}"
-        CFLAGS+=" $($PKG_CONFIG --cflags fdk-aac)" \
-        LDFLAGS+=" $($PKG_CONFIG --cflags --libs fdk-aac)" \
-            do_separate_confmakeinstall audio
+        do_cmakeinstall audio -DFDKAAC_BUILD_FDK_AAC=OFF
         do_checkIfExist
     fi
 fi

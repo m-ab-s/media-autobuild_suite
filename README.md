@@ -116,6 +116,8 @@ For information about the compiler environment see the wiki, there you also have
         - libdavs2 (git)
         - libdvdnav (git)
         - libdvdread (git)
+        - libfdk-xhe-aac (git)
+            - needs non-free license if not LGPL
         - libflite (git)
         - libfribidi (git)
         - libgme (git)
