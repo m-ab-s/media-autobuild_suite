@@ -18,7 +18,7 @@ For information about the compiler environment see the wiki, there you also have
 
 - FFmpeg (shared or static) with these libraries and features (all optional, but enabled by default unless said otherwise; subject to license and platform restrictions):
     - Light build:
-        - amd amf encoders (built-in)
+        - amf (AMD AMF headers, git)
         - bzlib (mingw-w64)
         - cuda (built-in)
         - cuda-llvm (built-in)
@@ -34,8 +34,8 @@ For information about the compiler environment see the wiki, there you also have
             - needs non-free license if not LGPL
         - libsvtav1 (git)
         - libmp3lame (mingw-w64)
-        - libopus (mingw-w64)
-        - libvorbis (mingw-w64)
+        - libopus (git)
+        - libvorbis (git)
         - libvpl (git)
         - libvpx (git)
         - libx264 (git)
@@ -47,11 +47,11 @@ For information about the compiler environment see the wiki, there you also have
         - schannel with gmp (mingw-w64)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
             - gmp can be switched by gcrypt (mingw-w64) with --enable-gcrypt
-        - sdl2 (git tag) (needed for ffplay)
+        - sdl2 (git, SDL2 branch) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
         - zlib (see the zlib variants under other tools)
     - Zeranoe-emulating build (in addition to Light)
-        - avisynth (AviSynthPlus; needs avisynth dll installed)
+        - avisynth (AviSynthPlus headers, git; needs avisynth dll installed)
         - fontconfig (latest release)
         - only one of these TLS libs (including schannel) can be enabled at once:
             - openssl (mingw-w64)
@@ -77,12 +77,12 @@ For information about the compiler environment see the wiki, there you also have
             - needed for sofalizer filter
         - libopencore-amrnb / libopencore-amrwb (mingw-w64)
         - libopenjpeg (openjpeg2, mingw-w64)
-        - libopenmpt (git tag)
+        - libopenmpt (git, OpenMPT-1.30 branch)
         - librav1e (git)
         - libshine (git)
         - libsnappy (mingw-w64)
         - libsoxr (git)
-        - libspeex (mingw-w64)
+        - libspeex (git)
         - libsrt (git)
         - libtheora (mingw-w64)
         - libtwolame (mingw-w64)
@@ -90,8 +90,9 @@ For information about the compiler environment see the wiki, there you also have
         - libvmaf (git)
         - libvo-amrwbenc (0.1.3)
         - libwebp (git)
-        - libxml2 (mingw-w64)
-        - libxvid (git)
+        - libxml2 (git)
+        - libxvid (mingw-w64)
+            - built from git instead if standalone binaries are enabled
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - audiotoolbox (AudioToolboxWrapper, git)
@@ -101,7 +102,7 @@ For information about the compiler environment see the wiki, there you also have
         - cuda-nvcc (needs CUDA SDK installed)
             - needs non-free license
             - disabled by default
-        - decklink (12.5.1)
+        - decklink (headers, git)
             - needs non-free license
         - frei0r (git)
         - ladspa (mingw-w64)
@@ -157,25 +158,29 @@ For information about the compiler environment see the wiki, there you also have
         - vulkan (git)
     - Full shared dependencies (in addition to Full)
         - libopenh264 (official binaries)
-        - opencl (from system)
+        - opencl (OpenCL-Headers, git; links against the system OpenCL.dll)
         - opengl (from system)
 
 - other tools
     - aom (git)
     - av1an (git)
         - requires an installed or portable copy of [64-bit Python 3.12.x](https://www.python.org/downloads/) and [Vapoursynth](https://github.com/vapoursynth/vapoursynth/releases/latest)
+    - avs2 tools: xavs2 and davs2 (git)
+        - davs2 can optionally be built from an unofficial fork with 10-bit support
     - bmx (git)
     - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
     - dav1d (git)
+    - dovi_tool (git)
     - dssim (git)
     - exhale (git)
     - faac (git)
     - fdk-aac (git)
     - flac (git)
     - gifski (git)
-        - with optional built-in video support (ffmpeg 6.1)
+        - with optional built-in video support (ffmpeg 8.0)
     - haisrt tools (git)
+    - hdr10plus_tool (git)
     - jo (git)
     - jpegli tools (git)
     - jpeg-xl tools (git)
@@ -207,22 +212,24 @@ For information about the compiler environment see the wiki, there you also have
         - Base build (ffmpegChoice=2 or 3)
             - ANGLE Headers (git)
                 - requires ANGLE shared libraries from somewhere else (i.e. Chrome, Firefox) for gpu-context=angle support
+            - dvdnav (git)
             - lcms2 (git)
+            - libarchive (mingw-w64)
             - libass (git)
             - libbluray (git)
                 - BD-J support requires installation of Java JDK
                 - BD-J support after compilation probably only requires JRE (untested)
+            - libcdio-paranoia (mingw-w64) for cdda
             - luajit (git)
             - mujs (git)
-            - rubberband (git snapshot)
+            - rubberband (git)
             - uchardet (mingw-w64)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
             - vapoursynth (R80)
+            - static libmpv
         - Full build (ffmpegChoice=4)
-            - dvdnav (git)
-            - libarchive (mingw-w64)
-            - shared libmpv
             - openal (git)
+            - sdl2 (git) for sdl2-audio, sdl2-video and sdl2-gamepad
     - opus-tools (git)
     - rav1e (git)
     - ripgrep (git)
@@ -231,6 +238,7 @@ For information about the compiler environment see the wiki, there you also have
     - speex (git)
     - svt-av1 (git)
     - svt-hevc (git)
+    - svt-vp9 (git)
     - tesseract (git)
     - uvg266 (git)
     - vlc (git) (broken)
