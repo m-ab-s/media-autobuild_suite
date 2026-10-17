@@ -165,7 +165,7 @@ if exist %ini% (
         } else { ^
             Write-Output "set `"${option}INI^=0^`"" ^
         } ^
-    } | powershell -NoProfile -Command - > %build%\options.bat
+    } | powershell -NoProfile -NonInteractive -Command - > %build%\options.bat
     call %build%\options.bat
     del %build%\options.bat
 ) else set deleteIni=1
@@ -1644,7 +1644,7 @@ if not exist "%instdir%\msys64\msys2_shell.cmd" (
     echo [System.Net.ServicePointManager]::SecurityProtocol = 'Tls12'; ^
         (New-Object System.Net.WebClient^).DownloadFile(^
         'https://github.com/msys2/msys2-installer/releases/download/nightly-x86_64/msys2-base-x86_64-latest.sfx.exe', ^
-        "$PWD\msys2-base.sfx.exe"^) | powershell -NoProfile -Command - || goto :errorMsys
+        "$PWD\msys2-base.sfx.exe"^) | powershell -NoProfile -NonInteractive -Command - || goto :errorMsys
     :unpack
     if exist %build%\msys2-base.sfx.exe (
         echo -------------------------------------------------------------------------------
