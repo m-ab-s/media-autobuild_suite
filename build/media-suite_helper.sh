@@ -1797,15 +1797,17 @@ create_debug_link() {
     done
 }
 
-# do_dlltool lib.a a.def
+# do_dlltool lib.a a.def [dlltool options]
 do_dlltool() (
+    local lib="$1" def="$2"
+    shift 2
     if dlltool --help | grep -q llvm; then
         # llvm's dlltool does not support delay import libraries.
         # Until I can find a better way than just injecting `-Wl,--delayload=a.dll` into the LDFLAGS,
         # ignore them for now.
-        exec llvm-dlltool -k -l "$1" -d "$2"
+        exec llvm-dlltool -k -l "$lib" -d "$def" "$@"
     fi
-    exec dlltool -k -y "$1" -d "$2" -A
+    exec dlltool -k -y "$lib" -d "$def" -A "$@"
 )
 
 # fix_impsyms "$MINGW_PREFIX/lib/libarchive.a" libarchive
