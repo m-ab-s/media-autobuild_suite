@@ -774,14 +774,7 @@ if [[ $ffmpeg != no ]] && enabled libquirc &&
     do_checkIfExist
 fi
 
-if files_exist bin-video/OpenCL.dll; then
-    opencldll=$LOCALDESTDIR/bin-video/OpenCL.dll
-else
-    syspath=$(cygpath -S)
-    opencldll=$syspath/OpenCL.dll
-    unset syspath
-fi
-if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
+if [[ $ffmpeg != no ]] && enabled opencl; then
     do_simple_print "${orange}FFmpeg and related apps will depend on OpenCL.dll$reset"
     do_pacman_remove opencl-headers
     _check=(CL/cl.h)
@@ -791,20 +784,19 @@ if [[ $ffmpeg != no && -f $opencldll ]] && enabled opencl; then
         do_checkIfExist
     fi
     _check=(libOpenCL.a)
-    if test_newer installed "$opencldll" "${_check[@]}"; then
-        cd_safe "$LOCALBUILDDIR"
-        [[ -d opencl ]] && rm -rf opencl
-        mkdir -p opencl && cd_safe opencl
+    cd_safe "$LOCALBUILDDIR"
+    mkdir -p opencl && cd_safe opencl
+    if do_wget -c -r -n \
+        "https://raw.githubusercontent.com/KhronosGroup/OpenCL-ICD-Loader/main/loader/windows/OpenCL.def" &&
+        test_newer "$PWD/OpenCL.def" "$(file_installed libOpenCL.a)"; then
+        do_uninstall "${_check[@]}"
         create_build_dir
-        gendef "$opencldll" >/dev/null 2>&1
-        [[ -f OpenCL.def ]] && do_dlltool libOpenCL.a OpenCL.def
-        [[ -f libOpenCL.a ]] && do_install libOpenCL.a
+        # Generate only the import library; OpenCL.dll is provided at runtime.
+        do_dlltool libOpenCL.a ../OpenCL.def -D OpenCL.dll
+        do_install libOpenCL.a
         do_checkIfExist
     fi
-else
-    do_removeOption --enable-opencl
 fi
-unset opencldll
 
 if { [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; } ||
     ! mpv_disabled libarchive; then
