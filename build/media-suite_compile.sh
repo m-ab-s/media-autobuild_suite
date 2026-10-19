@@ -1039,12 +1039,11 @@ if [[ $standalone = y ]] && enabled libvorbis &&
     unset extracommands
 fi
 
-_check=(libopus.{,l}a opus.pc opus/opus.h)
+_check=(libopus.a opus.pc opus/opus.h)
 if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
     do_pacman_remove opus
     do_uninstall include/opus "${_check[@]}"
-    do_autoreconf
-    do_separate_confmakeinstall --disable-{stack-protector,doc,extra-programs}
+    do_cmakeinstall -DOPUS_BUILD_{PROGRAMS,SHARED_LIBRARY,TESTING}=OFF
     do_checkIfExist
 fi
 

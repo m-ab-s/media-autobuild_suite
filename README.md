@@ -34,7 +34,7 @@ For information about the compiler environment see the wiki, there you also have
             - needs non-free license if not LGPL
         - libsvtav1 (git)
         - libmp3lame (mingw-w64)
-        - libopus (mingw-w64)
+        - libopus (git)
         - libvorbis (mingw-w64)
         - libvpl (git)
         - libvpx (git)
