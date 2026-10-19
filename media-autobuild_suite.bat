@@ -100,10 +100,10 @@ do if %%f lss 4 (
 set build=%instdir%\build
 if not exist %build% mkdir %build%
 
-set msyspackages=autoconf-archive autogen autotools base base-devel filesystem msys2-runtime ^
-pacutils unzip winpty
+set msyspackages=autoconf-archive autogen base base-devel filesystem msys2-runtime pacutils ^
+unzip winpty
 
-set mingwpackages=7zip ccache cmake dlfcn gettext-tools git meson nasm ninja toolchain
+set mingwpackages=7zip autotools ccache cmake dlfcn git meson nasm ninja toolchain
 
 :: built-ins
 set ffmpeg_options_builtin=--disable-autodetect amf bzlib cuda cuda-llvm cuvid d3d11va d3d12va ^
