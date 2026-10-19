@@ -2094,7 +2094,7 @@ if enabled librist; then
 fi
 
 _vapoursynth_install() {
-    _vsver=80
+    _vsver=81
     _vspyver=312
 
     _check=(vapoursynth.pc vapoursynth/{VS{Constants4,Helper4,Script4},VapourSynth4}.h)
