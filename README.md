@@ -14,12 +14,14 @@ For information about the compiler environment see the wiki, there you also have
 
 ## Included Tools And Libraries
 
+“MSYS2 package” refers to a native Windows package for the selected build environment (UCRT64 or CLANG64), installed from the MSYS2 repositories via pacman.
+
 ### [Information about FFmpeg external libraries](https://github.com/m-ab-s/media-autobuild_suite/wiki/ffmpeg_options.txt)
 
 - FFmpeg (shared or static) with these libraries and features (all optional, but enabled by default unless said otherwise; subject to license and platform restrictions):
     - Light build:
-        - amd amf encoders (built-in)
-        - bzlib (mingw-w64)
+        - amf (AMD AMF headers, git)
+        - bzlib (MSYS2 package)
         - cuda (built-in)
         - cuda-llvm (built-in)
         - cuvid (built-in)
@@ -27,39 +29,39 @@ For information about the compiler environment see the wiki, there you also have
         - d3d12va (built-in)
         - dxva2 (built-in)
         - ffnvcodec (git)
-        - iconv (mingw-w64)
+        - iconv (MSYS2 package)
         - libaom (git)
         - libdav1d (git)
         - libfdk-aac (git)
             - needs non-free license if not LGPL
         - libsvtav1 (git)
-        - libmp3lame (mingw-w64)
+        - libmp3lame (MSYS2 package)
         - libopus (git)
-        - libvorbis (mingw-w64)
+        - libvorbis (git)
         - libvpl (git)
         - libvpx (git)
         - libx264 (git)
         - libx265 (git)
-        - lzma (mingw-w64)
+        - lzma (MSYS2 package)
         - mediafoundation (built-in)
         - nvdec (built-in)
         - nvenc (built-in)
-        - schannel with gmp (mingw-w64)
+        - schannel with gmp (MSYS2 package)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
-            - gmp can be switched by gcrypt (mingw-w64) with --enable-gcrypt
-        - sdl2 (git tag) (needed for ffplay)
+            - gmp can be switched by gcrypt (MSYS2 package) with --enable-gcrypt
+        - sdl2 (git, SDL2 branch) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
         - zlib (see the zlib variants under other tools)
     - Zeranoe-emulating build (in addition to Light)
-        - avisynth (AviSynthPlus; needs avisynth dll installed)
+        - avisynth (AviSynthPlus headers, git; needs avisynth dll installed)
         - fontconfig (latest release)
         - only one of these TLS libs (including schannel) can be enabled at once:
-            - openssl (mingw-w64)
+            - openssl (MSYS2 package)
                 - preferred to gnutls and to libtls if all three are in options
                 - needs non-GPL license
             - libtls (from libressl) (latest release)
                 - needs non-GPL license
-            - mbedtls (mingw-w64)
+            - mbedtls (MSYS2 package)
                 - disabled by default
                 - preferred to gnutls if GPLv3 license is chosen
             - gnutls (3.8.13)
@@ -71,46 +73,47 @@ For information about the compiler environment see the wiki, there you also have
             - BD-J support requires installation of Java JDK
             - BD-J support after compilation probably only requires JRE (untested)
         - libfreetype (latest release)
-        - libgsm (mingw-w64)
+        - libgsm (MSYS2 package)
         - libharfbuzz (git)
         - libmysofa (git)
             - needed for sofalizer filter
-        - libopencore-amrnb / libopencore-amrwb (mingw-w64)
-        - libopenjpeg (openjpeg2, mingw-w64)
-        - libopenmpt (git tag)
+        - libopencore-amrnb / libopencore-amrwb (MSYS2 package)
+        - libopenjpeg (openjpeg2, MSYS2 package)
+        - libopenmpt (git, OpenMPT-1.30 branch)
         - librav1e (git)
         - libshine (git)
-        - libsnappy (mingw-w64)
+        - libsnappy (MSYS2 package)
         - libsoxr (git)
-        - libspeex (mingw-w64)
+        - libspeex (git)
         - libsrt (git)
-        - libtheora (mingw-w64)
-        - libtwolame (mingw-w64)
+        - libtheora (MSYS2 package)
+        - libtwolame (MSYS2 package)
         - libvidstab (git)
         - libvmaf (git)
         - libvo-amrwbenc (0.1.3)
         - libwebp (git)
-        - libxml2 (mingw-w64)
-        - libxvid (git)
+        - libxml2 (git)
+        - libxvid (MSYS2 package)
+            - built from git instead if standalone binaries are enabled
         - libzimg (git)
     - Full build (in addition to Zeranoe)
         - audiotoolbox (AudioToolboxWrapper, git)
             - requires Apple runtime DLLs, downloaded by the suite
-        - cairo (mingw-w64)
-        - chromaprint (mingw-w64)
+        - cairo (MSYS2 package)
+        - chromaprint (MSYS2 package)
         - cuda-nvcc (needs CUDA SDK installed)
             - needs non-free license
             - disabled by default
         - decklink (12.5.1)
             - needs non-free license
         - frei0r (git)
-        - ladspa (mingw-w64)
+        - ladspa (MSYS2 package)
         - libaribb24 (git)
         - libaribcaption (git)
         - libastcenc (git)
         - libbs2b (3.1.0)
-        - libcaca (mingw-w64)
-        - libcdio (mingw-w64)
+        - libcaca (MSYS2 package)
+        - libcdio (MSYS2 package)
         - libcodec2 (git)
         - libcurl (git)
         - libdavs2 (git)
@@ -128,7 +131,7 @@ For information about the compiler environment see the wiki, there you also have
         - liblc3 (git)
         - liblensfun (git)
             - disabled by default
-        - libmodplug (mingw-w64)
+        - libmodplug (MSYS2 package)
         - libmpeghdec (git)
             - needs non-free license
         - liboapv (git)
@@ -138,7 +141,7 @@ For information about the compiler environment see the wiki, there you also have
         - librist (git)
         - librtmp (git)
         - librubberband (git)
-        - libssh (mingw-w64)
+        - libssh (MSYS2 package)
         - libsvthevc (git) (using non-upstream patch)
         - libsvtjpegxs (git)
         - libsvtvp9 (git) (using non-upstream patch)
@@ -150,7 +153,7 @@ For information about the compiler environment see the wiki, there you also have
         - libxavs2 (git)
         - libxevd (git)
         - libxeve (git)
-        - libzmq (mingw-w64)
+        - libzmq (MSYS2 package)
         - libzvbi (git)
         - openal (git)
         - vapoursynth (R81)
@@ -165,18 +168,22 @@ For information about the compiler environment see the wiki, there you also have
     - aom (git)
     - av1an (git)
         - requires an installed or portable copy of [64-bit Python 3.12.x](https://www.python.org/downloads/) and [Vapoursynth](https://github.com/vapoursynth/vapoursynth/releases/latest)
+    - avs2 tools: xavs2 and davs2 (git)
+        - davs2 can optionally be built from an unofficial fork with 10-bit support
     - bmx (git)
     - curl (git) with WinSSL/LibreSSL/OpenSSL/mbedTLS/GnuTLS backend
     - cyanrip (git)
     - dav1d (git)
+    - dovi_tool (git)
     - dssim (git)
     - exhale (git)
     - faac (git)
     - fdk-aac (git)
     - flac (git)
     - gifski (git)
-        - with optional built-in video support (ffmpeg 6.1)
+        - with optional built-in video support (ffmpeg 8.0)
     - haisrt tools (git)
+    - hdr10plus_tool (git)
     - jo (git)
     - jpegli tools (git)
     - jpeg-xl tools (git)
@@ -208,22 +215,24 @@ For information about the compiler environment see the wiki, there you also have
         - Base build (ffmpegChoice=2 or 3)
             - ANGLE Headers (git)
                 - requires ANGLE shared libraries from somewhere else (i.e. Chrome, Firefox) for gpu-context=angle support
+            - dvdnav (git)
             - lcms2 (git)
+            - libarchive (MSYS2 package)
             - libass (git)
             - libbluray (git)
                 - BD-J support requires installation of Java JDK
                 - BD-J support after compilation probably only requires JRE (untested)
+            - libcdio-paranoia (MSYS2 package) for cdda
             - luajit (git)
             - mujs (git)
-            - rubberband (git snapshot)
-            - uchardet (mingw-w64)
+            - rubberband (git)
+            - uchardet (MSYS2 package)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
             - vapoursynth (R81)
+            - static libmpv
         - Full build (ffmpegChoice=4)
-            - dvdnav (git)
-            - libarchive (mingw-w64)
-            - shared libmpv
             - openal (git)
+            - sdl2 (git) for sdl2-audio, sdl2-video and sdl2-gamepad
     - opus-tools (git)
     - rav1e (git)
     - ripgrep (git)
@@ -232,6 +241,7 @@ For information about the compiler environment see the wiki, there you also have
     - speex (git)
     - svt-av1 (git)
     - svt-hevc (git)
+    - svt-vp9 (git)
     - tesseract (git)
     - uvg266 (git)
     - vlc (git) (broken)
@@ -243,7 +253,7 @@ For information about the compiler environment see the wiki, there you also have
     - x265 (8, 10 and 12 bit) (git)
     - xvc (git) (unsupported)
     - xvid (git)
-    - zlib (git or mingw-w64)
+    - zlib (git or MSYS2 package)
         - minizip, miniunzip (git)
     - zlib (Chromium fork, git)
         - minizip, minigzip (git)
