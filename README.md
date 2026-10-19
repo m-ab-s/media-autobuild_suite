@@ -162,7 +162,6 @@ For information about the compiler environment see the wiki, there you also have
         - libopenh264 (official binaries)
         - opencl (headers and import definitions from Khronos git)
             - requires OpenCL.dll and an OpenCL implementation at runtime
-        - opengl (from system)
 
 - other tools
     - aom (git)

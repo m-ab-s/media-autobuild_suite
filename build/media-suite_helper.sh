@@ -855,9 +855,9 @@ do_getFFmpegConfig() {
     fi
 
     if [[ $ffmpegKeepLegacyOpts == n ]]; then
-        enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,glslang,ndi_newtek,ndi-newtek,npp,shaderc,wavpack} netcdf &&
-            do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|glslang|ndi_newtek|ndi-newtek|npp|shaderc|wavpack)|netcdf)" &&
-            sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|glslang|ndi_newtek|ndi-newtek|npp|shaderc|wavpack)|netcdf);;g' \
+        enabled_any lib{vo-aacenc,aacplus,utvideo,dcadec,faac,ebur128,glslang,ndi_newtek,ndi-newtek,npp,shaderc,wavpack} netcdf opengl &&
+            do_removeOption "--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|glslang|ndi_newtek|ndi-newtek|npp|shaderc|wavpack)|netcdf|opengl)" &&
+            sed -ri 's;--enable-(lib(vo-aacenc|aacplus|utvideo|dcadec|faac|ebur128|glslang|ndi_newtek|ndi-newtek|npp|shaderc|wavpack)|netcdf|opengl);;g' \
                 "$LOCALBUILDDIR/ffmpeg_options.txt"
     fi
 }
@@ -938,7 +938,7 @@ do_changeFFmpegConfig() {
         done
     fi
     if [[ $ffmpeg == "bothstatic" ]]; then
-        do_removeOption "--enable-(opencl|opengl|libopenh264)"
+        do_removeOption "--enable-(opencl|libopenh264)"
     fi
 }
 

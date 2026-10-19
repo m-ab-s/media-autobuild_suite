@@ -128,7 +128,7 @@ libsvthevc libsvtjpegxs libsvtvp9 libtesseract libuavs3d libvvdec libvvenc libxa
 libxevd libxeve libzmq libzvbi openal vapoursynth vulkan
 
 :: options also available with the suite that add shared dependencies
-set ffmpeg_options_full_shared=libopenh264 opencl opengl
+set ffmpeg_options_full_shared=libopenh264 opencl
 
 :: built-ins
 set mpv_options_builtin="#-Dcplayer=true" #manpage-build #lua #javascript ^
@@ -816,8 +816,8 @@ if [0]==[%ffmpegB2INI%] (
     echo. compiled shared so they take less space. Currently broken if libass or libass
     echo. dependees are enabled.
     echo. Option 6 produces static and shared ffmpeg and ffmpeg libs where the static
-    echo. one includes only strictly static dependencies (opencl, opengl,
-    echo. libopenh264 are hard disabled.^)
+    echo. one includes only strictly static dependencies (opencl, libopenh264 are
+    echo. hard disabled.^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
