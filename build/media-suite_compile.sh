@@ -385,10 +385,6 @@ if [[ $ffmpeg != no ]] && enabled libastcenc; then
     fi
 fi
 
-# Fixes an issue with ordering with libbluray libxml2 and libz and liblzma
-# Probably caused by https://gitlab.gnome.org/GNOME/libxml2/-/commit/93e8bb2a402012858500b608b4146cd5c756e34d
-grep_or_sed Requires.private "$LOCALDESTDIR/lib/pkgconfig/libxml-2.0.pc" 's/Requires:/Requires.private:/'
-
 _check=(aribcaption/aribcaption.h libaribcaption.{a,pc})
 if [[ $ffmpeg != no ]] && enabled libaribcaption &&
     do_vcs "$SOURCE_REPO_ARIBCAPTION"; then
@@ -1619,11 +1615,7 @@ if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; 
     if ! enabled libxml2; then
         extracommands+=(-Dlibxml2=disabled)
     fi
-    CFLAGS+=" $(enabled libxml2 && echo "-DLIBXML_STATIC")" \
-        do_mesoninstall -Dfontconfig=disabled -Dfreetype=disabled "${extracommands[@]}"
-    if enabled libxml2; then
-        sed -ri 's;(Cflags.*);\1 -DLIBXML_STATIC;' $LOCALDESTDIR/lib/pkgconfig/libbluray.pc
-    fi
+    do_mesoninstall -Dfontconfig=disabled -Dfreetype=disabled "${extracommands[@]}"
     do_checkIfExist
     PATH=$OLD_PATH
     unset extracommands JDK_HOME JAVA_HOME OLD_PATH
@@ -2421,7 +2413,6 @@ if [[ $ffmpeg != no ]]; then
             $'/^Cflags:/a\\\nCflags.private: -DZMQ_STATIC\ns/-lpthread/& -lws2_32/'
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
-    enabled libxml2 && do_addOption --extra-cflags=-DLIBXML_STATIC
     enabled ladspa && do_pacman_install ladspa-sdk
     if enabled vapoursynth && pc_exists "vapoursynth"; then
         _ver=$($PKG_CONFIG --modversion vapoursynth)
@@ -2869,7 +2860,7 @@ if [[ $cyanrip = y ]]; then
         _extra_ldflags=("$(cygpath -m "$LOCALDESTDIR/opt/cyanffmpeg/lib")"
             "$(cygpath -m "$LOCALDESTDIR/lib")")
         hide_conflicting_libs "$LOCALDESTDIR/opt/cyanffmpeg"
-        CFLAGS+=" -DLIBXML_STATIC $(printf ' -I%s' "${_extra_cflags[@]}")" \
+        CFLAGS+=" $(printf ' -I%s' "${_extra_cflags[@]}")" \
         LDFLAGS+="$(printf ' -L%s' "${_extra_ldflags[@]}")" \
             do_mesoninstall audio
         hide_conflicting_libs -R "$LOCALDESTDIR/opt/cyanffmpeg"
@@ -3128,7 +3119,7 @@ EOF
             --enable-{shared,avcodec,merge-ffmpeg,qt,nls} \
             --disable-{static,dbus,fluidsynth,svgdec,aom,mod,ncurses,mpg123,notify,svg,secret,telx,ssp,lua,gst-decode,nvdec} \
             --with-binary-version="MABS" BUILDCC="$CC" \
-            CFLAGS="$CFLAGS -DGLIB_STATIC_COMPILATION -DQT_STATIC -DGNUTLS_INTERNAL_BUILD -DLIBXML_STATIC -DLIBXML_CATALOG_ENABLED" \
+            CFLAGS="$CFLAGS -DGLIB_STATIC_COMPILATION -DQT_STATIC -DGNUTLS_INTERNAL_BUILD -DLIBXML_CATALOG_ENABLED" \
             LIBS="$($PKG_CONFIG --libs libcddb regex iconv) -lwsock32 -lws2_32 -lpthread -liphlpapi"
         do_makeinstall
         do_checkIfExist
