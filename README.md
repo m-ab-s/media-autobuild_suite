@@ -79,7 +79,7 @@ For information about the compiler environment see the wiki, there you also have
             - needed for sofalizer filter
         - libopencore-amrnb / libopencore-amrwb (MSYS2 package)
         - libopenjpeg (openjpeg2, MSYS2 package)
-        - libopenmpt (git, OpenMPT-1.30 branch)
+        - libopenmpt (git, Latest OpenMPT branch)
         - librav1e (git)
         - libshine (git)
         - libsnappy (MSYS2 package)
