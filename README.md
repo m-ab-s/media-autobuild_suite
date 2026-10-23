@@ -56,14 +56,14 @@ For information about the compiler environment see the wiki, there you also have
         - avisynth (AviSynthPlus headers, git; needs avisynth dll installed)
         - fontconfig (latest release)
         - only one of these TLS libs (including schannel) can be enabled at once:
+            - when multiple compatible backends are requested, the suite prefers OpenSSL, libtls, mbedTLS, GnuTLS, then SChannel
             - openssl (MSYS2 package)
-                - preferred to gnutls and to libtls if all three are in options
-                - needs non-GPL license
+                - OpenSSL 3.0+ (Apache-2.0) is supported with LGPL and GPLv3
             - libtls (from libressl) (latest release)
                 - needs non-GPL license
             - mbedtls (MSYS2 package)
                 - disabled by default
-                - preferred to gnutls if GPLv3 license is chosen
+                - requires a version3 license mode (LGPLv3, GPLv3 or non-free)
             - gnutls (3.8.13)
         - libass (git)
             - by default with DirectWrite backend

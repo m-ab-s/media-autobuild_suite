@@ -2464,7 +2464,10 @@ if [[ $ffmpeg != no ]]; then
         fi
         if enabled libvvdec; then
             do_patch "https://raw.githubusercontent.com/wiki/fraunhoferhhi/vvdec/data/patch/v9-libvvdec.patch"  ||
-                do_removeOptions --enable-libvvdec
+                {
+                    do_removeOption --enable-libvvdec
+                    do_removeOption FFMPEG_OPTS_SHARED "--enable-libvvdec"
+                }
         fi
 
         # Remove explicit include of DeckLinkAPI_v14_2_1.h since it's merged into the main file for Windows
