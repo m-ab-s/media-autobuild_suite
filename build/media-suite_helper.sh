@@ -816,42 +816,23 @@ do_getFFmpegConfig() {
     # we set these accordingly for static or shared
     do_removeOption "--(en|dis)able-(shared|static)"
 
-    # OK to use GnuTLS for rtmpdump if not nonfree since GnuTLS was built for rtmpdump anyway
-    # If nonfree will use SChannel if neither openssl/libtls or gnutls are in the options
-    if ! enabled_any libtls openssl gnutls &&
-        { enabled librtmp || [[ $rtmpdump == y ]]; }; then
-        if [[ $license == nonfree ]] ||
-            [[ $license == lgpl* && $rtmpdump == n ]]; then
-            do_addOption --enable-openssl
-        else
-            do_addOption --enable-gnutls
-        fi
-        do_removeOption "--enable-(gmp|gcrypt|mbedtls)"
+    # Prefer the first requested TLS backend allowed by the license.
+    local tls=""
+    if enabled openssl && [[ $license != gpl ]]; then
+        tls=openssl # OpenSSL 3 requires version3 for GPL builds.
+    elif enabled libtls && [[ $license != gpl* ]]; then
+        tls=libtls
+    elif enabled mbedtls && [[ $license == lgplv3 || $license == gplv3 || $license == nonfree ]]; then
+        tls=mbedtls
+    elif enabled gnutls; then
+        tls=gnutls
+    elif ! disabled schannel; then
+        tls=schannel
     fi
 
-    local _all_tls="--enable-(mbedtls|gnutls|openssl|libtls|schannel)"
-    if enabled_any libtls openssl && [[ $license != gpl* ]]; then
-        # prefer openssl/libtls if both are in options and not gpl
-
-        # prefer openssl over libtls if both enabled
-        local _prefer=libtls
-        if enabled openssl; then
-            _prefer=openssl
-        fi
-
-        do_removeOption "${_all_tls}"
-        do_addOption "--enable-${_prefer}"
-    elif enabled mbedtls; then
-        # prefer mbedtls if any other tls libs are enabled and gpl
-        do_removeOption "${_all_tls}"
-        do_addOption --enable-mbedtls
-    elif enabled gnutls; then
-        do_removeOption "${_all_tls}"
-        do_addOption --enable-gnutls
-    elif ! disabled schannel; then
-        # fallback to schannel if no other tls libs are enabled
-        do_removeOption "${_all_tls}"
-        do_addOption --enable-schannel
+    do_removeOption "--enable-(mbedtls|gnutls|openssl|libtls|schannel)"
+    if [[ -n $tls ]]; then
+        do_addOption "--enable-$tls"
     fi
 
     if [[ $ffmpegKeepLegacyOpts == n ]]; then
@@ -887,7 +868,7 @@ do_changeFFmpegConfig() {
     if [[ $license == gplv3 || $license == lgplv3 || $license == nonfree ]] && enabled_any "${version3[@]}"; then
         do_addOption --enable-version3
     else
-        do_removeOptions "${version3[*]/#/--enable-} --enable-version3"
+        do_removeOptions "${version3[@]/#/--enable-}" --enable-version3
     fi
 
     local nonfreehwaccel
@@ -895,7 +876,7 @@ do_changeFFmpegConfig() {
     if [[ $license == "nonfree" ]] && enabled_any "${nonfreehwaccel[@]}"; then
         do_addOption --enable-nonfree
     else
-        do_removeOptions "${nonfreehwaccel[*]/#/--enable-} --enable-nonfree"
+        do_removeOptions "${nonfreehwaccel[@]/#/--enable-}" --enable-nonfree
     fi
 
     # cuda-only workarounds
@@ -904,7 +885,6 @@ do_changeFFmpegConfig() {
             local fixed_CUDA_PATH_UNIX
             fixed_CUDA_PATH_UNIX="$(cygpath -u "$CUDA_PATH")"
             nvcc.exe --help &> /dev/null || export PATH="$PATH:$fixed_CUDA_PATH_UNIX/bin"
-            echo -e "${orange}FFmpeg and related apps will depend on Nvidia drivers!${reset}"
         fi
     else
         do_removeOption "--enable-cuda-nvcc"
@@ -917,7 +897,7 @@ do_changeFFmpegConfig() {
         if [[ $license == "nonfree" ]] && enabled gpl; then
             do_addOption --enable-nonfree
         elif [[ $license == gpl* ]]; then
-            do_removeOptions "${nonfreegpl[*]/#/--enable-}"
+            do_removeOptions "${nonfreegpl[@]/#/--enable-}"
         fi
         # no lgpl here because they are accepted with it
     fi
@@ -927,8 +907,8 @@ do_changeFFmpegConfig() {
         do_addOption --disable-stripping
     fi
 
-    # both openssl and mbedtls don't need gcrypt/gmp for rtmpe
-    enabled_any openssl mbedtls && do_removeOption "--enable-(gcrypt|gmp)"
+    # librtmp replaces native RTMP; OpenSSL/mbedTLS provide native RTMPE crypto.
+    enabled_any librtmp openssl mbedtls && do_removeOption "--enable-(gcrypt|gmp)"
 
     # remove libs that don't work with shared
     if [[ $ffmpeg =~ "shared" || $ffmpeg =~ "both" ]]; then
@@ -1121,10 +1101,15 @@ do_removeOption() {
 }
 
 do_removeOptions() {
-    local option
-    local shared=$2
-    for option in $1; do
-        do_removeOption "$option" "$shared"
+    local varname="$1" arrayname option
+    if [[ ${varname#--} == "$varname" ]]; then
+        arrayname="$varname" && shift 1
+    else
+        arrayname="FFMPEG_OPTS"
+    fi
+
+    for option in "$@"; do
+        do_removeOption "$arrayname" "$option"
     done
 }
 

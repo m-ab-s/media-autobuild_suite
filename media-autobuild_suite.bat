@@ -185,22 +185,22 @@ if [0]==[%license2INI%] (
     echo.
     echo. Build FFmpeg with which license?
     echo. 1 = Non-free [unredistributable, but can include anything]
-    echo. 2 = GPLv3 [disables OpenSSL and FDK-AAC]
-    echo. 3 = GPLv2.1
-    echo.   [Same disables as GPLv3 with addition of gmp, opencore codecs]
+    echo. 2 = GPLv3 [disables FDK-AAC]
+    echo. 3 = GPLv2
+    echo.   [Also disables OpenSSL, gmp, opencore codecs]
     echo. 4 = LGPLv3
     echo.   [Disables x264, x265, XviD, GPL filters, etc.
-    echo.    but reenables OpenSSL/FDK-AAC]
-    echo. 5 = LGPLv2.1 [same disables as LGPLv3 + GPLv2.1]
+    echo.    but allows OpenSSL/FDK-AAC]
+    echo. 5 = LGPLv2.1 [same disables as LGPLv3 + GPLv2, except OpenSSL]
     echo.
     echo. If building for yourself, it's OK to choose non-free.
     echo. If building to redistribute online, choose GPL or LGPL.
-    echo. If building to include in a GPLv2.1 binary, choose LGPLv2.1 or GPLv2.1.
+    echo. If building to include in a GPLv2 binary, choose LGPLv2.1 or GPLv2.
     echo. If you want to use FFmpeg together with closed source software, choose LGPL
     echo. and follow instructions in https://www.ffmpeg.org/legal.html
     echo.
-    echo. OpenSSL and FDK-AAC have licenses incompatible with GPL but compatible
-    echo. with LGPL, so they won't be disabled automatically if you choose LGPL.
+    echo. OpenSSL 3.0+ uses Apache-2.0 and is allowed with LGPL or GPLv3.
+    echo. FDK-AAC is GPL-incompatible; it is allowed with LGPL.
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
