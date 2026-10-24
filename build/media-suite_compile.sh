@@ -2405,8 +2405,12 @@ if [[ $ffmpeg != no ]]; then
         fi
         unset _sha256 _openh264_ver
     fi
-    enabled chromaprint && do_addOption --extra-cflags=-DCHROMAPRINT_NODLL &&
-        { do_pacman_remove fftw; do_pacman_install chromaprint; }
+    if enabled chromaprint; then
+        do_pacman_remove fftw
+        do_pacman_install chromaprint
+        grep_or_sed 'CHROMAPRINT_NODLL' "$MINGW_PREFIX/lib/pkgconfig/libchromaprint.pc" \
+            $'/^Cflags:/a\\\nCflags.private: -DCHROMAPRINT_NODLL'
+    fi
     if enabled libzmq; then
         do_pacman_install zeromq
         grep_or_sed 'ZMQ_STATIC' "$MINGW_PREFIX/lib/pkgconfig/libzmq.pc" \
