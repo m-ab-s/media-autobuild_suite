@@ -908,7 +908,11 @@ if [[ $ffmpeg != no || $sox = y ]]; then
         do_pacman_install twolame
         do_addOption --extra-cflags=-DLIBTWOLAME_STATIC
     fi
-    enabled libmp3lame && do_pacman_install lame
+    if enabled libmp3lame; then
+        do_pacman_install lame
+        grep_or_sed '-lmpg123' "$MINGW_PREFIX/lib/pkgconfig/lame.pc" \
+            '/^Libs:/a Libs.private: -lmpg123'
+    fi
 fi
 
 _check=(ilbc.h libilbc.{a,pc})
