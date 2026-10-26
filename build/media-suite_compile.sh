@@ -910,8 +910,8 @@ if [[ $ffmpeg != no || $sox = y ]]; then
     fi
     if enabled libmp3lame; then
         do_pacman_install lame
-        grep_or_sed '-lmpg123' "$MINGW_PREFIX/lib/pkgconfig/lame.pc" \
-            '/^Libs:/a Libs.private: -lmpg123'
+        grep_or_sed 'libmpg123' "$MINGW_PREFIX/lib/pkgconfig/lame.pc" \
+            '/^Libs:/i Requires.private: libmpg123'
     fi
 fi
 
