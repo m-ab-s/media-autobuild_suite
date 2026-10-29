@@ -1178,17 +1178,26 @@ if [[ $sox = y ]]; then
         do_uninstall sox.{pc,h} bin-audio/{soxi,play,rec}.exe libsox.{,l}a "${_check[@]}"
         do_autoreconf
         extralibs=(-lshlwapi -lz)
-        enabled libmp3lame || extracommands+=(--without-lame)
+        extracflags=()
+        if enabled libmp3lame; then
+            mapfile -t -O "${#extralibs[@]}" extralibs < <($PKG_CONFIG --libs lame)
+            mapfile -t -O "${#extracflags[@]}" extracflags < <($PKG_CONFIG --cflags lame)
+        else
+            extracommands+=(--without-lame)
+        fi
         enabled_any libopencore-amr{wb,nb} &&
             extralibs+=(-lvo-amrwbenc) ||
             extracommands+=(--without-amr{wb,nb})
-        enabled libtwolame &&
-            extracommands+=(CFLAGS="$CFLAGS -DLIBTWOLAME_STATIC") ||
+        if enabled libtwolame; then
+            mapfile -t -O "${#extralibs[@]}" extralibs < <($PKG_CONFIG --libs twolame)
+            mapfile -t -O "${#extracflags[@]}" extracflags < <($PKG_CONFIG --cflags twolame)
+        else
             extracommands+=(--without-twolame)
+        fi
         enabled libvorbis || extracommands+=(--without-oggvorbis)
         hide_conflicting_libs
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
-        do_separate_conf --disable-symlinks ac_cv_lib_winmm_waveOutOpen=yes LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" "${extracommands[@]}"
+        do_separate_conf --disable-symlinks ac_cv_lib_winmm_waveOutOpen=yes LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" CFLAGS="${extracflags[*]} $CFLAGS" "${extracommands[@]}"
         do_make
         do_install src/sox.exe bin-audio/
         do_install sox.pc
