@@ -2397,28 +2397,22 @@ if [[ $ffmpeg != no ]]; then
             mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.a.dyn,a}
         fi
         [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a ]] && mv -f "$MINGW_PREFIX"/lib/libopenh264.{dll.,}a
-        _openh264_ver=2.6.0
-        _pacman_openh264_ver=$(pacman -Q "${MINGW_PACKAGE_PREFIX}-openh264" | awk '{print $2}')
-        if [[ $(vercmp.exe $_openh264_ver "$_pacman_openh264_ver") -ne 0 ]]; then
-            do_simple_print "${orange}Openh264 version differs from msys2's, current: $_openh264_ver, msys2: $_pacman_openh264_ver${reset}"
-            do_simple_print "${orange}Check if this is the latest suite and update if possible, else open an issue${reset}"
-        fi
-        if test_newer "$MINGW_PREFIX"/lib/libopenh264.dll.a "$LOCALDESTDIR/bin-video/libopenh264-7.dll" ||
-            ! get_dll_version "$LOCALDESTDIR/bin-video/libopenh264-7.dll" | grep -q "$_openh264_ver"; then
+        _openh264_ver=$(pacman -Q "${MINGW_PACKAGE_PREFIX}-openh264" |
+            awk '{sub(/^[^:]*:/, "", $2); sub(/-[^-]*$/, "", $2); print $2}')
+        _openh264_dll=$(pacman -Qql "${MINGW_PACKAGE_PREFIX}-openh264" |
+            awk -F/ '/\/bin\/libopenh264[^/]*\.dll$/ {print $NF}')
+        [[ -n $_openh264_ver && -n $_openh264_dll ]] ||
+            do_exit_prompt "Could not determine the installed OpenH264 version or DLL filename."
+        if test_newer "$MINGW_PREFIX/bin/$_openh264_dll" "$LOCALDESTDIR/bin-video/$_openh264_dll" ||
+            ! get_dll_version "$LOCALDESTDIR/bin-video/$_openh264_dll" | grep -Fq "$_openh264_ver"; then
             pushd "$LOCALDESTDIR/bin-video" >/dev/null || do_exit_prompt "Did you delete the bin-video folder?"
-            if [[ $bits = 64bit ]]; then
-                _sha256=dab5f2a872777f9a58b69bfa9fbcf20d9f82f2d6ec91383fd70bff49bd34ac9f
-            else
-                _sha256=a9445ed1fa2ce9665b22461a7ed0aeb52274add899aa55a93ef6278dbc17c90d
-            fi
-            do_wget -c -r -q -h $_sha256 \
-            "http://ciscobinary.openh264.org/openh264-${_openh264_ver}-win${bits%bit}.dll.bz2" \
-                libopenh264.dll.bz2
-            [[ -f libopenh264.dll.bz2 ]] && bunzip2 -f libopenh264.dll.bz2
-            mv -f libopenh264.dll libopenh264-7.dll
+            do_wget -c -r -q \
+                "https://ciscobinary.openh264.org/openh264-${_openh264_ver}-win64.dll.bz2" \
+                libopenh264.dll.bz2 &&
+                mv -f libopenh264.dll "$_openh264_dll"
             popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
         fi
-        unset _sha256 _openh264_ver
+        unset _openh264_ver _openh264_dll
     fi
     if enabled chromaprint; then
         do_pacman_remove fftw
