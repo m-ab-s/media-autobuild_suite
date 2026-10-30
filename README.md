@@ -129,6 +129,7 @@ For information about the compiler environment see the wiki, there you also have
         - libkvazaar (git)
         - lcms2 (git)
         - liblc3 (git)
+        - liblcevc-dec (git)
         - liblensfun (git)
             - disabled by default
         - libmodplug (MSYS2 package)

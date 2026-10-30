@@ -1691,6 +1691,14 @@ if [[ $ffmpeg != no ]] && enabled libuavs3d &&
     do_checkIfExist
 fi
 
+_check=(liblcevc_dec_api.a lcevc_dec.pc LCEVC/lcevc_dec.h)
+if [[ $ffmpeg != no ]] && enabled liblcevc-dec &&
+    do_vcs "$SOURCE_REPO_LCEVCDEC"; then
+    do_uninstall include/LCEVC "${_check[@]}"
+    do_cmakeinstall -DVN_SDK_{TRACING,METRICS,DIAGNOSTICS_ASYNC}=OFF
+    do_checkIfExist
+fi
+
 _check=(libdovi.a libdovi/rpu_parser.h dovi.pc bin-video/dovi_tool.exe)
 if [[ $dovitool = y ]] &&
     do_vcs "$SOURCE_REPO_DOVI_TOOL"; then
