@@ -2,7 +2,6 @@
 # shellcheck disable=SC2034
 
 # Dependency References
-SOURCE_REPO_AMF=https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
 SOURCE_REPO_ASTCENC=https://github.com/ARM-software/astc-encoder.git
 SOURCE_REPO_ANGLE=https://chromium.googlesource.com/angle/angle
 SOURCE_REPO_ARIBB24=https://github.com/nkoriyama/aribb24.git
