@@ -1398,7 +1398,7 @@ if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_uninstall share/model "${_check[@]}"
     do_pacman_install -m vim # for built_in_models
     cd_safe libvmaf
-    do_mesoninstall video -Denable_{float,tests}=true -Dbuilt_in_models=true
+    do_mesoninstall video -Denable_float=true -Dbuilt_in_models=true -Denable_tests=false
     do_checkIfExist
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
@@ -2528,7 +2528,7 @@ if [[ $ffmpeg != no ]]; then
             "$LOCALDESTDIR"/bin-video/{sw{scale,resample},postproc}.lib
             )
         _check=()
-        sedflags="prefix|bindir|extra-version|pkg-config-flags"
+        sedflags="prefix|bindir|shlibdir|cc|cxx|ld||pkg-config(-flags)?|extra-version"
 
         # --build-suffix handling
         opt_exists FFMPEG_OPTS "^--build-suffix=[a-zA-Z0-9-]+$" &&
@@ -2758,7 +2758,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
     _deps=(lib{ass,avcodec,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
         do_patch "https://github.com/mpv-player/mpv/compare/master...1480c1:mpv:initguid.patch" am
-        do_patch "https://github.com/mpv-player/mpv/pull/18328.patch" am
         do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
         hide_conflicting_libs
         create_ab_pkgconfig
