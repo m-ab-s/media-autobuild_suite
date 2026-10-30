@@ -1813,16 +1813,6 @@ if [[ $ffmpeg != no ]] && enabled libvpl; then
     fi
 fi
 
-_check=(AMF/core/Version.h)
-if [[ $ffmpeg != no ]] && { enabled amf || ! disabled_any autodetect amf; } &&
-    do_vcs "$SOURCE_REPO_AMF"; then
-    do_uninstall include/AMF
-    cd_safe amf/public/include
-    install -D -p -t "$LOCALDESTDIR/include/AMF/core" core/*.h
-    install -D -p -t "$LOCALDESTDIR/include/AMF/components" components/*.h
-    do_checkIfExist
-fi
-
 _check=(libgpac_static.a bin-video/{MP4Box,gpac}.exe)
 if [[ $mp4box = y ]] && do_vcs "$SOURCE_REPO_GPAC"; then
     do_uninstall include/gpac "${_check[@]}"
@@ -2378,6 +2368,9 @@ if [[ $ffmpeg != no ]]; then
     do_pacman_install -m texinfo
     enabled libgsm && do_pacman_install gsm
     enabled libsnappy && do_pacman_install snappy
+    if { enabled amf || ! disabled_any autodetect amf; } && do_pacman_install amf-headers; then
+        do_uninstall include/AMF
+    fi
     if enabled libxvid && [[ $standalone = n ]]; then
         do_pacman_install xvidcore
         [[ -f $MINGW_PREFIX/lib/xvidcore.a ]] && mv -f "$MINGW_PREFIX"/lib/{,lib}xvidcore.a

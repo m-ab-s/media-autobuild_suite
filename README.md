@@ -20,7 +20,7 @@ For information about the compiler environment see the wiki, there you also have
 
 - FFmpeg (shared or static) with these libraries and features (all optional, but enabled by default unless said otherwise; subject to license and platform restrictions):
     - Light build:
-        - amf (AMD AMF headers, git)
+        - amf (AMD AMF headers, MSYS2 package)
         - bzlib (MSYS2 package)
         - cuda (built-in)
         - cuda-llvm (built-in)
