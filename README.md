@@ -141,6 +141,7 @@ For information about the compiler environment see the wiki, there you also have
         - libquirc (git)
         - librist (git)
         - librtmp (git)
+            - disabled by default
         - librubberband (git)
         - libssh (MSYS2 package)
         - libsvthevc (git) (using non-upstream patch)
@@ -161,6 +162,7 @@ For information about the compiler environment see the wiki, there you also have
         - vulkan (git)
     - Full shared dependencies (in addition to Full)
         - libopenh264 (official binaries)
+            - disabled by default
         - opencl (headers and import definitions from Khronos git)
             - requires OpenCL.dll and an OpenCL implementation at runtime
 
