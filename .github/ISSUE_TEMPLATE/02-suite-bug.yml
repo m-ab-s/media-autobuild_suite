@@ -1,0 +1,57 @@
+name: Suite bug report
+description: A problem with the launcher, environment setup, updates, configuration, or suite scripts.
+title: "[Suite]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for problems in `media-autobuild_suite.bat` or the suite's setup, update, and helper scripts. If a specific tool or library fails to build, choose **Build failure** instead. If the build succeeds but the resulting program has a problem, choose **Built program issue**.
+
+        This form covers running the suite; problems in built programs that may relate to its build configuration or integration have their own form. Custom patches and unsupported builds are outside the suite's support scope; explain any changes and whether the problem also happens without them.
+
+        Give the title a short, specific description, for example: `[Suite]: launcher exits before creating the MSYS2 environment`.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before reporting
+      options:
+        - label: I have read the README's Troubleshooting section and searched open and closed issues for the same problem.
+          required: true
+        - label: I have updated the suite scripts and retried, or explained below why I cannot do so.
+          required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Affected stage
+      options:
+        - Batch launcher / initial configuration
+        - MSYS2 installation / environment setup
+        - Package or suite updates
+        - Configuration / helper scripts
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure and expected result
+      description: Describe what failed and what should have happened. Paste the relevant error lines as text, rather than only a screenshot.
+      placeholder: |
+        Expected:
+        Actual:
+        Error output:
+    validations:
+      required: true
+  - type: upload
+    id: logs
+    attributes:
+      label: Diagnostic logs
+      description: |
+        Drag `build/logs.zip` into this field. Wait for the upload to finish. If the archive was not generated, explain that above.
+        Review attachments for credentials and private paths before posting.
+  - type: textarea
+    id: troubleshooting
+    attributes:
+      label: Troubleshooting and additional context
+      description: Include attempted fixes and their results, the last working revision if known, and related issues. Explain here if updating or testing supported settings is blocked.

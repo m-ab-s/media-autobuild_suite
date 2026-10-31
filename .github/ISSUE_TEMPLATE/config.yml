@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation and troubleshooting
+    url: https://github.com/m-ab-s/media-autobuild_suite#troubleshooting
+    about: Check requirements, supported configurations, and troubleshooting steps before reporting a suite problem.

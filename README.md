@@ -329,7 +329,7 @@ If there's some error during compilation follow these steps:
 
 1. Make sure you're using the latest version of this suite by downloading the [latest version](https://github.com/m-ab-s/media-autobuild_suite/archive/master.zip) and replacing all files with the new ones;
 2. If you know which part it's crashing on, delete that project's folder in /build and run the script again (ex: if x264 is failing, try deleting x264-git folder in /build);
-3. If it still doesn't work, [create an issue](https://github.com/m-ab-s/media-autobuild_suite/issues/new) and paste the URL to `logs.zip` that the script gives or attach the file yourself to the issue page.
+3. If it still doesn't work, [create an issue](https://github.com/m-ab-s/media-autobuild_suite/issues/new/choose) and attach the `logs.zip` that the script gives to the issue page.
 4. If the problem isn't reproducible by the contributors of the suite, it's probably a problem on your side. Delete /msys64 and /local64 if they exist. /build is usually safe to keep and saves time;
 5. If the problem is reproducible, it could be a problem with the package itself or the contributors will find a way to probably make it work.
 6. If you compile with `--enable-cuda-nvcc`, see [Notes about CUDA SDK](#notes-about-cuda-sdk)

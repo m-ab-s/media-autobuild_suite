@@ -1,0 +1,35 @@
+name: Built program issue
+description: A program built by the suite fails to start, lacks a feature, crashes, or behaves unexpectedly.
+title: "[Runtime]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when a build succeeds but the resulting program has a problem that may relate to the suite's build configuration, dependencies, or integration. Examples include missing DLLs, missing enabled features, startup failures, and crashes.
+
+        Include the program and symptom in the title, for example: `[Runtime]: ffmpeg: built executable cannot find a DLL`.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before reporting
+      options:
+        - label: I have searched open and closed issues for the same problem.
+          required: true
+  - type: input
+    id: program
+    attributes:
+      label: Broken Program Name
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Explain what should happen and what happens instead. Include the exact error message as text, if available.
+      placeholder: |
+        Expected:
+        Actual:
+        Error output:
+    validations:
+      required: true
