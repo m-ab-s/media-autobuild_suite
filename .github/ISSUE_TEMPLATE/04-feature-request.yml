@@ -1,0 +1,54 @@
+name: Feature request
+description: Propose a concrete improvement to the suite or support for a tool or library.
+title: "Request: "
+labels: ["feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe a concrete problem and how the suite could solve it. General FFmpeg/mpv usage questions and feature requests for those programs belong upstream.
+
+        Maintainer time is limited. **Pull requests are strongly preferred for new tools and libraries**; an issue does not guarantee implementation or support for a custom build. A useful request explains the benefit, upstream support, and maintenance cost.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before requesting
+      options:
+        - label: I have checked the README and existing issues and pull requests; this capability is not already available or requested.
+          required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Request area
+      options:
+        - New tool or library
+        - Existing tool or library modification
+        - Other suite improvement
+    validations:
+      required: true
+  - type: textarea
+    id: feature
+    attributes:
+      label: Feature and its details
+      description: Describe the feature you are requesting and its details. For tools or libraries,
+        include the upstream project URL, license, Windows/MSYS2 build support, dependencies,
+        and intended FFmpeg/mpv integration where relevant. Say which details are unknown rather than guessing.
+    validations:
+      required: true
+  - type: textarea
+    id: benifit
+    attributes:
+      label: Feature benefit
+      description: >-
+        Describe the benefit of this feature to the suite and its users. Explain how it improves the user experience and what problems it solves.
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: How could you help?
+      description: Optional; contributing code is appreciated but is not required to propose an improvement.
+      options:
+        - I can submit a pull request
+        - I can help test an implementation
+        - I can provide more information

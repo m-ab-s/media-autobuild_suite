@@ -1,0 +1,64 @@
+name: Build failure
+description: A tool or library fails to download, configure, compile, or install through the suite.
+title: "[Build]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when the suite fails to build a tool or library. For launcher, setup, update, or script problems, choose **Suite bug report** instead. If the build succeeds but the resulting program has a problem, choose **Built program issue**.
+
+        This tracker covers the suite and problems in built programs that may relate to its build configuration or integration. General FFmpeg/mpv usage questions belong in those projects' support channels. Custom patches and unsupported builds should be discussed with their authors; reproduce with supported settings before reporting a suite bug.
+
+        Include the **failing component in the title**, for example: `[Build]: ffmpeg: configure cannot find libplacebo`.
+        If an optional component is not needed, disabling it in your FFmpeg/mpv options may let you continue building.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Before reporting
+      options:
+        - label: I have read the README's Troubleshooting section and searched open and closed issues for the same failure.
+          required: true
+        - label: I have updated the suite scripts and rerun the build, or explained below why I cannot do so.
+          required: true
+  - type: input
+    id: component
+    attributes:
+      label: Failing component
+      description: Name the tool or library and the failing stage.
+      placeholder: "ffmpeg: configure, x264: make, etc."
+    validations:
+      required: true
+  - type: checkboxes
+    id: environment
+    attributes:
+      label: Build environment
+      description: Select all environments where you reproduced the failure.
+      options:
+        - label: UCRT64 (GCC, default)
+        - label: CLANG64 (Clang, experimental)
+  - type: textarea
+    id: failure
+    attributes:
+      label: Failure and expected result
+      description: Describe what failed and what should have happened. Paste the relevant error lines as text, rather than only a screenshot.
+      placeholder: |
+        Expected:
+        Actual:
+        Error output:
+    validations:
+      required: true
+  - type: upload
+    id: logs
+    attributes:
+      label: Diagnostic logs
+      description: |
+        Drag `build/logs.zip` into this field. Wait for the upload to finish. If the archive was not generated, explain that above.
+        Review attachments for credentials and private paths before posting.
+  - type: textarea
+    id: troubleshooting
+    attributes:
+      label: Troubleshooting and additional context
+      description: >-
+        What have you tried, and with what result? If known, include the last working suite/component
+        revision, related issues, or upstream reports. Explain here if updating or testing supported settings is blocked.
