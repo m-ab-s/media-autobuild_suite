@@ -2409,6 +2409,7 @@ if [[ $ffmpeg != no ]]; then
             do_wget -c -r -q \
                 "https://ciscobinary.openh264.org/openh264-${_openh264_ver}-win64.dll.bz2" \
                 libopenh264.dll.bz2 &&
+                bunzip2 -f libopenh264.dll.bz2 &&
                 mv -f libopenh264.dll "$_openh264_dll"
             popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
         fi
