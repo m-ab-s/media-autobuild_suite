@@ -1903,7 +1903,9 @@ get_cl_path() {
     [[ $(uname -m) != x86_64 ]] && _hostbits=HostX86
 
     local basepath
-    if basepath=$(cygpath -u "$("$vswhere" -latest -all -find "VC/Tools/MSVC/*/bin/${_hostbits}/x64" | sort -uV | tail -1)") &&
+    if basepath=$(cygpath -u "$("$vswhere" -latest -all -products '*' \
+        -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+        -find "VC/Tools/MSVC/*/bin/${_hostbits}/x64" | sort -uV | tail -1)") &&
         "$basepath/cl.exe" /? > /dev/null 2>&1; then
         export PATH="$basepath:$PATH"
         return 0
