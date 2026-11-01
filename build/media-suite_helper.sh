@@ -327,7 +327,7 @@ do_git_submodule() {
 }
 
 guess_dirname() {
-    expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$'
+    expr "$1" : '\(.\+\)\.\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\|rar\)$'
 }
 
 check_hash() {
@@ -439,11 +439,16 @@ do_wget() {
 real_extract() {
     local archive="$1" dirName="$2" archive_type strip_comp=''
     [[ -z $archive ]] && return 1
-    archive_type=$(expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$')
-    [[ ! $dirName ]] && dirName=$(guess_dirname "$archive" || echo "${archive}")
+    case $archive in
+    *.tar.*) archive_type=tar.${archive##*.} ;;
+    *) archive_type=${archive##*.} ;;
+    esac
     case $archive_type in
-    zip | 7z)
+    zip | 7z | rar | gz | bz2 | xz)
         7z x -aoa -o"$dirName" "$archive"
+        case $archive_type in
+        gz | bz2 | xz) return ;;
+        esac
         ;;
     tar*)
         [[ -n $dirName && ! -d $dirName ]] && mkdir -p "$dirName"
@@ -472,7 +477,15 @@ real_extract() {
 do_extract() {
     local nocd="${nocd:-false}"
     local archive="$1" dirName="$2"
-    # accepted: zip, 7z, tar, tar.gz, tar.bz2 and tar.xz
+    # accepted: zip, 7z, rar, tar, tar.gz, tar.bz2, tar.xz, tar.lz, gz, bz2 and xz
+    case $archive in
+    *.tar.gz | *.tar.bz2 | *.tar.xz) ;;
+    *.gz | *.bz2 | *.xz)
+        log "extract" real_extract "$archive" "${dirName:-.}"
+        [[ -z $dirName ]] || $nocd || cd_safe "$dirName"
+        return
+        ;;
+    esac
     [[ -z $dirName ]] && dirName=$(guess_dirname "$archive")
     if [[ $dirName != "." && -d $dirName ]]; then
         if [[ $suiteMode == yes && ! -f \
@@ -482,7 +495,7 @@ do_extract() {
     elif [[ -d $dirName ]]; then
         $nocd || cd_safe "$dirName"
         return 0
-    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\)$' > /dev/null; then
+    elif ! expr "$archive" : '.\+\(tar\(\.\(gz\|bz2\|xz\|lz\)\)\?\|7z\|zip\|rar\)$' > /dev/null; then
         return 0
     fi
     log "extract" real_extract "$archive" "$dirName"
