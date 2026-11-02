@@ -1039,12 +1039,14 @@ if [0]==[%mpvINI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build mpv?
-    echo. 1 = Yes
+    echo. 1 = Yes [static libmpv]
     echo. 2 = No
+    echo. 3 = Yes [shared libmpv]
+    echo. 4 = Yes [both static and shared libmpv]
     echo.
-    echo. Note: when built with shared-only FFmpeg, mpv is also shared.
-    echo. Note: the third option was removed since vapoursynth is now a delay-import
-    echo. dependency that is only required if you try to use the corresponding filter.
+    echo. Note: shared libmpv is bin-video\libmpv-2.dll with the import library
+    echo. libmpv.dll.a. mpv.exe doesn't depend on it in any option.
+    echo. Note: with shared-only FFmpeg, mpv.exe and libmpv also need the FFmpeg DLLs.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildmpv="Build mpv: "
@@ -1053,7 +1055,12 @@ if [0]==[%mpvINI%] (
 if "%buildmpv%"=="" GOTO mpv
 if %buildmpv%==1 set "mpv=y"
 if %buildmpv%==2 set "mpv=n"
-if %buildmpv% GTR 2 GOTO mpv
+if %buildmpv%==3 set "mpv=y"
+if %buildmpv%==4 set "mpv=y"
+if %buildmpv% GTR 4 GOTO mpv
+set "libmpv=static"
+if %buildmpv%==3 set "libmpv=shared"
+if %buildmpv%==4 set "libmpv=both"
 if %deleteINI%==1 echo.mpv=^%buildmpv%>>%ini%
 
 :vlc
@@ -1896,7 +1903,7 @@ set compileArgs=--suite=yes --cpuCount=%cpuCount% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x264% --x265=%x265% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
 --ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% ^
---mpv=%mpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
+--mpv=%mpv% --libmpv=%libmpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
 --uvg266=%uvg266% --vvenc=%vvenc% --vvdec=%vvdec% --jq=%jq% --jo=%jo% --dssim=%dssim% ^

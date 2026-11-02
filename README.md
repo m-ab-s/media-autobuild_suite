@@ -231,7 +231,7 @@ For information about the compiler environment see the wiki, there you also have
             - uchardet (MSYS2 package)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
             - vapoursynth (R81)
-            - static libmpv
+            - libmpv: static, shared (libmpv-2.dll) or both, chosen when asked to build mpv
         - Full build (ffmpegChoice=4)
             - openal (git)
             - sdl2 (git) for sdl2-audio, sdl2-video and sdl2-gamepad
