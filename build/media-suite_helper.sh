@@ -993,6 +993,10 @@ do_getMpvConfig() (
     fi
     declare -A MPV_OPTS
     for opt in "${MPV_TEMP_OPTS[@]}"; do
+        if [[ $opt =~ ^(--default-library|-Ddefault_library)= ]]; then
+            echo "Ignored $opt, use mpv= in media-autobuild_suite.ini to pick the libmpv type" >&2
+            continue
+        fi
         if [[ $opt =~ ^-D ]]; then
             local opt_name="${opt#-D}"
             opt_name="${opt_name%%=*}"
