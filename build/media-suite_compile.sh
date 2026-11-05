@@ -1804,13 +1804,11 @@ if [[ $ffmpeg != no ]] && enabled decklink &&
 fi
 
 _check=(libvpl.a vpl.pc)
-if [[ $ffmpeg != no ]] && enabled libvpl; then
-    if do_vcs "$SOURCE_REPO_LIBVPL" libvpl; then
-        do_patch https://github.com/intel/libvpl/pull/198.patch am
-        do_uninstall include/vpl "${_check[@]}"
-        do_cmakeinstall -DUNIX=OFF
-        do_checkIfExist
-    fi
+if [[ $ffmpeg != no ]] && enabled libvpl &&
+    do_vcs "$SOURCE_REPO_LIBVPL" libvpl; then
+    do_uninstall include/vpl "${_check[@]}"
+    do_cmakeinstall -DUNIX=OFF
+    do_checkIfExist
 fi
 
 _check=(libgpac_static.a bin-video/{MP4Box,gpac}.exe)
