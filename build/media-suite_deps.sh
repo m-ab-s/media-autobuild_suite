@@ -83,6 +83,7 @@ SOURCE_REPO_LIBVVENC=https://github.com/fraunhoferhhi/vvenc.git
 SOURCE_REPO_LIBWEBP=https://chromium.googlesource.com/webm/libwebp
 SOURCE_REPO_LIBXML2=https://gitlab.gnome.org/GNOME/libxml2.git
 SOURCE_REPO_LIBZEN=https://github.com/MediaArea/ZenLib.git
+SOURCE_REPO_LIBZMQ=https://github.com/zeromq/libzmq.git
 SOURCE_REPO_LUAJIT=https://github.com/LuaJIT/LuaJIT.git
 SOURCE_REPO_MABS=https://github.com/m-ab-s/media-autobuild_suite.git
 SOURCE_REPO_MEDIAINFO=https://github.com/MediaArea/MediaInfo.git
