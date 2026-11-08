@@ -1480,9 +1480,9 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     fi
 
     do_checkIfExist
+    # add allow-multiple-definition to the .pc file to fix linking with other rust libraries
+    sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 fi
-# add allow-multiple-definition to the .pc file to fix linking with other rust libraries
-sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 
 _check=(bin-video/SvtAv1EncApp.exe
     libSvtAv1Enc.a SvtAv1Enc.pc)
@@ -2247,6 +2247,16 @@ if [[ $ffmpeg != no ]] && enabled avisynth &&
     do_checkIfExist
 fi
 
+_check=(zmq.h zmq_utils.h libzmq.{a,pc})
+if [[ $ffmpeg != no ]] && enabled libzmq &&
+    do_vcs "$SOURCE_REPO_LIBZMQ"; then
+    do_pacman_remove zeromq
+    do_uninstall "${_check[@]}"
+    do_cmakeinstall -DUNIX=OFF -DENABLE_{DRAFTS,CLANG}=OFF -DBUILD_{SHARED,TESTS}=OFF -DWITH_{DOCS,LIBBSD}=OFF
+    grep_or_sed 'ZMQ_STATIC' "$LOCALDESTDIR/lib/pkgconfig/libzmq.pc" $'/^Cflags:/a\\\nCflags.private: -DZMQ_STATIC'
+    do_checkIfExist
+fi
+
 _check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
 if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
      { [[ $mpv != n ]] && ! mpv_disabled_any vulkan libplacebo; } } &&
@@ -2418,11 +2428,6 @@ if [[ $ffmpeg != no ]]; then
         do_pacman_install chromaprint
         grep_or_sed 'CHROMAPRINT_NODLL' "$MINGW_PREFIX/lib/pkgconfig/libchromaprint.pc" \
             $'/^Cflags:/a\\\nCflags.private: -DCHROMAPRINT_NODLL'
-    fi
-    if enabled libzmq; then
-        do_pacman_install zeromq
-        grep_or_sed 'ZMQ_STATIC' "$MINGW_PREFIX/lib/pkgconfig/libzmq.pc" \
-            $'/^Cflags:/a\\\nCflags.private: -DZMQ_STATIC\ns/-lpthread/& -lws2_32/'
     fi
     enabled frei0r && do_addOption --extra-libs=-lpsapi
     enabled ladspa && do_pacman_install ladspa-sdk

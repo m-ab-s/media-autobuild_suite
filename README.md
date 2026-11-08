@@ -155,7 +155,7 @@ For information about the compiler environment see the wiki, there you also have
         - libxavs2 (git)
         - libxevd (git)
         - libxeve (git)
-        - libzmq (MSYS2 package)
+        - libzmq (git)
         - libzvbi (git)
         - openal (git)
         - vapoursynth (R81)
