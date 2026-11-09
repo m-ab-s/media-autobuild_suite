@@ -336,7 +336,7 @@ if [[ $gifski != n ]]; then
             unset audio_codecs image_demuxers gifski_ffmpeg_opts
         fi
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/gifskiffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH
+        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/gifskiffmpeg/lib/pkgconfig:$LOCALDESTDIR/opt/gifskiffmpeg/share/pkgconfig:$PKG_CONFIG_PATH
     fi
 
     _check=(bin-global/gifski.exe)
@@ -1868,7 +1868,7 @@ if [[ $x264 != no ]] ||
 
         # light ffmpeg build
         old_PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$MINGW_PREFIX/lib/pkgconfig
+        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/lightffmpeg/lib/pkgconfig:$LOCALDESTDIR/opt/lightffmpeg/share/pkgconfig:$MINGW_PREFIX/lib/pkgconfig:$MINGW_PREFIX/share/pkgconfig
         unset_extra_script
         if [[ $standalone = y || $av1an = y ]] && [[ $x264 =~ (full|fullv) ]]; then
             _check=("$LOCALDESTDIR"/opt/lightffmpeg/lib/pkgconfig/libav{codec,format}.pc)
@@ -2257,43 +2257,29 @@ if [[ $ffmpeg != no ]] && enabled libzmq &&
     do_checkIfExist
 fi
 
-_check=(libvulkan.a vulkan.pc vulkan/vulkan.h d3d{kmthk,ukmdt}.h)
+# This static shim resolves vulkan-1.dll at runtime
+_check=(libvulkan-1.a vulkan.pc vulkan/vulkan.h share/vulkan/registry/vk.xml)
 if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
      { [[ $mpv != n ]] && ! mpv_disabled_any vulkan libplacebo; } } &&
-    do_vcs "$SOURCE_REPO_VULKANLOADER" vulkan-loader; then
-    _wine_mirror=https://raw.githubusercontent.com/wine-mirror/wine/master/include
-    _mabs=https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/vulkan-loader
-    do_pacman_install uasm
-    do_uninstall "${_check[@]}"
-    do_patch "$_mabs/0001-pc-remove-CMAKE_CXX_IMPLICIT_LINK_LIBRARIES.patch" am
-    do_patch "$_mabs/0002-loader-CMake-related-static-hacks.patch" am
-    do_patch "$_mabs/0003-loader-Re-add-private-libs-to-pc-file.patch" am
-    do_patch "$_mabs/0004-loader-Static-library-name-related-hacks.patch" am
-    do_patch "$_mabs/0005-loader-dllmain-related-hacks.patch" am
-    do_patch "$_mabs/0006-loader-cross-compile-static-linking-hacks.patch" am
-
-    grep_and_sed VULKAN_LIB_SUFFIX loader/vulkan.pc.in \
-            's/@VULKAN_LIB_SUFFIX@//'
-    create_build_dir
-    sed -i "s|command_output(\['git', 'clone'|command_output(\['git', 'clone', '--filter=tree:0'|" ../scripts/update_deps.py
-    log dependencies "$MINGW_PREFIX"/bin/python ../scripts/update_deps.py --no-build
-    cd_safe Vulkan-Headers
-        do_print_progress "Installing Vulkan-Headers"
-        do_uninstall include/vulkan
-        # disable module header because clang-scan-deps can't understand `ccache clang++` as the "compiler."
-        do_cmakeinstall -DVULKAN_HEADERS_ENABLE_MODULE=OFF
-        do_wget -c -r -q "$_wine_mirror/ddk/d3dkmthk.h"
-        do_wget -c -r -q "$_wine_mirror/d3dukmdt.h"
-        do_install d3d{kmthk,ukmdt}.h include/
-    cd_safe "$(get_first_subdir -f)"
-    do_print_progress "Building Vulkan-Loader"
-    CC="${CC##ccache }" CXX="${CXX##ccache }" \
-        CFLAGS+=" -DSTRSAFE_NO_DEPRECATE" \
-        do_cmakeinstall -DBUILD_TESTS=OFF \
-    -DVULKAN_HEADERS_INSTALL_DIR="$LOCALDESTDIR" \
-    -DBUILD_STATIC_LOADER=ON -DUNIX=OFF
+    do_vcs "$SOURCE_REPO_VULKAN_SHIM"; then
+    do_git_submodule
+    # Remove the old static loader and its metadata
+    do_uninstall "${_check[@]}" libvulkan.a d3d{kmthk,ukmdt}.h \
+        include/{vulkan,vk_video} share/vulkan/registry \
+        lib/cmake/VulkanLoader share/cmake/VulkanHeaders
+    # Vulkan-Headers' named modules are disabled for ccache/clang-scan-deps.
+    do_cmakeinstall -DVULKAN_SHIM_IMPERSONATE=ON \
+        -DVULKAN_HEADERS_ENABLE_INSTALL=ON -DVULKAN_HEADERS_ENABLE_{MODULE,TESTS}=OFF
     do_checkIfExist
-    unset _wine_mirror _mabs
+fi
+
+# FFmpeg's swscale SPIR-V backend checks for installed SPIRV-Headers.
+_check=(spirv/unified1/spirv.h "$LOCALDESTDIR/share/pkgconfig/SPIRV-Headers.pc")
+if [[ $ffmpeg != no ]] && enabled vulkan &&
+    do_vcs "$SOURCE_REPO_SPIRV_HEADERS"; then
+    do_uninstall include/spirv
+    do_cmakeinstall -DSPIRV_HEADERS_ENABLE_INSTALL=ON -DSPIRV_HEADERS_ENABLE_TESTS=OFF
+    do_checkIfExist
 fi
 
 if [[ $exitearly = EE5 ]]; then
@@ -2301,63 +2287,49 @@ if [[ $exitearly = EE5 ]]; then
     exit 0
 fi
 
-_check=(spirv_cross/spirv_cross_c.h spirv-cross.pc libspirv-cross.a)
+_check=(spirv_cross/spirv_cross_c.h spirv-cross-c-shared.pc)
 if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_SPIRV_CROSS"; then
-    do_uninstall include/spirv_cross "${_check[@]}" spirv-cross-c-shared.pc libspirv-cross-c-shared.a
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/SPIRV-Cross/0001-add-a-basic-Meson-build-system-for-use-as-a-subproje.patch" am
-    do_mesoninstall
+    do_uninstall include/spirv_cross "${_check[@]}" libspirv-cross{,-cpp,-reflect,-msl,-util}.a spirv-cross.pc \
+        spirv-cross-c.pc libspirv-cross-c-shared.a
+    do_cmakeinstall -DSPIRV_CROSS_CLI=OFF -DSPIRV_CROSS_ENABLE_{MSL,CPP,REFLECT,UTIL}=OFF
+    printf '%s\n' 'Libs.private: -lspirv-cross-hlsl -lspirv-cross-glsl -lspirv-cross-core -lstdc++' \
+        >> "$(file_installed spirv-cross-c.pc)"
+    # Keep the package name expected by libplacebo and mpv, using static libraries.
+    cp -f "$(file_installed spirv-cross-c.pc)" "$(file_installed spirv-cross-c-shared.pc)"
     do_checkIfExist
 fi
 
-_check=(bin/glslangValidator.exe lib{glslang,OSDependent}.a
-        libSPIRV{,-Tools{,-opt,-link,-reduce}}.a glslang/SPIRV/GlslangToSpv.h)
+_check=(shaderc/shaderc.h libshaderc_combined.a shaderc.pc bin/glslc.exe)
 if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } } &&
-    do_vcs "$SOURCE_REPO_GLSLANG"; then
-    do_uninstall libHLSL.a "${_check[@]}"
-    sed -i "s|command_output(\['git', 'clone',|command_output(\['git', 'clone', '--filter=tree:0',|" ./update_glslang_sources.py
-    log dependencies "$MINGW_PREFIX"/bin/python ./update_glslang_sources.py
-    do_cmakeinstall -DUNIX=OFF
-    do_checkIfExist
-fi
-
-_check=(shaderc/shaderc.h libshaderc_combined.a)
-if { [[ $mpv != n ]] ||
-     { [[ $ffmpeg != no ]] && enabled libplacebo; } } ||
-     ! mpv_disabled shaderc &&
     do_vcs "$SOURCE_REPO_SHADERC"; then
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0001-third_party-set-INSTALL-variables-as-cache.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/shaderc/0002-shaderc_util-add-install.patch" am
+    do_patch "https://github.com/google/shaderc/pull/1592.patch" am
     do_uninstall "${_check[@]}" include/shaderc include/libshaderc_util
 
-    grep_and_sed d0e67c58134377f065a509845ca6b7d463f5b487 DEPS 's/d0e67c58134377f065a509845ca6b7d463f5b487/76cc41d26f6902de543773023611e40fbcdde58b/g'
     sed -i "s|\[git, 'clone',|\[git, 'clone', '--filter=tree:0',|" ./utils/git-sync-deps
     log dependencies "$MINGW_PREFIX"/bin/python ./utils/git-sync-deps
 
-    # fix python indentation errors from non-existant code review
-    grep -ZRlP --include="*.py" '\t' third_party/spirv-tools/ | xargs -r -0 -n1 sed -i 's;\t;    ;g'
-
-    do_cmakeinstall -GNinja -DSHADERC_SKIP_{TESTS,EXAMPLES}=ON -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DSKIP_{GLSLANG,GOOGLETEST}_INSTALL=ON -DSPIRV_HEADERS_SKIP_{INSTALL,EXAMPLES}=ON
+    do_cmakeinstall -DSHADERC_SKIP_{TESTS,EXAMPLES,COPYRIGHT_CHECK}=ON \
+        -DSHADERC_ENABLE_WERROR_COMPILE=OFF -DENABLE_GLSLANG_BINARIES=OFF \
+        -DSPIRV_SKIP_EXECUTABLES=ON -DSPIRV_WERROR=OFF -DSKIP_{GLSLANG,SPIRV_TOOLS}_INSTALL=ON
+    # Use the combined library to avoid linking lots of dependencies that only shaderc used separately.
+    mv -f "$(file_installed shaderc_combined.pc)" "$(file_installed shaderc.pc)"
     do_checkIfExist
-    unset add_third_party
 fi
 
-file_installed -s shaderc_static.pc &&
-    mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
-
 _check=(libplacebo.{a,pc})
-_deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
+_deps=(lib{vulkan-1,shaderc_combined}.a spirv-cross-c-shared.pc shaderc/shaderc.h)
 if { [[ $mpv != n ]] ||
      { [[ $ffmpeg != no ]] && enabled libplacebo; } } &&
     do_vcs "$SOURCE_REPO_LIBPLACEBO"; then
     do_git_submodule
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0001-meson-use-shaderc_combined.patch" am
-    do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/libplacebo/0002-spirv-cross-use-spirv-cross-instead-of-c-shared.patch" am
     do_pacman_install python-{mako,setuptools}
     do_uninstall "${_check[@]}"
-    do_mesoninstall -Dvulkan-registry="$LOCALDESTDIR/share/vulkan/registry/vk.xml" -Ddemos=false -Dd3d11=enabled
+    do_mesoninstall -Ddemos=false -Dd3d11=enabled
     do_checkIfExist
 fi
 
@@ -2756,7 +2728,7 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         ;;
     esac
     ! mpv_disabled cplayer && _check+=(bin-video/mpv.{exe,com})
-    _deps=(lib{ass,avcodec,shaderc_combined,spirv-cross,placebo}.a "$MINGW_PREFIX"/lib/libuchardet.a)
+    _deps=(lib{ass,avcodec,shaderc_combined,placebo}.a spirv-cross-c-shared.pc "$MINGW_PREFIX"/lib/libuchardet.a)
     if do_vcs "$SOURCE_REPO_MPV"; then
         do_patch "https://github.com/mpv-player/mpv/compare/master...1480c1:mpv:initguid.patch" am
         do_uninstall share/man/man1/mpv.1 include/mpv share/doc/mpv etc/mpv "${_check[@]}"
@@ -2769,10 +2741,6 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
         mpv_enabled pdf-build && do_pacman_install python-rst2pdf
 
         [[ -f mpv_extra.sh ]] && source mpv_extra.sh
-
-        # We don't have that lib, but mpv specifically checks that lib *only*, and it's required for d3d11 support.
-        # So d3d11 support never got built, but the "non c-shared" lib actually works.
-        sed -i "s|spirv-cross-c-shared|spirv-cross|" meson.build
 
         mapfile -t MPV_ARGS < <(mpv_build_args)
         [[ $libmpv =~ ^(shared|both)$ ]] && MPV_ARGS+=("--default-library=$libmpv")
@@ -2881,7 +2849,7 @@ if [[ $cyanrip = y ]]; then
             files_exist "${_check[@]}" && touch ../"build_successful${bits}_cyan"
         fi
         unset cyan_ffmpeg_opts
-        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$PKG_CONFIG_PATH
+        PKG_CONFIG_PATH=$LOCALDESTDIR/opt/cyanffmpeg/lib/pkgconfig:$LOCALDESTDIR/opt/cyanffmpeg/share/pkgconfig:$PKG_CONFIG_PATH
 
         cd_safe "$LOCALBUILDDIR"/cyanrip-git
         _check=(bin-audio/cyanrip.exe)
