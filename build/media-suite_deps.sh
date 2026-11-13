@@ -73,7 +73,7 @@ SOURCE_REPO_LIBRAV1E=https://github.com/xiph/rav1e.git
 SOURCE_REPO_LIBRESSL=https://github.com/libressl-portable/portable.git#tag=LATEST
 SOURCE_REPO_LIBRIST=https://code.videolan.org/rist/librist.git
 SOURCE_REPO_LIBRTMP=https://gitlab.com/m-ab-s/rtmpdump.git
-SOURCE_REPO_LIBSOXR=https://gitlab.com/m-ab-s/libsoxr.git
+SOURCE_REPO_LIBSOXR=https://git.code.sf.net/p/soxr/code
 SOURCE_REPO_LIBTIFF=https://gitlab.com/libtiff/libtiff.git
 SOURCE_REPO_LIBVMAF=https://github.com/Netflix/vmaf.git
 SOURCE_REPO_LIBVORBIS=https://github.com/xiph/vorbis.git
