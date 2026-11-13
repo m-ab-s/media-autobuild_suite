@@ -1086,7 +1086,7 @@ fi
 
 _check=(soxr.h libsoxr.a)
 if [[ $ffmpeg != no ]] && enabled libsoxr &&
-    do_vcs "$SOURCE_REPO_LIBSOXR"; then
+    do_vcs "$SOURCE_REPO_LIBSOXR" libsoxr; then
     do_uninstall "${_check[@]}"
     do_cmakeinstall -D{WITH_LSR_BINDINGS,BUILD_TESTS,WITH_OPENMP}=off
     do_checkIfExist
