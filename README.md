@@ -158,7 +158,7 @@ For information about the compiler environment see the wiki, there you also have
         - libzmq (MSYS2 package)
         - libzvbi (git)
         - openal (git)
-        - vapoursynth (R81)
+        - vapoursynth (R82)
         - vulkan (git)
     - Full shared dependencies (in addition to Full)
         - libopenh264 (official binaries)
@@ -230,7 +230,7 @@ For information about the compiler environment see the wiki, there you also have
             - rubberband (git)
             - uchardet (MSYS2 package)
             - vulkan, shaderc, spirv-cross, libplacebo (git)
-            - vapoursynth (R81)
+            - vapoursynth (R82)
             - libmpv: static, shared (libmpv-2.dll) or both, chosen when asked to build mpv
         - Full build (ffmpegChoice=4)
             - openal (git)
