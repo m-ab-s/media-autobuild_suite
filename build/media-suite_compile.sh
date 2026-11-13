@@ -865,13 +865,13 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libtesseract; then
     fi
 fi
 
-_check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher}.h)
+_check=(librubberband.a rubberband.pc rubberband/{rubberband-c,RubberBandStretcher,RubberBandLiveShifter}.h)
 if { { [[ $ffmpeg != no ]] && enabled librubberband; } ||
     ! mpv_disabled rubberband; } &&
     do_vcs "$SOURCE_REPO_RUBBERBAND"; then
     do_uninstall "${_check[@]}"
-    log "distclean" make distclean
-    do_make PREFIX="$LOCALDESTDIR" install-static
+    do_mesoninstall -D{jni,ladspa,lv2,vamp,cmdline,tests}=disabled
+    grep_or_sed stdc++ "$LOCALDESTDIR/lib/pkgconfig/rubberband.pc" '/^Libs:/a Libs.private: -lstdc++'
     do_checkIfExist
 fi
 
