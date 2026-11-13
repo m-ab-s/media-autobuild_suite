@@ -575,9 +575,9 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     _deps=(libidn2.a)
     _check=(libpsl.{{,l}a,h,pc})
     [[ $standalone == y ]] && _check+=(bin-global/psl.exe)
-    if do_pkgConfig "libpsl = 0.21.5" &&
-        do_wget -h 1dcc9ceae8b128f3c0b3f654decd0e1e891afc6ff81098f227ef260449dae208 \
-        "https://github.com/rockdaboot/libpsl/releases/download/0.21.5/libpsl-0.21.5.tar.gz"; then
+    if do_pkgConfig "libpsl = 0.23.3" &&
+        do_wget -h 93941f85a1e7bd593fa94f299233cb5dfc91cd144fd9a78a6ceb75001c5b03be \
+        "https://github.com/rockdaboot/libpsl/releases/download/0.23.3/libpsl-0.23.3.tar.gz"; then
         do_uninstall "${_check[@]}"
         [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' tools/Makefile.in
         grep_or_sed "Requires.private" libpsl.pc.in "/Libs:/ i\Requires.private: libidn2"
