@@ -1111,17 +1111,18 @@ fi
 if [[ $standalone = y ]] && enabled libmp3lame; then
     _check=(bin-audio/lame.exe)
     if files_exist "${_check[@]}" &&
-        grep -q "3.100" "$LOCALDESTDIR/bin-audio/lame.exe"; then
-        do_print_status "lame 3.100" "$green" "Up-to-date"
+        grep -q "LAME4.0" "$LOCALDESTDIR/bin-audio/lame.exe"; then
+        do_print_status "lame 4.0" "$green" "Up-to-date"
     elif do_wget_sf \
-            -h ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e \
-            "lame/lame/3.100/lame-3.100.tar.gz"; then
+            -h 3df5124d5ad3a98312ffd7ba6a9b36230e4f8a3e66d3ce0f425e336c32d216eb \
+            "lame/lame/4.0/lame-4.0.tar.gz"; then
         do_uninstall include/lame libmp3lame.{,l}a "${_check[@]}"
-        _mingw_patches_lame="https://raw.githubusercontent.com/Alexpux/MINGW-packages/master/mingw-w64-lame"
+        do_pacman_install mpg123
+        _mingw_patches_lame="https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-lame"
         do_patch "$_mingw_patches_lame/0005-no-gtk.all.patch"
         do_patch "$_mingw_patches_lame/0006-dont-use-outdated-symbol-list.patch"
-        do_patch "$_mingw_patches_lame/0007-revert-posix-code.patch"
         do_patch "$_mingw_patches_lame/0008-skip-termcap.patch"
+        do_patch "$_mingw_patches_lame/0010-frontend-utf8-id3v2-setters.patch"
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/lame/0001-libmp3lame-vector-Makefile.am-Add-msse-to-fix-i686-c.patch"
         do_autoreconf
         do_separate_conf --enable-nasm
