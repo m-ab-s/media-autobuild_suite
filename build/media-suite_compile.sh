@@ -142,12 +142,7 @@ if [[ "$ripgrep|$rav1e|$dssim|$libavif|$dovitool|$hdr10plustool|$av1an" = *y* ]]
     rust_wanted=true
 fi
 
-if [[ $packing = y &&
-    ! "$(/opt/bin/upx -V 2> /dev/null | head -1)" = "upx 5.0.0" ]] &&
-    do_wget -h 8c34b9cec2c225bf71f43cf2b788043d0d203d23edb54f649fbec16f34938d80 \
-        "https://github.com/upx/upx/releases/download/v5.0.0/upx-5.0.0-win32.zip"; then
-    do_install upx.exe /opt/bin/upx.exe
-fi
+[[ $packing = y ]] && do_pacman_install upx
 
 if $rust_wanted; then
     do_pacman_install rust

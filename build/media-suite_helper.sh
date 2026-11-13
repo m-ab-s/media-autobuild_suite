@@ -555,7 +555,7 @@ do_strip() {
 
 do_pack() {
     local file
-    local cmd=(/opt/bin/upx -9 -qq)
+    local cmd=("$MINGW_PREFIX"/bin/upx -9 -qq)
     local nopack=""
     local exts="exe|dll"
     enabled_any libtls openssl && nopack="ffmpeg|mpv"
