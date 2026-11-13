@@ -1312,10 +1312,10 @@ fi
 
 _check=(bin/atw_ldwrapper libAudioToolboxWrapper.a)
 if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
-    _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.10.11"
+    _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.13.9.1"
     _deps=(bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
     if ! files_exist "${_deps[@]}"; then
-        do_wget -r -q -h 32fcd058936410f7eabd3b55a8931bce5f45bb7892d6a2c65387820daca52f58 \
+        do_wget -r -q -h a81ac9146e8daec8c681e1c8d49548a950f62bb5fe44bdcdaca5aabe3afb3b8f \
             "${_qtfiles_url}/QTfiles64.7z"
         do_install ./*.dll bin-video
         rm -rf ../QTfiles64/
