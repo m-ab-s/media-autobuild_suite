@@ -104,6 +104,7 @@ For information about the compiler environment see the wiki, there you also have
         - cuda-nvcc (needs CUDA SDK installed)
             - needs non-free license
             - disabled by default
+            - disabled if cuda-llvm is enabled
         - decklink (12.5.1)
             - needs non-free license
         - frei0r (git)
@@ -493,6 +494,8 @@ Beware as they may change in the future.
 
 For `--enable-cuda-nvcc` to work, you need NVIDIA's [CUDA SDK](https://developer.nvidia.com/cuda-toolkit) installed with `CUDA_PATH` variable to be set system-wide (Usually set by default on CUDA SDK install) and VS2017 or better installed which should come with `vswhere.exe`.\
 If for some reason `CUDA_PATH` isn't set and/or `vswhere.exe` isn't installed, you need to export the `CUDA_PATH` variable path using the above mentioned user files and manually export the correct `PATH` including the absolute `cygpath` converted path to MSVC's `cl.exe`.
+
+`--enable-cuda-nvcc` is disabled if `--enable-cuda-llvm` is enabled.
 
 ### You do not need to do the following if you installed the SDK with the default locations etc and you have 8.3 short paths enabled or if you installed to a directory without any spaces
 
