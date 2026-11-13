@@ -2411,6 +2411,7 @@ if [[ $ffmpeg != no ]]; then
                 mv -f libopenh264.dll "$_openh264_dll"
             popd >/dev/null || do_exit_prompt "Did you delete the previous folder?"
         fi
+        rm -f "$LOCALDESTDIR/bin-video/libopenh264.dll.bz2"
         unset _openh264_ver _openh264_dll
     fi
     if enabled chromaprint; then
