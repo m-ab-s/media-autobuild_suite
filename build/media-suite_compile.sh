@@ -2285,6 +2285,7 @@ if { { [[ $ffmpeg != no ]] && enabled_any vulkan libplacebo; } ||
     do_checkIfExist
     unset _wine_mirror _mabs
 fi
+grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/vulkan.pc" 's/^Libs.private:.*/& -lpthread/'
 
 if [[ $exitearly = EE5 ]]; then
     do_simple_print -p '\n\t'"${orange}Exit due to env var MABS_EXIT_EARLY set to EE5"
@@ -2336,6 +2337,41 @@ fi
 
 file_installed -s shaderc_static.pc &&
     mv "$(file_installed shaderc_static.pc)" "$(file_installed shaderc.pc)"
+
+_check=(libwhisper.a libggml{,-base,-cpu}.a whisper.{h,pc} ggml.h)
+_whisper_vulkan=n
+enabled vulkan && files_exist bin/glslc.exe libvulkan.a vulkan/vulkan.hpp &&
+    _whisper_vulkan=y _check+=(libggml-vulkan.a)
+if [[ $ffmpeg != no ]] && enabled whisper &&
+    do_vcs "$SOURCE_REPO_WHISPER"; then
+    do_uninstall "$LOCALDESTDIR"/include/ggml*.h include/{gguf,parakeet}.h \
+        lib/cmake/{ggml,parakeet,whisper} lib{ggml-vulkan,parakeet}.a parakeet.pc "${_check[@]}"
+    sed -i '/CMAKE_STATIC_LIBRARY_PREFIX ""/d' ggml/CMakeLists.txt
+    case $CC in
+    *clang)
+        do_pacman_install omp
+        _whisper_omp=-fopenmp=libomp _whisper_flags=
+        ;;
+    *) _whisper_omp="-fopenmp -lgomp" _whisper_flags=" -Wa,-muse-unaligned-vector-move" ;;
+    esac
+    _whisper_libs="-lwhisper -lggml -lggml-cpu -lggml-base"
+    extracommands=(-DGGML_VULKAN=OFF)
+    if [[ $_whisper_vulkan = y ]]; then
+        do_pacman_install spirv-headers
+        _whisper_libs="-lwhisper -lggml -lggml-vulkan -lggml-cpu -lggml-base"
+        extracommands=(-DGGML_VULKAN=ON -DVulkan_LIBRARY="$LOCALDESTDIR/lib/libvulkan.a")
+    fi
+    CFLAGS+="$_whisper_flags" CXXFLAGS+="$_whisper_flags" \
+        do_cmakeinstall -DGGML_{NATIVE,CCACHE}=OFF -DWHISPER_BUILD_{TESTS,EXAMPLES,SERVER}=OFF \
+        "${extracommands[@]}"
+    sed -i -e "s|^Libs:.*|Libs: -L\${libdir} $_whisper_libs|" \
+        -e "/^Libs:/a Libs.private: $_whisper_omp" "$LOCALDESTDIR/lib/pkgconfig/whisper.pc"
+    [[ $_whisper_vulkan = y ]] &&
+        sed -i '/^Libs:/i Requires.private: vulkan' "$LOCALDESTDIR/lib/pkgconfig/whisper.pc"
+    do_checkIfExist
+    unset _whisper_omp _whisper_flags _whisper_libs extracommands
+fi
+unset _whisper_vulkan
 
 _check=(libplacebo.{a,pc})
 _deps=(lib{vulkan,shaderc_combined}.a spirv-cross.pc shaderc/shaderc.h)
