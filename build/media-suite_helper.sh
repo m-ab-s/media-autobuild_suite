@@ -251,7 +251,7 @@ do_vcs() {
 
     # try to see if we can "resolve" the currently provided ref to a commit,
     # excluding special tags that we will resolve later. Ignore it if it's
-    # a specific head. glslang's HEAD != their main branch somehow.
+    # a specific head.
     case $ref in
     LATEST | GREATEST | *\**) ;;
     origin/HEAD | origin/* | HEAD) ;;
@@ -641,6 +641,9 @@ file_installed() {
         ;;
     *.pc)
         file="lib/pkgconfig/$1"
+        if [[ ! -e $LOCALDESTDIR/$file && -e $LOCALDESTDIR/share/pkgconfig/$1 ]]; then
+            file="share/pkgconfig/$1"
+        fi
         ;;
     *.a | *.la | *.lib)
         file="lib/$1"
@@ -696,7 +699,7 @@ pc_exists() {
         local _pkg=${opt%% *}
         local _check=${opt#$_pkg}
         [[ $_pkg == "$_check" ]] && _check=""
-        [[ $_pkg == *.pc ]] || _pkg="${LOCALDESTDIR}/lib/pkgconfig/${_pkg}.pc"
+        [[ $_pkg == *.pc ]] || _pkg="$(file_installed "${_pkg}.pc")"
         $PKG_CONFIG --exists --silence-errors "${_pkg}${_check}" || return
     done
 }
@@ -828,6 +831,11 @@ do_getFFmpegConfig() {
 
     # we set these accordingly for static or shared
     do_removeOption "--(en|dis)able-(shared|static)"
+
+    if opt_exists FFMPEG_OPTS '^--enable-vulkan-static$'; then
+        do_simple_print -p "${orange}Warning: --enable-vulkan-static is unsupported with Vulkan-Shim-Loader; removing it and keeping FFmpeg's runtime Vulkan loading.${reset}"
+        do_removeOption --enable-vulkan-static
+    fi
 
     # Prefer the first requested TLS backend allowed by the license.
     local tls=""
@@ -2181,14 +2189,14 @@ create_cmake_toolchain() {
 
 do_fix_pkgconfig_abspaths() {
     # in case the root was moved, this fixes windows abspaths
-    mkdir -p "$LOCALDESTDIR/lib/pkgconfig"
+    mkdir -p "$LOCALDESTDIR"/{lib,share}/pkgconfig
     # pkgconfig keys to find the wrong abspaths from
     local _keys="(prefix|exec_prefix|libdir|includedir)"
     # current abspath root
     local _root
     _root=$(cygpath -m "$LOCALDESTDIR")
     # find .pc files with Windows abspaths
-    grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/lib/pkgconfig | \
+    grep -ElZR "${_keys}=[^/$].*" "$LOCALDESTDIR"/{lib,share}/pkgconfig | \
         # find those with a different abspath than the current
         xargs -0r grep -LZ "$_root" | \
         # replace with current abspath

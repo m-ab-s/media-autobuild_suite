@@ -1992,7 +1992,7 @@ goto :EOF
     echo.DXSDK_DIR="${MINGW_PREFIX}/${MINGW_CHOST}"
     echo.ACLOCAL_PATH="${LOCALDESTDIR}/share/aclocal:${MINGW_PREFIX}/share/aclocal:/usr/share/aclocal"
     echo.PKG_CONFIG="${MINGW_PREFIX}/bin/pkgconf --keep-system-cflags --static"
-    echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig"
+    echo.PKG_CONFIG_PATH="${LOCALDESTDIR}/lib/pkgconfig:${LOCALDESTDIR}/share/pkgconfig:${MINGW_PREFIX}/lib/pkgconfig:${MINGW_PREFIX}/share/pkgconfig"
     echo.
     echo.CFLAGS="-D_FORTIFY_SOURCE=2 -fstack-protector-strong" # security related flags
     echo.CFLAGS+=" -mtune=generic -O2 -pipe" # performance related flags
