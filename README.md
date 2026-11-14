@@ -160,6 +160,9 @@ For information about the compiler environment see the wiki, there you also have
         - openal (git)
         - vapoursynth (R82)
         - vulkan (git)
+        - whisper (whisper.cpp, git)
+            - requires a whisper.cpp model file at runtime
+            - uses Vulkan for GPU acceleration if vulkan is enabled
     - Full shared dependencies (in addition to Full)
         - libopenh264 (official binaries)
             - disabled by default
