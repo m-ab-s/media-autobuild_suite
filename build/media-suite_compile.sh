@@ -1268,7 +1268,8 @@ if { { [[ $ffmpeg != no ]] &&
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0001-CMake-Fix-issues-for-mingw-w64.patch" am
     do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/openal-soft/0003-CMake-include-gsl-include-for-main-lib-too.patch" am
     CC=${CC/ccache /}.bat CXX=${CXX/ccache /}.bat \
-        do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_ENABLE_MODULES=OFF
+        do_cmakeinstall -DLIBTYPE=STATIC -DALSOFT_UTILS=OFF -DALSOFT_EXAMPLES=OFF -DALSOFT_ENABLE_MODULES=OFF \
+            -DCMAKE_CXX_SCAN_FOR_MODULES=OFF
     sed -i -e 's/Libs.private.*/& -luuid -lole32/' \
         -e '/^Cflags:/a Cflags.private: -DAL_LIBTYPE_STATIC' \
         "$LOCALDESTDIR/lib/pkgconfig/openal.pc" # uuid is for FOLDERID_* stuff
