@@ -92,7 +92,6 @@ echo "--------------------------------------------------------------------------
 echo
 
 pacman -Sy --ask=20 --noconfirm
-{ pacman -Qqe | grep -q sed && pacman -Qqg base | pacman -D --asdeps - && pacman -D --asexplicit mintty flex; } > /dev/null
 do_unhide_all_sharedlibs
 
 # make sure that pacutils is always installed for pacsift
