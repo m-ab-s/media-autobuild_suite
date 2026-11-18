@@ -125,7 +125,7 @@ libaribb24 libaribcaption libastcenc libbs2b libcaca libcdio libcodec2 libcurl l
 libdvdread libfdk-xhe-aac libflite libfribidi libgme libilbc libjxl libkvazaar liblc3 liblcevc-dec #liblensfun ^
 libmodplug libmpeghdec liboapv libplacebo libqrencode libquirc librist #librtmp librubberband libssh ^
 libsvthevc libsvtjpegxs libsvtvp9 libtesseract libuavs3d libvvdec libvvenc libxavs libxavs2 ^
-libxevd libxeve libzmq libzvbi openal vapoursynth vulkan
+libxevd libxeve libzmq libzvbi openal vapoursynth vulkan whisper
 
 :: options also available with the suite that add shared dependencies
 set ffmpeg_options_full_shared=#libopenh264 opencl
