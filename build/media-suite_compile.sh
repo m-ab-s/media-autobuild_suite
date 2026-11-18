@@ -1309,13 +1309,18 @@ fi
 
 _check=(bin/atw_ldwrapper libAudioToolboxWrapper.a)
 if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
-    _qtfiles_url="https://github.com/AnimMouse/QTFiles/releases/download/v12.13.9.1"
-    _deps=(bin-video/{ASL,CoreAudioToolbox,CoreFoundation,icudt62,libdispatch,libicuin,libicuuc,objc}.dll)
-    if ! files_exist "${_deps[@]}"; then
-        do_wget -r -q -h a81ac9146e8daec8c681e1c8d49548a950f62bb5fe44bdcdaca5aabe3afb3b8f \
-            "${_qtfiles_url}/QTfiles64.7z"
-        do_install ./*.dll bin-video
-        rm -rf ../QTfiles64/
+    _deps=(bin-video/{ASL,CoreAudioToolbox,CoreFoundation,libdispatch,libicuin,libicuuc,objc}.dll)
+    if { ! files_exist "${_deps[@]}" ||
+        ! compgen -G "$LOCALDESTDIR/bin-video/icudt*.dll" > /dev/null; } &&
+        do_wget -r -n "https://www.apple.com/itunes/download/win64" iTunes64Setup.exe; then
+        rm -rf iTunes64 && mkdir iTunes64 && cd_safe iTunes64
+        log extract 7z e -y ../iTunes64Setup.exe iTunes64.msi
+        MSYS2_ARG_CONV_EXCL='*' log extract.msi msiexec /a "$(cygpath -w iTunes64.msi)" /qn \
+            TARGETDIR="$(cygpath -w "$PWD/root")"
+        do_install root/iTunes/{ASL,CoreAudioToolbox,CoreFoundation,icudt*,libdispatch,libicuin,libicuuc,objc}.dll \
+            bin-video/
+        cd_safe ..
+        rm -rf iTunes64 iTunes64Setup.exe
     fi
 
     if do_vcs "$SOURCE_REPO_AUDIOTOOLBOX"; then
@@ -1323,7 +1328,6 @@ if [[ $ffmpeg != no ]] && enabled audiotoolbox; then
         do_cmakeinstall
         do_checkIfExist
     fi
-    unset _qtfiles_url
 fi
 
 if [[ $exitearly = EE4 ]]; then
