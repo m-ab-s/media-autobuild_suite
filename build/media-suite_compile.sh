@@ -2370,6 +2370,40 @@ if { [[ $mpv != n ]] ||
     do_checkIfExist
 fi
 
+_check=(libwhisper.a libggml{,-base,-cpu}.a whisper.{h,pc} ggml.h)
+_whisper_vulkan=n
+enabled vulkan && files_exist bin/glslc.exe libvulkan-1.a vulkan/vulkan.hpp SPIRV-Headers.pc &&
+    _whisper_vulkan=y _check+=(libggml-vulkan.a)
+if [[ $ffmpeg != no ]] && enabled whisper &&
+    do_vcs "$SOURCE_REPO_WHISPER"; then
+    do_uninstall "$LOCALDESTDIR"/include/ggml*.h include/{gguf,parakeet}.h \
+        lib/cmake/{ggml,parakeet,whisper} lib{ggml-vulkan,parakeet}.a parakeet.pc "${_check[@]}"
+    sed -i '/CMAKE_STATIC_LIBRARY_PREFIX ""/d' ggml/CMakeLists.txt
+    case $CC in
+    *clang)
+        do_pacman_install omp
+        _whisper_omp=-fopenmp=libomp _whisper_flags=
+        ;;
+    *) _whisper_omp="-fopenmp -lgomp" _whisper_flags=" -Wa,-muse-unaligned-vector-move" ;;
+    esac
+    _whisper_libs="-lwhisper -lggml -lggml-cpu -lggml-base"
+    extracommands=(-DGGML_VULKAN=OFF)
+    if [[ $_whisper_vulkan = y ]]; then
+        _whisper_libs="-lwhisper -lggml -lggml-vulkan -lggml-cpu -lggml-base"
+        extracommands=(-DGGML_VULKAN=ON -DVulkan_LIBRARY="$LOCALDESTDIR/lib/libvulkan-1.a")
+    fi
+    CFLAGS+="$_whisper_flags" CXXFLAGS+="$_whisper_flags" \
+        do_cmakeinstall -DGGML_{NATIVE,CCACHE}=OFF -DWHISPER_BUILD_{TESTS,EXAMPLES,SERVER}=OFF \
+        "${extracommands[@]}"
+    sed -i -e "s|^Libs:.*|Libs: -L\${libdir} $_whisper_libs|" \
+        -e "/^Libs:/a Libs.private: $_whisper_omp" "$LOCALDESTDIR/lib/pkgconfig/whisper.pc"
+    [[ $_whisper_vulkan = y ]] &&
+        sed -i '/^Libs:/i Requires.private: vulkan' "$LOCALDESTDIR/lib/pkgconfig/whisper.pc"
+    do_checkIfExist
+    unset _whisper_omp _whisper_flags _whisper_libs extracommands
+fi
+unset _whisper_vulkan
+
 _check=(libplacebo.{a,pc})
 _deps=(lib{vulkan-1,shaderc_combined}.a spirv-cross-c-shared.pc shaderc/shaderc.h)
 if { [[ $mpv != n ]] ||

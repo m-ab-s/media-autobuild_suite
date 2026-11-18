@@ -87,6 +87,7 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
     vorbis
     vpx
     vulkan
+    whisper
     x264
     x265
     xavs
