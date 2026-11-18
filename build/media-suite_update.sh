@@ -23,8 +23,6 @@ while true; do
     esac
 done
 
-[[ "$(uname)" == *6.1* ]] && nargs="-n 4"
-
 # start suite update
 if [[ -d "/trunk/build" ]]; then
     cd "/trunk/build" || exit 1
@@ -75,24 +73,35 @@ if [[ $update == "yes" ]]; then
     fi
 fi # end suite update
 
-# --------------------------------------------------
-# packet update system
-# --------------------------------------------------
-
-# remove buggy crap
-grep -q abrepo /etc/pacman.conf && sed -i '/abrepo/d' /etc/pacman.conf
-rm -f /etc/pacman.d/abrepo.conf
-
-rm -rf /opt/cargo/bin
-
 echo
 echo "-------------------------------------------------------------------------------"
-echo "Updating pacman database..."
+echo "Updating pacman packages..."
 echo "-------------------------------------------------------------------------------"
 echo
 
 pacman -Sy --ask=20 --noconfirm
 do_unhide_all_sharedlibs
+
+have_updates="$(pacman -Qu | grep -v ignored]$ | cut -d' ' -f1)"
+if [[ -n $have_updates ]]; then
+    echo "-------------------------------------------------------------------------------"
+    echo "Updating msys2 system and installed packages..."
+    echo "-------------------------------------------------------------------------------"
+    grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
+        touch /build/update_core &&
+        have_updates="$(grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
+    mapfile -t updates <<< "$have_updates"
+    [[ -n $have_updates ]] && pacman -S --noconfirm --needed --overwrite "/mingw64/*" \
+        --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*" "${updates[@]}"
+fi
+
+# do an overall installation for potential downgrades
+pacman -Syuu --noconfirm --overwrite "/mingw64/*" \
+    --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*"
+
+# -------------------------------------------------------------------------------
+# check packages
+# -------------------------------------------------------------------------------
 
 # make sure that pacutils is always installed for pacsift
 { pacman -Qq pacutils || pacman -S --needed --noconfirm pacutils; } > /dev/null 2>&1
@@ -117,11 +126,8 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     echo "Checking pacman packages..."
     echo "-------------------------------------------------------------------------------"
     echo
-    while read -r pkg; do
-        add_pkg_group "$pkg" || printf '%s\n' "$pkg" >> "$new"
-    done < <(dos2unix -O /etc/pac-base.pk 2> /dev/null | sort -u)
     mapfile -t newmingw < <(dos2unix -O /etc/pac-mingw.pk /etc/pac-mingw-extra.pk 2>/dev/null | sort -u)
-    mapfile -t newmsys < <(dos2unix -O /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
+    mapfile -t newmsys < <(dos2unix -O /etc/pac-base.pk /etc/pac-msys-extra.pk 2> /dev/null | sort -u)
     case $CC in
     *clang) prefix=$(extract_pkg_prefix clang64) ;;
     *) prefix=$(extract_pkg_prefix ucrt64) ;;
@@ -143,7 +149,15 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
     mapfile -t install < <(diff --changed-group-format='%>' --unchanged-group-format='' "$old" "$new")
     mapfile -t uninstall < <(diff --changed-group-format='%<' --unchanged-group-format='' "$old" "$new")
 
-    if [[ ${#uninstall[@]} -gt 0 ]]; then
+    if [[ ${#install[@]} -gt 0 ]]; then
+        echo "You're missing some packages!"
+        echo "Proceeding with installation..."
+        pacman -S --noconfirm --needed "${install[@]}"
+        pacman -D --asexplicit "${install[@]}"
+    fi
+    [[ ${#uninstall[@]} -gt 0 ]] && pacman --noconfirm -D --asdeps "${uninstall[@]}"
+    mapfile -t orphans < <(pacman -Qqdtt)
+    if [[ ${#orphans[@]} -gt 0 ]]; then
         echo
         echo "-------------------------------------------------------------------------------"
         echo "You have more packages than needed!"
@@ -151,31 +165,20 @@ if [[ -f /etc/pac-base.pk && -f /etc/pac-mingw.pk ]]; then
         echo "-------------------------------------------------------------------------------"
         echo
         echo "Remove:"
-        echo "${uninstall[*]}"
+        printf '%s\n' "${orphans[@]}"
         while true; do
             read -r -p "remove packs [y/n]? " yn
             case $yn in
             [Yy]*)
-                pacman -Rs --noconfirm "${uninstall[@]}" >&2 2> /dev/null
-                for pkg in "${uninstall[@]}"; do
-                    pacman -Qs "^${pkg}$" && pacman -D --noconfirm --asdeps "$pkg" > /dev/null
-                done
+                pacman -Rns --noconfirm "${orphans[@]}" >&2 2> /dev/null
                 break
                 ;;
             [Nn]*)
-                pacman --noconfirm -D --asdeps "${uninstall[@]}"
                 break
                 ;;
             *) echo "Please answer yes or no" ;;
             esac
         done
-    fi
-    if [[ ${#install[@]} -gt 0 ]]; then
-        echo "You're missing some packages!"
-        echo "Proceeding with installation..."
-        pacman -Sw --noconfirm --needed "${install[@]}"
-        pacman -S --noconfirm --needed "${install[@]}"
-        pacman -D --asexplicit "${install[@]}"
     fi
     rm -f /etc/pac-{base,mingw}.pk "$new" "$old"
 fi
@@ -185,29 +188,6 @@ if [[ -d "/trunk" ]]; then
 else
     cd_safe "$(cygpath -w /).."
 fi
-
-# --------------------------------------------------
-# packet msys2 system
-# --------------------------------------------------
-
-have_updates="$(pacman -Qu | grep -v ignored]$ | cut -d' ' -f1)"
-if [[ -n $have_updates ]]; then
-    echo "-------------------------------------------------------------------------------"
-    echo "Updating msys2 system and installed packages..."
-    echo "-------------------------------------------------------------------------------"
-    grep -Eq '^(pacman|bash|msys2-runtime)$' <<< "$have_updates" &&
-        touch /build/update_core &&
-        have_updates="$(grep -Ev '^(pacman|bash|msys2-runtime)$' <<< "$have_updates")"
-    xargs $nargs pacman -S --noconfirm --overwrite "/mingw64/*" \
-        --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*" <<< "$have_updates"
-fi
-
-[[ ! -s /usr/ssl/certs/ca-bundle.crt ]] &&
-    pacman -S --noconfirm --asdeps ca-certificates
-
-# do a final overall installation for potential downgrades
-pacman -Syuu --noconfirm --overwrite "/mingw64/*" \
-    --overwrite "/mingw32/*" --overwrite "/clang64/*" --overwrite "/ucrt64/*" --overwrite "/usr/*"
 
 do_hide_all_sharedlibs
 
