@@ -785,8 +785,10 @@ if [0]==[%soxBINI%] (
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build sox binaries [Sound processing tool]?
-    echo. 1 = Yes
+    echo. 1 = Yes, build sox
     echo. 2 = No
+    echo. 3 = Yes, build sox_ng [maintained fork of sox, installed as sox_ng.exe]
+    echo. 4 = Yes, build both
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -796,7 +798,9 @@ if [0]==[%soxBINI%] (
 if "%buildsox%"=="" GOTO sox
 if %buildsox%==1 set "sox=y"
 if %buildsox%==2 set "sox=n"
-if %buildsox% GTR 2 GOTO sox
+if %buildsox%==3 set "sox=ng"
+if %buildsox%==4 set "sox=both"
+if %buildsox% GTR 4 GOTO sox
 if %deleteINI%==1 echo.soxB=^%buildsox%>>%ini%
 
 :ffmpeg

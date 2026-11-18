@@ -897,8 +897,8 @@ fi
 set_title "compiling audio tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
-[[ $sox = y ]] && do_pacman_install wavpack
-if [[ $ffmpeg != no || $sox = y ]]; then
+[[ $sox = @(y|ng|both) ]] && do_pacman_install wavpack
+if [[ $ffmpeg != no || $sox = @(y|ng|both) ]]; then
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
         do_pacman_install twolame
@@ -961,7 +961,7 @@ if [[ $flac = y ]]; then
         do_cmakeinstall audio -DBUILD_{DOCS,DOXYGEN,EXAMPLES,TESTING}=OFF -DINSTALL_MANPAGES=OFF
         do_checkIfExist
     fi
-elif [[ $sox = y ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
+elif [[ $sox = @(y|ng|both) ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
     grep_and_sed dllimport "$MINGW_PREFIX"/include/FLAC++/export.h \
         's|__declspec\(dllimport\)||g' "$MINGW_PREFIX"/include/FLAC{,++}/export.h
@@ -1152,7 +1152,7 @@ if [[ $ffmpeg != no ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
 fi
 
 _check=(libsndfile.a sndfile.{h,pc})
-if [[ $sox = y ]] && do_vcs "$SOURCE_REPO_SNDFILE" sndfile; then
+if [[ $sox = @(y|ng|both) ]] && do_vcs "$SOURCE_REPO_SNDFILE" sndfile; then
     do_uninstall include/sndfile.hh "${_check[@]}"
     do_cmakeinstall -DBUILD_EXAMPLES=off -DBUILD_TESTING=off -DBUILD_PROGRAMS=OFF
     do_checkIfExist
@@ -1160,7 +1160,7 @@ fi
 
 _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
-if [[ $sox = y ]]; then
+if [[ $sox = @(y|both) ]]; then
     do_pacman_install libmad
     do_pacman_install libid3tag
     extracommands=()
@@ -1201,6 +1201,54 @@ if [[ $sox = y ]]; then
         hide_conflicting_libs -R
         do_checkIfExist
         unset extralibs
+    fi
+    unset extracommands
+fi
+
+# sox_ng installs as sox_ng.exe with its own libsox_ng/sox_ng.h/sox_ng.pc,
+# so it can be built next to sox without the two overwriting each other.
+_check=(bin-audio/sox_ng.exe sox_ng.pc)
+_deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
+if [[ $sox = @(ng|both) ]]; then
+    do_pacman_install libmad libid3tag
+    extracommands=()
+    if enabled libopus; then
+        # libopusenc is what lets sox_ng write opus, not just read it
+        [[ $standalone = y ]] || do_pacman_install opusfile libopusenc
+    else
+        extracommands+=(--without-opus)
+    fi
+    if do_vcs "$SOURCE_REPO_SOX_NG" sox_ng; then
+        do_uninstall sox_ng.{pc,h} bin-audio/{soxi,play,rec}_ng.exe libsox_ng.{,l}a "${_check[@]}"
+        do_autoreconf
+        extralibs=(-lshlwapi -lz)
+        extracflags=()
+        if enabled libmp3lame; then
+            mapfile -t -O "${#extralibs[@]}" extralibs < <($PKG_CONFIG --libs lame)
+            mapfile -t -O "${#extracflags[@]}" extracflags < <($PKG_CONFIG --cflags lame)
+        else
+            extracommands+=(--without-lame)
+        fi
+        enabled_any libopencore-amr{wb,nb} &&
+            extralibs+=(-lvo-amrwbenc) ||
+            extracommands+=(--without-amr{wb,nb})
+        if enabled libtwolame; then
+            mapfile -t -O "${#extralibs[@]}" extralibs < <($PKG_CONFIG --libs twolame)
+            mapfile -t -O "${#extracflags[@]}" extracflags < <($PKG_CONFIG --cflags twolame)
+        else
+            extracommands+=(--without-twolame)
+        fi
+        enabled libvorbis || extracommands+=(--without-oggvorbis)
+        hide_conflicting_libs
+        sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
+        do_separate_conf --disable-symlinks --with-distro=media-autobuild_suite \
+            LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" CFLAGS="${extracflags[*]} $CFLAGS" "${extracommands[@]}"
+        do_make
+        do_install src/sox_ng.exe bin-audio/
+        do_install sox_ng.pc
+        hide_conflicting_libs -R
+        do_checkIfExist
+        unset extralibs extracflags
     fi
     unset extracommands
 fi

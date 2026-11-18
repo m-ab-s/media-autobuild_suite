@@ -105,6 +105,7 @@ SOURCE_REPO_SHADERC=https://github.com/google/shaderc.git
 SOURCE_REPO_SHINE=https://github.com/toots/shine.git
 SOURCE_REPO_SNDFILE=https://github.com/libsndfile/libsndfile.git
 SOURCE_REPO_SOX=https://git.code.sf.net/p/sox/code
+SOURCE_REPO_SOX_NG=https://codeberg.org/sox_ng/sox_ng.git
 SOURCE_REPO_SPEEX=https://github.com/xiph/speex.git
 SOURCE_REPO_SPIRV_CROSS=https://github.com/KhronosGroup/SPIRV-Cross.git
 SOURCE_REPO_SPIRV_HEADERS=https://github.com/KhronosGroup/SPIRV-Headers.git
