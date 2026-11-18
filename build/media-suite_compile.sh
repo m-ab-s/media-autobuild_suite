@@ -897,8 +897,8 @@ fi
 set_title "compiling audio tools"
 do_simple_print -p '\n\t'"${orange}Starting $bits compilation of audio tools${reset}"
 
-[[ $sox = @(y|ng|both) ]] && do_pacman_install wavpack
-if [[ $ffmpeg != no || $sox = @(y|ng|both) ]]; then
+[[ $sox != n ]] && do_pacman_install wavpack
+if [[ $ffmpeg != no || $sox != n ]]; then
     enabled_any libopencore-amr{wb,nb} && do_pacman_install opencore-amr
     if enabled libtwolame; then
         do_pacman_install twolame
@@ -961,7 +961,7 @@ if [[ $flac = y ]]; then
         do_cmakeinstall audio -DBUILD_{DOCS,DOXYGEN,EXAMPLES,TESTING}=OFF -DINSTALL_MANPAGES=OFF
         do_checkIfExist
     fi
-elif [[ $sox = @(y|ng|both) ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
+elif [[ $sox != n ]] || { [[ $standalone = y ]] && enabled_any libvorbis libopus; }; then
     do_pacman_install flac
     grep_and_sed dllimport "$MINGW_PREFIX"/include/FLAC++/export.h \
         's|__declspec\(dllimport\)||g' "$MINGW_PREFIX"/include/FLAC{,++}/export.h
@@ -971,7 +971,7 @@ grep_and_sed dllimport "$LOCALDESTDIR"/include/FLAC++/export.h \
 grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/flac.pc" 's/Libs.private: /&-pthread /;s/Cflags: .*/& -pthread/'
 
 _check=(libvo-amrwbenc.{,l}a vo-amrwbenc.pc)
-if [[ $ffmpeg != no || $sox = @(y|ng|both) ]] && enabled libvo-amrwbenc &&
+if [[ $ffmpeg != no || $sox != n ]] && enabled libvo-amrwbenc &&
     do_pkgConfig "vo-amrwbenc = 0.1.3" &&
     do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
         "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"; then
@@ -1152,7 +1152,7 @@ if [[ $ffmpeg != no ]] && enabled libbs2b && do_pkgConfig "libbs2b = 3.1.0" &&
 fi
 
 _check=(libsndfile.a sndfile.{h,pc})
-if [[ $sox = @(y|ng|both) ]] && do_vcs "$SOURCE_REPO_SNDFILE" sndfile; then
+if [[ $sox != n ]] && do_vcs "$SOURCE_REPO_SNDFILE" sndfile; then
     do_uninstall include/sndfile.hh "${_check[@]}"
     do_cmakeinstall -DBUILD_EXAMPLES=off -DBUILD_TESTING=off -DBUILD_PROGRAMS=OFF
     do_checkIfExist
@@ -1160,7 +1160,7 @@ fi
 
 _check=(bin-audio/sox.exe sox.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
-if [[ $sox = @(y|both) ]]; then
+if [[ $sox = y || $sox = both ]]; then
     do_pacman_install libmad
     do_pacman_install libid3tag
     extracommands=()
@@ -1209,7 +1209,7 @@ fi
 # so it can be built next to sox without the two overwriting each other.
 _check=(bin-audio/sox_ng.exe sox_ng.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
-if [[ $sox = @(ng|both) ]]; then
+if [[ $sox = ng || $sox = both ]]; then
     do_pacman_install libmad libid3tag
     extracommands=()
     if enabled libopus; then
