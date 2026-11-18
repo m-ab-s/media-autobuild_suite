@@ -971,7 +971,7 @@ grep_and_sed dllimport "$LOCALDESTDIR"/include/FLAC++/export.h \
 grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/flac.pc" 's/Libs.private: /&-pthread /;s/Cflags: .*/& -pthread/'
 
 _check=(libvo-amrwbenc.{,l}a vo-amrwbenc.pc)
-if [[ $ffmpeg != no ]] && enabled libvo-amrwbenc &&
+if [[ $ffmpeg != no || $sox = @(y|ng|both) ]] && enabled libvo-amrwbenc &&
     do_pkgConfig "vo-amrwbenc = 0.1.3" &&
     do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
         "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"; then
