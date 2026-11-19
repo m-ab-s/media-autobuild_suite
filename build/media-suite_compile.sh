@@ -1239,7 +1239,9 @@ if [[ $sox = ng || $sox = both ]]; then
         enabled libvorbis || extracommands+=(--without-oggvorbis)
         hide_conflicting_libs
         sed -i 's|found_libgsm=yes|found_libgsm=no|g' configure
-        do_separate_conf --disable-symlinks --with-distro=media-autobuild_suite \
+        # AudioToolboxWrapper (for ffmpeg's audiotoolbox) installs a stub CoreAudio/CoreAudio.h,
+        # which sox_ng's configure would otherwise take for macOS CoreAudio
+        do_separate_conf --disable-symlinks --with-distro=media-autobuild_suite --without-coreaudio \
             LIBS="-L$LOCALDESTDIR/lib ${extralibs[*]}" CFLAGS="${extracflags[*]} $CFLAGS" "${extracommands[@]}"
         do_make
         do_install src/sox_ng.exe bin-audio/
