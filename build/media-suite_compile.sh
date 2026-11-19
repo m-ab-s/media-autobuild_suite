@@ -568,15 +568,13 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
         do_checkIfExist
     fi
     _deps=(libidn2.a)
-    _check=(libpsl.{{,l}a,h,pc})
+    _check=(libpsl.{a,h,pc})
     [[ $standalone == y ]] && _check+=(bin-global/psl.exe)
     if do_pkgConfig "libpsl = 0.23.3" &&
         do_wget -h 93941f85a1e7bd593fa94f299233cb5dfc91cd144fd9a78a6ceb75001c5b03be \
         "https://github.com/rockdaboot/libpsl/releases/download/0.23.3/libpsl-0.23.3.tar.gz"; then
-        do_uninstall "${_check[@]}"
-        [[ $standalone == y ]] || sed -ri 's|(bin_PROGRAMS = ).*|\1|g' tools/Makefile.in
-        grep_or_sed "Requires.private" libpsl.pc.in "/Libs:/ i\Requires.private: libidn2"
-        CFLAGS+=" -DPSL_STATIC" do_separate_confmakeinstall global --disable-{nls,rpath,gtk-doc-html,man,runtime}
+        do_uninstall libpsl.la "${_check[@]}"
+        do_mesoninstall global -Druntime=libidn2 -Dtests=false
         do_checkIfExist
     fi
 fi
