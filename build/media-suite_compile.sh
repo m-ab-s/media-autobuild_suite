@@ -1206,8 +1206,7 @@ if [[ $sox = y || $sox = both ]]; then
     unset extracommands
 fi
 
-# sox_ng installs as sox_ng.exe with its own libsox_ng/sox_ng.h/sox_ng.pc,
-# so it can be built next to sox without the two overwriting each other.
+# The _ng suffix lets both versions be installed side by side.
 _check=(bin-audio/sox_ng.exe sox_ng.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
 if [[ $sox = ng || $sox = both ]]; then
