@@ -2165,13 +2165,16 @@ fi
 if enabled libsrt; then
     do_pacman_install openssl
     _check=(libsrt.a srt.pc srt/srt.h)
-    [[ $standalone = y ]] && _check+=(bin-video/srt-live-transmit.exe)
+    [[ $standalone = y ]] && _check+=(bin-video/srt-{live,file}-transmit.exe)
     if do_vcs "$SOURCE_REPO_SRT"; then
         hide_libressl
+        extracommands=()
+        [[ $standalone = y ]] || extracommands+=(-DENABLE_APPS=OFF)
         do_cmakeinstall video -DENABLE_SHARED=off -DENABLE_SUFLIP=off \
-            -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on -DUSE_STATIC_LIBSTDCXX=ON
+            -DENABLE_EXAMPLES=off -DUSE_OPENSSL_PC=on -DUSE_STATIC_LIBSTDCXX=ON "${extracommands[@]}"
         hide_libressl -R
         do_checkIfExist
+        unset extracommands
     fi
 fi
 
