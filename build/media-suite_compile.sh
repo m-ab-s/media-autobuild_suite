@@ -500,6 +500,8 @@ fi
 
 [[ $ffmpeg != no ]] && enabled gcrypt && do_pacman_install libgcrypt
 
+curl_cli=n
+[[ $standalone = y || $curl != n ]] && curl_cli=y
 if [[ $curl = y ]] || { [[ $curl = n ]] && enabled libcurl; }; then
     curl=schannel
     enabled libtls && curl=libressl
@@ -593,7 +595,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]]; then
     mbedtls) _deps=("$MINGW_PREFIX/lib/libmbedtls.a") ;;
     *) _deps=() ;;
     esac
-    [[ $standalone = y || $curl != n ]] && _check+=(bin-global/curl.exe)
+    [[ $curl_cli = y ]] && _check+=(bin-global/curl.exe)
     if do_vcs "$SOURCE_REPO_CURL"; then
         do_uninstall include/curl bin-global/curl-config libcurl.la lib/cmake/CURL "${_check[@]}"
         extra_opts=(
@@ -611,7 +613,7 @@ if [[ $mediainfo = y || $bmx = y || $curl != n || $cyanrip = y ]]; then
             -DCURL_CA_{BUNDLE,PATH}=none
             -DUNIX=OFF
         )
-        [[ $standalone = y || $curl != n ]] && extra_opts+=(-DBUILD_CURL_EXE=ON)
+        [[ $curl_cli = y ]] && extra_opts+=(-DBUILD_CURL_EXE=ON)
         case $curl in
         libressl|openssl)
             extra_opts+=(-DCURL_USE_OPENSSL=ON -DOPENSSL_USE_STATIC_LIBS=ON)
