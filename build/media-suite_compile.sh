@@ -2263,20 +2263,26 @@ if [[ $uvg266 = y ]] &&
     do_checkIfExist
 fi
 
-_check=(bin-video/vvenc{,FF}app.exe
-    vvenc/vvenc.h
+_check=(vvenc/vvenc.h
     libvvenc.{a,pc}
     lib/cmake/vvenc/vvencConfig.cmake)
+if [[ $standalone = y || $vvenc = y ]]; then
+    extracommands=(-DVVENC_LIBRARY_ONLY=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON)
+    _check+=(bin-video/vvenc{,FF}app.exe)
+else
+    extracommands=(-DVVENC_LIBRARY_ONLY=ON -DVVENC_INSTALL_FULLFEATURE_APP=OFF)
+fi
 if [[ $vvenc = y ]] ||
     { [[ $ffmpeg != no ]] && enabled libvvenc; } &&
     do_vcs "$SOURCE_REPO_LIBVVENC"; then
     do_pacman_install nlohmann-json
     do_uninstall include/vvenc lib/cmake/vvenc "${_check[@]}"
-    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_INSTALL_FULLFEATURE_APP=ON -DVVENC_ENABLE_THIRDPARTY_JSON=SYSTEM
+    do_cmakeinstall video -DVVENC_ENABLE_LINK_TIME_OPT=OFF -DVVENC_ENABLE_THIRDPARTY_JSON=SYSTEM "${extracommands[@]}"
     do_checkIfExist
 else
     pc_exists libvvenc || do_removeOption "--enable-libvvenc"
 fi
+unset extracommands
 
 _check=(bin-video/vvdecapp.exe
     vvdec/vvdec.h
