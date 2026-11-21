@@ -945,15 +945,14 @@ if enabled libvorbis && do_vcs "$SOURCE_REPO_LIBVORBIS"; then
     do_checkIfExist
 fi
 
-_check=(libspeex.{,l}a speex.pc speex/speex.h)
+_check=(libspeex.a speex.pc speex/speex.h)
 [[ $standalone = y ]] && _check+=(bin-audio/speex{enc,dec}.exe)
 if enabled libspeex && do_vcs "$SOURCE_REPO_SPEEX"; then
     do_pacman_remove speex
-    do_uninstall include/speex "${_check[@]}"
-    do_autogen
-    extracommands=()
-    [[ $standalone = y ]] || extracommands+=(--disable-binaries)
-    do_separate_confmakeinstall audio --enable-vorbis-psy "${extracommands[@]}"
+    do_uninstall include/speex libspeex.la "${_check[@]}"
+    extracommands=(-Dtools=disabled)
+    [[ $standalone = y ]] && extracommands=(-Dtools=enabled)
+    LDFLAGS+=" -lwinmm" do_mesoninstall audio -Dtest-binaries=disabled -Dvorbis-psy=enabled "${extracommands[@]}"
     do_checkIfExist
     unset extracommands
 fi
