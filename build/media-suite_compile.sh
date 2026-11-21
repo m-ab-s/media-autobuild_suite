@@ -1742,6 +1742,7 @@ _check=(libdavs2.a davs2_config.h davs2.{h,pc})
 [[ $standalone = y ]] && _check+=(bin-video/davs2.exe)
 davs2_repo=$SOURCE_REPO_DAVS
 extracommands=()
+[[ $standalone = y ]] || extracommands+=(--disable-cli)
 if [[ $avs2 = 10bit ]]; then
     davs2_repo=$SOURCE_REPO_DAVS10bit
     extracommands+=(--bit-depth=10)
