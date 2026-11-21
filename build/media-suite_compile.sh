@@ -686,14 +686,14 @@ if [[ $ffmpeg != no || $standalone = y ]] && enabled libwebp; then
     do_pacman_install giflib
     _check=(libwebp{,mux}.{a,pc})
     [[ $standalone = y ]] && _check+=(libwebp{demux,decoder}.{a,pc}
-    bin-global/{{c,d}webp,webpmux,img2webp}.exe)
+    bin-global/{{c,d}webp,webpmux,webpinfo,img2webp}.exe)
     if do_vcs "$SOURCE_REPO_LIBWEBP"; then
         do_uninstall include/webp bin-global/gif2webp.exe "${_check[@]}"
         extracommands=("-DWEBP_BUILD_EXTRAS=OFF" "-DWEBP_BUILD_VWEBP=OFF")
         if [[ $standalone = y ]]; then
-            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2}WEBP,ANIM_UTILS,WEBPMUX}"=ON")
+            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2}WEBP,ANIM_UTILS,WEBPMUX,WEBPINFO}"=ON")
         else
-            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX}"=OFF")
+            extracommands+=(-DWEBP_BUILD_{{C,D,GIF2,IMG2,V}WEBP,ANIM_UTILS,WEBPMUX,WEBPINFO}"=OFF")
         fi
         CFLAGS+=" -DFREEGLUT_STATIC $($PKG_CONFIG --cflags zlib)" \
             LDFLAGS+=" $($PKG_CONFIG --libs zlib)" \
