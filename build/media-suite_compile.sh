@@ -3176,11 +3176,10 @@ EOF
         do_checkIfExist
     fi
 
-    _check=(bin/protoc.exe libprotobuf-lite.{,l}a libprotobuf.{,l}a protobuf{,-lite}.pc)
+    _check=(bin/protoc.exe libprotobuf{,-lite}.a protobuf{,-lite}.pc lib/cmake/protobuf/protobuf-config.cmake)
     if do_vcs "https://github.com/protocolbuffers/protobuf.git"; then
-        do_uninstall include/google/protobuf "${_check[@]}"
-        do_autogen
-        do_separate_confmakeinstall
+        do_uninstall include/google/protobuf lib{protobuf,protobuf-lite,protoc}.la "${_check[@]}"
+        do_cmakeinstall -DUNIX=OFF -DCMAKE_CXX_STANDARD=17 -Dprotobuf_BUILD_TESTS=OFF
         do_checkIfExist
     fi
 
