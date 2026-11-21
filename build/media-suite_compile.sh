@@ -1729,9 +1729,12 @@ if { [[ $avs2 != n ]] || { [[ $ffmpeg != no ]] && enabled libxavs2; }; } &&
     cd_safe build/linux
     [[ -f config.mak ]] && log "distclean" make distclean
     do_uninstall all "${_check[@]}"
-    do_configure --bindir="$LOCALDESTDIR"/bin-video --enable-static --enable-strip
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(--disable-cli)
+    do_configure --bindir="$LOCALDESTDIR"/bin-video --enable-static --enable-strip "${extracommands[@]}"
     do_makeinstall
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libdavs2.a davs2_config.h davs2.{h,pc})
