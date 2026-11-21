@@ -1588,20 +1588,20 @@ if [[ $libavif = y ]]; then
     fi
 fi
 
-_check=(libkvazaar.{,l}a kvazaar.pc kvazaar.h)
-[[ $standalone = y ]] && _check+=(bin-video/kvazaar.exe)
+_check=(libkvazaar.a kvazaar.pc kvazaar.h)
+[[ $standalone = y || $other265 = y ]] && _check+=(bin-video/kvazaar.exe)
 if { [[ $other265 = y ]] || { [[ $ffmpeg != no ]] && enabled libkvazaar; }; } &&
     do_vcs "$SOURCE_REPO_LIBKVAZAAR"; then
-    do_patch "https://github.com/m-ab-s/mabs-patches/raw/master/kvazaar/0001-Mingw-w64-Re-enable-avx2.patch" am
-    do_uninstall kvazaar_version.h "${_check[@]}"
-    do_autogen
-    [[ $standalone = y || $other265 = y ]] ||
-        sed -i "s|bin_PROGRAMS = .*||" src/Makefile.in
-    CFLAGS+=" -fno-asynchronous-unwind-tables -DKVZ_BIT_DEPTH=10" \
-        do_separate_confmakeinstall video
+    do_uninstall kvazaar_version.h libkvazaar.la "${_check[@]}"
+    extracommands=(-DBUILD_KVAZAAR_BINARY=OFF)
+    [[ $standalone = y || $other265 = y ]] && extracommands=(-DBUILD_KVAZAAR_BINARY=ON)
+    CFLAGS+=" -fno-asynchronous-unwind-tables" \
+        do_cmakeinstall video -DBUILD_TESTS=OFF -DGIT_SUBMODULE=OFF -DKVZ_BIT_DEPTHS=10 "${extracommands[@]}"
+    grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/kvazaar.pc" 's/^Libs.private:.*/& -lpthread/'
     grep_or_sed 'KVZ_STATIC_LIB' "$LOCALDESTDIR/lib/pkgconfig/kvazaar.pc" \
     '/^Cflags:/a Cflags.private: -DKVZ_STATIC_LIB'
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(libSDL2{,main}.a sdl2.pc SDL2/SDL.h)
