@@ -1914,14 +1914,19 @@ if { [[ $svthevc = y ]] || enabled libsvthevc; } &&
 fi
 unset extracommands
 
-_check=(bin-video/SvtVp9EncApp.exe
-    libSvtVp9Enc.a SvtVp9Enc.pc)
+_check=(libSvtVp9Enc.a SvtVp9Enc.pc)
+extracommands=(-DBUILD_APP=OFF)
+if [[ $standalone = y || $svtvp9 = y ]]; then
+    _check+=(bin-video/SvtVp9EncApp.exe)
+    extracommands=(-DBUILD_APP=ON)
+fi
 if { [[ $svtvp9 = y ]] || enabled libsvtvp9; } &&
     do_vcs "$SOURCE_REPO_SVTVP9"; then
     do_uninstall include/svt-vp9 "${_check[@]}" include/svt-vp9
-    do_cmakeinstall video -DUNIX=OFF
+    do_cmakeinstall video -DUNIX=OFF "${extracommands[@]}"
     do_checkIfExist
 fi
+unset extracommands
 
 _check=(xvc.pc xvc{enc,dec}.h libxvc{enc,dec}.a bin-video/xvc{enc,dec}.exe)
 if [[ $xvc == y ]] &&
