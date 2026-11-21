@@ -1670,12 +1670,14 @@ if { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; th
 fi
 
 _check=(libbluray.{a,pc})
+[[ $standalone = y ]] && _check+=(bin/bd_{info,list_titles,splice}.exe)
 if { { [[ $ffmpeg != no ]] && enabled libbluray; } || ! mpv_disabled libbluray; } &&
     do_vcs "$SOURCE_REPO_LIBBLURAY"; then
     [[ -f contrib/libudfread/.git ]] || do_git_submodule
     do_uninstall include/libbluray share/java "${_check[@]}" libbluray.la
     sed -i 's|__declspec(dllexport)||g' jni/win32/jni_md.h
     extracommands=()
+    [[ $standalone = y ]] || extracommands+=(-Denable_tools=false)
     log javahome get_java_home
     OLD_PATH=$PATH
     if [[ -n $JAVA_HOME ]]; then
