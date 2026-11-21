@@ -938,11 +938,10 @@ if { [[ $flac = y ]] || enabled libvorbis || { [[ $standalone = y ]] && enabled 
     do_checkIfExist
 fi
 
-_check=(libvorbis{,enc,file}.{,l}a vorbis{,enc,file}.pc vorbis/vorbisenc.h)
+_check=(libvorbis{,enc,file}.a vorbis{,enc,file}.pc vorbis/vorbisenc.h lib/cmake/Vorbis/VorbisConfig.cmake)
 if enabled libvorbis && do_vcs "$SOURCE_REPO_LIBVORBIS"; then
-    do_uninstall include/vorbis "${_check[@]}"
-    do_autogen
-    do_separate_confmakeinstall audio --disable-docs
+    do_uninstall include/vorbis libvorbis{,enc,file}.la "${_check[@]}"
+    do_cmakeinstall audio -DBUILD_TESTING=OFF
     do_checkIfExist
 fi
 
