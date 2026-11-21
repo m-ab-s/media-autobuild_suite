@@ -930,12 +930,11 @@ if [[ $ffmpeg != no ]] && enabled libilbc &&
     do_checkIfExist
 fi
 
-_check=(libogg.{,l}a ogg/ogg.h ogg.pc)
-if { [[ $flac = y ]] || enabled libvorbis; } &&
+_check=(libogg.a ogg/ogg.h ogg.pc lib/cmake/Ogg/OggConfig.cmake)
+if { [[ $flac = y ]] || enabled libvorbis || { [[ $standalone = y ]] && enabled libspeex; }; } &&
     do_vcs "$SOURCE_REPO_LIBOGG"; then
-    do_uninstall include/ogg "${_check[@]}"
-    do_autogen
-    do_separate_confmakeinstall audio
+    do_uninstall include/ogg libogg.la "${_check[@]}"
+    do_cmakeinstall audio -DBUILD_TESTING=OFF
     do_checkIfExist
 fi
 
