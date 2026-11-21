@@ -1454,14 +1454,18 @@ else
 fi
 
 _check=(libvmaf.{a,pc} libvmaf/libvmaf.h)
+[[ $standalone = y ]] && _check+=(bin-video/vmaf.exe)
 if [[ $ffmpeg != no ]] && enabled libvmaf &&
     do_vcs "$SOURCE_REPO_LIBVMAF"; then
     do_patch "https://github.com/Netflix/vmaf/pull/1700.patch" am
     do_uninstall share/model "${_check[@]}"
     do_pacman_install -m vim # for built_in_models
     cd_safe libvmaf
-    do_mesoninstall video -Denable_float=true -Dbuilt_in_models=true -Denable_tests=false
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(-Denable_tools=false)
+    do_mesoninstall video -Denable_float=true -Dbuilt_in_models=true -Denable_tests=false "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 file_installed -s libvmaf.dll.a && rm "$(file_installed libvmaf.dll.a)"
 
