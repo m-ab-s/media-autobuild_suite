@@ -2340,12 +2340,16 @@ if [[ $ffmpeg != no ]] && enabled libxevd &&
     do_checkIfExist
 fi
 
-_check=(bin-video/oapv_app_{enc,dec}.exe oapv/oapv.h liboapv.a oapv.pc)
+_check=(oapv/oapv.h liboapv.a oapv.pc)
+[[ $standalone = y ]] && _check+=(bin-video/oapv_app_{enc,dec}.exe)
 if [[ $ffmpeg != no ]] && enabled liboapv &&
     do_vcs "$SOURCE_REPO_OPENAPV"; then
     do_uninstall "${_check[@]}"
-    do_cmakeinstall video -DOAPV_BUILD_SHARED_LIB=OFF
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(-DOAPV_BUILD_APPS=OFF)
+    do_cmakeinstall video -DOAPV_BUILD_SHARED_LIB=OFF "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(avisynth/avisynth{,_c}.h
