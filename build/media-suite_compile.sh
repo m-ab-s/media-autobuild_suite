@@ -1550,14 +1550,19 @@ if { [[ $rav1e = y ]] || [[ $libavif = y ]] || enabled librav1e; } &&
     sed -i 's/Libs.private:.*/& -Wl,--allow-multiple-definition/' "$LOCALDESTDIR/lib/pkgconfig/rav1e.pc" >/dev/null 2>&1
 fi
 
-_check=(bin-video/SvtAv1EncApp.exe
-    libSvtAv1Enc.a SvtAv1Enc.pc)
+_check=(libSvtAv1Enc.a SvtAv1Enc.pc)
+extracommands=(-DBUILD_APPS=OFF)
+if [[ $standalone = y || $svtav1 = y || $av1an = y ]]; then
+    _check+=(bin-video/SvtAv1EncApp.exe)
+    extracommands=(-DBUILD_APPS=ON)
+fi
 if { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
     do_vcs "$SOURCE_REPO_SVTAV1"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
-    do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON
+    do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON "${extracommands[@]}"
     do_checkIfExist
 fi
+unset extracommands
 
 if [[ $libavif = y ]]; then
     do_pacman_remove python-rst2pdf
