@@ -885,12 +885,16 @@ if [[ $ffmpeg != no ]] && enabled libzimg &&
     do_checkIfExist
 fi
 
-_check=(bin-global/SvtJpegxs{De,En}cApp.exe svt-jpegxs/SvtJpegxs{,Dec,Enc}.h libSvtJpegxs.a SvtJpegxs.pc)
+_check=(svt-jpegxs/SvtJpegxs{,Dec,Enc}.h libSvtJpegxs.a SvtJpegxs.pc)
+[[ $standalone = y ]] && _check+=(bin-global/SvtJpegxs{De,En}cApp.exe)
 if [[ $ffmpeg != no ]] && enabled libsvtjpegxs &&
     do_vcs "$SOURCE_REPO_SVTJXS"; then
     do_uninstall "${_check[@]}"
-    do_cmakeinstall global -DUNIX=OFF
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(-DBUILD_APPS=OFF)
+    do_cmakeinstall global -DUNIX=OFF "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 if [[ $exitearly = EE3 ]]; then
