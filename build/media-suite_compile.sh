@@ -2284,19 +2284,25 @@ else
 fi
 unset extracommands
 
-_check=(bin-video/vvdecapp.exe
-    vvdec/vvdec.h
+_check=(vvdec/vvdec.h
     libvvdec.{a,pc}
     lib/cmake/vvdec/vvdecConfig.cmake)
+if [[ $standalone = y || $vvdec = y ]]; then
+    extracommands=(-DVVDEC_LIBRARY_ONLY=OFF -DVVDEC_INSTALL_VVDECAPP=ON)
+    _check+=(bin-video/vvdecapp.exe)
+else
+    extracommands=(-DVVDEC_LIBRARY_ONLY=ON -DVVDEC_INSTALL_VVDECAPP=OFF)
+fi
 if [[ $vvdec = y ]] ||
     { [[ $ffmpeg != no ]] && enabled libvvdec; } &&
     do_vcs "$SOURCE_REPO_LIBVVDEC"; then
     do_uninstall include/vvdec lib/cmake/vvdec "${_check[@]}"
-    do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF -DVVDEC_INSTALL_VVDECAPP=ON
+    do_cmakeinstall video -DVVDEC_ENABLE_LINK_TIME_OPT=OFF "${extracommands[@]}"
     do_checkIfExist
 else
     pc_exists libvvdec || do_removeOption "--enable-libvvdec"
 fi
+unset extracommands
 
 _check=(bin-video/xeve_app.exe xeve/xeve{,_exports}.h xeve/libxeve.a xeve.pc)
 if [[ $ffmpeg != no ]] && enabled libxeve &&
