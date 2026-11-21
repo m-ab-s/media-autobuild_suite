@@ -1900,14 +1900,19 @@ if [[ $mp4box = y ]] && do_vcs "$SOURCE_REPO_GPAC"; then
     do_checkIfExist
 fi
 
-_check=(SvtHevcEnc.pc libSvtHevcEnc.a svt-hevc/EbApi.h
-    bin-video/SvtHevcEncApp.exe)
+_check=(SvtHevcEnc.pc libSvtHevcEnc.a svt-hevc/EbApi.h)
+extracommands=(-DBUILD_APP=OFF)
+if [[ $standalone = y || $svthevc = y ]]; then
+    _check+=(bin-video/SvtHevcEncApp.exe)
+    extracommands=(-DBUILD_APP=ON)
+fi
 if { [[ $svthevc = y ]] || enabled libsvthevc; } &&
     do_vcs "$SOURCE_REPO_SVTHEVC"; then
     do_uninstall "${_check[@]}" include/svt-hevc
-    do_cmakeinstall video -DUNIX=OFF
+    do_cmakeinstall video -DUNIX=OFF "${extracommands[@]}"
     do_checkIfExist
 fi
+unset extracommands
 
 _check=(bin-video/SvtVp9EncApp.exe
     libSvtVp9Enc.a SvtVp9Enc.pc)
