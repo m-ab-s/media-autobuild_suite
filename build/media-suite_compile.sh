@@ -257,11 +257,15 @@ unset _zlib_uninstall
 # instead of duplicating this growing dependency condition at each consumer.
 _deps=("$zlib_dir"/lib/libz.a)
 _check=(libpng.{pc,{,l}a} libpng16.{pc,{,l}a} libpng16/png.h)
+[[ $standalone = y ]] && _check+=(bin/pngfix.exe bin/png-fix-itxt.exe)
 if do_vcs "$SOURCE_REPO_LIBPNG"; then
     do_uninstall include/libpng16 "${_check[@]}"
     do_autoupdate
-    do_separate_confmakeinstall --with-pic
+    extracommands=()
+    [[ $standalone = y ]] || extracommands+=(--disable-tools)
+    do_separate_confmakeinstall --with-pic "${extracommands[@]}"
     do_checkIfExist
+    unset extracommands
 fi
 
 _check=(bin-global/rg.exe)
