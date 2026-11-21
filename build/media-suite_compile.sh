@@ -2909,12 +2909,16 @@ if [[ $mpv != n ]] && pc_exists libavcodec libavformat libswscale libavfilter; t
 fi
 
 if [[ $bmx = y ]]; then
-    _check=(bin-global/uriparse.exe liburiparser.a liburiparser.pc uriparser/Uri.h)
+    _check=(liburiparser.a liburiparser.pc uriparser/Uri.h)
+    [[ $standalone = y ]] && _check+=(bin-global/uriparse.exe)
     do_pacman_remove uriparser
     if do_vcs "$SOURCE_REPO_URIPARSER"; then
         do_uninstall include/uriparser "${_check[@]}"
-        do_cmakeinstall global -DURIPARSER_BUILD_{DOCS,TESTS}=OFF
+        extracommands=()
+        [[ $standalone = y ]] || extracommands+=(-DURIPARSER_BUILD_TOOLS=OFF)
+        do_cmakeinstall global -DURIPARSER_BUILD_{DOCS,TESTS}=OFF "${extracommands[@]}"
         do_checkIfExist
+        unset extracommands
     fi
 
     # libMXF and libMXF++ were moved into bmx.
