@@ -473,16 +473,18 @@ if [[ $mpv = y ]] ||
         unset extracommands
     fi
 
-    _check=(ass/ass{,_types}.h libass.{{,l}a,pc})
+    _check=(ass/ass{,_types}.h libass.{a,pc})
     _deps=(lib{freetype,fontconfig,harfbuzz,fribidi}.a)
     [[ $ffmpeg = sharedlibs ]] && _check+=(bin-video/libass-9.dll libass.dll.a)
     if do_vcs "$SOURCE_REPO_LIBASS"; then
-        do_autoreconf
-        do_uninstall bin{,-video}/libass-9.dll libass.dll.a include/ass "${_check[@]}"
+        do_uninstall bin{,-video}/libass-9.dll libass.{dll.a,la} include/ass "${_check[@]}"
         extracommands=()
-        enabled_any {lib,}fontconfig || extracommands+=(--disable-fontconfig)
-        [[ $ffmpeg = sharedlibs ]] && extracommands+=(--disable-fontconfig --enable-shared)
-        do_separate_confmakeinstall video "${extracommands[@]}"
+        if [[ $ffmpeg = sharedlibs ]]; then
+            extracommands+=(--default-library=both -Dfontconfig=disabled)
+        elif ! enabled_any {lib,}fontconfig; then
+            extracommands+=(-Dfontconfig=disabled)
+        fi
+        do_mesoninstall -Dcheckasm=disabled "${extracommands[@]}"
         [[ $ffmpeg = sharedlibs ]] && do_install "$LOCALDESTDIR"/bin/libass-9.dll bin-video/
         do_checkIfExist
         unset extracommands
