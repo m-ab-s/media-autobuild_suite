@@ -3201,8 +3201,7 @@ EOF
     _check=(pixman-1.pc libpixman-1.a pixman-1/pixman.h)
     if do_vcs "https://gitlab.freedesktop.org/pixman/pixman.git"; then
         do_uninstall include/pixman-1 libpixman-1.la "${_check[@]}"
-        CFLAGS="-msse2 -mfpmath=sse -mstackrealign $CFLAGS" \
-            do_mesoninstall -Dtests=disabled -Ddemos=disabled
+        do_mesoninstall -Dtests=disabled -Ddemos=disabled
         do_checkIfExist
     fi
 
