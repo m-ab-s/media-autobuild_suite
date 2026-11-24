@@ -1219,7 +1219,7 @@ fi
 _check=(bin-audio/sox_ng.exe sox_ng.pc)
 _deps=(libsndfile.a opus.pc "$MINGW_PREFIX"/lib/libmp3lame.a)
 if [[ $sox = ng || $sox = both ]]; then
-    do_pacman_install libmad libid3tag
+    do_pacman_install libmad libid3tag speexdsp
     extracommands=()
     if enabled libopus; then
         # libopusenc is what lets sox_ng write opus, not just read it
