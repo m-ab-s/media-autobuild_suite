@@ -578,9 +578,8 @@ if [[ $mediainfo = y || $bmx = y || $curl != n ]]; then
     _deps=(libidn2.a)
     _check=(libpsl.{a,h,pc})
     [[ $standalone == y ]] && _check+=(bin-global/psl.exe)
-    if do_pkgConfig "libpsl = 0.23.3" &&
-        do_wget -h 93941f85a1e7bd593fa94f299233cb5dfc91cd144fd9a78a6ceb75001c5b03be \
-        "https://github.com/rockdaboot/libpsl/releases/download/0.23.3/libpsl-0.23.3.tar.gz"; then
+    if do_vcs "$SOURCE_REPO_LIBPSL"; then
+        do_git_submodule
         do_uninstall libpsl.la "${_check[@]}"
         do_mesoninstall global -Druntime=libidn2 -Dtests=false
         do_checkIfExist
