@@ -120,6 +120,7 @@ SOURCE_REPO_UAVS3D=https://github.com/uavs3/uavs3d.git
 SOURCE_REPO_URIPARSER=https://github.com/uriparser/uriparser.git
 SOURCE_REPO_UVG266=https://github.com/ultravideo/uvg266.git
 SOURCE_REPO_VIDSTAB=https://github.com/georgmartius/vid.stab.git
+SOURCE_REPO_VOAMRWBENC=https://git.code.sf.net/p/opencore-amr/vo-amrwbenc
 SOURCE_REPO_VORBIS_TOOLS=https://github.com/xiph/vorbis-tools.git
 SOURCE_REPO_VPX=https://chromium.googlesource.com/webm/libvpx
 SOURCE_REPO_VULKAN_SHIM=https://github.com/BtbN/Vulkan-Shim-Loader.git
