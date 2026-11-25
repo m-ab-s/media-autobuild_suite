@@ -68,7 +68,8 @@ Most libs use pkg-config files to check if they exist, so for most libs in this 
     opus
     opusfile
     rubberband
-    sdl2
+    sdl2-compat
+    sdl3
     shine
     sndfile
     speex

@@ -49,7 +49,7 @@ For information about the compiler environment see the wiki, there you also have
         - schannel with gmp (MSYS2 package)
             - enabled by default if openssl, libtls, mbedtls or gnutls aren't enabled
             - gmp can be switched by gcrypt (MSYS2 package) with --enable-gcrypt
-        - sdl2 (git, SDL2 branch) (needed for ffplay)
+        - sdl2 (sdl2-compat git, statically linked with SDL3 git) (needed for ffplay)
             - enabled by default, use --disable-sdl2 if unneeded
         - zlib (see the zlib variants under other tools)
     - Zeranoe-emulating build (in addition to Light)

@@ -1602,14 +1602,34 @@ if { [[ $other265 = y ]] || { [[ $ffmpeg != no ]] && enabled libkvazaar; }; } &&
     unset extracommands
 fi
 
-_check=(libSDL2{,main}.a sdl2.pc SDL2/SDL.h)
-if { { [[ $ffmpeg != no ]] &&
+if { [[ $ffmpeg != no ]] &&
     { enabled sdl2 || ! disabled_any sdl2 autodetect; }; } ||
-    mpv_enabled sdl2; } &&
-    do_vcs "$SOURCE_REPO_SDL2"; then
-    do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config libSDL2{,_test,main}.la libSDL2_test.a "${_check[@]}"
-    do_cmakeinstall -DUNIX=OFF -DSDL_TEST=OFF
-    do_checkIfExist
+    mpv_enabled sdl2; then
+    _check=(libSDL3.a sdl3.pc SDL3/SDL.h)
+    if do_vcs "$SOURCE_REPO_SDL"; then
+        do_uninstall include/SDL3 lib/cmake/SDL3 "${_check[@]}"
+        do_cmakeinstall -DUNIX=OFF -DSDL_TEST_LIBRARY=OFF
+        do_checkIfExist
+    fi
+
+    _deps=(libSDL3.a)
+    _check=(libSDL2{,main}.a sdl2-compat.pc SDL2/SDL.h)
+    if do_vcs "$SOURCE_REPO_SDL2_COMPAT"; then
+        _mingw_patches_sdl2compat="https://raw.githubusercontent.com/msys2/MINGW-packages/master/mingw-w64-sdl2-compat"
+        # git am needs a clean tree, so apply these before the plain patches
+        do_patch "$_mingw_patches_sdl2compat/0003-Enable-static-library-support-for-Windows.patch" am
+        do_patch "$_mingw_patches_sdl2compat/0004-Make-static-library-really-static-for-MinGW.patch" am
+        do_patch "$_mingw_patches_sdl2compat/0001-just-build-normal.patch"
+        do_patch "$_mingw_patches_sdl2compat/0005-SDL_config_windows.h-Define-HAVE_LIBC-for-MinGW.patch"
+        do_uninstall include/SDL2 lib/cmake/SDL2 bin/sdl2-config sdl2.pc \
+            libSDL2{,_test,main}.la libSDL2_test.a "${_check[@]}"
+        do_cmakeinstall -DUNIX=OFF -DSDL2COMPAT_TESTS=OFF -DSDL2COMPAT_STATIC=ON
+        # there's no option to disable building the shared library, so delete them manually
+        [[ -f "$LOCALDESTDIR"/lib/libSDL2.dll.a ]] && rm -f "$LOCALDESTDIR"/lib/libSDL2.dll.a
+        [[ -f "$LOCALDESTDIR"/bin/SDL2.dll ]] && rm -f "$LOCALDESTDIR"/bin/SDL2.dll
+        do_checkIfExist
+        unset _mingw_patches_sdl2compat
+    fi
 fi
 
 _check=(libdvdread.a dvdread.pc)

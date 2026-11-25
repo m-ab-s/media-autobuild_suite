@@ -101,7 +101,8 @@ SOURCE_REPO_OPUSFILE=https://github.com/xiph/opusfile.git
 SOURCE_REPO_QUIRC=https://github.com/dlbeer/quirc.git
 SOURCE_REPO_RIPGREP=https://github.com/BurntSushi/ripgrep.git
 SOURCE_REPO_RUBBERBAND=https://github.com/breakfastquay/rubberband.git
-SOURCE_REPO_SDL2=https://github.com/libsdl-org/SDL.git#SDL2
+SOURCE_REPO_SDL=https://github.com/libsdl-org/SDL.git
+SOURCE_REPO_SDL2_COMPAT=https://github.com/libsdl-org/sdl2-compat.git
 SOURCE_REPO_SHADERC=https://github.com/google/shaderc.git
 SOURCE_REPO_SHINE=https://github.com/toots/shine.git#commit=ab5e3526b64af1a2eaa43aa6f441a7312e013519
 SOURCE_REPO_SNDFILE=https://github.com/libsndfile/libsndfile.git
