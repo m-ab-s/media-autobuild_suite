@@ -1049,17 +1049,18 @@ if enabled libopus && do_vcs "$SOURCE_REPO_OPUS"; then
 fi
 
 if [[ $standalone = y ]] && enabled libopus; then
-    do_pacman_install openssl
-    hide_libressl
     do_pacman_remove opusfile
     _check=(opus/opusfile.h libopus{file,url}.{,l}a opus{file,url}.pc)
-    _deps=(ogg.pc opus.pc "$MINGW_PREFIX"/lib/pkgconfig/libssl.pc)
+    _deps=(ogg.pc opus.pc)
+    # an older build with HTTP support still pulls in OpenSSL; redo it once
+    grep -qs openssl "$LOCALDESTDIR/lib/pkgconfig/opusurl.pc" &&
+        rm -f "$LOCALDESTDIR/lib/pkgconfig/opusurl.pc"
     if do_vcs "$SOURCE_REPO_OPUSFILE"; then
         do_uninstall "${_check[@]}"
-        do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/opusfile/0001-Disable-cert-store-integration-if-OPENSSL_VERSION_NU.patch" am
         do_patch "https://raw.githubusercontent.com/m-ab-s/mabs-patches/master/opusfile/0002-configure-Only-add-std-c89-if-not-mingw-because-of-c.patch" am
         do_autogen
-        do_separate_confmakeinstall --disable-{examples,doc}
+        # HTTP support would link OpenSSL statically into opusdec
+        do_separate_confmakeinstall --disable-{examples,doc,http}
         do_checkIfExist
     fi
 
@@ -1081,7 +1082,6 @@ if [[ $standalone = y ]] && enabled libopus; then
         do_separate_confmakeinstall audio
         do_checkIfExist
     fi
-    hide_libressl -R
 fi
 
 _check=(soxr.h libsoxr.a)
