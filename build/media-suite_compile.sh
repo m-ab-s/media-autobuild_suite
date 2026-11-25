@@ -979,10 +979,9 @@ grep_or_sed pthread "$LOCALDESTDIR/lib/pkgconfig/flac.pc" 's/Libs.private: /&-pt
 
 _check=(libvo-amrwbenc.{,l}a vo-amrwbenc.pc)
 if [[ $ffmpeg != no || $sox != n ]] && enabled libvo-amrwbenc &&
-    do_pkgConfig "vo-amrwbenc = 0.1.3" &&
-    do_wget_sf -h f63bb92bde0b1583cb3cb344c12922e0 \
-        "opencore-amr/vo-amrwbenc/vo-amrwbenc-0.1.3.tar.gz"; then
+    do_vcs "$SOURCE_REPO_VOAMRWBENC"; then
     do_uninstall include/vo-amrwbenc "${_check[@]}"
+    do_autoreconf
     do_separate_confmakeinstall
     do_checkIfExist
 fi

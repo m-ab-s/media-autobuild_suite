@@ -90,7 +90,7 @@ For information about the compiler environment see the wiki, there you also have
         - libtwolame (MSYS2 package)
         - libvidstab (git)
         - libvmaf (git)
-        - libvo-amrwbenc (0.1.3)
+        - libvo-amrwbenc (git)
         - libwebp (git)
         - libxml2 (git)
         - libxvid (MSYS2 package)
