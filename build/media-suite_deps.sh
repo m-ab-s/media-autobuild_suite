@@ -68,6 +68,7 @@ SOURCE_REPO_LIBOPUSENC=https://github.com/xiph/libopusenc.git
 SOURCE_REPO_LIBPLACEBO=https://code.videolan.org/videolan/libplacebo.git
 SOURCE_REPO_LIBQRENCODE=https://github.com/fukuchi/libqrencode.git
 SOURCE_REPO_LIBPNG=https://github.com/pnggroup/libpng.git#branch=libpng16
+SOURCE_REPO_LIBPSL=https://github.com/rockdaboot/libpsl.git
 SOURCE_REPO_LIBRAV1E=https://github.com/xiph/rav1e.git
 SOURCE_REPO_LIBRESSL=https://github.com/libressl-portable/portable.git#tag=LATEST
 SOURCE_REPO_LIBRIST=https://code.videolan.org/rist/librist.git
