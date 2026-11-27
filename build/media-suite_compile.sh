@@ -1424,7 +1424,8 @@ fi
 
 _check=(libvpx.a vpx.pc)
 [[ $standalone = y || $av1an = y ]] && _check+=(bin-video/vpxenc.exe)
-if { enabled libvpx || [[ $vpx = y ]]; } && do_vcs "$SOURCE_REPO_VPX" vpx; then
+if { { [[ $ffmpeg != no ]] && enabled libvpx; } || [[ $vpx = y ]]; } &&
+    do_vcs "$SOURCE_REPO_VPX" vpx; then
     do_pacman_install yasm
     extracommands=()
     [[ -f config.mk ]] && log "distclean" make distclean
@@ -1551,7 +1552,7 @@ if [[ $standalone = y || $svtav1 = y || $av1an = y ]]; then
     _check+=(bin-video/SvtAv1EncApp.exe)
     extracommands=(-DBUILD_APPS=ON)
 fi
-if { [[ $svtav1 = y ]] || enabled libsvtav1; } &&
+if { [[ $svtav1 = y ]] || { [[ $ffmpeg != no ]] && enabled libsvtav1; }; } &&
     do_vcs "$SOURCE_REPO_SVTAV1"; then
     do_uninstall include/svt-av1 "${_check[@]}" include/svt-av1
     do_cmakeinstall video -DUNIX=OFF -DENABLE_AVX512=ON "${extracommands[@]}"
