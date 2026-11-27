@@ -145,7 +145,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 set iniOptions=license2 vpx2 x2643 x2653 other265 flac fdkaac mediainfo ^
 soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ^
-curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski avs2 dovitool ^
+curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski2 avs2 dovitool ^
 hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl jpegli vvenc vvdec ^
 zlib ffmpegPath pkgUpdateTime
 @rem re-add autouploadlogs if we find some way to upload to github directly instead
@@ -1246,26 +1246,26 @@ if %builddssim% GTR 2 GOTO dssim
 if %deleteINI%==1 echo.dssim=^%builddssim%>>%ini%
 
 :gifski
-if [0]==[%gifskiINI%] (
+if [0]==[%gifski2INI%] (
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     echo.
     echo. Build gifski (high quality GIF encoder in Rust^)?
     echo. 1 = Yes
-    echo. 2 = With built-in video support
-    echo. 3 = No
+    echo. 2 = No
+    echo. 3 = With built-in video support
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
     set /P buildgifski="Build gifski: "
-) else set buildgifski=%gifskiINI%
+) else set buildgifski=%gifski2INI%
 
 if "%buildgifski%"=="" GOTO gifski
 if %buildgifski%==1 set "gifski=y"
-if %buildgifski%==2 set "gifski=video"
-if %buildgifski%==3 set "gifski=n"
+if %buildgifski%==2 set "gifski=n"
+if %buildgifski%==3 set "gifski=video"
 if %buildgifski% GTR 3 GOTO gifski
-if %deleteINI%==1 echo.gifski=^%buildgifski%>>%ini%
+if %deleteINI%==1 echo.gifski2=^%buildgifski%>>%ini%
 
 :avs2
 if [0]==[%avs2INI%] (
