@@ -137,6 +137,8 @@ For information about the compiler environment see the wiki, there you also have
         - libmpeghdec (git)
             - needs non-free license
         - liboapv (git)
+        - libopenh264 (git)
+            - only when compiling from source, which removes the royalty coverage in [Cisco's binary license](https://www.openh264.org/BINARY_LICENSE.txt)
         - libplacebo (git)
         - libqrencode (git)
         - libquirc (git)
@@ -167,6 +169,7 @@ For information about the compiler environment see the wiki, there you also have
     - Full shared dependencies (in addition to Full)
         - libopenh264 (official binaries)
             - disabled by default
+            - OpenH264 Video Codec provided by Cisco Systems, Inc.
         - opencl (headers and import definitions from Khronos git)
             - requires OpenCL.dll and an OpenCL implementation at runtime
 

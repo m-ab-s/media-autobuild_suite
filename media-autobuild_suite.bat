@@ -128,7 +128,7 @@ libsvthevc libsvtjpegxs libsvtvp9 libtesseract libuavs3d libvvdec libvvenc libxa
 libxevd libxeve libzmq libzvbi openal vapoursynth vulkan whisper
 
 :: options also available with the suite that add shared dependencies
-set ffmpeg_options_full_shared=#libopenh264 opencl
+set ffmpeg_options_full_shared=opencl
 
 :: built-ins
 set mpv_options_builtin="#-Dcplayer=true" #manpage-build #lua #javascript ^
@@ -143,7 +143,7 @@ set mpv_options_full=dvdnav cdda #egl-angle #html-build ^
 #pdf-build openal sdl2-gamepad sdl2-audio sdl2-video
 
 set iniOptions=license2 vpx2 x2643 x2653 other265 flac fdkaac mediainfo ^
-soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts mp4box rtmpdump mpv ^
+soxB ffmpegB2 ffmpegUpdate ffmpegChoice ffmpegKeepLegacyOpts openh264 mp4box rtmpdump mpv ^
 cores deleteSource strip pack logging bmx standalone updateSuite av1an aom faac exhale ^
 curl cyanrip2 rav1e ripgrep dav1d libavif libheif uvg266 jq dssim gifski avs2 dovitool ^
 hdr10plustool timeStamp noMintty ccache svthevc svtav1 svtvp9 xvc jo vlc CC jpegxl jpegli vvenc vvdec ^
@@ -820,8 +820,8 @@ if [0]==[%ffmpegB2INI%] (
     echo. compiled shared so they take less space. Currently broken if libass or libass
     echo. dependees are enabled.
     echo. Option 6 produces static and shared ffmpeg and ffmpeg libs where the static
-    echo. one includes only strictly static dependencies (opencl, libopenh264 are
-    echo. hard disabled.^)
+    echo. one includes only strictly static dependencies (opencl and libopenh264 from
+    echo. Cisco's binary are hard disabled.^)
     echo.
     echo -------------------------------------------------------------------------------
     echo -------------------------------------------------------------------------------
@@ -906,6 +906,33 @@ if %buildffmpegUp%==3 set "ffmpegUpdate=onlyFFmpeg"
 if %buildffmpegUp% GTR 3 GOTO ffmpegUp
 if %deleteINI%==1 echo.ffmpegUpdate=^%buildffmpegUp%>>%ini%
 
+:openh264
+if [0]==[%openh264INI%] (
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    echo.
+    echo. How to get OpenH264 for libopenh264?
+    echo. 1 = Download Cisco's binary [recommended]
+    echo. 2 = Compile from source
+    echo.
+    echo. Cisco's binary is a shared library covered by Cisco's H.264 patent license,
+    echo. see https://www.openh264.org/BINARY_LICENSE.txt
+    echo. Compiling from source links it statically and enables it in the full options,
+    echo. but this royalty coverage no longer applies.
+    echo.
+    echo. OpenH264 Video Codec provided by Cisco Systems, Inc.
+    echo.
+    echo -------------------------------------------------------------------------------
+    echo -------------------------------------------------------------------------------
+    set /P buildopenh264="OpenH264: "
+) else set buildopenh264=%openh264INI%
+
+if "%buildopenh264%"=="" GOTO openh264
+if %buildopenh264%==1 set "openh264=binary"
+if %buildopenh264%==2 set "openh264=source"
+if %buildopenh264% GTR 2 GOTO openh264
+if %deleteINI%==1 echo.openh264=^%buildopenh264%>>%ini%
+
 :ffmpegChoice
 if [0]==[%ffmpegChoiceINI%] (
     echo -------------------------------------------------------------------------------
@@ -948,8 +975,10 @@ if %buildffmpegChoice%==1 (
             echo.
             echo.# Full
             call :writeFFmpegOption %ffmpeg_options_full%
+            if "%openh264%"=="source" call :writeFFmpegOption libopenh264
             echo.
             echo.# Full plus options that add shared dependencies
+            if not "%openh264%"=="source" call :writeFFmpegOption #libopenh264
             call :writeFFmpegOption %ffmpeg_options_full_shared%
             )>%build%\ffmpeg_options.txt
         echo -------------------------------------------------------------------------------
@@ -1906,7 +1935,7 @@ endlocal & (
 set compileArgs=--suite=yes --cpuCount=%cpuCount% ^
 --deleteSource=%deleteSource% --mp4box=%mp4box% --vpx=%vpx2% --x264=%x264% --x265=%x265% ^
 --other265=%other265% --flac=%flac% --fdkaac=%fdkaac% --mediainfo=%mediainfo% --sox=%sox% ^
---ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% ^
+--ffmpeg=%ffmpeg% --ffmpegUpdate=%ffmpegUpdate% --ffmpegChoice=%ffmpegChoice% --ffmpegKeepLegacyOpts=%ffmpegKeepLegacyOpts% --openh264=%openh264% ^
 --mpv=%mpv% --libmpv=%libmpv% --license=%license2%  --stripping=%stripFile% --packing=%packFile% --rtmpdump=%rtmpdump% ^
 --logging=%logging% --bmx=%bmx% --standalone=%standalone% --aom=%aom% --faac=%faac% --exhale=%exhale% ^
 --curl=%curl% --cyanrip=%cyanrip% --rav1e=%rav1e% --ripgrep=%ripgrep% --dav1d=%dav1d% ^
