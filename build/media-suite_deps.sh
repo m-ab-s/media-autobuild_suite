@@ -96,6 +96,7 @@ SOURCE_REPO_OBUPARSE=https://github.com/dwbuiten/obuparse.git
 SOURCE_REPO_OPENAL=https://github.com/kcat/openal-soft.git#tag=latest
 SOURCE_REPO_OPENAPV=https://github.com/AcademySoftwareFoundation/openapv.git
 SOURCE_REPO_OPENCLHEADERS=https://github.com/KhronosGroup/OpenCL-Headers.git
+SOURCE_REPO_OPENH264=https://github.com/cisco/openh264.git
 SOURCE_REPO_OPUS=https://github.com/xiph/opus.git
 SOURCE_REPO_OPUSEXE=https://github.com/xiph/opus-tools.git
 SOURCE_REPO_OPUSFILE=https://github.com/xiph/opusfile.git

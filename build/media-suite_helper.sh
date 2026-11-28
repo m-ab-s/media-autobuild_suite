@@ -807,6 +807,7 @@ do_getFFmpegConfig() {
         mapfile -t FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_(builtin|basic)" /trunk/media-autobuild_suite.bat)
         [[ $ffmpegChoice != n ]] && mapfile -t -O "${#FFMPEG_DEFAULT_OPTS[@]}" FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_zeranoe" /trunk/media-autobuild_suite.bat)
         [[ $ffmpegChoice == f ]] && mapfile -t -O "${#FFMPEG_DEFAULT_OPTS[@]}" FFMPEG_DEFAULT_OPTS < <(do_readbatoptions_ffmpeg "ffmpeg_options_full(|_shared)" /trunk/media-autobuild_suite.bat)
+        [[ $ffmpegChoice == f && $openh264 == source ]] && FFMPEG_DEFAULT_OPTS+=(--enable-libopenh264)
         echo "Imported default FFmpeg options from .bat"
     else
         if [[ -f "$LOCALBUILDDIR/ffmpeg_options_$bits.txt" ]]; then
@@ -939,7 +940,8 @@ do_changeFFmpegConfig() {
         done
     fi
     if [[ $ffmpeg == "bothstatic" ]]; then
-        do_removeOption "--enable-(opencl|libopenh264)"
+        do_removeOption "--enable-opencl"
+        [[ $openh264 = source ]] || do_removeOption "--enable-libopenh264"
     fi
 }
 
@@ -2208,15 +2210,14 @@ do_clean_old_builds() {
         lib{jpeg,nettle,gnurx,regex}.{,l}a
         lib{opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,magic,uchardet}.{,l}a
         libSDL{,main}.{,l}a libopen{jpwl,mj2,jp2}.{a,pc}
-        include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet,wels}
+        include/{nettle,opencore-amr{nb,wb},theora,cdio,SDL,openjpeg-2.{1,2},luajit-2.0,uchardet}
         regex.h magic.h
         {nettle,vo-aacenc,sdl,uchardet}.pc
-        {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL,openh264}.pc
+        {opencore-amr{nb,wb},twolame,theora{,enc,dec},caca,dcadec,libEGL}.pc
         libcdio_{cdda,paranoia}.{{,l}a,pc}
         twolame.h bin-audio/{twolame,cd-paranoia}.exe
         bin-global/{{file,uchardet}.exe,sdl-config,luajit-2.0.4.exe}
         libebur128.a ebur128.h
-        libopenh264.a
         liburiparser.{{,l}a,pc}
         libchromaprint.{a,pc} chromaprint.h
         bin-global/libgcrypt-config libgcrypt.a gcrypt.h

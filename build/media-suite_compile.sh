@@ -38,6 +38,7 @@ while true; do
     --ffmpegPath=* ) ffmpegPath="${1#*=}"; shift ;;
     --ffmpegChoice=* ) ffmpegChoice=${1#*=} && shift ;;
     --ffmpegKeepLegacyOpts=* ) ffmpegKeepLegacyOpts=${1#*=} && shift ;;
+    --openh264=* ) openh264=${1#*=} && shift ;;
     --mpv=* ) mpv=${1#*=} && shift ;;
     --libmpv=* ) libmpv=${1#*=} && shift ;;
     --deleteSource=* ) deleteSource=${1#*=} && shift ;;
@@ -2369,6 +2370,15 @@ if [[ $ffmpeg != no ]] && enabled liboapv &&
     unset extracommands
 fi
 
+_check=(libopenh264.a openh264.pc wels/codec_api.h)
+if [[ $ffmpeg != no ]] && enabled libopenh264 && [[ $openh264 = source ]] &&
+    do_vcs "$SOURCE_REPO_OPENH264"; then
+    do_pacman_remove openh264
+    do_uninstall include/wels "$LOCALDESTDIR"/bin-video/libopenh264*.dll "${_check[@]}"
+    do_mesoninstall video -Dtests=disabled
+    do_checkIfExist
+fi
+
 _check=(avisynth/avisynth{,_c}.h
         avisynth/avs/{alignment,arch,capi,config,cpuid,minmax,posix,types,win,version}.h)
 if [[ $ffmpeg != no ]] && enabled avisynth &&
@@ -2535,7 +2545,8 @@ if [[ $ffmpeg != no ]]; then
         $'/^Cflags:/a\\\nCflags.private: -DCACA_STATIC\n/Requires:/s|[[:blank:]]*$| zlib|;s|[[:blank:]]+-lz||'
     enabled libmodplug && do_addOption --extra-cflags=-DMODPLUG_STATIC && do_pacman_install libmodplug
     enabled libopenjpeg && do_pacman_install openjpeg2
-    if enabled libopenh264; then
+    if enabled libopenh264 && [[ $openh264 != source ]]; then
+        do_uninstall q include/wels libopenh264.a openh264.pc
         # We use msys2's package for the header and import library so we don't build it, for licensing reasons
         do_pacman_install openh264
         if [[ -f $MINGW_PREFIX/lib/libopenh264.dll.a.dyn ]]; then
@@ -2781,7 +2792,7 @@ if [[ $libheif != n ]] &&
         extracommands+=(-DWITH_VVENC=ON -DWITH_VVENC_PLUGIN=OFF)
     pc_exists "libvvdec" &&
         extracommands+=(-DWITH_VVDEC=ON -DWITH_VVDEC_PLUGIN=OFF)
-    pacman -Q $MINGW_PACKAGE_PREFIX-openh264 > /dev/null 2>&1 &&
+    { pc_exists "openh264" || pacman -Q $MINGW_PACKAGE_PREFIX-openh264 > /dev/null 2>&1; } &&
         extracommands+=(-DWITH_OpenH264_DECODER=ON -DWITH_OpenH264_DECODER_PLUGIN=OFF)
 
     # don't fail on .dll.a not found because we hide it
