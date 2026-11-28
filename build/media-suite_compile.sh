@@ -1606,6 +1606,8 @@ if { [[ $ffmpeg != no ]] &&
     mpv_enabled sdl2; then
     _check=(libSDL3.a sdl3.pc SDL3/SDL.h)
     if do_vcs "$SOURCE_REPO_SDL"; then
+        # linking libmincore.a leaves some ws2_32 and crypt32 imports unbound in mpv
+        grep_and_sed ' mincore\)' CMakeLists.txt 's/ mincore\)/)/'
         do_uninstall include/SDL3 lib/cmake/SDL3 "${_check[@]}"
         do_cmakeinstall -DUNIX=OFF -DSDL_TEST_LIBRARY=OFF
         do_checkIfExist
